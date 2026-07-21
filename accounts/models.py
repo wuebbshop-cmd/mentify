@@ -94,13 +94,13 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    county = models.CharField(max_length=100, blank=True, help_text="Kenyan county")
+    county = models.CharField(max_length=100, blank=True, help_text="County, state, or region")
     school = models.CharField(max_length=255, blank=True)
-    # For learners - CBC class level
+    # For learners - school or experience level.
     class_level = models.CharField(
         max_length=20,
         blank=True,
-        help_text="e.g. JSS1, JSS2, JSS3, Form 1, etc."
+        help_text="e.g. Primary, JSS, Senior School, Past Senior School, Adult Learner"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

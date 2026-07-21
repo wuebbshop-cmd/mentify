@@ -21,7 +21,7 @@ class Assignment(models.Model):
         related_name="assignments",
     )
     title = models.CharField(max_length=255)
-    description = models.TextField(help_text="Assignment brief — what learners need to do")
+    description = models.TextField(help_text="Assignment brief - what learners need to do")
     due_date = models.DateField(null=True, blank=True)
     github_stored_path = models.CharField(
         max_length=512, blank=True,
@@ -36,7 +36,7 @@ class Assignment(models.Model):
         ordering = ["lesson", "due_date"]
 
     def __str__(self):
-        return f"{self.title} — {self.lesson.title}"
+        return f"{self.title} - {self.lesson.title}"
 
     def total_rubric_weight(self):
         return sum(c.weight for c in self.criteria.all())
@@ -55,7 +55,7 @@ class RubricCriterion(models.Model):
         ordering = ["assignment", "order"]
 
     def __str__(self):
-        return f"{self.label} ({self.weight}pts) — {self.assignment.title}"
+        return f"{self.label} ({self.weight}pts) - {self.assignment.title}"
 
 
 class Submission(models.Model):
@@ -107,7 +107,7 @@ class Grade(models.Model):
         db_table = table_name("grades")
 
     def __str__(self):
-        return f"Grade: {self.total_score}/{self.submission.assignment.max_score} — {self.submission}"
+        return f"Grade: {self.total_score}/{self.submission.assignment.max_score} - {self.submission}"
 
     @property
     def percentage(self):

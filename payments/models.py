@@ -109,4 +109,4 @@ class Payment(models.Model):
         ordering = ["-paid_at"]
 
     def __str__(self):
-        return f"[{self.method}] {self.subscription.learner.get_full_name()} — KES {self.amount_kes} ({self.status})"
+        return f"[{self.method}] {self.subscription.learner.get_full_name()} - KES {self.amount_kes} ({self.status})"

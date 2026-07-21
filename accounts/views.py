@@ -9,7 +9,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.db.models import Q
+from django.db.models import Count, Q
 
 from .forms import (
     LearnerRegistrationForm,
@@ -300,7 +300,7 @@ def learner_dashboard(request):
     from assignments.models import Assignment, Submission
     from live_sessions.models import Attendance
 
-    enrollments = (
+    enrollments = list(
         Enrollment.objects.filter(learner=request.user, status="active")
         .select_related("cohort__course", "cohort__tutor")
         .order_by("cohort__start_date")
@@ -314,7 +314,7 @@ def learner_dashboard(request):
 
     # Upcoming sessions for enrolled cohorts
     from django.utils import timezone
-    cohort_ids = list(enrollments.values_list("cohort_id", flat=True))
+    cohort_ids = [enrollment.cohort_id for enrollment in enrollments]
     upcoming_sessions = (
         LiveSession.objects.filter(
             cohort_id__in=cohort_ids,
@@ -326,35 +326,76 @@ def learner_dashboard(request):
     )
 
     # ── Per-cohort progress rollups ──────────────────────────────
+    lesson_totals = {
+        item["cohort_id"]: item["total"]
+        for item in Lesson.objects.filter(cohort_id__in=cohort_ids, is_published=True)
+        .values("cohort_id")
+        .annotate(total=Count("id"))
+    }
+    lesson_done_totals = {
+        item["lesson__cohort_id"]: item["total"]
+        for item in LessonProgress.objects.filter(
+            learner=request.user,
+            lesson__cohort_id__in=cohort_ids,
+            completed=True,
+        )
+        .values("lesson__cohort_id")
+        .annotate(total=Count("id"))
+    }
+    assignment_totals = {
+        item["lesson__cohort_id"]: item["total"]
+        for item in Assignment.objects.filter(lesson__cohort_id__in=cohort_ids, is_published=True)
+        .values("lesson__cohort_id")
+        .annotate(total=Count("id"))
+    }
+    assignment_done_totals = {
+        item["assignment__lesson__cohort_id"]: item["total"]
+        for item in Submission.objects.filter(
+            learner=request.user,
+            assignment__lesson__cohort_id__in=cohort_ids,
+            status__in=[Submission.Status.SUBMITTED, Submission.Status.GRADED],
+        )
+        .values("assignment__lesson__cohort_id")
+        .annotate(total=Count("id"))
+    }
+    past_session_totals = {
+        item["cohort_id"]: item["total"]
+        for item in LiveSession.objects.filter(
+            cohort_id__in=cohort_ids,
+            scheduled_at__lt=timezone.now(),
+            is_cancelled=False,
+        )
+        .values("cohort_id")
+        .annotate(total=Count("id"))
+    }
+    attended_totals = {
+        item["session__cohort_id"]: item["total"]
+        for item in Attendance.objects.filter(
+            session__cohort_id__in=cohort_ids,
+            learner=request.user,
+            status=Attendance.AttendanceStatus.ATTENDED,
+        )
+        .values("session__cohort_id")
+        .annotate(total=Count("id"))
+    }
+
     cohort_progress = []
     for enrollment in enrollments:
         cohort = enrollment.cohort
 
         # 1. Lesson completion %
-        total_lessons = Lesson.objects.filter(cohort=cohort, is_published=True).count()
-        done_lessons = LessonProgress.objects.filter(
-            learner=request.user, lesson__cohort=cohort, completed=True
-        ).count()
+        total_lessons = lesson_totals.get(cohort.id, 0)
+        done_lessons = lesson_done_totals.get(cohort.id, 0)
         lessons_pct = round((done_lessons / total_lessons) * 100) if total_lessons else 0
 
         # 2. Assignment submission rate %
-        total_assignments = Assignment.objects.filter(
-            lesson__cohort=cohort, is_published=True
-        ).count()
-        submitted_assignments = Submission.objects.filter(
-            learner=request.user,
-            assignment__lesson__cohort=cohort,
-            status__in=[Submission.Status.SUBMITTED, Submission.Status.GRADED],
-        ).count()
+        total_assignments = assignment_totals.get(cohort.id, 0)
+        submitted_assignments = assignment_done_totals.get(cohort.id, 0)
         assignments_pct = round((submitted_assignments / total_assignments) * 100) if total_assignments else 0
 
         # 3. Attendance rate %
-        total_sessions = LiveSession.objects.filter(
-            cohort=cohort, scheduled_at__lt=timezone.now(), is_cancelled=False
-        ).count()
-        attended_count = Attendance.objects.filter(
-            session__cohort=cohort, learner=request.user, status=Attendance.Status.ATTENDED
-        ).count()
+        total_sessions = past_session_totals.get(cohort.id, 0)
+        attended_count = attended_totals.get(cohort.id, 0)
         attendance_pct = round((attended_count / total_sessions) * 100) if total_sessions else None
 
         cohort_progress.append({
@@ -387,6 +428,7 @@ def learner_dashboard(request):
 
     context = {
         "enrollments": enrollments,
+        "enrollment_count": len(enrollments),
         "active_subs": active_subs,
         "upcoming_sessions": upcoming_sessions,
         "cohort_progress": cohort_progress,
@@ -577,9 +619,9 @@ def admin_reports(request):
         )
         .select_related("cohort__course")
         .annotate(
-            attended_count=Count("attendances", filter=Q(attendances__status=Attendance.Status.ATTENDED)),
-            missed_count=Count("attendances", filter=Q(attendances__status=Attendance.Status.MISSED)),
-            excused_count=Count("attendances", filter=Q(attendances__status=Attendance.Status.EXCUSED)),
+            attended_count=Count("attendances", filter=Q(attendances__status=Attendance.AttendanceStatus.ATTENDED)),
+            missed_count=Count("attendances", filter=Q(attendances__status=Attendance.AttendanceStatus.MISSED)),
+            excused_count=Count("attendances", filter=Q(attendances__status=Attendance.AttendanceStatus.EXCUSED)),
             total_marked=Count("attendances"),
         )
         .order_by("-scheduled_at")[:30]
@@ -701,7 +743,7 @@ def guardian_dashboard(request):
                 cohort=cohort, scheduled_at__lt=timezone.now(), is_cancelled=False
             ).count()
             present = Attendance.objects.filter(
-                session__cohort=cohort, learner=learner, status=Attendance.Status.PRESENT
+                session__cohort=cohort, learner=learner, status=Attendance.AttendanceStatus.ATTENDED
             ).count()
             attendance_pct = round((present / total_sessions) * 100) if total_sessions else None
 

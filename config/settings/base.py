@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 # ─── Middleware ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -90,6 +91,8 @@ DATABASES = {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             **({"ssl": {}} if os.environ.get("DB_SSL", "").lower() in ("true", "1", "yes") else {}),
         },
+        "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+        "CONN_HEALTH_CHECKS": True,
     }
 }
 
@@ -123,6 +126,19 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+# --- Caching -------------------------------------------------------------------------------
+CACHES = {
+    "default": {
+        "BACKEND": os.environ.get(
+            "CACHE_BACKEND",
+            "django.core.cache.backends.locmem.LocMemCache",
+        ),
+        "LOCATION": os.environ.get("CACHE_LOCATION", "mentify-default-cache"),
+        "TIMEOUT": int(os.environ.get("CACHE_TIMEOUT", "300")),
+    }
+}
 
 
 # --- Media (local dev only - prod uses GitHub / Bunny) ------------------------------------------------

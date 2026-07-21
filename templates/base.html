@@ -7,17 +7,18 @@
   <meta name="theme-color" content="#ffffff">
 
   <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} - {{ PLATFORM_NAME }}</title>
-  <meta name="description" content="{% block meta_description %}Kenya's premier tutoring platform for teens and young learners. Programming, AI, Math, Sciences and more.{% endblock %}">  <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+  <meta name="description" content="{% block meta_description %}Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more.{% endblock %}">
+  <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="{% block og_title %}{{ PLATFORM_NAME }}{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Kenya's premier tutoring platform for teens and young learners. Programming, AI, Math, Sciences and more.{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more.{% endblock %}">
   <meta property="og:image" content="{% static 'images/logo.png' %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% block twitter_title %}{{ PLATFORM_NAME }}{% endblock %}">
-  <meta name="twitter:description" content="{% block twitter_description %}Kenya's premier tutoring platform for teens and young learners. Programming, AI, Math, Sciences and more.{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more.{% endblock %}">
   <meta name="twitter:image" content="{% static 'images/logo.png' %}">
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
@@ -40,11 +41,7 @@
     "name": "{{ PLATFORM_NAME }}",
     "url": "{{ request.build_absolute_uri }}",
     "logo": "{% static 'images/logo.png' %}",
-    "description": "Kenya's premier tutoring platform for teens and young learners. Programming, AI, Math, Sciences and more.",
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "KE"
-    }
+    "description": "Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more."
   }
   </script>
 </head>
@@ -198,8 +195,8 @@
 <footer class="footer">
   <div class="container">
     <div class="footer-inner">
-      <span>© 2026 {{ PLATFORM_NAME }}. Built for Kenyan learners</span>
-      <span>Weekends &amp; Holidays · Grades JSS–Form 4</span>
+      <span>© 2026 {{ PLATFORM_NAME }}. Built for learners everywhere</span>
+      <span>Primary, JSS, senior school, past senior school, and adult learners</span>
     </div>
   </div>
 </footer>

@@ -31,10 +31,17 @@ CSRF_COOKIE_SECURE = True
 # ─── Render-specific proxy headers ─────────────────────────────────────────
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 # ─── Static files: Render uses persistent storage only for /render/output/ ───
 # WhiteNoise in middleware + compression via STATICFILES_STORAGE handle this
 # Collect static files before deploy via render.yaml build command
+WHITENOISE_MAX_AGE = 31536000
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 # ─── Email: Gmail SMTP for all notifications ──────────────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

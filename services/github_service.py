@@ -1,8 +1,8 @@
-﻿"""
+"""
 services/github_service.py
 
 Adapted from ml101/github_ops.py (GitHubOps).
-Framework-agnostic — handles PDF/file uploads to a GitHub repo.
+Framework-agnostic - handles PDF/file uploads to a GitHub repo.
 """
 from __future__ import annotations
 

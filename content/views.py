@@ -1,4 +1,4 @@
-"""content/views.py — Lesson browsing and resource access."""
+"""content/views.py - Lesson browsing and resource access."""
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import StreamingHttpResponse, Http404
@@ -71,7 +71,7 @@ def lesson_detail(request, cohort_id, lesson_id):
 def resource_download(request, resource_id):
     """
     Proxy endpoint for GitHub-hosted PDFs.
-    Streams the file from GitHub using the stored token — learner never sees the raw GitHub URL.
+    Streams the file from GitHub using the stored token - learner never sees the raw GitHub URL.
     """
     resource = get_object_or_404(Resource, id=resource_id)
 

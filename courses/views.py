@@ -2,6 +2,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Count
 
 from .models import Course, Cohort, Enrollment
 from accounts.decorators import role_required
@@ -9,7 +10,7 @@ from payments.models import Subscription
 
 
 def course_list(request):
-    """Course catalog — redirects non-learners to their role dashboards/cohorts."""
+    """Course catalog - redirects non-learners to their role dashboards/cohorts."""
     if request.user.is_authenticated:
         if request.user.is_tutor:
             return redirect("courses:tutor_cohorts")
@@ -18,7 +19,9 @@ def course_list(request):
         elif request.user.is_admin:
             return redirect("accounts:admin_dashboard")
 
-    courses = Course.objects.filter(is_active=True).prefetch_related("cohorts")
+    courses = Course.objects.filter(is_active=True).annotate(
+        cohort_count=Count("cohorts", distinct=True)
+    )
     track = request.GET.get("track", "")
     if track:
         courses = courses.filter(track=track)
@@ -33,7 +36,7 @@ def course_detail(request, slug):
 
 
 def cohort_detail(request, cohort_id):
-    """Cohort detail — learners can see schedule, price, tutor."""
+    """Cohort detail - learners can see schedule, price, tutor."""
     cohort = get_object_or_404(Cohort, id=cohort_id, status="active")
     is_enrolled = False
     if request.user.is_authenticated and request.user.is_learner:
@@ -49,7 +52,7 @@ def cohort_detail(request, cohort_id):
 @login_required
 @role_required("learner")
 def enroll(request, cohort_id):
-    """Handle enrollment — triggers payment flow."""
+    """Handle enrollment - triggers payment flow."""
     cohort = get_object_or_404(Cohort, id=cohort_id, status="active")
     existing = Enrollment.objects.filter(learner=request.user, cohort=cohort).first()
 
@@ -57,7 +60,7 @@ def enroll(request, cohort_id):
         messages.info(request, "You are already enrolled in this cohort.")
         return redirect("content:cohort_lessons", cohort_id=cohort.id)
 
-    # Create enrollment as PENDING — only activated after successful payment
+    # Create enrollment as PENDING - only activated after successful payment
     enrollment, created = Enrollment.objects.get_or_create(
         learner=request.user, cohort=cohort,
         defaults={"status": "pending"}

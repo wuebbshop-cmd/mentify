@@ -145,7 +145,7 @@ def payment_callback(request):
 @require_POST
 def paystack_webhook(request):
     """
-    Paystack webhook handler — the authoritative payment confirmation path.
+    Paystack webhook handler - the authoritative payment confirmation path.
     Verifies HMAC-SHA512 signature, then extends subscription paid_until.
     """
     signature = request.headers.get("X-Paystack-Signature", "")

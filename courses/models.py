@@ -24,17 +24,14 @@ class Course(models.Model):
 
     class Track(models.TextChoices):
         TECH = "tech", "Tech (Programming / ML / AI)"
-        CBC = "cbc", "CBC Academic (Math, Science, etc.)"
+        CBC = "cbc", "CBE Academic (Math, Science, etc.)"
         SPECIALIST = "specialist", "Specialist (Robotics, Cybersecurity, etc.)"
 
     class Level(models.TextChoices):
-        JSS1 = "JSS1", "Junior Secondary School 1"
-        JSS2 = "JSS2", "Junior Secondary School 2"
-        JSS3 = "JSS3", "Junior Secondary School 3"
-        FORM1 = "Form1", "Form 1"
-        FORM2 = "Form2", "Form 2"
-        FORM3 = "Form3", "Form 3"
-        FORM4 = "Form4", "Form 4"
+        PRIMARY = "primary", "Primary School"
+        JSS = "jss", "Junior Secondary School"
+        SENIOR = "senior", "Senior School"
+        PAST_SENIOR = "past_senior", "Past Senior School"
         OPEN = "open", "Open / All Levels"
 
     title = models.CharField(max_length=255)
@@ -70,7 +67,7 @@ class Course(models.Model):
 
 class Cohort(models.Model):
     """
-    A Cohort is one running instance of a Course — specific tutor, dates, price.
+    A Cohort is one running instance of a Course - specific tutor, dates, price.
     """
 
     class Status(models.TextChoices):
@@ -87,14 +84,14 @@ class Cohort(models.Model):
         related_name="cohorts_teaching",
         limit_choices_to={"role__in": ["admin", "tutor"]},
     )
-    name = models.CharField(max_length=255, help_text="e.g. 'Batch 1 – Jan 2026' or 'Term 2 2026'")
+    name = models.CharField(max_length=255, help_text="e.g. 'Batch 1 - Jan 2026' or 'Term 2 2026'")
     description = models.TextField(blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     schedule_description = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Human-readable schedule e.g. 'Saturdays 10am–12pm'",
+        help_text="Human-readable schedule e.g. 'Saturdays 10am-12pm' or 'Weekdays 7pm-8pm'",
     )
     capacity = models.PositiveIntegerField(default=30)
     price_kes = models.DecimalField(
@@ -110,7 +107,7 @@ class Cohort(models.Model):
         ordering = ["-start_date"]
 
     def __str__(self):
-        return f"{self.course.title} — {self.name}"
+        return f"{self.course.title} - {self.name}"
 
     @property
     def enrolled_count(self):

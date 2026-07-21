@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}Welcome{% endblock %}
-{% block meta_description %}{{ PLATFORM_NAME }} — Kenya's premier tutoring platform for teens. Learn programming, AI, math and sciences from expert tutors.{% endblock %}
+{% block meta_description %}{{ PLATFORM_NAME }} offers practical tutoring for school learners, graduates, and adults. Learn programming, AI, math, science, CBE subjects, robotics, and more.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -19,15 +19,15 @@
     <div style="max-width: 680px; padding: 80px 0;">
       <div class="badge badge-accent mb-md" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
         <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green);"></span>
-        Built for Kenyan Learners
+        Learning for Students and Adults
       </div>
       <h1 style="font-size: 2.2rem; line-height: 1.15; margin-bottom: 24px; font-family: inherit; font-weight: 700; color: var(--text);">
         Learn to Build the Future.
         <span class="text-gradient" style="color: var(--green);">At Your Pace.</span>
       </h1>
       <p style="font-size: 1.15rem; max-width: 540px; color: var(--text-muted); margin-bottom: 40px;">
-        Weekend and holiday classes for teens — programming with AI, machine learning, software engineering,
-        CBC subjects, robotics, and more. Expert tutors. Real skills.
+        Flexible classes for primary school learners, JSS, senior school, past senior school learners, and adults. Learn programming with AI, machine learning, software engineering,
+        CBE subjects, robotics, and more with expert tutors.
       </p>
       <div class="flex gap-md flex-wrap">
         <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg" id="hero-browse-btn">
@@ -47,7 +47,7 @@
       </div>
       <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        Weekend Live Classes
+        Flexible Live Classes
       </div>
       <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
@@ -71,7 +71,7 @@
     <div style="text-align: center; margin-bottom: 40px;">
       <h2 style="font-family: inherit; font-weight: 700; color: var(--text);">Two Learning Tracks</h2>
       <p style="max-width: 480px; margin: 8px auto 0; color: var(--text-muted);">
-        Whether you want to code, understand AI, or ace your CBC exams — we have a track for you.
+        Whether you want to code, understand AI, strengthen school performance, or build career-ready skills, we have a track for you.
       </p>
     </div>
 
@@ -94,15 +94,15 @@
         </div>
       </div>
 
-      <!-- CBC Track -->
+      <!-- CBE Track -->
       <div class="card" style="background: var(--white); border: 1px solid var(--border); border-top: 4px solid var(--green); border-radius: var(--radius); padding: 40px;">
         <div style="margin-bottom: 16px;">
           <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
         </div>
-        <h3 class="mb-sm" style="font-family: inherit; font-weight: 700;">CBC Academic + Specialist</h3>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 700;">CBE Academic + Specialist</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
-          CBC curriculum subjects for Junior Secondary School — Math, Biology, Chemistry, Physics.
-          Plus specialist tracks: Electronics &amp; Robotics, Cybersecurity, and more.
+          CBE academic support for primary school learners, JSS, senior school, and past senior school learners.
+          Plus specialist tracks for adults and younger learners, including Electronics &amp; Robotics, Cybersecurity, and more.
         </p>
         <div class="flex gap-sm flex-wrap">
           <span class="badge badge-primary">JSS Math</span>
@@ -137,9 +137,9 @@
           <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
         </div>
         <div class="badge badge-muted mb-md">Step 2</div>
-        <h3 class="mb-sm" style="font-family: inherit; font-weight: 600;">Join Weekend Classes</h3>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 600;">Join Live Classes</h3>
         <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
-          Attend live sessions on weekends and holidays via Google Meet. Miss one? Watch the makeup video.
+          Attend live sessions through available weekend, holiday, and selected weekday cohorts. Miss one? Watch the makeup video.
         </p>
       </div>
       <div class="card" style="text-align: center; padding: 40px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);">
@@ -161,7 +161,7 @@
   <div class="container" style="text-align: center;">
     <h2 class="cta-title" style="margin-bottom: 16px; font-family: inherit; font-weight: 700; color: var(--text);">Ready to Start Learning?</h2>
     <p style="color: var(--text-muted); margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto;">
-      Classes run on weekends and during school holidays. Spots are limited per cohort.
+      Classes run in weekend, holiday, and selected weekday cohorts. Spots are limited per cohort.
     </p>
     <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg" id="cta-browse-btn">
       View All Courses

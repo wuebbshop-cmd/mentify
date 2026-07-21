@@ -1,6 +1,6 @@
 Hello {{ guardian.get_full_name }},
 
-Good news — {{ learner.get_full_name }} has accepted your request to link their account. You can now view their progress on Mentify.
+Good news - {{ learner.get_full_name }} has accepted your request to link their account. You can now view their progress on Mentify.
 
 Visit your dashboard: {{ link_url|default:request.build_absolute_uri }}
 

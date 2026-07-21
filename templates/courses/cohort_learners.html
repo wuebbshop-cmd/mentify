@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Cohort Roster — {{ cohort.name }}{% endblock %}
+{% block title %}Cohort Roster - {{ cohort.name }}{% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
@@ -70,7 +70,7 @@
                 {{ enrollment.learner.get_full_name }}
               </td>
               <td>{{ enrollment.learner.email }}</td>
-              <td>{{ enrollment.learner.phone|default:"—" }}</td>
+              <td>{{ enrollment.learner.phone|default:"-" }}</td>
               <td>
                 <span class="badge {% if enrollment.status == 'active' %}badge-success{% else %}badge-danger{% endif %}">
                   {{ enrollment.get_status_display }}

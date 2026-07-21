@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block title %}Course Catalog{% endblock %}
-{% block meta_description %}Explore our available tracks. Choose a programming, AI, robotics, or CBC academic cohort and start learning.{% endblock %}
+{% block meta_description %}Explore available tracks for school learners, graduates, and adults. Choose programming, AI, robotics, or CBE academic cohorts and start learning.{% endblock %}
 
 {% block content %}
 <div class="page-header" style="background: var(--white); padding: 64px 0 40px; margin-bottom: 64px; border-bottom: 1px solid var(--border);">
   <div class="container">
     <h1 style="margin-bottom: 8px;">Course Catalog</h1>
     <p style="color: var(--text-muted); max-width: 580px; margin: 0;">
-      Find the right cohort for you. We offer weekend and school holiday schedules with expert tutors.
+      Find the right cohort for you. We offer weekend, school holiday, and selected weekday schedules with expert tutors.
     </p>
 
     <!-- Track filter -->
@@ -20,13 +20,13 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/></svg> Tech Track
       </a>
       <a href="{% url 'courses:list' %}?track=cbc" class="btn {% if selected_track == 'cbc' %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> CBC Academic &amp; Specialist
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> CBE Academic &amp; Specialist
       </a>
     </div>
   </div>
 </div>
 
-<div class="container mb-2xl">
+<div class="container course-catalog-container mb-2xl">
   {% if courses %}
     <div class="grid grid-auto">
       {% for course in courses %}
@@ -50,7 +50,7 @@
         </div>
         <div class="card-footer">
           <span style="font-size: 0.8rem; color: var(--text-muted);">
-            {{ course.cohorts.count }} cohort(s)
+            {{ course.cohort_count }} cohort(s)
           </span>
           <a href="{% url 'courses:detail' course.slug %}" class="btn btn-outline btn-sm">
             Learn More

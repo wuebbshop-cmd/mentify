@@ -1,9 +1,9 @@
 """
 sessions/models.py
 
-LiveSession — manually-entered meeting link, no Zoom API.
-Attendance — manually marked by tutor after session.
-MakeupSession — reuses LiveSession model with is_makeup=True + original_session FK.
+LiveSession - manually-entered meeting link, no Zoom API.
+Attendance - manually marked by tutor after session.
+MakeupSession - reuses LiveSession model with is_makeup=True + original_session FK.
 """
 from django.db import models
 from django.conf import settings
@@ -54,7 +54,7 @@ class LiveSession(models.Model):
 
     def __str__(self):
         makeup_tag = " [MAKEUP]" if self.is_makeup else ""
-        return f"{self.cohort.name} — {self.title}{makeup_tag} @ {self.scheduled_at.strftime('%d %b %Y %H:%M')}"
+        return f"{self.cohort.name} - {self.title}{makeup_tag} @ {self.scheduled_at.strftime('%d %b %Y %H:%M')}"
 
     @property
     def is_upcoming(self):
@@ -95,4 +95,4 @@ class Attendance(models.Model):
         unique_together = [("session", "learner")]
 
     def __str__(self):
-        return f"{self.learner.get_full_name()} — {self.session.title} [{self.status}]"
+        return f"{self.learner.get_full_name()} - {self.session.title} [{self.status}]"

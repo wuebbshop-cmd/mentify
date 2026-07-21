@@ -2,7 +2,7 @@
 services/paystack_service.py
 
 Adapted from ml101/payments.py (PaystackClient).
-Framework-agnostic — no Django imports here.
+Framework-agnostic - no Django imports here.
 """
 from __future__ import annotations
 

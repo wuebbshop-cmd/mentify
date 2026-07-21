@@ -45,7 +45,7 @@ class Lesson(models.Model):
 class VideoAsset(models.Model):
     """
     Bunny Stream video linked to a Lesson.
-    We only store the Bunny video ID — never serve raw video from Django.
+    We only store the Bunny video ID - never serve raw video from Django.
     The embed/player URL is constructed from the library ID + video ID.
     """
     lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name="video")
@@ -78,7 +78,7 @@ class VideoAsset(models.Model):
 
 class Resource(models.Model):
     """
-    A resource attached to a Lesson — PDF (stored on GitHub) or external link.
+    A resource attached to a Lesson - PDF (stored on GitHub) or external link.
     """
 
     class ResourceType(models.TextChoices):
@@ -100,7 +100,7 @@ class Resource(models.Model):
         ordering = ["lesson", "resource_type", "title"]
 
     def __str__(self):
-        return f"{self.title} [{self.get_resource_type_display()}] — {self.lesson.title}"
+        return f"{self.title} [{self.get_resource_type_display()}] - {self.lesson.title}"
 
     def get_download_url(self):
         """Return the URL to access this resource."""
@@ -130,4 +130,4 @@ class LessonProgress(models.Model):
 
     def __str__(self):
         status = "✓" if self.completed else "○"
-        return f"{status} {self.learner.get_full_name()} — {self.lesson.title}"
+        return f"{status} {self.learner.get_full_name()} - {self.lesson.title}"

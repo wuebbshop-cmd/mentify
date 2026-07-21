@@ -1,1 +1,1 @@
-"""services package — framework-agnostic service classes"""
+"""services package - framework-agnostic service classes"""
