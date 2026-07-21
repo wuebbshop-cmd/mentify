@@ -492,9 +492,9 @@ def admin_dashboard(request):
         )
         .select_related("cohort__course")
         .annotate(
-            attended_count=Count("attendances", filter=Q(attendances__status=Attendance.Status.ATTENDED)),
-            missed_count=Count("attendances", filter=Q(attendances__status=Attendance.Status.MISSED)),
-            excused_count=Count("attendances", filter=Q(attendances__status=Attendance.Status.EXCUSED)),
+            attended_count=Count("attendances", filter=Q(attendances__status=Attendance.AttendanceStatus.ATTENDED)),
+            missed_count=Count("attendances", filter=Q(attendances__status=Attendance.AttendanceStatus.MISSED)),
+            excused_count=Count("attendances", filter=Q(attendances__status=Attendance.AttendanceStatus.EXCUSED)),
             total_marked=Count("attendances"),
         )
         .order_by("-scheduled_at")[:30]
