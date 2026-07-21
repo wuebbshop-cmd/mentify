@@ -5,10 +5,13 @@ Custom User model + Profile + Guardian.
 All roles live on the User model itself for simple FK lookups.
 Profile holds extended info. Guardian links parents to learners.
 """
+import os
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-import os
+from django.utils import timezone
 
 def table_name(base_name: str) -> str:
     prefix = os.getenv("DB_TABLE_PREFIX", "me_")
@@ -143,3 +146,62 @@ class Guardian(models.Model):
 
     def __str__(self):
         return f"Guardian: {self.user.get_full_name()}"
+
+
+class GuardianLinkRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        ACCEPTED = "accepted", _("Accepted")
+        REJECTED = "rejected", _("Rejected")
+        CANCELLED = "cancelled", _("Cancelled")
+
+    guardian = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="guardian_link_requests",
+        limit_choices_to={"role": User.Role.GUARDIAN},
+    )
+    learner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="guardian_requests",
+        limit_choices_to={"role": User.Role.LEARNER},
+    )
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        db_table = table_name("guardian_link_requests")
+        ordering = ["-created_at"]
+        unique_together = [["guardian", "learner"]]
+
+    def __str__(self):
+        return f"Link request from {self.guardian.get_full_name()} to {self.learner.get_full_name()} ({self.status})"
+
+
+class GuardianLinkRequestLog(models.Model):
+    class Event(models.TextChoices):
+        REQUESTED = "requested", _("Requested")
+        ACCEPTED = "accepted", _("Accepted")
+        REJECTED = "rejected", _("Rejected")
+        CANCELLED = "cancelled", _("Cancelled")
+
+    request = models.ForeignKey(
+        GuardianLinkRequest,
+        on_delete=models.CASCADE,
+        related_name="logs",
+    )
+    event = models.CharField(max_length=20, choices=Event.choices)
+    actor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = table_name("guardian_link_request_logs")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.get_event_display()} for {self.request}"

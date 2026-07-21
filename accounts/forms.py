@@ -1,6 +1,7 @@
 """accounts/forms.py — Registration, login, profile update forms."""
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, SetPasswordForm
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from .models import User, Profile
@@ -69,6 +70,45 @@ class TutorRegistrationForm(UserCreationForm):
             user.save()
             Profile.objects.get_or_create(user=user)
         return user
+
+
+class GuardianChildLinkForm(forms.Form):
+    email_or_username = forms.CharField(
+        max_length=255,
+        label="Learner email or username",
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "learner@example.com or username",
+        }),
+    )
+    notes = forms.CharField(
+        required=False,
+        label="Notes for learner",
+        widget=forms.Textarea(attrs={
+            "class": "form-control",
+            "rows": 3,
+            "placeholder": "Optional message to help the learner recognize you.",
+        }),
+    )
+
+    def clean_email_or_username(self):
+        identifier = self.cleaned_data["email_or_username"].strip()
+        learner = User.objects.filter(
+            Q(email__iexact=identifier) | Q(username__iexact=identifier),
+            role=User.Role.LEARNER,
+        ).first()
+        if not learner:
+            raise forms.ValidationError(
+                "No learner found with that email or username. Please check and try again."
+            )
+        return learner
+
+    def clean(self):
+        cleaned_data = super().clean()
+        learner = cleaned_data.get("email_or_username")
+        if learner and learner.role != User.Role.LEARNER:
+            raise forms.ValidationError("Selected account is not a learner.")
+        return cleaned_data
 
 
 class MentifyLoginForm(AuthenticationForm):

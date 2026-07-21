@@ -1,0 +1,12 @@
+Hello {{ learner.first_name }},
+
+{{ guardian.get_full_name }} has requested to link their guardian account to your learner profile so they can monitor your progress.
+
+To accept or reject this request, click the link below:
+
+{{ link_url }}
+
+If you do not recognize this request, please ignore this email.
+
+Thank you,
+{{ PLATFORM_NAME }} Team

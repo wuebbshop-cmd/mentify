@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, Profile, Guardian
+from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRequestLog
 
 
 @admin.register(User)
@@ -42,3 +42,19 @@ class GuardianAdmin(admin.ModelAdmin):
     filter_horizontal = ["learners"]
     raw_id_fields = ["user"]
     search_fields = ["user__email", "user__first_name"]
+
+
+@admin.register(GuardianLinkRequest)
+class GuardianLinkRequestAdmin(admin.ModelAdmin):
+    list_display = ["guardian", "learner", "status", "created_at", "responded_at"]
+    list_filter = ["status", "created_at"]
+    search_fields = ["guardian__email", "learner__email", "guardian__first_name", "learner__first_name"]
+    raw_id_fields = ["guardian", "learner"]
+
+
+@admin.register(GuardianLinkRequestLog)
+class GuardianLinkRequestLogAdmin(admin.ModelAdmin):
+    list_display = ["request", "event", "actor", "created_at"]
+    list_filter = ["event", "created_at"]
+    search_fields = ["actor__email", "request__guardian__email", "request__learner__email"]
+    raw_id_fields = ["actor", "request"]

@@ -40,7 +40,10 @@ urlpatterns = [
     path("dashboard/tutor/", views.tutor_dashboard, name="tutor_dashboard"),
     path("dashboard/admin/", views.admin_dashboard, name="admin_dashboard"),
     path("dashboard/admin/reports/", views.admin_reports, name="admin_reports"),
+    path("dashboard/admin/guardian-requests/", views.admin_guardian_requests, name="admin_guardian_requests"),
     path("dashboard/guardian/", views.guardian_dashboard, name="guardian_dashboard"),
+    path("dashboard/guardian/link/", views.guardian_link_request, name="guardian_link_request"),
+    path("dashboard/guardian/link/confirm/<uuid:token>/", views.guardian_link_confirm, name="guardian_link_confirm"),
 
     # Profile
     path("profile/", views.profile_view, name="profile"),

@@ -33,9 +33,12 @@
 
   <!-- Main Body -->
   <div class="dashboard-body">
-    <div class="page-header">
-      <h1>Guardian Dashboard</h1>
-      <p style="margin: 0; color: var(--text-muted);">Monitor progress and active subscriptions for your linked learners.</p>
+    <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+      <div>
+        <h1>Guardian Dashboard</h1>
+        <p style="margin: 0; color: var(--text-muted);">Monitor progress and active subscriptions for your linked learners.</p>
+      </div>
+      <a href="{% url 'accounts:guardian_link_request' %}" class="btn btn-primary" style="white-space: nowrap;">Request learner link</a>
     </div>
 
     <!-- Learners list -->

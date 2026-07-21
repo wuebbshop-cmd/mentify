@@ -1,0 +1,18 @@
+# robots.txt — Web crawler directives and sitemap location
+# Tells search engines which pages to crawl and where sitemap is located
+
+# Allow all crawlers (no restrictions)
+User-agent: *
+Allow: /
+
+# Disallow private/admin areas
+Disallow: /admin/
+Disallow: /accounts/admin-*
+Disallow: /dashboard/admin*
+
+# Sitemap location for Google Search Console and other search engines
+Sitemap: https://yourdomain.co.ke/sitemap.xml
+
+# Optional: Add more sitemaps if you have additional ones later
+# Sitemap: https://yourdomain.co.ke/courses-sitemap.xml
+# Sitemap: https://yourdomain.co.ke/content-sitemap.xml

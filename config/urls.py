@@ -5,10 +5,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from accounts.sitemap_views import sitemap, robots_txt
 
 urlpatterns = [
     # Django admin (platform owner only)
     path("admin/", admin.site.urls),
+
+    # SEO: Sitemap for Google Search Console
+    path("sitemap.xml", sitemap, name="sitemap"),
+    
+    # SEO: robots.txt for crawler directives
+    path("robots.txt", robots_txt, name="robots"),
 
     # Auth + accounts
     path("accounts/", include("accounts.urls")),

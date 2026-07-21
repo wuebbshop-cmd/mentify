@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Guardian Link{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 80px 0;">
+  <div class="card" style="max-width: 600px; margin: 0 auto; padding: 32px;">
+    <h1>Confirm guardian request</h1>
+    <p style="color: var(--text-muted);">{{ request_obj.guardian.get_full_name }} wants to link to your progress.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;">
+        <button type="submit" name="action" value="accept" class="btn btn-primary">Accept request</button>
+        <button type="submit" name="action" value="reject" class="btn btn-secondary">Reject request</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

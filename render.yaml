@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: eduai-api
+    runtime: python
+    pythonVersion: 3.11
+    
+    # ─── Build Command ───────────────────────────────────────────────
+    # Installs dependencies + runs migrations + collects static files
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput
+    
+    # ─── Start Command ───────────────────────────────────────────────
+    # Gunicorn with 3 worker processes, listening on 0.0.0.0:10000
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 3 --worker-class sync --timeout 60
+    
+    # ─── Environment Variables ───────────────────────────────────────
+    # IMPORTANT: Set these in Render dashboard Environment section BEFORE deploy
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    
+    # ─── Health Check ────────────────────────────────────────────────
+    # Optional: Render pings /health/ to check if service is alive
+    # You can implement a simple health check view in urls.py if desired
+    healthCheckPath: /accounts/login/  # Django login page as proxy health check
+
+  # ─── PostgreSQL Database (managed by Render) ──────────────────────
+  - type: pserv
+    name: eduai-db
+    runtime: postgres
+    ipAllowList: []  # Allow all IPs (internal Render communication)
+    plan: free  # free, starter, standard, pro
+    region: oregon  # Same region as web service for performance
+    postgresMajorVersion: 16

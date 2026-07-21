@@ -126,3 +126,17 @@ Key design point: **cash payments and Paystack payments both write to the same `
 - Reporting for the admin (active subscriptions, revenue by cohort, attendance trends).
 
 Each phase should be independently testable and deployable — don't wait until everything is built to have a working, demoable slice of the platform (Phases 1–3 alone give you a usable "learners can pay and watch content" product).
+
+
+Self‑service linking (recommended UX):
+Allow guardians to add a child by email/username from their dashboard.
+Backend validates the learner exists and has role learner.
+Send a confirmation request to the learner (or to admin) and require acceptance (consent), or require the guardian to provide a verification code from the learner account.
+Create (or update) the Guardian record and add the learner to guardian.learners only after successful validation/consent.
+Admin-managed linking (current, simple):
+Keep admin linking via Django admin for controlled environments or until the self‑serve flow is implemented.
+Security & privacy:
+Require learner consent or admin approval before exposing progress/grades.
+Log link/unlink events (audit trail) and notify both parties by email.
+
+For any needed notifications, Use gmail smtp

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Guardian Link Requests{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 48px 0;">
+  <div class="card" style="max-width: 900px; margin: 0 auto; padding: 24px;">
+    <h1>Guardian Link Requests</h1>
+    <p style="color: var(--text-muted);">Review and manage guardian link requests.</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Guardian</th>
+            <th>Learner</th>
+            <th>Notes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            <td>{{ r.guardian.get_full_name }}<br><small>{{ r.guardian.email }}</small></td>
+            <td>{{ r.learner.get_full_name }}<br><small>{{ r.learner.email }}</small></td>
+            <td>{{ r.notes|default:"-" }}</td>
+            <td>{{ r.get_status_display }}</td>
+            <td>
+              {% if r.status == r.Status.PENDING %}
+                <button name="action" value="accept:{{ r.id }}" class="btn btn-sm btn-success">Accept</button>
+                <button name="action" value="reject:{{ r.id }}" class="btn btn-sm btn-danger">Reject</button>
+              {% else %}
+                <span class="text-muted">No actions</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+{% endblock %}

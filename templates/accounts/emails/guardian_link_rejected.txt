@@ -1,0 +1,6 @@
+Hello {{ guardian.get_full_name }},
+
+We wanted to let you know that {{ learner.get_full_name }} has declined your request to link their account. If you believe this was a mistake, please contact support.
+
+Thanks,
+{{ PLATFORM_NAME }} Team

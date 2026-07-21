@@ -7,14 +7,18 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.urls import reverse
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.db.models import Q
 
 from .forms import (
     LearnerRegistrationForm,
     MentifyLoginForm,
     ProfileUpdateForm,
     UserUpdateForm,
+    GuardianChildLinkForm,
 )
-from .models import User, Profile
+from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRequestLog
 from .decorators import role_required
 
 
@@ -117,6 +121,134 @@ def register_tutor(request):
     else:
         form = LearnerRegistrationForm()
     return render(request, "accounts/register_tutor.html", {"form": form})
+
+
+@login_required
+@role_required("guardian")
+def guardian_link_request(request):
+    """Guardian self-service request to link to their learner's account."""
+    if request.method == "POST":
+        form = GuardianChildLinkForm(request.POST)
+        if form.is_valid():
+            learner = form.cleaned_data["email_or_username"]
+            guardian = request.user
+            notes = form.cleaned_data.get("notes", "")
+            request_obj = GuardianLinkRequest.objects.filter(
+                guardian=guardian,
+                learner=learner,
+            ).first()
+            if request_obj:
+                if request_obj.status == GuardianLinkRequest.Status.PENDING:
+                    messages.info(request, "A pending request already exists for this learner.")
+                    return redirect("accounts:guardian_dashboard")
+                if request_obj.status == GuardianLinkRequest.Status.ACCEPTED:
+                    messages.info(request, "This learner is already linked to your account.")
+                    return redirect("accounts:guardian_dashboard")
+                request_obj.status = GuardianLinkRequest.Status.PENDING
+                request_obj.notes = notes or request_obj.notes
+                request_obj.responded_at = None
+                request_obj.save()
+            else:
+                request_obj = GuardianLinkRequest.objects.create(
+                    guardian=guardian,
+                    learner=learner,
+                    notes=notes,
+                )
+            GuardianLinkRequestLog.objects.create(
+                request=request_obj,
+                event=GuardianLinkRequestLog.Event.REQUESTED,
+                actor=guardian,
+                message="Guardian requested link to learner account.",
+            )
+            confirm_url = request.build_absolute_uri(reverse("accounts:guardian_link_confirm", args=[request_obj.token]))
+            subject = f"Guardian link request from {guardian.get_full_name()}"
+            message_body = render_to_string("accounts/emails/guardian_link_request.txt", {
+                "learner": learner,
+                "guardian": guardian,
+                "link_url": confirm_url,
+                "PLATFORM_NAME": getattr(settings, "PLATFORM_NAME", "Mentify"),
+            })
+            send_mail(
+                subject,
+                message_body,
+                settings.DEFAULT_FROM_EMAIL,
+                [learner.email],
+                fail_silently=True,
+            )
+            messages.success(request, "Your request has been sent. The learner will be notified by email.")
+            return redirect("accounts:guardian_dashboard")
+    else:
+        form = GuardianChildLinkForm()
+
+    pending_requests = GuardianLinkRequest.objects.filter(
+        guardian=request.user
+    ).select_related("learner").order_by("-created_at")
+
+    return render(request, "accounts/guardian_link_request.html", {
+        "form": form,
+        "pending_requests": pending_requests,
+    })
+
+
+@login_required
+@role_required("learner")
+def guardian_link_confirm(request, token):
+    """Learner confirms or rejects a guardian link request and notifies the guardian by email."""
+    from django.utils import timezone
+
+    request_obj = get_object_or_404(GuardianLinkRequest, token=token)
+    if request.user != request_obj.learner:
+        return HttpResponseForbidden("You are not authorized to confirm this link.")
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        learner = request_obj.learner
+        guardian = request_obj.guardian
+        if action == "accept":
+            request_obj.status = GuardianLinkRequest.Status.ACCEPTED
+            request_obj.responded_at = timezone.now()
+            request_obj.save()
+            guardian_profile, _ = Guardian.objects.get_or_create(user=guardian)
+            guardian_profile.learners.add(learner)
+            GuardianLinkRequestLog.objects.create(
+                request=request_obj,
+                event=GuardianLinkRequestLog.Event.ACCEPTED,
+                actor=request.user,
+                message="Learner accepted guardian link request.",
+            )
+            # notify guardian
+            subject = f"{learner.get_full_name()} accepted your guardian request"
+            message_body = render_to_string("accounts/emails/guardian_link_accepted.txt", {
+                "learner": learner,
+                "guardian": guardian,
+                "PLATFORM_NAME": getattr(settings, "PLATFORM_NAME", "Mentify"),
+            })
+            send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [guardian.email], fail_silently=True)
+
+            messages.success(request, "Link accepted. Your guardian can now see your progress.")
+        else:
+            request_obj.status = GuardianLinkRequest.Status.REJECTED
+            request_obj.responded_at = timezone.now()
+            request_obj.save()
+            GuardianLinkRequestLog.objects.create(
+                request=request_obj,
+                event=GuardianLinkRequestLog.Event.REJECTED,
+                actor=request.user,
+                message="Learner rejected guardian link request.",
+            )
+            # notify guardian
+            subject = f"{learner.get_full_name()} declined your guardian request"
+            message_body = render_to_string("accounts/emails/guardian_link_rejected.txt", {
+                "learner": learner,
+                "guardian": guardian,
+                "PLATFORM_NAME": getattr(settings, "PLATFORM_NAME", "Mentify"),
+            })
+            send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [guardian.email], fail_silently=True)
+
+            messages.info(request, "Link rejected. Your guardian will not be able to see your progress.")
+        return redirect(request.user.get_dashboard_url())
+
+    return render(request, "accounts/guardian_link_confirm.html", {"request_obj": request_obj})
 
 
 def login_view(request):
@@ -459,6 +591,66 @@ def admin_reports(request):
         "past_sessions": past_sessions,
     }
     return render(request, "accounts/admin_reports.html", context)
+
+
+@login_required
+@role_required("admin")
+def admin_guardian_requests(request):
+    """Admin review page for guardian link requests."""
+    from django.utils import timezone
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+        if ":" in action:
+            verb, pk = action.split(":", 1)
+            try:
+                req = GuardianLinkRequest.objects.get(pk=int(pk))
+            except GuardianLinkRequest.DoesNotExist:
+                messages.error(request, "Request not found.")
+                return redirect("accounts:admin_guardian_requests")
+
+            if verb == "accept" and req.status == GuardianLinkRequest.Status.PENDING:
+                req.status = GuardianLinkRequest.Status.ACCEPTED
+                req.responded_at = timezone.now()
+                req.save()
+                guardian_profile, _ = Guardian.objects.get_or_create(user=req.guardian)
+                guardian_profile.learners.add(req.learner)
+                GuardianLinkRequestLog.objects.create(
+                    request=req,
+                    event=GuardianLinkRequestLog.Event.ACCEPTED,
+                    actor=request.user,
+                    message="Admin accepted guardian link request.",
+                )
+                # notify guardian
+                subject = f"{req.learner.get_full_name()} linked to your account"
+                message_body = render_to_string("accounts/emails/guardian_link_accepted.txt", {
+                    "learner": req.learner,
+                    "guardian": req.guardian,
+                    "PLATFORM_NAME": getattr(settings, "PLATFORM_NAME", "Mentify"),
+                })
+                send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [req.guardian.email], fail_silently=True)
+                messages.success(request, "Request accepted and guardian notified.")
+            elif verb == "reject" and req.status == GuardianLinkRequest.Status.PENDING:
+                req.status = GuardianLinkRequest.Status.REJECTED
+                req.responded_at = timezone.now()
+                req.save()
+                GuardianLinkRequestLog.objects.create(
+                    request=req,
+                    event=GuardianLinkRequestLog.Event.REJECTED,
+                    actor=request.user,
+                    message="Admin rejected guardian link request.",
+                )
+                subject = f"{req.learner.get_full_name()} declined your guardian request"
+                message_body = render_to_string("accounts/emails/guardian_link_rejected.txt", {
+                    "learner": req.learner,
+                    "guardian": req.guardian,
+                    "PLATFORM_NAME": getattr(settings, "PLATFORM_NAME", "Mentify"),
+                })
+                send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [req.guardian.email], fail_silently=True)
+                messages.success(request, "Request rejected and guardian notified.")
+        return redirect("accounts:admin_guardian_requests")
+
+    requests = GuardianLinkRequest.objects.select_related("guardian", "learner").order_by("-created_at")
+    return render(request, "accounts/admin_guardian_requests.html", {"requests": requests})
 
 
 @login_required

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Request Learner Link{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 80px 0;">
+  <div class="card" style="max-width: 700px; margin: 0 auto; padding: 32px;">
+    <h1>Link a learner</h1>
+    <p style="color: var(--text-muted);">Send a request to a learner so they can approve your guardian access.</p>
+
+    <form method="post" class="mb-lg">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_email_or_username">Learner email or username</label>
+        {{ form.email_or_username }}
+        {% if form.email_or_username.errors %}
+          <div class="form-error">{{ form.email_or_username.errors.as_text }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label for="id_notes">Message to learner</label>
+        {{ form.notes }}
+        {% if form.notes.errors %}
+          <div class="form-error">{{ form.notes.errors.as_text }}</div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Send request</button>
+    </form>
+
+    <section>
+      <h2>Pending requests</h2>
+      {% if pending_requests %}
+        <ul class="list-group">
+          {% for request_obj in pending_requests %}
+            <li class="list-group-item">
+              <strong>{{ request_obj.learner.get_full_name }}</strong>
+              <span style="color: var(--text-muted);">({{ request_obj.learner.email }})</span>
+              <span class="badge badge-{{ request_obj.status }}">{{ request_obj.get_status_display }}</span>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">
+                Requested on {{ request_obj.created_at|date:"d M Y H:i" }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <p>No pending guardian requests yet.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
