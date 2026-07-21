@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Grade Submission — {{ submission.learner.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Tutor navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:tutor_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohorts' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Cohort Management
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'assignments:submissions' assignment.id %}">Submissions</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Grade</span>
+      </div>
+      <h1>Grade Solution: {{ submission.learner.get_full_name }}</h1>
+      <p style="margin: 0; color: var(--text-muted);">Assignment: {{ assignment.title }}</p>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 40px; align-items: flex-start;">
+      <!-- Left Column: Submitted Deliverables -->
+      <div>
+        <div class="card mb-xl">
+          <h3 class="mb-md">Student Submission details</h3>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Submitted at: <strong>{{ submission.submitted_at|date:"d M Y H:i" }}</strong>
+          </div>
+
+          {% if submission.text_response %}
+            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Written Answer / Code Response:</div>
+            <pre style="background: hsl(225, 15%, 8%); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+                        font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; overflow-x: auto; margin-bottom: 24px;">{{ submission.text_response }}</pre>
+          {% endif %}
+
+          {% if submission.github_stored_path %}
+            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Attached Files:</div>
+            <div style="background: hsl(225, 15%, 14%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px;
+                        display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 16px;">
+              <span class="truncate"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> <code>{{ submission.github_stored_path }}</code></span>
+              <!-- We link to download endpoint which proxies GitHub -->
+              {% if submission.id %}
+              <!-- A helper proxy to download learner attachment could be added, but for now we view stored path -->
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right Column: Grading Tool Form -->
+      <div>
+        <div class="card">
+          <h3 class="mb-md">Evaluation &amp; Rubrics</h3>
+          <form method="post" id="grade-form">
+            {% csrf_token %}
+
+            <!-- Rubric Criteria Inputs -->
+            {% if criteria %}
+              <div style="display: flex; flex-direction: column; gap: 24px; margin-bottom: 24px;">
+                {% for c in criteria %}
+                <div style="background: hsl(225, 15%, 12%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong style="color: var(--text);">{{ c.label }}</strong>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Max: {{ c.weight }} pts</span>
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">{{ c.description }}</p>
+
+                  <div class="form-group mb-sm">
+                    <label class="form-label" style="font-size: 0.8rem;">Score</label>
+                    <input type="number" name="criterion_{{ c.id }}" class="form-control" step="0.5" min="0" max="{{ c.weight }}" required
+                           value="{% for s in existing_grade.criterion_scores.all %}{% if s.criterion_id == c.id %}{{ s.score }}{% endif %}{% endfor %}">
+                  </div>
+                  <div class="form-group mb-0">
+                    <label class="form-label" style="font-size: 0.8rem;">Feedback comment</label>
+                    <input type="text" name="comment_{{ c.id }}" class="form-control" placeholder="Specific feedback..."
+                           value="{% for s in existing_grade.criterion_scores.all %}{% if s.criterion_id == c.id %}{{ s.comment }}{% endif %}{% endfor %}">
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="divider"></div>
+
+            <h3 class="mb-md">Overall Evaluation</h3>
+
+            <div class="form-group">
+              <label class="form-label">Total Score Override (calculated automatically from criteria if left blank)</label>
+              {{ grade_form.total_score }}
+              {% if grade_form.total_score.errors %}<div class="form-error">{{ grade_form.total_score.errors.as_text }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Overall Tutor Comment</label>
+              {{ grade_form.tutor_comment }}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-md" id="grade-submit-btn">
+              Submit Grade &amp; Feedback
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

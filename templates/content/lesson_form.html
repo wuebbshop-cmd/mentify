@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Lesson — {{ cohort.name }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Tutor navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:tutor_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohorts' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Cohort Management
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohort_manage' cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>️</span> Manage Content
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'courses:tutor_cohorts' %}">Cohorts</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="{% url 'courses:tutor_cohort_manage' cohort.id %}">{{ cohort.name }}</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">{{ action }} Lesson</span>
+      </div>
+      <h1>{{ action }} Lesson</h1>
+      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }} · Course: {{ cohort.course.title }}</p>
+    </div>
+
+    <div style="max-width: 600px;">
+      <div class="auth-card" style="padding: 40px;">
+        <form method="post" id="lesson-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.title.id_for_label }}">Lesson Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<div class="form-error">{{ form.title.errors.as_text }}</div>{% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.description.id_for_label }}">Description / Summary</label>
+            {{ form.description }}
+            {% if form.description.errors %}<div class="form-error">{{ form.description.errors.as_text }}</div>{% endif %}
+          </div>
+
+          <div class="grid grid-2" style="gap: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="{{ form.order.id_for_label }}">Order sequence</label>
+              {{ form.order }}
+              {% if form.order.errors %}<div class="form-error">{{ form.order.errors.as_text }}</div>{% endif %}
+              <span class="form-text">Display sequence number (e.g. Lesson 1, Lesson 2).</span>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 8px;">
+              <div class="form-check">
+                {{ form.is_published }}
+                <label class="form-check-label" for="{{ form.is_published.id_for_label }}">Publish Lesson (makes visible to students)</label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary mt-md" id="lesson-save-btn">
+            Create Lesson &amp; Add Assets →
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

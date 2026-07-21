@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Guardian Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Guardian navigation">
+                            <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:guardian_dashboard' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'accounts:profile' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <h1>Guardian Dashboard</h1>
+      <p style="margin: 0; color: var(--text-muted);">Monitor progress and active subscriptions for your linked learners.</p>
+    </div>
+
+    <!-- Learners list -->
+    <section>
+      <h3 class="mb-md">Your Learners</h3>
+      {% if learners %}
+        <div class="grid grid-2">
+          {% for learner in learners %}
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: hsl(251, 86%, 65%, 0.2);
+                          display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </div>
+              <div>
+                <h4 style="margin: 0;">{{ learner.get_full_name }}</h4>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ learner.email }}</div>
+              </div>
+            </div>
+
+            <!-- Cohorts / subscriptions -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted);">Enrolled Cohorts:</div>
+              {% for subscription in learner.subscriptions.all %}
+              <div style="background: hsl(225, 15%, 12%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px;
+                          display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text);">{{ subscription.cohort.course.title }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Cohort: {{ subscription.cohort.name }}</div>
+                </div>
+                <div style="text-align: right;">
+                  <span class="badge {% if subscription.is_access_valid %}badge-success{% else %}badge-danger{% endif %}">
+                    {% if subscription.is_access_valid %}Paid (Access Active){% else %}Subscription Expired{% endif %}
+                  </span>
+                  {% if subscription.paid_until %}
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Valid until: {{ subscription.paid_until|date:"d M Y" }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              {% empty %}
+              <div style="font-size: 0.85rem; color: var(--text-muted);">No active cohort subscriptions.</div>
+              {% endfor %}
+            </div>
+
+            <div class="divider"></div>
+            <!-- Submissions summary -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Total graded assignments:</span>
+              <span style="font-weight: 700; color: var(--text);">
+                {{ learner.submissions.count }}
+              </span>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <p>No learners linked to this guardian account.</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Please contact admin to link a learner account.</p>
+        </div>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+{% endblock %}

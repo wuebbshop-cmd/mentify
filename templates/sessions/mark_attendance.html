@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Mark Attendance — {{ session.title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Tutor navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:tutor_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohorts' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Cohort Management
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohort_manage' session.cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>️</span> Manage Content
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'courses:tutor_cohort_manage' session.cohort.id %}">{{ session.cohort.name }}</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Mark Attendance</span>
+      </div>
+      <h1>Mark Attendance: {{ session.title }}</h1>
+      <p style="margin: 0; color: var(--text-muted);">
+        Date: <strong>{{ session.scheduled_at|date:"d M Y @ g:i A" }}</strong>
+      </p>
+    </div>
+
+    <div class="card mb-xl">
+      <form method="post" id="attendance-form">
+        {% csrf_token %}
+
+        {% if learner_attendance %}
+          <div class="table-wrapper mb-lg">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Email</th>
+                  <th>Attendance Status</th>
+                  <th>Notes / Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for learner, record in learner_attendance %}
+                <tr>
+                  <td style="font-weight: 600; color: var(--text);">
+                    {{ learner.get_full_name }}
+                  </td>
+                  <td>{{ learner.email }}</td>
+                  <td>
+                    <!-- Status selector -->
+                    <select name="attendance_{{ learner.id }}" class="form-select form-select-sm" style="max-width: 140px;">
+                      {% for val, label in status_choices %}
+                      <option value="{{ val }}" {% if record.status == val %}selected{% elif not record and val == 'missed' %}selected{% endif %}>
+                        {{ label }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </td>
+                  <td>
+                    <!-- Notes input -->
+                    <input type="text" name="notes_{{ learner.id }}" class="form-control form-control-sm" placeholder="e.g. Late by 15 mins"
+                           value="{{ record.notes|default:'' }}">
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; gap: 16px;">
+            <button type="submit" class="btn btn-primary" id="save-attendance-btn">
+              Save Attendance Sheet
+            </button>
+            <a href="{% url 'courses:tutor_cohort_manage' session.cohort.id %}" class="btn btn-ghost">
+              Cancel
+            </a>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <h3>No enrolled learners</h3>
+            <p>There are no students enrolled in this cohort yet to mark attendance for.</p>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

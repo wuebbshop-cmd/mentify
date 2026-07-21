@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-xl mb-2xl">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'courses:list' %}">Courses</a>
+    <span class="breadcrumb-sep">/</span>
+    <span class="text-primary">{{ course.title }}</span>
+  </nav>
+
+  <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 40px; align-items: flex-start; margin-top: 16px;">
+    <!-- Left Column: Details -->
+    <div>
+      <div style="margin-bottom: 24px;">
+        <span class="badge badge-{{ course.track }} mb-sm">{{ course.get_track_display }}</span>
+        <h1 style="margin-bottom: 8px;">{{ course.title }}</h1>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">
+          Subject Area: <strong>{{ course.subject_area }}</strong> · Level: <strong>{{ course.get_level_display }}</strong>
+        </div>
+      </div>
+
+      <div class="card mb-xl">
+        <h3 class="mb-md">About This Course</h3>
+        <p style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-muted);">{{ course.description }}</p>
+      </div>
+
+      <!-- Cohorts available -->
+      <div>
+        <h3 class="mb-md">Available Cohorts</h3>
+        {% if cohorts %}
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            {% for cohort in cohorts %}
+            <div class="card" style="border-left: 3px solid var(--green);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <h4 style="margin: 0;">{{ cohort.name }}</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0;">
+                    Tutor: <strong>{{ cohort.tutor.get_full_name|default:cohort.tutor.email }}</strong>
+                  </p>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 1.25rem; font-weight: 700; color: var(--text);">
+                    KES {{ cohort.price_kes|floatformat:2 }}
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Monthly Subscription</div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="grid grid-3" style="gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+                <div><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <strong>Start:</strong> {{ cohort.start_date|date:"d M Y" }}</div>
+                <div><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> <strong>End:</strong> {{ cohort.end_date|date:"d M Y" }}</div>
+                <div><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> <strong>Capacity:</strong> {{ cohort.capacity }} seats max</div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <a href="{% url 'courses:cohort_detail' cohort.id %}" class="btn btn-ghost btn-sm">
+                  View Schedule &amp; Details
+                </a>
+                <a href="{% url 'courses:enroll' cohort.id %}" class="btn btn-primary btn-sm">
+                  Enroll &amp; Pay KES {{ cohort.price_kes|floatformat:0 }} →
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state" style="padding: 40px 16px; background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+            <p>No active cohorts are currently enrolling for this course.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Tutors are scheduling new sessions soon. Please check back.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column: Meta Info -->
+    <div style="position: sticky; top: calc(var(--nav-h) + 16px);">
+      <div class="card">
+        <h3 class="mb-sm">At a Glance</h3>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem; color: var(--text-muted); margin: 0; padding: 0;">
+          <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
+            <span>Track:</span>
+            <strong class="text-primary">{{ course.get_track_display }}</strong>
+          </li>
+          <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
+            <span>Level:</span>
+            <strong>{{ course.get_level_display }}</strong>
+          </li>
+          <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
+            <span>Subject:</span>
+            <strong>{{ course.subject_area }}</strong>
+          </li>
+          <li style="display: flex; justify-content: space-between;">
+            <span>Delivery:</span>
+            <strong>Live sessions + Videos</strong>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

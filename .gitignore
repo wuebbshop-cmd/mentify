@@ -1,0 +1,46 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environment
+.env
+*.env
+*.env.local
+
+# Database
+*.sqlite3
+*.db
+
+# Static / Media (collected by whitenoise)
+staticfiles/
+media/
+
+# Django
+local_settings.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Migrations (keep these in version control)
+# migrations/ — do NOT ignore
+
+# Certs
+*.pem
+*.key

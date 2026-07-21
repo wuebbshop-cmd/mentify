@@ -1,0 +1,14 @@
+<div class="sidebar-profile">
+  <div class="sidebar-profile-row">
+    <div class="sidebar-profile-avatar">
+      {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+    </div>
+    <div class="sidebar-profile-info">
+      <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+      <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+      <span class="badge sidebar-profile-role {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+  </div>
+</div>

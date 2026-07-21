@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div style="width: 100%; max-width: 420px;">
+
+    <div class="auth-logo">
+      <img src="{% static 'images/logo.png' %}" alt="{{ PLATFORM_NAME }} Logo">
+      <h1>Welcome back</h1>
+      <p>Sign in to your {{ PLATFORM_NAME }} account</p>
+    </div>
+
+    <div class="auth-card">
+      <!-- Google Sign In -->
+      <a href="{% url 'accounts:google_login' %}?action=login" class="btn-google" id="google-login-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.91c1.7-1.56 2.69-3.86 2.69-6.6z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.2l-2.91-2.26a5.6 5.6 0 0 1-3.05.86 5.57 5.57 0 0 1-5.27-3.85H.78v2.33A9 9 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.73 10.55a5.4 5.4 0 0 1 0-3.1V5.12H.78a9 9 0 0 0 0 7.76l2.95-2.33z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59A9 9 0 0 0 .78 5.12l2.95 2.33A5.57 5.57 0 0 1 9 3.58z"/>
+        </svg>
+        Sign in with Google
+      </a>
+
+      <div class="divider-text">or sign in with email</div>
+
+      <form method="post" id="login-form" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-error" style="margin-bottom: 16px;">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Email Address</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+          <div class="form-error">{{ form.username.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.password.id_for_label }}">
+            Password
+            <a href="{% url 'accounts:password_reset' %}" style="float: right; font-weight: 400; color: var(--blue); font-size: .8rem;">
+              Forgot password?
+            </a>
+          </label>
+          {{ form.password }}
+          {% if form.password.errors %}
+          <div class="form-error">{{ form.password.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn" style="margin-top: 8px;">
+          Sign In
+        </button>
+      </form>
+
+      <div class="divider"></div>
+
+      <p style="text-align: center; color: var(--text-muted); font-size: .875rem; margin: 0;">
+        New here?
+        <a href="{% url 'accounts:register' %}" style="color: var(--green); font-weight: 600;">
+          Create a learner account
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

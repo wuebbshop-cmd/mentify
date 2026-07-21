@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback — {{ assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Learner navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:learner_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'content:cohort_lessons' assignment.lesson.cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Lessons
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'assignments:detail' assignment.id %}">Assignment Details</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Grading Feedback</span>
+      </div>
+      <h1>Grading &amp; Feedback</h1>
+      <p style="margin: 0; color: var(--text-muted);">Assignment: {{ assignment.title }}</p>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 40px; align-items: flex-start;">
+      <!-- Main feedback and criterion breakdown -->
+      <div>
+        <!-- Grade Score -->
+        <div class="card mb-xl" style="background: linear-gradient(135deg, hsl(251, 80%, 15%), var(--white)); border-left: 4px solid var(--green); padding: 40px;">
+          <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--green); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">
+            Your Score
+          </div>
+          <div style="font-size: 3rem; font-weight: 800; color: var(--text); line-height: 1;">
+            {{ grade.total_score }} <span style="font-size: 1.5rem; font-weight: 400; color: var(--text-muted);">/ {{ assignment.max_score }}</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
+            Graded by <strong>{{ grade.graded_by.get_full_name|default:grade.graded_by.email }}</strong> on {{ grade.graded_at|date:"d M Y" }}
+          </div>
+        </div>
+
+        <!-- Tutor Comments -->
+        {% if grade.tutor_comment %}
+        <div class="card mb-xl">
+          <h3 class="mb-sm">Tutor Comments &amp; Feedback</h3>
+          <p style="font-size: 0.95rem; color: var(--text-muted); white-space: pre-wrap; margin: 0;">{{ grade.tutor_comment }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Rubric Scores Breakdown -->
+        {% if criterion_scores %}
+        <div class="card">
+          <h3 class="mb-md">Rubric Breakdown</h3>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            {% for cs in criterion_scores %}
+            <div style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <strong style="color: var(--text);">{{ cs.criterion.label }}</strong>
+                <span style="font-weight: 600; color: var(--green);">
+                  {{ cs.score }} / {{ cs.criterion.weight }} pts
+                </span>
+              </div>
+              {% if cs.comment %}
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0 0; font-style: italic;">
+                  "{{ cs.comment }}"
+                </p>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Submitted Files Info -->
+      <div>
+        <div class="card">
+          <h3 class="mb-md">Your Submission</h3>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Submitted at: <strong>{{ submission.submitted_at|date:"d M Y H:i" }}</strong>
+          </div>
+          {% if submission.text_response %}
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Written Solution:</div>
+            <pre style="background: hsl(225, 15%, 8%); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px;
+                        font-family: monospace; font-size: 0.75rem; white-space: pre-wrap; overflow-x: auto; margin-bottom: 16px;">{{ submission.text_response }}</pre>
+          {% endif %}
+
+          {% if submission.github_stored_path %}
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Attached File:</div>
+            <div style="background: hsl(225, 15%, 14%); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px;
+                        font-size: 0.8rem; word-break: break-all; margin-bottom: 16px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> <code>{{ submission.github_stored_path }}</code>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Profile navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Back to Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'accounts:profile' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile Settings
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <h1>Profile Settings</h1>
+      <p style="margin: 0; color: var(--text-muted);">Manage your personal details, parent/guardian info, and contact details.</p>
+    </div>
+
+    <div style="max-width: 600px;">
+      <div class="auth-card" style="padding: 40px;">
+        <form method="post" id="profile-form">
+          {% csrf_token %}
+
+          <h3 class="mb-md">Personal Information</h3>
+
+          <div class="grid grid-2" style="gap: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="{{ user_form.first_name.id_for_label }}">First Name</label>
+              {{ user_form.first_name }}
+              {% if user_form.first_name.errors %}<div class="form-error">{{ user_form.first_name.errors.as_text }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ user_form.last_name.id_for_label }}">Last Name</label>
+              {{ user_form.last_name }}
+              {% if user_form.last_name.errors %}<div class="form-error">{{ user_form.last_name.errors.as_text }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ user_form.email.id_for_label }}">Email Address</label>
+            {{ user_form.email }}
+            {% if user_form.email.errors %}<div class="form-error">{{ user_form.email.errors.as_text }}</div>{% endif %}
+            <span class="form-text">Used for platform notifications and receipt delivery.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ user_form.phone.id_for_label }}">Phone Number</label>
+            {{ user_form.phone }}
+            {% if user_form.phone.errors %}<div class="form-error">{{ user_form.phone.errors.as_text }}</div>{% endif %}
+            <span class="form-text">e.g. 0712345678 or +254712345678 (primarily for Paystack SMS / billing notifications).</span>
+          </div>
+
+          <!-- Profile specific fields -->
+          {% if profile_form %}
+            <div class="divider"></div>
+            <h3 class="mb-md">Bio &amp; Meta</h3>
+            <div class="form-group">
+              <label class="form-label" for="{{ profile_form.bio.id_for_label }}">Bio / Short Description</label>
+              {{ profile_form.bio }}
+              {% if profile_form.bio.errors %}<div class="form-error">{{ profile_form.bio.errors.as_text }}</div>{% endif %}
+            </div>
+          {% endif %}
+
+          <button type="submit" class="btn btn-primary mt-md" id="profile-save-btn">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

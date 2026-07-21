@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Lesson — {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Tutor navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:tutor_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohorts' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Cohort Management
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohort_manage' cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>️</span> Manage Content
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'courses:tutor_cohorts' %}">Cohorts</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="{% url 'courses:tutor_cohort_manage' cohort.id %}">{{ cohort.name }}</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Edit Lesson</span>
+      </div>
+      <h1>Edit Lesson: {{ lesson.title }}</h1>
+      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }} · Course: {{ cohort.course.title }}</p>
+    </div>
+
+    <!-- Quick action links -->
+    <div style="display: flex; gap: 16px; margin-bottom: 40px; flex-wrap: wrap;">
+      <a href="{% url 'assignments:create' lesson.id %}" class="btn btn-outline btn-sm">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Add Assignment
+      </a>
+      <a href="{% url 'content:cohort_lessons' cohort.id %}" class="btn btn-ghost btn-sm" target="_blank">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>️ Preview Lesson View
+      </a>
+    </div>
+
+    <div class="grid grid-2" style="align-items: flex-start; gap: 40px;">
+      <!-- Left Column: Edit Form & Video Asset -->
+      <div>
+        <div class="card mb-xl">
+          <form method="post" id="edit-lesson-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_lesson">
+
+            <h3 class="mb-md">Lesson Details</h3>
+
+            <div class="form-group">
+              <label class="form-label">Lesson Title</label>
+              {{ lesson_form.title }}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description / Summary</label>
+              {{ lesson_form.description }}
+            </div>
+
+            <div class="grid grid-2" style="gap: 16px;">
+              <div class="form-group">
+                <label class="form-label">Order</label>
+                {{ lesson_form.order }}
+              </div>
+              <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 8px;">
+                <div class="form-check">
+                  {{ lesson_form.is_published }}
+                  <label class="form-check-label">Published (visible to students)</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <h3 class="mb-md"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Bunny Stream Video Asset</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+              Specify the Bunny Stream video GUID. We construct standard iframe embeds automatically.
+            </p>
+            <div class="form-group">
+              <label class="form-label">Bunny Video ID (GUID)</label>
+              {{ video_form.bunny_video_id }}
+              <span class="form-text">e.g. abc12345-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custom Library ID <span class="text-muted">(optional)</span></label>
+              {{ video_form.bunny_library_id }}
+              <span class="form-text">Overrides the platform default library ID if set.</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Video Duration (seconds)</label>
+              {{ video_form.duration_seconds }}
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-md" id="lesson-submit-btn">
+              Save Lesson &amp; Video Details
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: Lesson Resources (Files / Links) -->
+      <div>
+        <div class="card mb-xl">
+          <h3 class="mb-md">Reference Resources</h3>
+
+          <!-- Existing Resources List -->
+          {% if resources %}
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
+              {% for res in resources %}
+              <div style="background: hsl(225, 15%, 14%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px;
+                          display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                  <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span>
+                  <span class="truncate" style="font-weight: 500;">{{ res.title }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="badge badge-muted">{{ res.get_resource_type_display }}</span>
+                  <a href="{{ res.get_download_url }}" target="_blank" class="btn btn-ghost btn-sm" style="padding: 2px 8px;">View</a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">No resources have been added to this lesson.</p>
+          {% endif %}
+
+          <div class="divider"></div>
+
+          <!-- Add Resource Form -->
+          <form method="post" enctype="multipart/form-data" id="add-resource-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_resource">
+
+            <h3 class="mb-md"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Reference Resource</h3>
+
+            <div class="form-group">
+              <label class="form-label">Resource Title</label>
+              {{ resource_form.title }}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Resource Type</label>
+              {{ resource_form.resource_type }}
+              <span class="form-text">PDFs will be securely uploaded to GitHub. External links are saved directly.</span>
+            </div>
+
+            <!-- Conditional PDF File field -->
+            <div class="form-group" id="pdf-file-group">
+              <label class="form-label">Select PDF File</label>
+              {{ resource_form.pdf_file }}
+            </div>
+
+            <!-- Conditional Link field -->
+            <div class="form-group" id="external-url-group">
+              <label class="form-label">External URL</label>
+              {{ resource_form.external_url }}
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-md" id="resource-submit-btn">
+              Add Resource
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Dynamic form field toggle based on resource type selection
+  document.addEventListener('DOMContentLoaded', function() {
+    var typeSelect = document.getElementById('{{ resource_form.resource_type.id_for_label }}');
+    var pdfGroup = document.getElementById('pdf-file-group');
+    var urlGroup = document.getElementById('external-url-group');
+
+    function toggleFields() {
+      if (typeSelect.value === 'pdf') {
+        pdfGroup.style.display = 'block';
+        urlGroup.style.display = 'none';
+      } else {
+        pdfGroup.style.display = 'none';
+        urlGroup.style.display = 'block';
+      }
+    }
+
+    typeSelect.addEventListener('change', toggleFields);
+    toggleFields(); // Initial run
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Solution — {{ assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Learner navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:learner_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'content:cohort_lessons' assignment.lesson.cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Lessons
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'assignments:detail' assignment.id %}">Assignment Details</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Submit</span>
+      </div>
+      <h1>Submit Solution</h1>
+      <p style="margin: 0; color: var(--text-muted);">Assignment: {{ assignment.title }}</p>
+    </div>
+
+    <div style="max-width: 600px;">
+      <div class="auth-card" style="padding: 40px;">
+        <form method="post" enctype="multipart/form-data" id="submission-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.text_response.id_for_label }}">Written Answer / Solution Code</label>
+            {{ form.text_response }}
+            {% if form.text_response.errors %}<div class="form-error">{{ form.text_response.errors.as_text }}</div>{% endif %}
+            <span class="form-text">Paste code, write notes, or document your submission response here.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.submission_file.id_for_label }}">Attach File (PDF, ZIP, IPYNB, etc.)</label>
+            {{ form.submission_file }}
+            {% if form.submission_file.errors %}<div class="form-error">{{ form.submission_file.errors.as_text }}</div>{% endif %}
+            <span class="form-text">Files are securely uploaded and stored in the GitHub repository.</span>
+          </div>
+
+          {% if submission.github_stored_path %}
+          <div class="alert alert-info mb-md">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> <strong>Currently Attached:</strong> <code>{{ submission.github_stored_path }}</code>
+          </div>
+          {% endif %}
+
+          <div style="display: flex; gap: 16px; margin-top: 24px;">
+            <button type="submit" class="btn btn-primary flex-1" id="submit-btn">
+              Submit Solution
+            </button>
+            <a href="{% url 'assignments:detail' assignment.id %}" class="btn btn-ghost">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

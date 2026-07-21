@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Welcome{% endblock %}
+{% block meta_description %}{{ PLATFORM_NAME }} — Kenya's premier tutoring platform for teens. Learn programming, AI, math and sciences from expert tutors.{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Ensure CTA headline remains readable in dark mode */
+  .dark-theme .cta-title { color: #000 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" style="position: relative; overflow: hidden; background: var(--white);">
+
+  <div class="container" style="position: relative; z-index: 1;">
+    <div style="max-width: 680px; padding: 80px 0;">
+      <div class="badge badge-accent mb-md" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green);"></span>
+        Built for Kenyan Learners
+      </div>
+      <h1 style="font-size: 2.2rem; line-height: 1.15; margin-bottom: 24px; font-family: inherit; font-weight: 700; color: var(--text);">
+        Learn to Build the Future.
+        <span class="text-gradient" style="color: var(--green);">At Your Pace.</span>
+      </h1>
+      <p style="font-size: 1.15rem; max-width: 540px; color: var(--text-muted); margin-bottom: 40px;">
+        Weekend and holiday classes for teens — programming with AI, machine learning, software engineering,
+        CBC subjects, robotics, and more. Expert tutors. Real skills.
+      </p>
+      <div class="flex gap-md flex-wrap">
+        <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg" id="hero-browse-btn">
+          Browse Courses
+        </a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-outline btn-lg" id="hero-join-btn">
+          Join Free
+        </a>
+      </div>
+    </div>
+
+    <!-- Feature chips -->
+    <div class="flex gap-sm flex-wrap mt-xl">
+      <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        Pre-Recorded Lessons
+      </div>
+      <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Weekend Live Classes
+      </div>
+      <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        M-Pesa Payments
+      </div>
+      <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h2a2 2 0 002 2m-6 9l2 2 4-4"/></svg>
+        Assignments &amp; Grading
+      </div>
+      <div style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        Progress Tracking
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Track Cards Section -->
+<section style="padding: 64px 0; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-family: inherit; font-weight: 700; color: var(--text);">Two Learning Tracks</h2>
+      <p style="max-width: 480px; margin: 8px auto 0; color: var(--text-muted);">
+        Whether you want to code, understand AI, or ace your CBC exams — we have a track for you.
+      </p>
+    </div>
+
+    <div class="grid grid-2" style="max-width: 900px; margin: 0 auto;">
+      <!-- Tech Track -->
+      <div class="card" style="background: var(--white); border: 1px solid var(--border); border-top: 4px solid var(--green); border-radius: var(--radius); padding: 40px;">
+        <div style="margin-bottom: 16px;">
+          <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+        </div>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 700;">Tech Track</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          Modern programming (Python, web dev), machine learning basics, software engineering,
+          statistics and math for ML, and approachable AI concepts. Learn to direct AI models.
+        </p>
+        <div class="flex gap-sm flex-wrap">
+          <span class="badge badge-primary">Python</span>
+          <span class="badge badge-primary">Machine Learning</span>
+          <span class="badge badge-primary">AI</span>
+          <span class="badge badge-primary">Engineering</span>
+        </div>
+      </div>
+
+      <!-- CBC Track -->
+      <div class="card" style="background: var(--white); border: 1px solid var(--border); border-top: 4px solid var(--green); border-radius: var(--radius); padding: 40px;">
+        <div style="margin-bottom: 16px;">
+          <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        </div>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 700;">CBC Academic + Specialist</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          CBC curriculum subjects for Junior Secondary School — Math, Biology, Chemistry, Physics.
+          Plus specialist tracks: Electronics &amp; Robotics, Cybersecurity, and more.
+        </p>
+        <div class="flex gap-sm flex-wrap">
+          <span class="badge badge-primary">JSS Math</span>
+          <span class="badge badge-primary">Biology</span>
+          <span class="badge badge-primary">Robotics</span>
+          <span class="badge badge-primary">Cybersecurity</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section style="padding: 64px 0; background: var(--surface);">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-family: inherit; font-weight: 700; color: var(--text);">How It Works</h2>
+    </div>
+    <div class="grid grid-3">
+      <div class="card" style="text-align: center; padding: 40px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);">
+        <div style="margin-bottom: 16px; display: flex; justify-content: center;">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <div class="badge badge-muted mb-md">Step 1</div>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 600;">Enroll &amp; Pay</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+          Choose your cohort and pay monthly via M-Pesa or card. Cash? We record it for you.
+        </p>
+      </div>
+      <div class="card" style="text-align: center; padding: 40px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);">
+        <div style="margin-bottom: 16px; display: flex; justify-content: center;">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </div>
+        <div class="badge badge-muted mb-md">Step 2</div>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 600;">Join Weekend Classes</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+          Attend live sessions on weekends and holidays via Google Meet. Miss one? Watch the makeup video.
+        </p>
+      </div>
+      <div class="card" style="text-align: center; padding: 40px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);">
+        <div style="margin-bottom: 16px; display: flex; justify-content: center;">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--green);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        </div>
+        <div class="badge badge-muted mb-md">Step 3</div>
+        <h3 class="mb-sm" style="font-family: inherit; font-weight: 600;">Learn &amp; Grow</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+          Watch pre-recorded lessons anytime, submit assignments, get graded, track your progress.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+<section style="padding: 64px 0; background: #efe2d0; border-top: 1px solid var(--border);">
+  <div class="container" style="text-align: center;">
+    <h2 class="cta-title" style="margin-bottom: 16px; font-family: inherit; font-weight: 700; color: var(--text);">Ready to Start Learning?</h2>
+    <p style="color: var(--text-muted); margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto;">
+      Classes run on weekends and during school holidays. Spots are limited per cohort.
+    </p>
+    <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg" id="cta-browse-btn">
+      View All Courses
+    </a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }} — {{ cohort.course.title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Learner navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:learner_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'content:cohort_lessons' cohort.id %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Lessons
+      </a></li>
+      <li class="nav-item"><a href="{% url 'sessions:learner_sessions' cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Live Sessions
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'content:cohort_lessons' cohort.id %}">Lessons</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Lesson {{ lesson.order }}</span>
+      </div>
+      <h1>{{ lesson.title }}</h1>
+      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }}</p>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 40px; align-items: flex-start;">
+      <!-- Video and Description Column -->
+      <div>
+        {% if video %}
+          <div class="video-container mb-lg">
+            <iframe src="{{ video.get_embed_url }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+        {% else %}
+          <div class="empty-state" style="background: hsl(225, 15%, 11%); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 24px;">
+            <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
+            <p>No video lesson uploaded yet for this session.</p>
+          </div>
+        {% endif %}
+
+        <div class="card mb-xl">
+          <h3 class="mb-sm">Lesson Overview</h3>
+          <p style="font-size: 0.95rem; color: var(--text-muted); white-space: pre-wrap; margin: 0;">{{ lesson.description }}</p>
+        </div>
+      </div>
+
+      <!-- Resources and Assignments Column -->
+      <div>
+        <!-- Resources Card -->
+        <div class="card mb-lg">
+          <h3 class="mb-md">Lesson Resources</h3>
+          {% if resources %}
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              {% for res in resources %}
+              <a href="{{ res.get_download_url }}" target="_blank" class="resource-link">
+                <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span>
+                <span class="truncate" style="flex: 1;">{{ res.title }}</span>
+                <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted);">
+                  {{ res.get_resource_type_display }}
+                </span>
+              </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">No downloadable resources or reference links provided.</p>
+          {% endif %}
+        </div>
+
+        <!-- Assignments Card -->
+        <div class="card">
+          <h3 class="mb-md">Assignments</h3>
+          {% if assignments %}
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              {% for assignment in assignments %}
+              <div style="background: hsl(225, 15%, 14%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;
+                          display: flex; flex-direction: column; gap: 4px;">
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text);">{{ assignment.title }}</div>
+                {% if assignment.due_date %}
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Due: {{ assignment.due_date|date:"d M Y" }}</div>
+                {% endif %}
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Max Score: {{ assignment.max_score }} pts</div>
+                <a href="{% url 'assignments:detail' assignment.id %}" class="btn btn-primary btn-sm btn-block">
+                  View Assignment →
+                </a>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">No assignments set for this lesson.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

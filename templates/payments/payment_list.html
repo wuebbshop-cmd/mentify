@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Payments List{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Admin navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:admin_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'payments:record_cash' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Record Cash Payment
+      </a></li>
+      <li class="nav-item"><a href="{% url 'payments:payment_list' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> View Payments
+      </a></li>
+      <li class="nav-item"><a href="{% url 'accounts:profile' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'accounts:admin_dashboard' %}">Admin Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Payments Ledger</span>
+      </div>
+      <h1>Payments Ledger</h1>
+      <p style="margin: 0; color: var(--text-muted);">Historical ledger of all payments (online and manually entered cash receipts).</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex gap-sm flex-wrap mb-lg">
+      <a href="{% url 'payments:payment_list' %}" class="btn {% if not method_filter %}btn-outline{% else %}btn-ghost{% endif %} btn-sm">
+        All Payments
+      </a>
+      <a href="{% url 'payments:payment_list' %}?method=paystack" class="btn {% if method_filter == 'paystack' %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Paystack
+      </a>
+      <a href="{% url 'payments:payment_list' %}?method=cash" class="btn {% if method_filter == 'cash' %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Cash Receipts
+      </a>
+    </div>
+
+    <!-- Ledger Table -->
+    {% if payments %}
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Learner</th>
+              <th>Cohort</th>
+              <th>Payment Method</th>
+              <th>Amount</th>
+              <th>Reference / Transaction ID</th>
+              <th>Date Paid</th>
+              <th>Recorded By</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in payments %}
+            <tr>
+              <td style="font-weight: 600; color: var(--text);">
+                {{ payment.subscription.learner.get_full_name }}
+                <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">{{ payment.subscription.learner.email }}</div>
+              </td>
+              <td>{{ payment.subscription.cohort }}</td>
+              <td>
+                <span class="badge {% if payment.method == 'cash' %}badge-accent{% else %}badge-primary{% endif %}">
+                  {{ payment.get_method_display }}
+                </span>
+              </td>
+              <td style="font-weight: 700; color: var(--text);">
+                KES {{ payment.amount_kes|floatformat:2 }}
+              </td>
+              <td>
+                <code>{{ payment.reference }}</code>
+                {% if payment.paystack_transaction_id %}
+                <div style="font-size: 0.7rem; color: var(--text-muted);">ID: {{ payment.paystack_transaction_id }}</div>
+                {% endif %}
+              </td>
+              <td>{{ payment.paid_at|date:"d M Y H:i" }}</td>
+              <td>
+                {% if payment.recorded_by %}
+                  <span class="text-secondary">{{ payment.recorded_by.get_full_name|default:payment.recorded_by.email }}</span>
+                {% else %}
+                  <span class="text-muted">System (Paystack)</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {% if payment.status == 'success' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                  {{ payment.get_status_display }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <h3>No payments found</h3>
+        <p>No transactions match the selected filter query.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

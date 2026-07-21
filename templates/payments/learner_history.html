@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Billing &amp; Subscription History{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Learner navigation">
+        <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:learner_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'payments:learner_history' %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Payments
+      </a></li>
+      <li class="nav-item"><a href="{% url 'accounts:profile' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'accounts:learner_dashboard' %}">Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Payments &amp; Billing</span>
+      </div>
+      <h1>Billing &amp; Subscriptions</h1>
+      <p style="margin: 0; color: var(--text-muted);">Manage your active subscriptions, paid access dates, and review payment history.</p>
+    </div>
+
+    <!-- Active Subscriptions -->
+    <section class="mb-xl">
+      <h3 class="mb-md">Active Subscriptions</h3>
+      {% if subscriptions %}
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 800px;">
+          {% for sub in subscriptions %}
+          <div class="card" style="border-left: 3px solid {% if sub.is_access_valid %}var(--green){% else %}var(--danger){% endif %};">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h4 style="margin: 0;">{{ sub.cohort.course.title }}</h4>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                  Cohort: <strong>{{ sub.cohort.name }}</strong>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <span class="badge {% if sub.is_access_valid %}badge-success{% else %}badge-danger{% endif %}">
+                  {% if sub.is_access_valid %}Access Active{% else %}Access Suspended / Lapsed{% endif %}
+                </span>
+                {% if sub.paid_until %}
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                    Paid until: <strong>{{ sub.paid_until|date:"d M Y" }}</strong>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">
+                Subscription Rate: KES {{ sub.cohort.price_kes|floatformat:2 }} / month
+              </span>
+              <a href="{% url 'payments:initiate' sub.cohort.id %}" class="btn btn-primary btn-sm">
+                {% if sub.is_access_valid %}Renew / Pay Next Month{% else %}Pay &amp; Reactivate Access →{% endif %}
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state" style="max-width: 800px;">
+          <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+          <h3>No subscriptions found</h3>
+          <p>You have not subscribed to any paid cohorts yet.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Payment Receipts Ledger -->
+    <section>
+      <h3 class="mb-md">Payment History</h3>
+      {% if subscriptions %}
+        <div class="table-wrapper" style="max-width: 800px;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Cohort</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>Reference</th>
+                <th>Status</th>
+                <th>Date Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in subscriptions %}
+                {% for p in sub.payments.all %}
+                <tr>
+                  <td style="font-weight: 500; color: var(--text);">{{ sub.cohort.name }}</td>
+                  <td>
+                    <span class="badge {% if p.method == 'cash' %}badge-accent{% else %}badge-primary{% endif %}">
+                      {{ p.get_method_display }}
+                    </span>
+                  </td>
+                  <td style="font-weight: 600;">KES {{ p.amount_kes|floatformat:2 }}</td>
+                  <td><code>{{ p.reference }}</code></td>
+                  <td>
+                    <span class="badge {% if p.status == 'success' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                      {{ p.get_status_display }}
+                    </span>
+                  </td>
+                  <td>{{ p.paid_at|date:"d M Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="font-size: 0.85rem; color: var(--text-muted);">No transaction receipts found.</p>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+{% endblock %}
