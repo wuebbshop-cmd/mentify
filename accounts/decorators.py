@@ -1,4 +1,4 @@
-"""accounts/decorators.py — Role-based access decorators."""
+"""accounts/decorators.py - Role-based access decorators."""
 from functools import wraps
 from django.shortcuts import redirect
 from django.contrib import messages

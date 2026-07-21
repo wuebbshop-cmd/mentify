@@ -1,4 +1,4 @@
-"""Sitemap and robots.txt views for SEO — Google Search Console integration"""
+"""Sitemap and robots.txt views for SEO - Google Search Console integration"""
 
 from django.http import HttpResponse
 from django.urls import reverse
@@ -42,7 +42,7 @@ def sitemap(request):
     ]
     
     # Try to include courses if courses app has a course list view
-    # This is optional — adapt to your actual URL structure
+    # This is optional - adapt to your actual URL structure
     try:
         courses_url = f"{base_url}/courses/"
         static_pages.append({
@@ -82,7 +82,7 @@ def robots_txt(request):
     base_url = settings.BASE_URL.rstrip('/')
     sitemap_url = f"{base_url}/sitemap.xml"
     
-    robots_content = f"""# robots.txt — Web crawler directives and sitemap location
+    robots_content = f"""# robots.txt - Web crawler directives and sitemap location
 # Tells search engines which pages to crawl and where sitemap is located
 
 # Allow all crawlers (no restrictions)

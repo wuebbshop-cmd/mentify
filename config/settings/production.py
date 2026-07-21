@@ -1,4 +1,4 @@
-"""Production settings — DEBUG off, HTTPS enforced, Render-ready."""
+"""Production settings - DEBUG off, HTTPS enforced, Render-ready."""
 
 from .base import *  # noqa: F401, F403
 import os

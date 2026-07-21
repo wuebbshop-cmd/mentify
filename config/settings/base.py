@@ -1,5 +1,5 @@
 """
-Mentify Platform — Base Settings
+Mentify Platform - Base Settings
 Shared across all environments. Sensitive values come from .env.
 """
 
@@ -76,7 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# ─── Database — MySQL (mysqlclient, utf8mb4) ──────────────────────────────────
+# --- Database - MySQL (mysqlclient, utf8mb4) -------------------------------------------------------
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -125,7 +125,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-# ─── Media (local dev only — prod uses GitHub / Bunny) ───────────────────────
+# --- Media (local dev only - prod uses GitHub / Bunny) ------------------------------------------------
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -168,7 +168,7 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@Mentify.co.ke
 
 # ─── Cron Jobs ────────────────────────────────────────────────────────────────
 CRONJOBS = [
-    # Run daily at 1:00 AM Nairobi time — flag/suspend expired subscriptions
+    # Run daily at 1:00 AM Nairobi time - flag/suspend expired subscriptions
     ("0 1 * * *", "django.core.management.call_command", ["check_expired_subscriptions"]),
 ]
 

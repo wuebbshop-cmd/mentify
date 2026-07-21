@@ -1,4 +1,4 @@
-"""accounts/forms.py — Registration, login, profile update forms."""
+"""accounts/forms.py - Registration, login, profile update forms."""
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, SetPasswordForm
 from django.db.models import Q
@@ -22,7 +22,7 @@ class LearnerRegistrationForm(UserCreationForm):
     phone = forms.CharField(
         max_length=20, required=False,
         label="Phone Number",
-        help_text="Optional — E.164 format e.g. +254700000000"
+        help_text="Optional - E.164 format e.g. +254700000000"
     )
 
     class Meta:

@@ -1,4 +1,4 @@
-"""Development settings — DEBUG on, SQLite fallback not used (always MySQL)."""
+"""Development settings - DEBUG on, SQLite fallback not used (always MySQL)."""
 
 from .base import *  # noqa: F401, F403
 

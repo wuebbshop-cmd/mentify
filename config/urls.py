@@ -1,5 +1,5 @@
 ﻿"""
-Mentify Platform — Root URL Configuration
+Mentify Platform - Root URL Configuration
 """
 from django.contrib import admin
 from django.urls import path, include

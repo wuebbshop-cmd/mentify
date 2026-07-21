@@ -96,7 +96,7 @@ class Profile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     county = models.CharField(max_length=100, blank=True, help_text="Kenyan county")
     school = models.CharField(max_length=255, blank=True)
-    # For learners — CBC class level
+    # For learners - CBC class level
     class_level = models.CharField(
         max_length=20,
         blank=True,
