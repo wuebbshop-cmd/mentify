@@ -5,7 +5,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve as static_serve
 from accounts.sitemap_views import sitemap, robots_txt
+import os
 
 urlpatterns = [
     # Django admin (platform owner only)
@@ -16,6 +18,9 @@ urlpatterns = [
     
     # SEO: robots.txt for crawler directives
     path("robots.txt", robots_txt, name="robots"),
+    
+    # SEO: Google Search Console verification
+    path('google20c3024f708d9e69.html', lambda request: static_serve(request, 'google20c3024f708d9e69.html', document_root=settings.BASE_DIR)),
 
     # Auth + accounts
     path("accounts/", include("accounts.urls")),
