@@ -777,10 +777,24 @@ def profile_view(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        user_form = UserUpdateForm(request.POST, instance=request.user)
+        user_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+            user = user_form.save(commit=False)
+            avatar_image = user_form.cleaned_data.get("avatar_image")
+            if avatar_image:
+                from services.github_service import GitHubService
+
+                svc = GitHubService(
+                    settings.GITHUB_TOKEN,
+                    settings.GITHUB_REPO,
+                    settings.GITHUB_BRANCH,
+                    settings.GITHUB_UPLOAD_DIR,
+                )
+                result = svc.upload_file(avatar_image, subdir=f"profile-images/user-{request.user.id}")
+                if result:
+                    user.avatar_url = result.stored_path
+            user.save()
             profile_form.save()
             messages.success(request, "Profile updated successfully.")
             return redirect("accounts:profile")

@@ -40,7 +40,11 @@ class Course(models.Model):
     track = models.CharField(max_length=20, choices=Track.choices, default=Track.TECH, db_index=True)
     subject_area = models.CharField(max_length=100, blank=True, help_text="e.g. Mathematics, Python, Robotics")
     level = models.CharField(max_length=20, choices=Level.choices, default=Level.OPEN)
-    cover_image_url = models.CharField(max_length=512, blank=True, help_text="GitHub-hosted or CDN URL")
+    cover_image_url = models.CharField(
+        max_length=512,
+        blank=True,
+        help_text="Paste a raw GitHub link or upload below. Saved links are proxied through /cdn/assets/.",
+    )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

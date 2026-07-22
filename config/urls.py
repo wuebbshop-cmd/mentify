@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve as static_serve
 from accounts.sitemap_views import sitemap, robots_txt
+from services.cdn_views import assets_proxy, github_asset_proxy
 import os
 
 urlpatterns = [
@@ -21,6 +22,18 @@ urlpatterns = [
     
     # SEO: Google Search Console verification
     path('google20c3024f708d9e69.html', lambda request: static_serve(request, 'google20c3024f708d9e69.html', document_root=settings.BASE_DIR)),
+
+    # GitHub asset proxy (course banners, avatars, etc.)
+    path(
+        "cdn/assets/<path:filepath>",
+        assets_proxy,
+        name="assets_proxy",
+    ),
+    path(
+        "cdn/github/<str:owner>/<str:repo>/<str:ref>/<path:filepath>",
+        github_asset_proxy,
+        name="github_asset_proxy",
+    ),
 
     # Auth + accounts
     path("accounts/", include("accounts.urls")),

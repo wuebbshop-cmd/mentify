@@ -139,6 +139,12 @@ class ProfileUpdateForm(forms.ModelForm):
 
 class UserUpdateForm(forms.ModelForm):
     """Update core user fields (name, phone)."""
+    avatar_image = forms.ImageField(
+        required=False,
+        label="Profile image",
+        help_text="Uploads to the configured GitHub repo and uses it as your profile image.",
+    )
+
     class Meta:
         model = User
         fields = ["first_name", "last_name", "phone"]
@@ -147,6 +153,10 @@ class UserUpdateForm(forms.ModelForm):
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
             "phone": forms.TextInput(attrs={"class": "form-control"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["avatar_image"].widget.attrs["class"] = "form-control"
 
 
 class PasswordChangeForm(SetPasswordForm):

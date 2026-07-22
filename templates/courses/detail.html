@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load storage_urls %}
 
 {% block title %}{{ course.title }}{% endblock %}
 
@@ -14,6 +15,11 @@
   <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 40px; align-items: flex-start; margin-top: 16px;">
     <!-- Left Column: Details -->
     <div>
+      {% if course.cover_image_url %}
+      <div class="course-detail-banner mb-lg">
+        <img src="{{ course.cover_image_url|public_asset_url }}" alt="{{ course.title }} cover image">
+      </div>
+      {% endif %}
       <div style="margin-bottom: 24px;">
         <span class="badge badge-{{ course.track }} mb-sm">{{ course.get_track_display }}</span>
         <h1 style="margin-bottom: 8px;">{{ course.title }}</h1>

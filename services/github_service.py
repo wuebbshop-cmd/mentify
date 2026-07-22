@@ -10,6 +10,7 @@ import base64
 import uuid
 from dataclasses import dataclass
 from typing import Optional
+from urllib.parse import quote, unquote, urlparse
 
 import requests
 
@@ -157,3 +158,120 @@ class GitHubService:
         if len(parts) < 4:
             return None
         return parts[3]
+
+
+def clean_asset_reference(value: str | None) -> str:
+    """Strip whitespace and trailing punctuation from pasted asset URLs."""
+    if not value:
+        return ""
+    return value.strip().rstrip(";,").strip()
+
+
+def assets_cdn_url(repo_path: str) -> str:
+    """Build a BloodLink-style local proxy URL for a repo-relative file path."""
+    return f"/cdn/assets/{quote(repo_path.lstrip('/'), safe='/')}"
+
+
+def github_cdn_url(owner: str, repo: str, ref: str, repo_path: str) -> str:
+    """Build a local proxy URL for a GitHub-hosted asset."""
+    return f"/cdn/github/{owner}/{repo}/{ref}/{quote(repo_path.lstrip('/'), safe='/')}"
+
+
+def parse_raw_github_url(url: str) -> tuple[str, str, str, str] | None:
+    """Return (owner, repo, ref, path) from a raw.githubusercontent.com URL."""
+    parsed = urlparse(clean_asset_reference(url))
+    if parsed.netloc != "raw.githubusercontent.com":
+        return None
+
+    parts = parsed.path.lstrip("/").split("/", 3)
+    if len(parts) < 4:
+        return None
+
+    owner, repo, ref, repo_path = parts
+    return owner, repo, ref, unquote(repo_path)
+
+
+def _repo_matches(full_repo: str, configured_repo: str) -> bool:
+    return bool(configured_repo) and full_repo.lower() == configured_repo.lower()
+
+
+def normalize_asset_reference(
+    value: str | None,
+    *,
+    repo_name: str = "",
+    branch: str = "main",
+) -> str:
+    """
+    Normalize pasted links into a stable github:// stored reference.
+    Raw commit URLs for the configured repo are rewritten to use the branch ref.
+    """
+    value = clean_asset_reference(value)
+    if not value:
+        return ""
+
+    if value.startswith("github://"):
+        return value
+
+    if value.startswith("/cdn/assets/"):
+        repo_path = unquote(value[len("/cdn/assets/"):].lstrip("/"))
+        if repo_name and repo_path:
+            return f"github://{repo_name}/{branch}/{repo_path}"
+        return value
+
+    parsed = parse_raw_github_url(value)
+    if parsed:
+        owner, repo, _ref, repo_path = parsed
+        full_repo = f"{owner}/{repo}"
+        if _repo_matches(full_repo, repo_name):
+            return f"github://{repo_name}/{branch}/{repo_path}"
+        return value
+
+    if value.startswith(("http://", "https://")):
+        return value
+
+    if repo_name and not value.startswith("/"):
+        return f"github://{repo_name}/{branch}/{value.lstrip('/')}"
+
+    return value
+
+
+def github_public_url(
+    stored_path: str | None,
+    *,
+    repo_name: str = "",
+    branch: str = "main",
+) -> str | None:
+    """Return a browser-usable URL for a stored GitHub path or ordinary URL."""
+    stored_path = clean_asset_reference(stored_path)
+    if not stored_path:
+        return None
+
+    if stored_path.startswith("/cdn/assets/") or stored_path.startswith("/cdn/github/"):
+        return stored_path
+
+    parsed = parse_raw_github_url(stored_path)
+    if parsed:
+        owner, repo, ref, repo_path = parsed
+        full_repo = f"{owner}/{repo}"
+        if _repo_matches(full_repo, repo_name):
+            return assets_cdn_url(repo_path)
+        return github_cdn_url(owner, repo, ref, repo_path)
+
+    if stored_path.startswith(("http://", "https://")):
+        return stored_path
+
+    if stored_path.startswith("github://"):
+        rest = stored_path[len("github://"):]
+        parts = rest.split("/", 3)
+        if len(parts) < 4:
+            return None
+        owner, repo, stored_branch, repo_path = parts
+        full_repo = f"{owner}/{repo}"
+        if _repo_matches(full_repo, repo_name):
+            return assets_cdn_url(repo_path)
+        return github_cdn_url(owner, repo, stored_branch, repo_path)
+
+    if repo_name:
+        return assets_cdn_url(stored_path)
+
+    return None

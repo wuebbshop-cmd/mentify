@@ -22,6 +22,15 @@ services:
         value: config.settings.production
       - key: PYTHON_VERSION
         value: 3.11.0
+      # Required for GitHub-hosted course banners, avatars, and uploads
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO
+        sync: false
+      - key: GITHUB_BRANCH
+        value: main
+      - key: GITHUB_UPLOAD_DIR
+        value: mentify-uploads
     
     # ─── Health Check ────────────────────────────────────────────────
     # Optional: Render pings /health/ to check if service is alive
