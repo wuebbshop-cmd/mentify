@@ -22,6 +22,16 @@ from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRe
 from .decorators import role_required
 
 
+def _form_error_message(form, default="Please correct the errors below and try again."):
+    if form.non_field_errors():
+        return " ".join(str(error) for error in form.non_field_errors())
+    for field, errors in form.errors.items():
+        if errors:
+            label = form.fields[field].label if field in form.fields else field.replace("_", " ").title()
+            return f"{label}: {errors[0]}"
+    return default
+
+
 # ─── Admin Email Promotion ────────────────────────────────────────────────────
 def promote_if_admin_email(user):
     """
@@ -77,6 +87,7 @@ def register_learner(request):
             login(request, user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
             return redirect(user.get_dashboard_url())
+        messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
 
@@ -98,6 +109,7 @@ def register_guardian(request):
             login(request, user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
             return redirect(user.get_dashboard_url())
+        messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
     return render(request, "accounts/register_guardian.html", {"form": form})
@@ -118,6 +130,7 @@ def register_tutor(request):
             login(request, user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
             return redirect(user.get_dashboard_url())
+        messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
     return render(request, "accounts/register_tutor.html", {"form": form})
@@ -265,8 +278,7 @@ def login_view(request):
             next_url = request.GET.get("next") or user.get_dashboard_url()
             messages.success(request, f"Welcome back, {user.first_name}!")
             return redirect(next_url)
-        else:
-            messages.error(request, "Invalid email or password. Please try again.")
+        messages.error(request, _form_error_message(form, "Invalid email or password. Please try again."))
     else:
         form = MentifyLoginForm(request)
 

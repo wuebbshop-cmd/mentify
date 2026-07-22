@@ -9,34 +9,52 @@ from .models import User, Profile
 
 class LearnerRegistrationForm(UserCreationForm):
     """Self-registration form for learners, guardians, and tutors."""
-    ROLE_CHOICES = [
-        ("learner", "Learner / Student"),
-        ("guardian", "Parent / Guardian"),
-        ("tutor", "Tutor / Instructor"),
-    ]
 
     first_name = forms.CharField(max_length=150, required=True, label="First Name")
     last_name = forms.CharField(max_length=150, required=True, label="Last Name")
     email = forms.EmailField(required=True, label="Email Address")
-    role = forms.ChoiceField(choices=ROLE_CHOICES, initial="learner", label="I am joining as")
     phone = forms.CharField(
         max_length=20, required=False,
         label="Phone Number",
-        help_text="Optional - E.164 format e.g. +254700000000"
+        help_text="Optional - E.164 format e.g. +254700000000",
     )
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email", "username", "role", "phone", "password1", "password2"]
+        fields = ["first_name", "last_name", "email", "phone", "password1", "password2"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields.pop("username", None)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
 
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+        if email:
+            cleaned_data["username"] = self._make_username(email)
+        return cleaned_data
+
+    @staticmethod
+    def _make_username(email: str) -> str:
+        base = email.split("@")[0]
+        base = "".join(c if c.isalnum() or c in "._-" else "_" for c in base)[:30] or "user"
+        candidate = base
+        suffix = 1
+        while User.objects.filter(username=candidate).exists():
+            candidate = f"{base}{suffix}"
+            suffix += 1
+        return candidate
+
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.role = self.cleaned_data.get("role", User.Role.LEARNER)
         user.email = self.cleaned_data["email"]
         user.phone = self.cleaned_data.get("phone", "")
         if commit:

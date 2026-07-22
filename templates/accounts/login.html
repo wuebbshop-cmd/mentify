@@ -34,6 +34,8 @@
         <div class="alert alert-error" style="margin-bottom: 16px;">
           {% for error in form.non_field_errors %}{{ error }}{% endfor %}
         </div>
+        {% elif form.errors %}
+        <div class="alert alert-error" style="margin-bottom: 16px;">Please fix the highlighted fields below.</div>
         {% endif %}
 
         <div class="form-group">
