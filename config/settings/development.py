@@ -7,8 +7,7 @@ DEBUG = True
 # In dev, allow all hosts
 ALLOWED_HOSTS = ["*"]
 
-# Verbose email in console
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Uses Resend when RESEND_API_KEY is set (see base.py), otherwise console backend.
 
 # Django debug toolbar (optional, install separately if needed)
 # INSTALLED_APPS += ["debug_toolbar"]

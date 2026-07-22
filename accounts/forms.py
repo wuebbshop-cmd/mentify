@@ -1,6 +1,6 @@
 """accounts/forms.py - Registration, login, profile update forms."""
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, SetPasswordForm, PasswordResetForm
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
@@ -139,6 +139,23 @@ class MentifyLoginForm(AuthenticationForm):
         label="Password",
         widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "••••••••"})
     )
+
+
+class MentifyPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "you@example.com",
+            "autofocus": True,
+        })
+
+
+class MentifySetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
 
 
 class ProfileUpdateForm(forms.ModelForm):

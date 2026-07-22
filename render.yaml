@@ -31,6 +31,11 @@ services:
         value: main
       - key: GITHUB_UPLOAD_DIR
         value: mentify-uploads
+      # Required for password reset + notification emails (Resend.com)
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
     
     # ─── Health Check ────────────────────────────────────────────────
     # Optional: Render pings /health/ to check if service is alive

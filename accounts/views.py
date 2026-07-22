@@ -2,11 +2,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import (
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.urls import reverse
+from django.urls import reverse_lazy
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.db.models import Count, Q
@@ -14,12 +21,15 @@ from django.db.models import Count, Q
 from .forms import (
     LearnerRegistrationForm,
     MentifyLoginForm,
+    MentifyPasswordResetForm,
+    MentifySetPasswordForm,
     ProfileUpdateForm,
     UserUpdateForm,
     GuardianChildLinkForm,
 )
 from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRequestLog
 from .decorators import role_required
+from services.email_service import send_welcome_email
 
 
 def _form_error_message(form, default="Please correct the errors below and try again."):
@@ -85,6 +95,7 @@ def register_learner(request):
             Profile.objects.get_or_create(user=user)
             promote_if_admin_email(user)
             login(request, user)
+            send_welcome_email(user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
             return redirect(user.get_dashboard_url())
         messages.error(request, _form_error_message(form))
@@ -107,6 +118,7 @@ def register_guardian(request):
             Profile.objects.get_or_create(user=user)
             promote_if_admin_email(user)
             login(request, user)
+            send_welcome_email(user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
             return redirect(user.get_dashboard_url())
         messages.error(request, _form_error_message(form))
@@ -128,6 +140,7 @@ def register_tutor(request):
             Profile.objects.get_or_create(user=user)
             promote_if_admin_email(user)
             login(request, user)
+            send_welcome_email(user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
             return redirect(user.get_dashboard_url())
         messages.error(request, _form_error_message(form))
@@ -283,6 +296,43 @@ def login_view(request):
         form = MentifyLoginForm(request)
 
     return render(request, "accounts/login.html", {"form": form})
+
+
+class MentifyPasswordResetView(PasswordResetView):
+    template_name = "accounts/password_reset.html"
+    email_template_name = "accounts/emails/password_reset_email.txt"
+    html_email_template_name = "accounts/emails/password_reset_email.html"
+    subject_template_name = "accounts/emails/password_reset_subject.txt"
+    form_class = MentifyPasswordResetForm
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+    def get_extra_email_context(self):
+        return {"PLATFORM_NAME": getattr(settings, "PLATFORM_NAME", "Mentify")}
+
+    def form_valid(self, form):
+        messages.info(
+            self.request,
+            "If an account exists for that email, a reset link has been sent.",
+        )
+        return super().form_valid(form)
+
+
+class MentifyPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "accounts/password_reset_done.html"
+
+
+class MentifyPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "accounts/password_reset_confirm.html"
+    form_class = MentifySetPasswordForm
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Your password has been updated. You can sign in now.")
+        return super().form_valid(form)
+
+
+class MentifyPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = "accounts/password_reset_complete.html"
 
 
 @require_POST
@@ -953,6 +1003,8 @@ def google_callback(request):
         # Mark email verified
         user.is_email_verified = True
         user.save()
+        Profile.objects.get_or_create(user=user)
+        send_welcome_email(user)
         messages.success(request, f"Successfully registered and logged in as {user.first_name}!")
     else:
         # User already exists, log them in

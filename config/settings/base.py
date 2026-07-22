@@ -177,9 +177,18 @@ PLATFORM_NAME = os.environ.get("PLATFORM_NAME", "Mentify")
 BASE_URL = os.environ.get("BASE_URL", "http://127.0.0.1:8000")
 
 
-# ─── Email ────────────────────────────────────────────────────────────────────
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@Mentify.co.ke")
+# ─── Email (Resend.com) ───────────────────────────────────────────────────────
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+DEFAULT_FROM_EMAIL = (
+    os.environ.get("FROM_EMAIL", "").strip()
+    or os.environ.get("DEFAULT_FROM_EMAIL", "noreply@mentify.co.ke").strip()
+)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+if RESEND_API_KEY:
+    EMAIL_BACKEND = "services.resend_backend.ResendEmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # ─── Cron Jobs ────────────────────────────────────────────────────────────────
