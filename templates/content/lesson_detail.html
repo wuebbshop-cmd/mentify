@@ -48,34 +48,88 @@
       <div>
         {% if video and video_embed_url %}
           <div class="lesson-video-panel mb-lg">
-            <div class="video-container" style="position: relative; padding-top: 56.25%; background: #000; border-radius: 8px 8px 0 0; overflow: hidden;">
-              {% if video_is_direct %}
-                {# HTML5 player for proxy-streamed files (GitHub fallback) #}
+
+            {% if video_is_direct %}
+              {# ── Direct/proxy video: standard HTML5 player ── #}
+              <div style="position:relative; padding-top:56.25%; background:#000; border-radius:8px 8px 0 0; overflow:hidden;">
                 <video
                   controls
                   controlsList="nodownload"
                   preload="metadata"
-                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                  style="position:absolute; top:0; left:0; width:100%; height:100%;"
                 >
                   <source src="{{ video_embed_url }}" type="video/mp4">
-                  Your browser does not support HTML5 video playback.
+                  Your browser does not support HTML5 video.
                 </video>
-              {% else %}
-                {# Bunny Stream signed embed — iframe with token auth #}
-                <iframe
-                  src="{{ video_embed_url }}"
-                  loading="lazy"
-                  style="border: none; position: absolute; top: 0; height: 100%; width: 100%;"
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                  allowfullscreen="true"
-                ></iframe>
-              {% endif %}
-            </div>
-            <div class="lesson-video-meta" style="padding: 12px 16px; background: var(--white); border: 1px solid var(--border); border-top: 0; border-radius: 0 0 8px 8px; display: flex; justify-content: space-between; align-items: center;">
+              </div>
+
+            {% else %}
+              {# ── Bunny Stream: click-to-load facade ─────────────────────────────
+                 The iframe and all Bunny player JS are NOT loaded until the user
+                 clicks play. This eliminates idle bandwidth on the lesson page and
+                 speeds up initial render significantly.
+              ── #}
+              <div id="video-facade-{{ video.pk }}"
+                   onclick="mentifyLoadPlayer(this)"
+                   data-embed-url="{{ video_embed_url }}"
+                   style="position:relative; padding-top:56.25%; background:#111; border-radius:8px 8px 0 0; overflow:hidden; cursor:pointer;">
+
+                {# Thumbnail — Bunny auto-generates this from the video content #}
+                {% if video_thumbnail_url %}
+                  <img src="{{ video_thumbnail_url }}"
+                       alt="{{ lesson.title }}"
+                       style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition:opacity .2s;"
+                       onerror="this.style.display='none'">
+                {% endif %}
+
+                {# Dark overlay #}
+                <div style="position:absolute; inset:0; background:rgba(0,0,0,0.35);"></div>
+
+                {# Play button #}
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                  <div style="width:72px; height:72px; background:rgba(255,255,255,0.95); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 24px rgba(0,0,0,0.4); transition:transform .15s, box-shadow .15s;"
+                       onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 8px 32px rgba(0,0,0,0.5)';"
+                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 24px rgba(0,0,0,0.4)';">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="#0f766e" style="margin-left:4px;">
+                      <polygon points="5,3 19,12 5,21"/>
+                    </svg>
+                  </div>
+                </div>
+
+                {# "Click to play" hint #}
+                <div style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); color:#fff; font-size:0.78rem; opacity:0.85; white-space:nowrap; letter-spacing:0.03em;">
+                  Click to play
+                </div>
+              </div>
+
+              {# Hidden player slot — iframe is injected here on click #}
+              <div id="video-player-{{ video.pk }}" style="display:none; position:relative; padding-top:56.25%; background:#000; border-radius:8px 8px 0 0; overflow:hidden;"></div>
+
+              <script>
+                function mentifyLoadPlayer(facade) {
+                  var embedUrl = facade.getAttribute('data-embed-url');
+                  var pk       = facade.id.replace('video-facade-', '');
+                  var slot     = document.getElementById('video-player-' + pk);
+
+                  // Inject the iframe only now (first click)
+                  var iframe = document.createElement('iframe');
+                  iframe.src = embedUrl + '&autoplay=true';
+                  iframe.setAttribute('allow', 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;');
+                  iframe.setAttribute('allowfullscreen', 'true');
+                  iframe.style.cssText = 'border:none; position:absolute; top:0; left:0; height:100%; width:100%;';
+
+                  slot.appendChild(iframe);
+                  slot.style.display = 'block';
+                  facade.style.display = 'none';
+                }
+              </script>
+            {% endif %}
+
+            <div class="lesson-video-meta" style="padding:12px 16px; background:var(--white); border:1px solid var(--border); border-top:0; border-radius:0 0 8px 8px;">
               <strong>{{ lesson.title }}</strong>
-              <span class="badge badge-accent">{% if video_is_direct %}Video Lesson{% else %}Bunny Stream{% endif %}</span>
             </div>
           </div>
+
         {% else %}
           <div class="empty-state lesson-empty-video">
             <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>

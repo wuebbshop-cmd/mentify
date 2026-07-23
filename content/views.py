@@ -61,30 +61,40 @@ def lesson_detail(request, cohort_id, lesson_id):
 
     # Build video embed URL — sign it server-side if token auth is enabled
     video_embed_url = None
+    video_thumbnail_url = None
     video_is_direct = False
     if video:
         if video.github_stored_path:
-            # Proxy-streamed direct file
+            # Legacy proxy-streamed file (no Bunny CDN — direct from Django)
             video_embed_url = f"/content/video/{video.pk}/stream/"
             video_is_direct = True
         elif video.bunny_video_id:
             library_id = video.bunny_library_id or getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "")
             token_auth_key = getattr(settings, "BUNNY_TOKEN_AUTH_KEY", "").strip()
+            cdn_hostname = getattr(settings, "BUNNY_CDN_HOSTNAME", "").strip()
+
             if library_id and token_auth_key:
-                # Token Authentication is enabled — generate a server-side signed URL
+                # Token Authentication enabled — generate server-side signed URL.
+                # 60-minute expiry: matches max lesson length, minimises replay window.
                 from services.bunny_service import sign_bunny_embed_url
                 video_embed_url = sign_bunny_embed_url(
                     library_id=library_id,
                     video_id=video.bunny_video_id,
                     token_auth_key=token_auth_key,
-                    expires_seconds=7200,  # 2-hour window
+                    expires_seconds=3600,  # 60-minute window — matches max 45-min lesson
                 )
             elif library_id:
-                # No token auth — plain embed URL (public library)
+                # No token auth — plain public embed URL
                 video_embed_url = (
                     f"https://iframe.mediadelivery.net/embed/{library_id}/{video.bunny_video_id}"
                     f"?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
                 )
+
+            # Bunny auto-generates a thumbnail at {cdn_hostname}/{video_id}/thumbnail.jpg
+            # Used for the click-to-load facade (saves player JS from loading until user clicks play)
+            if cdn_hostname and video.bunny_video_id:
+                video_thumbnail_url = f"https://{cdn_hostname}/{video.bunny_video_id}/thumbnail.jpg"
+
             video_is_direct = False
 
     return render(request, "content/lesson_detail.html", {
@@ -92,6 +102,7 @@ def lesson_detail(request, cohort_id, lesson_id):
         "lesson": lesson,
         "video": video,
         "video_embed_url": video_embed_url,
+        "video_thumbnail_url": video_thumbnail_url,
         "video_is_direct": video_is_direct,
         "resources": resources,
         "assignments": assignments,
@@ -265,33 +276,31 @@ def edit_lesson(request, cohort_id, lesson_id):
                             from services.bunny_service import BunnyStreamService
                             service = BunnyStreamService(bunny_lib, bunny_key)
                             uploaded_bunny = service.upload(lesson.title, video_file)
-                        except Exception:
+                        except Exception as exc:
                             uploaded_bunny = None
+                            _bunny_exc = str(exc)
+                        else:
+                            _bunny_exc = None
+                    else:
+                        uploaded_bunny = None
+                        _bunny_exc = "Bunny Stream credentials not configured."
 
                     va, _ = VideoAsset.objects.get_or_create(lesson=lesson)
                     if uploaded_bunny:
                         va.bunny_video_id = uploaded_bunny.video_id
                         va.bunny_library_id = uploaded_bunny.library_id
-                        va.github_stored_path = ""
+                        va.github_stored_path = ""  # clear any legacy fallback path
                         va.save()
                         messages.success(request, "Lesson saved & video uploaded to Bunny Stream.")
                     else:
-                        # Fallback storage via GitHub Service / proxy
-                        from services.github_service import GitHubService
-                        svc = GitHubService(
-                            settings.GITHUB_TOKEN,
-                            settings.GITHUB_REPO,
-                            settings.GITHUB_BRANCH,
-                            settings.GITHUB_UPLOAD_DIR,
+                        # Do NOT silently fall back to GitHub for video — that proxies
+                        # every byte twice (GitHub → Render → learner) which doubles
+                        # bandwidth costs and is slow. Tutor must fix Bunny credentials.
+                        messages.error(
+                            request,
+                            f"Video upload failed — please try again or contact support. "
+                            f"({_bunny_exc})"
                         )
-                        result = svc.upload_file(video_file, subdir=f"cohort_{cohort.id}/lesson_{lesson.id}_videos")
-                        if result:
-                            va.github_stored_path = result.stored_path
-                            va.bunny_video_id = result.stored_path
-                            va.save()
-                            messages.success(request, "Lesson saved & video uploaded successfully.")
-                        else:
-                            messages.error(request, "Video storage upload failed. Please try again.")
                 elif video_form.cleaned_data.get("bunny_video_id"):
                     va = video_form.save(commit=False)
                     va.lesson = lesson
