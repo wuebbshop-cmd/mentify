@@ -59,3 +59,38 @@ class BunnyStreamService:
         video_id = self.create_video(title)
         self.upload_video_file(video_id, file_obj)
         return BunnyVideoUploadResult(video_id=video_id, library_id=self.library_id)
+
+
+def sign_bunny_embed_url(
+    library_id: str,
+    video_id: str,
+    token_auth_key: str,
+    expires_seconds: int = 7200,
+) -> str:
+    """
+    Generate a signed Bunny Stream embed URL for Token Authentication.
+
+    Algorithm (per Bunny docs):
+      token = SHA256(token_auth_key + video_id + expires_timestamp)
+      url   = https://iframe.mediadelivery.net/embed/{libraryId}/{videoId}?token={token}&expires={expires}
+
+    Args:
+        library_id:       Bunny Stream Library ID
+        video_id:         Bunny video GUID
+        token_auth_key:   Token Security Key from Stream → Library → Security
+        expires_seconds:  How many seconds until the URL expires (default 2 hours)
+
+    Returns:
+        Signed iframe embed URL string ready to drop into an <iframe src="...">.
+    """
+    import hashlib
+    import time
+
+    expires = int(time.time()) + expires_seconds
+    raw = f"{token_auth_key}{video_id}{expires}"
+    token = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    return (
+        f"https://iframe.mediadelivery.net/embed/{library_id}/{video_id}"
+        f"?token={token}&expires={expires}"
+        f"&autoplay=false&loop=false&muted=false&preload=true&responsive=true"
+    )

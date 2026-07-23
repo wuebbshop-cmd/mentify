@@ -39,6 +39,7 @@ def cohort_lessons(request, cohort_id):
 @cohort_access_required
 def lesson_detail(request, cohort_id, lesson_id):
     """Learner watches a lesson (Bunny embed + resources + assignment)."""
+    from django.conf import settings
     cohort = get_object_or_404(Cohort, id=cohort_id)
     lesson = get_object_or_404(Lesson, id=lesson_id, cohort=cohort, is_published=True)
 
@@ -58,10 +59,40 @@ def lesson_detail(request, cohort_id, lesson_id):
     # Assignments
     assignments = lesson.assignments.filter(is_published=True)
 
+    # Build video embed URL — sign it server-side if token auth is enabled
+    video_embed_url = None
+    video_is_direct = False
+    if video:
+        if video.github_stored_path:
+            # Proxy-streamed direct file
+            video_embed_url = f"/content/video/{video.pk}/stream/"
+            video_is_direct = True
+        elif video.bunny_video_id:
+            library_id = video.bunny_library_id or getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "")
+            token_auth_key = getattr(settings, "BUNNY_TOKEN_AUTH_KEY", "").strip()
+            if library_id and token_auth_key:
+                # Token Authentication is enabled — generate a server-side signed URL
+                from services.bunny_service import sign_bunny_embed_url
+                video_embed_url = sign_bunny_embed_url(
+                    library_id=library_id,
+                    video_id=video.bunny_video_id,
+                    token_auth_key=token_auth_key,
+                    expires_seconds=7200,  # 2-hour window
+                )
+            elif library_id:
+                # No token auth — plain embed URL (public library)
+                video_embed_url = (
+                    f"https://iframe.mediadelivery.net/embed/{library_id}/{video.bunny_video_id}"
+                    f"?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
+                )
+            video_is_direct = False
+
     return render(request, "content/lesson_detail.html", {
         "cohort": cohort,
         "lesson": lesson,
         "video": video,
+        "video_embed_url": video_embed_url,
+        "video_is_direct": video_is_direct,
         "resources": resources,
         "assignments": assignments,
     })
@@ -108,7 +139,11 @@ def resource_download(request, resource_id):
 
 @login_required
 def video_stream(request, video_id):
-    """Proxy endpoint for streaming uploaded video assets securely."""
+    """
+    Proxy endpoint for streaming uploaded video assets securely.
+    Supports HTTP Range requests so the browser's native <video> controls
+    (seeking, scrubbing) work correctly — exactly like real CDN video delivery.
+    """
     from .models import VideoAsset
     video = get_object_or_404(VideoAsset, id=video_id)
     cohort = video.lesson.cohort
@@ -120,6 +155,7 @@ def video_stream(request, video_id):
 
     from services.github_service import GitHubService
     from django.conf import settings
+    from django.http import HttpResponse
 
     try:
         svc = GitHubService(
@@ -132,11 +168,30 @@ def video_stream(request, video_id):
     except Exception:
         raise Http404("Video file not available.")
 
-    response = StreamingHttpResponse(
-        streaming_content=iter([file_bytes]),
-        content_type="video/mp4",
-    )
-    response["Content-Disposition"] = 'inline'
+    file_size = len(file_bytes)
+    content_type = "video/mp4"
+
+    # --- HTTP Range support (seek/scrub support in HTML5 <video>) ---
+    range_header = request.META.get("HTTP_RANGE", "").strip()
+    if range_header and range_header.startswith("bytes="):
+        try:
+            ranges = range_header[6:].split("-")
+            start = int(ranges[0]) if ranges[0] else 0
+            end = int(ranges[1]) if len(ranges) > 1 and ranges[1] else file_size - 1
+            end = min(end, file_size - 1)
+            chunk = file_bytes[start:end + 1]
+            response = HttpResponse(chunk, status=206, content_type=content_type)
+            response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+            response["Content-Length"] = len(chunk)
+        except (ValueError, IndexError):
+            response = HttpResponse(file_bytes, content_type=content_type)
+            response["Content-Length"] = file_size
+    else:
+        response = HttpResponse(file_bytes, content_type=content_type)
+        response["Content-Length"] = file_size
+
+    response["Accept-Ranges"] = "bytes"
+    response["Content-Disposition"] = "inline"
     return response
 
 
