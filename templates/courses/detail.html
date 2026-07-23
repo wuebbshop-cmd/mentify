@@ -48,10 +48,11 @@
                   </p>
                 </div>
                 <div style="text-align: right;">
-                  <div style="font-size: 1.25rem; font-weight: 700; color: var(--text);">
+                  <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
                     KES {{ cohort.price_kes|floatformat:2 }}
+                    <span class="badge badge-accent" style="font-size: 0.75rem; text-transform: lowercase;">/ month</span>
                   </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Access runs from the cohort dates shown below</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Monthly subscription • Cancel anytime</div>
                 </div>
               </div>
               <div class="tutor-inline-summary">
@@ -79,7 +80,7 @@
                   View Schedule &amp; Details
                 </a>
                 <a href="{% url 'courses:enroll' cohort.id %}" class="btn btn-primary btn-sm">
-                  Enroll &amp; Pay KES {{ cohort.price_kes|floatformat:0 }}
+                  Enroll &amp; Pay KES {{ cohort.price_kes|floatformat:0 }} / mo
                 </a>
               </div>
             </div>

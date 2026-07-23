@@ -69,6 +69,14 @@ class Subscription(models.Model):
         self.status = self.Status.ACTIVE
         self.save()
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status == self.Status.ACTIVE and self.is_access_valid:
+            from courses.models import Enrollment
+            Enrollment.objects.filter(
+                learner=self.learner, cohort=self.cohort
+            ).update(status="active")
+
 
 class Payment(models.Model):
     """
@@ -110,3 +118,14 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"[{self.method}] {self.subscription.learner.get_full_name()} - KES {self.amount_kes} ({self.status})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status == self.Status.SUCCESS:
+            from courses.models import Enrollment
+            if not self.subscription.is_access_valid or self.subscription.status != Subscription.Status.ACTIVE:
+                self.subscription.extend_by_one_month()
+            Enrollment.objects.filter(
+                learner=self.subscription.learner, cohort=self.subscription.cohort
+            ).update(status="active")
+

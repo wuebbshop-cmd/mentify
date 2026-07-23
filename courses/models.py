@@ -152,3 +152,16 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f"{self.learner.get_full_name()} → {self.cohort}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status == self.Status.ACTIVE:
+            from payments.models import Subscription
+            sub, _ = Subscription.objects.get_or_create(
+                learner=self.learner,
+                cohort=self.cohort,
+                defaults={"status": Subscription.Status.ACTIVE},
+            )
+            if not sub.is_access_valid or sub.status != Subscription.Status.ACTIVE:
+                sub.extend_by_one_month()
+

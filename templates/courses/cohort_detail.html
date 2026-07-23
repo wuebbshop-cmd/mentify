@@ -23,9 +23,11 @@
           <h2>Cohort: {{ cohort.name }}</h2>
           <p class="mt-sm mb-0">Course: <strong>{{ cohort.course.title }}</strong></p>
         </div>
-        <div class="price-panel">
-          <div class="price-panel__value">KES {{ cohort.price_kes|floatformat:2 }}</div>
-          <div class="price-panel__label">Cohort access fee</div>
+        <div class="price-panel" style="text-align: right;">
+          <div class="price-panel__value" style="font-size: 1.5rem; font-weight: 700; color: var(--text);">
+            KES {{ cohort.price_kes|floatformat:2 }} <span class="badge badge-accent" style="font-size: 0.75rem; vertical-align: middle; text-transform: lowercase;">/ month</span>
+          </div>
+          <div class="price-panel__label" style="font-size: 0.8rem; color: var(--text-muted);">Monthly cohort subscription</div>
         </div>
       </div>
 
@@ -65,9 +67,9 @@
       {% else %}
         <div class="cohort-enroll-actions">
           <a href="{% url 'courses:enroll' cohort.id %}" class="btn btn-primary btn-lg w-full" id="cohort-enroll-submit-btn">
-            Enroll &amp; Proceed to Payment
+            Enroll &amp; Pay KES {{ cohort.price_kes|floatformat:0 }} / month
           </a>
-          <p class="text-sm mt-sm mb-0">You will be redirected to Paystack to complete the cohort fee for the current access window. Secure payment via Card or M-Pesa.</p>
+          <p class="text-sm mt-sm mb-0">You will be redirected to Paystack to complete your monthly cohort subscription fee. Secure payment via Card or M-Pesa.</p>
         </div>
       {% endif %}
     </div>
