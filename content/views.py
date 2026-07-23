@@ -25,13 +25,20 @@ def cohort_lessons(request, cohort_id):
                 learner=request.user, lesson__in=lessons, completed=True
             ).values_list("lesson_id", flat=True)
         )
+        submitted_ids = set(
+            LessonProgress.objects.filter(
+                learner=request.user, lesson__in=lessons, status=LessonProgress.Status.SUBMITTED
+            ).values_list("lesson_id", flat=True)
+        )
     else:
         completed_ids = set()
+        submitted_ids = set()
 
     return render(request, "content/lesson_list.html", {
         "cohort": cohort,
         "lessons": lessons,
         "completed_ids": completed_ids,
+        "submitted_ids": submitted_ids,
     })
 
 
@@ -46,15 +53,12 @@ def lesson_detail(request, cohort_id, lesson_id):
     video = getattr(lesson, "video", None)
     resources = lesson.resources.all().order_by("resource_type", "title")
 
-    # Mark as viewed
+    # Track progress (do NOT auto-complete — student must mark completed & tutor verify)
+    progress = None
     if request.user.is_learner:
-        progress, created = LessonProgress.objects.get_or_create(
+        progress, _ = LessonProgress.objects.get_or_create(
             learner=request.user, lesson=lesson
         )
-        if not progress.completed:
-            progress.completed = True
-            progress.completed_at = timezone.now()
-            progress.save()
 
     # Assignments
     assignments = lesson.assignments.filter(is_published=True)
@@ -74,24 +78,19 @@ def lesson_detail(request, cohort_id, lesson_id):
             cdn_hostname = getattr(settings, "BUNNY_CDN_HOSTNAME", "").strip()
 
             if library_id and token_auth_key:
-                # Token Authentication enabled — generate server-side signed URL.
-                # 60-minute expiry: matches max lesson length, minimises replay window.
                 from services.bunny_service import sign_bunny_embed_url
                 video_embed_url = sign_bunny_embed_url(
                     library_id=library_id,
                     video_id=video.bunny_video_id,
                     token_auth_key=token_auth_key,
-                    expires_seconds=3600,  # 60-minute window — matches max 45-min lesson
+                    expires_seconds=3600,
                 )
             elif library_id:
-                # No token auth — plain public embed URL
                 video_embed_url = (
                     f"https://iframe.mediadelivery.net/embed/{library_id}/{video.bunny_video_id}"
                     f"?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
                 )
 
-            # Bunny auto-generates a thumbnail at {cdn_hostname}/{video_id}/thumbnail.jpg
-            # Used for the click-to-load facade (saves player JS from loading until user clicks play)
             if cdn_hostname and video.bunny_video_id:
                 video_thumbnail_url = f"https://{cdn_hostname}/{video.bunny_video_id}/thumbnail.jpg"
 
@@ -106,7 +105,33 @@ def lesson_detail(request, cohort_id, lesson_id):
         "video_is_direct": video_is_direct,
         "resources": resources,
         "assignments": assignments,
+        "progress": progress,
     })
+
+
+@login_required
+@cohort_access_required
+def mark_lesson_submitted(request, cohort_id, lesson_id):
+    """Learner marks a lesson as completed (submits for tutor verification)."""
+    if not request.user.is_learner:
+        messages.error(request, "Only learners can submit lesson completion requests.")
+        return redirect("content:lesson_detail", cohort_id=cohort_id, lesson_id=lesson_id)
+
+    cohort = get_object_or_404(Cohort, id=cohort_id)
+    lesson = get_object_or_404(Lesson, id=lesson_id, cohort=cohort, is_published=True)
+
+    progress, _ = LessonProgress.objects.get_or_create(learner=request.user, lesson=lesson)
+    if progress.completed:
+        messages.info(request, "This lesson has already been verified and marked complete by your tutor.")
+    else:
+        progress.status = LessonProgress.Status.SUBMITTED
+        progress.student_submitted_at = timezone.now()
+        progress.save()
+        messages.success(
+            request,
+            "Completion request submitted! Your tutor will verify your attendance and assignment submission before marking it complete."
+        )
+    return redirect("content:lesson_detail", cohort_id=cohort.id, lesson_id=lesson.id)
 
 
 @login_required
@@ -368,3 +393,91 @@ def edit_lesson(request, cohort_id, lesson_id):
         "resources": resources,
         "video": video,
     })
+
+
+@login_required
+@role_required("tutor", "admin")
+def verify_lesson_progress(request, cohort_id):
+    """
+    Tutor reviews student completion requests for a cohort,
+    verifying attendance and assignment submissions before marking complete.
+    """
+    from django.db import models
+    if request.user.is_admin:
+        cohort = get_object_or_404(Cohort, id=cohort_id)
+    else:
+        cohort = get_object_or_404(Cohort, id=cohort_id, tutor=request.user)
+
+    from live_sessions.models import Attendance, LiveSession
+    from assignments.models import Submission, Assignment
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        progress_id = request.POST.get("progress_id")
+        progress = get_object_or_404(LessonProgress, id=progress_id, lesson__cohort=cohort)
+
+        if action == "verify":
+            progress.completed = True
+            progress.status = LessonProgress.Status.VERIFIED
+            progress.verified_by = request.user
+            progress.completed_at = timezone.now()
+            progress.save()
+            messages.success(request, f"Verified lesson completion for {progress.learner.get_full_name()}.")
+        elif action == "reject":
+            progress.completed = False
+            progress.status = LessonProgress.Status.REJECTED
+            progress.verified_by = request.user
+            progress.save()
+            messages.info(request, f"Returned lesson completion request for {progress.learner.get_full_name()}.")
+
+        return redirect("content:verify_lesson_progress", cohort_id=cohort.id)
+
+    # Filter requests for this cohort
+    submitted_requests = LessonProgress.objects.filter(
+        lesson__cohort=cohort,
+        status=LessonProgress.Status.SUBMITTED
+    ).select_related("learner", "lesson").order_by("-student_submitted_at")
+
+    all_verifications = LessonProgress.objects.filter(
+        lesson__cohort=cohort,
+        status__in=[LessonProgress.Status.VERIFIED, LessonProgress.Status.REJECTED]
+    ).select_related("learner", "lesson", "verified_by").order_by("-completed_at")[:20]
+
+    # Attendance and assignment summaries per learner
+    learner_ids = list(submitted_requests.values_list("learner_id", flat=True).distinct())
+
+    past_sessions_count = LiveSession.objects.filter(cohort=cohort, scheduled_at__lt=timezone.now(), is_cancelled=False).count()
+    attendance_map = {
+        item["learner_id"]: item["total"]
+        for item in Attendance.objects.filter(
+            session__cohort=cohort,
+            learner_id__in=learner_ids,
+            status=Attendance.AttendanceStatus.ATTENDED
+        ).values("learner_id").annotate(total=models.Count("id"))
+    }
+
+    assignment_map = {
+        (item["learner_id"], item["assignment__lesson_id"]): item["status"]
+        for item in Submission.objects.filter(
+            assignment__lesson__cohort=cohort,
+            learner_id__in=learner_ids
+        ).values("learner_id", "assignment__lesson_id", "status")
+    }
+
+    verification_items = []
+    for req in submitted_requests:
+        attended = attendance_map.get(req.learner_id, 0)
+        submission_status = assignment_map.get((req.learner_id, req.lesson_id), "None")
+        verification_items.append({
+            "progress": req,
+            "attended_sessions": attended,
+            "total_past_sessions": past_sessions_count,
+            "submission_status": submission_status,
+        })
+
+    return render(request, "content/verifications.html", {
+        "cohort": cohort,
+        "verification_items": verification_items,
+        "all_verifications": all_verifications,
+    })
+

@@ -133,15 +133,41 @@ class Resource(models.Model):
 
 
 class LessonProgress(models.Model):
-    """Tracks whether a learner has viewed a lesson."""
+    """
+    Tracks a learner's lesson completion request and tutor verification.
+    Completion is a 2-step transparent process:
+    1. Student marks lesson as completed (status='submitted')
+    2. Tutor verifies attendance + assignments and marks as verified (completed=True, status='verified')
+    """
+
+    class Status(models.TextChoices):
+        NOT_STARTED = "not_started", "Not Started"
+        SUBMITTED = "submitted", "Pending Verification"
+        VERIFIED = "verified", "Verified & Completed"
+        REJECTED = "rejected", "Returned by Tutor"
+
     learner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="lesson_progress",
     )
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="progress_records")
-    completed = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.NOT_STARTED,
+        db_index=True,
+    )
+    student_submitted_at = models.DateTimeField(null=True, blank=True)
+    completed = models.BooleanField(default=False, help_text="True once verified by tutor")
     completed_at = models.DateTimeField(null=True, blank=True)
+    verified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="verified_lesson_progress",
+    )
     first_viewed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -149,5 +175,6 @@ class LessonProgress(models.Model):
         unique_together = [("learner", "lesson")]
 
     def __str__(self):
-        status = "✓" if self.completed else "○"
-        return f"{status} {self.learner.get_full_name()} - {self.lesson.title}"
+        status_symbol = "✓" if self.completed else ("⌛" if self.status == self.Status.SUBMITTED else "○")
+        return f"[{status_symbol}] {self.learner.get_full_name()} - {self.lesson.title}"
+

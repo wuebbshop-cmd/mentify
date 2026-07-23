@@ -57,10 +57,17 @@
           {% for lesson in lessons %}
           <a href="{% url 'content:lesson_detail' cohort.id lesson.id %}" class="lesson-item {% if lesson.id in completed_ids %}completed{% endif %}">
             <div class="lesson-number">
-              {% if lesson.id in completed_ids %}✓{% else %}{{ lesson.order }}{% endif %}
+              {% if lesson.id in completed_ids %}✓{% elif lesson.id in submitted_ids %}⌛{% else %}{{ lesson.order }}{% endif %}
             </div>
             <div class="lesson-info">
-              <div class="lesson-title">{{ lesson.title }}</div>
+              <div class="lesson-title">
+                {{ lesson.title }}
+                {% if lesson.id in completed_ids %}
+                  <span class="badge badge-success" style="font-size: 0.72rem; margin-left: 6px;">Verified</span>
+                {% elif lesson.id in submitted_ids %}
+                  <span class="badge badge-warning" style="font-size: 0.72rem; margin-left: 6px;">Pending Verification</span>
+                {% endif %}
+              </div>
               <div class="lesson-meta">
                 {% if lesson.description %}{{ lesson.description|truncatewords:12 }}{% else %}No description provided.{% endif %}
               </div>

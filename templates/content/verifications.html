@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Lesson Completion - {{ cohort.name }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Tutor navigation">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-row">
+        <div class="sidebar-profile-avatar">
+          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        </div>
+        <div class="sidebar-profile-info">
+          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
+        {{ request.user.get_role_display|default:request.user.role|title }}
+      </span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a href="{% url 'accounts:tutor_dashboard' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Dashboard
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohorts' %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span> Cohort Management
+      </a></li>
+      <li class="nav-item"><a href="{% url 'courses:tutor_cohort_manage' cohort.id %}">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Manage Content
+      </a></li>
+      <li class="nav-item"><a href="{% url 'content:verify_lesson_progress' cohort.id %}" class="active">
+        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Lesson Verifications
+      </a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Body -->
+  <div class="dashboard-body">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="{% url 'courses:tutor_cohorts' %}">Cohorts</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="{% url 'courses:tutor_cohort_manage' cohort.id %}">{{ cohort.name }}</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="text-primary">Lesson Verifications</span>
+      </div>
+      <h1>Verify Lesson Completion Requests</h1>
+      <p style="margin: 0; color: var(--text-muted);">Review student completion submissions against attendance records and assignments before marking complete.</p>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="card mb-xl">
+      <h3 class="mb-md">Pending Completion Requests ({% if verification_items %}{{ verification_items|length }}{% else %}0{% endif %})</h3>
+      {% if verification_items %}
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          {% for item in verification_items %}
+          <div class="card" style="padding: 20px; border-left: 4px solid var(--warning); background: var(--surface);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <div style="font-weight: 700; font-size: 1.05rem;">{{ item.progress.learner.get_full_name }}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                  Lesson {{ item.progress.lesson.order }}: <strong>{{ item.progress.lesson.title }}</strong>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                  Submitted on {{ item.progress.student_submitted_at|date:"d M Y @ g:i A" }}
+                </div>
+              </div>
+              <span class="badge badge-warning">Pending Verification</span>
+            </div>
+
+            <!-- Proof Bar -->
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; padding: 12px; background: var(--white); border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.85rem;">
+              <div>
+                <strong>Live Attendance:</strong>
+                <span class="text-primary font-bold">{{ item.attended_sessions }} / {{ item.total_past_sessions }}</span> past sessions attended
+              </div>
+              <div style="border-left: 1px solid var(--border); padding-left: 16px;">
+                <strong>Assignment Status:</strong>
+                <span class="badge {% if item.submission_status == 'graded' %}badge-success{% elif item.submission_status == 'submitted' %}badge-warning{% else %}badge-muted{% endif %}">
+                  {{ item.submission_status|title }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="verify">
+                <input type="hidden" name="progress_id" value="{{ item.progress.id }}">
+                <button type="submit" class="btn btn-primary btn-sm">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Verify &amp; Mark Complete
+                </button>
+              </form>
+
+              <form method="post" style="display: inline;" onsubmit="return confirm('Return this completion request to the student?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reject">
+                <input type="hidden" name="progress_id" value="{{ item.progress.id }}">
+                <button type="submit" class="btn btn-outline btn-sm">
+                  ✕ Return Request
+                </button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state" style="padding: 32px 16px;">
+          <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <p class="mb-0">No pending lesson completion requests for this cohort.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent History -->
+    {% if all_verifications %}
+    <div class="card">
+      <h3 class="mb-md">Recently Verified / Returned Requests</h3>
+      <table class="table" style="width: 100%; font-size: 0.875rem;">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Lesson</th>
+            <th>Status</th>
+            <th>Action Date</th>
+            <th>Verified By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in all_verifications %}
+          <tr>
+            <td><strong>{{ p.learner.get_full_name }}</strong></td>
+            <td>Lesson {{ p.lesson.order }}: {{ p.lesson.title }}</td>
+            <td>
+              {% if p.completed %}
+                <span class="badge badge-success">✓ Verified &amp; Complete</span>
+              {% else %}
+                <span class="badge badge-danger">Returned</span>
+              {% endif %}
+            </td>
+            <td>{{ p.completed_at|date:"d M Y @ g:i A"|default:"-" }}</td>
+            <td>{{ p.verified_by.get_full_name|default:"Tutor" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
