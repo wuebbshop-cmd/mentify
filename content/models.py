@@ -44,19 +44,23 @@ class Lesson(models.Model):
 
 class VideoAsset(models.Model):
     """
-    Bunny Stream video linked to a Lesson.
-    We only store the Bunny video ID - never serve raw video from Django.
-    The embed/player URL is constructed from the library ID + video ID.
+    Bunny Stream video linked to a Lesson with GitHub/Direct Video fallback support.
     """
     lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name="video")
     bunny_video_id = models.CharField(
         max_length=255,
-        help_text="Bunny Stream video GUID (from your Bunny library)"
+        blank=True,
+        help_text="Bunny Stream video GUID or fallback identifier"
     )
     bunny_library_id = models.CharField(
         max_length=100,
         blank=True,
         help_text="Overrides settings.BUNNY_STREAM_LIBRARY_ID if set"
+    )
+    github_stored_path = models.CharField(
+        max_length=512,
+        blank=True,
+        help_text="Stored path in GitHub repository for fallback video streaming"
     )
     duration_seconds = models.PositiveIntegerField(null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -68,12 +72,28 @@ class VideoAsset(models.Model):
         return f"Video for: {self.lesson.title}"
 
     def get_embed_url(self):
-        library_id = self.bunny_library_id or settings.BUNNY_STREAM_LIBRARY_ID
-        return f"https://iframe.mediadelivery.net/embed/{library_id}/{self.bunny_video_id}"
+        if self.github_stored_path:
+            return f"/content/video/{self.pk}/stream/"
+        if self.bunny_video_id:
+            if self.bunny_video_id.startswith("http") or self.bunny_video_id.startswith("/"):
+                return self.bunny_video_id
+            library_id = self.bunny_library_id or getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "")
+            if library_id:
+                return f"https://iframe.mediadelivery.net/embed/{library_id}/{self.bunny_video_id}"
+        return ""
+
+    @property
+    def is_direct_file(self):
+        url = self.get_embed_url()
+        return bool(self.github_stored_path or url.endswith((".mp4", ".webm", ".mov")) or "/stream/" in url)
 
     def get_player_url(self):
-        library_id = self.bunny_library_id or settings.BUNNY_STREAM_LIBRARY_ID
+        url = self.get_embed_url()
+        if url:
+            return url
+        library_id = self.bunny_library_id or getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "")
         return f"https://iframe.mediadelivery.net/play/{library_id}/{self.bunny_video_id}"
+
 
 
 class Resource(models.Model):

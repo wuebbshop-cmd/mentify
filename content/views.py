@@ -106,6 +106,40 @@ def resource_download(request, resource_id):
     return response
 
 
+@login_required
+def video_stream(request, video_id):
+    """Proxy endpoint for streaming uploaded video assets securely."""
+    from .models import VideoAsset
+    video = get_object_or_404(VideoAsset, id=video_id)
+    cohort = video.lesson.cohort
+    if not check_cohort_access(request.user, cohort):
+        raise Http404("Video not found or access denied.")
+
+    if not video.github_stored_path:
+        raise Http404("No video file stream available.")
+
+    from services.github_service import GitHubService
+    from django.conf import settings
+
+    try:
+        svc = GitHubService(
+            settings.GITHUB_TOKEN,
+            settings.GITHUB_REPO,
+            settings.GITHUB_BRANCH,
+            settings.GITHUB_UPLOAD_DIR,
+        )
+        file_bytes = svc.download_file(video.github_stored_path)
+    except Exception:
+        raise Http404("Video file not available.")
+
+    response = StreamingHttpResponse(
+        streaming_content=iter([file_bytes]),
+        content_type="video/mp4",
+    )
+    response["Content-Disposition"] = 'inline'
+    return response
+
+
 # ─── Tutor content management ─────────────────────────────────────────────────
 
 @login_required
@@ -140,7 +174,7 @@ def create_lesson(request, cohort_id):
 @login_required
 @role_required("tutor", "admin")
 def edit_lesson(request, cohort_id, lesson_id):
-    """Tutor edits lesson, video ID, and resources."""
+    """Tutor edits lesson, video file, and resources."""
     if request.user.is_admin:
         cohort = get_object_or_404(Cohort, id=cohort_id)
     else:
@@ -160,32 +194,58 @@ def edit_lesson(request, cohort_id, lesson_id):
 
         if action == "save_lesson" and lesson_form.is_valid():
             lesson_form.save()
-            # Handle video
+            # Handle video upload
             if video_form.is_valid():
                 video_file = video_form.cleaned_data.get("video_file")
                 if video_file:
                     from django.conf import settings
-                    from services.bunny_service import BunnyStreamService
+                    from .models import VideoAsset
 
-                    try:
-                        service = BunnyStreamService(
-                            settings.BUNNY_STREAM_LIBRARY_ID,
-                            settings.BUNNY_STREAM_API_KEY,
+                    uploaded_bunny = None
+                    bunny_lib = getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "").strip()
+                    bunny_key = getattr(settings, "BUNNY_STREAM_API_KEY", "").strip()
+
+                    if bunny_lib and bunny_key:
+                        try:
+                            from services.bunny_service import BunnyStreamService
+                            service = BunnyStreamService(bunny_lib, bunny_key)
+                            uploaded_bunny = service.upload(lesson.title, video_file)
+                        except Exception:
+                            uploaded_bunny = None
+
+                    va, _ = VideoAsset.objects.get_or_create(lesson=lesson)
+                    if uploaded_bunny:
+                        va.bunny_video_id = uploaded_bunny.video_id
+                        va.bunny_library_id = uploaded_bunny.library_id
+                        va.github_stored_path = ""
+                        va.save()
+                        messages.success(request, "Lesson saved & video uploaded to Bunny Stream.")
+                    else:
+                        # Fallback storage via GitHub Service / proxy
+                        from services.github_service import GitHubService
+                        svc = GitHubService(
+                            settings.GITHUB_TOKEN,
+                            settings.GITHUB_REPO,
+                            settings.GITHUB_BRANCH,
+                            settings.GITHUB_UPLOAD_DIR,
                         )
-                        uploaded = service.upload(lesson.title, video_file)
-                    except Exception as exc:
-                        messages.error(request, f"Video upload failed: {exc}")
-                        return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
-                    va = video_form.save(commit=False)
-                    va.lesson = lesson
-                    va.bunny_video_id = uploaded.video_id
-                    va.bunny_library_id = uploaded.library_id
-                    va.save()
+                        result = svc.upload_file(video_file, subdir=f"cohort_{cohort.id}/lesson_{lesson.id}_videos")
+                        if result:
+                            va.github_stored_path = result.stored_path
+                            va.bunny_video_id = result.stored_path
+                            va.save()
+                            messages.success(request, "Lesson saved & video uploaded successfully.")
+                        else:
+                            messages.error(request, "Video storage upload failed. Please try again.")
                 elif video_form.cleaned_data.get("bunny_video_id"):
                     va = video_form.save(commit=False)
                     va.lesson = lesson
                     va.save()
-            messages.success(request, "Lesson saved.")
+                    messages.success(request, "Lesson saved.")
+                else:
+                    messages.success(request, "Lesson saved.")
+            else:
+                messages.error(request, "Please check the video upload details.")
             return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
 
         elif action == "add_resource":
