@@ -101,7 +101,7 @@
                 <input type="hidden" name="action" value="reject">
                 <input type="hidden" name="progress_id" value="{{ item.progress.id }}">
                 <button type="submit" class="btn btn-outline btn-sm">
-                  ✕ Return Request
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Return Request
                 </button>
               </form>
             </div>
@@ -137,7 +137,10 @@
             <td>Lesson {{ p.lesson.order }}: {{ p.lesson.title }}</td>
             <td>
               {% if p.completed %}
-                <span class="badge badge-success">✓ Verified &amp; Complete</span>
+                <span class="badge badge-success" style="display: inline-flex; align-items: center; gap: 4px;">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Verified &amp; Complete
+                </span>
               {% else %}
                 <span class="badge badge-danger">Returned</span>
               {% endif %}

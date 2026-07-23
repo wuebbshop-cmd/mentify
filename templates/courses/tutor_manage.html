@@ -123,7 +123,9 @@
                 <a href="{% url 'sessions:schedule_makeup' s.id %}" class="btn btn-ghost btn-sm" title="Schedule makeup session">Makeup</a>
                 <form action="{% url 'sessions:cancel' s.id %}" method="post" style="display:inline;" onsubmit="return confirm('Cancel this session?');">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-danger btn-sm">✕</button>
+                  <button type="submit" class="btn btn-danger btn-sm" title="Cancel session">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
                 </form>
               </div>
               {% endif %}

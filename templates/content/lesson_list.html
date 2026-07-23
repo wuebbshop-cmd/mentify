@@ -57,7 +57,13 @@
           {% for lesson in lessons %}
           <a href="{% url 'content:lesson_detail' cohort.id lesson.id %}" class="lesson-item {% if lesson.id in completed_ids %}completed{% endif %}">
             <div class="lesson-number">
-              {% if lesson.id in completed_ids %}✓{% elif lesson.id in submitted_ids %}⌛{% else %}{{ lesson.order }}{% endif %}
+              {% if lesson.id in completed_ids %}
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              {% elif lesson.id in submitted_ids %}
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              {% else %}
+                {{ lesson.order }}
+              {% endif %}
             </div>
             <div class="lesson-info">
               <div class="lesson-title">

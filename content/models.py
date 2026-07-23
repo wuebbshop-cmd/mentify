@@ -175,6 +175,6 @@ class LessonProgress(models.Model):
         unique_together = [("learner", "lesson")]
 
     def __str__(self):
-        status_symbol = "✓" if self.completed else ("⌛" if self.status == self.Status.SUBMITTED else "○")
-        return f"[{status_symbol}] {self.learner.get_full_name()} - {self.lesson.title}"
+        status_tag = "Verified" if self.completed else ("Pending" if self.status == self.Status.SUBMITTED else "Not Started")
+        return f"[{status_tag}] {self.learner.get_full_name()} - {self.lesson.title}"
 

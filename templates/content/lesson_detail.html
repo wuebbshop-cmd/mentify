@@ -139,19 +139,28 @@
           {% if progress.completed %}
             <div class="alert alert-success mb-0 flex items-center justify-between" style="padding: 16px;">
               <div>
-                <strong>✓ Lesson Verified &amp; Completed</strong>
-                <p class="mb-0 text-sm">Verified by {{ progress.verified_by.get_full_name|default:"Tutor" }} on {{ progress.completed_at|date:"d M Y @ g:i A" }}.</p>
+                <strong style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Lesson Verified &amp; Completed
+                </strong>
+                <p class="mb-0 text-sm mt-xs">Verified by {{ progress.verified_by.get_full_name|default:"Tutor" }} on {{ progress.completed_at|date:"d M Y @ g:i A" }}.</p>
               </div>
             </div>
           {% elif progress.status == 'submitted' %}
             <div class="alert alert-warning mb-0" style="padding: 16px;">
-              <strong>⌛ Submitted for Verification</strong>
-              <p class="mb-0 text-sm">You requested completion on {{ progress.student_submitted_at|date:"d M Y @ g:i A" }}. Your tutor will verify your live session attendance and assignment submissions before marking complete.</p>
+              <strong style="display: flex; align-items: center; gap: 6px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Submitted for Verification
+              </strong>
+              <p class="mb-0 text-sm mt-xs">You requested completion on {{ progress.student_submitted_at|date:"d M Y @ g:i A" }}. Your tutor will verify your live session attendance and assignment submissions before marking complete.</p>
             </div>
           {% elif progress.status == 'rejected' %}
             <div class="alert alert-danger mb-md" style="padding: 16px;">
-              <strong>⚠️ Completion Request Returned by Tutor</strong>
-              <p class="mb-0 text-sm">Your tutor requested you check live session attendance or assignment submissions before completion.</p>
+              <strong style="display: flex; align-items: center; gap: 6px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Completion Request Returned by Tutor
+              </strong>
+              <p class="mb-0 text-sm mt-xs">Your tutor requested you check live session attendance or assignment submissions before completion.</p>
             </div>
             <form method="post" action="{% url 'content:mark_lesson_submitted' cohort.id lesson.id %}">
               {% csrf_token %}
