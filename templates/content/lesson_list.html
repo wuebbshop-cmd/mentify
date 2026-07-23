@@ -6,7 +6,7 @@
 <div class="dashboard-layout">
   <!-- Sidebar -->
   <aside class="sidebar" role="navigation" aria-label="Learner navigation">
-        <div class="sidebar-profile">
+    <div class="sidebar-profile">
       <div class="sidebar-profile-row">
         <div class="sidebar-profile-avatar">
           {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
@@ -55,10 +55,9 @@
       {% if lessons %}
         <div style="display: flex; flex-direction: column; gap: 8px; max-width: 800px;">
           {% for lesson in lessons %}
-          {% with is_completed=lesson.id in completed_ids %}
-          <a href="{% url 'content:lesson_detail' cohort.id lesson.id %}" class="lesson-item {% if is_completed %}completed{% endif %}">
+          <a href="{% url 'content:lesson_detail' cohort.id lesson.id %}" class="lesson-item {% if lesson.id in completed_ids %}completed{% endif %}">
             <div class="lesson-number">
-              {% if is_completed %}✓{% else %}{{ lesson.order }}{% endif %}
+              {% if lesson.id in completed_ids %}✓{% else %}{{ lesson.order }}{% endif %}
             </div>
             <div class="lesson-info">
               <div class="lesson-title">{{ lesson.title }}</div>
@@ -70,7 +69,6 @@
               View Lesson
             </div>
           </a>
-          {% endwith %}
           {% endfor %}
         </div>
       {% else %}
