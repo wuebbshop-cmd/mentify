@@ -18,7 +18,8 @@ class LessonForm(forms.ModelForm):
 class VideoAssetForm(forms.ModelForm):
     video_file = forms.FileField(
         required=False,
-        label="Upload Video",
+        label="Upload video",
+        help_text="(ensure the video uploaded is to a reasonable size and length; Maximum video duration: 45 minutes and Maximum file size: 1.5 GB, and 1080p (Full HD) resolution; anything more than these is declined)",
         widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"}),
     )
 
@@ -26,26 +27,25 @@ class VideoAssetForm(forms.ModelForm):
         model = VideoAsset
         fields = ["video_file", "bunny_video_id", "bunny_library_id", "duration_seconds"]
         widgets = {
-            "bunny_video_id": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Filled automatically after upload"
-            }),
-            "bunny_library_id": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Leave blank to use platform default"
-            }),
-            "duration_seconds": forms.NumberInput(attrs={"class": "form-control"}),
+            "bunny_video_id": forms.HiddenInput(),
+            "bunny_library_id": forms.HiddenInput(),
+            "duration_seconds": forms.HiddenInput(),
         }
+
+    def clean_video_file(self):
+        video_file = self.cleaned_data.get("video_file")
+        if video_file:
+            if not getattr(video_file, "content_type", "").startswith("video/"):
+                raise forms.ValidationError("Upload a valid video file.")
+            max_size = 1.5 * 1024 * 1024 * 1024
+            if video_file.size > max_size:
+                raise forms.ValidationError("File size exceeds the maximum limit of 1.5 GB.")
+        return video_file
 
     def clean(self):
         cleaned_data = super().clean()
-        video_file = cleaned_data.get("video_file")
-        bunny_video_id = cleaned_data.get("bunny_video_id")
-        if video_file and not getattr(video_file, "content_type", "").startswith("video/"):
-            raise forms.ValidationError("Upload a valid video file.")
-        if not video_file and not bunny_video_id and not self.instance.pk:
-            return cleaned_data
         return cleaned_data
+
 
 
 class ResourceForm(forms.ModelForm):

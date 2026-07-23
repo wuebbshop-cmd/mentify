@@ -6,7 +6,7 @@
 <div class="dashboard-layout">
   <!-- Sidebar -->
   <aside class="sidebar" role="navigation" aria-label="Tutor navigation">
-        <div class="sidebar-profile">
+    <div class="sidebar-profile">
       <div class="sidebar-profile-row">
         <div class="sidebar-profile-avatar">
           {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
@@ -71,17 +71,20 @@
             <div class="form-group">
               <label class="form-label">Lesson Title</label>
               {{ lesson_form.title }}
+              {% if lesson_form.title.errors %}<div class="form-error">{{ lesson_form.title.errors.as_text }}</div>{% endif %}
             </div>
 
             <div class="form-group">
               <label class="form-label">Description / Summary</label>
               {{ lesson_form.description }}
+              {% if lesson_form.description.errors %}<div class="form-error">{{ lesson_form.description.errors.as_text }}</div>{% endif %}
             </div>
 
             <div class="grid grid-2" style="gap: 16px;">
               <div class="form-group">
                 <label class="form-label">Order</label>
                 {{ lesson_form.order }}
+                {% if lesson_form.order.errors %}<div class="form-error">{{ lesson_form.order.errors.as_text }}</div>{% endif %}
               </div>
               <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 8px;">
                 <div class="form-check">
@@ -93,33 +96,31 @@
 
             <div class="divider"></div>
 
-            <h3 class="mb-md"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Bunny Stream Video Asset</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-              Upload a video file to Bunny Stream. Existing Bunny video IDs are still supported for already-uploaded lessons.
-            </p>
+            <h3 class="mb-md"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Lesson Video</h3>
+
             <div class="form-group">
-              <label class="form-label">Upload Video File</label>
+              <label class="form-label">Upload video</label>
               {{ video_form.video_file }}
               {% if video_form.video_file.errors %}<div class="form-error">{{ video_form.video_file.errors.as_text }}</div>{% endif %}
-              <span class="form-text">MP4, MOV, or another browser-supported video file. The video is uploaded to Bunny Stream and embedded for learners.</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Bunny Video ID (GUID)</label>
-              {{ video_form.bunny_video_id }}
-              <span class="form-text">Filled automatically after upload. You can paste an existing Bunny GUID if needed.</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Custom Library ID <span class="text-muted">(optional)</span></label>
-              {{ video_form.bunny_library_id }}
-              <span class="form-text">Overrides the platform default library ID if set.</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Video Duration (seconds)</label>
-              {{ video_form.duration_seconds }}
+              <span class="form-text" style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 0.82rem; line-height: 1.4;">
+                (ensure the video uploaded is to a reasonable size and length; Maximum video duration: 45 minutes and Maximum file size: 1.5 GB, and 1080p (Full HD) resolution; anything more than these is declined)
+              </span>
             </div>
 
+            {% if video and video.bunny_video_id %}
+            <div class="alert alert-success" style="margin-top: 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span>Video attached and active for this lesson.</span>
+            </div>
+            {% endif %}
+
+            <!-- Hidden technical fields -->
+            {{ video_form.bunny_video_id }}
+            {{ video_form.bunny_library_id }}
+            {{ video_form.duration_seconds }}
+
             <button type="submit" class="btn btn-primary mt-md" id="lesson-submit-btn">
-              Save Lesson &amp; Video Details
+              Save Lesson
             </button>
           </form>
         </div>
@@ -134,7 +135,7 @@
           {% if resources %}
             <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
               {% for res in resources %}
-              <div style="background: hsl(225, 15%, 14%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px;
+              <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px;
                           display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
                   <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span>
@@ -163,24 +164,26 @@
             <div class="form-group">
               <label class="form-label">Resource Title</label>
               {{ resource_form.title }}
+              {% if resource_form.title.errors %}<div class="form-error">{{ resource_form.title.errors.as_text }}</div>{% endif %}
             </div>
 
             <div class="form-group">
               <label class="form-label">Resource Type</label>
               {{ resource_form.resource_type }}
-              <span class="form-text">PDFs are uploaded to the configured GitHub folder. Reference links are stored in the database.</span>
             </div>
 
             <!-- Conditional PDF File field -->
             <div class="form-group" id="pdf-file-group">
               <label class="form-label">Select PDF File</label>
               {{ resource_form.pdf_file }}
+              {% if resource_form.pdf_file.errors %}<div class="form-error">{{ resource_form.pdf_file.errors.as_text }}</div>{% endif %}
             </div>
 
             <!-- Conditional Link field -->
             <div class="form-group" id="external-url-group">
               <label class="form-label">External URL</label>
               {{ resource_form.external_url }}
+              {% if resource_form.external_url.errors %}<div class="form-error">{{ resource_form.external_url.errors.as_text }}</div>{% endif %}
             </div>
 
             <button type="submit" class="btn btn-primary mt-md" id="resource-submit-btn">
