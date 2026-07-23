@@ -42,13 +42,8 @@
         </div>
         <div class="tutor-profile-card__body">
           <div class="tutor-profile-card__name">{{ cohort.tutor.get_full_name|default:cohort.tutor.email }}</div>
-          <div class="tutor-profile-card__meta">{{ cohort.tutor.profile.headline|default:"Lead Tutor and Mentor" }}</div>
-          {% if cohort.tutor.profile.specialty %}
-          <div class="tutor-profile-card__specialty">{{ cohort.tutor.profile.specialty }}</div>
-          {% endif %}
-          {% if cohort.tutor.profile.bio %}
-          <p>{{ cohort.tutor.profile.bio|truncatewords:32 }}</p>
-          {% endif %}
+          <div class="tutor-profile-card__meta">Lead Tutor and Mentor</div>
+          <p class="mb-0">Course delivery, weekly guidance, and live support are coordinated through this cohort.</p>
         </div>
       </div>
 
