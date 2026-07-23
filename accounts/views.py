@@ -92,7 +92,14 @@ def contact_page(request):
             message = form.cleaned_data["message"]
             subject = f"Contact form message from {name}"
             body = f"Name: {name}\nEmail: {email}\n\n{message}"
-            sent = send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_FROM_EMAIL], fail_silently=False)
+            recipient_email = "shivogojohn@gmail.com"
+            sent = send_mail(
+                subject,
+                body,
+                settings.DEFAULT_FROM_EMAIL,
+                [recipient_email],
+                fail_silently=False,
+            )
             if sent:
                 messages.success(request, "Your message has been sent. We will follow up by email.")
                 return redirect("accounts:contact")
@@ -866,11 +873,65 @@ def guardian_dashboard(request):
     return render(request, "accounts/guardian_dashboard.html", context)
 
 
-# ─── Profile ──────────────────────────────────────────────────────────────────
+# ─── Profile ────────────────────────────────────────────────────────────────────────
 
 @login_required
 def profile_view(request):
-    """View and update own profile."""
+    """BloodLink-style read-only profile view for the logged-in user."""
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    # Role-specific stat context
+    stats = {}
+    if request.user.is_learner:
+        from courses.models import Enrollment
+        from content.models import LessonProgress
+        from assignments.models import Submission
+        stats["enrollments"] = Enrollment.objects.filter(
+            learner=request.user, status="active"
+        ).count()
+        stats["completed_lessons"] = LessonProgress.objects.filter(
+            learner=request.user, completed=True
+        ).count()
+        stats["submitted_assignments"] = Submission.objects.filter(
+            learner=request.user,
+            status__in=[Submission.Status.SUBMITTED, Submission.Status.GRADED],
+        ).count()
+    elif request.user.is_tutor or request.user.is_admin:
+        from courses.models import Cohort
+        from assignments.models import Submission
+        cohort_qs = (
+            Cohort.objects.filter(status="active")
+            if request.user.is_admin
+            else Cohort.objects.filter(tutor=request.user, status="active")
+        )
+        stats["active_cohorts"] = cohort_qs.count()
+        stats["total_cohorts"] = (
+            Cohort.objects.count()
+            if request.user.is_admin
+            else Cohort.objects.filter(tutor=request.user).count()
+        )
+        stats["graded_count"] = Submission.objects.filter(
+            assignment__lesson__cohort__in=cohort_qs,
+            status=Submission.Status.GRADED,
+        ).count()
+    elif request.user.is_guardian:
+        try:
+            guardian = request.user.guardian_profile
+            stats["linked_learners"] = guardian.learners.count()
+        except Exception:
+            stats["linked_learners"] = 0
+
+    return render(request, "accounts/profile.html", {
+        "profile_user": request.user,
+        "profile": profile,
+        "stats": stats,
+        "is_own_profile": True,
+    })
+
+
+@login_required
+def profile_edit(request):
+    """Edit own profile — avatar upload, personal info, and role-specific fields."""
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
@@ -881,7 +942,6 @@ def profile_view(request):
             avatar_image = user_form.cleaned_data.get("avatar_image")
             if avatar_image:
                 from services.github_service import GitHubService
-
                 svc = GitHubService(
                     settings.GITHUB_TOKEN,
                     settings.GITHUB_REPO,
@@ -895,17 +955,44 @@ def profile_view(request):
             profile_form.save()
             messages.success(request, "Profile updated successfully.")
             return redirect("accounts:profile")
+        messages.error(request, "Please correct the errors below.")
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=profile)
 
-    return render(request, "accounts/profile.html", {
+    return render(request, "accounts/profile_edit.html", {
         "user_form": user_form,
         "profile_form": profile_form,
     })
 
 
-# ─── Google OAuth ────────────────────────────────────────────────────────────
+@login_required
+def public_profile(request, user_id):
+    """View another user's public profile (mainly tutors browsed by learners)."""
+    from courses.models import Cohort
+
+    profile_user = get_object_or_404(User, pk=user_id)
+    profile, _ = Profile.objects.get_or_create(user=profile_user)
+
+    stats = {}
+    if profile_user.is_tutor or profile_user.is_admin:
+        cohort_qs = Cohort.objects.filter(tutor=profile_user, status="active")
+        stats["active_cohorts"] = cohort_qs.count()
+        stats["total_cohorts"] = Cohort.objects.filter(tutor=profile_user).count()
+    elif profile_user.is_learner:
+        from content.models import LessonProgress
+        stats["completed_lessons"] = LessonProgress.objects.filter(
+            learner=profile_user, completed=True
+        ).count()
+
+    return render(request, "accounts/profile.html", {
+        "profile_user": profile_user,
+        "profile": profile,
+        "stats": stats,
+        "is_own_profile": request.user.pk == profile_user.pk,
+    })
+
+
 
 def google_login(request):
     """Initiates Google OAuth2 login flow."""

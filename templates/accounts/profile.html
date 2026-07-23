@@ -1,161 +1,210 @@
 {% extends "base.html" %}
+{% load static %}
 {% load storage_urls %}
 
-{% block title %}My Profile{% endblock %}
+{% block title %}
+  {% if is_own_profile %}My Profile{% else %}{{ profile_user.get_full_name }} — Profile{% endif %} — Mentify
+{% endblock %}
 
 {% block content %}
-<div class="dashboard-layout">
-  <!-- Sidebar -->
-  <aside class="sidebar" role="navigation" aria-label="Profile navigation">
-        <div class="sidebar-profile">
-      <div class="sidebar-profile-row">
-        <div class="sidebar-profile-avatar{% if request.user.avatar_url %} has-image{% endif %}">
-          {% if request.user.avatar_url %}
-          <img src="{{ request.user.avatar_url|public_asset_url }}" alt="{{ request.user.get_full_name }} profile image">
+<!-- Lightbox for avatar zoom -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">&#215;</button>
+  <img class="lightbox-img" id="lightbox-img" src="" alt="Profile picture" onclick="event.stopPropagation()">
+</div>
+
+<div class="profile-page">
+  <div class="profile-col">
+
+    <!-- Page header -->
+    <div class="profile-page-header">
+      <div>
+        <h1 class="page-title">
+          {% if is_own_profile %}My Profile{% else %}{{ profile_user.get_full_name }}'s Profile{% endif %}
+        </h1>
+        <p class="page-subtitle">
+          {% if is_own_profile %}Your public information and account details.{% else %}{{ profile_user.role|title }} profile on Mentify.{% endif %}
+        </p>
+      </div>
+      {% if is_own_profile %}
+      <a href="{% url 'accounts:profile_edit' %}" class="btn btn-secondary btn-sm" id="edit-profile-btn">Edit Profile</a>
+      {% endif %}
+    </div>
+
+    <!-- Hero card -->
+    <div class="profile-hero-card">
+      <!-- Cover banner -->
+      <div class="profile-cover {% if profile_user.is_tutor %}cover-tutor{% elif profile_user.is_learner %}cover-learner{% elif profile_user.is_guardian %}cover-guardian{% else %}cover-admin{% endif %}"></div>
+
+      <!-- Avatar + name -->
+      <div class="profile-hero-body">
+        <div class="profile-avatar-wrap">
+          {% if profile_user.avatar_url %}
+            <img
+              src="{{ profile_user.avatar_url|public_asset_url }}"
+              alt="Profile picture of {{ profile_user.get_full_name }}"
+              class="profile-avatar clickable"
+              id="profile-avatar-img"
+              onclick="openLightbox('{{ profile_user.avatar_url|public_asset_url }}', '{{ profile_user.get_full_name }}')"
+              title="Click to enlarge"
+            >
           {% else %}
-          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-          {% endif %}
-        </div>
-        <div class="sidebar-profile-info">
-          <div class="sidebar-profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
-          <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email }}</div>
-        </div>
-      </div>
-      <span class="badge {% if request.user.is_admin %}badge-danger{% elif request.user.is_tutor %}badge-primary{% else %}badge-accent{% endif %}" style="font-size: 0.72rem; align-self: flex-start;">
-        {{ request.user.get_role_display|default:request.user.role|title }}
-      </span>
-    </div>
-
-    <ul class="sidebar-nav">
-      <li class="nav-item"><a href="{% url 'accounts:dashboard' %}">
-        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span> Back to Dashboard
-      </a></li>
-      <li class="nav-item"><a href="{% url 'accounts:profile' %}" class="active">
-        <span class="icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile Settings
-      </a></li>
-    </ul>
-  </aside>
-
-  <!-- Main Body -->
-  <div class="dashboard-body">
-    <div class="page-header">
-      <h1>Profile Settings</h1>
-      <p style="margin: 0; color: var(--text-muted);">Manage your personal details, parent/guardian info, and contact details.</p>
-    </div>
-
-    <div class="profile-settings-shell">
-      <div class="auth-card profile-settings-card">
-        <form method="post" enctype="multipart/form-data" id="profile-form">
-          {% csrf_token %}
-
-          <h3 class="mb-md">Personal Information</h3>
-          <div class="profile-photo-panel mb-lg">
-            <div class="profile-photo-preview{% if request.user.avatar_url %} has-image{% endif %}">
-              {% if request.user.avatar_url %}
-              <img src="{{ request.user.avatar_url|public_asset_url }}" alt="{{ request.user.get_full_name }} profile image">
-              {% else %}
-              {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-              {% endif %}
-            </div>
-            <div class="form-group" style="margin: 0; flex: 1;">
-              <label class="form-label" for="{{ user_form.avatar_image.id_for_label }}">Profile Image</label>
-              {{ user_form.avatar_image }}
-              {% if user_form.avatar_image.errors %}<div class="form-error">{{ user_form.avatar_image.errors.as_text }}</div>{% endif %}
-              <span class="form-text">Upload a square JPG, PNG, or WebP image for best results.</span>
-            </div>
-          </div>
-
-          <div class="grid grid-2" style="gap: 16px;">
-            <div class="form-group">
-              <label class="form-label" for="{{ user_form.first_name.id_for_label }}">First Name</label>
-              {{ user_form.first_name }}
-              {% if user_form.first_name.errors %}<div class="form-error">{{ user_form.first_name.errors.as_text }}</div>{% endif %}
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="{{ user_form.last_name.id_for_label }}">Last Name</label>
-              {{ user_form.last_name }}
-              {% if user_form.last_name.errors %}<div class="form-error">{{ user_form.last_name.errors.as_text }}</div>{% endif %}
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ user_form.email.id_for_label }}">Email Address</label>
-            {{ user_form.email }}
-            {% if user_form.email.errors %}<div class="form-error">{{ user_form.email.errors.as_text }}</div>{% endif %}
-            <span class="form-text">Used for platform notifications and receipt delivery.</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ user_form.phone.id_for_label }}">Phone Number</label>
-            {{ user_form.phone }}
-            {% if user_form.phone.errors %}<div class="form-error">{{ user_form.phone.errors.as_text }}</div>{% endif %}
-            <span class="form-text">e.g. 0712345678 or +254712345678 (primarily for Paystack SMS / billing notifications).</span>
-          </div>
-
-          <!-- Profile specific fields -->
-          {% if profile_form %}
-            <div class="divider"></div>
-            <h3 class="mb-md">Profile Details</h3>
-            <div class="form-group">
-              <label class="form-label" for="{{ profile_form.headline.id_for_label }}">Headline</label>
-              {{ profile_form.headline }}
-              {% if profile_form.headline.errors %}<div class="form-error">{{ profile_form.headline.errors.as_text }}</div>{% endif %}
-              <span class="form-text">A short line shown on your profile and tutor cards.</span>
-            </div>
-            {% if request.user.is_tutor %}
-            <div class="form-group">
-              <label class="form-label" for="{{ profile_form.specialty.id_for_label }}">Tutor Specialty</label>
-              {{ profile_form.specialty }}
-              {% if profile_form.specialty.errors %}<div class="form-error">{{ profile_form.specialty.errors.as_text }}</div>{% endif %}
-              <span class="form-text">Shown to students before they enroll.</span>
-            </div>
-            {% endif %}
-            <div class="form-group">
-              <label class="form-label" for="{{ profile_form.bio.id_for_label }}">Bio / Short Description</label>
-              {{ profile_form.bio }}
-              {% if profile_form.bio.errors %}<div class="form-error">{{ profile_form.bio.errors.as_text }}</div>{% endif %}
-            </div>
-            {% if request.user.is_tutor %}
-            <div class="form-group">
-              <label class="form-label" for="{{ profile_form.experience_summary.id_for_label }}">Teaching Experience</label>
-              {{ profile_form.experience_summary }}
-              {% if profile_form.experience_summary.errors %}<div class="form-error">{{ profile_form.experience_summary.errors.as_text }}</div>{% endif %}
-            </div>
-            {% endif %}
-
-            <div class="grid grid-2" style="gap: 16px;">
-              <div class="form-group">
-                <label class="form-label" for="{{ profile_form.county.id_for_label }}">Region</label>
-                {{ profile_form.county }}
-                {% if profile_form.county.errors %}<div class="form-error">{{ profile_form.county.errors.as_text }}</div>{% endif %}
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="{{ profile_form.class_level.id_for_label }}">Learning Level</label>
-                {{ profile_form.class_level }}
-                {% if profile_form.class_level.errors %}<div class="form-error">{{ profile_form.class_level.errors.as_text }}</div>{% endif %}
-              </div>
-            </div>
-            <div class="grid grid-2" style="gap: 16px;">
-              <div class="form-group">
-                <label class="form-label" for="{{ profile_form.school.id_for_label }}">School / Organization</label>
-                {{ profile_form.school }}
-                {% if profile_form.school.errors %}<div class="form-error">{{ profile_form.school.errors.as_text }}</div>{% endif %}
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="{{ profile_form.date_of_birth.id_for_label }}">Date of Birth</label>
-                {{ profile_form.date_of_birth }}
-                {% if profile_form.date_of_birth.errors %}<div class="form-error">{{ profile_form.date_of_birth.errors.as_text }}</div>{% endif %}
-              </div>
+            <div class="profile-avatar-placeholder {% if profile_user.is_tutor %}avatar-tutor{% elif profile_user.is_learner %}avatar-learner{% elif profile_user.is_guardian %}avatar-guardian{% else %}avatar-admin{% endif %}">
+              {{ profile_user.first_name|first|upper }}{{ profile_user.last_name|first|upper }}
             </div>
           {% endif %}
+        </div>
 
-          <button type="submit" class="btn btn-primary mt-md" id="profile-save-btn">
-            Save Changes
-          </button>
-        </form>
+        <div class="profile-name-block">
+          <div class="profile-full-name">{{ profile_user.get_full_name }}</div>
+          <div class="profile-email">{{ profile_user.email }}</div>
+          <div class="profile-badges-row">
+            <span class="profile-role-badge role-{{ profile_user.role }}">{{ profile_user.get_role_display|default:profile_user.role|title }}</span>
+            {% if profile_user.is_tutor and profile.specialty %}
+              <span class="profile-specialty-tag">{{ profile.specialty }}</span>
+            {% endif %}
+            {% if profile.county %}
+              <span class="profile-location-tag">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ profile.county }}
+              </span>
+            {% endif %}
+          </div>
+          {% if profile.headline %}
+            <p class="profile-headline">{{ profile.headline }}</p>
+          {% endif %}
+        </div>
       </div>
+
+      <!-- Stats row -->
+      <div class="profile-stats-row">
+        {% if profile_user.is_learner %}
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.enrollments|default:"0" }}</span>
+            <span class="stat-label">Courses Enrolled</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.completed_lessons|default:"0" }}</span>
+            <span class="stat-label">Lessons Completed</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.submitted_assignments|default:"0" }}</span>
+            <span class="stat-label">Assignments Submitted</span>
+          </div>
+        {% elif profile_user.is_tutor or profile_user.is_admin %}
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.active_cohorts|default:"0" }}</span>
+            <span class="stat-label">Active Cohorts</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.total_cohorts|default:"0" }}</span>
+            <span class="stat-label">Total Cohorts</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.graded_count|default:"0" }}</span>
+            <span class="stat-label">Submissions Graded</span>
+          </div>
+        {% elif profile_user.is_guardian %}
+          <div class="profile-stat">
+            <span class="stat-value">{{ stats.linked_learners|default:"0" }}</span>
+            <span class="stat-label">Linked Learners</span>
+          </div>
+        {% endif %}
+        <div class="profile-stat">
+          <span class="stat-value">{{ profile_user.created_at|date:"Y" }}</span>
+          <span class="stat-label">Joined</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info grid card -->
+    <div class="profile-info-card">
+      <h3 class="profile-section-title">Personal Information</h3>
+      <div class="profile-info-grid">
+        <div class="profile-info-item">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ profile_user.email }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Phone</span>
+          <span class="info-value">{{ profile_user.phone|default:"—" }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Region / County</span>
+          <span class="info-value">{{ profile.county|default:"—" }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Member Since</span>
+          <span class="info-value">{{ profile_user.created_at|date:"F j, Y" }}</span>
+        </div>
+        {% if profile_user.is_learner %}
+        <div class="profile-info-item">
+          <span class="info-label">School / Institution</span>
+          <span class="info-value">{{ profile.school|default:"—" }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Class Level</span>
+          <span class="info-value">{{ profile.class_level|default:"—" }}</span>
+        </div>
+        {% endif %}
+        {% if profile_user.is_tutor %}
+        <div class="profile-info-item">
+          <span class="info-label">Area of Specialty</span>
+          <span class="info-value">{{ profile.specialty|default:"—" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Bio section -->
+    {% if profile.bio %}
+    <div class="profile-info-card">
+      <h3 class="profile-section-title">About</h3>
+      <p class="profile-bio-text">{{ profile.bio }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Teaching experience — tutors only -->
+    {% if profile_user.is_tutor and profile.experience_summary %}
+    <div class="profile-info-card">
+      <h3 class="profile-section-title">Teaching Experience</h3>
+      <p class="profile-bio-text">{{ profile.experience_summary }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Placeholder if profile is sparse and it's own profile -->
+    {% if is_own_profile and not profile.bio and not profile.headline %}
+    <div class="profile-empty-nudge">
+      <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <p>Your profile is looking a bit empty.</p>
+      <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary btn-sm">Complete Your Profile</a>
+    </div>
+    {% endif %}
+
+    <!-- Back / actions footer -->
+    <div class="profile-actions-footer">
+      <a href="{{ profile_user.get_dashboard_url }}" class="btn btn-ghost btn-sm">&#8592; Back to Dashboard</a>
+      {% if is_own_profile %}
+      <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary btn-sm">Edit Profile</a>
+      {% endif %}
     </div>
 
   </div>
 </div>
+
+<script>
+function openLightbox(src, name) {
+  const overlay = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  img.src = src;
+  img.alt = name;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
 {% endblock %}

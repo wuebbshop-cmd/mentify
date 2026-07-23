@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+{% load storage_urls %}
+
+{% block title %}Edit Profile — Mentify{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <div class="profile-col">
+
+    <!-- Page header -->
+    <div class="profile-page-header">
+      <div>
+        <h1 class="page-title">Edit Profile</h1>
+        <p class="page-subtitle">Update your personal information and how others see you on Mentify.</p>
+      </div>
+      <a href="{% url 'accounts:profile' %}" class="btn btn-ghost btn-sm">&#8592; View Profile</a>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="profile-edit-form">
+      {% csrf_token %}
+
+      <!-- Avatar section -->
+      <div class="profile-edit-card">
+        <h3 class="profile-section-title">Profile Photo</h3>
+        <div class="avatar-upload-row">
+          <div class="avatar-preview-wrap" id="avatar-preview-wrap">
+            {% if request.user.avatar_url %}
+              <img id="avatar-preview-img" src="{{ request.user.avatar_url|public_asset_url }}" alt="{{ request.user.get_full_name }} avatar" class="profile-avatar">
+            {% else %}
+              <div class="profile-avatar-placeholder avatar-{{ request.user.role }}" id="avatar-initials">
+                {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="avatar-upload-info">
+            <label class="btn btn-outline btn-sm avatar-upload-btn" for="{{ user_form.avatar_image.id_for_label }}">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Change Photo
+            </label>
+            {{ user_form.avatar_image }}
+            {% if user_form.avatar_image.errors %}<div class="form-error">{{ user_form.avatar_image.errors.as_text }}</div>{% endif %}
+            <p class="form-hint">Upload a square JPG, PNG or WebP image. Max 5MB. Stored securely via GitHub.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal details -->
+      <div class="profile-edit-card">
+        <h3 class="profile-section-title">Personal Information</h3>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="{{ user_form.first_name.id_for_label }}">First Name</label>
+            {{ user_form.first_name }}
+            {% if user_form.first_name.errors %}<div class="form-error">{{ user_form.first_name.errors.as_text }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ user_form.last_name.id_for_label }}">Last Name</label>
+            {{ user_form.last_name }}
+            {% if user_form.last_name.errors %}<div class="form-error">{{ user_form.last_name.errors.as_text }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ user_form.email.id_for_label }}">Email Address</label>
+          {{ user_form.email }}
+          {% if user_form.email.errors %}<div class="form-error">{{ user_form.email.errors.as_text }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ user_form.phone.id_for_label }}">Phone Number</label>
+          {{ user_form.phone }}
+          {% if user_form.phone.errors %}<div class="form-error">{{ user_form.phone.errors.as_text }}</div>{% endif %}
+          <span class="form-hint">E.164 format recommended — e.g. +254700123456</span>
+        </div>
+      </div>
+
+      <!-- Profile details -->
+      <div class="profile-edit-card">
+        <h3 class="profile-section-title">Profile Details</h3>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ profile_form.headline.id_for_label }}">Profile Headline</label>
+          {{ profile_form.headline }}
+          {% if profile_form.headline.errors %}<div class="form-error">{{ profile_form.headline.errors.as_text }}</div>{% endif %}
+          <span class="form-hint">A short one-liner that appears under your name — e.g. "JSS Mathematics Tutor"</span>
+        </div>
+
+        {% if request.user.is_tutor or request.user.is_admin %}
+        <div class="form-group">
+          <label class="form-label" for="{{ profile_form.specialty.id_for_label }}">Area of Specialty</label>
+          {{ profile_form.specialty }}
+          {% if profile_form.specialty.errors %}<div class="form-error">{{ profile_form.specialty.errors.as_text }}</div>{% endif %}
+          <span class="form-hint">e.g. Python Programming, CBE Mathematics, Robotics & AI — helps learners find the right tutor.</span>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="{{ profile_form.bio.id_for_label }}">About Me</label>
+          {{ profile_form.bio }}
+          {% if profile_form.bio.errors %}<div class="form-error">{{ profile_form.bio.errors.as_text }}</div>{% endif %}
+        </div>
+
+        {% if request.user.is_tutor or request.user.is_admin %}
+        <div class="form-group">
+          <label class="form-label" for="{{ profile_form.experience_summary.id_for_label }}">Teaching Experience</label>
+          {{ profile_form.experience_summary }}
+          {% if profile_form.experience_summary.errors %}<div class="form-error">{{ profile_form.experience_summary.errors.as_text }}</div>{% endif %}
+          <span class="form-hint">Describe your teaching background, qualifications, and years of experience.</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Location & academic info -->
+      <div class="profile-edit-card">
+        <h3 class="profile-section-title">Location &amp; Academic Info</h3>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="{{ profile_form.county.id_for_label }}">Region / County</label>
+            {{ profile_form.county }}
+            {% if profile_form.county.errors %}<div class="form-error">{{ profile_form.county.errors.as_text }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ profile_form.date_of_birth.id_for_label }}">Date of Birth</label>
+            {{ profile_form.date_of_birth }}
+            {% if profile_form.date_of_birth.errors %}<div class="form-error">{{ profile_form.date_of_birth.errors.as_text }}</div>{% endif %}
+          </div>
+        </div>
+
+        {% if request.user.is_learner or request.user.is_guardian %}
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="{{ profile_form.school.id_for_label }}">School / Institution</label>
+            {{ profile_form.school }}
+            {% if profile_form.school.errors %}<div class="form-error">{{ profile_form.school.errors.as_text }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ profile_form.class_level.id_for_label }}">Class / Learning Level</label>
+            {{ profile_form.class_level }}
+            {% if profile_form.class_level.errors %}<div class="form-error">{{ profile_form.class_level.errors.as_text }}</div>{% endif %}
+            <span class="form-hint">e.g. JSS1, Form 2, Adult Learner</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Action buttons -->
+      <div class="profile-edit-actions">
+        <button type="submit" class="btn btn-primary" id="profile-save-btn">Save Changes</button>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+// Live avatar preview before upload
+document.addEventListener('DOMContentLoaded', function () {
+  const fileInput = document.getElementById('{{ user_form.avatar_image.id_for_label }}');
+  if (fileInput) {
+    fileInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const wrap = document.getElementById('avatar-preview-wrap');
+          // Replace whatever is inside with an img
+          wrap.innerHTML = '<img id="avatar-preview-img" src="' + e.target.result + '" alt="Preview" class="profile-avatar">';
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
