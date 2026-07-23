@@ -57,5 +57,12 @@ urlpatterns = [
     path("", include("accounts.home_urls")),
 ]
 
+# Custom Error Handlers
+handler404 = "accounts.views.custom_404"
+handler500 = "accounts.views.custom_500"
+handler403 = "accounts.views.custom_403"
+handler400 = "accounts.views.custom_400"
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

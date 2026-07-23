@@ -68,17 +68,21 @@ def initiate_payment(request, cohort_id):
 
     callback_url = request.build_absolute_uri(f"/payments/callback/?ref={reference}")
 
-    status_code, body = ps.initialize(
-        email=request.user.email,
-        amount_cents=amount_cents,
-        reference=reference,
-        callback_url=callback_url,
-        metadata={
-            "subscription_id": subscription.id,
-            "cohort_id": cohort.id,
-            "learner_id": request.user.id,
-        },
-    )
+    try:
+        status_code, body = ps.initialize(
+            email=request.user.email,
+            amount_cents=amount_cents,
+            reference=reference,
+            callback_url=callback_url,
+            metadata={
+                "subscription_id": subscription.id,
+                "cohort_id": cohort.id,
+                "learner_id": request.user.id,
+            },
+        )
+    except Exception as e:
+        messages.error(request, "Could not connect to payment gateway. Please try again in a moment.")
+        return redirect("courses:cohort_detail", cohort_id=cohort.id)
 
     if status_code != 200 or not body.get("status"):
         error_msg = body.get("message", "Payment initialization failed. Please try again.")
@@ -94,7 +98,11 @@ def initiate_payment(request, cohort_id):
         status=Payment.Status.PENDING,
     )
 
-    authorization_url = body["data"]["authorization_url"]
+    authorization_url = body.get("data", {}).get("authorization_url")
+    if not authorization_url:
+        messages.error(request, "Payment gateway did not return a valid checkout link.")
+        return redirect("courses:cohort_detail", cohort_id=cohort.id)
+
     return redirect(authorization_url)
 
 
@@ -119,7 +127,11 @@ def payment_callback(request):
         public_key=settings.PAYSTACK_PUBLIC_KEY,
         currency=settings.PAYSTACK_CURRENCY,
     )
-    status_code, body = ps.verify(reference)
+
+    try:
+        status_code, body = ps.verify(reference)
+    except Exception:
+        status_code, body = 500, {}
 
     if status_code == 200 and body.get("data", {}).get("status") == "success":
         _confirm_payment(payment, body["data"].get("id", ""))

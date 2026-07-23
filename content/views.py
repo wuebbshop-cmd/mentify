@@ -223,12 +223,21 @@ def create_lesson(request, cohort_id):
     if request.method == "POST":
         form = LessonForm(request.POST)
         if form.is_valid():
-            lesson = form.save(commit=False)
-            lesson.cohort = cohort
-            lesson.created_by = request.user
-            lesson.save()
-            messages.success(request, f"Lesson '{lesson.title}' created.")
-            return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
+            try:
+                lesson = form.save(commit=False)
+                lesson.cohort = cohort
+                lesson.created_by = request.user
+                lesson.save()
+                messages.success(request, f"Lesson '{lesson.title}' created.")
+                return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
+            except Exception as e:
+                from django.db import IntegrityError
+                if isinstance(e, IntegrityError):
+                    messages.error(request, f"Lesson order #{form.cleaned_data.get('order')} is already used in this cohort. Please pick a different order number.")
+                else:
+                    messages.error(request, f"Failed to create lesson: {e}")
+        else:
+            messages.error(request, "Please correct the errors in the form below.")
     else:
         # Auto-set order
         last_order = Lesson.objects.filter(cohort=cohort).order_by("-order").values_list("order", flat=True).first()
@@ -258,83 +267,95 @@ def edit_lesson(request, cohort_id, lesson_id):
     if request.method == "POST":
         action = request.POST.get("action")
 
-        if action == "save_lesson" and lesson_form.is_valid():
-            lesson_form.save()
-            # Handle video upload
-            if video_form.is_valid():
-                video_file = video_form.cleaned_data.get("video_file")
-                if video_file:
-                    from django.conf import settings
-                    from .models import VideoAsset
-
-                    uploaded_bunny = None
-                    bunny_lib = getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "").strip()
-                    bunny_key = getattr(settings, "BUNNY_STREAM_API_KEY", "").strip()
-
-                    if bunny_lib and bunny_key:
-                        try:
-                            from services.bunny_service import BunnyStreamService
-                            service = BunnyStreamService(bunny_lib, bunny_key)
-                            uploaded_bunny = service.upload(lesson.title, video_file)
-                        except Exception as exc:
-                            uploaded_bunny = None
-                            _bunny_exc = str(exc)
-                        else:
-                            _bunny_exc = None
+        if action == "save_lesson":
+            if lesson_form.is_valid():
+                try:
+                    lesson_form.save()
+                except Exception as e:
+                    from django.db import IntegrityError
+                    if isinstance(e, IntegrityError):
+                        messages.error(request, f"Lesson order #{lesson_form.cleaned_data.get('order')} is already used in this cohort. Please choose a different order number.")
                     else:
+                        messages.error(request, f"Failed to save lesson: {e}")
+                    return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
+
+                # Handle video upload
+                if video_form.is_valid():
+                    video_file = video_form.cleaned_data.get("video_file")
+                    if video_file:
+                        from django.conf import settings
+                        from .models import VideoAsset
+
                         uploaded_bunny = None
-                        _bunny_exc = "Bunny Stream credentials not configured."
+                        bunny_lib = getattr(settings, "BUNNY_STREAM_LIBRARY_ID", "").strip()
+                        bunny_key = getattr(settings, "BUNNY_STREAM_API_KEY", "").strip()
 
-                    va, _ = VideoAsset.objects.get_or_create(lesson=lesson)
-                    if uploaded_bunny:
-                        va.bunny_video_id = uploaded_bunny.video_id
-                        va.bunny_library_id = uploaded_bunny.library_id
-                        va.github_stored_path = ""  # clear any legacy fallback path
+                        if bunny_lib and bunny_key:
+                            try:
+                                from services.bunny_service import BunnyStreamService
+                                service = BunnyStreamService(bunny_lib, bunny_key)
+                                uploaded_bunny = service.upload(lesson.title, video_file)
+                            except Exception as exc:
+                                uploaded_bunny = None
+                                _bunny_exc = str(exc)
+                            else:
+                                _bunny_exc = None
+                        else:
+                            uploaded_bunny = None
+                            _bunny_exc = "Bunny Stream credentials not configured."
+
+                        va, _ = VideoAsset.objects.get_or_create(lesson=lesson)
+                        if uploaded_bunny:
+                            va.bunny_video_id = uploaded_bunny.video_id
+                            va.bunny_library_id = uploaded_bunny.library_id
+                            va.github_stored_path = ""  # clear any legacy fallback path
+                            va.save()
+                            messages.success(request, "Lesson saved & video uploaded to Bunny Stream.")
+                        else:
+                            messages.error(
+                                request,
+                                f"Video upload failed — please try again or contact support. "
+                                f"({_bunny_exc})"
+                            )
+                    elif video_form.cleaned_data.get("bunny_video_id"):
+                        va = video_form.save(commit=False)
+                        va.lesson = lesson
                         va.save()
-                        messages.success(request, "Lesson saved & video uploaded to Bunny Stream.")
+                        messages.success(request, "Lesson details & video saved.")
                     else:
-                        # Do NOT silently fall back to GitHub for video — that proxies
-                        # every byte twice (GitHub → Render → learner) which doubles
-                        # bandwidth costs and is slow. Tutor must fix Bunny credentials.
-                        messages.error(
-                            request,
-                            f"Video upload failed — please try again or contact support. "
-                            f"({_bunny_exc})"
-                        )
-                elif video_form.cleaned_data.get("bunny_video_id"):
-                    va = video_form.save(commit=False)
-                    va.lesson = lesson
-                    va.save()
-                    messages.success(request, "Lesson saved.")
+                        messages.success(request, "Lesson saved successfully.")
                 else:
-                    messages.success(request, "Lesson saved.")
+                    messages.error(request, "Please check the video upload details and try again.")
             else:
-                messages.error(request, "Please check the video upload details.")
+                messages.error(request, "Please correct the errors in the lesson details form.")
             return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
 
         elif action == "add_resource":
             resource_form = ResourceForm(request.POST, request.FILES)
             if resource_form.is_valid():
-                resource = resource_form.save(commit=False)
-                resource.lesson = lesson
-                # Handle PDF upload to GitHub
-                if request.FILES.get("pdf_file"):
-                    from services.github_service import GitHubService
-                    from django.conf import settings
-                    svc = GitHubService(
-                        settings.GITHUB_TOKEN,
-                        settings.GITHUB_REPO,
-                        settings.GITHUB_BRANCH,
-                        settings.GITHUB_UPLOAD_DIR,
-                    )
-                    result = svc.upload_file(
-                        request.FILES["pdf_file"],
-                        subdir=f"cohort_{cohort.id}/lesson_{lesson.id}"
-                    )
-                    if result:
-                        resource.github_stored_path = result.stored_path
-                resource.save()
-                messages.success(request, f"Resource '{resource.title}' added.")
+                try:
+                    resource = resource_form.save(commit=False)
+                    resource.lesson = lesson
+                    # Handle PDF upload to GitHub
+                    if request.FILES.get("pdf_file"):
+                        from services.github_service import GitHubService
+                        from django.conf import settings
+                        svc = GitHubService(
+                            settings.GITHUB_TOKEN,
+                            settings.GITHUB_REPO,
+                            settings.GITHUB_BRANCH,
+                            settings.GITHUB_UPLOAD_DIR,
+                        )
+                        result = svc.upload_file(
+                            request.FILES["pdf_file"],
+                            subdir=f"cohort_{cohort.id}/lesson_{lesson.id}"
+                        )
+                        if result:
+                            resource.github_stored_path = result.stored_path
+                    resource.save()
+                    messages.success(request, f"Resource '{resource.title}' added successfully.")
+                except Exception as e:
+                    messages.error(request, f"Could not add resource: {e}")
                 return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
             messages.error(request, "Please correct the resource details and try again.")
 

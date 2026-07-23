@@ -43,23 +43,29 @@ def submit_assignment(request, assignment_id):
         return redirect("assignments:detail", assignment_id=assignment_id)
 
     form = SubmissionForm(request.POST or None, request.FILES or None, instance=submission)
-    if request.method == "POST" and form.is_valid():
-        sub = form.save(commit=False)
-        if request.FILES.get("submission_file"):
-            from services.github_service import GitHubService
-            from django.conf import settings
-            svc = GitHubService(settings.GITHUB_TOKEN, settings.GITHUB_REPO, settings.GITHUB_BRANCH)
-            result = svc.upload_file(
-                request.FILES["submission_file"],
-                subdir=f"submissions/assignment_{assignment.id}/learner_{request.user.id}"
-            )
-            if result:
-                sub.github_stored_path = result.stored_path
-        sub.status = Submission.Status.SUBMITTED
-        sub.submitted_at = timezone.now()
-        sub.save()
-        messages.success(request, "Assignment submitted successfully!")
-        return redirect("assignments:detail", assignment_id=assignment_id)
+    if request.method == "POST":
+        if form.is_valid():
+            try:
+                sub = form.save(commit=False)
+                if request.FILES.get("submission_file"):
+                    from services.github_service import GitHubService
+                    from django.conf import settings
+                    svc = GitHubService(settings.GITHUB_TOKEN, settings.GITHUB_REPO, settings.GITHUB_BRANCH)
+                    result = svc.upload_file(
+                        request.FILES["submission_file"],
+                        subdir=f"submissions/assignment_{assignment.id}/learner_{request.user.id}"
+                    )
+                    if result:
+                        sub.github_stored_path = result.stored_path
+                sub.status = Submission.Status.SUBMITTED
+                sub.submitted_at = timezone.now()
+                sub.save()
+                messages.success(request, "Assignment submitted successfully!")
+                return redirect("assignments:detail", assignment_id=assignment_id)
+            except Exception as e:
+                messages.error(request, f"Error submitting assignment: {e}")
+        else:
+            messages.error(request, "Please check your submission details and try again.")
 
     return render(request, "assignments/submit.html", {
         "assignment": assignment,
@@ -92,12 +98,18 @@ def create_assignment(request, lesson_id):
         return redirect("accounts:tutor_dashboard")
 
     form = AssignmentForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        assignment = form.save(commit=False)
-        assignment.lesson = lesson
-        assignment.save()
-        messages.success(request, f"Assignment '{assignment.title}' created.")
-        return redirect("content:lesson_edit", cohort_id=lesson.cohort.id, lesson_id=lesson.id)
+    if request.method == "POST":
+        if form.is_valid():
+            try:
+                assignment = form.save(commit=False)
+                assignment.lesson = lesson
+                assignment.save()
+                messages.success(request, f"Assignment '{assignment.title}' created.")
+                return redirect("content:lesson_edit", cohort_id=lesson.cohort.id, lesson_id=lesson.id)
+            except Exception as e:
+                messages.error(request, f"Could not create assignment: {e}")
+        else:
+            messages.error(request, "Please correct the form errors below.")
 
     return render(request, "assignments/create.html", {"form": form, "lesson": lesson})
 
@@ -133,29 +145,40 @@ def grade_submission(request, submission_id):
     if request.method == "POST":
         grade_form = GradeForm(request.POST, instance=existing_grade)
         if grade_form.is_valid():
-            grade = grade_form.save(commit=False)
-            grade.submission = submission
-            grade.graded_by = request.user
-            total = 0
-            for criterion in criteria:
-                score_val = float(request.POST.get(f"criterion_{criterion.id}", 0) or 0)
-                total += score_val
-            grade.total_score = total
-            grade.save()
-            for criterion in criteria:
-                score_val = float(request.POST.get(f"criterion_{criterion.id}", 0) or 0)
-                CriterionScore.objects.update_or_create(
-                    grade=grade,
-                    criterion=criterion,
-                    defaults={
-                        "score": score_val,
-                        "comment": request.POST.get(f"comment_{criterion.id}", ""),
-                    },
-                )
-            submission.status = Submission.Status.GRADED
-            submission.save()
-            messages.success(request, f"Grade submitted: {total}/{assignment.max_score}")
-            return redirect("assignments:submissions", assignment_id=assignment.id)
+            try:
+                grade = grade_form.save(commit=False)
+                grade.submission = submission
+                grade.graded_by = request.user
+                total = 0.0
+                for criterion in criteria:
+                    try:
+                        score_val = float(request.POST.get(f"criterion_{criterion.id}", 0) or 0)
+                    except (ValueError, TypeError):
+                        score_val = 0.0
+                    total += score_val
+                grade.total_score = total
+                grade.save()
+                for criterion in criteria:
+                    try:
+                        score_val = float(request.POST.get(f"criterion_{criterion.id}", 0) or 0)
+                    except (ValueError, TypeError):
+                        score_val = 0.0
+                    CriterionScore.objects.update_or_create(
+                        grade=grade,
+                        criterion=criterion,
+                        defaults={
+                            "score": score_val,
+                            "comment": request.POST.get(f"comment_{criterion.id}", ""),
+                        },
+                    )
+                submission.status = Submission.Status.GRADED
+                submission.save()
+                messages.success(request, f"Grade submitted: {total}/{assignment.max_score}")
+                return redirect("assignments:submissions", assignment_id=assignment.id)
+            except Exception as e:
+                messages.error(request, f"Failed to save grade: {e}")
+        else:
+            messages.error(request, "Please correct the grade form details.")
     else:
         grade_form = GradeForm(instance=existing_grade)
 

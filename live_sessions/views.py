@@ -20,13 +20,19 @@ def schedule_session(request, cohort_id):
         cohort = get_object_or_404(Cohort, id=cohort_id, tutor=request.user)
 
     form = LiveSessionForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        session = form.save(commit=False)
-        session.cohort = cohort
-        session.created_by = request.user
-        session.save()
-        messages.success(request, f"Session '{session.title}' scheduled for {session.scheduled_at.strftime('%d %b %Y %H:%M')}.")
-        return redirect("courses:tutor_cohort_manage", cohort_id=cohort.id)
+    if request.method == "POST":
+        if form.is_valid():
+            try:
+                session = form.save(commit=False)
+                session.cohort = cohort
+                session.created_by = request.user
+                session.save()
+                messages.success(request, f"Session '{session.title}' scheduled for {session.scheduled_at.strftime('%d %b %Y %H:%M')}.")
+                return redirect("courses:tutor_cohort_manage", cohort_id=cohort.id)
+            except Exception as e:
+                messages.error(request, f"Failed to schedule session: {e}")
+        else:
+            messages.error(request, "Please correct the session form errors below.")
 
     return render(request, "sessions/schedule_form.html", {"form": form, "cohort": cohort})
 
@@ -41,10 +47,16 @@ def edit_session(request, session_id):
         return redirect("accounts:tutor_dashboard")
 
     form = LiveSessionForm(request.POST or None, instance=session)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Session updated.")
-        return redirect("courses:tutor_cohort_manage", cohort_id=session.cohort.id)
+    if request.method == "POST":
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Session updated.")
+                return redirect("courses:tutor_cohort_manage", cohort_id=session.cohort.id)
+            except Exception as e:
+                messages.error(request, f"Failed to update session: {e}")
+        else:
+            messages.error(request, "Please correct the form details.")
 
     return render(request, "sessions/schedule_form.html", {
         "form": form, "cohort": session.cohort, "session": session

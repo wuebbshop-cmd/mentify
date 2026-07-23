@@ -938,24 +938,32 @@ def profile_edit(request):
         user_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save(commit=False)
-            avatar_image = user_form.cleaned_data.get("avatar_image")
-            if avatar_image:
-                from services.github_service import GitHubService
-                svc = GitHubService(
-                    settings.GITHUB_TOKEN,
-                    settings.GITHUB_REPO,
-                    settings.GITHUB_BRANCH,
-                    settings.GITHUB_UPLOAD_DIR,
-                )
-                result = svc.upload_file(avatar_image, subdir=f"profile-images/user-{request.user.id}")
-                if result:
-                    user.avatar_url = result.stored_path
-            user.save()
-            profile_form.save()
-            messages.success(request, "Profile updated successfully.")
-            return redirect("accounts:profile")
-        messages.error(request, "Please correct the errors below.")
+            try:
+                user = user_form.save(commit=False)
+                avatar_image = user_form.cleaned_data.get("avatar_image")
+                if avatar_image:
+                    from services.github_service import GitHubService
+                    svc = GitHubService(
+                        settings.GITHUB_TOKEN,
+                        settings.GITHUB_REPO,
+                        settings.GITHUB_BRANCH,
+                        settings.GITHUB_UPLOAD_DIR,
+                    )
+                    result = svc.upload_file(avatar_image, subdir=f"profile-images/user-{request.user.id}")
+                    if result:
+                        user.avatar_url = result.stored_path
+                user.save()
+                profile_form.save()
+                messages.success(request, "Profile updated successfully.")
+                return redirect("accounts:profile")
+            except Exception as e:
+                from django.db import IntegrityError
+                if isinstance(e, IntegrityError):
+                    messages.error(request, "That email or username is already in use by another account.")
+                else:
+                    messages.error(request, f"Could not update profile: {e}")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=profile)
@@ -1135,4 +1143,27 @@ def google_callback(request):
     login(request, user)
     promote_if_admin_email(user)  # auto-promote whitelisted admins
     return redirect(user.get_dashboard_url())
+
+
+# ─── Custom HTTP Error Handlers ───────────────────────────────────────────────
+
+def custom_404(request, exception=None):
+    """Custom 404 Not Found error page."""
+    return render(request, "404.html", status=404)
+
+
+def custom_500(request):
+    """Custom 500 Internal Server Error page."""
+    return render(request, "500.html", status=500)
+
+
+def custom_403(request, exception=None):
+    """Custom 403 Permission Denied error page."""
+    return render(request, "403.html", status=403)
+
+
+def custom_400(request, exception=None):
+    """Custom 400 Bad Request error page."""
+    return render(request, "400.html", status=400)
+
 
