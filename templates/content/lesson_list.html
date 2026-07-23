@@ -46,7 +46,7 @@
         <span class="text-primary">{{ cohort.course.title }}</span>
       </div>
       <h1>Lessons: {{ cohort.course.title }}</h1>
-      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }} · Lead Tutor: {{ cohort.tutor.get_full_name }}</p>
+      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }} | Lead Tutor: {{ cohort.tutor.get_full_name }}</p>
     </div>
 
     <!-- Lessons List -->
@@ -67,7 +67,7 @@
               </div>
             </div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">
-              View Lesson →
+              View Lesson
             </div>
           </a>
           {% endwith %}

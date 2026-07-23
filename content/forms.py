@@ -16,13 +16,19 @@ class LessonForm(forms.ModelForm):
 
 
 class VideoAssetForm(forms.ModelForm):
+    video_file = forms.FileField(
+        required=False,
+        label="Upload Video",
+        widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"}),
+    )
+
     class Meta:
         model = VideoAsset
-        fields = ["bunny_video_id", "bunny_library_id", "duration_seconds"]
+        fields = ["video_file", "bunny_video_id", "bunny_library_id", "duration_seconds"]
         widgets = {
             "bunny_video_id": forms.TextInput(attrs={
                 "class": "form-control",
-                "placeholder": "e.g. abc12345-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                "placeholder": "Filled automatically after upload"
             }),
             "bunny_library_id": forms.TextInput(attrs={
                 "class": "form-control",
@@ -30,6 +36,16 @@ class VideoAssetForm(forms.ModelForm):
             }),
             "duration_seconds": forms.NumberInput(attrs={"class": "form-control"}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        video_file = cleaned_data.get("video_file")
+        bunny_video_id = cleaned_data.get("bunny_video_id")
+        if video_file and not getattr(video_file, "content_type", "").startswith("video/"):
+            raise forms.ValidationError("Upload a valid video file.")
+        if not video_file and not bunny_video_id and not self.instance.pk:
+            return cleaned_data
+        return cleaned_data
 
 
 class ResourceForm(forms.ModelForm):
@@ -47,3 +63,14 @@ class ResourceForm(forms.ModelForm):
             "resource_type": forms.Select(attrs={"class": "form-select"}),
             "external_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://..."}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        resource_type = cleaned_data.get("resource_type")
+        pdf_file = cleaned_data.get("pdf_file")
+        external_url = cleaned_data.get("external_url")
+        if resource_type == Resource.ResourceType.PDF and not pdf_file:
+            raise forms.ValidationError("Upload a PDF file for PDF resources.")
+        if resource_type == Resource.ResourceType.LINK and not external_url:
+            raise forms.ValidationError("Add a URL for link resources.")
+        return cleaned_data

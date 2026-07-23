@@ -1,4 +1,4 @@
-{% load static %}
+{% load static storage_urls %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,18 +7,18 @@
   <meta name="theme-color" content="#ffffff">
 
   <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} - {{ PLATFORM_NAME }}</title>
-  <meta name="description" content="{% block meta_description %}Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more.{% endblock %}">
+  <meta name="description" content="{% block meta_description %}Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
   <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="{% block og_title %}{{ PLATFORM_NAME }}{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more.{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
   <meta property="og:image" content="{% static 'images/logo.png' %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% block twitter_title %}{{ PLATFORM_NAME }}{% endblock %}">
-  <meta name="twitter:description" content="{% block twitter_description %}Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more.{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
   <meta name="twitter:image" content="{% static 'images/logo.png' %}">
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
@@ -41,11 +41,20 @@
     "name": "{{ PLATFORM_NAME }}",
     "url": "{{ request.build_absolute_uri }}",
     "logo": "{% static 'images/logo.png' %}",
-    "description": "Practical tutoring for school learners, graduates, and adults. Learn programming, AI, Math, Sciences, CBE subjects, robotics, and more."
+    "description": "Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support."
   }
   </script>
 </head>
 <body class="{% if request.COOKIES.theme == 'dark' %}dark-theme{% endif %}">
+
+{% if not request.COOKIES.cookie_consent %}
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+  <div class="container cookie-banner__inner">
+    <span>We use cookies to keep the platform secure and remember your preferences. By continuing to browse, you consent to our <a href="{% url 'accounts:cookie_policy' %}">cookie policy</a>.</span>
+    <button type="button" class="btn btn-primary btn-sm" id="cookie-accept-btn">Accept cookies</button>
+  </div>
+</div>
+{% endif %}
 
 <!-- ─── Navbar ──────────────────────────────────────────────────── -->
 <nav class="navbar" role="navigation" aria-label="Main navigation">
@@ -80,8 +89,12 @@
       {% if user.is_learner %}
       <a href="{% url 'accounts:dashboard' %}" class="btn btn-ghost btn-sm">Dashboard</a>
       {% endif %}
-      <a href="{% url 'accounts:profile' %}" class="nav-avatar" title="{{ user.get_full_name }}">
+      <a href="{% url 'accounts:profile' %}" class="nav-avatar{% if user.avatar_url %} has-image{% endif %}" title="{{ user.get_full_name }}">
+        {% if user.avatar_url %}
+        <img src="{{ user.avatar_url|public_asset_url }}" alt="{{ user.get_full_name }} profile image">
+        {% else %}
         {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+        {% endif %}
       </a>
       <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
         {% csrf_token %}
@@ -195,8 +208,14 @@
 <footer class="footer">
   <div class="container">
     <div class="footer-inner">
-      <span>© 2026 {{ PLATFORM_NAME }}. Built for learners everywhere</span>
+      <span>© 2026 {{ PLATFORM_NAME }}. Built for curious learners everywhere.</span>
       <span>Primary, JSS, senior school, past senior school, and adult learners</span>
+    </div>
+    <div class="footer-links">
+      <a href="{% url 'accounts:contact' %}">Contact</a>
+      <a href="{% url 'accounts:privacy_policy' %}">Privacy Policy</a>
+      <a href="{% url 'accounts:terms' %}">Terms</a>
+      <a href="{% url 'accounts:cookie_policy' %}">Cookies</a>
     </div>
   </div>
 </footer>
@@ -267,6 +286,28 @@
   if (toggleBtnMobile) {
     toggleBtnMobile.addEventListener('click', function() {
       setTheme(body.classList.contains('dark-theme') ? 'light' : 'dark');
+    });
+  }
+
+  // Password visibility toggle
+  document.querySelectorAll('.password-input-group').forEach(function(group) {
+    const input = group.querySelector('input');
+    const button = group.querySelector('.password-toggle');
+    if (!input || !button) return;
+    button.addEventListener('click', function() {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      button.innerHTML = isPassword ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M10.58 10.58A2 2 0 1013.42 13.42"/><path d="M9.88 5.15A10.94 10.94 0 0112 5c4.72 0 8.24 2.79 9.5 6.5a11.16 11.16 0 01-2.17 3.44"/><path d="M6.42 6.42A10.96 10.96 0 002.5 11.5a11.16 11.16 0 003.4 4.9"/></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+      button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+    });
+  });
+
+  const cookieBanner = document.getElementById('cookie-banner');
+  const cookieAcceptBtn = document.getElementById('cookie-accept-btn');
+  if (cookieAcceptBtn) {
+    cookieAcceptBtn.addEventListener('click', function() {
+      document.cookie = 'cookie_consent=accepted; path=/; max-age=31536000; SameSite=Lax';
+      if (cookieBanner) cookieBanner.remove();
     });
   }
 

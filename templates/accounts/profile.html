@@ -43,8 +43,8 @@
       <p style="margin: 0; color: var(--text-muted);">Manage your personal details, parent/guardian info, and contact details.</p>
     </div>
 
-    <div style="max-width: 600px;">
-      <div class="auth-card" style="padding: 40px;">
+    <div class="profile-settings-shell">
+      <div class="auth-card profile-settings-card">
         <form method="post" enctype="multipart/form-data" id="profile-form">
           {% csrf_token %}
 
@@ -95,11 +95,57 @@
           <!-- Profile specific fields -->
           {% if profile_form %}
             <div class="divider"></div>
-            <h3 class="mb-md">Bio &amp; Meta</h3>
+            <h3 class="mb-md">Profile Details</h3>
+            <div class="form-group">
+              <label class="form-label" for="{{ profile_form.headline.id_for_label }}">Headline</label>
+              {{ profile_form.headline }}
+              {% if profile_form.headline.errors %}<div class="form-error">{{ profile_form.headline.errors.as_text }}</div>{% endif %}
+              <span class="form-text">A short line shown on your profile and tutor cards.</span>
+            </div>
+            {% if request.user.is_tutor %}
+            <div class="form-group">
+              <label class="form-label" for="{{ profile_form.specialty.id_for_label }}">Tutor Specialty</label>
+              {{ profile_form.specialty }}
+              {% if profile_form.specialty.errors %}<div class="form-error">{{ profile_form.specialty.errors.as_text }}</div>{% endif %}
+              <span class="form-text">Shown to students before they enroll.</span>
+            </div>
+            {% endif %}
             <div class="form-group">
               <label class="form-label" for="{{ profile_form.bio.id_for_label }}">Bio / Short Description</label>
               {{ profile_form.bio }}
               {% if profile_form.bio.errors %}<div class="form-error">{{ profile_form.bio.errors.as_text }}</div>{% endif %}
+            </div>
+            {% if request.user.is_tutor %}
+            <div class="form-group">
+              <label class="form-label" for="{{ profile_form.experience_summary.id_for_label }}">Teaching Experience</label>
+              {{ profile_form.experience_summary }}
+              {% if profile_form.experience_summary.errors %}<div class="form-error">{{ profile_form.experience_summary.errors.as_text }}</div>{% endif %}
+            </div>
+            {% endif %}
+
+            <div class="grid grid-2" style="gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="{{ profile_form.county.id_for_label }}">Region</label>
+                {{ profile_form.county }}
+                {% if profile_form.county.errors %}<div class="form-error">{{ profile_form.county.errors.as_text }}</div>{% endif %}
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="{{ profile_form.class_level.id_for_label }}">Learning Level</label>
+                {{ profile_form.class_level }}
+                {% if profile_form.class_level.errors %}<div class="form-error">{{ profile_form.class_level.errors.as_text }}</div>{% endif %}
+              </div>
+            </div>
+            <div class="grid grid-2" style="gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="{{ profile_form.school.id_for_label }}">School / Organization</label>
+                {{ profile_form.school }}
+                {% if profile_form.school.errors %}<div class="form-error">{{ profile_form.school.errors.as_text }}</div>{% endif %}
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="{{ profile_form.date_of_birth.id_for_label }}">Date of Birth</label>
+                {{ profile_form.date_of_birth }}
+                {% if profile_form.date_of_birth.errors %}<div class="form-error">{{ profile_form.date_of_birth.errors.as_text }}</div>{% endif %}
+              </div>
             </div>
           {% endif %}
 

@@ -87,7 +87,12 @@ def resource_download(request, resource_id):
     from django.conf import settings
 
     try:
-        svc = GitHubService(settings.GITHUB_TOKEN, settings.GITHUB_REPO, settings.GITHUB_BRANCH)
+        svc = GitHubService(
+            settings.GITHUB_TOKEN,
+            settings.GITHUB_REPO,
+            settings.GITHUB_BRANCH,
+            settings.GITHUB_UPLOAD_DIR,
+        )
         file_bytes = svc.download_file(resource.github_stored_path)
     except Exception:
         raise Http404("File not available.")
@@ -147,7 +152,7 @@ def edit_lesson(request, cohort_id, lesson_id):
 
     from .forms import LessonForm, VideoAssetForm, ResourceForm
     lesson_form = LessonForm(request.POST or None, instance=lesson)
-    video_form = VideoAssetForm(request.POST or None, instance=video)
+    video_form = VideoAssetForm(request.POST or None, request.FILES or None, instance=video)
     resource_form = ResourceForm()
 
     if request.method == "POST":
@@ -156,10 +161,30 @@ def edit_lesson(request, cohort_id, lesson_id):
         if action == "save_lesson" and lesson_form.is_valid():
             lesson_form.save()
             # Handle video
-            if video_form.is_valid() and video_form.cleaned_data.get("bunny_video_id"):
-                va = video_form.save(commit=False)
-                va.lesson = lesson
-                va.save()
+            if video_form.is_valid():
+                video_file = video_form.cleaned_data.get("video_file")
+                if video_file:
+                    from django.conf import settings
+                    from services.bunny_service import BunnyStreamService
+
+                    try:
+                        service = BunnyStreamService(
+                            settings.BUNNY_STREAM_LIBRARY_ID,
+                            settings.BUNNY_STREAM_API_KEY,
+                        )
+                        uploaded = service.upload(lesson.title, video_file)
+                    except Exception as exc:
+                        messages.error(request, f"Video upload failed: {exc}")
+                        return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
+                    va = video_form.save(commit=False)
+                    va.lesson = lesson
+                    va.bunny_video_id = uploaded.video_id
+                    va.bunny_library_id = uploaded.library_id
+                    va.save()
+                elif video_form.cleaned_data.get("bunny_video_id"):
+                    va = video_form.save(commit=False)
+                    va.lesson = lesson
+                    va.save()
             messages.success(request, "Lesson saved.")
             return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
 
@@ -172,7 +197,12 @@ def edit_lesson(request, cohort_id, lesson_id):
                 if request.FILES.get("pdf_file"):
                     from services.github_service import GitHubService
                     from django.conf import settings
-                    svc = GitHubService(settings.GITHUB_TOKEN, settings.GITHUB_REPO, settings.GITHUB_BRANCH)
+                    svc = GitHubService(
+                        settings.GITHUB_TOKEN,
+                        settings.GITHUB_REPO,
+                        settings.GITHUB_BRANCH,
+                        settings.GITHUB_UPLOAD_DIR,
+                    )
                     result = svc.upload_file(
                         request.FILES["pdf_file"],
                         subdir=f"cohort_{cohort.id}/lesson_{lesson.id}"
@@ -182,6 +212,7 @@ def edit_lesson(request, cohort_id, lesson_id):
                 resource.save()
                 messages.success(request, f"Resource '{resource.title}' added.")
                 return redirect("content:lesson_edit", cohort_id=cohort.id, lesson_id=lesson.id)
+            messages.error(request, "Please correct the resource details and try again.")
 
     return render(request, "content/lesson_edit.html", {
         "cohort": cohort,

@@ -9,7 +9,7 @@
   <div class="container">
     <h1 style="margin-bottom: 8px;">Course Catalog</h1>
     <p style="color: var(--text-muted); max-width: 580px; margin: 0;">
-      Find the right cohort for you. We offer weekend, school holiday, and selected weekday schedules with expert tutors.
+      Find the right cohort for you. We offer weekend, school holiday, and selected weekday options with expert tutors.
     </p>
 
     <!-- Track filter -->
@@ -50,7 +50,7 @@
             {{ course.description }}
           </p>
           <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: auto;">
-            Subject: {{ course.subject_area }} · Level: {{ course.get_level_display }}
+            Subject: {{ course.subject_area }} | Level: {{ course.get_level_display }}
           </div>
         </div>
         <div class="card-footer">

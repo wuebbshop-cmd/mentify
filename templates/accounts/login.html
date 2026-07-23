@@ -53,7 +53,10 @@
               Forgot password?
             </a>
           </label>
-          {{ form.password }}
+          <div class="password-input-group">
+            {{ form.password }}
+            <button type="button" class="password-toggle" aria-label="Show password">👁</button>
+          </div>
           {% if form.password.errors %}
           <div class="form-error">{{ form.password.errors.as_text }}</div>
           {% endif %}

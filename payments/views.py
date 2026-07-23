@@ -23,6 +23,7 @@ from accounts.models import User, Profile
 from courses.models import Cohort, Enrollment
 from .models import Payment, Subscription
 from services.paystack_service import PaystackService
+from services.email_service import send_payment_confirmation_email
 
 logger = logging.getLogger(__name__)
 
@@ -203,6 +204,7 @@ def _confirm_payment(payment: Payment, transaction_id: str):
     Enrollment.objects.filter(
         learner=sub.learner, cohort=sub.cohort
     ).update(status="active")
+    send_payment_confirmation_email(payment)
 
 
 # ─── Admin: Manual Cash Payment ───────────────────────────────────────────────
@@ -267,6 +269,7 @@ def record_cash_payment(request):
 
                 # Ensure enrollment active
                 Enrollment.objects.filter(learner=learner, cohort=cohort).update(status="active")
+                send_payment_confirmation_email(payment)
 
                 messages.success(
                     request,

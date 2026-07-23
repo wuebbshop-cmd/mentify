@@ -92,7 +92,10 @@ class Profile(models.Model):
     Extended profile info. Kept separate so User model stays lean.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    headline = models.CharField(max_length=160, blank=True)
+    specialty = models.CharField(max_length=160, blank=True)
     bio = models.TextField(blank=True)
+    experience_summary = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     county = models.CharField(max_length=100, blank=True, help_text="County, state, or region")
     school = models.CharField(max_length=255, blank=True)

@@ -155,7 +155,7 @@
           <div style="flex: 1;">
             <div style="font-weight: 600; font-size: 0.95rem;">{{ session.title }}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">
-              {{ session.cohort.course.title }} · {{ session.scheduled_at|date:"l, g:i A" }}
+              {{ session.cohort.course.title }} | {{ session.scheduled_at|date:"l, g:i A" }}
               {% if session.is_makeup %}<span class="badge badge-warning ml-sm">Makeup</span>{% endif %}
             </div>
           </div>

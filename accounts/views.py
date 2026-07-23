@@ -26,6 +26,7 @@ from .forms import (
     ProfileUpdateForm,
     UserUpdateForm,
     GuardianChildLinkForm,
+    ContactForm,
 )
 from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRequestLog
 from .decorators import role_required
@@ -79,6 +80,40 @@ def role_select(request):
     if request.user.is_authenticated:
         return redirect(request.user.get_dashboard_url())
     return render(request, "accounts/role_select.html")
+
+
+def contact_page(request):
+    """Public contact form for support and feedback."""
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            message = form.cleaned_data["message"]
+            subject = f"Contact form message from {name}"
+            body = f"Name: {name}\nEmail: {email}\n\n{message}"
+            sent = send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_FROM_EMAIL], fail_silently=False)
+            if sent:
+                messages.success(request, "Your message has been sent. We will follow up by email.")
+                return redirect("accounts:contact")
+            messages.error(request, "We could not send your message right now. Please try again later.")
+        else:
+            messages.error(request, _form_error_message(form))
+    else:
+        form = ContactForm()
+    return render(request, "accounts/contact.html", {"form": form})
+
+
+def privacy_policy(request):
+    return render(request, "accounts/privacy_policy.html")
+
+
+def terms_of_service(request):
+    return render(request, "accounts/terms_of_service.html")
+
+
+def cookie_policy(request):
+    return render(request, "accounts/cookie_policy.html")
 
 
 def register_learner(request):

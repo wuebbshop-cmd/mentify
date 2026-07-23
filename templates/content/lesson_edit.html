@@ -45,7 +45,7 @@
         <span class="text-primary">Edit Lesson</span>
       </div>
       <h1>Edit Lesson: {{ lesson.title }}</h1>
-      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }} · Course: {{ cohort.course.title }}</p>
+      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }} | Course: {{ cohort.course.title }}</p>
     </div>
 
     <!-- Quick action links -->
@@ -62,7 +62,7 @@
       <!-- Left Column: Edit Form & Video Asset -->
       <div>
         <div class="card mb-xl">
-          <form method="post" id="edit-lesson-form">
+          <form method="post" enctype="multipart/form-data" id="edit-lesson-form">
             {% csrf_token %}
             <input type="hidden" name="action" value="save_lesson">
 
@@ -95,12 +95,18 @@
 
             <h3 class="mb-md"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Bunny Stream Video Asset</h3>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-              Specify the Bunny Stream video GUID. We construct standard iframe embeds automatically.
+              Upload a video file to Bunny Stream. Existing Bunny video IDs are still supported for already-uploaded lessons.
             </p>
+            <div class="form-group">
+              <label class="form-label">Upload Video File</label>
+              {{ video_form.video_file }}
+              {% if video_form.video_file.errors %}<div class="form-error">{{ video_form.video_file.errors.as_text }}</div>{% endif %}
+              <span class="form-text">MP4, MOV, or another browser-supported video file. The video is uploaded to Bunny Stream and embedded for learners.</span>
+            </div>
             <div class="form-group">
               <label class="form-label">Bunny Video ID (GUID)</label>
               {{ video_form.bunny_video_id }}
-              <span class="form-text">e.g. abc12345-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+              <span class="form-text">Filled automatically after upload. You can paste an existing Bunny GUID if needed.</span>
             </div>
             <div class="form-group">
               <label class="form-label">Custom Library ID <span class="text-muted">(optional)</span></label>
@@ -162,7 +168,7 @@
             <div class="form-group">
               <label class="form-label">Resource Type</label>
               {{ resource_form.resource_type }}
-              <span class="form-text">PDFs will be securely uploaded to GitHub. External links are saved directly.</span>
+              <span class="form-text">PDFs are uploaded to the configured GitHub folder. Reference links are stored in the database.</span>
             </div>
 
             <!-- Conditional PDF File field -->

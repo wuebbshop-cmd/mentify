@@ -91,7 +91,7 @@
               You have not submitted work for this assignment yet.
             </p>
             <a href="{% url 'assignments:submit' assignment.id %}" class="btn btn-primary btn-block">
-              Submit Solution →
+              Submit Solution
             </a>
           {% else %}
             {% if submission.status == 'draft' %}
@@ -100,7 +100,7 @@
                 Your solution is in draft status and not yet graded.
               </p>
               <a href="{% url 'assignments:submit' assignment.id %}" class="btn btn-outline btn-block">
-                Edit &amp; Submit Solution →
+                Edit &amp; Submit Solution
               </a>
             {% elif submission.status == 'submitted' %}
               <div class="badge badge-primary mb-md">Submitted</div>

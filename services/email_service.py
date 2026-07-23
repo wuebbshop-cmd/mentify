@@ -82,3 +82,21 @@ def send_welcome_email(user) -> bool:
         f"Welcome aboard,\nThe {platform} Team"
     )
     return send_email_notification(subject, user.email, body)
+
+
+def send_payment_confirmation_email(payment) -> bool:
+    subscription = payment.subscription
+    learner = subscription.learner
+    cohort = subscription.cohort
+    platform = getattr(settings, "PLATFORM_NAME", "Mentify")
+    subject = f"Payment confirmed for {cohort.course.title}"
+    body = (
+        f"Hello {learner.first_name or 'there'},\n\n"
+        f"We have confirmed your payment of KES {payment.amount_kes} for {cohort.course.title}.\n\n"
+        f"Cohort: {cohort.name}\n"
+        f"Reference: {payment.reference}\n"
+        f"Access valid until: {subscription.paid_until}\n\n"
+        "You can sign in and continue from your dashboard.\n\n"
+        f"The {platform} Team"
+    )
+    return send_email_notification(subject, learner.email, body)

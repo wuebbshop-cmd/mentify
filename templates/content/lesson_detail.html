@@ -4,9 +4,8 @@
 
 {% block content %}
 <div class="dashboard-layout">
-  <!-- Sidebar -->
   <aside class="sidebar" role="navigation" aria-label="Learner navigation">
-        <div class="sidebar-profile">
+    <div class="sidebar-profile">
       <div class="sidebar-profile-row">
         <div class="sidebar-profile-avatar">
           {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
@@ -34,7 +33,6 @@
     </ul>
   </aside>
 
-  <!-- Main Body -->
   <div class="dashboard-body">
     <div class="page-header">
       <div class="breadcrumb">
@@ -43,18 +41,23 @@
         <span class="text-primary">Lesson {{ lesson.order }}</span>
       </div>
       <h1>{{ lesson.title }}</h1>
-      <p style="margin: 0; color: var(--text-muted);">Cohort: {{ cohort.name }}</p>
+      <p class="mb-0">Cohort: {{ cohort.name }}</p>
     </div>
 
-    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 40px; align-items: flex-start;">
-      <!-- Video and Description Column -->
+    <div class="lesson-detail-grid">
       <div>
         {% if video %}
-          <div class="video-container mb-lg">
-            <iframe src="{{ video.get_embed_url }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="lesson-video-panel mb-lg">
+            <div class="video-container">
+              <iframe src="{{ video.get_embed_url }}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="lesson-video-meta">
+              <strong>{{ lesson.title }}</strong>
+              <span>Bunny Stream secure embed</span>
+            </div>
           </div>
         {% else %}
-          <div class="empty-state" style="background: hsl(225, 15%, 11%); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 24px;">
+          <div class="empty-state lesson-empty-video">
             <div class="empty-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
             <p>No video lesson uploaded yet for this session.</p>
           </div>
@@ -62,58 +65,49 @@
 
         <div class="card mb-xl">
           <h3 class="mb-sm">Lesson Overview</h3>
-          <p style="font-size: 0.95rem; color: var(--text-muted); white-space: pre-wrap; margin: 0;">{{ lesson.description }}</p>
+          <p class="lesson-copy">{{ lesson.description }}</p>
         </div>
       </div>
 
-      <!-- Resources and Assignments Column -->
       <div>
-        <!-- Resources Card -->
         <div class="card mb-lg">
           <h3 class="mb-md">Lesson Resources</h3>
           {% if resources %}
-            <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="resource-list">
               {% for res in resources %}
               <a href="{{ res.get_download_url }}" target="_blank" class="resource-link">
                 <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span>
                 <span class="truncate" style="flex: 1;">{{ res.title }}</span>
-                <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted);">
-                  {{ res.get_resource_type_display }}
-                </span>
+                <span class="resource-type">{{ res.get_resource_type_display }}</span>
               </a>
               {% endfor %}
             </div>
           {% else %}
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">No downloadable resources or reference links provided.</p>
+            <p class="text-sm mb-0">No downloadable resources or reference links provided.</p>
           {% endif %}
         </div>
 
-        <!-- Assignments Card -->
         <div class="card">
           <h3 class="mb-md">Assignments</h3>
           {% if assignments %}
-            <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="assignment-list">
               {% for assignment in assignments %}
-              <div style="background: hsl(225, 15%, 14%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;
-                          display: flex; flex-direction: column; gap: 4px;">
-                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text);">{{ assignment.title }}</div>
+              <div class="assignment-card">
+                <div class="fw-600">{{ assignment.title }}</div>
                 {% if assignment.due_date %}
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Due: {{ assignment.due_date|date:"d M Y" }}</div>
+                <div class="text-sm">Due: {{ assignment.due_date|date:"d M Y" }}</div>
                 {% endif %}
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Max Score: {{ assignment.max_score }} pts</div>
-                <a href="{% url 'assignments:detail' assignment.id %}" class="btn btn-primary btn-sm btn-block">
-                  View Assignment →
-                </a>
+                <div class="text-sm mb-sm">Max Score: {{ assignment.max_score }} pts</div>
+                <a href="{% url 'assignments:detail' assignment.id %}" class="btn btn-primary btn-sm btn-block">View Assignment</a>
               </div>
               {% endfor %}
             </div>
           {% else %}
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">No assignments set for this lesson.</p>
+            <p class="text-sm mb-0">No assignments set for this lesson.</p>
           {% endif %}
         </div>
       </div>
     </div>
-
   </div>
 </div>
 {% endblock %}

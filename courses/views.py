@@ -31,13 +31,17 @@ def course_list(request):
 def course_detail(request, slug):
     """Public course detail with active cohorts."""
     course = get_object_or_404(Course, slug=slug, is_active=True)
-    cohorts = course.cohorts.filter(status="active").select_related("tutor")
+    cohorts = course.cohorts.filter(status="active").select_related("tutor", "tutor__profile")
     return render(request, "courses/detail.html", {"course": course, "cohorts": cohorts})
 
 
 def cohort_detail(request, cohort_id):
     """Cohort detail - learners can see schedule, price, tutor."""
-    cohort = get_object_or_404(Cohort, id=cohort_id, status="active")
+    cohort = get_object_or_404(
+        Cohort.objects.select_related("course", "tutor", "tutor__profile"),
+        id=cohort_id,
+        status="active",
+    )
     is_enrolled = False
     if request.user.is_authenticated and request.user.is_learner:
         is_enrolled = Enrollment.objects.filter(

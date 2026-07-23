@@ -1,4 +1,4 @@
-﻿"""
+"""
 Mentify Platform - Root URL Configuration
 """
 from django.contrib import admin

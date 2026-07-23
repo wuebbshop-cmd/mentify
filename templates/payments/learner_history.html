@@ -79,7 +79,7 @@
                 Subscription Rate: KES {{ sub.cohort.price_kes|floatformat:2 }} / month
               </span>
               <a href="{% url 'payments:initiate' sub.cohort.id %}" class="btn btn-primary btn-sm">
-                {% if sub.is_access_valid %}Renew / Pay Next Month{% else %}Pay &amp; Reactivate Access →{% endif %}
+                {% if sub.is_access_valid %}Renew / Pay Next Month{% else %}Pay &amp; Reactivate Access{% endif %}
               </a>
             </div>
           </div>

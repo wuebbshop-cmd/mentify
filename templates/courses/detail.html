@@ -24,7 +24,7 @@
         <span class="badge badge-{{ course.track }} mb-sm">{{ course.get_track_display }}</span>
         <h1 style="margin-bottom: 8px;">{{ course.title }}</h1>
         <div style="font-size: 0.9rem; color: var(--text-muted);">
-          Subject Area: <strong>{{ course.subject_area }}</strong> · Level: <strong>{{ course.get_level_display }}</strong>
+          Subject Area: <strong>{{ course.subject_area }}</strong> | Level: <strong>{{ course.get_level_display }}</strong>
         </div>
       </div>
 
@@ -51,9 +51,24 @@
                   <div style="font-size: 1.25rem; font-weight: 700; color: var(--text);">
                     KES {{ cohort.price_kes|floatformat:2 }}
                   </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Monthly Subscription</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Access runs from the cohort dates shown below</div>
                 </div>
               </div>
+              {% if cohort.tutor.profile.specialty or cohort.tutor.profile.headline %}
+              <div class="tutor-inline-summary">
+                {% if cohort.tutor.avatar_url %}
+                <img src="{{ cohort.tutor.avatar_url|public_asset_url }}" alt="{{ cohort.tutor.get_full_name }} profile image">
+                {% else %}
+                <span>{{ cohort.tutor.first_name|first|upper }}{{ cohort.tutor.last_name|first|upper }}</span>
+                {% endif %}
+                <div>
+                  <strong>{{ cohort.tutor.profile.specialty|default:cohort.tutor.profile.headline }}</strong>
+                  {% if cohort.tutor.profile.headline and cohort.tutor.profile.specialty %}
+                  <small>{{ cohort.tutor.profile.headline }}</small>
+                  {% endif %}
+                </div>
+              </div>
+              {% endif %}
 
               <div class="divider"></div>
 
@@ -68,7 +83,7 @@
                   View Schedule &amp; Details
                 </a>
                 <a href="{% url 'courses:enroll' cohort.id %}" class="btn btn-primary btn-sm">
-                  Enroll &amp; Pay KES {{ cohort.price_kes|floatformat:0 }} →
+                  Enroll &amp; Pay KES {{ cohort.price_kes|floatformat:0 }}
                 </a>
               </div>
             </div>

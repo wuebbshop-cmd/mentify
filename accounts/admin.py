@@ -31,8 +31,8 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ["user", "county", "school", "class_level"]
-    search_fields = ["user__email", "user__first_name", "user__last_name"]
+    list_display = ["user", "specialty", "county", "school", "class_level"]
+    search_fields = ["user__email", "user__first_name", "user__last_name", "headline", "specialty"]
     raw_id_fields = ["user"]
 
 
