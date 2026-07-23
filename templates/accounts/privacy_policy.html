@@ -1,16 +1,70 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Privacy Policy{% endblock %}
+{% block title %}Privacy Policy — Mentify{% endblock %}
 
 {% block content %}
-<div class="container page-wrap">
-  <div class="card" style="max-width: 860px; margin: 0 auto; padding: 40px;">
+<div class="policy-page-container">
+  <!-- Policy Navigation -->
+  <div class="policy-nav-tabs">
+    <a href="{% url 'accounts:privacy_policy' %}" class="policy-nav-link active">Privacy Policy</a>
+    <a href="{% url 'accounts:terms_of_service' %}" class="policy-nav-link">Terms of Service</a>
+    <a href="{% url 'accounts:cookie_policy' %}" class="policy-nav-link">Cookie Policy</a>
+    <a href="{% url 'accounts:contact' %}" class="policy-nav-link">Contact Us</a>
+  </div>
+
+  <!-- Header -->
+  <div class="policy-header">
+    <span class="policy-header-tag">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Legal &amp; Transparency
+    </span>
     <h1>Privacy Policy</h1>
-    <p>We collect the information needed to create your account, manage your learning progress, process payments securely, and provide support.</p>
-    <p>We use your email, name, and phone number to provide account access, course updates, and support. Payment details are handled by our payment processor and are not stored directly by us.</p>
-    <p>We may use cookies to remember your preferences, keep the site secure, and improve basic functionality. You can manage cookie preferences through your browser settings.</p>
-    <p>If you have questions about your data, please contact us through the contact page and we will help you promptly.</p>
+    <p>Your privacy is fundamental to us. This policy outlines how Mentify collects, uses, and safeguards your personal data across our learning platform.</p>
+    <div class="policy-meta-row">
+      <span><strong>Last updated:</strong> July 2026</span>
+      <span>•</span>
+      <span><strong>Applies to:</strong> Learners, Tutors, and Guardians</span>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div class="policy-content-card">
+    <div class="policy-section">
+      <h2><span class="sec-num">1</span> Information We Collect</h2>
+      <p>We collect essential personal information required to deliver a personalized, secure, and effective tutoring experience:</p>
+      <ul>
+        <li><strong>Account Data:</strong> Full name, email address, phone number, role (Learner, Tutor, Guardian), and profile settings.</li>
+        <li><strong>Academic &amp; Learning Progress:</strong> Cohort enrollments, lesson completion status, assignment submissions, grades, and attendance records.</li>
+        <li><strong>Financial &amp; Subscription Details:</strong> Subscription plans, payment status, and transaction references processed securely via M-Pesa / Daraja or card providers.</li>
+      </ul>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">2</span> How We Use Your Information</h2>
+      <p>Your data enables us to operate, manage, and continuously improve platform services:</p>
+      <ul>
+        <li>Facilitating cohort enrollments and live session attendance tracking.</li>
+        <li>Enabling tutors to review and grade assignment submissions with personalized rubrics.</li>
+        <li>Allowing parents and guardians to track their linked children’s academic progress and billing history.</li>
+        <li>Sending important account notifications, security alerts, and subscription receipts.</li>
+      </ul>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">3</span> Data Protection &amp; Security</h2>
+      <p>Mentify employs industry-standard encryption, secure authentication tokens, and strict role-based access control. We never store raw payment PINs or passwords in plain text.</p>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">4</span> Data Sharing &amp; Third-Party Services</h2>
+      <p>We respect your privacy and do not sell or rent personal information to third-party advertisers. Data is shared only with trusted infrastructure providers (such as GitHub storage and Bunny Stream) strictly to deliver course materials and video content securely.</p>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">5</span> Your Rights &amp; Contact Information</h2>
+      <p>You have the right to inspect, update, or request deletion of your personal data at any time via your profile settings or by reaching out to our team.</p>
+      <p>If you have any questions or data privacy concerns, please reach out via our <a href="{% url 'accounts:contact' %}">Contact Form</a> or email us at <strong>shivogojohn@gmail.com</strong>.</p>
+    </div>
   </div>
 </div>
 {% endblock %}

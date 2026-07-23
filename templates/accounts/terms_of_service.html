@@ -1,16 +1,68 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Terms of Service{% endblock %}
+{% block title %}Terms of Service — Mentify{% endblock %}
 
 {% block content %}
-<div class="container page-wrap">
-  <div class="card" style="max-width: 860px; margin: 0 auto; padding: 40px;">
+<div class="policy-page-container">
+  <!-- Policy Navigation -->
+  <div class="policy-nav-tabs">
+    <a href="{% url 'accounts:privacy_policy' %}" class="policy-nav-link">Privacy Policy</a>
+    <a href="{% url 'accounts:terms_of_service' %}" class="policy-nav-link active">Terms of Service</a>
+    <a href="{% url 'accounts:cookie_policy' %}" class="policy-nav-link">Cookie Policy</a>
+    <a href="{% url 'accounts:contact' %}" class="policy-nav-link">Contact Us</a>
+  </div>
+
+  <!-- Header -->
+  <div class="policy-header">
+    <span class="policy-header-tag">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> User Agreement
+    </span>
     <h1>Terms of Service</h1>
-    <p>By using {{ PLATFORM_NAME }}, you agree to use the platform responsibly and provide accurate information when signing up.</p>
-    <p>You are responsible for protecting your account credentials and for any activity that occurs through your account.</p>
-    <p>Course access, lesson availability, and payment terms are communicated clearly within each cohort and may change over time. Learners are expected to respect the learning environment and any tutor or platform instructions.</p>
-    <p>For any misuse, support issues, or account concerns, please contact us through the contact page.</p>
+    <p>Please read these terms carefully before using Mentify. By accessing or registering on our platform, you agree to comply with these terms.</p>
+    <div class="policy-meta-row">
+      <span><strong>Last updated:</strong> July 2026</span>
+      <span>•</span>
+      <span><strong>Applies to:</strong> All registered users and visitors</span>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div class="policy-content-card">
+    <div class="policy-section">
+      <h2><span class="sec-num">1</span> Account Responsibility</h2>
+      <p>Users must provide accurate information when registering for an account. You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.</p>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">2</span> Acceptable Platform Use</h2>
+      <p>Mentify is designed for learning, tutoring, and educational collaboration. Users agree to:</p>
+      <ul>
+        <li>Maintain respectful conduct in all live sessions, assignment submissions, and tutor communications.</li>
+        <li>Refrain from sharing copyrighted course materials outside the platform without explicit permission.</li>
+        <li>Not attempt to disrupt, exploit, or bypass platform access control mechanisms.</li>
+      </ul>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">3</span> Course Enrollment &amp; Payments</h2>
+      <p>Enrollment in paid cohorts requires an active subscription or valid payment confirmation. Fees, course schedules, and cohort start dates are presented during checkout.</p>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">4</span> Content Ownership</h2>
+      <p>Tutors and content creators retain ownership of their instructional materials while granting Mentify the non-exclusive license to host and stream content to enrolled learners.</p>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">5</span> Termination &amp; Account Suspension</h2>
+      <p>We reserve the right to suspend or terminate access for accounts that violate platform policies or engage in disruptive behavior.</p>
+    </div>
+
+    <div class="policy-section">
+      <h2><span class="sec-num">6</span> Support &amp; Questions</h2>
+      <p>If you have any questions regarding these Terms of Service, please visit our <a href="{% url 'accounts:contact' %}">Contact Page</a> or contact support.</p>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,32 +1,46 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Contact Us{% endblock %}
+{% block title %}Contact Us — Mentify{% endblock %}
 
 {% block content %}
-<div class="auth-page">
-  <div style="width: 100%; max-width: 620px;">
-    <div class="auth-logo">
-      <img src="{% static 'images/logo.png' %}" alt="{{ PLATFORM_NAME }} Logo">
-      <h1>Contact the {{ PLATFORM_NAME }} team</h1>
-      <p>Share your questions, feedback, or support needs and we will get back to you by email.</p>
-    </div>
+<div class="contact-container">
+  <!-- Policy Navigation -->
+  <div class="policy-nav-tabs" style="margin-bottom: 24px;">
+    <a href="{% url 'accounts:privacy_policy' %}" class="policy-nav-link">Privacy Policy</a>
+    <a href="{% url 'accounts:terms_of_service' %}" class="policy-nav-link">Terms of Service</a>
+    <a href="{% url 'accounts:cookie_policy' %}" class="policy-nav-link">Cookie Policy</a>
+    <a href="{% url 'accounts:contact' %}" class="policy-nav-link active">Contact Us</a>
+  </div>
 
-    <div class="auth-card">
+  <!-- Header -->
+  <div class="policy-header" style="margin-bottom: 28px;">
+    <span class="policy-header-tag">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Get in Touch
+    </span>
+    <h1>Contact Support</h1>
+    <p>Have questions about courses, cohort schedules, payments, or tutor accounts? Send us a message and our support team will reach out by email.</p>
+  </div>
+
+  <div class="contact-grid">
+    <!-- Left Column: Contact Form -->
+    <div class="policy-content-card" style="padding: 32px;">
+      <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Send Us a Message</h2>
+
       <form method="post" novalidate>
         {% csrf_token %}
         {% if form.non_field_errors %}
-        <div class="alert alert-error">{{ form.non_field_errors }}</div>
+        <div class="alert alert-error mb-md">{{ form.non_field_errors }}</div>
         {% endif %}
 
         <div class="form-group">
-          <label class="form-label" for="id_name">Your name</label>
+          <label class="form-label" for="id_name">Your Name</label>
           {{ form.name }}
           {% if form.name.errors %}<div class="form-error">{{ form.name.errors.as_text }}</div>{% endif %}
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="id_email">Email address</label>
+          <label class="form-label" for="id_email">Email Address</label>
           {{ form.email }}
           {% if form.email.errors %}<div class="form-error">{{ form.email.errors.as_text }}</div>{% endif %}
         </div>
@@ -37,14 +51,62 @@
           {% if form.message.errors %}<div class="form-error">{{ form.message.errors.as_text }}</div>{% endif %}
         </div>
 
-        <div class="form-group" style="display:flex; align-items:flex-start; gap:8px;">
+        <div class="form-group" style="display:flex; align-items:flex-start; gap:10px; margin-top: 10px;">
           {{ form.consent }}
-          <label class="form-label" for="id_consent" style="margin:0;">I consent to being contacted about my request.</label>
+          <label class="form-label" for="id_consent" style="margin:0; font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">
+            I consent to being contacted about my request.
+          </label>
         </div>
-        {% if form.consent.errors %}<div class="form-error">{{ form.consent.errors.as_text }}</div>{% endif %}
+        {% if form.consent.errors %}<div class="form-error mb-sm">{{ form.consent.errors.as_text }}</div>{% endif %}
 
-        <button type="submit" class="btn btn-primary btn-block">Send message</button>
+        <button type="submit" class="btn btn-primary btn-block mt-md" style="padding: 12px;">Send Message</button>
       </form>
+    </div>
+
+    <!-- Right Column: Support Info Cards -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div class="contact-info-card">
+        <h3 class="profile-section-title" style="margin-bottom: 20px;">Contact Information</h3>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="contact-info-text">
+            <h4>Support Email</h4>
+            <p><a href="mailto:shivogojohn@gmail.com">shivogojohn@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="contact-info-text">
+            <h4>Response Time</h4>
+            <p>Usually within 24 hours on business days.</p>
+          </div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="contact-info-text">
+            <h4>Platform Region</h4>
+            <p>Nairobi, Kenya</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-info-card" style="background: var(--surface);">
+        <h4 style="font-size: 0.95rem; margin-bottom: 8px;">Quick Links</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem;">
+          <a href="{% url 'accounts:privacy_policy' %}">View Privacy Policy →</a>
+          <a href="{% url 'accounts:terms_of_service' %}">View Terms of Service →</a>
+          <a href="{% url 'accounts:cookie_policy' %}">View Cookie Policy →</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
