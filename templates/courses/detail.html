@@ -3,6 +3,46 @@
 
 {% block title %}{{ course.title }}{% endblock %}
 
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "{{ course.title|escapejs }}",
+  "description": "{{ course.description|truncatewords:50|escapejs }}",
+  "provider": {
+    "@type": "EducationalOrganization",
+    "name": "{{ PLATFORM_NAME }}",
+    "url": "https://mlaudit.info"
+  },
+  "educationalLevel": "{{ course.get_level_display|escapejs }}",
+  "hasCourseInstance": [
+    {% for cohort in cohorts %}
+    {
+      "@type": "CourseInstance",
+      "name": "{{ cohort.name|escapejs }}",
+      "startDate": "{{ cohort.start_date|date:'Y-m-d' }}",
+      "endDate": "{{ cohort.end_date|date:'Y-m-d' }}",
+      "courseMode": "Blended",
+      "instructor": {
+        "@type": "Person",
+        "name": "{{ cohort.tutor.get_full_name|default:cohort.tutor.email|escapejs }}"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "{{ cohort.price_kes }}",
+        "priceCurrency": "KES",
+        "category": "Monthly Subscription",
+        "availability": "https://schema.org/InStock",
+        "url": "https://mlaudit.info/courses/cohort/{{ cohort.id }}/"
+      }
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-xl mb-2xl">
   <!-- Breadcrumb -->

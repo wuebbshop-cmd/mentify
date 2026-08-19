@@ -3,6 +3,31 @@
 
 {% block title %}Cohort Info - {{ cohort.name }}{% endblock %}
 
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CourseInstance",
+  "name": "{{ cohort.name|escapejs }}",
+  "description": "{{ cohort.description|default:cohort.course.description|truncatewords:50|escapejs }}",
+  "courseMode": "Blended",
+  "startDate": "{{ cohort.start_date|date:'Y-m-d' }}",
+  "endDate": "{{ cohort.end_date|date:'Y-m-d' }}",
+  "instructor": {
+    "@type": "Person",
+    "name": "{{ cohort.tutor.get_full_name|default:cohort.tutor.email|escapejs }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ cohort.price_kes }}",
+    "priceCurrency": "KES",
+    "category": "Monthly Subscription",
+    "availability": "https://schema.org/InStock"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-xl mb-2xl">
   <nav class="breadcrumb" aria-label="Breadcrumb navigation">
