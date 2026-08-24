@@ -27,17 +27,32 @@ ALLOWED_HOSTS = list(set(
 
 # ─── Database: Render uses PostgreSQL (via DATABASE_URL) ────────────────────
 # Render provides DATABASE_URL in production environment
-db_from_env = dj_database_url.config(default=None, conn_max_age=600)
-if db_from_env:
-    DATABASES["default"] = db_from_env
+database_url = os.environ.get("DATABASE_URL")
+if database_url:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
+    DATABASES["default"]["OPTIONS"] = {}
 else:
-    # Fallback if DATABASE_URL not set (shouldn't happen on Render)
-    DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
-    DATABASES["default"]["NAME"] = os.environ.get("DB_NAME", "")
-    DATABASES["default"]["USER"] = os.environ.get("DB_USER", "")
-    DATABASES["default"]["PASSWORD"] = os.environ.get("DB_PASSWORD", "")
-    DATABASES["default"]["HOST"] = os.environ.get("DB_HOST", "localhost")
-    DATABASES["default"]["PORT"] = os.environ.get("DB_PORT", "5432")
+    # Fallback if DATABASE_URL not set
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "mentify"),
+            "USER": os.environ.get("DB_USER", "mentify"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+            "CONN_MAX_AGE": 600,
+            "CONN_HEALTH_CHECKS": True,
+            "OPTIONS": {},
+        }
+    }
 
 # ─── Security: HTTPS and HSTS ──────────────────────────────────────────────
 SECURE_SSL_REDIRECT = True
