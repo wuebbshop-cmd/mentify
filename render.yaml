@@ -21,9 +21,9 @@ services:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.production
       - key: ALLOWED_HOSTS
-        value: mlaudit.info,www.mlaudit.info
+        value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://mlaudit.info,https://www.mlaudit.info
+        value: https://mlaudit.info,https://www.mlaudit.info,https://*.onrender.com,https://mentify-klm7.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: eduai-db

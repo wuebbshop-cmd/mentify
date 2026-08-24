@@ -6,11 +6,24 @@ import dj_database_url
 
 DEBUG = False
 
-# Keep the primary custom domains allowed even when Render has an older
-# ALLOWED_HOSTS environment variable configured.
-for host in ("mlaudit.info", "www.mlaudit.info"):
-    if host not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(host)
+# ─── Allowed Hosts ──────────────────────────────────────────────────────────
+# Allow custom domains, Render domains, and dynamic RENDER_EXTERNAL_HOSTNAME
+env_hosts = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]
+render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
+
+ALLOWED_HOSTS = list(set(
+    ALLOWED_HOSTS
+    + env_hosts
+    + [
+        "mlaudit.info",
+        "www.mlaudit.info",
+        ".onrender.com",
+        "mentify-klm7.onrender.com",
+        "localhost",
+        "127.0.0.1",
+    ]
+    + ([render_host] if render_host else [])
+))
 
 # ─── Database: Render uses PostgreSQL (via DATABASE_URL) ────────────────────
 # Render provides DATABASE_URL in production environment
@@ -37,14 +50,16 @@ CSRF_COOKIE_SECURE = True
 # ─── Render-specific proxy headers ─────────────────────────────────────────
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
-]
-for origin in ("https://mlaudit.info", "https://www.mlaudit.info"):
-    if origin not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append(origin)
+CSRF_TRUSTED_ORIGINS = list(set(
+    [origin.strip() for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()]
+    + [
+        "https://mlaudit.info",
+        "https://www.mlaudit.info",
+        "https://*.onrender.com",
+        "https://mentify-klm7.onrender.com",
+    ]
+    + ([f"https://{render_host}"] if render_host else [])
+))
 
 # ─── Static files: Render uses persistent storage only for /render/output/ ───
 # WhiteNoise in middleware + compression via STATICFILES_STORAGE handle this
