@@ -63,6 +63,20 @@ handler500 = "accounts.views.custom_500"
 handler403 = "accounts.views.custom_403"
 handler400 = "accounts.views.custom_400"
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+from django.urls import re_path
+
+# Fallback serving of static and media files (ensures assets are always served)
+urlpatterns += [
+    re_path(
+        r"^static/(?P<path>.*)$",
+        static_serve,
+        {"document_root": settings.STATIC_ROOT or (settings.BASE_DIR / "static")},
+    ),
+    re_path(
+        r"^media/(?P<path>.*)$",
+        static_serve,
+        {"document_root": settings.MEDIA_ROOT},
+    ),
+]
+
 
