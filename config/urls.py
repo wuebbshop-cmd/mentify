@@ -8,8 +8,6 @@ from django.conf.urls.static import static
 from django.views.static import serve as static_serve
 from django.contrib.staticfiles import finders
 from django.http import FileResponse, Http404
-from django.templatetags.static import static as static_url
-from django.views.generic import RedirectView
 from accounts.sitemap_views import sitemap, robots_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
 import os
@@ -44,12 +42,20 @@ def static_fallback_serve(request, path):
             return FileResponse(open(found, "rb"))
         raise
 
+
+def favicon(request):
+    """Serve a real favicon.ico response for browsers that bypass page metadata."""
+    return FileResponse(
+        open(settings.BASE_DIR / "static" / "favicon.ico", "rb"),
+        content_type="image/x-icon",
+    )
+
 urlpatterns = [
     # Health check for uptime monitoring & diagnostics
     path("health/", health_check, name="health_check"),
 
     # Browser tab icon fallback. Most pages also declare the favicon in base.html.
-    path("favicon.ico", RedirectView.as_view(url=static_url("images/logo.png"), permanent=True)),
+    path("favicon.ico", favicon, name="favicon"),
 
     # Django admin (platform owner only)
     path("admin/", admin.site.urls),
