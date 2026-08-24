@@ -1,4 +1,4 @@
-# 🚀 EduAI Deployment Guide — Render + PostgreSQL + Gmail SMTP + Google SEO
+# 🚀 EduAI Deployment Guide — Render + PostgreSQL + Resend + Google SEO
 
 This guide walks you through deploying EduAI to Render, a modern cloud platform (similar to Heroku but free tier available). By the end, your app will be live at `https://your-app.onrender.com`.
 
@@ -10,37 +10,71 @@ Before starting, you need:
 
 - [x] **GitHub account** (Render deploys from GitHub)
 - [x] **Render account** (free at https://render.com)
-- [x] **Gmail account** (for SMTP email notifications)
+- [x] **Resend account** (for transactional email delivery)
 - [x] **Domain name** (optional, but recommended for production)
 - [x] **Your Django project with `render.yaml`** (already configured in this repo)
 
 ---
 
-## 🔑 Step 1: Generate Gmail App Password for Email Notifications
+## 📧 Email Configuration: What Was Wrong and What It Does Now
 
-Gmail requires an "App Password" for third-party apps (Django won't accept regular passwords via SMTP for security).
+The original contact form had two separate problems:
+
+1. It always delivered contact messages to a hard-coded Gmail address, so changing the sender did not change the inbox receiving the message.
+2. It did not set `Reply-To`, so mail clients could choose the account used to send the reply instead of routing the reply to the person who submitted the form.
+
+EduAI now uses these settings:
+
+```text
+FROM_EMAIL=mentify@mlaudit.info
+CONTACT_RECIPIENT_EMAIL=techbidmarketplace@gmail.com
+```
+
+`FROM_EMAIL` is the visible sender for application mail. `CONTACT_RECIPIENT_EMAIL` is where contact-form notifications arrive. Each contact notification also has `Reply-To` set to the visitor's submitted email, so replying from the TechBid Gmail inbox replies to that visitor.
+
+The application-generated email text is English. If an email still appears in German, check Gmail's translation banner or browser translation first; Resend does not translate the message body.
+
+### Required Resend setup
+
+1. In Resend, verify the `mlaudit.info` domain and ensure `mentify@mlaudit.info` is an allowed sender.
+2. Copy the Resend API key into the deployment environment as `RESEND_API_KEY`.
+3. Do not put the Resend API key in source control or paste it into support messages.
+
+### Required Render setup
+
+In Render, open the EduAI service, choose **Environment**, and set:
+
+```text
+DJANGO_SETTINGS_MODULE=config.settings.production
+RESEND_API_KEY=<your Resend API key>
+FROM_EMAIL=mentify@mlaudit.info
+CONTACT_RECIPIENT_EMAIL=techbidmarketplace@gmail.com
+```
+
+Save the changes and deploy/restart the service. Render does not automatically use the local `.env` file.
+
+### Optional Gmail sender setup
+
+If you want replies composed in Gmail to show `mentify@mlaudit.info` in the `From` field, configure Gmail separately:
+
+1. Sign in to `techbidmarketplace@gmail.com`.
+2. Open **Settings** → **See all settings** → **Accounts and Import**.
+3. Under **Send mail as**, choose **Add another email address**.
+4. Add `mentify@mlaudit.info` and complete Gmail's verification.
+5. Select `mentify@mlaudit.info` as the default sender, or choose it from the `From` dropdown when replying.
+
+This Gmail setting is required because a web application can set the sender of its own messages, but it cannot force Gmail to send a manually composed reply from another account.
+
+## 🔑 Step 1: Prepare Resend
+
+EduAI uses the Resend API, so Gmail SMTP credentials and a Gmail App Password are not required.
 
 ### Steps:
 
-1. **Enable 2-Factor Authentication** (required for App Passwords):
-   - Go to https://myaccount.google.com/security
-   - Scroll to "2-Step Verification" → click **Enable**
-   - Follow the prompts (you'll verify with phone)
-
-2. **Generate App Password**:
-   - Go to https://myaccount.google.com/apppasswords
-   - Select **App**: Mail
-   - Select **Device**: Windows Computer (or your OS)
-   - Click **Generate**
-   - Copy the 16-character password shown (looks like: `xxxx xxxx xxxx xxxx`)
-
-3. **Save this password** — you'll paste it into Render dashboard in Step 5
-
-**Example Gmail Setup**:
-```
-EMAIL_HOST_USER=youremail@gmail.com
-EMAIL_HOST_PASSWORD=abcd efgh ijkl mnop  (16 chars, spaces included in display only)
-```
+1. Create or sign in to your Resend account.
+2. Add and verify `mlaudit.info` under **Domains**.
+3. Create an API key under **API Keys**.
+4. Store that key only in Render's environment settings as `RESEND_API_KEY`.
 
 ---
 
@@ -121,11 +155,9 @@ Render auto-creates the PostgreSQL database from `render.yaml`, BUT you need to 
    DJANGO_SECRET_KEY=<generate-a-long-random-string>
    ALLOWED_HOSTS=<your-app>.onrender.com,www.yourdomain.co.ke
    
-   EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_HOST_USER=youremail@gmail.com
-   EMAIL_HOST_PASSWORD=<paste-your-16-char-app-password>
-   DEFAULT_FROM_EMAIL=noreply@yourdomain.co.ke
+   RESEND_API_KEY=<your-Resend-api-key>
+   FROM_EMAIL=mentify@mlaudit.info
+   CONTACT_RECIPIENT_EMAIL=techbidmarketplace@gmail.com
    
    PLATFORM_NAME=Mentify
    BASE_URL=https://<your-app>.onrender.com
@@ -294,9 +326,9 @@ After you make changes locally and push to GitHub:
 - Consider upgrading if you go live with users
 
 ### Email Sending
-- Gmail SMTP works, but you may hit rate limits (100/hour)
-- For production, consider **SendGrid** (free tier: 100/day) or **Mailgun**
-- Update `EMAIL_BACKEND` and credentials in `production.py` if switching
+- EduAI sends mail through Resend's API.
+- Confirm `mlaudit.info` is verified in Resend and `mentify@mlaudit.info` is an approved sender.
+- Confirm `RESEND_API_KEY`, `FROM_EMAIL`, and `CONTACT_RECIPIENT_EMAIL` are set in Render.
 
 ### Static Files
 - WhiteNoise handles static file serving
@@ -321,9 +353,10 @@ After you make changes locally and push to GitHub:
 - Fix: Dashboard → **Manual Deploy** → click Deploy
 
 ### Emails not sending
-- Check: `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD` are correct
-- Test locally first: `python manage.py shell` → `send_mail(...)`
-- Check spam folder (Gmail might flag test emails)
+- Check that `RESEND_API_KEY` is valid and that `mlaudit.info` is verified in Resend.
+- Check that `FROM_EMAIL=mentify@mlaudit.info` is an approved sender in Resend.
+- Check that `CONTACT_RECIPIENT_EMAIL=techbidmarketplace@gmail.com` is set in Render.
+- Check the Resend dashboard logs and the Gmail spam folder.
 
 ### Guardian links not working
 - Check: `BASE_URL` env var matches your domain
@@ -338,13 +371,13 @@ After you make changes locally and push to GitHub:
 ## 📝 Summary: What We've Set Up
 
 ✅ **render.yaml** — Deployment config with build/start commands  
-✅ **production.py** — PostgreSQL + security headers + Gmail SMTP  
+✅ **production.py** — PostgreSQL + security headers + Resend email configuration
 ✅ **requirements.txt** — gunicorn + dj-database-url + psycopg2  
 ✅ **Sitemap API** — `/sitemap.xml` for Google indexing  
 ✅ **robots.txt** — `/robots.txt` for crawler directives  
 ✅ **.env.example** — Template for all production env vars  
 ✅ **Guardian linking** — Self-service + learner consent (from previous work)  
-✅ **Email notifications** — Guardian requests/confirmations via Gmail  
+✅ **Email notifications** — Guardian requests/confirmations via Resend
 
 ---
 

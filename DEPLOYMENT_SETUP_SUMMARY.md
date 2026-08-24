@@ -7,7 +7,7 @@
 | File | Purpose |
 |------|---------|
 | **render.yaml** | Render deployment config (build → migrate → collectstatic → gunicorn) |
-| **config/settings/production.py** | PostgreSQL database URL parsing, HTTPS security, Gmail SMTP |
+| **config/settings/production.py** | PostgreSQL database URL parsing, HTTPS security, Resend email configuration |
 | **requirements.txt** | Added: `gunicorn`, `dj-database-url`, `psycopg2-binary` |
 | **.env.example** | Updated with all production variables (DATABASE_URL, email, etc.) |
 | **config/urls.py** | Added `/sitemap.xml` and `/robots.txt` routes |
@@ -18,10 +18,10 @@
 
 ## 🚀 Quick Start: Deploy in 5 Steps
 
-### 1️⃣ **Prepare Gmail** (5 min)
-- Go to https://myaccount.google.com/apppasswords
-- Generate App Password (Gmail → Your Device)
-- Copy the 16-character password
+### 1️⃣ **Prepare Resend** (5 min)
+- Verify `mlaudit.info` in Resend
+- Confirm `mentify@mlaudit.info` is an approved sender
+- Create a Resend API key
 
 ### 2️⃣ **Push to GitHub** (2 min)
 ```bash
@@ -36,7 +36,7 @@ git push origin main
 ### 4️⃣ **Deploy Web Service** (5 min)
 - Dashboard → New Web Service
 - Connect GitHub repo
-- Set environment variables (DJANGO_SECRET_KEY, EMAIL_HOST_PASSWORD, etc.)
+- Set environment variables (DJANGO_SECRET_KEY, RESEND_API_KEY, FROM_EMAIL, etc.)
 - Click Create
 
 ### 5️⃣ **Wait & Test** (5 min)
@@ -57,9 +57,9 @@ DJANGO_SETTINGS_MODULE=config.settings.production
 DJANGO_SECRET_KEY=<run: python manage.py shell, from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())>
 ALLOWED_HOSTS=your-app.onrender.com,yourdomain.co.ke
 
-EMAIL_HOST_USER=youremail@gmail.com
-EMAIL_HOST_PASSWORD=<your 16-char Gmail App Password>
-DEFAULT_FROM_EMAIL=noreply@yourdomain.co.ke
+RESEND_API_KEY=<your Resend API key>
+FROM_EMAIL=mentify@mlaudit.info
+CONTACT_RECIPIENT_EMAIL=techbidmarketplace@gmail.com
 
 BASE_URL=https://your-app.onrender.com
 PLATFORM_NAME=Mentify

@@ -39,6 +39,9 @@ def send_email_notification(
         "to": [recipient],
         "subject": subject,
         "text": body,
+        "headers": {
+            "Content-Language": "en",
+        },
     }
     if html_body:
         payload["html"] = html_body
