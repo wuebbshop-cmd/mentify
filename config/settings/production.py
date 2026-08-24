@@ -26,18 +26,17 @@ ALLOWED_HOSTS = list(set(
 ))
 
 # ─── Database: Render uses PostgreSQL (via DATABASE_URL) ────────────────────
-# Render provides DATABASE_URL in production environment
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            database_url,
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=True,
-        )
-    }
-    DATABASES["default"]["OPTIONS"] = {}
+    db_config = dj_database_url.parse(
+        database_url,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+    current_options = db_config.get("OPTIONS", {})
+    cleaned_options = {k: v for k, v in current_options.items() if k not in ("charset", "init_command")}
+    db_config["OPTIONS"] = cleaned_options
+    DATABASES = {"default": db_config}
 else:
     # Fallback if DATABASE_URL not set
     DATABASES = {

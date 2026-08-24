@@ -5,15 +5,14 @@ services:
     pythonVersion: 3.11
     
     # ─── Build Command ───────────────────────────────────────────────
-    # Installs dependencies + collects static files + runs migrations
+    # Installs dependencies + collects static files
     buildCommand: >
       pip install -r requirements.txt &&
-      python manage.py collectstatic --noinput &&
-      python manage.py migrate --noinput
+      python manage.py collectstatic --noinput
     
     # ─── Start Command ───────────────────────────────────────────────
-    # Gunicorn with 3 worker processes, listening on 0.0.0.0:10000
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 3 --worker-class sync --timeout 60
+    # Runs database migrations on startup + starts Gunicorn
+    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 3 --worker-class sync --timeout 60
     
     # ─── Environment Variables ───────────────────────────────────────
     # IMPORTANT: Set these in Render dashboard Environment section BEFORE deploy
