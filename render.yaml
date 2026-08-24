@@ -25,10 +25,6 @@ services:
         value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
         value: https://mlaudit.info,https://www.mlaudit.info,https://*.onrender.com,https://mentify-klm7.onrender.com
-      - key: DATABASE_URL
-        fromDatabase:
-          name: eduai-db
-          property: connectionString
       - key: PYTHON_VERSION
         value: 3.11.11
       # Required for GitHub-hosted course banners, avatars, and uploads
@@ -52,11 +48,3 @@ services:
     # Optional: Render pings /health/ to check if service is alive
     # You can implement a simple health check view in urls.py if desired
     healthCheckPath: /health/
-
-databases:
-  - name: eduai-db
-    databaseName: mentify
-    user: mentify
-    plan: free
-    region: oregon
-    postgresMajorVersion: 16
