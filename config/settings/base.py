@@ -192,6 +192,7 @@ DEFAULT_FROM_EMAIL = (
 )
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "mentify@mlaudit.info").strip()
+CONTACT_RECIPIENT_EMAIL = os.environ.get("CONTACT_RECIPIENT_EMAIL", SUPPORT_EMAIL).strip()
 
 if RESEND_API_KEY:
     EMAIL_BACKEND = "services.resend_backend.ResendEmailBackend"

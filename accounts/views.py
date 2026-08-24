@@ -14,7 +14,7 @@ from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.urls import reverse
 from django.urls import reverse_lazy
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, send_mail
 from django.template.loader import render_to_string
 from django.db.models import Count, Q
 
@@ -92,14 +92,15 @@ def contact_page(request):
             message = form.cleaned_data["message"]
             subject = f"Contact form message from {name}"
             body = f"Name: {name}\nEmail: {email}\n\n{message}"
-            recipient_email = settings.SUPPORT_EMAIL
-            sent = send_mail(
-                subject,
-                body,
-                settings.DEFAULT_FROM_EMAIL,
-                [recipient_email],
-                fail_silently=False,
+            recipient_email = settings.CONTACT_RECIPIENT_EMAIL
+            email_message = EmailMessage(
+                subject=subject,
+                body=body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[recipient_email],
+                reply_to=[email],
             )
+            sent = email_message.send(fail_silently=False)
             if sent:
                 messages.success(request, "Your message has been sent. We will follow up by email.")
                 return redirect("accounts:contact")
@@ -1165,4 +1166,3 @@ def custom_403(request, exception=None):
 def custom_400(request, exception=None):
     """Custom 400 Bad Request error page."""
     return render(request, "400.html", status=400)
-

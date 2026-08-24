@@ -43,6 +43,8 @@ services:
         value: mentify@mlaudit.info
       - key: SUPPORT_EMAIL
         value: mentify@mlaudit.info
+      - key: CONTACT_RECIPIENT_EMAIL
+        sync: false
     
     # ─── Health Check ────────────────────────────────────────────────
     # Optional: Render pings /health/ to check if service is alive

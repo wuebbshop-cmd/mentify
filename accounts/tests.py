@@ -24,9 +24,9 @@ class UsernameGenerationTests(TestCase):
 
 
 class ContactFormEmailTests(TestCase):
-    def test_contact_form_delivers_to_support_email(self):
-        with patch("accounts.views.send_mail") as mock_send_mail:
-            mock_send_mail.return_value = 1
+    def test_contact_form_delivers_to_contact_recipient_email(self):
+        with patch("accounts.views.EmailMessage") as mock_email_message:
+            mock_email_message.return_value.send.return_value = 1
             response = self.client.post(
                 reverse("accounts:contact"),
                 {
@@ -38,12 +38,14 @@ class ContactFormEmailTests(TestCase):
             )
 
         self.assertEqual(response.status_code, 302)
-        mock_send_mail.assert_called_once()
-        args, kwargs = mock_send_mail.call_args
-        self.assertEqual(args[0], "Contact form message from Jane Doe")
-        self.assertEqual(args[1], "Name: Jane Doe\nEmail: jane@example.com\n\nHello from the contact form")
-        self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(args[3], [settings.SUPPORT_EMAIL])
+        mock_email_message.assert_called_once_with(
+            subject="Contact form message from Jane Doe",
+            body="Name: Jane Doe\nEmail: jane@example.com\n\nHello from the contact form",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[settings.CONTACT_RECIPIENT_EMAIL],
+            reply_to=["jane@example.com"],
+        )
+        mock_email_message.return_value.send.assert_called_once_with(fail_silently=False)
 
 
 class ProfileViewTests(TestCase):

@@ -24,12 +24,14 @@ class ResendEmailBackend(BaseEmailBackend):
                 continue
 
             for recipient in recipients:
+                reply_to = message.reply_to[0] if getattr(message, "reply_to", None) else None
                 if send_email_notification(
                     message.subject,
                     recipient,
                     message.body,
                     html_body=html_body,
                     from_email=message.from_email,
+                    reply_to=reply_to,
                 ):
                     sent_count += 1
 
