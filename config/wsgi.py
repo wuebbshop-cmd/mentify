@@ -1,5 +1,6 @@
 """WSGI config for Mentify Platform."""
 import os
+from pathlib import Path
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
@@ -15,6 +16,11 @@ try:
     raw_static = str(settings.BASE_DIR / "static")
     if os.path.isdir(raw_static):
         application.add_files(raw_static, prefix="/static/")
+
+    from django.contrib.staticfiles import finders
+
+    admin_css = finders.find("admin/css/base.css")
+    if admin_css:
+        application.add_files(str(Path(admin_css).parents[2]), prefix="/static/")
 except Exception:
     pass
-
