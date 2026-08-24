@@ -6,6 +6,12 @@ import dj_database_url
 
 DEBUG = False
 
+# Keep the primary custom domains allowed even when Render has an older
+# ALLOWED_HOSTS environment variable configured.
+for host in ("mlaudit.info", "www.mlaudit.info"):
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
 # ─── Database: Render uses PostgreSQL (via DATABASE_URL) ────────────────────
 # Render provides DATABASE_URL in production environment
 db_from_env = dj_database_url.config(default=None, conn_max_age=600)
@@ -36,6 +42,9 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+for origin in ("https://mlaudit.info", "https://www.mlaudit.info"):
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 # ─── Static files: Render uses persistent storage only for /render/output/ ───
 # WhiteNoise in middleware + compression via STATICFILES_STORAGE handle this
