@@ -92,16 +92,12 @@ def contact_page(request):
             message = form.cleaned_data["message"]
             subject = f"Contact form message from {name}"
             body = f"Name: {name}\nEmail: {email}\n\n{message}"
-            recipient_email = settings.CONTACT_RECIPIENT_EMAIL
+            recipient_email = "shivogojohn@gmail.com"
             sent = send_mail(
                 subject,
                 body,
                 settings.DEFAULT_FROM_EMAIL,
                 [recipient_email],
-                headers={
-                    "Reply-To": email,
-                    "Content-Language": "en",
-                },
                 fail_silently=False,
             )
             if sent:

@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
 
 from .models import Profile, User
@@ -24,8 +24,7 @@ class UsernameGenerationTests(TestCase):
 
 
 class ContactFormEmailTests(TestCase):
-    @override_settings(CONTACT_RECIPIENT_EMAIL="support@example.com")
-    def test_contact_form_delivers_to_configured_inbox_and_sets_reply_to(self):
+    def test_contact_form_delivers_to_personal_email(self):
         with patch("accounts.views.send_mail") as mock_send_mail:
             mock_send_mail.return_value = 1
             response = self.client.post(
@@ -44,11 +43,7 @@ class ContactFormEmailTests(TestCase):
         self.assertEqual(args[0], "Contact form message from Jane Doe")
         self.assertEqual(args[1], "Name: Jane Doe\nEmail: jane@example.com\n\nHello from the contact form")
         self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(args[3], ["support@example.com"])
-        self.assertEqual(kwargs["headers"], {
-            "Reply-To": "jane@example.com",
-            "Content-Language": "en",
-        })
+        self.assertEqual(args[3], ["shivogojohn@gmail.com"])
 
 
 class ProfileViewTests(TestCase):

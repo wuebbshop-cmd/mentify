@@ -184,10 +184,6 @@ DEFAULT_FROM_EMAIL = (
     or os.environ.get("DEFAULT_FROM_EMAIL", "noreply@mentify.co.ke").strip()
 )
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-CONTACT_RECIPIENT_EMAIL = os.environ.get(
-    "CONTACT_RECIPIENT_EMAIL",
-    DEFAULT_FROM_EMAIL,
-).strip()
 
 if RESEND_API_KEY:
     EMAIL_BACKEND = "services.resend_backend.ResendEmailBackend"
