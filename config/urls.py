@@ -6,6 +6,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve as static_serve
+from django.contrib.staticfiles import finders
+from django.http import FileResponse, Http404
 from accounts.sitemap_views import sitemap, robots_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
 import os
@@ -24,6 +26,21 @@ def health_check(request):
         return HttpResponse("unhealthy", status=503, content_type="text/plain")
 
     return HttpResponse("ok", content_type="text/plain")
+
+
+def static_fallback_serve(request, path):
+    """Serve collected static files, then fall back to app static finders."""
+    try:
+        return static_serve(
+            request,
+            path,
+            document_root=settings.STATIC_ROOT or (settings.BASE_DIR / "static"),
+        )
+    except Http404:
+        found = finders.find(path)
+        if found and os.path.isfile(found):
+            return FileResponse(open(found, "rb"))
+        raise
 
 urlpatterns = [
     # Health check for uptime monitoring & diagnostics
@@ -87,8 +104,7 @@ from django.urls import re_path
 urlpatterns += [
     re_path(
         r"^static/(?P<path>.*)$",
-        static_serve,
-        {"document_root": settings.STATIC_ROOT or (settings.BASE_DIR / "static")},
+        static_fallback_serve,
     ),
     re_path(
         r"^media/(?P<path>.*)$",
@@ -96,4 +112,3 @@ urlpatterns += [
         {"document_root": settings.MEDIA_ROOT},
     ),
 ]
-
