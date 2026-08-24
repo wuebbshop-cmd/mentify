@@ -5,11 +5,11 @@ services:
     pythonVersion: 3.11
     
     # ─── Build Command ───────────────────────────────────────────────
-    # Installs dependencies + runs migrations + collects static files
+    # Installs dependencies + collects static files + runs migrations
     buildCommand: >
       pip install -r requirements.txt &&
-      python manage.py migrate --noinput &&
-      python manage.py collectstatic --noinput
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate --noinput
     
     # ─── Start Command ───────────────────────────────────────────────
     # Gunicorn with 3 worker processes, listening on 0.0.0.0:10000

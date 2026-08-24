@@ -50,7 +50,6 @@ for origin in ("https://mlaudit.info", "https://www.mlaudit.info"):
 # WhiteNoise in middleware + compression via STATICFILES_STORAGE handle this
 # Collect static files before deploy via render.yaml build command
 WHITENOISE_MAX_AGE = 31536000
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 # ─── Email: Resend.com (Render-friendly, no SMTP ports required) ───────────
 # Configured in base.py via RESEND_API_KEY + FROM_EMAIL / DEFAULT_FROM_EMAIL
