@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Privacy Policy — Mentify{% endblock %}
+{% block title %}Privacy Policy | Mentify{% endblock %}
 
 {% block content %}
 <div class="policy-page-container">
@@ -63,7 +63,7 @@
     <div class="policy-section">
       <h2><span class="sec-num">5</span> Your Rights &amp; Contact Information</h2>
       <p>You have the right to inspect, update, or request deletion of your personal data at any time via your profile settings or by reaching out to our team.</p>
-      <p>If you have any questions or data privacy concerns, please reach out via our <a href="{% url 'accounts:contact' %}">Contact Form</a> or email us at <strong>shivogojohn@gmail.com</strong>.</p>
+      <p>If you have any questions or data privacy concerns, please reach out via our <a href="{% url 'accounts:contact' %}">Contact Form</a> or email us at <strong>{{ SUPPORT_EMAIL }}</strong>.</p>
     </div>
   </div>
 </div>

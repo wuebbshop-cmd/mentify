@@ -92,7 +92,7 @@ def contact_page(request):
             message = form.cleaned_data["message"]
             subject = f"Contact form message from {name}"
             body = f"Name: {name}\nEmail: {email}\n\n{message}"
-            recipient_email = "shivogojohn@gmail.com"
+            recipient_email = settings.SUPPORT_EMAIL
             sent = send_mail(
                 subject,
                 body,
@@ -1165,5 +1165,4 @@ def custom_403(request, exception=None):
 def custom_400(request, exception=None):
     """Custom 400 Bad Request error page."""
     return render(request, "400.html", status=400)
-
 

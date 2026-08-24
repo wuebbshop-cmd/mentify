@@ -24,7 +24,7 @@ class UsernameGenerationTests(TestCase):
 
 
 class ContactFormEmailTests(TestCase):
-    def test_contact_form_delivers_to_personal_email(self):
+    def test_contact_form_delivers_to_support_email(self):
         with patch("accounts.views.send_mail") as mock_send_mail:
             mock_send_mail.return_value = 1
             response = self.client.post(
@@ -43,7 +43,7 @@ class ContactFormEmailTests(TestCase):
         self.assertEqual(args[0], "Contact form message from Jane Doe")
         self.assertEqual(args[1], "Name: Jane Doe\nEmail: jane@example.com\n\nHello from the contact form")
         self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(args[3], ["shivogojohn@gmail.com"])
+        self.assertEqual(args[3], [settings.SUPPORT_EMAIL])
 
 
 class ProfileViewTests(TestCase):

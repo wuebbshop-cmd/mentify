@@ -41,8 +41,8 @@ services:
         sync: false
       - key: FROM_EMAIL
         value: mentify@mlaudit.info
-      - key: CONTACT_RECIPIENT_EMAIL
-        value: techbidmarketplace@gmail.com
+      - key: SUPPORT_EMAIL
+        value: mentify@mlaudit.info
     
     # ─── Health Check ────────────────────────────────────────────────
     # Optional: Render pings /health/ to check if service is alive
