@@ -153,14 +153,15 @@ Render auto-creates the PostgreSQL database from `render.yaml`, BUT you need to 
    ```
    DJANGO_SETTINGS_MODULE=config.settings.production
    DJANGO_SECRET_KEY=<generate-a-long-random-string>
-   ALLOWED_HOSTS=<your-app>.onrender.com,www.yourdomain.co.ke
+   ALLOWED_HOSTS=mlaudit.info,www.mlaudit.info
+   CSRF_TRUSTED_ORIGINS=https://mlaudit.info,https://www.mlaudit.info
    
    RESEND_API_KEY=<your-Resend-api-key>
    FROM_EMAIL=mentify@mlaudit.info
    CONTACT_RECIPIENT_EMAIL=techbidmarketplace@gmail.com
    
    PLATFORM_NAME=Mentify
-   BASE_URL=https://<your-app>.onrender.com
+   BASE_URL=https://mlaudit.info
    
    PAYSTACK_SECRET_KEY=<your-paystack-key>
    PAYSTACK_PUBLIC_KEY=<your-paystack-key>
