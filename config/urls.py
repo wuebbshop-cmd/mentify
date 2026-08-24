@@ -10,7 +10,25 @@ from accounts.sitemap_views import sitemap, robots_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
 import os
 
+def health_check(request):
+    """Minimal health check for Render and uptime monitoring."""
+    from django.http import HttpResponse
+
+    try:
+        from django.db import connection
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+    except Exception:
+        return HttpResponse("unhealthy", status=503, content_type="text/plain")
+
+    return HttpResponse("ok", content_type="text/plain")
+
 urlpatterns = [
+    # Health check for uptime monitoring & diagnostics
+    path("health/", health_check, name="health_check"),
+
     # Django admin (platform owner only)
     path("admin/", admin.site.urls),
 
@@ -78,5 +96,4 @@ urlpatterns += [
         {"document_root": settings.MEDIA_ROOT},
     ),
 ]
-
 

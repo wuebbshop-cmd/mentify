@@ -6,10 +6,6 @@ from django.utils import timezone
 from django.views.decorators.cache import cache_page
 from xml.sax.saxutils import escape
 
-from courses.models import Course, Cohort
-from accounts.models import User
-
-
 def get_base_url(request):
     """Dynamically resolve canonical base URL for SEO outputs."""
     configured = getattr(settings, "BASE_URL", "").strip().rstrip("/")
@@ -31,6 +27,9 @@ def sitemap(request):
     
     Returns: XML formatted as application/xml
     """
+    from accounts.models import User
+    from courses.models import Course, Cohort
+
     base_url = get_base_url(request)
     today = timezone.now().date().isoformat()
     

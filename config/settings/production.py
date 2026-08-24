@@ -33,25 +33,16 @@ if database_url:
         conn_max_age=600,
         conn_health_checks=True,
     )
-    current_options = db_config.get("OPTIONS", {})
-    cleaned_options = {k: v for k, v in current_options.items() if k not in ("charset", "init_command")}
-    db_config["OPTIONS"] = cleaned_options
-    DATABASES = {"default": db_config}
-else:
-    # Fallback if DATABASE_URL not set
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "mentify"),
-            "USER": os.environ.get("DB_USER", "mentify"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
-            "CONN_MAX_AGE": 600,
-            "CONN_HEALTH_CHECKS": True,
-            "OPTIONS": {},
+    if "postgresql" in db_config.get("ENGINE", ""):
+        invalid_pg_options = {"charset", "init_command"}
+        for key in invalid_pg_options:
+            db_config.pop(key, None)
+        db_config["OPTIONS"] = {
+            key: value
+            for key, value in db_config.get("OPTIONS", {}).items()
+            if key not in invalid_pg_options
         }
-    }
+    DATABASES = {"default": db_config}
 
 # ─── Security: HTTPS and HSTS ──────────────────────────────────────────────
 SECURE_SSL_REDIRECT = True
