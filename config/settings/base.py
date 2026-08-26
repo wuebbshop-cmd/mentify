@@ -191,8 +191,11 @@ DEFAULT_FROM_EMAIL = (
     or os.environ.get("DEFAULT_FROM_EMAIL", "noreply@mentify.co.ke").strip()
 )
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "mentify@mlaudit.info").strip()
-CONTACT_RECIPIENT_EMAIL = os.environ.get("CONTACT_RECIPIENT_EMAIL", SUPPORT_EMAIL).strip()
+# CONTACT_RECIPIENT_EMAIL: real inbox that can receive mail (not @mlaudit.info which has no MX).
+# Render env var overrides this. Default is your Gmail so the fallback always works.
+CONTACT_RECIPIENT_EMAIL = os.environ.get(
+    "CONTACT_RECIPIENT_EMAIL", "techbidmarketplace@gmail.com"
+).strip()
 
 if RESEND_API_KEY:
     EMAIL_BACKEND = "services.resend_backend.ResendEmailBackend"
