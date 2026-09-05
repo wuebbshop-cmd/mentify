@@ -99,6 +99,9 @@ urlpatterns = [
     # Payments
     path("payments/", include("payments.urls")),
 
+    # Blog & Content Hub
+    path("blog/", include("blog.urls")),
+
     # Root redirect
     path("", include("accounts.home_urls")),
 ]

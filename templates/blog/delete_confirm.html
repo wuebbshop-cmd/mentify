@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Article - {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-8" style="max-width: 540px;">
+  <div class="card" style="text-align: center; padding: 2.5rem 1.5rem; border-radius: var(--radius-lg);">
+    <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    </div>
+
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text);">
+      Delete Article?
+    </h2>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+      Are you sure you want to delete <strong>"{{ post.title }}"</strong>? This action cannot be undone.
+    </p>
+
+    <form method="post" style="display: flex; gap: 12px; justify-content: center;">
+      {% csrf_token %}
+      <a href="{% url 'blog:tutor_manage' %}" class="btn btn-outline">Cancel</a>
+      <button type="submit" class="btn" style="background: #dc2626; color: #fff; font-weight: 700; border: none; padding: 10px 20px;">
+        Yes, Delete Article
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

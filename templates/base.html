@@ -81,6 +81,7 @@
     {% else %}
       <li><a href="{% url 'courses:list' %}" class="nav-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}">Courses</a></li>
     {% endif %}
+    <li><a href="{% url 'blog:index' %}" class="nav-link {% if request.resolver_match.app_name == 'blog' %}active{% endif %}">Blog</a></li>
   </ul>
 
   <div class="navbar-end">
@@ -215,6 +216,7 @@
       <span>Primary, JSS, senior school, past senior school, and adult learners</span>
     </div>
     <div class="footer-links">
+      <a href="{% url 'blog:index' %}">Blog</a>
       <a href="{% url 'accounts:contact' %}">Contact</a>
       <a href="{% url 'accounts:privacy_policy' %}">Privacy Policy</a>
       <a href="{% url 'accounts:terms' %}">Terms</a>

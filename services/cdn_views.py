@@ -86,3 +86,42 @@ def github_asset_proxy(request, owner, repo, ref, filepath):
     response = HttpResponse(content, content_type=content_type)
     response["Cache-Control"] = "public, max-age=86400"
     return response
+
+
+def upload_to_github(file_obj, filename: str, folder: str = "blog") -> str | None:
+    """
+    Upload a file to GitHub repository (via PyGithub or GitHub REST API)
+    and return the proxy CDN URL.
+    """
+    token = getattr(settings, "GITHUB_TOKEN", "").strip()
+    repo_full = getattr(settings, "GITHUB_REPO", "").strip()
+    branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
+
+    if not token or not repo_full or "/" not in repo_full:
+        return None
+
+    path = f"{folder}/{filename}".strip("/")
+    content_bytes = file_obj.read() if hasattr(file_obj, "read") else file_obj
+    content_b64 = base64.b64encode(content_bytes).decode("utf-8")
+
+    api_url = f"https://api.github.com/repos/{repo_full}/contents/{path}"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    payload = {
+        "message": f"Upload blog asset: {filename}",
+        "content": content_b64,
+        "branch": branch,
+    }
+
+    try:
+        resp = requests.put(api_url, headers=headers, json=payload, timeout=15)
+        if resp.status_code in (200, 201):
+            return f"/cdn/assets/{path}"
+    except Exception:
+        pass
+
+    return None
+

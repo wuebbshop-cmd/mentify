@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "assignments",
     "live_sessions",
     "payments",
+    "blog",
 ]
 
 

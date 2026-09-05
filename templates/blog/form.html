@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Blog Article - {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-8" style="max-width: 960px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text);">
+        {{ action }} Blog Article
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">
+        Write in Markdown, upload images, or import a pre-written <code>.md</code> file from your computer.
+      </p>
+    </div>
+    <a href="{% url 'blog:tutor_manage' %}" class="btn btn-outline">
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" id="blog-form">
+    {% csrf_token %}
+
+    <!-- .md File Import Dropzone -->
+    <div class="card" style="margin-bottom: 2rem; background: rgba(15,118,110,0.04); border: 2px dashed var(--green); border-radius: var(--radius-md); padding: 1.5rem; text-align: center;">
+      <div style="font-weight: 700; font-size: 1rem; color: var(--green); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Import Pre-Written .md File (Optional)
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Select or drag &amp; drop an existing <code>.md</code> file to auto-populate the title and editor content instantly.
+      </p>
+      <input type="file" name="md_file" id="md-file-input" accept=".md,.markdown,.txt" style="display: none;">
+      <button type="button" onclick="document.getElementById('md-file-input').click();" class="btn btn-outline" style="background: var(--white); border-color: var(--green); color: var(--green); font-weight: 600;">
+        Choose .md File
+      </button>
+      <span id="md-file-name" style="font-size: 0.85rem; font-weight: 600; color: var(--text); margin-left: 10px;"></span>
+    </div>
+
+    <!-- Main Form Fields -->
+    <div class="card" style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1.25rem;">
+      <!-- Title -->
+      <div>
+        <label for="title" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
+          Article Title <span style="color: #dc2626;">*</span>
+        </label>
+        <input type="text" name="title" id="title" value="{{ post.title|default:'' }}" required placeholder="e.g., How to Master Python for Beginners in 2026" class="form-input" style="width: 100%; font-size: 1.1rem; font-weight: 700;">
+      </div>
+
+      <!-- Category & Tags Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+        <div>
+          <label for="category" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
+            Category
+          </label>
+          <select name="category" id="category" class="form-input" style="width: 100%;">
+            <option value="">-- Select Category --</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if post and post.category and post.category.id == cat.id %}selected{% endif %}>
+                {{ cat.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label for="tags" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
+            Tags (Comma separated)
+          </label>
+          <input type="text" name="tags" id="tags" value="{{ post.tags|default:'' }}" placeholder="e.g. Python, Web, Beginners" class="form-input" style="width: 100%;">
+        </div>
+      </div>
+
+      <!-- Excerpt -->
+      <div>
+        <label for="excerpt" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
+          Short Excerpt / Teaser
+        </label>
+        <textarea name="excerpt" id="excerpt" rows="2" placeholder="Brief 1-2 sentence summary for search results and cards..." class="form-input" style="width: 100%;">{{ post.excerpt|default:'' }}</textarea>
+      </div>
+
+      <!-- Cover Image URL & Upload -->
+      <div>
+        <label for="featured_image_url" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">
+          Cover Image URL (GitHub CDN or External)
+        </label>
+        <div style="display: flex; gap: 10px;">
+          <input type="url" name="featured_image_url" id="featured_image_url" value="{{ post.featured_image_url|default:'' }}" placeholder="https://..." class="form-input" style="flex: 1;">
+          <input type="file" id="cover-image-file" accept="image/*" style="display: none;">
+          <button type="button" onclick="document.getElementById('cover-image-file').click();" class="btn btn-outline" style="white-space: nowrap;">
+            Upload Image
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Markdown Editor Card -->
+    <div class="card" style="margin-bottom: 2rem; padding: 0; overflow: hidden;">
+      <!-- Editor Header Toolbar -->
+      <div style="background: var(--bg-surface, #f9fafb); padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <button type="button" onclick="insertMarkdown('# ')" class="btn btn-outline" style="padding: 4px 8px; font-weight: 700; font-size: 0.8rem;" title="Heading 1">H1</button>
+          <button type="button" onclick="insertMarkdown('## ')" class="btn btn-outline" style="padding: 4px 8px; font-weight: 700; font-size: 0.8rem;" title="Heading 2">H2</button>
+          <button type="button" onclick="insertMarkdown('### ')" class="btn btn-outline" style="padding: 4px 8px; font-weight: 700; font-size: 0.8rem;" title="Heading 3">H3</button>
+          <span style="width: 1px; height: 20px; background: var(--border); margin: 0 4px; align-self: center;"></span>
+          <button type="button" onclick="insertMarkdown('**', '**')" class="btn btn-outline" style="padding: 4px 8px; font-weight: 800; font-size: 0.8rem;" title="Bold">B</button>
+          <button type="button" onclick="insertMarkdown('*', '*')" class="btn btn-outline" style="padding: 4px 8px; font-style: italic; font-size: 0.8rem;" title="Italic">I</button>
+          <button type="button" onclick="insertMarkdown('> ')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="Quote">&ldquo; &rdquo;</button>
+          <span style="width: 1px; height: 20px; background: var(--border); margin: 0 4px; align-self: center;"></span>
+          <button type="button" onclick="insertMarkdown('[Link Title](', ')')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="Insert Link">Link</button>
+          <button type="button" onclick="insertMarkdown('```python\n', '\n```')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; font-family: monospace;" title="Code Block">&lt;/&gt;</button>
+          <button type="button" onclick="insertMarkdown('- ')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="List">&bull; List</button>
+        </div>
+
+        <!-- Mode Toggle Tabs -->
+        <div style="display: flex; gap: 4px;">
+          <button type="button" id="tab-write" onclick="switchEditorTab('write')" class="btn btn-primary" style="padding: 4px 12px; font-size: 0.8rem;">Write</button>
+          <button type="button" id="tab-preview" onclick="switchEditorTab('preview')" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;">Preview</button>
+        </div>
+      </div>
+
+      <!-- Editor Textarea Area -->
+      <div id="editor-write-pane" style="padding: 1rem;">
+        <textarea name="markdown_content" id="markdown_content" rows="18" placeholder="Write your post in Markdown format...
+# Section Heading
+Use **bold**, *italics*, [links](url), code blocks, and images." class="form-input" style="width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.95rem; line-height: 1.6; border: none; resize: vertical;">{{ post.markdown_content|default:'' }}</textarea>
+      </div>
+
+      <!-- Live Preview Pane -->
+      <div id="editor-preview-pane" style="display: none; padding: 1.5rem; min-height: 350px; font-size: 1rem; line-height: 1.7;" class="blog-article-content">
+        <div style="color: var(--text-muted); font-style: italic;">Rendering live preview...</div>
+      </div>
+    </div>
+
+    <!-- Options & Save Bar -->
+    <div class="card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+          <input type="checkbox" name="is_published" {% if not post or post.is_published %}checked{% endif %}>
+          Publish Live
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+          <input type="checkbox" name="is_featured" {% if post and post.is_featured %}checked{% endif %}>
+          Pin as Featured Hero Article
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="{% url 'blog:tutor_manage' %}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-weight: 700;">
+          Save Article
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+// Client-side .md file reader
+document.getElementById('md-file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  document.getElementById('md-file-name').textContent = 'Selected: ' + file.name;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const content = evt.target.result;
+    document.getElementById('markdown_content').value = content;
+
+    // Auto-extract title if title field is empty and content starts with # Title
+    const titleInput = document.getElementById('title');
+    if (!titleInput.value.trim()) {
+      const match = content.match(/^#\s+(.+)$/m);
+      if (match) {
+        titleInput.value = match[1].trim();
+      } else {
+        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        titleInput.value = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+      }
+    }
+  };
+  reader.readAsText(file);
+});
+
+// Markdown Insertion Helper
+function insertMarkdown(startTag, endTag = '') {
+  const textarea = document.getElementById('markdown_content');
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.substring(start, end);
+  const replacement = startTag + (selected || 'text') + endTag;
+  textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+  textarea.focus();
+  textarea.selectionStart = start + startTag.length;
+  textarea.selectionEnd = start + startTag.length + (selected || 'text').length;
+}
+
+// Switch Write vs Preview Tabs
+function switchEditorTab(tab) {
+  const writePane = document.getElementById('editor-write-pane');
+  const previewPane = document.getElementById('editor-preview-pane');
+  const writeTabBtn = document.getElementById('tab-write');
+  const previewTabBtn = document.getElementById('tab-preview');
+
+  if (tab === 'write') {
+    writePane.style.display = 'block';
+    previewPane.style.display = 'none';
+    writeTabBtn.className = 'btn btn-primary';
+    previewTabBtn.className = 'btn btn-outline';
+  } else {
+    writePane.style.display = 'none';
+    previewPane.style.display = 'block';
+    writeTabBtn.className = 'btn btn-outline';
+    previewTabBtn.className = 'btn btn-primary';
+
+    // Simple JS Preview
+    const rawMd = document.getElementById('markdown_content').value;
+    previewPane.innerHTML = simpleMarkdownToHtml(rawMd);
+  }
+}
+
+// Lightweight JS Markdown renderer for live tab preview
+function simpleMarkdownToHtml(md) {
+  if (!md) return '<em>Nothing to preview yet...</em>';
+  let html = md
+    .replace(/^### (.*$)/gim, '<h3 style="font-size:1.25rem; font-weight:700; margin:1.25rem 0 0.5rem;">$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2 style="font-size:1.5rem; font-weight:800; margin:1.5rem 0 0.75rem;">$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1 style="font-size:1.85rem; font-weight:800; margin:1.75rem 0 1rem;">$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; margin:1rem 0;">')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:#0f766e;">$1</a>')
+    .replace(/\n/g, '<br>');
+  return html;
+}
+
+// Cover image GitHub upload
+document.getElementById('cover-image-file').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+  const btn = e.target.nextElementSibling;
+  btn.textContent = 'Uploading...';
+  btn.disabled = true;
+
+  fetch('{% url "blog:upload_image" %}', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.textContent = 'Upload Image';
+    btn.disabled = false;
+    if (data.success && data.url) {
+      document.getElementById('featured_image_url').value = data.url;
+      alert('Cover image uploaded successfully to CDN!');
+    } else {
+      alert('Failed to upload image: ' + (data.error || 'Unknown error'));
+    }
+  })
+  .catch(err => {
+    btn.textContent = 'Upload Image';
+    btn.disabled = false;
+    alert('Upload error: ' + err);
+  });
+});
+</script>
+{% endblock %}

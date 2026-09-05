@@ -58,6 +58,30 @@ def sitemap(request):
             "priority": "0.8",
         })
 
+    # Blog Hub Page
+    blog_hub = [{'loc': f"{base_url}/blog/", 'lastmod': today, 'changefreq': 'daily', 'priority': '0.9'}]
+
+    # Published Blog Posts
+    blog_post_pages = []
+    try:
+        from blog.models import Post, Category
+        for post in Post.objects.filter(is_published=True).only("slug", "updated_at"):
+            blog_post_pages.append({
+                "loc": f"{base_url}/blog/{post.slug}/",
+                "lastmod": post.updated_at.date().isoformat(),
+                "changefreq": "weekly",
+                "priority": "0.8",
+            })
+        for cat in Category.objects.all().only("slug"):
+            blog_post_pages.append({
+                "loc": f"{base_url}/blog/category/{cat.slug}/",
+                "lastmod": today,
+                "changefreq": "weekly",
+                "priority": "0.7",
+            })
+    except Exception:
+        pass
+
     # Active Cohorts
     cohort_pages = []
     for cohort in Cohort.objects.filter(status="active").only("id", "updated_at"):
@@ -78,7 +102,7 @@ def sitemap(request):
             "priority": "0.6",
         })
 
-    pages = static_pages + course_pages + cohort_pages + tutor_pages
+    pages = static_pages + blog_hub + course_pages + blog_post_pages + cohort_pages + tutor_pages
     
     xml_output = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

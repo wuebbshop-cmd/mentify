@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ category.name }} Articles - {{ PLATFORM_NAME }} Blog{% endblock %}
+
+{% block meta_description %}Read articles and tutorials on {{ category.name }} from {{ PLATFORM_NAME }}.{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <!-- Category Header -->
+  <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
+    <span class="badge badge-green" style="margin-bottom: 0.75rem; display: inline-flex; align-items: center; gap: 6px;">
+      Topic Category
+    </span>
+    <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; color: var(--text);">
+      {{ category.name }}
+    </h1>
+    {% if category.description %}
+    <p style="color: var(--text-muted); font-size: 1.05rem; margin: 0;">
+      {{ category.description }}
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Category Filter Bar -->
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem;">
+    <a href="{% url 'blog:index' %}" class="badge badge-gray" style="text-decoration: none; padding: 6px 14px; font-size: 0.85rem;">
+      All Topics
+    </a>
+    {% for cat in categories %}
+      <a href="{% url 'blog:category_detail' cat.slug %}" class="badge {% if cat.slug == category.slug %}badge-green{% else %}badge-gray{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 0.85rem;">
+        {{ cat.name }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Articles Grid -->
+  {% if page_obj %}
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+    {% for post in page_obj %}
+    <div class="card" style="display: flex; flex-direction: column; padding: 0; overflow: hidden; height: 100%; border-radius: var(--radius-md);">
+      <a href="{% url 'blog:detail' post.slug %}" style="text-decoration: none; display: block; aspect-ratio: 16/9; background: #f3f4f6; overflow: hidden;">
+        {% if post.featured_image_url %}
+          <img src="{{ post.featured_image_url }}" alt="{{ post.title }}" style="width:100%; height:100%; object-fit:cover;">
+        {% else %}
+          <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, rgba(15,118,110,0.8), rgba(13,35,64,0.9)); color:#fff; font-weight:800; font-size:1.5rem;">
+            {{ PLATFORM_NAME }}
+          </div>
+        {% endif %}
+      </a>
+      <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+          <span class="badge badge-green" style="font-size: 0.7rem; padding: 2px 8px;">{{ category.name }}</span>
+          <span>{{ post.reading_time_minutes }} min read</span>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4;">
+          <a href="{% url 'blog:detail' post.slug %}" style="text-decoration: none; color: var(--text);">
+            {{ post.title }}
+          </a>
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem; line-height: 1.5; flex: 1;">
+          {{ post.excerpt|default:post.markdown_content|truncatewords:22 }}
+        </p>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted);">
+          <span>By {{ post.author.first_name|default:post.author.username }}</span>
+          <span>{{ post.published_at|date:"M d, Y" }}</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination Controls -->
+  {% if page_obj.has_other_pages %}
+  <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 3rem;">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline" style="padding: 6px 14px;">&laquo; Previous</a>
+    {% endif %}
+    
+    <span class="btn btn-outline" style="padding: 6px 14px; opacity: 0.7; pointer-events: none;">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline" style="padding: 6px 14px;">Next &raquo;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="card" style="text-align: center; padding: 4rem 2rem; margin-bottom: 3rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">No articles in {{ category.name }} yet</h3>
+    <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto 1.5rem;">
+      Check back soon for new articles in this category, or explore other topics on our blog hub.
+    </p>
+    <a href="{% url 'blog:index' %}" class="btn btn-primary">Browse All Articles</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
