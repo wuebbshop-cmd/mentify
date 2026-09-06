@@ -19,6 +19,19 @@
     <p style="color: var(--text-muted); font-size: 1.05rem; margin: 0;">
       Practical tutorials, tech guides, academic advice, and insights written by {{ PLATFORM_NAME }} tutors and mentors.
     </p>
+
+    {% if user.is_authenticated and user.role in "tutor,admin" or user.is_staff or user.is_superuser %}
+    <div style="display: flex; justify-content: center; gap: 12px; margin-top: 1.25rem; flex-wrap: wrap;">
+      <a href="{% url 'blog:tutor_create' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+        Write New Article
+      </a>
+      <a href="{% url 'blog:tutor_manage' %}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Manage Articles
+      </a>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Featured Post Hero Banner -->
