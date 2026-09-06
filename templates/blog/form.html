@@ -109,6 +109,10 @@
           <button type="button" onclick="insertMarkdown('> ')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="Quote">&ldquo; &rdquo;</button>
           <span style="width: 1px; height: 20px; background: var(--border); margin: 0 4px; align-self: center;"></span>
           <button type="button" onclick="insertMarkdown('[Link Title](', ')')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="Insert Link">Link</button>
+          <button type="button" onclick="document.getElementById('editor-inline-image-file').click();" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; background: rgba(15,118,110,0.08); color: var(--green); border-color: var(--green); font-weight: 600;" title="Upload & Insert Image">
+            📷 Insert Image
+          </button>
+          <input type="file" id="editor-inline-image-file" accept="image/*" style="display: none;">
           <button type="button" onclick="insertMarkdown('```python\n', '\n```')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; font-family: monospace;" title="Code Block">&lt;/&gt;</button>
           <button type="button" onclick="insertMarkdown('- ')" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="List">&bull; List</button>
         </div>
@@ -269,6 +273,80 @@ document.getElementById('cover-image-file').addEventListener('change', function(
     btn.disabled = false;
     alert('Upload error: ' + err);
   });
+});
+
+// Inline Image Upload Handler for Toolbar Button, Clipboard Paste & Drag-and-Drop
+function handleInlineImageUpload(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+
+  const textarea = document.getElementById('markdown_content');
+  const placeholder = `![Uploading ${file.name}...]()`;
+  insertMarkdown(placeholder);
+
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+  fetch('{% url "blog:upload_image" %}', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && data.url) {
+      const markdownTag = `![${file.name.replace(/\.[^/.]+$/, "")}](${data.url})`;
+      textarea.value = textarea.value.replace(placeholder, markdownTag);
+    } else {
+      alert('Image upload failed: ' + (data.error || 'Unknown error'));
+      textarea.value = textarea.value.replace(placeholder, '');
+    }
+  })
+  .catch(err => {
+    alert('Image upload error: ' + err);
+    textarea.value = textarea.value.replace(placeholder, '');
+  });
+}
+
+// 1. Toolbar Button Trigger
+document.getElementById('editor-inline-image-file').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    handleInlineImageUpload(file);
+    e.target.value = ''; // Reset input
+  }
+});
+
+// 2. Clipboard Paste (Ctrl+V / Cmd+V) Listener on Editor Textarea
+document.getElementById('markdown_content').addEventListener('paste', function(e) {
+  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for (let item of items) {
+    if (item.type.indexOf('image') === 0) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      handleInlineImageUpload(file);
+      break;
+    }
+  }
+});
+
+// 3. Drag & Drop File Listener on Editor Textarea
+const textareaElem = document.getElementById('markdown_content');
+textareaElem.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  textareaElem.style.borderColor = 'var(--green)';
+});
+textareaElem.addEventListener('dragleave', function(e) {
+  textareaElem.style.borderColor = '';
+});
+textareaElem.addEventListener('drop', function(e) {
+  e.preventDefault();
+  textareaElem.style.borderColor = '';
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    const file = e.dataTransfer.files[0];
+    if (file.type.startsWith('image/')) {
+      handleInlineImageUpload(file);
+    }
+  }
 });
 </script>
 {% endblock %}
