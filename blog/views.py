@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import F, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -77,7 +77,7 @@ def post_detail(request, slug):
             return render(request, "404.html", status=404)
 
     # Increment view counter silently
-    Post.objects.filter(pk=post.pk).update(views_count=models.F("views_count") + 1)
+    Post.objects.filter(pk=post.pk).update(views_count=F("views_count") + 1)
     post.refresh_from_db(fields=["views_count"])
 
     related_posts = (
