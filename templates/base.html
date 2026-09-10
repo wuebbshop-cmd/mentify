@@ -36,15 +36,23 @@
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
 
-  <!-- Structured Data (JSON-LD) -->
+  <!-- Structured Data (JSON-LD) for Search Engines & Google Knowledge Graph -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     "name": "{{ PLATFORM_NAME }}",
-    "url": "{{ request.build_absolute_uri }}",
-    "logo": "{% static 'images/logo.png' %}",
-    "description": "Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support."
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
+    "description": "Mentify is an interactive online tutoring, cohort learning, and tech education platform founded and led by John Shivogo. It offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, and career-focused technical articles.",
+    "founder": {
+      "@type": "Person",
+      "name": "John Shivogo"
+    },
+    "sameAs": [
+      "{{ request.scheme }}://{{ request.get_host }}/blog/",
+      "{{ request.scheme }}://{{ request.get_host }}/courses/"
+    ]
   }
   </script>
 </head>
