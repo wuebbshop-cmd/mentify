@@ -149,7 +149,7 @@
           {{ post.excerpt|default:post.markdown_content|truncatewords:22 }}
         </p>
         <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted);">
-          <span>By {{ post.author.first_name|default:post.author.username }}</span>
+          <span>By {{ post.get_author_display_name }}</span>
           <span>{{ post.published_at|date:"M d, Y" }}</span>
         </div>
       </div>

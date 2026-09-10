@@ -70,7 +70,7 @@
         </div>
         <div>
           <div style="font-weight: 700; font-size: 0.95rem; color: var(--text);">
-            {{ post.author.get_full_name|default:post.author.username }}
+            {{ post.get_author_display_name }}
           </div>
           <div style="font-size: 0.8rem; color: var(--text-muted);">
             Published on {{ post.published_at|date:"F j, Y" }}
@@ -160,7 +160,7 @@
     </div>
     <div>
       <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 2px;">
-        Written by {{ post.author.get_full_name|default:post.author.username }}
+        Written by {{ post.get_author_display_name }}
       </div>
       <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">
         Tutor &amp; Educator at {{ PLATFORM_NAME }}

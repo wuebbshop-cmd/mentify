@@ -107,5 +107,13 @@ class Post(models.Model):
             return []
         return [t.strip() for t in self.tags.split(",") if t.strip()]
 
+    def get_author_display_name(self):
+        if self.author:
+            full_name = f"{self.author.first_name} {self.author.last_name}".strip()
+            if full_name:
+                return full_name.title()
+            return self.author.username
+        return "Mentify Team"
+
     def __str__(self):
         return self.title
