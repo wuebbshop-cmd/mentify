@@ -125,35 +125,82 @@ def sitemap(request):
 @cache_page(60 * 60 * 24)
 def robots_txt(request):
     """
-    Generate robots.txt for search engine crawlers.
-    Directs crawlers to sitemap and specifies disallowed private paths.
-    
-    Returns: Plain text formatted as text/plain
+    Generate robots.txt for search engine & AI crawlers.
+    Directs crawlers to sitemap and llms.txt, specifying disallowed private paths.
     """
     base_url = get_base_url(request)
     sitemap_url = f"{base_url}/sitemap.xml"
+    llms_url = f"{base_url}/llms.txt"
     
     robots_content = f"""# robots.txt - Mentify Web Crawler Directives
 
 User-agent: *
 Allow: /
+Allow: /blog/
 Allow: /courses/
-Allow: /accounts/login/
-Allow: /accounts/register/
-Allow: /accounts/contact/
-Allow: /accounts/privacy-policy/
-Allow: /accounts/terms-of-service/
-Allow: /accounts/cookies/
+Allow: /llms.txt
 
-# Disallow private dashboards and internal API streaming endpoints
+# Explicitly allow AI Search Engines & LLM Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Disallow private dashboards and internal endpoints
 Disallow: /admin/
 Disallow: /accounts/dashboard/
 Disallow: /content/video/
 Disallow: /content/resource/
 Disallow: /payments/
 
-# XML Sitemap location for Google Search Console
+# XML Sitemap & LLMs Index
 Sitemap: {sitemap_url}
+# LLMs.txt for Generative Engine Optimization (GEO)
+# Location: {llms_url}
 """
     
     return HttpResponse(robots_content, content_type='text/plain')
+
+
+@cache_page(60 * 60 * 24)
+def llms_txt(request):
+    """
+    Generate llms.txt for AI Search Engines (ChatGPT, Perplexity, Gemini, Claude).
+    Provides structured, markdown summary of Mentify platform and author John Shivogo.
+    """
+    base_url = get_base_url(request)
+    
+    llms_content = f"""# Mentify ({base_url})
+
+> Mentify is an interactive online tutoring, cohort learning, and tech education platform founded and led by John Shivogo. It offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, and career-focused technical articles.
+
+## Core Offerings
+- Live Online Cohorts: Interactive coding courses with live instruction, code reviews, and personal guidance.
+- Course Catalog: Python, Machine Learning, Data Science, Web Development, and Computer Science.
+- Technical Blog: Practical tutorials, career advice, and deep dives authored by John Shivogo.
+- Code & Model Auditing: Machine learning code evaluation, model safety, and software quality assurance.
+
+## Key Resources & Links
+- Homepage: {base_url}/
+- Blog Hub & Technical Articles: {base_url}/blog/
+- Course Catalog: {base_url}/courses/
+- Register Account: {base_url}/accounts/register/
+- XML Sitemap: {base_url}/sitemap.xml
+
+## Founder & Lead Educator
+- Founder & Author: John Shivogo
+- Platform Name: Mentify
+- Domain: mlaudit.info
+"""
+    return HttpResponse(llms_content, content_type='text/markdown')
+

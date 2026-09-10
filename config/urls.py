@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 from django.views.static import serve as static_serve
 from django.contrib.staticfiles import finders
 from django.http import FileResponse, Http404
-from accounts.sitemap_views import sitemap, robots_txt
+from accounts.sitemap_views import sitemap, robots_txt, llms_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
 import os
 
@@ -65,6 +65,9 @@ urlpatterns = [
     
     # SEO: robots.txt for crawler directives
     path("robots.txt", robots_txt, name="robots"),
+    
+    # GEO (Generative Engine Optimization): llms.txt for AI Search Engines (ChatGPT, Perplexity, Gemini, Claude)
+    path("llms.txt", llms_txt, name="llms_txt"),
     
     # SEO: Google Search Console verification
     path('google20c3024f708d9e69.html', lambda request: static_serve(request, 'google20c3024f708d9e69.html', document_root=settings.BASE_DIR)),
