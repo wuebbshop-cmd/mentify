@@ -86,7 +86,7 @@
           Cover Image URL (GitHub CDN or External)
         </label>
         <div style="display: flex; gap: 10px;">
-          <input type="url" name="featured_image_url" id="featured_image_url" value="{{ post.featured_image_url|default:'' }}" placeholder="https://..." class="form-input" style="flex: 1;">
+          <input type="text" name="featured_image_url" id="featured_image_url" value="{{ post.featured_image_url|default:'' }}" placeholder="/cdn/assets/... or https://..." class="form-input" style="flex: 1;">
           <input type="file" id="cover-image-file" accept="image/*" style="display: none;">
           <button type="button" onclick="document.getElementById('cover-image-file').click();" class="btn btn-outline" style="white-space: nowrap;">
             Upload Image

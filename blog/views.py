@@ -181,25 +181,52 @@ def tutor_blog_create(request):
 
         if not title:
             messages.error(request, "Article title is required.")
-            return render(request, "blog/form.html", {"categories": categories})
+            return render(request, "blog/form.html", {"categories": categories, "action": "Create"})
 
         category = Category.objects.filter(pk=category_id).first() if category_id else None
 
-        post = Post.objects.create(
-            title=title,
-            excerpt=excerpt,
-            markdown_content=markdown_content,
-            featured_image_url=featured_image_url,
-            author=request.user,
-            category=category,
-            tags=tags,
-            is_published=is_published,
-            is_featured=is_featured,
-            published_at=timezone.now(),
-        )
+        # Clean featured_image_url if user pasted relative or leading 'v/'
+        if featured_image_url:
+            if featured_image_url.startswith("v/"):
+                featured_image_url = "/" + featured_image_url[2:]
+            elif not featured_image_url.startswith("http") and not featured_image_url.startswith("/"):
+                featured_image_url = "/" + featured_image_url
 
-        messages.success(request, f"Article '{post.title}' created successfully!")
-        return redirect("blog:tutor_manage")
+        try:
+            post = Post.objects.create(
+                title=title,
+                excerpt=excerpt,
+                markdown_content=markdown_content,
+                featured_image_url=featured_image_url,
+                author=request.user,
+                category=category,
+                tags=tags,
+                is_published=is_published,
+                is_featured=is_featured,
+                published_at=timezone.now(),
+            )
+            messages.success(request, f"Article '{post.title}' created successfully!")
+            return redirect("blog:tutor_manage")
+        except Exception as e:
+            logger.error("Failed to create blog post: %s", e)
+            messages.error(request, f"Could not save article: {e}")
+            return render(
+                request,
+                "blog/form.html",
+                {
+                    "categories": categories,
+                    "action": "Create",
+                    "post": {
+                        "title": title,
+                        "excerpt": excerpt,
+                        "markdown_content": markdown_content,
+                        "featured_image_url": featured_image_url,
+                        "tags": tags,
+                        "is_published": is_published,
+                        "is_featured": is_featured,
+                    },
+                },
+            )
 
     context = {
         "categories": categories,
@@ -228,7 +255,14 @@ def tutor_blog_edit(request, post_id):
         post.category = Category.objects.filter(pk=category_id).first() if category_id else None
         post.excerpt = request.POST.get("excerpt", "").strip()
         post.markdown_content = request.POST.get("markdown_content", "").strip()
-        post.featured_image_url = request.POST.get("featured_image_url", "").strip()
+        
+        img_url = request.POST.get("featured_image_url", "").strip()
+        if img_url.startswith("v/"):
+            img_url = "/" + img_url[2:]
+        elif img_url and not img_url.startswith("http") and not img_url.startswith("/"):
+            img_url = "/" + img_url
+        post.featured_image_url = img_url
+
         post.tags = request.POST.get("tags", "").strip()
         post.is_published = request.POST.get("is_published") == "on"
         post.is_featured = request.POST.get("is_featured") == "on"
@@ -242,9 +276,13 @@ def tutor_blog_edit(request, post_id):
             except Exception as e:
                 logger.error("Failed to parse uploaded .md file: %s", e)
 
-        post.save()
-        messages.success(request, f"Article '{post.title}' updated successfully!")
-        return redirect("blog:tutor_manage")
+        try:
+            post.save()
+            messages.success(request, f"Article '{post.title}' updated successfully!")
+            return redirect("blog:tutor_manage")
+        except Exception as e:
+            logger.error("Failed to update blog post: %s", e)
+            messages.error(request, f"Could not update article: {e}")
 
     context = {
         "post": post,
@@ -283,7 +321,9 @@ def upload_blog_image(request):
 
     if request.method == "POST" and request.FILES.get("image"):
         image_file = request.FILES["image"]
-        filename = f"blog_{timezone.now().strftime('%Y%m%d_%H%M%S')}_{image_file.name}"
+        # Sanitize filename by converting spaces and special characters to underscores
+        clean_name = re.sub(r"[^a-zA-Z0-9_.-]", "_", image_file.name)
+        filename = f"blog_{timezone.now().strftime('%Y%m%d_%H%M%S')}_{clean_name}"
         cdn_url = upload_to_github(image_file, filename, folder="blog")
 
         if cdn_url:

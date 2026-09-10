@@ -46,10 +46,10 @@ class Post(models.Model):
     markdown_content = models.TextField(
         help_text="Full article body in Markdown format (# headings, **bold**, *italics*, code blocks, images)",
     )
-    featured_image_url = models.URLField(
+    featured_image_url = models.CharField(
         max_length=500,
         blank=True,
-        help_text="URL of cover image (GitHub CDN or external URL)",
+        help_text="URL or path of cover image (GitHub CDN path or external URL)",
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
