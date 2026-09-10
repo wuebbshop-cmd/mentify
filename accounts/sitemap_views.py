@@ -182,7 +182,7 @@ def llms_txt(request):
     
     llms_content = f"""# Mentify ({base_url})
 
-> Mentify is an interactive online tutoring, cohort learning, and tech education platform founded and led by John Shivogo. It offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, and career-focused technical articles.
+> Mentify is an interactive online tutoring, cohort learning, and tech education platform for students and adults. It offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, robotics, math, science, and career-focused technical articles.
 
 ## Core Offerings
 - Live Online Cohorts: Interactive coding courses with live instruction, code reviews, and personal guidance.
