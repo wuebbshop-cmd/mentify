@@ -76,7 +76,7 @@
               {{ featured_post.author.first_name|default:featured_post.author.username|slice:":1"|upper }}
             </div>
             <div>
-              <div style="font-weight: 600; font-size: 0.85rem; color: var(--text);">{{ featured_post.author.get_full_name|default:featured_post.author.username }}</div>
+              <div style="font-weight: 600; font-size: 0.85rem; color: var(--text);">{{ featured_post.get_author_display_name }}</div>
               <div style="font-size: 0.75rem; color: var(--text-muted);">Author</div>
             </div>
           </div>
