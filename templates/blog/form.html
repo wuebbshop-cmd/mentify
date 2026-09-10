@@ -228,16 +228,97 @@ function switchEditorTab(tab) {
 // Lightweight JS Markdown renderer for live tab preview
 function simpleMarkdownToHtml(md) {
   if (!md) return '<em>Nothing to preview yet...</em>';
-  let html = md
-    .replace(/^### (.*$)/gim, '<h3 style="font-size:1.25rem; font-weight:700; margin:1.25rem 0 0.5rem;">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 style="font-size:1.5rem; font-weight:800; margin:1.5rem 0 0.75rem;">$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1 style="font-size:1.85rem; font-weight:800; margin:1.75rem 0 1rem;">$1</h1>')
+  
+  let lines = md.split('\n');
+  let html = [];
+  let inCode = false;
+  let inUl = false;
+  let inOl = false;
+  let codeBuf = [];
+
+  lines.forEach(line => {
+    let str = line.trim();
+    if (str.startsWith('```')) {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      if (inCode) {
+        let codeStr = codeBuf.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html.push('<pre><code>' + codeStr + '</code></pre>');
+        codeBuf = [];
+        inCode = false;
+      } else {
+        inCode = true;
+      }
+      return;
+    }
+    if (inCode) { codeBuf.push(line); return; }
+
+    if (str === '---' || str === '***' || str === '___') {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      html.push('<hr>');
+      return;
+    }
+
+    if (str.startsWith('### ')) {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      html.push('<h3>' + str.substring(4) + '</h3>');
+      return;
+    }
+    if (str.startsWith('## ')) {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      html.push('<h2>' + str.substring(3) + '</h2>');
+      return;
+    }
+    if (str.startsWith('# ')) {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      html.push('<h1>' + str.substring(2) + '</h1>');
+      return;
+    }
+
+    if (str.startsWith('> ')) {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      html.push('<blockquote><p>' + str.substring(2) + '</p></blockquote>');
+      return;
+    }
+
+    if (/^[\-\*]\s+/.test(str)) {
+      if (inOl) { html.push('</ol>'); inOl = false; }
+      if (!inUl) { html.push('<ul>'); inUl = true; }
+      html.push('<li>' + str.replace(/^[\-\*]\s+/, '') + '</li>');
+      return;
+    }
+
+    if (/^\d+\.\s+/.test(str)) {
+      if (inUl) { html.push('</ul>'); inUl = false; }
+      if (!inOl) { html.push('<ol>'); inOl = true; }
+      html.push('<li>' + str.replace(/^\d+\.\s+/, '') + '</li>');
+      return;
+    }
+
+    if (inUl) { html.push('</ul>'); inUl = false; }
+    if (inOl) { html.push('</ol>'); inOl = false; }
+
+    if (str.length > 0) {
+      html.push('<p>' + str + '</p>');
+    }
+  });
+
+  if (inUl) html.push('</ul>');
+  if (inOl) html.push('</ol>');
+
+  let out = html.join('')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; margin:1rem 0;">')
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:#0f766e;">$1</a>')
-    .replace(/\n/g, '<br>');
-  return html;
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+  return out;
 }
 
 // Cover image GitHub upload

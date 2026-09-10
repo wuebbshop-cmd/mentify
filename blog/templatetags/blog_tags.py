@@ -14,15 +14,15 @@ except ImportError:
 
 
 def _convert_video_embeds(html: str) -> str:
-    """Convert raw YouTube and Vimeo URLs inside paragraph text into responsive iframe video embeds."""
+    """Convert raw YouTube URLs inside paragraph text into responsive iframe video embeds."""
     youtube_pattern = r'(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})'
     
     def repl_yt(match):
         video_id = match.group(1)
         return (
-            f'<div class="blog-video-embed my-6 overflow-hidden rounded-xl shadow-lg aspect-video">'
+            f'<div class="blog-video-embed my-6 overflow-hidden rounded-xl shadow-lg aspect-video" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; margin: 1.5rem 0; border-radius: 8px;">'
             f'<iframe src="https://www.youtube.com/embed/{video_id}" '
-            f'class="w-full h-full border-0" allowfullscreen '
+            f'style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen '
             f'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">'
             f'</iframe></div>'
         )
@@ -33,12 +33,11 @@ def _convert_video_embeds(html: str) -> str:
 def _add_heading_ids(html: str) -> str:
     """Add anchor IDs to h2 and h3 tags for table of contents linking."""
     def repl(match):
-        tag = match.group(1)
+        tag = match.group(1).lower()
         title = match.group(2).strip()
-        # Strip internal tags if any
         clean_text = re.sub(r'<[^>]+>', '', title)
         heading_id = slugify(clean_text) or 'section'
-        return f'<{tag} id="{heading_id}" class="scroll-mt-24 font-bold text-gray-900 dark:text-white mt-8 mb-4">{title}</{tag}>'
+        return f'<{tag} id="{heading_id}">{title}</{tag}>'
 
     return re.sub(r'<(h[23])>(.*?)</\1>', repl, html, flags=re.IGNORECASE | re.DOTALL)
 
@@ -51,11 +50,22 @@ def _fallback_markdown_parser(text: str) -> str:
     lines = text.split("\n")
     html_lines = []
     in_code_block = False
-    code_lang = ""
+    in_ul = False
+    in_ol = False
     code_buffer = []
 
     for line in lines:
-        if line.startswith("```"):
+        stripped = line.strip()
+
+        # Handle Code Blocks (```)
+        if stripped.startswith("```"):
+            if in_ul:
+                html_lines.append("</ul>")
+                in_ul = False
+            if in_ol:
+                html_lines.append("</ol>")
+                in_ol = False
+
             if in_code_block:
                 escaped_code = (
                     "\n".join(code_buffer)
@@ -63,56 +73,100 @@ def _fallback_markdown_parser(text: str) -> str:
                     .replace("<", "&lt;")
                     .replace(">", "&gt;")
                 )
-                html_lines.append(
-                    f'<pre class="blog-code-block my-6 p-4 rounded-xl bg-gray-900 text-gray-100 font-mono text-sm overflow-x-auto"><code>{escaped_code}</code></pre>'
-                )
+                html_lines.append(f'<pre><code>{escaped_code}</code></pre>')
                 code_buffer = []
                 in_code_block = False
             else:
                 in_code_block = True
-                code_lang = line[3:].strip()
             continue
 
         if in_code_block:
             code_buffer.append(line)
             continue
 
+        # Horizontal Rules (---, ***, ___)
+        if stripped in ("---", "***", "___") or re.match(r'^(\-{3,}|\*{3,}|_{3,})$', stripped):
+            if in_ul:
+                html_lines.append("</ul>")
+                in_ul = False
+            if in_ol:
+                html_lines.append("</ol>")
+                in_ol = False
+            html_lines.append("<hr>")
+            continue
+
         # Headings
-        if line.startswith("### "):
-            html_lines.append(f"<h3>{line[4:].strip()}</h3>")
+        if stripped.startswith("### "):
+            if in_ul: html_lines.append("</ul>"); in_ul = False
+            if in_ol: html_lines.append("</ol>"); in_ol = False
+            html_lines.append(f"<h3>{stripped[4:].strip()}</h3>")
             continue
-        elif line.startswith("## "):
-            html_lines.append(f"<h2>{line[3:].strip()}</h2>")
+        elif stripped.startswith("## "):
+            if in_ul: html_lines.append("</ul>"); in_ul = False
+            if in_ol: html_lines.append("</ol>"); in_ol = False
+            html_lines.append(f"<h2>{stripped[3:].strip()}</h2>")
             continue
-        elif line.startswith("# "):
-            html_lines.append(f"<h1>{line[2:].strip()}</h1>")
-            continue
-
-        # Blockquote
-        if line.startswith("> "):
-            html_lines.append(
-                f'<blockquote class="my-6 border-l-4 border-teal-600 pl-4 italic text-gray-700 dark:text-gray-300">{line[2:].strip()}</blockquote>'
-            )
-            continue
-
-        # List items
-        if line.startswith("- ") or line.startswith("* "):
-            html_lines.append(f'<li class="ml-6 list-disc my-1">{line[2:].strip()}</li>')
+        elif stripped.startswith("# "):
+            if in_ul: html_lines.append("</ul>"); in_ul = False
+            if in_ol: html_lines.append("</ol>"); in_ol = False
+            html_lines.append(f"<h1>{stripped[2:].strip()}</h1>")
             continue
 
-        if not line.strip():
-            html_lines.append("<br>")
+        # Blockquote (> Quote)
+        if stripped.startswith("> "):
+            if in_ul: html_lines.append("</ul>"); in_ul = False
+            if in_ol: html_lines.append("</ol>"); in_ol = False
+            html_lines.append(f"<blockquote><p>{stripped[2:].strip()}</p></blockquote>")
             continue
 
-        html_lines.append(f"<p class='my-4 leading-relaxed'>{line}</p>")
+        # Unordered Bullet List (- item or * item)
+        if re.match(r'^[\-\*]\s+', stripped):
+            if in_ol:
+                html_lines.append("</ol>")
+                in_ol = False
+            if not in_ul:
+                html_lines.append("<ul>")
+                in_ul = True
+            item_text = re.sub(r'^[\-\*]\s+', '', stripped)
+            html_lines.append(f"<li>{item_text}</li>")
+            continue
+
+        # Ordered Numbered List (1. item)
+        if re.match(r'^\d+\.\s+', stripped):
+            if in_ul:
+                html_lines.append("</ul>")
+                in_ul = False
+            if not in_ol:
+                html_lines.append("<ol>")
+                in_ol = True
+            item_text = re.sub(r'^\d+\.\s+', '', stripped)
+            html_lines.append(f"<li>{item_text}</li>")
+            continue
+
+        # Close lists if empty or non-list line
+        if in_ul:
+            html_lines.append("</ul>")
+            in_ul = False
+        if in_ol:
+            html_lines.append("</ol>")
+            in_ol = False
+
+        if not stripped:
+            continue
+
+        html_lines.append(f"<p>{stripped}</p>")
+
+    if in_ul: html_lines.append("</ul>")
+    if in_ol: html_lines.append("</ol>")
 
     html = "".join(html_lines)
 
     # Inline formatting
     html = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', html)
     html = re.sub(r'\*(.*?)\*', r'<em>\1</em>', html)
-    html = re.sub(r'!\[(.*?)\]\((.*?)\)', r'<img src="\2" alt="\1" class="my-6 rounded-xl shadow-md max-w-full h-auto">', html)
-    html = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2" target="_blank" rel="noopener noreferrer" class="text-teal-600 dark:text-teal-400 underline font-medium hover:text-teal-700">\1</a>', html)
+    html = re.sub(r'`([^`]+)`', r'<code>\1</code>', html)  # Inline code backticks
+    html = re.sub(r'!\[(.*?)\]\((.*?)\)', r'<img src="\2" alt="\1">', html)
+    html = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2" target="_blank" rel="noopener noreferrer">\1</a>', html)
 
     return html
 
@@ -126,6 +180,7 @@ def render_markdown(value: str) -> str:
     if HAS_MARKDOWN:
         md = markdown.Markdown(
             extensions=[
+                "extra",       # Includes tables, fenced_code, hr, attr_list, def_list, etc.
                 "fenced_code",
                 "tables",
                 "toc",
@@ -150,12 +205,10 @@ def extract_toc(value: str) -> list[dict]:
         return []
 
     toc = []
-    # Find h2 and h3 headings in markdown
     for line in value.split("\n"):
         line_str = line.strip()
         if line_str.startswith("## "):
             title = line_str[3:].strip()
-            # Strip formatting characters
             clean_title = re.sub(r'[\*\_\`\[\]\(\)]', '', title)
             toc.append({
                 "level": 2,
