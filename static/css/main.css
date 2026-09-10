@@ -1517,6 +1517,38 @@ section + section { margin-top: 32px; }
 
 .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
+/* Social Share SVG Buttons */
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.share-btn:hover {
+  color: var(--green);
+  border-color: var(--green);
+  background: var(--green-light);
+  transform: translateY(-2px);
+}
+body.dark-theme .share-btn {
+  background: #242424;
+  border-color: #383838;
+  color: #a1a1a1;
+}
+body.dark-theme .share-btn:hover {
+  color: #2dd4bf;
+  border-color: var(--green);
+  background: rgba(15, 118, 110, 0.2);
+}
+
 /* Theme toggle */
 .theme-toggle {
   background: transparent; border: none; color: var(--text);
