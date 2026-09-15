@@ -1,55 +1,50 @@
-<!-- Mentify AI Customer Service Chatbot Widget (Concept 1: Capsule Pill Dock) -->
+<!-- Mentify AI Customer Service Chatbot Widget -->
 <style>
-  /* Capsule Pill Launcher Button */
   .mentify-chatbot-trigger {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    height: 48px;
-    padding: 0 20px 0 16px;
-    border-radius: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
     background: var(--green, #0f766e);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 20px rgba(15, 118, 110, 0.3);
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(15, 118, 110, 0.35);
     z-index: 9999;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .mentify-chatbot-trigger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(15, 118, 110, 0.4);
-    background: #0d6962;
+    transform: scale(1.06);
+    box-shadow: 0 6px 24px rgba(15, 118, 110, 0.45);
   }
   .mentify-chatbot-trigger .online-dot {
-    width: 8px;
-    height: 8px;
-    background: #4ade80;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #22c55e;
+    border: 2px solid var(--white, #ffffff);
     border-radius: 50%;
-    display: inline-block;
-  }
-  .mentify-chatbot-trigger-text {
-    font-weight: 600;
-    font-size: 0.875rem;
-    letter-spacing: 0.2px;
   }
 
-  /* Capsule Drawer Window */
   .mentify-chatbot-window {
     position: fixed;
-    bottom: 84px;
+    bottom: 92px;
     right: 24px;
-    width: 390px;
+    width: 380px;
     max-width: calc(100vw - 32px);
-    height: 530px;
-    max-height: calc(100vh - 110px);
+    height: 520px;
+    max-height: calc(100vh - 120px);
     background: var(--bg-surface, #ffffff);
     border: 1px solid var(--border, #e2e8f0);
-    border-radius: 20px;
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -57,7 +52,7 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(16px) scale(0.96);
-    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
   }
   .mentify-chatbot-window.active {
     opacity: 1;
@@ -65,30 +60,38 @@
     transform: translateY(0) scale(1);
   }
 
-  /* Header */
   .mentify-chatbot-header {
-    background: var(--bg-surface, #ffffff);
-    color: var(--text, #0f172a);
-    padding: 16px;
-    border-bottom: 1px solid var(--border, #e2e8f0);
+    background: var(--green, #0f766e);
+    color: #ffffff;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  .mentify-chatbot-header-badge {
-    background: rgba(15, 118, 110, 0.08);
-    color: var(--green, #0f766e);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    display: inline-flex;
+  .mentify-chatbot-header-info {
+    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
-  .mentify-chatbot-header-status {
-    font-size: 0.75rem;
-    color: var(--text-muted, #64748b);
+  .mentify-chatbot-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  .mentify-chatbot-header-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .mentify-chatbot-header-subtitle {
+    font-size: 0.725rem;
+    opacity: 0.85;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -96,26 +99,25 @@
   .mentify-chatbot-header-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .mentify-chatbot-btn-icon {
-    background: transparent;
+    background: none;
     border: none;
-    color: var(--text-muted, #64748b);
+    color: #ffffff;
+    opacity: 0.85;
     cursor: pointer;
-    padding: 6px;
-    border-radius: 50%;
+    padding: 4px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease, color 0.15s ease;
   }
   .mentify-chatbot-btn-icon:hover {
-    color: var(--text, #0f172a);
-    background: var(--border, #f1f5f9);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
   }
 
-  /* Messages Container */
   .mentify-chatbot-messages {
     flex: 1;
     padding: 16px;
@@ -123,29 +125,29 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: var(--bg-body, #f8fafc);
+    background: var(--bg-body, #fafafa);
   }
 
   .mentify-chatbot-msg {
-    max-width: 86%;
-    padding: 11px 15px;
+    max-width: 85%;
+    padding: 10px 14px;
     font-size: 0.875rem;
-    line-height: 1.48;
+    line-height: 1.45;
     word-break: break-word;
   }
   .mentify-chatbot-msg-user {
     align-self: flex-end;
     background: var(--green, #0f766e);
     color: #ffffff;
-    border-radius: 20px 20px 4px 20px;
+    border-radius: 16px 16px 2px 16px;
   }
   .mentify-chatbot-msg-ai {
     align-self: flex-start;
     background: var(--bg-surface, #ffffff);
     color: var(--text, #1e293b);
     border: 1px solid var(--border, #e2e8f0);
-    border-radius: 20px 20px 20px 4px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    border-radius: 16px 16px 16px 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
   .mentify-chatbot-msg-ai a {
     color: var(--green, #0f766e);
@@ -157,31 +159,27 @@
     text-decoration: none;
   }
 
-  /* Suggestion Chips */
   .mentify-chatbot-suggestions {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 8px;
+    margin-top: 6px;
   }
   .mentify-chatbot-chip {
     background: var(--bg-surface, #ffffff);
-    border: 1px solid var(--border, #cbd5e1);
-    color: var(--text, #334155);
+    border: 1px solid var(--green, #0f766e);
+    color: var(--green, #0f766e);
     font-size: 0.775rem;
-    font-weight: 500;
-    padding: 6px 12px;
-    border-radius: 16px;
+    padding: 5px 10px;
+    border-radius: 14px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
   }
   .mentify-chatbot-chip:hover {
     background: var(--green, #0f766e);
-    border-color: var(--green, #0f766e);
     color: #ffffff;
   }
 
-  /* Typing Dots */
   .mentify-chatbot-typing {
     display: flex;
     align-items: center;
@@ -189,7 +187,7 @@
     padding: 10px 14px;
     background: var(--bg-surface, #ffffff);
     border: 1px solid var(--border, #e2e8f0);
-    border-radius: 20px 20px 20px 4px;
+    border-radius: 16px 16px 16px 2px;
     align-self: flex-start;
     width: fit-content;
   }
@@ -207,36 +205,31 @@
     40% { transform: scale(1); }
   }
 
-  /* Input Pill Area */
   .mentify-chatbot-input-area {
-    padding: 12px 14px;
+    padding: 10px 12px;
     background: var(--bg-surface, #ffffff);
     border-top: 1px solid var(--border, #e2e8f0);
-  }
-  .mentify-chatbot-input-wrapper {
-    background: var(--bg-body, #f8fafc);
-    border: 1px solid var(--border, #cbd5e1);
-    border-radius: 24px;
     display: flex;
+    gap: 8px;
     align-items: center;
-    padding: 4px 6px 4px 14px;
-    transition: border-color 0.15s ease;
-  }
-  .mentify-chatbot-input-wrapper:focus-within {
-    border-color: var(--green, #0f766e);
   }
   .mentify-chatbot-input {
     flex: 1;
-    border: none;
-    background: transparent;
-    outline: none;
+    border: 1px solid var(--border, #cbd5e1);
+    border-radius: 20px;
+    padding: 8px 14px;
     font-size: 0.85rem;
+    outline: none;
+    background: var(--bg-body, #ffffff);
     color: var(--text, #0f172a);
     font-family: inherit;
   }
+  .mentify-chatbot-input:focus {
+    border-color: var(--green, #0f766e);
+  }
   .mentify-chatbot-send-btn {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--green, #0f766e);
     color: #ffffff;
@@ -246,78 +239,66 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: background 0.15s ease;
   }
   .mentify-chatbot-send-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
-  /* Dark Theme Overrides */
+  /* Dark theme overrides */
   body.dark-theme .mentify-chatbot-window {
     background: #0f172a;
-    border-color: #1e293b;
-  }
-  body.dark-theme .mentify-chatbot-header {
-    background: #0f172a;
-    border-color: #1e293b;
-    color: #f8fafc;
-  }
-  body.dark-theme .mentify-chatbot-header-badge {
-    background: rgba(15, 118, 110, 0.2);
-    color: #2dd4bf;
+    border-color: #334155;
   }
   body.dark-theme .mentify-chatbot-messages {
     background: #0b1120;
   }
   body.dark-theme .mentify-chatbot-msg-ai {
     background: #1e293b;
-    color: #f8fafc;
+    color: #f1f5f9;
     border-color: #334155;
   }
   body.dark-theme .mentify-chatbot-input-area {
     background: #0f172a;
-    border-color: #1e293b;
-  }
-  body.dark-theme .mentify-chatbot-input-wrapper {
-    background: #1e293b;
     border-color: #334155;
   }
   body.dark-theme .mentify-chatbot-input {
+    background: #1e293b;
+    border-color: #475569;
     color: #f8fafc;
   }
   body.dark-theme .mentify-chatbot-chip {
     background: #1e293b;
-    border-color: #334155;
-    color: #cbd5e1;
+    border-color: #0f766e;
+    color: #2dd4bf;
   }
   body.dark-theme .mentify-chatbot-chip:hover {
     background: #0f766e;
-    border-color: #0f766e;
     color: #ffffff;
   }
 </style>
 
-<!-- Capsule Pill Launcher Button -->
-<button type="button" id="mentifyChatTrigger" class="mentify-chatbot-trigger" aria-label="Open Mentify AI Assistant">
+<!-- Floating Launcher Button -->
+<button type="button" id="mentifyChatTrigger" class="mentify-chatbot-trigger" aria-label="Open AI Assistant">
   <span class="online-dot"></span>
-  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
   </svg>
-  <span class="mentify-chatbot-trigger-text">Ask Mentify</span>
 </button>
 
-<!-- Capsule Drawer Window -->
+<!-- Chat Window Drawer -->
 <div id="mentifyChatWindow" class="mentify-chatbot-window">
   <div class="mentify-chatbot-header">
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <div class="mentify-chatbot-header-badge">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        Mentify Assistant
+    <div class="mentify-chatbot-header-info">
+      <div class="mentify-chatbot-avatar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       </div>
-      <div class="mentify-chatbot-header-status">
-        <span style="display:inline-block; width:6px; height:6px; background:#22c55e; border-radius:50%;"></span>
-        Online
+      <div>
+        <h4 class="mentify-chatbot-header-title">Mentify Assistant</h4>
+        <div class="mentify-chatbot-header-subtitle">
+          <span style="display:inline-block; width:6px; height:6px; background:#4ade80; border-radius:50%;"></span>
+          Online
+        </div>
       </div>
     </div>
     <div class="mentify-chatbot-header-actions">
@@ -331,7 +312,7 @@
   </div>
 
   <div id="mentifyChatMessages" class="mentify-chatbot-messages">
-    <!-- Welcome Message -->
+    <!-- Welcome message -->
     <div class="mentify-chatbot-msg mentify-chatbot-msg-ai">
       Hi there! I'm Mentify's AI Assistant. Ask me anything about our courses, 1-on-1 tutoring, pricing, or enrollment!
       <div class="mentify-chatbot-suggestions">
@@ -344,15 +325,13 @@
   </div>
 
   <div class="mentify-chatbot-input-area">
-    <div class="mentify-chatbot-input-wrapper">
-      <input type="text" id="mentifyChatInput" class="mentify-chatbot-input" placeholder="Ask about courses, pricing, tutoring..." autocomplete="off">
-      <button type="button" id="mentifyChatSendBtn" class="mentify-chatbot-send-btn" aria-label="Send message">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-          <line x1="22" y1="2" x2="11" y2="13"/>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-      </button>
-    </div>
+    <input type="text" id="mentifyChatInput" class="mentify-chatbot-input" placeholder="Ask about courses, pricing, tutoring..." autocomplete="off">
+    <button type="button" id="mentifyChatSendBtn" class="mentify-chatbot-send-btn" aria-label="Send message">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -432,6 +411,7 @@
     // Markdown Links: [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, text, url) {
       const cleanUrl = url.trim();
+      // Ensure local or safe https links
       if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mlaudit.info')) {
         return `<a href="${cleanUrl}">${text}</a>`;
       }
