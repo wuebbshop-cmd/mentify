@@ -1,0 +1,555 @@
+<!-- Mentify AI Customer Service Chatbot Widget -->
+<style>
+  .mentify-chatbot-trigger {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--green, #0f766e);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(15, 118, 110, 0.35);
+    z-index: 9999;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .mentify-chatbot-trigger:hover {
+    transform: scale(1.06);
+    box-shadow: 0 6px 24px rgba(15, 118, 110, 0.45);
+  }
+  .mentify-chatbot-trigger .online-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #22c55e;
+    border: 2px solid var(--white, #ffffff);
+    border-radius: 50%;
+  }
+
+  .mentify-chatbot-window {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 520px;
+    max-height: calc(100vh - 120px);
+    background: var(--bg-surface, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(16px) scale(0.96);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  }
+  .mentify-chatbot-window.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .mentify-chatbot-header {
+    background: var(--green, #0f766e);
+    color: #ffffff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mentify-chatbot-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mentify-chatbot-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  .mentify-chatbot-header-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .mentify-chatbot-header-subtitle {
+    font-size: 0.725rem;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mentify-chatbot-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mentify-chatbot-btn-icon {
+    background: none;
+    border: none;
+    color: #ffffff;
+    opacity: 0.85;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mentify-chatbot-btn-icon:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .mentify-chatbot-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg-body, #fafafa);
+  }
+
+  .mentify-chatbot-msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    word-break: break-word;
+  }
+  .mentify-chatbot-msg-user {
+    align-self: flex-end;
+    background: var(--green, #0f766e);
+    color: #ffffff;
+    border-radius: 16px 16px 2px 16px;
+  }
+  .mentify-chatbot-msg-ai {
+    align-self: flex-start;
+    background: var(--bg-surface, #ffffff);
+    color: var(--text, #1e293b);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 16px 16px 16px 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+  .mentify-chatbot-msg-ai a {
+    color: var(--green, #0f766e);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .mentify-chatbot-msg-ai a:hover {
+    text-decoration: none;
+  }
+
+  .mentify-chatbot-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .mentify-chatbot-chip {
+    background: var(--bg-surface, #ffffff);
+    border: 1px solid var(--green, #0f766e);
+    color: var(--green, #0f766e);
+    font-size: 0.775rem;
+    padding: 5px 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .mentify-chatbot-chip:hover {
+    background: var(--green, #0f766e);
+    color: #ffffff;
+  }
+
+  .mentify-chatbot-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: var(--bg-surface, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 16px 16px 16px 2px;
+    align-self: flex-start;
+    width: fit-content;
+  }
+  .mentify-chatbot-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--text-muted, #94a3b8);
+    border-radius: 50%;
+    animation: mentifyChatDot 1.4s infinite ease-in-out both;
+  }
+  .mentify-chatbot-dot:nth-child(1) { animation-delay: -0.32s; }
+  .mentify-chatbot-dot:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes mentifyChatDot {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
+
+  .mentify-chatbot-input-area {
+    padding: 10px 12px;
+    background: var(--bg-surface, #ffffff);
+    border-top: 1px solid var(--border, #e2e8f0);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .mentify-chatbot-input {
+    flex: 1;
+    border: 1px solid var(--border, #cbd5e1);
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    outline: none;
+    background: var(--bg-body, #ffffff);
+    color: var(--text, #0f172a);
+    font-family: inherit;
+  }
+  .mentify-chatbot-input:focus {
+    border-color: var(--green, #0f766e);
+  }
+  .mentify-chatbot-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--green, #0f766e);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .mentify-chatbot-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Dark theme overrides */
+  body.dark-theme .mentify-chatbot-window {
+    background: #0f172a;
+    border-color: #334155;
+  }
+  body.dark-theme .mentify-chatbot-messages {
+    background: #0b1120;
+  }
+  body.dark-theme .mentify-chatbot-msg-ai {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #334155;
+  }
+  body.dark-theme .mentify-chatbot-input-area {
+    background: #0f172a;
+    border-color: #334155;
+  }
+  body.dark-theme .mentify-chatbot-input {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f8fafc;
+  }
+  body.dark-theme .mentify-chatbot-chip {
+    background: #1e293b;
+    border-color: #0f766e;
+    color: #2dd4bf;
+  }
+  body.dark-theme .mentify-chatbot-chip:hover {
+    background: #0f766e;
+    color: #ffffff;
+  }
+</style>
+
+<!-- Floating Launcher Button -->
+<button type="button" id="mentifyChatTrigger" class="mentify-chatbot-trigger" aria-label="Open AI Assistant">
+  <span class="online-dot"></span>
+  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+  </svg>
+</button>
+
+<!-- Chat Window Drawer -->
+<div id="mentifyChatWindow" class="mentify-chatbot-window">
+  <div class="mentify-chatbot-header">
+    <div class="mentify-chatbot-header-info">
+      <div class="mentify-chatbot-avatar">✨</div>
+      <div>
+        <h4 class="mentify-chatbot-header-title">Mentify Assistant</h4>
+        <div class="mentify-chatbot-header-subtitle">
+          <span style="display:inline-block; width:6px; height:6px; background:#4ade80; border-radius:50%;"></span>
+          Online &bull; Powered by Gemini
+        </div>
+      </div>
+    </div>
+    <div class="mentify-chatbot-header-actions">
+      <button type="button" id="mentifyChatClearBtn" class="mentify-chatbot-btn-icon" title="Clear chat history">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      </button>
+      <button type="button" id="mentifyChatCloseBtn" class="mentify-chatbot-btn-icon" title="Close chat window">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mentifyChatMessages" class="mentify-chatbot-messages">
+    <!-- Welcome message -->
+    <div class="mentify-chatbot-msg mentify-chatbot-msg-ai">
+      Hi there! 👋 I'm Mentify's AI Assistant. Ask me anything about our courses, 1-on-1 tutoring, pricing, or enrollment!
+      <div class="mentify-chatbot-suggestions">
+        <button type="button" class="mentify-chatbot-chip" data-query="What courses do you offer?">What courses do you offer?</button>
+        <button type="button" class="mentify-chatbot-chip" data-query="What is Building with AI about?">Building with AI?</button>
+        <button type="button" class="mentify-chatbot-chip" data-query="How does 1-on-1 tutoring work?">1-on-1 Tutoring?</button>
+        <button type="button" class="mentify-chatbot-chip" data-query="How do I pay via M-Pesa?">M-Pesa Payments?</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mentify-chatbot-input-area">
+    <input type="text" id="mentifyChatInput" class="mentify-chatbot-input" placeholder="Ask about courses, pricing, tutoring..." autocomplete="off">
+    <button type="button" id="mentifyChatSendBtn" class="mentify-chatbot-send-btn" aria-label="Send message">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const triggerBtn = document.getElementById('mentifyChatTrigger');
+  const chatWindow = document.getElementById('mentifyChatWindow');
+  const closeBtn = document.getElementById('mentifyChatCloseBtn');
+  const clearBtn = document.getElementById('mentifyChatClearBtn');
+  const messagesContainer = document.getElementById('mentifyChatMessages');
+  const inputEl = document.getElementById('mentifyChatInput');
+  const sendBtn = document.getElementById('mentifyChatSendBtn');
+
+  let history = [];
+
+  // Load history from sessionStorage
+  try {
+    const saved = sessionStorage.getItem('mentify_chat_history');
+    if (saved) {
+      history = JSON.parse(saved);
+      renderSavedHistory();
+    }
+  } catch (e) {}
+
+  function toggleWindow() {
+    chatWindow.classList.toggle('active');
+    if (chatWindow.classList.contains('active')) {
+      inputEl.focus();
+      scrollToBottom();
+    }
+  }
+
+  triggerBtn.addEventListener('click', toggleWindow);
+  closeBtn.addEventListener('click', toggleWindow);
+
+  clearBtn.addEventListener('click', function() {
+    history = [];
+    try { sessionStorage.removeItem('mentify_chat_history'); } catch (e) {}
+    messagesContainer.innerHTML = `
+      <div class="mentify-chatbot-msg mentify-chatbot-msg-ai">
+        Chat history cleared! How can I help you explore Mentify today?
+        <div class="mentify-chatbot-suggestions">
+          <button type="button" class="mentify-chatbot-chip" data-query="What courses do you offer?">What courses do you offer?</button>
+          <button type="button" class="mentify-chatbot-chip" data-query="What is Building with AI about?">Building with AI?</button>
+          <button type="button" class="mentify-chatbot-chip" data-query="How does 1-on-1 tutoring work?">1-on-1 Tutoring?</button>
+        </div>
+      </div>
+    `;
+    bindChipClick();
+  });
+
+  // Handle suggestion chips click
+  function bindChipClick() {
+    document.querySelectorAll('.mentify-chatbot-chip').forEach(chip => {
+      chip.onclick = function() {
+        const query = this.getAttribute('data-query');
+        if (query) {
+          inputEl.value = query;
+          sendMessage();
+        }
+      };
+    });
+  }
+  bindChipClick();
+
+  // Escape HTML
+  function escapeHTML(str) {
+    return str.replace(/[&<>"']/g, function(m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
+  }
+
+  // Simple Markdown Parser (links, bold, lists, newlines)
+  function parseMarkdown(str) {
+    let html = escapeHTML(str);
+
+    // Markdown Links: [text](url)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, text, url) {
+      const cleanUrl = url.trim();
+      // Ensure local or safe https links
+      if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mlaudit.info')) {
+        return `<a href="${cleanUrl}">${text}</a>`;
+      }
+      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+    });
+
+    // Bold **text**
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // Bullet list items
+    html = html.replace(/(?:^|\n)[-*\u2022]\s+([^\n]+)/g, '<br>&bull; $1');
+
+    // Newlines to <br>
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+  }
+
+  function renderSavedHistory() {
+    history.forEach(item => {
+      appendMessageBubble(item.role === 'user' ? 'user' : 'ai', item.text, false);
+    });
+  }
+
+  function appendMessageBubble(role, text, animate = true) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `mentify-chatbot-msg ${role === 'user' ? 'mentify-chatbot-msg-user' : 'mentify-chatbot-msg-ai'}`;
+    
+    if (role === 'user') {
+      msgDiv.textContent = text;
+    } else {
+      msgDiv.innerHTML = parseMarkdown(text);
+    }
+
+    messagesContainer.appendChild(msgDiv);
+    scrollToBottom();
+  }
+
+  function showTyping() {
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'mentifyChatTypingIndicator';
+    typingDiv.className = 'mentify-chatbot-typing';
+    typingDiv.innerHTML = '<span class="mentify-chatbot-dot"></span><span class="mentify-chatbot-dot"></span><span class="mentify-chatbot-dot"></span>';
+    messagesContainer.appendChild(typingDiv);
+    scrollToBottom();
+  }
+
+  function hideTyping() {
+    const typingDiv = document.getElementById('mentifyChatTypingIndicator');
+    if (typingDiv) typingDiv.remove();
+  }
+
+  function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    inputEl.value = '';
+    sendBtn.disabled = true;
+
+    // Append user message to UI
+    appendMessageBubble('user', text);
+
+    // Show typing
+    showTyping();
+
+    // Prepare payload
+    const payload = {
+      message: text,
+      history: history
+    };
+
+    try {
+      const response = await fetch('/api/chat/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken') || ''
+        },
+        body: JSON.stringify(payload)
+      });
+
+      hideTyping();
+
+      if (!response.ok) {
+        appendMessageBubble('ai', 'I encountered a temporary network issue. Please try sending your message again!');
+        sendBtn.disabled = false;
+        return;
+      }
+
+      const data = await response.json();
+      if (data.status === 'success' && data.response) {
+        const replyText = data.response;
+        
+        // Update history
+        history.push({ role: 'user', text: text });
+        history.push({ role: 'model', text: replyText });
+        if (history.length > 10) history = history.slice(-10);
+
+        try {
+          sessionStorage.setItem('mentify_chat_history', JSON.stringify(history));
+        } catch (e) {}
+
+        appendMessageBubble('ai', replyText);
+      } else {
+        appendMessageBubble('ai', data.error || 'Sorry, I could not process your request right now.');
+      }
+    } catch (err) {
+      hideTyping();
+      appendMessageBubble('ai', 'Network connection lost. Please check your internet and try again.');
+    } finally {
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+})();
+</script>
