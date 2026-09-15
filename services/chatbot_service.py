@@ -134,7 +134,7 @@ def generate_chat_response(messages_history: list, user_message: str) -> str:
     system_prompt = get_mentify_system_context()
 
     # 4. Construct Gemini REST API Payload
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip() or "gemini-2.5-flash-lite"
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash").strip() or "gemini-1.5-flash"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
     
