@@ -404,27 +404,47 @@
     });
   }
 
-  // Simple Markdown Parser (links, bold, lists, newlines)
+  // Comprehensive Markdown & Auto-Link Parser
   function parseMarkdown(str) {
     let html = escapeHTML(str);
 
-    // Markdown Links: [text](url)
+    // 1. Explicit Markdown Links: [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, text, url) {
       const cleanUrl = url.trim();
-      // Ensure local or safe https links
       if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mlaudit.info')) {
         return `<a href="${cleanUrl}">${text}</a>`;
       }
       return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${text}</a>`;
     });
 
-    // Bold **text**
+    // 2. Auto-link bare URLs (https://... or http://...) not already in HTML tags
+    html = html.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, function(match, prefix, url) {
+      const cleanUrl = url.trim();
+      if (cleanUrl.includes('wa.me')) {
+        return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>`;
+      }
+      return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
+    });
+
+    // 3. Auto-link bare relative paths (/courses/..., /contact/, etc.) not inside HTML tags
+    html = html.replace(/(^|[\s(])(\/(?:courses|cohort|blog|contact|accounts|register)[^\s<)]*)/g, function(match, prefix, path) {
+      const cleanPath = path.trim();
+      return `${prefix}<a href="${cleanPath}">${cleanPath}</a>`;
+    });
+
+    // 4. Auto-link bare WhatsApp phone numbers (+254731900577 or 254731900577) not inside HTML tags
+    html = html.replace(/(^|[\s(])(\+?2547\d{8})(?!\w)/g, function(match, prefix, phone) {
+      const cleanPhone = phone.replace('+', '');
+      return `${prefix}<a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp (${phone})</a>`;
+    });
+
+    // 5. Bold **text**
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-    // Bullet list items
+    // 6. Bullet list items
     html = html.replace(/(?:^|\n)[-*\u2022]\s+([^\n]+)/g, '<br>&bull; $1');
 
-    // Newlines to <br>
+    // 7. Newlines to <br>
     html = html.replace(/\n/g, '<br>');
 
     return html;
