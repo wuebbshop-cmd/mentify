@@ -42,15 +42,12 @@ def get_mentify_system_context() -> str:
             
             cohort_str = "\n".join(cohort_info) if cohort_info else "  - No active public cohort right now (1-on-1 custom tutoring available)."
             
+            desc_short = course.description[:180].replace("\n", " ") + "..." if len(course.description) > 180 else course.description
             courses_context_lines.append(
-                f"- **Title**: {course.title}\n"
-                f"  **Slug**: {course.slug}\n"
-                f"  **URL**: /courses/{course.slug}/\n"
-                f"  **Track**: {course.get_track_display()}\n"
-                f"  **Level**: {course.get_level_display()}\n"
-                f"  **Subject Area**: {course.subject_area or 'General'}\n"
-                f"  **Description**: {course.description}\n"
-                f"  **Available Cohorts**:\n{cohort_str}\n"
+                f"- **Title**: {course.title} | **URL**: /courses/{course.slug}/\n"
+                f"  Track: {course.get_track_display()} | Level: {course.get_level_display()} | Subject: {course.subject_area or 'General'}\n"
+                f"  Summary: {desc_short}\n"
+                f"  Cohorts: {cohort_str}\n"
             )
     except Exception as e:
         logger.warning(f"Could not load dynamic courses context: {e}")
@@ -110,10 +107,10 @@ def generate_chat_response(messages_history: list, user_message: str) -> str:
             "to your `.env` file to activate the Mentify AI Assistant."
         )
 
-    # 2. Prune and format chat history (Max last 6 messages to stay under free tier token limits)
+    # 2. Prune and format chat history (Max last 4 messages to save tokens)
     clean_history = []
     if isinstance(messages_history, list):
-        for msg in messages_history[-6:]:
+        for msg in messages_history[-4:]:
             role = msg.get("role", "user")
             text = msg.get("text") or msg.get("content") or ""
             if not text:
@@ -122,11 +119,11 @@ def generate_chat_response(messages_history: list, user_message: str) -> str:
             gemini_role = "model" if role in ["model", "assistant", "bot"] else "user"
             clean_history.append({
                 "role": gemini_role,
-                "parts": [{"text": str(text)[:1000]}]  # Cap input message length
+                "parts": [{"text": str(text)[:500]}]  # Cap turn length
             })
 
     # Add current user message if not already in history
-    user_text = str(user_message).strip()[:1000]
+    user_text = str(user_message).strip()[:500]
     if not clean_history or clean_history[-1].get("parts", [{}])[0].get("text") != user_text:
         clean_history.append({
             "role": "user",
@@ -148,7 +145,7 @@ def generate_chat_response(messages_history: list, user_message: str) -> str:
         "contents": clean_history,
         "generationConfig": {
             "temperature": 0.3,
-            "maxOutputTokens": 600,
+            "maxOutputTokens": 400,
             "topP": 0.95
         }
     }
