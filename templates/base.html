@@ -6,20 +6,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#ffffff">
 
-  <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} - {{ PLATFORM_NAME }}</title>
-  <meta name="description" content="{% block meta_description %}Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
-  <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+  <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} | {{ PLATFORM_NAME }}</title>
+  <meta name="description" content="{% block meta_description %}Practical online tutoring and technical education for students, graduates, and adults worldwide. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
+  
+  <!-- Clean Canonical & International Targeting -->
+  <link rel="canonical" href="{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  
+  <!-- Global Geotargeting & Indexing Directives -->
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="coverage" content="Worldwide">
+  <meta name="distribution" content="Global">
+  <meta name="rating" content="General">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ PLATFORM_NAME }}">
   <meta property="og:title" content="{% block og_title %}{{ PLATFORM_NAME }}{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Practical online tutoring and technical education for students, graduates, and adults worldwide. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
   <meta property="og:image" content="{% static 'images/logo.png' %}">
-  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="en_GB">
+  <meta property="og:locale:alternate" content="en_CA">
+  <meta property="og:locale:alternate" content="en_AU">
+
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% block twitter_title %}{{ PLATFORM_NAME }}{% endblock %}">
-  <meta name="twitter:description" content="{% block twitter_description %}Practical tutoring and enrichment for students and adults. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Practical online tutoring and technical education for students, graduates, and adults worldwide. Learn programming, AI, robotics, math, science, and academic support.{% endblock %}">
   <meta name="twitter:image" content="{% static 'images/logo.png' %}">
+
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}?v=2">
   <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}?v=2">
@@ -36,7 +54,7 @@
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
 
-  <!-- Structured Data (JSON-LD) for Search Engines & Google Knowledge Graph -->
+  <!-- Global EducationalOrganization Structured Data (JSON-LD) for Search Engines & AI Knowledge Graphs -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -44,11 +62,21 @@
     "name": "{{ PLATFORM_NAME }}",
     "url": "{{ request.scheme }}://{{ request.get_host }}/",
     "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
-    "description": "Mentify is an interactive online tutoring, cohort learning, and tech education platform for students and adults. Offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, robotics, math, science, and career-focused technical articles.",
-    "founder": {
-      "@type": "Person",
-      "name": "John Shivogo"
+    "description": "Mentify is an interactive online tutoring, cohort learning, and tech education platform for students, graduates, and adults worldwide. Offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, robotics, math, science, and technical articles.",
+    "areaServed": {
+      "@type": "AdministrativeArea",
+      "name": "Worldwide"
     },
+    "availableLanguage": ["English"],
+    "knowsAbout": [
+      "Python Programming",
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Software Engineering",
+      "Robotics",
+      "Mathematics",
+      "Competency Based Education"
+    ],
     "sameAs": [
       "{{ request.scheme }}://{{ request.get_host }}/blog/",
       "{{ request.scheme }}://{{ request.get_host }}/courses/"
