@@ -13,6 +13,7 @@ from .models import (
     PrepDocument,
     PrepPaper,
     PrepQuestion,
+    PrepContentCache,
     PrepWallet,
     PrepCourseEnrollment,
     PrepTransaction,
@@ -77,25 +78,132 @@ def clean_tag_label(label: str) -> str:
     return text
 
 
-@login_required
+def _public_topic_notes(topic):
+    """Return the newest complete shared Level 2 notes without generating content."""
+    from services.prep_ai_router import _note_completion_issues
+
+    cached_notes = PrepContentCache.objects.filter(
+        topic=topic,
+        content_type="topic_notes",
+    ).order_by("-updated_at", "-id")
+    for entry in cached_notes:
+        content = str(entry.payload.get("content", "") or "").strip()
+        if content and not _note_completion_issues(content, topic.title):
+            return content, entry.updated_at
+    return "", None
+
+
+def _public_topic_questions(topic):
+    """Return shared verified questions using the same course-safe matching as study pages."""
+    topic_match = (
+        Q(topic=topic)
+        | (
+            Q(topic__isnull=True)
+            & Q(paper__course=topic.course)
+            & Q(topic_label__icontains=topic.title)
+        )
+    )
+    return (
+        PrepQuestion.objects.filter(
+            topic_match,
+            verification_status="verified",
+        )
+        .filter(Q(paper__isnull=True) | Q(paper__is_published=True))
+        .select_related("paper")
+        .order_by("question_type", "paper__created_at", "number", "id")
+    )
+
+
+def prep_public_library(request):
+    """Public catalogue for search visitors and crawlers, branded as Mentify."""
+    courses = (
+        PrepCourse.objects.filter(is_active=True)
+        .annotate(
+            topic_count=Count("topics", distinct=True),
+            paper_count=Count("papers", filter=Q(papers__is_published=True), distinct=True),
+        )
+        .order_by("category", "code")
+    )
+    return render(request, "prep/public_library.html", {"courses": courses})
+
+
+def prep_public_course(request, course_slug):
+    """Public, canonical course syllabus page with internal links to each topic."""
+    course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
+    topics = list(course.topics.order_by("order", "id"))
+    for topic in topics:
+        topic.question_count = _public_topic_questions(topic).count()
+
+    return render(
+        request,
+        "prep/public_course.html",
+        {
+            "course": course,
+            "topics": topics,
+            "published_papers": course.papers.filter(is_published=True).order_by("-created_at"),
+        },
+    )
+
+
+def prep_public_topic(request, course_slug, topic_id, topic_slug):
+    """Public topic resource containing only validated notes and verified shared Q&A."""
+    course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
+    topic = get_object_or_404(PrepTopic, pk=topic_id, course=course)
+    if topic.slug != topic_slug:
+        return redirect(
+            "prep:public_topic",
+            course_slug=course.slug,
+            topic_id=topic.id,
+            topic_slug=topic.slug,
+            permanent=True,
+        )
+
+    notes, notes_updated_at = _public_topic_notes(topic)
+    questions = _public_topic_questions(topic)
+    return render(
+        request,
+        "prep/public_topic.html",
+        {
+            "course": course,
+            "topic": topic,
+            "notes": notes,
+            "notes_updated_at": notes_updated_at,
+            "questions": questions,
+            "is_indexable": bool(notes or questions),
+        },
+    )
+
+
 def prep_dashboard(request):
     """Mentify Prep Hub Main Landing Page with real database metrics."""
-    wallet = PrepWallet.get_or_create_wallet(request.user)
-
     courses_qs = PrepCourse.objects.filter(is_active=True).annotate(
         topics_count=Count("topics", distinct=True),
         papers_count=Count("papers", distinct=True),
     )
 
-    enrolled_courses = PrepCourse.objects.filter(
-        enrollments__user=request.user,
-    ).annotate(
-        topics_count=Count("topics", distinct=True),
-        papers_count=Count("papers", distinct=True),
-    ).order_by("-enrollments__created_at")
+    if request.user.is_authenticated:
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        user_credits = wallet.credits_balance
+        recent_credit_transactions = wallet.transactions.all()[:10]
+        enrolled_courses = PrepCourse.objects.filter(
+            enrollments__user=request.user,
+        ).annotate(
+            topics_count=Count("topics", distinct=True),
+            papers_count=Count("papers", distinct=True),
+        ).order_by("-enrollments__created_at")
+        history_qs = PrepHistory.objects.filter(user=request.user).order_by("-created_at")[:5]
+        display_courses = enrolled_courses[:3]
+    else:
+        wallet = None
+        user_credits = 0
+        recent_credit_transactions = []
+        enrolled_courses = PrepCourse.objects.none()
+        history_qs = PrepHistory.objects.none()
+        # For public/crawler visitors, showcase active courses
+        display_courses = courses_qs.order_by("-created_at")[:6]
 
     recent_courses = []
-    for c in enrolled_courses[:3]:
+    for c in display_courses:
         clean_title = c.title
         if c.code and c.code in clean_title:
             clean_title = re.sub(r"^" + re.escape(c.code) + r"[\s:\-\–—]*", "", clean_title, flags=re.IGNORECASE).strip()
@@ -111,7 +219,6 @@ def prep_dashboard(request):
         })
 
     # Recent activity from database
-    history_qs = PrepHistory.objects.filter(user=request.user).order_by("-created_at")[:5]
     recent_activity = []
     for h in history_qs:
         recent_activity.append({
@@ -159,11 +266,9 @@ def prep_dashboard(request):
             "type": "Syllabus Notes",
         }
 
-    recent_credit_transactions = wallet.transactions.all()[:10]
-
     context = {
         "active_tab": "dashboard",
-        "user_credits": wallet.credits_balance,
+        "user_credits": user_credits,
         "recent_courses": recent_courses,
         "recent_activity": recent_activity,
         "recent_credit_transactions": recent_credit_transactions,
@@ -449,23 +554,15 @@ def prep_topic_study(request, topic_id):
             "is_cached": True,
         })
 
-    # 3. Initial Topic Notes (Level 2 default)
-    from services.prep_ai_router import get_or_generate_topic_notes
-    initial_notes_res = get_or_generate_topic_notes(
-        course_code=course_code,
-        topic_title=topic_title,
-        subtopics=subtopics,
-        level="level_2",
-        course_obj=topic.course if topic else None,
-        topic_obj=topic,
-        generate_if_missing=False,
-    )
-    initial_notes = initial_notes_res.get("notes", "") or initial_notes_res.get("content", "")
+    # 3. Preload every already-published level. This is a read-only database
+    # lookup, so opening a topic and switching levels never triggers AI work,
+    # repeat validation, or a synthesis screen for shared verified notes.
+    from services.prep_ai_router import get_published_topic_note_levels
+    published_notes_by_level = get_published_topic_note_levels(topic)
+    initial_notes = published_notes_by_level.get("level_2", "")
     initial_notes_error = ""
     if not initial_notes:
-        initial_notes_error = initial_notes_res.get(
-            "error", "No validated notes are available for this topic yet."
-        )
+        initial_notes_error = "No validated Level 2 notes are available for this topic yet."
 
     topic_dict = {
         "id": str(topic.id) if topic else str(topic_id),
@@ -483,8 +580,9 @@ def prep_topic_study(request, topic_id):
         "user_credits": wallet.credits_balance,
         "topic": topic_dict,
         "initial_notes": initial_notes,
+        "published_notes_by_level": published_notes_by_level,
         "initial_notes_error": initial_notes_error,
-        "initial_notes_stale": bool(initial_notes_res.get("stale")),
+        "initial_notes_stale": False,
         "authentic_questions": authentic_qs,
         "generated_questions": generated_qs,
     }
@@ -582,12 +680,13 @@ def prep_practice(request, topic_id):
     return redirect("prep:past_papers")
 
 
-@login_required
 def prep_upload(request):
     """Document Ingestion Hub with user-specified document metadata and database record creation."""
-    wallet = PrepWallet.get_or_create_wallet(request.user)
-
     if request.method == "POST":
+        if not request.user.is_authenticated:
+            messages.info(request, "Please sign in or create a free account to upload study materials.")
+            return redirect(f"/accounts/login/?next={request.path}")
+        wallet = PrepWallet.get_or_create_wallet(request.user)
         course_name = request.POST.get("course_name", "").strip()
         doc_type = request.POST.get("doc_type", "Lecture Notes")
         academic_year = request.POST.get("academic_year", "").strip()
@@ -695,31 +794,36 @@ def prep_upload(request):
 
         return redirect("prep:course_detail", course_code=course_slug)
 
-    # Recent uploads for this user
-    user_docs = PrepDocument.objects.filter(user=request.user).order_by("-created_at")[:5]
+    # Recent uploads for this user (if authenticated)
     recent_uploads = []
-    for d in user_docs:
-        size_mb = round(d.file_size_bytes / (1024 * 1024), 1) if d.file_size_bytes else 0
-        recent_uploads.append({
-            "filename": d.file.name.split("/")[-1] if d.file else "Document.pdf",
-            "course": d.course.code,
-            "type": d.doc_type,
-            "size": f"{size_mb} MB" if size_mb > 0 else "< 1 MB",
-            "date": d.created_at.strftime("%Y-%m-%d"),
-            "stage": d.get_stage_display(),
-        })
+    user_credits = 30
+    enrolled_ids = set()
+    if request.user.is_authenticated:
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        user_credits = wallet.credits_balance
+        user_docs = PrepDocument.objects.filter(user=request.user).order_by("-created_at")[:5]
+        for d in user_docs:
+            size_mb = round(d.file_size_bytes / (1024 * 1024), 1) if d.file_size_bytes else 0
+            recent_uploads.append({
+                "filename": d.file.name.split("/")[-1] if d.file else "Document.pdf",
+                "course": d.course.code,
+                "type": d.doc_type,
+                "size": f"{size_mb} MB" if size_mb > 0 else "< 1 MB",
+                "date": d.created_at.strftime("%Y-%m-%d"),
+                "stage": d.get_stage_display(),
+            })
+        enrolled_ids = set(
+            PrepCourseEnrollment.objects.filter(user=request.user).values_list("course_id", flat=True)
+        )
 
     context = {
         "active_tab": "upload",
-        "user_credits": wallet.credits_balance,
+        "user_credits": user_credits,
         "recent_uploads": recent_uploads,
         "search_query": request.GET.get("q", "").strip(),
     }
     if context["search_query"]:
         query = context["search_query"]
-        enrolled_ids = set(
-            PrepCourseEnrollment.objects.filter(user=request.user).values_list("course_id", flat=True)
-        )
         matches = list(
             PrepCourse.objects.filter(is_active=True)
             .filter(Q(code__icontains=query) | Q(title__icontains=query) | Q(category__icontains=query))
@@ -742,32 +846,44 @@ def prep_history(request):
     return redirect("prep:dashboard")
 
 
-@login_required
 def prep_billing(request):
     """Credit Balance & M-Pesa Top-Up Page connected to PrepWallet."""
-    wallet = PrepWallet.get_or_create_wallet(request.user)
-
-    if wallet.current_plan == "pro":
-        plan_display = "Pro (Exam Master)"
-    elif wallet.current_plan == "plus":
-        plan_display = "Plus (Semester Pass)"
-    elif wallet.current_plan == "basic":
-        plan_display = "Basic (Starter Prep)"
-    elif wallet.current_plan == "expired":
-        plan_display = "Free Trial Expired"
+    if request.user.is_authenticated:
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        user_credits = wallet.credits_balance
+        if wallet.current_plan == "pro":
+            plan_display = "Pro (Exam Master)"
+        elif wallet.current_plan == "plus":
+            plan_display = "Plus (Semester Pass)"
+        elif wallet.current_plan == "basic":
+            plan_display = "Basic (Starter Prep)"
+        elif wallet.current_plan == "expired":
+            plan_display = "Free Trial Expired"
+        else:
+            plan_display = "Free Trial (3 Days)"
+        is_trial = wallet.current_plan == "trial"
+        can_top_up = has_active_subscription(wallet)
+        plan_expires_at = wallet.plan_expires_at
+        recent_transactions = wallet.transactions.all()[:10]
+        current_plan_code = wallet.current_plan
     else:
-        plan_display = "Free Trial (3 Days)"
-
-    recent_transactions = wallet.transactions.all()[:10]
+        wallet = None
+        user_credits = 30
+        plan_display = "Free 30-Credit Trial (Sign Up Free)"
+        is_trial = False
+        can_top_up = False
+        plan_expires_at = None
+        recent_transactions = []
+        current_plan_code = None
 
     context = {
         "active_tab": "billing",
         "wallet": wallet,
-        "user_credits": wallet.credits_balance,
+        "user_credits": user_credits,
         "current_plan": plan_display,
-        "is_trial": wallet.current_plan == "trial",
-        "can_top_up": has_active_subscription(wallet),
-        "plan_expires_at": wallet.plan_expires_at,
+        "is_trial": is_trial,
+        "can_top_up": can_top_up,
+        "plan_expires_at": plan_expires_at,
         "recent_transactions": recent_transactions,
         "topup_price_kes": 150,
         "plans": [
@@ -792,7 +908,7 @@ def prep_billing(request):
                     "All 3 Explanation Levels",
                     "Standard Generation Queue",
                 ],
-                "active": wallet.current_plan == "basic",
+                "active": current_plan_code == "basic",
             },
             {
                 "id": "plus_plan",
@@ -815,7 +931,7 @@ def prep_billing(request):
                     "All 3 Explanation Levels",
                     "Priority Generation Queue",
                 ],
-                "active": wallet.current_plan == "plus",
+                "active": current_plan_code == "plus",
             },
             {
                 "id": "pro_plan",
@@ -838,7 +954,7 @@ def prep_billing(request):
                     "All 3 Explanation Levels",
                     "Top Priority Queue & Exam Support",
                 ],
-                "active": wallet.current_plan == "pro",
+                "active": current_plan_code == "pro",
             },
         ],
     }
@@ -1193,7 +1309,10 @@ def prep_topic_notes_api(request):
         )
 
     if res.get("error") and not res.get("notes"):
-        return JsonResponse({"success": False, "error": res["error"]}, status=500)
+        # The provider may return structurally invalid notes. That is an
+        # expected validation rejection, not an application/server failure.
+        status = 422 if res.get("validation_failed") else 502
+        return JsonResponse({"success": False, "error": res["error"]}, status=status)
 
     credits_deducted = 0
     if not res.get("cached") and not res.get("regenerated_from_invalid_cache"):
@@ -1652,24 +1771,28 @@ def prep_mark_notification_read_api(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-@login_required
 def prep_terms(request):
     """Mentify Prep Terms of Service."""
-    wallet = PrepWallet.get_or_create_wallet(request.user)
+    credits = 30
+    if request.user.is_authenticated:
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        credits = wallet.credits_balance
     context = {
         "active_tab": "terms",
-        "user_credits": wallet.credits_balance,
+        "user_credits": credits,
     }
     return render(request, "prep/terms.html", context)
 
 
-@login_required
 def prep_privacy(request):
     """Mentify Prep Privacy Policy."""
-    wallet = PrepWallet.get_or_create_wallet(request.user)
+    credits = 30
+    if request.user.is_authenticated:
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        credits = wallet.credits_balance
     context = {
         "active_tab": "privacy",
-        "user_credits": wallet.credits_balance,
+        "user_credits": credits,
     }
     return render(request, "prep/privacy.html", context)
 

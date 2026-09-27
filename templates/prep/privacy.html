@@ -1,6 +1,22 @@
 {% extends 'prep/base_prep.html' %}
 
 {% block title %}Privacy Policy | Mentify Prep{% endblock %}
+{% block meta_description %}Learn how Mentify Prep safeguards student privacy, uploaded lecture notes, and revision records. Read our zero public AI training policy and encryption standards.{% endblock %}
+{% block og_title %}Mentify Prep Privacy Policy — Data Protection & AI Privacy Guarantees{% endblock %}
+{% block og_description %}Discover how student study records, uploaded notes, and transaction audits are securely handled on Mentify Prep with zero public AI model training.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Mentify Prep Privacy Policy",
+  "description": "Information on student data protection, uploaded revision document security, and zero public model training guarantees.",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'prep:privacy' %}",
+  "inLanguage": "en"
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="page-header" style="margin-bottom: 24px;">

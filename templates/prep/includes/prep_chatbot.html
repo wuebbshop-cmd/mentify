@@ -306,6 +306,42 @@
     background: #0f766e;
     color: #ffffff;
   }
+
+  /* Mobile responsive fullscreen modal */
+  @media (max-width: 640px) {
+    .prep-chatbot-trigger {
+      bottom: 16px;
+      right: 16px;
+      width: 50px;
+      height: 50px;
+    }
+    .prep-chatbot-window {
+      bottom: 0;
+      right: 0;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .prep-chatbot-header {
+      padding: 16px;
+    }
+    .prep-chatbot-btn-icon {
+      width: 36px;
+      height: 36px;
+    }
+    .prep-chatbot-input-area {
+      padding: 10px 14px max(12px, env(safe-area-inset-bottom));
+    }
+    .prep-chatbot-msg {
+      max-width: 90%;
+    }
+  }
 </style>
 
 <!-- Floating Launcher Button -->
@@ -393,8 +429,13 @@
   function toggleWindow() {
     chatWindow.classList.toggle('active');
     if (chatWindow.classList.contains('active')) {
+      if (window.innerWidth <= 640) {
+        triggerBtn.style.display = 'none';
+      }
       inputEl.focus();
       scrollToBottom();
+    } else {
+      triggerBtn.style.display = 'flex';
     }
   }
 
@@ -430,50 +471,93 @@
   }
   bindChipClicks();
 
-  function escapeHTML(str) {
-    return String(str).replace(/[&<>"']/g, function(m) {
+  function parsePrepMarkdown(str) {
+    if (!str) return '';
+    let text = String(str);
+
+    // 1. Strip backticks around markdown links or paths that LLMs sometimes generate: `[Title](url)` -> [Title](url)
+    text = text.replace(/`+(\[[^\]]+\]\([^)]+\))`+/g, '$1');
+    text = text.replace(/`+(\/(?:prep|dashboard|courses|accounts)[^`]+)`+/g, '$1');
+
+    // 2. Escape HTML tags to prevent XSS
+    let html = text.replace(/[&<>"']/g, function(m) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
     });
+
+    // 3. KaTeX math rendering if library is present
+    if (window.katex && typeof window.katex.renderToString === 'function') {
+      html = html.replace(/\$\$([\s\S]+?)\$\$/g, function(match, latex) {
+        try {
+          const rawLatex = latex.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+          return window.katex.renderToString(rawLatex, { displayMode: true, throwOnError: false });
+        } catch (e) {
+          return `<div class="katex-display">${latex}</div>`;
+        }
+      });
+      html = html.replace(/\$([^\$\n\r]+?)\$/g, function(match, latex) {
+        try {
+          const rawLatex = latex.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+          return window.katex.renderToString(rawLatex, { displayMode: false, throwOnError: false });
+        } catch (e) {
+          return `<span class="katex-inline">${latex}</span>`;
+        }
+      });
+    }
+
+    // 4. Convert all explicit Markdown links [text](url) to clickable HTML anchors
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, linkText, url) {
+      const cleanUrl = url.trim().replace(/&amp;/g, '&');
+      if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mlaudit.info')) {
+        return `<a href="${cleanUrl}">${linkText}</a>`;
+      }
+      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+    });
+
+    // 5. Auto-link bare URLs (https://... or http://...) not already inside href
+    html = html.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, function(match, prefix, url) {
+      const cleanUrl = url.trim().replace(/&amp;/g, '&');
+      if (cleanUrl.includes('wa.me')) {
+        return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>`;
+      }
+      return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
+    });
+
+    // 6. Auto-link bare relative paths (/prep/... or /dashboard/...) not inside href attribute
+    html = html.replace(/(^|[\s(])(\/(?:prep|dashboard|courses|billing|accounts|contact)[^\s<)]*)/g, function(match, prefix, path) {
+      const cleanPath = path.trim().replace(/&amp;/g, '&');
+      return `${prefix}<a href="${cleanPath}">${cleanPath}</a>`;
+    });
+
+    // 7. Auto-link bare WhatsApp numbers (+254731900577 or 254731900577)
+    html = html.replace(/(^|[\s(])(\+?2547\d{8})(?!\w)/g, function(match, prefix, phone) {
+      const cleanPhone = phone.replace('+', '');
+      return `${prefix}<a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp (${phone})</a>`;
+    });
+
+    // 8. Headers (### Title, ## Title)
+    html = html.replace(/^###\s+([^\n]+)/gm, '<h5 style="margin:8px 0 4px;font-size:0.92rem;font-weight:700;">$1</h5>');
+    html = html.replace(/^##\s+([^\n]+)/gm, '<h4 style="margin:10px 0 4px;font-size:0.98rem;font-weight:700;">$1</h4>');
+
+    // 9. Bold **text**
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // 10. Inline code `code` (that wasn't a link)
+    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.06);padding:2px 5px;border-radius:4px;font-size:0.85em;">$1</code>');
+
+    // 11. Bullet list items (* item or - item)
+    html = html.replace(/(?:^|\n)[-*\u2022]\s+([^\n]+)/g, '<br>&bull; $1');
+
+    // 12. Numbered list items (1. item)
+    html = html.replace(/(?:^|\n)(\d+)\.\s+([^\n]+)/g, '<br><strong>$1.</strong> $2');
+
+    // 13. Double newlines to paragraph break, single newlines to <br>
+    html = html.replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+
+    return html;
   }
 
   function renderMessageContent(container, text) {
-    // If the unified Prep Markdown & KaTeX engine is loaded, use it!
-    if (window.renderMarkdownWithKaTeX && typeof window.renderMarkdownWithKaTeX === 'function') {
-      try {
-        window.renderMarkdownWithKaTeX(text, container);
-        return;
-      } catch (e) {
-        console.warn('renderMarkdownWithKaTeX fallback:', e);
-      }
-    }
-
-    // Fallback parser with link detection
-    let html = escapeHTML(text);
-
-    // Markdown Links [Text](URL)
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, t, url) {
-      const cleanUrl = url.trim();
-      if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me')) {
-        return `<a href="${cleanUrl}">${t}</a>`;
-      }
-      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${t}</a>`;
-    });
-
-    // Auto-link relative prep paths (/prep/...)
-    html = html.replace(/(^|[\s(])(\/prep\/[^\s<)]*)/g, function(match, prefix, path) {
-      return `${prefix}<a href="${path}">${path}</a>`;
-    });
-
-    // Bold **text**
-    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-    // Bullet points
-    html = html.replace(/(?:^|\n)[-*\u2022]\s+([^\n]+)/g, '<br>&bull; $1');
-
-    // Newlines to <br>
-    html = html.replace(/\n/g, '<br>');
-
-    container.innerHTML = html;
+    container.innerHTML = parsePrepMarkdown(text);
   }
 
   function renderSavedHistory() {

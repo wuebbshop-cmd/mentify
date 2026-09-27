@@ -84,6 +84,28 @@ def send_welcome_email(user) -> bool:
     return send_email_notification(subject, user.email, body)
 
 
+def send_email_verification_email(user, verification_url: str) -> bool:
+    """Send the one-time link required before a password account can sign in."""
+    platform = getattr(settings, "PLATFORM_NAME", "Mentify")
+    subject = f"Verify your {platform} email address"
+    body = (
+        f"Hello {user.first_name or 'there'},\n\n"
+        f"Verify your email address to activate your {platform} account:\n\n"
+        f"{verification_url}\n\n"
+        "This link expires according to the site's password-reset timeout. "
+        "If you did not create this account, you can ignore this email.\n\n"
+        f"The {platform} Team"
+    )
+    html_body = (
+        f'<p>Hello {user.first_name or "there"},</p>'
+        f'<p>Verify your email address to activate your {platform} account.</p>'
+        f'<p><a href="{verification_url}">Verify email address</a></p>'
+        '<p>This link expires according to the site password-reset timeout. '
+        'If you did not create this account, you can ignore this email.</p>'
+    )
+    return send_email_notification(subject, user.email, body, html_body=html_body)
+
+
 def send_payment_confirmation_email(payment) -> bool:
     subscription = payment.subscription
     learner = subscription.learner
@@ -170,7 +192,7 @@ def send_prep_review_completed_email(prep_doc) -> bool:
       </div>
 
       <p style="font-size:0.85rem; color:#64748b; line-height:1.5; margin-top:32px; border-top:1px solid #e2e8f0; padding-top:16px;">
-        Mentify Prep &bull; High-accuracy syllabus readiness for Kenyan universities & CBE programs.
+        Mentify Prep &bull; High-accuracy syllabus readiness for universities and academic programs.
       </p>
     </div>
     """
@@ -241,7 +263,7 @@ def send_prep_credit_topup_email(wallet, credits_added: int, amount_kes: int, re
       </div>
 
       <p style="font-size:0.85rem; color:#64748b; line-height:1.5; margin-top:32px; border-top:1px solid #e2e8f0; padding-top:16px;">
-        Mentify Prep &bull; High-accuracy syllabus readiness for Kenyan universities & CBE programs.
+        Mentify Prep &bull; High-accuracy syllabus readiness for universities and academic programs.
       </p>
     </div>
     """
@@ -273,4 +295,3 @@ def send_prep_low_credits_email(wallet) -> bool:
     )
 
     return send_email_notification(subject, user.email, body)
-

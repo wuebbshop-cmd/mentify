@@ -24,7 +24,7 @@ class Course(models.Model):
 
     class Track(models.TextChoices):
         TECH = "tech", "Tech (Programming / ML / AI)"
-        CBC = "cbc", "CBE Academic (Math, Science, etc.)"
+        CBC = "cbc", "Academia"
         SPECIALIST = "specialist", "Specialist (Robotics, Cybersecurity, etc.)"
 
     class Level(models.TextChoices):

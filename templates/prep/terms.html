@@ -1,6 +1,22 @@
 {% extends 'prep/base_prep.html' %}
 
 {% block title %}Terms of Service | Mentify Prep{% endblock %}
+{% block meta_description %}Read the official Terms of Service for Mentify Prep. Details on student credit wallet usage, free trial terms, monthly subscription tiers, and academic revision ethics.{% endblock %}
+{% block og_title %}Mentify Prep Terms of Service — Academic Revision & Credit Rules{% endblock %}
+{% block og_description %}Official terms governing Mentify Prep subscriptions, credit allocations, CAT preparation, and uploaded syllabus documents.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Mentify Prep Terms of Service",
+  "description": "Terms governing student revision, credit subscriptions, CAT preparation, and document uploads on Mentify Prep.",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'prep:terms' %}",
+  "inLanguage": "en"
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="page-header" style="margin-bottom: 24px;">

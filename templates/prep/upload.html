@@ -1,6 +1,37 @@
 {% extends 'prep/base_prep.html' %}
 
 {% block title %}Upload Documents | Mentify Prep{% endblock %}
+{% block meta_description %}Upload university past papers, CATs, lecture notes, and tutorial sheets to Mentify Prep. Learn how our 3-stage extraction, Vision OCR, and tutor review gate index your syllabus.{% endblock %}
+{% block og_title %}Upload Study Material & Document Review Process — Mentify Prep{% endblock %}
+{% block og_description %}Submit your syllabus documents and past papers for automated parsing and tutor review. Expand your university course catalog on Mentify Prep.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How Document Uploads & Syllabus Ingestion Work on Mentify Prep",
+  "description": "A 3-stage process for uploading university past papers, lecture notes, and revision materials for academic review and catalog indexing.",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Upload Document",
+      "text": "Select your course code and upload digital PDFs, Word documents, or scanned handwritten papers up to 15 MB."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Parsing & OCR Extraction",
+      "text": "High-precision text extractors and Vision OCR parse mathematical formulas and match them to syllabus topics."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Tutor Review & Global Indexing",
+      "text": "Academic tutors review the extracted questions and solutions before indexing them into the course catalogue."
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="page-header">

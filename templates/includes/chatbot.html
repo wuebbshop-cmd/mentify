@@ -126,6 +126,13 @@
     flex-direction: column;
     gap: 12px;
     background: var(--bg-body, #fafafa);
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  .mentify-chatbot-messages::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .mentify-chatbot-msg {
@@ -276,6 +283,42 @@
     background: #0f766e;
     color: #ffffff;
   }
+
+  /* Mobile responsive fullscreen modal */
+  @media (max-width: 640px) {
+    .mentify-chatbot-trigger {
+      bottom: 16px;
+      right: 16px;
+      width: 50px;
+      height: 50px;
+    }
+    .mentify-chatbot-window {
+      bottom: 0;
+      right: 0;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .mentify-chatbot-header {
+      padding: 16px;
+    }
+    .mentify-chatbot-btn-icon {
+      width: 36px;
+      height: 36px;
+    }
+    .mentify-chatbot-input-area {
+      padding: 10px 14px max(12px, env(safe-area-inset-bottom));
+    }
+    .mentify-chatbot-msg {
+      max-width: 90%;
+    }
+  }
 </style>
 
 <!-- Floating Launcher Button -->
@@ -359,8 +402,13 @@
   function toggleWindow() {
     chatWindow.classList.toggle('active');
     if (chatWindow.classList.contains('active')) {
+      if (window.innerWidth <= 640) {
+        triggerBtn.style.display = 'none';
+      }
       inputEl.focus();
       scrollToBottom();
+    } else {
+      triggerBtn.style.display = 'flex';
     }
   }
 
@@ -406,29 +454,36 @@
 
   // Comprehensive Markdown & Auto-Link Parser
   function parseMarkdown(str) {
-    let html = escapeHTML(str);
+    if (!str) return '';
+    let text = String(str);
+
+    // Strip backticks around markdown links or paths
+    text = text.replace(/`+(\[[^\]]+\]\([^)]+\))`+/g, '$1');
+    text = text.replace(/`+(\/(?:courses|cohort|blog|prep|contact|accounts|terms|privacy|library)[^`]+)`+/g, '$1');
+
+    let html = escapeHTML(text);
 
     // 1. Explicit Markdown Links: [text](url)
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, text, url) {
-      const cleanUrl = url.trim();
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, linkText, url) {
+      const cleanUrl = url.trim().replace(/&amp;/g, '&');
       if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mlaudit.info')) {
-        return `<a href="${cleanUrl}">${text}</a>`;
+        return `<a href="${cleanUrl}">${linkText}</a>`;
       }
-      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
     });
 
     // 2. Auto-link bare URLs (https://... or http://...) not already in HTML tags
     html = html.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, function(match, prefix, url) {
-      const cleanUrl = url.trim();
+      const cleanUrl = url.trim().replace(/&amp;/g, '&');
       if (cleanUrl.includes('wa.me')) {
         return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>`;
       }
       return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
     });
 
-    // 3. Auto-link bare relative paths (/courses/..., /contact/, etc.) not inside HTML tags
-    html = html.replace(/(^|[\s(])(\/(?:courses|cohort|blog|contact|accounts|register)[^\s<)]*)/g, function(match, prefix, path) {
-      const cleanPath = path.trim();
+    // 3. Auto-link bare relative paths (/courses/..., /contact/, /prep/...) not inside HTML tags
+    html = html.replace(/(^|[\s(])(\/(?:courses|cohort|blog|prep|contact|accounts|terms|privacy|library|register)[^\s<)]*)/g, function(match, prefix, path) {
+      const cleanPath = path.trim().replace(/&amp;/g, '&');
       return `${prefix}<a href="${cleanPath}">${cleanPath}</a>`;
     });
 
@@ -438,14 +493,24 @@
       return `${prefix}<a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp (${phone})</a>`;
     });
 
-    // 5. Bold **text**
+    // 5. Headers (### Title, ## Title)
+    html = html.replace(/^###\s+([^\n]+)/gm, '<h5 style="margin:8px 0 4px;font-size:0.92rem;font-weight:700;">$1</h5>');
+    html = html.replace(/^##\s+([^\n]+)/gm, '<h4 style="margin:10px 0 4px;font-size:0.98rem;font-weight:700;">$1</h4>');
+
+    // 6. Bold **text**
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-    // 6. Bullet list items
+    // 7. Inline code `code`
+    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.06);padding:2px 5px;border-radius:4px;font-size:0.85em;">$1</code>');
+
+    // 8. Bullet list items
     html = html.replace(/(?:^|\n)[-*\u2022]\s+([^\n]+)/g, '<br>&bull; $1');
 
-    // 7. Newlines to <br>
-    html = html.replace(/\n/g, '<br>');
+    // 9. Numbered list items
+    html = html.replace(/(?:^|\n)(\d+)\.\s+([^\n]+)/g, '<br><strong>$1.</strong> $2');
+
+    // 10. Newlines to <br>
+    html = html.replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
 
     return html;
   }

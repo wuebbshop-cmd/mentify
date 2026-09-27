@@ -207,7 +207,7 @@ class ProfileUpdateForm(forms.ModelForm):
         ]
         widgets = {
             "headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "Short profile headline"}),
-            "specialty": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g. Python, CBE Mathematics, AI, Robotics"}),
+            "specialty": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g. Python, Mathematics, AI, Robotics"}),
             "bio": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "experience_summary": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "date_of_birth": forms.DateInput(attrs={"type": "date", "class": "form-control"}),

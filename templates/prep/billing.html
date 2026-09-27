@@ -1,6 +1,31 @@
 {% extends 'prep/base_prep.html' %}
 
 {% block title %}Credits & Plans | Mentify Prep{% endblock %}
+{% block meta_description %}Explore Mentify Prep pricing plans, M-Pesa STK push top-ups, and Credit Consumption Rules for university exam revision. Free 30-credit trial with plans starting from KES 399/mo.{% endblock %}
+{% block og_title %}Mentify Prep Pricing, Plans & Credit Consumption Rules{% endblock %}
+{% block og_description %}Get transparent pricing for university revision, authentic CAT solutions, and step-by-step proofs. Pay easily via M-Pesa with 30 free starter credits.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Mentify Prep Subscriptions & Credits",
+  "description": "Exam revision platform for university undergraduate students with credit wallet, step-by-step mathematical proofs, and authentic past paper solutions.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Mentify Prep"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "KES",
+    "lowPrice": "399",
+    "highPrice": "799",
+    "offerCount": "3"
+  }
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="page-header">

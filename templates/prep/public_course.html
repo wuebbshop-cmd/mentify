@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.code }} {{ course.title }} Syllabus and Study Resources{% endblock %}
+{% block meta_description %}Study {{ course.code }} {{ course.title }} with the Mentify Prep syllabus, topic notes, and verified revision questions for {{ course.level|lower }} learners.{% endblock %}
+{% block og_title %}{{ course.code }} {{ course.title }} | Mentify Prep{% endblock %}
+{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, and revision questions on Mentify.{% endblock %}
+{% block extra_head %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|default:'Structured syllabus, study notes, and revision resources from Mentify.'|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify"},"educationalLevel":"{{ course.level|escapejs }}","inLanguage":"en"}</script>
+{% endblock %}
+
+{% block content %}
+<section class="container" style="max-width: 980px; padding-top: 50px; padding-bottom: 64px;">
+  <nav aria-label="Breadcrumb" style="font-size: .9rem; margin-bottom: 18px;"><a href="/">Mentify</a> / <a href="{% url 'prep:public_library' %}">Prep library</a> / {{ course.code }}</nav>
+  <header style="border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 30px;">
+    <p style="color: var(--green); font-weight: 700; margin-bottom: 8px;">{{ course.code }} | {{ course.level }}</p>
+    <h1>{{ course.title }}</h1>
+    <p style="max-width: 760px; color: var(--text-muted); line-height: 1.7;">{{ course.description|default:"A structured Mentify Prep course with syllabus-guided study resources and revision questions." }}</p>
+  </header>
+  <section aria-labelledby="topics-heading">
+    <h2 id="topics-heading">Syllabus topics</h2>
+    <div style="display: grid; gap: 12px; margin-top: 16px;">
+      {% for topic in topics %}
+      <article class="card" style="padding: 20px;">
+        <p style="color: var(--green); font-weight: 700; font-size: .82rem; margin: 0 0 6px;">UNIT {{ topic.order }}</p>
+        <h3 style="margin: 0 0 8px;"><a href="{% url 'prep:public_topic' course.slug topic.id topic.slug %}" style="color: inherit;">{{ topic.title }}</a></h3>
+        {% if topic.subtopics %}<p style="margin: 0 0 10px; color: var(--text-muted);">{{ topic.subtopics|join:", " }}</p>{% endif %}
+        <p style="margin: 0; font-size: .9rem; color: var(--text-muted);">{{ topic.question_count }} verified question{{ topic.question_count|pluralize }} available</p>
+      </article>
+      {% empty %}<p>Syllabus topics are being prepared.</p>{% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}

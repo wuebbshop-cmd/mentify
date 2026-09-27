@@ -11,6 +11,7 @@ from django.http import FileResponse, Http404
 from accounts.sitemap_views import sitemap, robots_txt, llms_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
 from services.chat_views import chatbot_api_view
+from accounts.views import contact_page, privacy_policy, terms_of_service, cookie_policy
 import os
 
 def health_check(request):
@@ -87,6 +88,14 @@ urlpatterns = [
         github_asset_proxy,
         name="github_asset_proxy",
     ),
+
+    # Direct vanity and policy endpoints
+    path("contact/", contact_page, name="contact"),
+    path("terms/", terms_of_service, name="terms"),
+    path("terms-of-service/", terms_of_service, name="terms_of_service"),
+    path("privacy/", privacy_policy, name="privacy"),
+    path("privacy-policy/", privacy_policy, name="privacy_policy"),
+    path("cookies/", cookie_policy, name="cookie_policy"),
 
     # Auth + accounts
     path("accounts/", include("accounts.urls")),

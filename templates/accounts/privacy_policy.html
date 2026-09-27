@@ -19,11 +19,11 @@
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Legal &amp; Transparency
     </span>
     <h1>Privacy Policy</h1>
-    <p>Your privacy is fundamental to us. This policy outlines how Mentify and Mentify Prep collect, use, and safeguard your personal data across our learning and exam revision platform.</p>
+    <p>Your privacy is fundamental to us. This policy outlines how Mentify collects, uses, and safeguards your personal data across our learning platform.</p>
     <div class="policy-meta-row">
-      <span><strong>Last updated:</strong> September 2026</span>
+      <span><strong>Last updated:</strong> July 2026</span>
       <span>•</span>
-      <span><strong>Applies to:</strong> All Learners, Students, Tutors, and Guardians</span>
+      <span><strong>Applies to:</strong> Learners, Tutors, and Guardians</span>
     </div>
   </div>
 
@@ -31,12 +31,11 @@
   <div class="policy-content-card">
     <div class="policy-section">
       <h2><span class="sec-num">1</span> Information We Collect</h2>
-      <p>We collect essential information required to deliver a personalized, secure, and effective study and revision experience:</p>
+      <p>We collect essential personal information required to deliver a personalized, secure, and effective tutoring experience:</p>
       <ul>
-        <li><strong>Account Data:</strong> Full name, email address, phone number, user role, and profile preferences.</li>
-        <li><strong>Course &amp; Academic Progress:</strong> Course enrollments, syllabus study progress, completed practice variants, and exported study packs.</li>
-        <li><strong>Uploaded Study Documents:</strong> Lecture notes, course outlines, and past exam sheets uploaded for syllabus mapping and text extraction.</li>
-        <li><strong>Financial &amp; Wallet Details:</strong> Mentify Prep credit transactions, subscription plan status, and payment references processed securely via Paystack / M-Pesa. We never store raw payment PINs or card details.</li>
+        <li><strong>Account Data:</strong> Full name, email address, phone number, role (Learner, Tutor, Guardian), and profile settings.</li>
+        <li><strong>Academic &amp; Learning Progress:</strong> Cohort enrollments, lesson completion status, assignment submissions, grades, and attendance records.</li>
+        <li><strong>Financial &amp; Subscription Details:</strong> Subscription plans, payment status, and transaction references processed securely via M-Pesa / Daraja or card providers.</li>
       </ul>
     </div>
 
@@ -44,28 +43,27 @@
       <h2><span class="sec-num">2</span> How We Use Your Information</h2>
       <p>Your data enables us to operate, manage, and continuously improve platform services:</p>
       <ul>
-        <li>Organizing and indexing course syllabus topics, lecture notes, and verified past questions.</li>
-        <li>Generating tailored practice question variants and step-by-step mathematical proofs.</li>
-        <li>Compiling and formatting complete PDF and Word study packs for your personal revision.</li>
-        <li>Tracking credit consumption balances and sending automated low-credit or subscription alerts.</li>
-        <li>Sending important account notifications, security alerts, and payment receipts.</li>
+        <li>Facilitating cohort enrollments and live session attendance tracking.</li>
+        <li>Enabling tutors to review and grade assignment submissions with personalized rubrics.</li>
+        <li>Allowing parents and guardians to track their linked children’s academic progress and billing history.</li>
+        <li>Sending important account notifications, security alerts, and subscription receipts.</li>
       </ul>
     </div>
 
     <div class="policy-section">
-      <h2><span class="sec-num">3</span> Data Protection &amp; AI Privacy Guarantees</h2>
-      <p>Mentify employs industry-standard encryption, secure authentication tokens, and strict role-based access control. Your uploaded study documents and personalized derivations are processed strictly to fulfill your study requests and are <strong>never sold, rented, or used for public AI model training</strong>.</p>
+      <h2><span class="sec-num">3</span> Data Protection &amp; Security</h2>
+      <p>Mentify employs industry-standard encryption, secure authentication tokens, and strict role-based access control. We never store raw payment PINs or passwords in plain text.</p>
     </div>
 
     <div class="policy-section">
       <h2><span class="sec-num">4</span> Data Sharing &amp; Third-Party Services</h2>
-      <p>We do not sell personal data to advertisers. Data is processed only through trusted infrastructure and payment partners (such as Paystack for M-Pesa processing and secure server environments) strictly to deliver platform services.</p>
+      <p>We respect your privacy and do not sell or rent personal information to third-party advertisers. Data is shared only with trusted infrastructure providers (such as GitHub storage and Bunny Stream) strictly to deliver course materials and video content securely.</p>
     </div>
 
     <div class="policy-section">
       <h2><span class="sec-num">5</span> Your Rights &amp; Contact Information</h2>
-      <p>You have the right to inspect, update, or request deletion of your personal data and uploaded materials at any time via your profile settings or by reaching out to our team.</p>
-      <p>If you have any questions or data privacy concerns, please reach out via our <a href="{% url 'accounts:contact' %}">Contact Form</a> or contact support.</p>
+      <p>You have the right to inspect, update, or request deletion of your personal data at any time via your profile settings or by reaching out to our team.</p>
+      <p>If you have any questions or data privacy concerns, please reach out via our <a href="{% url 'accounts:contact' %}">Contact Form</a> or email us at <strong>{{ SUPPORT_EMAIL }}</strong>.</p>
     </div>
   </div>
 </div>

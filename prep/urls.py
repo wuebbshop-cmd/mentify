@@ -4,6 +4,15 @@ from . import views
 app_name = "prep"
 
 urlpatterns = [
+    # Public, crawlable Mentify Prep learning library. These read only approved
+    # shared content and never invoke AI generation or student credit logic.
+    path("library/", views.prep_public_library, name="public_library"),
+    path("library/<slug:course_slug>/", views.prep_public_course, name="public_course"),
+    path(
+        "library/<slug:course_slug>/<int:topic_id>-<slug:topic_slug>/",
+        views.prep_public_topic,
+        name="public_topic",
+    ),
     path("", views.prep_dashboard, name="dashboard"),
     path("courses/", views.prep_courses, name="courses"),
     path("courses/<int:course_id>/add/", views.prep_add_course, name="add_course"),

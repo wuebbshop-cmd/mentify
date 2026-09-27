@@ -14,6 +14,9 @@ from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.urls import reverse
 from django.urls import reverse_lazy
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage, send_mail
 from django.template.loader import render_to_string
 from django.db.models import Count, Q
@@ -30,7 +33,7 @@ from .forms import (
 )
 from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRequestLog
 from .decorators import role_required
-from services.email_service import send_welcome_email
+from services.email_service import send_welcome_email, send_email_verification_email
 
 
 def _form_error_message(form, default="Please correct the errors below and try again."):
@@ -41,6 +44,25 @@ def _form_error_message(form, default="Please correct the errors below and try a
             label = form.fields[field].label if field in form.fields else field.replace("_", " ").title()
             return f"{label}: {errors[0]}"
     return default
+
+
+def _send_email_verification(request, user):
+    """Create a signed verification URL and send it without storing raw tokens."""
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    url = request.build_absolute_uri(reverse("accounts:verify_email", args=[uid, token]))
+    return send_email_verification_email(user, url)
+
+
+def _finish_password_registration(request, user):
+    """Leave new password accounts logged out until their email is verified."""
+    user.is_email_verified = False
+    user.save(update_fields=["is_email_verified"])
+    request.session["pending_verification_email"] = user.email
+    request.session["email_verification_next"] = (
+        request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
+    )
+    return _send_email_verification(request, user)
 
 
 # ─── Admin Email Promotion ────────────────────────────────────────────────────
@@ -143,11 +165,12 @@ def register_learner(request):
             user.save()
             Profile.objects.get_or_create(user=user)
             promote_if_admin_email(user)
-            login(request, user)
-            send_welcome_email(user)
-            messages.success(request, f"Welcome to Mentify, {user.first_name}!")
-            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
-            return redirect(next_url)
+            sent = _finish_password_registration(request, user)
+            if sent:
+                messages.success(request, "Account created. Check your email for the verification link before signing in.")
+            else:
+                messages.warning(request, "Account created, but the verification email could not be sent. Use the resend option below.")
+            return redirect("accounts:verify_email_pending")
         messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
@@ -167,11 +190,12 @@ def register_guardian(request):
             user.save()
             Profile.objects.get_or_create(user=user)
             promote_if_admin_email(user)
-            login(request, user)
-            send_welcome_email(user)
-            messages.success(request, f"Welcome to Mentify, {user.first_name}!")
-            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
-            return redirect(next_url)
+            sent = _finish_password_registration(request, user)
+            if sent:
+                messages.success(request, "Account created. Check your email for the verification link before signing in.")
+            else:
+                messages.warning(request, "Account created, but the verification email could not be sent. Use the resend option below.")
+            return redirect("accounts:verify_email_pending")
         messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
@@ -190,11 +214,12 @@ def register_tutor(request):
             user.save()
             Profile.objects.get_or_create(user=user)
             promote_if_admin_email(user)
-            login(request, user)
-            send_welcome_email(user)
-            messages.success(request, f"Welcome to Mentify, {user.first_name}!")
-            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
-            return redirect(next_url)
+            sent = _finish_password_registration(request, user)
+            if sent:
+                messages.success(request, "Account created. Check your email for the verification link before signing in.")
+            else:
+                messages.warning(request, "Account created, but the verification email could not be sent. Use the resend option below.")
+            return redirect("accounts:verify_email_pending")
         messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
@@ -338,6 +363,10 @@ def login_view(request):
         form = MentifyLoginForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            if not getattr(user, "is_email_verified", False):
+                request.session["pending_verification_email"] = user.email
+                messages.warning(request, "Please verify your email before signing in. You can resend the verification link below.")
+                return redirect("accounts:verify_email_pending")
             promote_if_admin_email(user)  # auto-promote whitelisted admins
             login(request, user)
             next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
@@ -348,6 +377,51 @@ def login_view(request):
         form = MentifyLoginForm(request)
 
     return render(request, "accounts/login.html", {"form": form})
+
+
+def verify_email_pending(request):
+    """Show the verification state without exposing the user's email publicly."""
+    return render(request, "accounts/verify_email_pending.html", {
+        "email": request.session.get("pending_verification_email", ""),
+    })
+
+
+@require_POST
+def resend_email_verification(request):
+    email = (request.POST.get("email") or request.session.get("pending_verification_email") or "").strip().lower()
+    user = User.objects.filter(email__iexact=email).first()
+    if user and not user.is_email_verified:
+        request.session["pending_verification_email"] = user.email
+        if _send_email_verification(request, user):
+            messages.success(request, "A new verification link has been sent.")
+        else:
+            messages.error(request, "We could not send the verification email right now. Please try again later.")
+    else:
+        messages.info(request, "If that account still needs verification, a new link has been sent.")
+    return redirect("accounts:verify_email_pending")
+
+
+def verify_email(request, uidb64, token):
+    """Verify a password account and sign the user in once."""
+    try:
+        user = User.objects.get(pk=force_str(urlsafe_base64_decode(uidb64)))
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if not user or not default_token_generator.check_token(user, token):
+        messages.error(request, "That verification link is invalid or has expired. Request a new link.")
+        return redirect("accounts:verify_email_pending")
+
+    if not user.is_email_verified:
+        user.is_email_verified = True
+        user.save(update_fields=["is_email_verified"])
+        send_welcome_email(user)
+
+    request.session.pop("pending_verification_email", None)
+    next_url = request.session.pop("email_verification_next", None) or user.get_dashboard_url()
+    login(request, user)
+    messages.success(request, "Your email is verified. Welcome to Mentify!")
+    return redirect(next_url)
 
 
 class MentifyPasswordResetView(PasswordResetView):
@@ -1150,7 +1224,10 @@ def google_callback(request):
         send_welcome_email(user)
         messages.success(request, f"Successfully registered and logged in as {user.first_name}!")
     else:
-        # User already exists, log them in
+        # Google has already authenticated this email address.
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            user.save(update_fields=["is_email_verified"])
         messages.success(request, f"Welcome back, {user.first_name}!")
 
     login(request, user)

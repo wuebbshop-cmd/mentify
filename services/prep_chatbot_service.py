@@ -118,7 +118,7 @@ def get_prep_system_context(user=None, user_message: str = "") -> str:
 The student inquired about course availability. The following course(s) match in the database:
 {chr(10).join(lines)}
 
-OPERATING INSTRUCTION: Confirm to the student that this course is available on Mentify Prep, include its clickable Markdown link `[{c.code} - {c.title}](/prep/courses/{quote(c.code)}/)`, and summarize its available past papers and syllabus topics.
+OPERATING INSTRUCTION: Confirm to the student that this course is available on Mentify Prep, include its clickable Markdown link [{matched_courses[0].code} - {matched_courses[0].title}](/prep/courses/{quote(matched_courses[0].code)}/), and summarize its available past papers and syllabus topics.
 """
         else:
             course_query_block = """
@@ -199,17 +199,19 @@ Key capabilities:
 {user_context_block}
 ### STRICT OPERATING RULES & GUARDRAILS:
 1. **Be Concise & Helpful**: Keep responses clear, professional, direct, and well-structured (100-220 words max).
-2. **MANDATORY SMART LINKING**: ANY TIME you mention or reference ANY course, dashboard, upload page, billing page, or WhatsApp contact (+254731900577), you MUST format it as a clickable Markdown link `[Text](URL)`:
-   - **Course Link**: `[Course Code - Title](/prep/courses/{'{CourseCode}'}/)` (e.g. `[SMA 300 - Real Analysis I](/prep/courses/SMA%20300/)`)
-   - **Catalog Link**: `[Courses & Syllabi](/prep/courses/)`
-   - **Upload Page**: `[Upload Study Material](/prep/upload/)`
-   - **Billing & Plans**: `[Credits & Plans](/prep/billing/)`
-   - **Dashboard**: `[Prep Dashboard](/prep/)`
-   - **Terms**: `[Terms of Service](/prep/terms/)`
-   - **Privacy**: `[Privacy Policy](/prep/privacy/)`
-   - **Main Mentify App**: `[Mentify Main App](/dashboard/)`
-   - **WhatsApp Support**: `[Chat on WhatsApp (+254731900577)](https://wa.me/254731900577)`
-   NEVER leave a course code, page reference, or contact number unlinked!
+2. **MANDATORY SMART LINKING**: ANY TIME you mention or reference ANY course, dashboard, upload page, billing page, or WhatsApp contact (+254731900577), you MUST format it as a standard clickable Markdown link [Text](URL). NEVER put backticks (`) around links!
+   - **Course Link**: [Course Code - Title](/prep/courses/{'{CourseCode}'}/) (e.g. [SMA 300 - Real Analysis I](/prep/courses/SMA%20300/))
+   - **Catalog Link**: [Courses & Syllabi](/prep/courses/)
+   - **Study Library**: [Study Library](/prep/library/)
+   - **Upload Page**: [Upload Study Material](/prep/upload/)
+   - **Billing & Plans**: [Credits & Plans](/prep/billing/)
+   - **Dashboard**: [Prep Dashboard](/prep/)
+   - **Contact Support**: [Contact Support](/accounts/contact/)
+   - **Terms**: [Terms of Service](/prep/terms/)
+   - **Privacy**: [Privacy Policy](/prep/privacy/)
+   - **Main Mentify App**: [Mentify Main App](/dashboard/)
+   - **WhatsApp Support**: [Chat on WhatsApp (+254731900577)](https://wa.me/254731900577)
+   NEVER write links in backticks or code spans. Write clean Markdown links directly in your text.
 3. **STRICTLY STICK TO MENTIFY PREP**: Only answer questions about Mentify Prep, courses, past papers, syllabus modules, uploads, mathematical problem solving, credits, and billing plans.
    - If a student asks general non-educational questions (weather, general news, politics, sports), politely redirect them:
      "I am your Mentify Prep Assistant! I can help you with your courses, past papers, syllabus revision, uploads, and credit plans. How can I assist your exam preparation today?"

@@ -60,6 +60,8 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
 
 
 NOTES_CACHE_VERSION = "markdown-katex-v6"
+NOTE_VALIDATION_STATE = "validated"
+NOTE_MAX_FAILED_GENERATION_CYCLES = 2
 
 
 def _merge_usage(*usage_items) -> dict:
@@ -311,7 +313,9 @@ def get_cached_content(cache_key: str) -> dict | None:
         cache_entry = PrepContentCache.objects.filter(cache_key=cache_key).first()
         if cache_entry:
             cache_entry.hit_count += 1
-            cache_entry.save(update_fields=["hit_count", "updated_at"])
+            # Reading a cache must not make the note appear freshly edited or
+            # invalidate browser/server cache headers based on updated_at.
+            cache_entry.save(update_fields=["hit_count"])
             logger.info(f"[PrepCache HIT] {cache_key} (Total hits: {cache_entry.hit_count})")
             payload = cache_entry.payload
             if isinstance(payload, str):
@@ -366,6 +370,174 @@ def _cache_payload_as_dict(payload) -> dict | None:
     return payload if isinstance(payload, dict) else None
 
 
+def repair_json_escaped_latex_newlines(content: str) -> str:
+    """Repair JSON-decoded ``\\n`` LaTex commands only while inside math mode.
+
+    Some providers return ``\\notin`` or ``\\neq`` with one slash in JSON. A
+    JSON decoder then turns ``\\n`` into a physical newline, leaving ``otin`` or
+    ``eq`` inside a math expression. This is a narrow, deterministic repair;
+    normal prose line breaks and arbitrary malformed LaTex are left untouched.
+    """
+    if not isinstance(content, str) or "\n" not in content:
+        return content or ""
+
+    suffixes = ("otin", "eq", "abla", "u", "atural", "ewcommand")
+    output = []
+    mode = None
+    index = 0
+    backslashes = 0
+    length = len(content)
+
+    while index < length:
+        char = content[index]
+        if char == "\\":
+            output.append(char)
+            backslashes += 1
+            index += 1
+            continue
+
+        escaped = backslashes % 2 == 1
+        backslashes = 0
+        if char == "$" and not escaped:
+            is_display = index + 1 < length and content[index + 1] == "$"
+            if is_display:
+                output.append("$$")
+                if mode == "display":
+                    mode = None
+                elif mode is None:
+                    mode = "display"
+                index += 2
+                continue
+            output.append(char)
+            if mode == "inline":
+                mode = None
+            elif mode is None:
+                mode = "inline"
+            index += 1
+            continue
+
+        if char == "\n" and mode:
+            remainder = content[index + 1:]
+            suffix = next((item for item in suffixes if remainder.startswith(item)), None)
+            if suffix:
+                boundary = len(suffix)
+                if boundary == len(remainder) or not remainder[boundary].isalpha():
+                    output.append("\\n")
+                    index += 1
+                    continue
+
+        output.append(char)
+        index += 1
+
+    return "".join(output)
+
+
+def _publish_legacy_note_cache(entry, payload: dict, topic_title: str) -> dict | None:
+    """Validate an unmarked legacy note once, then persist its publication state."""
+    content = repair_json_escaped_latex_newlines(
+        str(payload.get("content") or payload.get("notes") or "")
+    ).strip()
+    if not content or _note_completion_issues(content, topic_title):
+        return None
+
+    published_payload = dict(payload)
+    published_payload["content"] = content
+    published_payload["validation_state"] = NOTE_VALIDATION_STATE
+    published_payload["validated_at"] = timezone.now().isoformat()
+    entry.payload = published_payload
+    entry.save(update_fields=["payload", "updated_at"])
+    return published_payload
+
+
+def get_published_topic_note_levels(topic_obj) -> dict[str, str]:
+    """Return all shared, published note levels without invoking AI generation."""
+    if not topic_obj:
+        return {}
+
+    from prep.models import PrepContentCache
+
+    levels: dict[str, str] = {}
+    entries = PrepContentCache.objects.filter(
+        content_type="topic_notes",
+        topic=topic_obj,
+    ).order_by("-updated_at", "-id")
+    for entry in entries:
+        payload = _cache_payload_as_dict(entry.payload)
+        if not payload:
+            continue
+        level = payload.get("level")
+        if level not in {"level_1", "level_2", "level_3"} or level in levels:
+            continue
+        if payload.get("validation_state") != NOTE_VALIDATION_STATE:
+            payload = _publish_legacy_note_cache(entry, payload, topic_obj.title)
+        if not payload:
+            continue
+        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        if content:
+            levels[level] = content
+    return levels
+
+
+def _note_generation_guard(topic_obj, level: str, source_signature: str):
+    if not topic_obj:
+        return None
+    from prep.models import PrepNoteGenerationGuard
+
+    return PrepNoteGenerationGuard.objects.filter(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+    ).first()
+
+
+def _blocked_note_generation(topic_obj, level: str, source_signature: str) -> dict | None:
+    guard = _note_generation_guard(topic_obj, level, source_signature)
+    if not guard or guard.status != "needs_review":
+        return None
+    return {
+        "notes": "",
+        "blocks": [],
+        "cached": False,
+        "level": level,
+        "validation_failed": True,
+        "needs_review": True,
+        "error": (
+            "Validated notes could not be produced after two complete attempts. "
+            "This topic is awaiting tutor/admin review before another generation is allowed."
+        ),
+    }
+
+
+def _record_note_generation_failure(topic_obj, level: str, source_signature: str, error: str) -> None:
+    if not topic_obj:
+        return
+    from prep.models import PrepNoteGenerationGuard
+
+    guard, _ = PrepNoteGenerationGuard.objects.get_or_create(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+    )
+    guard.failed_attempts += 1
+    guard.last_error = error[:4000]
+    guard.last_failed_at = timezone.now()
+    if guard.failed_attempts >= NOTE_MAX_FAILED_GENERATION_CYCLES:
+        guard.status = "needs_review"
+    guard.save(update_fields=["failed_attempts", "last_error", "last_failed_at", "status", "updated_at"])
+
+
+def _clear_note_generation_guard(topic_obj, level: str, source_signature: str) -> None:
+    if not topic_obj:
+        return
+    from prep.models import PrepNoteGenerationGuard
+
+    PrepNoteGenerationGuard.objects.filter(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+    ).delete()
+
+
 def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclude_cache_key: str = "") -> dict | None:
     """Return a prior valid shared version only after current generation fails."""
     if not topic_obj:
@@ -386,11 +558,14 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
             continue
 
         content = str(payload.get("content") or payload.get("notes") or "").strip()
-        if _note_completion_issues(content, topic_title):
+        if payload.get("validation_state") != NOTE_VALIDATION_STATE:
+            payload = _publish_legacy_note_cache(entry, payload, topic_title)
+        if not payload:
             continue
+        content = str(payload.get("content") or payload.get("notes") or "").strip()
 
         entry.hit_count += 1
-        entry.save(update_fields=["hit_count", "updated_at"])
+        entry.save(update_fields=["hit_count"])
         logger.warning(
             "[Topic Notes] Serving last valid shared version for %s at %s after current generation failed.",
             topic_title,
@@ -654,20 +829,59 @@ def get_or_generate_topic_notes(
         if isinstance(getattr(topic_obj, "subtopics", None), list):
             subtopics = topic_obj.subtopics
 
+    # A published shared note belongs to this specific approved topic and
+    # level. Serve it before the historical signature-key path so unrelated
+    # course changes cannot make later students regenerate already-approved
+    # content. A material change to this topic removes these entries via the
+    # PrepTopic signal above.
+    published_levels = get_published_topic_note_levels(topic_obj)
+    if level in published_levels:
+        return {
+            "notes": published_levels[level],
+            "blocks": None,
+            "schema_version": 2,
+            "cached": True,
+            "level": level,
+            "model": "Published Shared Notes",
+        }
+
     # The signature makes cache reuse contingent on the approved topic and
     # curriculum state, rather than only its title. This prevents a valid but
     # stale note from surviving a reviewed syllabus update.
     cache_signature = _topic_notes_cache_signature(course_obj, topic_obj, topic_title, subtopics)
+    blocked = _blocked_note_generation(topic_obj, level, cache_signature)
+    if blocked:
+        return blocked
     cache_key = compute_cache_key(
         "notes", NOTES_CACHE_VERSION, course_code, topic_title, level, cache_signature
     )
     cached = get_cached_content(cache_key)
     regenerated_from_invalid_cache = False
     if cached and isinstance(cached, dict) and ("content" in cached or "blocks" in cached):
-        cached_content = str(cached.get("content", "") or "")
+        cached_content = repair_json_escaped_latex_newlines(
+            str(cached.get("content", "") or "")
+        )
+        if cached.get("validation_state") == NOTE_VALIDATION_STATE:
+            # Strict read-only: never mutate or overwrite a valid cache on read.
+            return {
+                "notes": cached_content,
+                "blocks": cached.get("blocks"),
+                "schema_version": cached.get("schema_version", 1),
+                "cached": True,
+                "level": level,
+                "model": cached.get("model", "Cache"),
+            }
+
+        # Notes created before the publication marker existed are checked once.
+        # A successful check upgrades the shared row so no later student repeats it.
         cached_issues = _note_completion_issues(cached_content, topic_title)
         if not cached_issues:
-            # Strict read-only: never mutate or overwrite a valid cache on read.
+            from prep.models import PrepContentCache
+
+            cached["content"] = cached_content
+            cached["validation_state"] = NOTE_VALIDATION_STATE
+            cached["validated_at"] = timezone.now().isoformat()
+            PrepContentCache.objects.filter(cache_key=cache_key).update(payload=cached)
             return {
                 "notes": cached_content,
                 "blocks": cached.get("blocks"),
@@ -854,7 +1068,7 @@ def get_or_generate_topic_notes(
     result = route_math_request(prompt, course_code, topic_label=topic_title, is_complex_proof=False)
 
     if result.get("success"):
-        content = result["content"]
+        content = repair_json_escaped_latex_newlines(result["content"])
 
         # Continue boundedly until all required sections and delimiters are complete.
         # This protects against responses that contain the final heading but stop
@@ -912,6 +1126,12 @@ def get_or_generate_topic_notes(
                 topic_title,
                 "; ".join(completion_issues),
             )
+            _record_note_generation_failure(
+                topic_obj,
+                level,
+                cache_signature,
+                "; ".join(completion_issues),
+            )
             fallback = _latest_valid_shared_notes(
                 topic_obj,
                 level,
@@ -930,6 +1150,7 @@ def get_or_generate_topic_notes(
                 "model": result.get("model_used"),
                 "usage": result.get("usage", {}),
                 "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
+                "validation_failed": True,
                 "error": "The notes generation was incomplete. Please retry.",
             }
         blocks = parse_markdown_to_blocks(content)
@@ -941,6 +1162,8 @@ def get_or_generate_topic_notes(
             "schema_version": 2,
             "blocks": blocks,
             "content": content,
+            "validation_state": NOTE_VALIDATION_STATE,
+            "validated_at": timezone.now().isoformat(),
             "model": result.get("model_used", "deepseek-chat"),
             "course": course_code,
             "topic": topic_title,
@@ -948,6 +1171,7 @@ def get_or_generate_topic_notes(
             "generated_at": timezone.now().isoformat(),
         }
         store_cached_content(cache_key, "topic_notes", p_hash, payload, course=course_obj, topic=topic_obj)
+        _clear_note_generation_guard(topic_obj, level, cache_signature)
         return {
             "notes": content,
             "blocks": blocks,

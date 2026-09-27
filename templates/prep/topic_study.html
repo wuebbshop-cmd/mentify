@@ -943,6 +943,7 @@
 
 <!-- Raw Safe Data Storage -->
 {{ initial_notes|json_script:"initial-notes-data" }}
+{{ published_notes_by_level|json_script:"published-notes-by-level-data" }}
 {{ initial_notes_error|json_script:"initial-notes-error-data" }}
 {{ authentic_questions|json_script:"authentic-questions-data" }}
 {{ generated_questions|json_script:"generated-questions-data" }}
@@ -957,6 +958,7 @@
   let notePages = [];
   let currentPageIndex = 0;
   let currentNotesText = "";
+  let publishedNotesByLevel = {};
   let notesUnavailableMessage = "No validated notes are available for this topic yet.";
 
   function splitNotesIntoPages(rawNotes) {
@@ -1162,6 +1164,12 @@
     const bodyEl = document.getElementById('notes-body');
     const statusBadge = document.getElementById('notes-status-badge');
 
+    if (publishedNotesByLevel[level]) {
+      if (statusBadge) { statusBadge.textContent = ''; }
+      setupNotesPagination(publishedNotesByLevel[level]);
+      return;
+    }
+
     loadingEl.style.display = 'block';
     bodyEl.style.opacity = '0.3';
 
@@ -1185,6 +1193,7 @@
 
       if (data.success && data.notes) {
         if (statusBadge) { statusBadge.textContent = ''; }
+        publishedNotesByLevel[level] = data.notes;
         setupNotesPagination(data.notes);
       } else {
         alert(data.error || 'Failed to load notes for this level.');
@@ -1354,6 +1363,14 @@
 
   // ─── Initial Page Load Initialization ─────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
+    const publishedNotesDataEl = document.getElementById('published-notes-by-level-data');
+    if (publishedNotesDataEl && publishedNotesDataEl.textContent) {
+      try {
+        publishedNotesByLevel = JSON.parse(publishedNotesDataEl.textContent) || {};
+      } catch (e) {
+        console.error("Error parsing published notes JSON:", e);
+      }
+    }
     // 1. Load initial notes
     const initialNotesErrorDataEl = document.getElementById('initial-notes-error-data');
     if (initialNotesErrorDataEl && initialNotesErrorDataEl.textContent) {
@@ -1370,7 +1387,10 @@
         if (typeof initialNotes === 'string' && initialNotes.trim()) {
           setupNotesPagination(initialNotes);
         } else if (document.getElementById('pillar-notes').style.display !== 'none') {
-          loadNotesLevel('level_2');
+          const notesBody = document.getElementById('notes-body');
+          if (notesBody) {
+            notesBody.innerHTML = '<p style="color: var(--text-muted);">Validated notes are not available for this level yet. Select a level to prepare them.</p>';
+          }
         }
       } catch (e) {
         console.error("Error parsing initial notes JSON:", e);

@@ -90,7 +90,7 @@
           <label class="form-label" for="{{ profile_form.headline.id_for_label }}">Profile Headline</label>
           {{ profile_form.headline }}
           {% if profile_form.headline.errors %}<div class="form-error">{{ profile_form.headline.errors.as_text }}</div>{% endif %}
-          <span class="form-hint">A short one-liner that appears under your name — e.g. "JSS Mathematics Tutor"</span>
+          <span class="form-hint">A short one-liner that appears under your name — e.g. "Mathematics Tutor"</span>
         </div>
 
         {% if request.user.is_tutor or request.user.is_admin %}
@@ -98,7 +98,7 @@
           <label class="form-label" for="{{ profile_form.specialty.id_for_label }}">Area of Specialty</label>
           {{ profile_form.specialty }}
           {% if profile_form.specialty.errors %}<div class="form-error">{{ profile_form.specialty.errors.as_text }}</div>{% endif %}
-          <span class="form-hint">e.g. Python Programming, CBE Mathematics, Robotics & AI — helps learners find the right tutor.</span>
+          <span class="form-hint">e.g. Python Programming, Mathematics, Robotics & AI — helps learners find the right tutor.</span>
         </div>
         {% endif %}
 
@@ -146,7 +146,7 @@
             <label class="form-label" for="{{ profile_form.class_level.id_for_label }}">Class / Learning Level</label>
             {{ profile_form.class_level }}
             {% if profile_form.class_level.errors %}<div class="form-error">{{ profile_form.class_level.errors.as_text }}</div>{% endif %}
-            <span class="form-hint">e.g. JSS1, Form 2, Adult Learner</span>
+            <span class="form-hint">e.g. Current class or academic level</span>
           </div>
         </div>
         {% endif %}

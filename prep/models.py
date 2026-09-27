@@ -284,6 +284,37 @@ class PrepContentCache(models.Model):
         return f"Cache [{self.content_type}] {self.cache_key} (Hits: {self.hit_count})"
 
 
+class PrepNoteGenerationGuard(models.Model):
+    """Stops repeated provider spend when one topic/level cannot validate."""
+
+    STATUS_CHOICES = [
+        ("open", "Retry permitted"),
+        ("needs_review", "Needs tutor/admin review"),
+    ]
+
+    topic = models.ForeignKey(PrepTopic, on_delete=models.CASCADE, related_name="note_generation_guards")
+    level = models.CharField(max_length=20)
+    source_signature = models.CharField(max_length=64, db_index=True)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open", db_index=True)
+    last_error = models.TextField(blank=True)
+    last_failed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["topic", "level", "source_signature"],
+                name="unique_prep_note_generation_guard",
+            ),
+        ]
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return f"{self.topic} {self.level}: {self.status} ({self.failed_attempts} failures)"
+
+
 class PrepWallet(models.Model):
     """User credit balance and monthly exam readiness plan."""
     PLAN_CHOICES = [

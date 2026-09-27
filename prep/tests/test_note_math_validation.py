@@ -7,6 +7,7 @@ from django.urls import reverse
 from accounts.models import User
 from prep.models import PrepContentCache, PrepCourse, PrepQuestion, PrepTopic, PrepWallet
 from services.prep_ai_router import (
+    NOTE_VALIDATION_STATE,
     NOTES_CACHE_VERSION,
     _display_math_issues,
     _latex_syntax_issues,
@@ -14,11 +15,19 @@ from services.prep_ai_router import (
     _topic_notes_cache_signature,
     compute_cache_key,
     generate_similar_practice_questions,
+    get_published_topic_note_levels,
     get_or_generate_topic_notes,
+    repair_json_escaped_latex_newlines,
 )
 
 
 class NoteMathValidationTests(SimpleTestCase):
+    def test_repairs_json_decoded_notin_only_inside_math(self):
+        source = "For $b \notin (a, b)$, continue.\nOutside prose stays unchanged."
+        repaired = repair_json_escaped_latex_newlines(source)
+
+        self.assertEqual(repaired, "For $b \\notin (a, b)$, continue.\nOutside prose stays unchanged.")
+
     def test_valid_display_math_is_accepted(self):
         content = """## 1. One
 
@@ -225,6 +234,23 @@ $$
         self.assertEqual(response.json()["credits_deducted"], 0)
         self.assertEqual(wallet.credits_balance, before)
 
+    @patch("prep.views.get_or_generate_topic_notes")
+    def test_rejected_note_generation_is_not_reported_as_a_server_error(self, generate_notes):
+        generate_notes.return_value = {
+            "notes": "",
+            "error": "The notes generation was incomplete. Please retry.",
+            "validation_failed": True,
+        }
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data='{ "topic_id": "%s", "level": "level_2" }' % self.topic.id,
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 422)
+
     @patch("services.prep_ai_router.route_math_request")
     def test_prior_valid_shared_notes_are_served_when_the_current_generation_fails(self, route_request):
         PrepContentCache.objects.create(
@@ -252,6 +278,94 @@ $$
         self.assertTrue(result["cached"])
         self.assertTrue(result["stale"])
         self.assertEqual(result["notes"], self.valid_notes.strip())
+
+    def test_validated_shared_note_is_not_revalidated_for_later_students(self):
+        cache = PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:level_2",
+            content_type="topic_notes",
+            prompt_hash="published-version",
+            payload={
+                "content": self.valid_notes,
+                "level": "level_2",
+                "model": "test-model",
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+
+        first_read = get_published_topic_note_levels(self.topic)
+        cache.refresh_from_db()
+        self.assertEqual(first_read["level_2"], self.valid_notes.strip())
+        self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
+
+        with patch("services.prep_ai_router._note_completion_issues") as validation:
+            second_read = get_published_topic_note_levels(self.topic)
+
+        self.assertEqual(second_read["level_2"], self.valid_notes.strip())
+        validation.assert_not_called()
+
+    def test_published_note_bypasses_signature_changes_from_other_topics(self):
+        PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:level_2:old-signature",
+            content_type="topic_notes",
+            prompt_hash="old-signature",
+            payload={
+                "content": self.valid_notes,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+        PrepTopic.objects.create(
+            course=self.course,
+            order=2,
+            title="Later Approved Topic",
+            slug="later-approved-topic",
+        )
+
+        with patch("services.prep_ai_router.route_math_request") as generation:
+            result = get_or_generate_topic_notes(
+                self.course.code,
+                self.topic.title,
+                level="level_2",
+                course_obj=self.course,
+                topic_obj=self.topic,
+            )
+
+        self.assertTrue(result["cached"])
+        self.assertEqual(result["notes"], self.valid_notes.strip())
+        generation.assert_not_called()
+
+    def test_topic_source_update_invalidates_only_its_own_published_notes(self):
+        other_topic = PrepTopic.objects.create(
+            course=self.course,
+            order=2,
+            title="Limits",
+            slug="limits",
+        )
+        own_cache = PrepContentCache.objects.create(
+            cache_key="notes:source-change:sequences",
+            content_type="topic_notes",
+            prompt_hash="source-change",
+            payload={"content": self.valid_notes, "level": "level_2", "validation_state": NOTE_VALIDATION_STATE},
+            course=self.course,
+            topic=self.topic,
+        )
+        other_cache = PrepContentCache.objects.create(
+            cache_key="notes:source-change:limits",
+            content_type="topic_notes",
+            prompt_hash="source-change",
+            payload={"content": self.valid_notes, "level": "level_2", "validation_state": NOTE_VALIDATION_STATE},
+            course=self.course,
+            topic=other_topic,
+        )
+
+        self.topic.summary = "Approved additional source material."
+        self.topic.save(update_fields=["summary"])
+
+        self.assertFalse(PrepContentCache.objects.filter(pk=own_cache.pk).exists())
+        self.assertTrue(PrepContentCache.objects.filter(pk=other_cache.pk).exists())
 
 
 class SharedPracticeQuestionTests(TestCase):

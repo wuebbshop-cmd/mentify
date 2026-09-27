@@ -103,7 +103,7 @@ class Profile(models.Model):
     class_level = models.CharField(
         max_length=20,
         blank=True,
-        help_text="e.g. Primary, JSS, Senior School, Past Senior School, Adult Learner"
+        help_text="e.g. Current class or academic level"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

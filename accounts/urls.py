@@ -19,6 +19,9 @@ urlpatterns = [
     path("register/tutor/", views.register_tutor, name="register_tutor"),
     path("google/", views.google_login, name="google_login"),
     path("google/callback/", views.google_callback, name="google_callback"),
+    path("verify-email/pending/", views.verify_email_pending, name="verify_email_pending"),
+    path("verify-email/resend/", views.resend_email_verification, name="resend_email_verification"),
+    path("verify-email/<uidb64>/<token>/", views.verify_email, name="verify_email"),
 
     # Password reset (Resend email delivery)
     path("password-reset/", views.MentifyPasswordResetView.as_view(), name="password_reset"),

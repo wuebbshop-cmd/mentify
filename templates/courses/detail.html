@@ -15,7 +15,7 @@
     "name": "{{ PLATFORM_NAME }}",
     "url": "https://mlaudit.info"
   },
-  "educationalLevel": "{{ course.get_level_display|escapejs }}",
+  "educationalLevel": "Academia",
   "hasCourseInstance": [
     {% for cohort in cohorts %}
     {
@@ -65,7 +65,7 @@
         <span class="badge badge-{{ course.track }} mb-sm">{{ course.get_track_display }}</span>
         <h1 style="margin-bottom: 8px; font-size: 2rem; font-weight: 800;">{{ course.title }}</h1>
         <div style="font-size: 0.9rem; color: var(--text-muted);">
-          Subject Area: <strong>{{ course.subject_area }}</strong> &bull; Level: <strong>{{ course.get_level_display }}</strong>
+          Subject Area: <strong>{{ course.subject_area }}</strong>
         </div>
       </div>
 
@@ -133,10 +133,6 @@
           <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
             <span>Track:</span>
             <strong class="text-primary">{{ course.get_track_display }}</strong>
-          </li>
-          <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
-            <span>Level:</span>
-            <strong>{{ course.get_level_display }}</strong>
           </li>
           <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
             <span>Subject:</span>

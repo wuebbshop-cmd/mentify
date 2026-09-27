@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load prep_seo %}
+
+{% block title %}{{ topic.title }} {{ course.code }} Study Notes and Questions{% endblock %}
+{% block meta_description %}Study {{ topic.title }} for {{ course.code }} {{ course.title }} with structured Mentify notes and verified revision questions for {{ course.level|lower }} learners.{% endblock %}
+{% block og_title %}{{ topic.title }} | {{ course.code }} | Mentify{% endblock %}
+{% block og_description %}Study notes and verified revision questions for {{ topic.title }} in {{ course.code }} on Mentify Prep.{% endblock %}
+{% block robots %}{% if is_indexable %}index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1{% else %}noindex, follow{% endif %}{% endblock %}
+{% block extra_head %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"{{ topic.title|escapejs }}","description":"Study notes and verified revision questions for {{ topic.title|escapejs }} in {{ course.code|escapejs }} {{ course.title|escapejs }}.","educationalLevel":"{{ course.level|escapejs }}","learningResourceType":"Study guide","isPartOf":{"@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}"},"provider":{"@type":"EducationalOrganization","name":"Mentify"},"inLanguage":"en"}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .prep-public-content { line-height: 1.75; max-width: 860px; }
+  .prep-public-content h2 { margin-top: 2.2rem; }
+  .prep-public-content h3 { margin-top: 1.5rem; }
+  .prep-public-content blockquote { border-left: 4px solid var(--green); margin: 1.25rem 0; padding: .7rem 1rem; background: var(--surface); }
+  .prep-public-content pre { overflow-x: auto; padding: 1rem; background: #151515; color: #f4f4f4; border-radius: 6px; }
+  .prep-public-content table { border-collapse: collapse; display: block; max-width: 100%; overflow-x: auto; margin: 1.25rem 0; }
+  .prep-public-content th, .prep-public-content td { padding: .65rem; border: 1px solid var(--border); text-align: left; }
+  .prep-public-question { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    document.querySelectorAll('.prep-public-content').forEach(function (element) {
+      renderMathInElement(element, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });
+    });
+  }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="container" style="max-width: 980px; padding-top: 50px; padding-bottom: 64px;">
+  <nav aria-label="Breadcrumb" style="font-size: .9rem; margin-bottom: 18px;"><a href="/">Mentify</a> / <a href="{% url 'prep:public_library' %}">Prep library</a> / <a href="{% url 'prep:public_course' course.slug %}">{{ course.code }}</a> / {{ topic.title }}</nav>
+  <header style="border-bottom: 1px solid var(--border); padding-bottom: 26px; margin-bottom: 30px;">
+    <p style="margin: 0 0 8px; color: var(--green); font-weight: 700;">{{ course.code }} | UNIT {{ topic.order }} | {{ course.level }}</p>
+    <h1>{{ topic.title }}</h1>
+    {% if topic.subtopics %}<p style="color: var(--text-muted); line-height: 1.6;">Topics covered: {{ topic.subtopics|join:", " }}</p>{% endif %}
+  </header>
+  {% if notes %}
+  <section class="prep-public-content" aria-labelledby="notes-heading">
+    <h2 id="notes-heading">Study notes</h2>
+    {{ notes|render_prep_markdown }}
+  </section>
+  {% endif %}
+  {% if questions %}
+  <section class="prep-public-content" aria-labelledby="questions-heading" style="margin-top: 42px;">
+    <h2 id="questions-heading">Verified revision questions and answers</h2>
+    {% for question in questions %}
+    <article class="prep-public-question">
+      <h3>Question {{ question.number }}{% if question.marks %} ({{ question.marks }} marks){% endif %}</h3>
+      <div>{{ question.question_latex|render_prep_markdown }}</div>
+      {% if question.solution_latex %}
+      <h4>Answer and explanation</h4>
+      <div>{{ question.solution_latex|render_prep_markdown }}</div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+  {% endif %}
+  {% if not notes and not questions %}
+  <p>This topic is currently being prepared. The course syllabus remains available above.</p>
+  {% endif %}
+  <p style="margin-top: 42px; color: var(--text-muted); font-size: .9rem;">Mentify Prep study resource for {{ course.code }}. <a href="{% url 'accounts:register' %}">Create a Mentify account</a> to access the full study workspace.</p>
+</article>
+{% endblock %}
