@@ -595,12 +595,12 @@ class PrepNoteGenerationGuardAdmin(admin.ModelAdmin):
     list_display = ("topic", "level", "status", "failed_attempts", "last_failed_at", "updated_at")
     list_filter = ("status", "level", "topic__course")
     search_fields = ("topic__title", "topic__course__code", "source_signature", "last_error")
-    readonly_fields = ("topic", "level", "source_signature", "failed_attempts", "last_error", "last_failed_at", "created_at", "updated_at")
+    readonly_fields = ("topic", "level", "source_signature", "failed_attempts", "last_error", "last_failed_at", "notification_sent_at", "created_at", "updated_at")
     actions = ("reset_generation_guards",)
 
     @admin.action(description="Allow another validated note generation attempt")
     def reset_generation_guards(self, request, queryset):
-        count = queryset.update(status="open", failed_attempts=0, last_error="", last_failed_at=None)
+        count = queryset.update(status="open", failed_attempts=0, last_error="", last_failed_at=None, notification_sent_at=None)
         self.message_user(request, f"Reset {count} note generation guard(s).")
 
 

@@ -44,11 +44,6 @@ class LearnerRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=150, required=True, label="First Name")
     last_name = forms.CharField(max_length=150, required=True, label="Last Name")
     email = forms.EmailField(required=True, label="Email Address")
-    phone = forms.CharField(
-        max_length=20, required=False,
-        label="Phone Number",
-        help_text="Optional - E.164 format e.g. +254700000000",
-    )
     agree_to_terms = forms.BooleanField(
         required=True,
         label="I agree to the Terms and Privacy Policy",
@@ -57,7 +52,7 @@ class LearnerRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email", "phone", "password1", "password2", "agree_to_terms"]
+        fields = ["first_name", "last_name", "email", "password1", "password2", "agree_to_terms"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -84,7 +79,6 @@ class LearnerRegistrationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
-        user.phone = self.cleaned_data.get("phone", "")
         user.username = self.cleaned_data.get("username") or build_username_from_email(user.email, existing_user=user)
         if commit:
             user.save()

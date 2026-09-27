@@ -494,6 +494,7 @@ def _blocked_note_generation(topic_obj, level: str, source_signature: str) -> di
     guard = _note_generation_guard(topic_obj, level, source_signature)
     if not guard or guard.status != "needs_review":
         return None
+    _notify_note_generation_failure(guard.pk)
     return {
         "notes": "",
         "blocks": [],
@@ -506,6 +507,26 @@ def _blocked_note_generation(topic_obj, level: str, source_signature: str) -> di
             "This topic is awaiting tutor/admin review before another generation is allowed."
         ),
     }
+
+
+def _notify_note_generation_failure(guard_id: int) -> None:
+    """Send a one-time admin alert, retaining failed delivery for later retry."""
+    from django.db import transaction
+    from prep.models import PrepNoteGenerationGuard
+    from services.email_service import send_prep_note_generation_failure_email
+
+    with transaction.atomic():
+        guard = (
+            PrepNoteGenerationGuard.objects.select_for_update()
+            .select_related("topic__course")
+            .filter(pk=guard_id, status="needs_review", notification_sent_at__isnull=True)
+            .first()
+        )
+        if not guard:
+            return
+        if send_prep_note_generation_failure_email(guard):
+            guard.notification_sent_at = timezone.now()
+            guard.save(update_fields=["notification_sent_at", "updated_at"])
 
 
 def _record_note_generation_failure(topic_obj, level: str, source_signature: str, error: str) -> None:
@@ -524,6 +545,8 @@ def _record_note_generation_failure(topic_obj, level: str, source_signature: str
     if guard.failed_attempts >= NOTE_MAX_FAILED_GENERATION_CYCLES:
         guard.status = "needs_review"
     guard.save(update_fields=["failed_attempts", "last_error", "last_failed_at", "status", "updated_at"])
+    if guard.status == "needs_review":
+        _notify_note_generation_failure(guard.pk)
 
 
 def _clear_note_generation_guard(topic_obj, level: str, source_signature: str) -> None:

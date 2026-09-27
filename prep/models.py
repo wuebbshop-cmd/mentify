@@ -299,6 +299,7 @@ class PrepNoteGenerationGuard(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open", db_index=True)
     last_error = models.TextField(blank=True)
     last_failed_at = models.DateTimeField(null=True, blank=True)
+    notification_sent_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

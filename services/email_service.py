@@ -106,6 +106,37 @@ def send_email_verification_email(user, verification_url: str) -> bool:
     return send_email_notification(subject, user.email, body, html_body=html_body)
 
 
+def send_prep_note_generation_failure_email(guard) -> bool:
+    """Alert every configured administrator when a topic requires human review."""
+    recipients = list(dict.fromkeys(
+        email.strip().lower()
+        for email in getattr(settings, "ADMIN_EMAILS", [])
+        if email and email.strip()
+    ))
+    if not recipients:
+        logger.warning("No ADMIN_EMAILS configured for Prep note-generation failure alerts.")
+        return False
+
+    from django.urls import reverse
+
+    topic = guard.topic
+    course = topic.course
+    base_url = getattr(settings, "BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+    review_url = base_url + reverse("admin:prep_prepnotegenerationguard_change", args=[guard.pk])
+    subject = f"[Mentify Prep] Notes need review: {course.code} - {topic.title} ({guard.level})"
+    body = (
+        "Validated notes could not be generated after the configured retry limit.\n\n"
+        f"Course: {course.code} - {course.title}\n"
+        f"Topic: {topic.title}\n"
+        f"Level: {guard.level}\n"
+        f"Failed cycles: {guard.failed_attempts}\n"
+        f"Last error: {guard.last_error or 'No error details recorded.'}\n\n"
+        f"Review or reset the generation guard here:\n{review_url}\n"
+    )
+    results = [send_email_notification(subject, recipient, body) for recipient in recipients]
+    return all(results)
+
+
 def send_payment_confirmation_email(payment) -> bool:
     subscription = payment.subscription
     learner = subscription.learner
