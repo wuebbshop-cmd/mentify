@@ -1277,7 +1277,9 @@ def prep_topic_notes_api(request):
     topic_id = data.get("topic_id")
     course_code = data.get("course_code", "").strip()
     topic_title = data.get("topic_title", "").strip()
-    level = data.get("level", "level_2")
+    level = str(data.get("level", "level_2") or "level_2").strip().lower()
+    if level not in {"level_1", "level_2", "level_3"}:
+        level = "level_2"
 
     wallet = PrepWallet.get_or_create_wallet(request.user)
 
@@ -1292,6 +1294,23 @@ def prep_topic_notes_api(request):
         return JsonResponse({"success": False, "error": "Topic title is required."}, status=400)
 
     subtopics = topic_obj.subtopics if (topic_obj and isinstance(topic_obj.subtopics, list)) else []
+
+    # Use the same published-level source that rendered the notes on the page.
+    # This makes a visible shared level unconditionally free, even if an older
+    # cache-key lookup would otherwise report that generation is required.
+    from services.prep_ai_router import get_published_topic_note_levels
+    published_notes = get_published_topic_note_levels(topic_obj) if topic_obj else {}
+    if level in published_notes:
+        wallet.refresh_from_db()
+        return JsonResponse({
+            "success": True,
+            "notes": published_notes[level],
+            "level": level,
+            "cached": True,
+            "credits_deducted": 0,
+            "credits_balance": wallet.credits_balance,
+            "model": "Published Shared Notes",
+        })
 
     # Read the shared validated cache before permitting an AI generation. This
     # prevents a page request from spending provider tokens for a user whose
