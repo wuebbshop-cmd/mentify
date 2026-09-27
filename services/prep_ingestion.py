@@ -16,8 +16,15 @@ import json
 import logging
 import os
 import re
-import fitz  # PyMuPDF
-import pdfplumber
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    fitz = None
+
+try:
+    import pdfplumber
+except ImportError:
+    pdfplumber = None
 import requests
 from django.conf import settings
 from django.utils import timezone

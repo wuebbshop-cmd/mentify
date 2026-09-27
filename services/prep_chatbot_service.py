@@ -27,31 +27,106 @@ BASE_DIR = getattr(settings, "BASE_DIR", Path(__file__).resolve().parents[1])
 load_dotenv(BASE_DIR / ".env", override=True)
 
 
-def get_prep_system_context(user=None) -> str:
+def find_matching_course_inventory(query_text: str) -> tuple[list, bool]:
     """
-    Dynamically fetch active courses, syllabus modules, paper counts,
-    and user wallet/enrollment state to build real-time system context for Gemini.
+    Checks if user is inquiring about a specific course code or title availability.
+    Distinguishes specific course inquiries from general catalog questions.
+    Returns (matches_list, was_specific_course_query).
     """
-    course_lines = []
+    if not query_text:
+        return [], False
 
-    try:
-        from prep.models import PrepCourse
-        courses = PrepCourse.objects.filter(is_active=True).prefetch_related("topics", "papers")[:25]
-        for c in courses:
-            topics = list(c.topics.all()[:4])
-            topic_names = ", ".join([t.title for t in topics]) if topics else "Syllabus in indexing"
-            papers_count = c.papers.filter(is_published=True).count()
-            course_url = f"/prep/courses/{quote(c.code)}/"
-            course_lines.append(
-                f"- **{c.code}**: {c.title} (Level: {c.level}, Category: {c.category})\n"
-                f"  URL: {course_url}\n"
-                f"  Past Papers Available: {papers_count} | Sample Topics: {topic_names}"
-            )
-    except Exception as e:
-        logger.warning(f"Could not load dynamic prep courses context: {e}")
-        course_lines.append("- Catalog available at /prep/courses/")
+    import re
+    from django.db.models import Q
+    from prep.models import PrepCourse
 
-    courses_block = "\n".join(course_lines) if course_lines else "- No courses indexed yet."
+    # 1. Check for course code patterns e.g. SMA 300, SMA300, STA 200, CIT 101, etc.
+    code_matches = re.findall(r"\b([A-Za-z]{2,5}\s*\d{2,4}[A-Za-z]?)\b", query_text)
+    if code_matches:
+        q_filter = Q()
+        for code in code_matches:
+            clean_code = re.sub(r"\s+", "", code).upper()
+            spaced_code = re.sub(r"([A-Za-z]+)(\d+)", r"\1 \2", clean_code)
+            q_filter |= Q(code__iexact=spaced_code) | Q(code__iexact=clean_code) | Q(code__icontains=clean_code)
+
+        try:
+            results = list(PrepCourse.objects.filter(q_filter, is_active=True).prefetch_related("topics", "papers")[:5])
+            return results, True
+        except Exception:
+            return [], True
+
+    # 2. Check if asking generally about courses (e.g. "what courses are available?", "what courses do you offer?")
+    is_general_catalog_question = bool(re.search(
+        r"\b(what\s+courses|which\s+courses|all\s+courses|list\s+of\s+courses|show\s+me\s+courses|what\s+subjects|what\s+units|what\s+do\s+you\s+offer)\b",
+        query_text,
+        re.IGNORECASE,
+    ))
+    if is_general_catalog_question:
+        return [], False
+
+    # 3. Check for specific course subject inquiry: "is ABC available?", "do you have calculus?", etc.
+    is_specific_inquiry = bool(re.search(
+        r"\b(is|do you have|can i find|looking for|have|teach|cover)\b",
+        query_text,
+        re.IGNORECASE,
+    ))
+
+    stop_words = {
+        "what", "which", "where", "have", "offer", "available", "there",
+        "courses", "course", "about", "please", "mentify", "prep", "tell",
+        "help", "with", "from", "that", "this", "some", "many", "much",
+        "units", "unit", "does", "free", "credits", "credit", "study",
+        "material", "exam", "exams", "paper", "papers", "online"
+    }
+    words = [w.strip() for w in re.findall(r"[A-Za-z]{3,}", query_text) if w.lower() not in stop_words]
+    if words and is_specific_inquiry:
+        q_title = Q()
+        for w in words[:3]:
+            q_title |= Q(title__icontains=w) | Q(code__icontains=w) | Q(category__icontains=w)
+        try:
+            results = list(PrepCourse.objects.filter(q_title, is_active=True).prefetch_related("topics", "papers")[:5])
+            return results, True
+        except Exception:
+            return [], True
+
+    return [], False
+
+
+def get_prep_system_context(user=None, user_message: str = "") -> str:
+    """
+    Dynamically fetch real-time system context for Gemini without dumping the
+    full course catalog. Accurately verifies specific course availability on demand.
+    """
+    course_query_block = ""
+    matched_courses, was_course_query = find_matching_course_inventory(user_message)
+
+    if was_course_query:
+        if matched_courses:
+            lines = []
+            for c in matched_courses:
+                topics = list(c.topics.all()[:4])
+                topic_names = ", ".join([t.title for t in topics]) if topics else "Syllabus available"
+                papers_count = c.papers.filter(is_published=True).count()
+                course_url = f"/prep/courses/{quote(c.code)}/"
+                lines.append(
+                    f"- **{c.code}**: {c.title} (Level: {c.level}, Category: {c.category})\n"
+                    f"  URL: {course_url}\n"
+                    f"  Past Papers Available: {papers_count} | Sample Topics: {topic_names}"
+                )
+            course_query_block = f"""
+### SPECIFIC COURSE AVAILABILITY CHECK (DATABASE SEARCH RESULTS):
+The student inquired about course availability. The following course(s) match in the database:
+{chr(10).join(lines)}
+
+OPERATING INSTRUCTION: Confirm to the student that this course is available on Mentify Prep, include its clickable Markdown link `[{c.code} - {c.title}](/prep/courses/{quote(c.code)}/)`, and summarize its available past papers and syllabus topics.
+"""
+        else:
+            course_query_block = """
+### SPECIFIC COURSE AVAILABILITY CHECK (DATABASE SEARCH RESULTS):
+The student inquired about the availability of a specific course, but NO matching course was found in the active Mentify Prep database.
+
+OPERATING INSTRUCTION: Politely inform the student that this course is not currently available or indexed on Mentify Prep. Direct them to search the catalog at [Courses & Syllabi](/prep/courses/) or encourage them to upload their past papers or lecture notes at [Upload Study Material](/prep/upload/) so our tutors can review and index it!
+"""
 
     user_context_block = ""
     if user and user.is_authenticated:
@@ -87,7 +162,7 @@ def get_prep_system_context(user=None) -> str:
 ### PLATFORM OVERVIEW:
 Mentify Prep is an exam readiness and past-paper revision engine tailored for university undergraduate and college students in Kenya and East Africa.
 Key capabilities:
-1. **Course-Anchored Revision**: Organizes study materials strictly by course code (e.g. SMA 300, STA 200, CIT 100), syllabus modules, and subtopics.
+1. **Course-Anchored Revision**: Organizes study materials strictly by course unit, syllabus modules, and subtopics.
 2. **Authentic Past Papers & CATs**: Real Continuous Assessment Tests and final examination papers with step-by-step verified mathematical proofs and derivations.
 3. **Multi-Level AI Proofs & Explanations**: 
    - Intuitive (high-level visual intuition)
@@ -101,6 +176,11 @@ Key capabilities:
    - Stage 3: Published to the global catalog for instant revision.
 6. **Study Pack Exports**: Complete revision notes and solved papers downloadable as formatted PDF and Word DOCX files.
 
+### COURSE CATALOG & AVAILABILITY POLICY:
+- Mentify Prep covers university degree courses across Mathematics, Statistics, Computing, Engineering, Business & Economics, and General Sciences.
+- Do NOT output or dump a list of all courses under any circumstances.
+- If a student asks generally "what courses do you offer?" or "what courses are available?", guide them to browse and search the full catalog at [Courses & Syllabi](/prep/courses/), and let them know they can ask you if any specific course unit (e.g. SMA 300, STA 200, Real Analysis, etc.) is available.
+{course_query_block}
 ### SUBSCRIPTION PLANS & BILLING:
 - **Free Trial**: Every new student receives 30 free starter credits valid for 3 days upon signup, with complete access to all platform features.
 - **Basic (Starter Prep)**: KES 399 / month. Includes 250 credits/mo, up to 10 document uploads, 100 practice questions, 5 scanned OCR uploads.
@@ -117,9 +197,6 @@ Key capabilities:
 - **1 Credit**: Generating an AI practice question variant.
 - **3 Credits**: Generating on-demand AI topic summary notes.
 {user_context_block}
-### AVAILABLE COURSES IN PREP:
-{courses_block}
-
 ### STRICT OPERATING RULES & GUARDRAILS:
 1. **Be Concise & Helpful**: Keep responses clear, professional, direct, and well-structured (100-220 words max).
 2. **MANDATORY SMART LINKING**: ANY TIME you mention or reference ANY course, dashboard, upload page, billing page, or WhatsApp contact (+254731900577), you MUST format it as a clickable Markdown link `[Text](URL)`:
@@ -182,7 +259,7 @@ def generate_prep_chat_response(messages_history: list, user_message: str, user=
         })
 
     # 3. System Prompt Context
-    system_prompt = get_prep_system_context(user=user)
+    system_prompt = get_prep_system_context(user=user, user_message=user_text)
 
     # 4. Construct Gemini REST API Payload
     model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip() or "gemini-2.5-flash-lite"

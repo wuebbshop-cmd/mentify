@@ -18,30 +18,44 @@ import re
 import tempfile
 from datetime import datetime
 
-import docx
 from django.conf import settings
-from docx import Document
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml import parse_xml
-from docx.oxml.ns import nsdecls
-
 logger = logging.getLogger(__name__)
 
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    HRFlowable,
-    KeepTogether,
-)
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+try:
+    import docx
+    from docx import Document
+    from docx.shared import Inches, Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml import parse_xml
+    from docx.oxml.ns import nsdecls
+except ImportError:
+    docx = None
+    Document = None
+    Inches = Pt = RGBColor = None
+    WD_ALIGN_PARAGRAPH = None
+    parse_xml = nsdecls = None
+
+try:
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Paragraph,
+        Spacer,
+        Table,
+        TableStyle,
+        HRFlowable,
+        KeepTogether,
+    )
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+except ImportError:
+    colors = None
+    A4 = None
+    getSampleStyleSheet = ParagraphStyle = None
+    SimpleDocTemplate = Paragraph = Spacer = Table = TableStyle = HRFlowable = KeepTogether = None
+    pdfmetrics = TTFont = None
 
 
 # ─── Font Registration for ReportLab (Unicode & Math Support) ─────────────────

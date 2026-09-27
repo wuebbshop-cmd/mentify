@@ -131,6 +131,13 @@
     flex-direction: column;
     gap: 12px;
     background: var(--bg-body, #fafafa);
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE / Edge */
+  }
+  .prep-chatbot-messages::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .prep-chatbot-msg {
@@ -341,7 +348,7 @@
     <div class="prep-chatbot-msg prep-chatbot-msg-ai">
       Hi there! I am your Mentify Prep Assistant. Ask me anything about your university courses, syllabus topics, past exam papers, uploading study materials, or credits and plans!
       <div class="prep-chatbot-suggestions">
-        <button type="button" class="prep-chatbot-chip" data-query="What courses are available?">What courses are available?</button>
+        <button type="button" class="prep-chatbot-chip" data-query="Is SMA 300 available?">Is SMA 300 available?</button>
         <button type="button" class="prep-chatbot-chip" data-query="How do credits work?">How do credits work?</button>
         <button type="button" class="prep-chatbot-chip" data-query="Which subscription plan should I choose?">Which plan should I choose?</button>
         <button type="button" class="prep-chatbot-chip" data-query="How do I upload a past paper?">How to upload past papers?</button>
@@ -401,7 +408,7 @@
       <div class="prep-chatbot-msg prep-chatbot-msg-ai">
         Chat history cleared! How can I help you with your exam preparation today?
         <div class="prep-chatbot-suggestions">
-          <button type="button" class="prep-chatbot-chip" data-query="What courses are available?">What courses are available?</button>
+          <button type="button" class="prep-chatbot-chip" data-query="Is SMA 300 available?">Is SMA 300 available?</button>
           <button type="button" class="prep-chatbot-chip" data-query="How do credits work?">How do credits work?</button>
           <button type="button" class="prep-chatbot-chip" data-query="Which subscription plan should I choose?">Which plan should I choose?</button>
         </div>

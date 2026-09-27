@@ -17,7 +17,10 @@ import logging
 import os
 import re
 import requests
-import sympy as sp
+try:
+    import sympy as sp
+except ImportError:
+    sp = None
 from django.conf import settings
 from django.utils import timezone
 
@@ -413,6 +416,10 @@ def evaluate_symbolic_math(expr_str: str, operation: str = "simplify") -> dict:
     Supports: simplify, expand, factor, diff, integrate, solve.
     Returns LaTeX representations of input and result with $0 token cost.
     """
+    if sp is None:
+        logger.warning("[SymPy] sympy library is not installed; skipping deterministic evaluation.")
+        return {"success": False, "error": "SymPy is not installed", "engine": "SymPy"}
+
     try:
         # Define standard mathematical symbols
         x, y, z, t, r, n, k = sp.symbols("x y z t r n k")

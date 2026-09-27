@@ -9,3 +9,8 @@ PyGithub==2.8.1
 django-crontab==0.7.1
 python-dateutil==2.9.0
 markdown==3.7
+sympy>=1.13.0
+reportlab>=4.2.0
+python-docx>=1.1.0
+pdfplumber>=0.11.0
+PyMuPDF>=1.24.0
