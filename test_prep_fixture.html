@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prep Renderer Fixture Verification</title>
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <!-- Marked -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <!-- Prism -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
+  <!-- Our Unified Renderer -->
+  <script src="static/js/prep-renderer.js"></script>
+
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121212; color: #e0e0e0; padding: 20px; }
+    .fixture-box { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 24px; margin-bottom: 40px; }
+    .desktop-box { width: 900px; max-width: 100%; }
+    .mobile-box { width: 390px; }
+    .test-status { padding: 12px 18px; border-radius: 6px; font-weight: bold; margin-bottom: 20px; }
+    .status-pass { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+    .status-fail { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+
+    /* Match main.css styles */
+    .markdown-rendered { line-height: 1.8; font-size: 0.96rem; }
+    .markdown-rendered blockquote {
+      border-left: 4px solid #10b981;
+      background: #242424;
+      padding: 12px 18px;
+      margin: 18px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .markdown-rendered table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .markdown-rendered th, .markdown-rendered td { padding: 10px 14px; border: 1px solid #444; }
+    .markdown-rendered th { background: #2a2a2a; }
+    .markdown-rendered pre { background: #181818; padding: 14px; border-radius: 6px; overflow-x: auto; }
+    .markdown-rendered .katex-display { margin: 12px 0; overflow-x: auto; }
+  </style>
+</head>
+<body>
+
+  <h1>Mentify Prep — Regression Fixture Verification</h1>
+  <div id="test-summary" class="test-status">Running assertions...</div>
+
+  <h2>1. Desktop Width (900px)</h2>
+  <div class="fixture-box desktop-box">
+    <div id="desktop-target" class="markdown-rendered"></div>
+  </div>
+
+  <h2>2. Mobile Width (390px)</h2>
+  <div class="fixture-box mobile-box">
+    <div id="mobile-target" class="markdown-rendered"></div>
+  </div>
+
+  <script>
+    // 6-Element Comprehensive Gold-Standard Fixture:
+    // 1. 3-column table
+    // 2. Inline math (with spacing variations)
+    // 3. Matrices and aligned derivations
+    // 4. Theorem / Definition callouts with embedded display math
+    // 5. R code block (with $)
+    // 6. Normal prose
+    const FIXTURE_MARKDOWN = `
+## 2. Mathematical Formalization & Core Definitions
+
+A matrix is an ordered rectangular array of numbers arranged in rows and columns.
+We denote a matrix of dimension $m \\times n$ as $A \\in \\mathbb{R}^{m \\times n}$.
+The individual entry at row $i$ and column $j$ is denoted $a_{ij}$.
+Notice inline math with trailing space like $b_{23} $ and $b_{11} = 5$.
+
+> **Definition 2.11 (Determinant of a $2 \\times 2$ Matrix)**
+> For any square matrix $A \\in \\mathbb{R}^{2 \\times 2}$:
+> $$
+> A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}
+> $$
+> The determinant is defined by the scalar:
+> $$
+> \\det(A) = ad - bc
+> $$
+
+Here is an aligned derivation verifying the property $\\det(AB) = \\det(A)\\det(B)$:
+
+$$
+\\begin{aligned}
+\\det(AB) &= \\det(A) \\cdot \\det(B) \\\\
+&= (ad - bc)(eh - fg)
+\\end{aligned}
+$$
+
+### Matrix Properties & Operations
+
+| Operation | Algebraic Definition | R Equivalent |
+| :--- | :--- | :--- |
+| Addition | $C = A + B \\implies c_{ij} = a_{ij} + b_{ij}$ | \`A + B\` |
+| Matrix Product | $C = AB \\implies c_{ij} = \\sum_{k=1}^n a_{ik} b_{kj}$ | \`A %*% B\` |
+| Transpose | $A^T \\implies (A^T)_{ij} = a_{ji}$ | \`t(A)\` |
+
+### R Implementation
+
+In R, matrices are constructed column-by-column using the \`matrix()\` function:
+
+\`\`\`r
+# Construct a 2x2 matrix
+A <- matrix(c(4, 2, 1, 3), nrow = 2, ncol = 2, byrow = TRUE)
+det_A <- det(A)
+
+# Access columns and data frame fields with $
+df <- data.frame(id = 1:2, val = c(10, 20))
+val_col <- df$val
+print(val_col)
+\`\`\`
+`;
+
+    // Render into both containers
+    const desktopEl = document.getElementById('desktop-target');
+    const mobileEl = document.getElementById('mobile-target');
+
+    renderMarkdownWithKaTeX(FIXTURE_MARKDOWN, desktopEl);
+    renderMarkdownWithKaTeX(FIXTURE_MARKDOWN, mobileEl);
+
+    // Run Automated Assertions
+    const results = [];
+    function assert(name, condition) {
+      results.push({ name, pass: !!condition });
+    }
+
+    // 1. Table check
+    const tables = desktopEl.querySelectorAll('table');
+    assert('Table rendered', tables.length === 1);
+    if (tables.length > 0) {
+      const ths = tables[0].querySelectorAll('th');
+      assert('Table has 3 columns', ths.length === 3);
+    }
+
+    // 2. Math checks
+    const katexNodes = desktopEl.querySelectorAll('.katex');
+    assert('KaTeX rendered math elements', katexNodes.length >= 6);
+
+    const katexDisplays = desktopEl.querySelectorAll('.katex-display');
+    assert('KaTeX display equations rendered', katexDisplays.length >= 3);
+
+    // 3. Math inside Blockquote check
+    const blockquotes = desktopEl.querySelectorAll('blockquote');
+    assert('Blockquote (Callout) rendered', blockquotes.length >= 1);
+    if (blockquotes.length > 0) {
+      const bqMath = blockquotes[0].querySelectorAll('.katex-display');
+      assert('Callout contains rendered KaTeX display math (matrix)', bqMath.length >= 2);
+    }
+
+    // 4. Code block check
+    const codeBlocks = desktopEl.querySelectorAll('pre code');
+    assert('Code block rendered', codeBlocks.length >= 1);
+    if (codeBlocks.length > 0) {
+      const codeText = codeBlocks[0].textContent;
+      assert('R code preserved $ syntax (df$val)', codeText.includes('df$val'));
+    }
+
+    // 5. No raw math leaks outside .katex containers
+    const clone = desktopEl.cloneNode(true);
+    clone.querySelectorAll('.katex, pre').forEach(el => el.remove());
+    const unrenderedText = clone.textContent || '';
+    assert('No raw $$ display markers leaked', !unrenderedText.includes('$$'));
+    assert('No raw $ inline markers leaked', !unrenderedText.includes('$'));
+    assert('No raw \\begin{pmatrix} leaked', !unrenderedText.includes('\\begin{pmatrix}'));
+    assert('No raw \\begin{aligned} leaked', !unrenderedText.includes('\\begin{aligned}'));
+
+    // 6. Summary reporting
+    const summaryEl = document.getElementById('test-summary');
+    const allPass = results.every(r => r.pass);
+    summaryEl.className = 'test-status ' + (allPass ? 'status-pass' : 'status-fail');
+    summaryEl.innerHTML = (allPass ? '✓ ALL 10 ASSERTIONS PASSED' : '✗ SOME ASSERTIONS FAILED') + '<br>' +
+      results.map(r => (r.pass ? '✓ ' : '✗ ') + r.name).join('<br>');
+
+    // Log to console for headless verification
+    console.log('FIXTURE_TEST_RESULT:', JSON.stringify({ allPass, results }));
+  </script>
+</body>
+</html>

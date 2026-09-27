@@ -1,0 +1,140 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}Courses &amp; Syllabi | Mentify Prep{% endblock %}
+
+{% block extra_css %}
+<style>
+  .course-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 8px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    border-radius: var(--radius-sm);
+  }
+  .course-item-row:hover {
+    background: var(--hover);
+  }
+  .course-action-link {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--green);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.15s;
+  }
+  .course-item-row:hover .course-action-link {
+    transform: translateX(3px);
+  }
+  .search-input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input-field:focus {
+    border-color: var(--green);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+  <div>
+    <h1 style="margin-bottom: 4px; font-size: 1.6rem; letter-spacing: -0.02em;">Courses &amp; Syllabi</h1>
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem;">Search the shared course catalogue, then add the courses you want to study.</p>
+  </div>
+  <a href="{% url 'prep:upload' %}" class="btn btn-danger btn-sm" style="font-weight: 500;">
+    + Upload Material
+  </a>
+</div>
+
+<!-- Search Strip (Streamlined & Container-Free) -->
+<section style="margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border);">
+  <form method="get" action="{% url 'prep:courses' %}" style="display: flex; align-items: end; gap: 10px; flex-wrap: wrap;">
+    <div style="flex: 1 1 300px;">
+      <label for="course-search" style="display: block; margin-bottom: 6px; font-size: 0.84rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Find a course</label>
+      <input id="course-search" type="search" name="q" value="{{ search_query }}" placeholder="Search by course code or title, e.g. SMA 300 or Real Analysis"
+             class="search-input-field">
+    </div>
+    <button type="submit" class="btn btn-primary" style="padding: 10px 22px; font-weight: 500;">Search</button>
+    {% if search_query %}
+      <a href="{% url 'prep:courses' %}" class="btn btn-outline" style="padding: 10px 16px;">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if search_query %}
+    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Search Results</div>
+      {% for course in search_results %}
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 12px 4px; border-bottom: 1px solid var(--border);">
+          <div>
+            <div style="font-weight: 700; color: var(--text);">{{ course.code }}{% if course.title and course.title != course.code %} <span style="font-weight: 500; color: var(--text-muted);">&bull; {{ course.title }}</span>{% endif %}</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">{{ course.topics }} topics &bull; {{ course.papers }} past papers</div>
+          </div>
+          <form method="post" action="{% url 'prep:add_course' course_id=course.id %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-sm" style="padding: 6px 16px;">Add Course</button>
+          </form>
+        </div>
+      {% empty %}
+        {% if already_added_matches %}
+          <div style="padding: 12px 4px; color: var(--text-muted); font-size: 0.88rem;">This course is already in My Courses below.</div>
+        {% else %}
+          <div style="padding: 12px 4px; color: var(--text-muted); font-size: 0.88rem;">
+            No shared course matches &quot;{{ search_query }}&quot;. You can <a href="{% url 'prep:upload' %}" style="color: var(--green); font-weight: 600; text-decoration: none;">upload course material &rarr;</a> to create it for the platform.
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+<!-- My Courses Section -->
+<section style="margin-bottom: 32px;">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+    <div>
+      <h3 style="margin: 0 0 4px; font-size: 1.05rem; color: var(--text); font-weight: 600;">My Courses</h3>
+      <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Courses you added for quick access in your workspace.</p>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column;">
+    {% for c in courses %}
+      <div class="course-item-row">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+            <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" style="font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none;">{{ c.code }}</a>
+            {% if c.title and c.code != c.title %}
+              <span style="color: var(--text-muted);">&bull;</span>
+              <span style="font-weight: 500; color: var(--text);">{{ c.title }}</span>
+            {% endif %}
+          </div>
+          <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0;">
+            {{ c.topics }} topics &bull; {{ c.papers }} past papers{% if c.category %} &bull; {{ c.category }}{% endif %}
+          </p>
+        </div>
+        <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" class="course-action-link">
+          Open Syllabus &rarr;
+        </a>
+      </div>
+    {% empty %}
+      <div style="padding: 36px 20px; text-align: center; color: var(--text-muted); margin-top: 12px; border: 1px dashed var(--border); border-radius: var(--radius-md);">
+        <p style="margin: 0 0 8px; color: var(--text); font-weight: 600;">Your course list is empty.</p>
+        <p style="margin: 0; font-size: 0.88rem;">Use the search above to find and add a course, or upload new syllabus materials.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

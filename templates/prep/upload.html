@@ -1,0 +1,208 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}Upload Documents | Mentify Prep{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Find or Add a Course</h1>
+  <p style="margin: 0; color: var(--text-muted);">Search the Mentify Prep catalogue first. Add an existing course to your list, or upload material only when it is missing.</p>
+</div>
+
+<section class="card mb-xl" style="padding: 20px;">
+  <form method="get" action="{% url 'prep:upload' %}" style="display: flex; align-items: end; gap: 10px; flex-wrap: wrap;">
+    <div style="flex: 1 1 280px;">
+      <label for="course-search" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Search by course code, title, or discipline</label>
+      <input type="search" id="course-search" name="q" value="{{ search_query }}" placeholder="e.g. SMA 300, real analysis, statistics"
+             style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
+    </div>
+    <button type="submit" class="btn btn-primary" style="padding: 9px 20px;">Search Courses</button>
+    {% if search_query %}
+      <a href="{% url 'prep:upload' %}" class="btn btn-outline">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if search_query %}
+    <div style="margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px;">
+      {% for course in matching_courses %}
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border);">
+          <div>
+            <div style="font-weight: 700; color: var(--text);">{{ course.code }}{% if course.title and course.title != course.code %} <span style="font-weight: 500; color: var(--text-muted);">&bull; {{ course.title }}</span>{% endif %}</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">{{ course.level }} &bull; {{ course.topics_count }} topics &bull; {{ course.papers_count }} papers</div>
+          </div>
+          {% if course.is_added %}
+            <button type="button" class="btn btn-outline btn-sm" disabled style="opacity: 0.7; cursor: default;">Already Added</button>
+          {% else %}
+            <form method="post" action="{% url 'prep:add_course' course_id=course.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'prep:course_detail' course_code=course.slug|default:course.code %}">
+              <button type="submit" class="btn btn-primary btn-sm">Add to My Courses</button>
+            </form>
+          {% endif %}
+        </div>
+      {% empty %}
+        <div style="padding: 8px 0 2px; color: var(--text-muted); font-size: 0.9rem;">No matching catalogue course was found.</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if not search_query %}
+    <div style="margin-top: 12px; color: var(--text-muted); font-size: 0.85rem;">Search before uploading so you do not duplicate a course that is already available.</div>
+  {% endif %}
+</section>
+
+{% if show_upload_form %}
+<!-- Upload form is available only after a catalogue search has no match. -->
+<div class="card mb-xl">
+  <div style="padding: 18px 20px 0;">
+    <h2 style="font-size: 1.15rem; margin: 0 0 4px;">Upload Material for a New Course</h2>
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">The new course becomes part of the shared Mentify Prep catalogue. Its uploaded material is still reviewed before publication.</p>
+  </div>
+  <form method="post" enctype="multipart/form-data" id="upload-doc-form" onsubmit="return validateForm()">
+    {% csrf_token %}
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px;">
+      <!-- Course Code / Title -->
+      <div>
+        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Course Code & Title *</label>
+        <input type="text" name="course_name" id="course_name" required placeholder="e.g. SMA 300 - Real Analysis I" 
+               style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
+      </div>
+
+      <!-- Document Type Selection -->
+      <div>
+        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Document Type *</label>
+        <select name="doc_type" id="doc_type" required 
+                style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
+          <option value="Lecture Notes">Lecture Notes / Module</option>
+          <option value="Continuous Assessment Test (CAT)">Continuous Assessment Test (CAT)</option>
+          <option value="Final Examination Paper">Final Examination Past Paper</option>
+          <option value="Revision Sheet">Revision Exercises / Tutorial</option>
+        </select>
+      </div>
+
+      <!-- Academic Year / Period -->
+      <div>
+        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Academic Year / Period *</label>
+        <input type="text" name="academic_year" id="academic_year" required placeholder="e.g. 2024/2025 Semester 1" 
+               style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
+      </div>
+
+      <!-- Topic / Unit Covered (Optional) -->
+      <div>
+        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Topic / Unit Covered <span style="font-weight: 400; color: var(--text-muted);">(optional)</span></label>
+        <input type="text" name="topic_name" id="topic_name" placeholder="e.g. Metric Spaces, or Full Syllabus" 
+               style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
+      </div>
+    </div>
+
+    <!-- Document File Input -->
+    <div style="margin-bottom: 20px; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <label style="font-weight: 600; font-size: 0.9rem; color: var(--text); display: block; margin-bottom: 2px;">Attach Document (PDF, Word, or Markdown) *</label>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Supports PDF (.pdf), Word (.docx), and Markdown notes (.md, .txt) up to 15 MB</span>
+        </div>
+        <input type="file" name="file" id="prep-file" accept=".pdf,.docx,.doc,.md,.txt" required onchange="checkFileSize(this)">
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <span class="badge badge-danger" style="font-size: 0.78rem;">
+        15 MB Maximum File Size
+      </span>
+      <button type="submit" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger); padding: 9px 24px;">
+        Upload
+      </button>
+    </div>
+  </form>
+</div>
+{% elif search_query and matching_courses %}
+<div style="margin: -8px 0 28px; font-size: 0.88rem; color: var(--text-muted);">
+  Found your course? Add it above. If it is not the right course, <a href="{% url 'prep:upload' %}?q={{ search_query|urlencode }}&upload=1" style="color: var(--green); font-weight: 600;">upload material for a new course</a>.
+</div>
+{% endif %}
+
+<!-- Verification & Processing Steps Flow -->
+<section id="how-it-works" style="margin-top: 32px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 22px; box-shadow: var(--shadow);">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+    <div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+        <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px;">
+          PROCESS
+        </span>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text);">What Happens After You Upload?</h3>
+      </div>
+      <p style="margin: 0; color: var(--text-muted); font-size: 0.84rem;">Your document moves through 3 simple steps before it is ready for your revision.</p>
+    </div>
+    <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-muted); background: var(--surface); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border);">
+      3 Steps to Revision
+    </span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+    <!-- Step 1 -->
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(15, 118, 110, 0.12); color: var(--green); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <span style="font-size: 0.72rem; font-weight: 700; color: var(--green); letter-spacing: 0.5px;">STEP 01</span>
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 4px;">Document Processing</div>
+        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">We scan your file to organize questions, lecture notes, and syllabus topics.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(217, 48, 37, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span style="font-size: 0.72rem; font-weight: 700; color: var(--danger); letter-spacing: 0.5px;">STEP 02</span>
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 4px;">Tutor Review</div>
+        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">A tutor checks questions and formulas for accuracy and matches them to your syllabus.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(28, 133, 232, 0.1); color: var(--blue); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </div>
+        <span style="font-size: 0.72rem; font-weight: 700; color: var(--blue); letter-spacing: 0.5px;">STEP 03</span>
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 4px;">Ready to Study</div>
+        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">Materials are added directly to your course topics, with an alert on your dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function checkFileSize(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const maxBytes = 15 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        alert("The selected file exceeds the 15 MB limit. Please select a smaller PDF file.");
+        input.value = "";
+      }
+    }
+  }
+
+  function validateForm() {
+    const fileInput = document.getElementById('prep-file');
+    if (!fileInput.files || !fileInput.files[0]) {
+      alert("Please select a PDF file.");
+      return false;
+    }
+    return true;
+  }
+</script>
+{% endblock %}

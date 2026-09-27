@@ -1,0 +1,1429 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}{{ topic.title }} — Study & Practice | Mentify Prep{% endblock %}
+
+{% block extra_css %}
+<style>
+  .study-tab-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .study-tab-btn.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+    font-weight: 700;
+  }
+  .study-tab-btn:hover:not(.active) {
+    color: var(--text);
+  }
+
+  /* Export PDF Split Button */
+  .export-pdf-btn-group {
+    display: inline-flex;
+    align-items: stretch;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.15s ease-in-out;
+  }
+  .export-pdf-btn-group:hover {
+    border-color: var(--danger);
+    box-shadow: 0 4px 14px rgba(217, 48, 37, 0.16);
+  }
+  body.dark-theme .export-pdf-btn-group {
+    background: #1e1e1e;
+    border-color: #383838;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  }
+  body.dark-theme .export-pdf-btn-group:hover {
+    border-color: var(--danger);
+    box-shadow: 0 4px 16px rgba(217, 48, 37, 0.25);
+  }
+  .export-pdf-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .export-pdf-action-btn:hover {
+    background: var(--hover);
+  }
+  .export-pdf-icon-wrap {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background: rgba(217, 48, 37, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .export-pdf-badge {
+    background: rgba(217, 48, 37, 0.1);
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(217, 48, 37, 0.2);
+  }
+  .export-pdf-chevron-btn {
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+  }
+  .export-pdf-chevron-btn:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+  .export-pdf-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    z-index: 100;
+    min-width: 270px;
+    padding: 4px 0;
+  }
+  body.dark-theme .export-pdf-menu {
+    background: #1e1e1e;
+    border-color: #383838;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  /* High-Contrast Level Selector Buttons & Toolbar */
+  .level-selector-toolbar {
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+  }
+  body.dark-theme .level-selector-toolbar {
+    background: #181818;
+    border-color: #2e2e2e;
+  }
+
+  .level-btn {
+    padding: 7px 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: all .15s ease-in-out;
+  }
+  .level-btn:hover:not(.active) {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .level-btn.active {
+    background: var(--green) !important;
+    color: #ffffff !important;
+    border-color: var(--green) !important;
+    font-weight: 600;
+  }
+  body.dark-theme .level-btn {
+    background: #1e1e1e;
+    color: #e4e4e4;
+    border-color: #333333;
+  }
+  body.dark-theme .level-btn:hover:not(.active) {
+    border-color: #2dd4bf;
+    color: #2dd4bf;
+  }
+  body.dark-theme .level-btn.active {
+    background: #0f766e !important;
+    color: #ffffff !important;
+    border-color: #2dd4bf !important;
+  }
+
+  .subtopic-chip {
+    font-size: 0.78rem;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+  }
+  body.dark-theme .subtopic-chip {
+    background: #1e1e1e;
+    border-color: #333;
+    color: #ddd;
+  }
+
+  .count-pill {
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--text);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .count-pill.active {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+    font-weight: 600;
+  }
+  body.dark-theme .count-pill {
+    background: #1e1e1e;
+    color: #e4e4e4;
+    border-color: #333;
+  }
+  body.dark-theme .count-pill.active {
+    background: #0f766e;
+    color: #fff;
+    border-color: #2dd4bf;
+  }
+
+  .reading-pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .reading-bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .page-pill {
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--white);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .page-pill:hover:not(.active) {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .page-pill.active {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+    font-weight: 600;
+  }
+  body.dark-theme .page-pill {
+    background: #1e1e1e;
+    color: #a1a1a1;
+    border-color: #333;
+  }
+  body.dark-theme .page-pill.active {
+    background: #0f766e;
+    color: #fff;
+    border-color: #2dd4bf;
+  }
+
+  /* Structured Block University Callouts */
+  .prep-callout {
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    margin: 20px 0;
+    border-left: 4px solid var(--border);
+    background: var(--surface);
+  }
+  .prep-callout-theorem {
+    border-left-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .prep-callout-definition {
+    border-left-color: var(--green);
+    background: rgba(45, 212, 191, 0.05);
+  }
+  .prep-callout-proof {
+    border-left-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.05);
+  }
+  .prep-callout-example {
+    border-left-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.05);
+  }
+  .prep-callout-warning {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+  }
+  .prep-callout-insight {
+    border-left-color: #06b6d4;
+    background: rgba(6, 182, 212, 0.05);
+  }
+  .prep-callout-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .prep-callout-body {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  /* Structured Block Tables */
+  .table-responsive {
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .prep-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    background: var(--surface);
+  }
+  .prep-table th, .prep-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+  .prep-table th {
+    background: var(--surface);
+    font-weight: 700;
+    color: var(--text);
+  }
+  .prep-table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+  body.dark-theme .prep-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* Authentic Examination Problem Cards */
+  .exam-question-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .exam-question-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+  }
+  body.dark-theme .exam-question-card {
+    background: #181818;
+    border-color: #333333;
+    border-left-color: #2dd4bf;
+  }
+  .exam-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .exam-q-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .exam-paper-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .exam-problem-box {
+    font-size: 0.98rem;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  body.dark-theme .exam-problem-box {
+    background: #121212;
+    border-color: #2a2a2a;
+  }
+  .exam-actions-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .exam-solution-box {
+    margin-top: 18px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: var(--radius);
+  }
+  body.dark-theme .exam-solution-box {
+    background: #141414;
+    border-color: #2e2e2e;
+    border-left-color: #2dd4bf;
+  }
+
+  /* Clean Markdown Rendering Styles with Multi-Line Spacing */
+  .markdown-rendered {
+    line-height: 1.85;
+    color: var(--text);
+    font-size: 0.96rem;
+  }
+  .markdown-rendered h1 {
+    font-size: 1.4rem;
+    margin-top: 26px;
+    margin-bottom: 16px;
+    color: var(--text);
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    line-height: 1.3;
+  }
+  .markdown-rendered h2 {
+    font-size: 1.25rem;
+    margin-top: 28px;
+    margin-bottom: 14px;
+    color: var(--green);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  body.dark-theme .markdown-rendered h1,
+  body.dark-theme .markdown-rendered h2 {
+    color: #2dd4bf !important;
+  }
+  .markdown-rendered h3,
+  .markdown-rendered h4,
+  .markdown-rendered h5,
+  .markdown-rendered h6 {
+    font-size: 1.08rem;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  body.dark-theme .markdown-rendered h3,
+  body.dark-theme .markdown-rendered h4,
+  body.dark-theme .markdown-rendered h5,
+  body.dark-theme .markdown-rendered h6 {
+    color: #f1f5f9 !important;
+  }
+  .markdown-rendered p {
+    margin-bottom: 16px;
+    line-height: 1.8;
+  }
+  .markdown-rendered ul, .markdown-rendered ol {
+    margin-left: 24px;
+    margin-bottom: 16px;
+  }
+  .markdown-rendered li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+  }
+  /* Task List & Checkbox Styling */
+  .markdown-rendered ul:has(input[type="checkbox"]) {
+    list-style: none !important;
+    padding-left: 4px !important;
+    margin-left: 0 !important;
+  }
+  .markdown-rendered li:has(input[type="checkbox"]) {
+    list-style: none !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .markdown-rendered input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 17px;
+    height: 17px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    cursor: default;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .markdown-rendered input[type="checkbox"]:checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  body.dark-theme .markdown-rendered input[type="checkbox"] {
+    background: #262626;
+    border-color: #555;
+  }
+  body.dark-theme .markdown-rendered input[type="checkbox"]:checked {
+    background: #0f766e;
+    border-color: #2dd4bf;
+  }
+  .markdown-rendered hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+  .markdown-rendered pre {
+    background: #1e1e1e !important;
+    color: #f3f4f6 !important;
+    padding: 16px 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin: 16px 0;
+    border: 1px solid #333333;
+  }
+  .markdown-rendered code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.88em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.06);
+    color: var(--text);
+  }
+  body.dark-theme .markdown-rendered code {
+    background: rgba(255,255,255,0.1);
+    color: #e4e4e4;
+  }
+  .markdown-rendered pre code {
+    background: transparent !important;
+    padding: 0 !important;
+    color: inherit !important;
+    border: none;
+  }
+  .markdown-rendered blockquote {
+    border-left: 4px solid var(--green);
+    background: var(--surface);
+    padding: 12px 18px;
+    margin: 18px 0;
+    color: var(--text);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(150, 150, 150, 0.25) transparent;
+  }
+  .markdown-rendered blockquote::-webkit-scrollbar {
+    height: 4px;
+  }
+  .markdown-rendered blockquote::-webkit-scrollbar-thumb {
+    background: rgba(150, 150, 150, 0.25);
+    border-radius: 4px;
+  }
+  .markdown-rendered blockquote::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  body.dark-theme .markdown-rendered blockquote {
+    background: #1a1a1a;
+    border-left-color: #2dd4bf;
+  }
+  .markdown-rendered .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 0;
+    margin: 12px 0;
+    max-width: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(150, 150, 150, 0.25) transparent;
+  }
+  .markdown-rendered .katex-display::-webkit-scrollbar {
+    height: 4px;
+  }
+  .markdown-rendered .katex-display::-webkit-scrollbar-thumb {
+    background: rgba(150, 150, 150, 0.25);
+    border-radius: 4px;
+  }
+  .markdown-rendered .katex-display::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .markdown-rendered table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.9rem;
+  }
+  .markdown-rendered th, .markdown-rendered td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+  .markdown-rendered th {
+    background: var(--surface);
+    font-weight: 600;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+  <div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+      <a href="{% url 'prep:courses' %}" style="color: var(--green);">Courses</a> &rarr; 
+      <a href="{% url 'prep:course_detail' course_code=topic.course_code %}" style="color: var(--green);">{{ topic.course_code }}</a> &rarr; 
+      {{ topic.title }}
+    </div>
+    <h1 style="margin-bottom: 4px;">{{ topic.title }}</h1>
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem;">{{ topic.course_code }}{% if topic.course_title and topic.course_code != topic.course_title %} &bull; {{ topic.course_title }}{% endif %}</p>
+    {% if subtopics %}
+    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+      {% for st in subtopics %}
+      <span class="subtopic-chip">{{ st }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+    <!-- PDF Export with Dynamic Level Selection (Prominent High-Contrast) -->
+    <div style="position: relative; display: inline-flex;" id="export-pdf-container">
+      <div class="export-pdf-btn-group">
+        <a id="export-pdf-main-btn" href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_2" class="export-pdf-action-btn">
+          <div class="export-pdf-icon-wrap">
+            <svg width="15" height="15" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <span style="font-weight: 700; font-size: 0.88rem; color: var(--text);">Export PDF Study Pack</span>
+          <span id="export-pdf-level-badge" class="export-pdf-badge">Level 2</span>
+        </a>
+        <button type="button" class="export-pdf-chevron-btn" onclick="togglePdfLevelMenu(event)" title="Select tone level to export" aria-label="Select export level">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+
+      <div id="pdf-level-dropdown" class="export-pdf-menu">
+        <div style="padding: 8px 16px 6px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border);">
+          Select Export Level
+        </div>
+        <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_1" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight: 600;">Level 1: Intuition &amp; Basics</span>
+          <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+        </a>
+        <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_2" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight: 600;">Level 2: University Standard</span>
+          <span class="badge badge-accent" style="font-size: 0.68rem; padding: 2px 6px;">DEFAULT</span>
+        </a>
+        <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_3" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight: 600;">Level 3: Exam Mode &amp; High Yield</span>
+          <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+        </a>
+        <div style="height: 1px; margin: 4px 0; background: var(--border);"></div>
+        <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?section=questions_answers" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight: 600;">Questions &amp; Answers</span>
+          <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">PDF</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 3 Core Pillar Navigation Tabs (Tabs with Red SVGs) ───────────────────── -->
+<div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 8px;">
+  <button type="button" class="study-tab-btn {% if active_subtab == 'notes' %}active{% endif %}" onclick="switchPillarTab('notes')">
+    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    Topic Notes &amp; Explanations
+  </button>
+  <button type="button" class="study-tab-btn {% if active_subtab == 'past_questions' %}active{% endif %}" onclick="switchPillarTab('past_questions')">
+    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+    Authentic Past Questions ({{ authentic_questions|length }})
+  </button>
+  <button type="button" class="study-tab-btn {% if active_subtab == 'practice' %}active{% endif %}" onclick="switchPillarTab('practice')">
+    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+    Practice &amp; Variant Generator
+  </button>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     PILLAR 1: TOPIC NOTES & EXPLANATIONS (WITH LEVEL SELECTOR & MULTI-PAGE MODE)
+     ══════════════════════════════════════════════════════════════════════════════ -->
+<div id="pillar-notes" style="display: {% if active_subtab == 'notes' %}block{% else %}none{% endif %};">
+  <!-- Level Selector Bar (Refined Contrast, No Verified Academic Notes text) -->
+  <div class="level-selector-toolbar">
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+        Tone &amp; Depth:
+      </span>
+      <button type="button" class="level-btn" id="btn-lvl-1" onclick="loadNotesLevel('level_1')">
+        Level 1: Intuition &amp; Basics
+      </button>
+      <button type="button" class="level-btn active" id="btn-lvl-2" onclick="loadNotesLevel('level_2')">
+        Level 2: University Standard
+      </button>
+      <button type="button" class="level-btn" id="btn-lvl-3" onclick="loadNotesLevel('level_3')">
+        Level 3: Exam Mode &amp; High Yield
+      </button>
+    </div>
+
+    <div id="notes-status-badge" style="{% if initial_notes_stale %}display: block; font-size: 0.82rem; color: var(--text-muted);{% else %}display: none;{% endif %}">{% if initial_notes_stale %}Showing the latest validated version while an updated version is unavailable.{% endif %}</div>
+  </div>
+
+  <!-- 5-Page Navigation Bar (Top) -->
+  <div id="notes-pagination" class="reading-pagination-bar" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Study Notes:</span>
+      <span id="reading-page-indicator" class="badge badge-accent" style="font-size: 0.82rem; padding: 4px 12px; font-weight: 600;">Page 1 of 5</span>
+    </div>
+
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button type="button" class="btn btn-outline btn-sm" id="btn-prev-page" onclick="changeNotePage(-1)" disabled>&larr; Previous Page</button>
+      <button type="button" class="btn btn-outline btn-sm" id="btn-next-page" onclick="changeNotePage(1)">Next Page &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Notes Content Canvas -->
+  <div class="card" style="padding: 28px; min-height: 320px;">
+    <div id="notes-loading" style="display: none; text-align: center; padding: 48px 0;">
+      <div style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">
+        Synthesizing explanation for this level...
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        Formulating rigorous university definitions, theorems, and worked examples.
+      </div>
+    </div>
+
+    <!-- Rendered Markdown + KaTeX Container -->
+    <div id="notes-body" class="markdown-rendered">
+      <!-- Injected client-side with parsed markdown and KaTeX -->
+    </div>
+
+    <!-- Bottom Page Navigation for smooth flipping -->
+    <div id="notes-bottom-pagination" class="reading-bottom-nav" style="display: none;">
+      <button type="button" class="btn btn-outline btn-sm" id="bottom-btn-prev-page" onclick="changeNotePage(-1)" disabled>&larr; Previous Page</button>
+      <span id="bottom-page-indicator" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);"></span>
+      <button type="button" class="btn btn-outline btn-sm" id="bottom-btn-next-page" onclick="changeNotePage(1)">Next Page &rarr;</button>
+    </div>
+
+    <!-- Footer Action -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); margin-top: 32px; padding-top: 16px;">
+      <a href="{% url 'prep:course_detail' course_code=topic.course_code %}" class="btn btn-outline btn-sm">&larr; Back to Topics</a>
+      <button type="button" class="btn btn-primary btn-sm" style="background: var(--green); border-color: var(--green);" onclick="switchPillarTab('past_questions')">
+        View Authentic Past Questions &rarr;
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     PILLAR 2: AUTHENTIC PAST EXAMINATION QUESTIONS
+     ══════════════════════════════════════════════════════════════════════════════ -->
+<div id="pillar-past_questions" style="display: {% if active_subtab == 'past_questions' %}block{% else %}none{% endif %};">
+  <div class="card mb-lg" style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <h3 style="font-size: 1rem; margin: 0 0 4px 0; color: var(--text);">Authentic Assessment Problems</h3>
+      <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Verified examination problems strictly mapped to this syllabus topic.</p>
+    </div>
+    <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">{{ authentic_questions|length }} QUESTIONS INDEXED</span>
+  </div>
+
+  <div id="authentic-questions-container">
+    {% if authentic_questions %}
+      {% for q in authentic_questions %}
+      <div class="exam-question-card" id="auth-card-{{ q.id }}">
+        <!-- Header -->
+        <div class="exam-card-header">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="badge" style="background: #0f766e; color: #fff; font-size: 0.72rem; padding: 3px 8px; font-weight: 700; letter-spacing: 0.5px;">
+              OFFICIAL PAST EXAM
+            </span>
+            <span class="exam-q-title">
+              Question {{ q.number }}
+            </span>
+            <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">
+              {{ q.marks }} MARKS
+            </span>
+          </div>
+          <div class="exam-paper-meta">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>{{ q.paper_title }} &bull; {{ q.year }}</span>
+          </div>
+        </div>
+
+        <!-- Problem Statement Canvas -->
+        <div class="exam-problem-box markdown-rendered" id="auth-q-content-{{ q.id }}">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Actions -->
+        <div class="exam-actions-row">
+          <button type="button" class="btn btn-outline btn-sm" onclick="toggleSolution('auth-sol-{{ q.id }}', '{{ q.id }}')">
+            Reveal Verified Solution &amp; Marking Rubric
+          </button>
+          <button type="button" class="btn btn-sm" style="background: var(--green); color: #fff; border: 1px solid var(--green);" onclick="deriveR1Proof('{{ q.id }}', '{{ topic.course_code }}', '{{ topic.title }}')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            View Step-by-Step Proof &amp; Solution
+          </button>
+        </div>
+
+        <!-- Solution Box -->
+        <div id="auth-sol-{{ q.id }}" class="exam-solution-box" style="display: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <span style="font-size: 0.88rem; font-weight: 700; color: var(--green); display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              Step-by-Step Verified Solution &amp; Marking Scheme:
+            </span>
+            <span class="badge badge-accent" style="font-size: 0.72rem;">Verified Answer</span>
+          </div>
+          <div id="auth-sol-content-{{ q.id }}" class="markdown-rendered">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="card" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+        <p style="margin-bottom: 8px; font-size: 1rem; color: var(--text); font-weight: 600;">No authentic past questions linked directly to this topic yet.</p>
+        <p style="font-size: 0.85rem; margin-bottom: 20px;">You can upload additional examination papers in the upload tab, or generate similar examination questions below.</p>
+        <button type="button" class="btn btn-primary btn-sm" style="background: var(--green); border-color: var(--green);" onclick="switchPillarTab('practice')">
+          Go to Practice Question Generator &rarr;
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     PILLAR 3: PRACTICE & SIMILAR QUESTION GENERATOR (1 TO 5 QUESTIONS PER RUN)
+     ══════════════════════════════════════════════════════════════════════════════ -->
+<div id="pillar-practice" style="display: {% if active_subtab == 'practice' %}block{% else %}none{% endif %};">
+  <div class="card mb-lg" style="padding: 22px;">
+    <div style="margin-bottom: 16px;">
+      <h3 style="margin-bottom: 4px; color: var(--text);">Academic Practice Variant Generator</h3>
+      <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">
+        Generate between 1 and 5 examination-style practice questions calibrated to this topic's authentic past papers, with complete step-by-step answers and marking rubrics.
+      </p>
+    </div>
+
+    <!-- Interactive Question Count Selector (1 to 5) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-right: 4px;">Select Count:</span>
+        <button type="button" class="count-pill" onclick="selectQuestionCount(1, this)">1 Question</button>
+        <button type="button" class="count-pill" onclick="selectQuestionCount(2, this)">2 Questions</button>
+        <button type="button" class="count-pill active" onclick="selectQuestionCount(3, this)">3 Questions (Recommended)</button>
+        <button type="button" class="count-pill" onclick="selectQuestionCount(4, this)">4 Questions</button>
+        <button type="button" class="count-pill" onclick="selectQuestionCount(5, this)">5 Questions</button>
+      </div>
+
+      <button type="button" id="btn-generate-practice" class="btn btn-primary btn-sm" style="background: var(--green); border-color: var(--green); padding: 8px 20px; font-weight: 600;" onclick="runPracticeGeneration()">
+        Generate Similar Questions
+      </button>
+    </div>
+
+    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;">
+      Synthesized variants adhere strictly to curriculum standards &bull; Balance: <strong id="wallet-balance-indicator">{{ user_credits|default:30 }}</strong> Credits
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="practice-loading" style="display: none; text-align: center; padding: 48px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px;">
+    <div style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">
+      Generating examination-style practice variants...
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+      Analyzing syllabus patterns, formulating syllabus-standard problems, and preparing step-by-step LaTeX proofs.
+    </div>
+  </div>
+
+  <!-- Practice Questions Canvas -->
+  <div id="practice-container">
+    <div id="practice-list">
+      {% if generated_questions %}
+        {% for q in generated_questions %}
+        <div class="exam-question-card" id="gen-card-{{ q.id }}">
+          <div class="exam-card-header">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="badge" style="background: #1c85e8; color: #fff; font-size: 0.72rem; padding: 3px 8px; font-weight: 700;">
+                PRACTICE VARIANT
+              </span>
+              <span class="exam-q-title">
+                Question {{ q.number }}
+              </span>
+              <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">
+                {{ q.marks }} MARKS
+              </span>
+            </div>
+            <span class="badge badge-outline" style="font-size: 0.72rem;">{{ q.topic_label }}</span>
+          </div>
+
+          <div class="exam-problem-box markdown-rendered" id="gen-q-content-{{ q.id }}">
+            <!-- Rendered via JS -->
+          </div>
+
+          <div class="exam-actions-row">
+            <button type="button" class="btn btn-outline btn-sm" onclick="toggleSolution('gen-sol-{{ q.id }}', '{{ q.id }}')">
+              View Step-by-Step Answer &amp; Rubric
+            </button>
+          </div>
+
+          <div id="gen-sol-{{ q.id }}" class="exam-solution-box" style="display: none;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: var(--green); margin-bottom: 8px;">
+              Step-by-Step Solution &amp; Marking Scheme:
+            </div>
+            <div id="gen-sol-content-{{ q.id }}" class="markdown-rendered">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div id="practice-empty-state" class="card" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+          <p style="margin-bottom: 8px; font-size: 1rem; font-weight: 600; color: var(--text);">No practice questions generated for this topic yet.</p>
+          <p style="font-size: 0.85rem; margin-bottom: 20px;">Select how many questions you want (1 to 5) above and click "Generate Similar Questions".</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Raw Safe Data Storage -->
+{{ initial_notes|json_script:"initial-notes-data" }}
+{{ initial_notes_error|json_script:"initial-notes-error-data" }}
+{{ authentic_questions|json_script:"authentic-questions-data" }}
+{{ generated_questions|json_script:"generated-questions-data" }}
+
+<script>
+  let selectedCount = 3;
+  const topicId = "{{ topic.id }}";
+  const courseCode = "{{ topic.course_code }}";
+  const topicTitle = "{{ topic.title }}";
+
+  // ─── 5-Page Syllabus Notes Navigation State ─────────────────────────────
+  let notePages = [];
+  let currentPageIndex = 0;
+  let currentNotesText = "";
+  let notesUnavailableMessage = "No validated notes are available for this topic yet.";
+
+  function splitNotesIntoPages(rawNotes) {
+    if (!rawNotes) return [''];
+    let text = '';
+    if (typeof rawNotes === 'string') {
+      text = rawNotes;
+    } else if (rawNotes && typeof rawNotes === 'object') {
+      text = rawNotes.content || '';
+    }
+    text = text.replace(/\\n(?![a-zA-Z])/g, '\n').trim();
+
+    // Split strictly by the 5 canonical syllabus sections: ## 1., ## 2., ## 3., ## 4., ## 5.
+    // Negative lookahead (?!\d) ensures subsections like ## 2.1, ## 2.2 do NOT split into separate pages
+    let parts = text.split(/\n(?=##\s+[1-5]\.\s+(?!\d))/g);
+    if (parts.length > 1) {
+      if (!parts[0].match(/^##\s+1\.\s+/m) && parts.length >= 2) {
+        parts[1] = parts[0] + "\n\n" + parts[1];
+        parts.shift();
+      }
+      return parts.map(p => p.trim()).filter(Boolean);
+    }
+
+    // Fallback: split by any single-digit ## section
+    let fallbackParts = text.split(/\n(?=##\s+\d+\.\s+(?!\d))/g);
+    if (fallbackParts.length > 1) {
+      if (!fallbackParts[0].match(/^##\s+\d+\.\s+/m) && fallbackParts.length >= 2) {
+        fallbackParts[1] = fallbackParts[0] + "\n\n" + fallbackParts[1];
+        fallbackParts.shift();
+      }
+      return fallbackParts.map(p => p.trim()).filter(Boolean);
+    }
+
+    return [text];
+  }
+
+  function setupNotesPagination(notesText) {
+    currentNotesText = notesText || "";
+    // Keep the original single reading surface. The legacy page splitter is
+    // retained only for compatibility with existing function calls.
+    notePages = [currentNotesText];
+    currentPageIndex = 0;
+    renderCurrentNotePage();
+  }
+
+  function renderCurrentNotePage() {
+    const bodyEl = document.getElementById('notes-body');
+    const paginationControls = document.getElementById('notes-pagination');
+    const bottomNav = document.getElementById('notes-bottom-pagination');
+    const pageIndicator = document.getElementById('reading-page-indicator');
+    const bottomIndicator = document.getElementById('bottom-page-indicator');
+    const prevBtn = document.getElementById('btn-prev-page');
+    const nextBtn = document.getElementById('btn-next-page');
+    const bottomPrevBtn = document.getElementById('bottom-btn-prev-page');
+    const bottomNextBtn = document.getElementById('bottom-btn-next-page');
+
+    if (!notePages || notePages.length <= 1) {
+      if (paginationControls) paginationControls.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
+      if (!currentNotesText) {
+        bodyEl.replaceChildren();
+        const notice = document.createElement('div');
+        notice.className = 'alert alert-error';
+        notice.setAttribute('role', 'alert');
+        notice.style.margin = '0';
+
+        const title = document.createElement('strong');
+        title.textContent = 'Notes are unavailable.';
+        const detail = document.createElement('p');
+        detail.style.margin = '8px 0 0';
+        detail.textContent = notesUnavailableMessage;
+        notice.append(title, detail);
+        bodyEl.appendChild(notice);
+        return;
+      }
+      renderMarkdownWithKaTeX(currentNotesText, bodyEl);
+      return;
+    }
+
+    // Active 5-Page Mode
+    if (paginationControls) paginationControls.style.display = 'flex';
+    if (bottomNav) bottomNav.style.display = 'flex';
+
+    const totalPages = notePages.length;
+    const pageText = `Page ${currentPageIndex + 1} of ${totalPages}`;
+    if (pageIndicator) pageIndicator.textContent = pageText;
+    if (bottomIndicator) bottomIndicator.textContent = pageText;
+
+    if (prevBtn) prevBtn.disabled = (currentPageIndex === 0);
+    if (nextBtn) nextBtn.disabled = (currentPageIndex === totalPages - 1);
+    if (bottomPrevBtn) bottomPrevBtn.disabled = (currentPageIndex === 0);
+    if (bottomNextBtn) bottomNextBtn.disabled = (currentPageIndex === totalPages - 1);
+
+    renderMarkdownWithKaTeX(notePages[currentPageIndex], bodyEl);
+  }
+
+  function changeNotePage(delta) {
+    const newIndex = currentPageIndex + delta;
+    if (newIndex >= 0 && newIndex < notePages.length) {
+      currentPageIndex = newIndex;
+      renderCurrentNotePage();
+      const topBar = document.getElementById('notes-pagination');
+      if (topBar) topBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // ─── Tab Switching ────────────────────────────────────────────────────────
+  function switchPillarTab(tabName) {
+    document.querySelectorAll('.study-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('pillar-notes').style.display = 'none';
+    document.getElementById('pillar-past_questions').style.display = 'none';
+    document.getElementById('pillar-practice').style.display = 'none';
+
+    if (tabName === 'notes') {
+      document.querySelector('[onclick="switchPillarTab(\'notes\')"]').classList.add('active');
+      document.getElementById('pillar-notes').style.display = 'block';
+    } else if (tabName === 'past_questions') {
+      document.querySelector('[onclick="switchPillarTab(\'past_questions\')"]').classList.add('active');
+      document.getElementById('pillar-past_questions').style.display = 'block';
+    } else if (tabName === 'practice') {
+      document.querySelector('[onclick="switchPillarTab(\'practice\')"]').classList.add('active');
+      document.getElementById('pillar-practice').style.display = 'block';
+    }
+  }
+
+  // ─── Solution Toggler with Robust Mapping ──────────────────────────────────
+  const authQuestionsMap = {};
+  const genQuestionsMap = {};
+
+  function toggleSolution(elementId, qId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const isHidden = (el.style.display === 'none' || !el.style.display);
+    el.style.display = isHidden ? 'block' : 'none';
+
+    if (isHidden && qId) {
+      const cleanId = String(qId).replace(/^gen-/, '');
+      const contentEl = document.getElementById(elementId.replace('auth-sol-', 'auth-sol-content-').replace('gen-sol-', 'gen-sol-content-'));
+      if (contentEl && !contentEl.dataset.rendered) {
+        let sol = "";
+        if (authQuestionsMap[cleanId]) {
+          sol = authQuestionsMap[cleanId].solution_latex;
+        } else if (genQuestionsMap[cleanId]) {
+          sol = genQuestionsMap[cleanId].solution_latex;
+        }
+        if (sol) {
+          renderMarkdownWithKaTeX(sol, contentEl);
+          contentEl.dataset.rendered = "true";
+        }
+      }
+    }
+  }
+
+  function selectQuestionCount(count, btnElement) {
+    selectedCount = count;
+    document.querySelectorAll('.count-pill').forEach(pill => pill.classList.remove('active'));
+    btnElement.classList.add('active');
+  }
+
+  // ─── PDF Export Helper for Dynamic Level ──────────────────────────────────
+  let currentActiveLevel = 'level_2';
+
+  function updateExportPdfButton(level) {
+    currentActiveLevel = level;
+    const mainBtn = document.getElementById('export-pdf-main-btn');
+    const badge = document.getElementById('export-pdf-level-badge');
+    if (mainBtn && badge) {
+      const baseExportUrl = "{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}";
+      mainBtn.href = `${baseExportUrl}?level=${level}`;
+      const labelMap = {
+        'level_1': 'Level 1',
+        'level_2': 'Level 2',
+        'level_3': 'Level 3',
+      };
+      badge.textContent = labelMap[level] || 'Level 2';
+    }
+  }
+
+  function togglePdfLevelMenu(e) {
+    if (e) e.stopPropagation();
+    const dropdown = document.getElementById('pdf-level-dropdown');
+    if (dropdown) {
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('pdf-level-dropdown');
+    const container = document.getElementById('export-pdf-container');
+    if (dropdown && container && !container.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // ─── Level Notes Loader ───────────────────────────────────────────────────
+  function loadNotesLevel(level) {
+    updateExportPdfButton(level);
+    document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById('btn-lvl-' + level.replace('level_', ''));
+    if (activeBtn) activeBtn.classList.add('active');
+
+    const loadingEl = document.getElementById('notes-loading');
+    const bodyEl = document.getElementById('notes-body');
+    const statusBadge = document.getElementById('notes-status-badge');
+
+    loadingEl.style.display = 'block';
+    bodyEl.style.opacity = '0.3';
+
+    fetch("{% url 'prep:api_topic_notes' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({
+        topic_id: topicId,
+        course_code: courseCode,
+        topic_title: topicTitle,
+        level: level,
+      }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      loadingEl.style.display = 'none';
+      bodyEl.style.opacity = '1';
+
+      if (data.success && data.notes) {
+        if (statusBadge) { statusBadge.textContent = ''; }
+        setupNotesPagination(data.notes);
+      } else {
+        alert(data.error || 'Failed to load notes for this level.');
+      }
+    })
+    .catch(err => {
+      loadingEl.style.display = 'none';
+      bodyEl.style.opacity = '1';
+      console.error(err);
+      alert('Network error while fetching notes.');
+    });
+  }
+
+  // ─── Practice Question Generator (1 to 5) ──────────────────────────────────
+  function runPracticeGeneration() {
+    const btn = document.getElementById('btn-generate-practice');
+    const loadingEl = document.getElementById('practice-loading');
+    const emptyState = document.getElementById('practice-empty-state');
+    const listContainer = document.getElementById('practice-list');
+
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    loadingEl.style.display = 'block';
+    if (emptyState) emptyState.style.display = 'none';
+
+    fetch("{% url 'prep:api_generate_practice' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({
+        topic_id: topicId,
+        course_code: courseCode,
+        topic_title: topicTitle,
+        count: selectedCount,
+      }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false;
+      btn.textContent = 'Generate Similar Questions';
+      loadingEl.style.display = 'none';
+
+      if (data.success && data.questions && data.questions.length > 0) {
+        listContainer.innerHTML = '';
+        data.questions.forEach(q => {
+          genQuestionsMap[q.id] = q;
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'exam-question-card';
+          cardDiv.id = `gen-card-${q.id}`;
+          cardDiv.innerHTML = `
+            <div class="exam-card-header">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="badge" style="background: #1c85e8; color: #fff; font-size: 0.72rem; padding: 3px 8px; font-weight: 700;">
+                  PRACTICE VARIANT
+                </span>
+                <span class="exam-q-title">Question ${q.number}</span>
+                <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">${q.marks} MARKS</span>
+              </div>
+              <span class="badge badge-outline" style="font-size: 0.72rem;">${escapeHtml(q.topic_label || topicTitle)}</span>
+            </div>
+            <div class="exam-problem-box markdown-rendered" id="gen-q-content-${q.id}"></div>
+            <div class="exam-actions-row">
+              <button type="button" class="btn btn-outline btn-sm" onclick="toggleSolution('gen-sol-${q.id}', '${q.id}')">
+                View Step-by-Step Answer &amp; Rubric
+              </button>
+            </div>
+            <div id="gen-sol-${q.id}" class="exam-solution-box" style="display: none;">
+              <div style="font-size: 0.88rem; font-weight: 700; color: var(--green); margin-bottom: 8px;">
+                Step-by-Step Solution &amp; Marking Scheme:
+              </div>
+              <div id="gen-sol-content-${q.id}" class="markdown-rendered"></div>
+            </div>
+          `;
+          listContainer.appendChild(cardDiv);
+
+          // Render Question and Solution
+          const qBox = document.getElementById(`gen-q-content-${q.id}`);
+          if (qBox) renderMarkdownWithKaTeX(q.question_latex, qBox);
+
+          const sBox = document.getElementById(`gen-sol-content-${q.id}`);
+          if (sBox && q.solution_latex) {
+            renderMarkdownWithKaTeX(q.solution_latex, sBox);
+            sBox.dataset.rendered = "true";
+          }
+        });
+
+        if (data.credits_balance !== undefined) {
+          const bal = document.getElementById('wallet-balance-indicator');
+          if (bal) bal.textContent = data.credits_balance;
+        }
+      } else {
+        alert(data.error || 'Could not generate questions at this time.');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Generate Similar Questions';
+      loadingEl.style.display = 'none';
+      console.error(err);
+      alert('Error communicating with practice generation service.');
+    });
+  }
+
+  // ─── Step-by-Step Solution & Proof Derivation ──────────────────────────────
+  function deriveR1Proof(questionId, course, topic) {
+    const solBox = document.getElementById('auth-sol-' + questionId);
+    const contentBox = document.getElementById('auth-sol-content-' + questionId);
+    if (!solBox || !contentBox) return;
+
+    solBox.style.display = 'block';
+    contentBox.innerHTML = '<div style="font-style: italic; color: var(--text-muted); padding: 8px 0;">Preparing rigorous step-by-step mathematical proof and marking scheme...</div>';
+
+    fetch("{% url 'prep:api_solve_question' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({
+        question_id: questionId,
+        course_code: course,
+        topic_label: topic,
+      }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.solution) {
+        renderMarkdownWithKaTeX(data.solution, contentBox);
+        contentBox.dataset.rendered = "true";
+        if (authQuestionsMap[questionId]) {
+          authQuestionsMap[questionId].solution_latex = data.solution;
+        }
+      } else {
+        contentBox.textContent = data.error || 'Failed to generate solution.';
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      contentBox.textContent = 'Error connecting to solution verification service.';
+    });
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  // ─── Initial Page Load Initialization ─────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Load initial notes
+    const initialNotesErrorDataEl = document.getElementById('initial-notes-error-data');
+    if (initialNotesErrorDataEl && initialNotesErrorDataEl.textContent) {
+      try {
+        notesUnavailableMessage = JSON.parse(initialNotesErrorDataEl.textContent) || notesUnavailableMessage;
+      } catch (e) {
+        console.error("Error parsing initial notes error JSON:", e);
+      }
+    }
+    const rawNotesDataEl = document.getElementById('initial-notes-data');
+    if (rawNotesDataEl && rawNotesDataEl.textContent) {
+      try {
+        const initialNotes = JSON.parse(rawNotesDataEl.textContent);
+        if (typeof initialNotes === 'string' && initialNotes.trim()) {
+          setupNotesPagination(initialNotes);
+        } else if (document.getElementById('pillar-notes').style.display !== 'none') {
+          loadNotesLevel('level_2');
+        }
+      } catch (e) {
+        console.error("Error parsing initial notes JSON:", e);
+      }
+    }
+
+    // 2. Load authentic questions (Problem + Solution)
+    const authDataEl = document.getElementById('authentic-questions-data');
+    if (authDataEl && authDataEl.textContent) {
+      try {
+        const authQuestions = JSON.parse(authDataEl.textContent);
+        if (Array.isArray(authQuestions)) {
+          authQuestions.forEach(q => {
+            authQuestionsMap[q.id] = q;
+            const qBox = document.getElementById(`auth-q-content-${q.id}`);
+            if (qBox && q.question_latex) {
+              renderMarkdownWithKaTeX(q.question_latex, qBox);
+            }
+            const sBox = document.getElementById(`auth-sol-content-${q.id}`);
+            if (sBox && q.solution_latex) {
+              renderMarkdownWithKaTeX(q.solution_latex, sBox);
+              sBox.dataset.rendered = "true";
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing authentic questions JSON:", e);
+      }
+    }
+
+    // 3. Load generated questions (Problem + Solution)
+    const genDataEl = document.getElementById('generated-questions-data');
+    if (genDataEl && genDataEl.textContent) {
+      try {
+        const genQuestions = JSON.parse(genDataEl.textContent);
+        if (Array.isArray(genQuestions)) {
+          genQuestions.forEach(q => {
+            genQuestionsMap[q.id] = q;
+            const qBox = document.getElementById(`gen-q-content-${q.id}`);
+            if (qBox && q.question_latex) {
+              renderMarkdownWithKaTeX(q.question_latex, qBox);
+            }
+            const sBox = document.getElementById(`gen-sol-content-${q.id}`);
+            if (sBox && q.solution_latex) {
+              renderMarkdownWithKaTeX(q.solution_latex, sBox);
+              sBox.dataset.rendered = "true";
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing generated questions JSON:", e);
+      }
+    }
+  });
+</script>
+{% endblock %}

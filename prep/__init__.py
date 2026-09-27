@@ -1,0 +1,1 @@
+# Mentify Prep Django App

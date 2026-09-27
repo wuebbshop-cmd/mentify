@@ -95,11 +95,10 @@ def generate_chat_response(messages_history: list, user_message: str) -> str:
     and history pruning.
     """
     # 1. Check API Key
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("GOOGLE_API_KEY", "").strip()
     if not api_key:
-        # Re-try loading .env
         load_dotenv(BASE_DIR / ".env", override=True)
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("GOOGLE_API_KEY", "").strip()
     
     if not api_key:
         return (
@@ -132,6 +131,74 @@ def generate_chat_response(messages_history: list, user_message: str) -> str:
 
     # 3. System Prompt Context
     system_prompt = get_mentify_system_context()
+
+    # 4. Construct Gemini REST API Payload
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip() or "gemini-2.5-flash-lite"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    
+    payload = {
+        "system_instruction": {
+            "parts": [{"text": system_prompt}]
+        },
+        "contents": clean_history,
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 400,
+            "topP": 0.95
+        }
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=12)
+        response_data = response.json()
+
+        if response.status_code != 200:
+            error_msg = response_data.get("error", {}).get("message", "API call failed")
+            error_code = response_data.get("error", {}).get("code", response.status_code)
+            
+            # Log exact technical error internally
+            logger.error(f"Gemini API Error ({response.status_code} / {error_code}): {error_msg}")
+
+            # Return clean, user-friendly responses without exposing raw API or quota details
+            if response.status_code == 429 or "quota" in error_msg.lower() or "rate limit" in error_msg.lower() or "RESOURCE_EXHAUSTED" in error_msg:
+                return (
+                    "I am currently receiving a high volume of inquiries! "
+                    "Please wait about a minute and try asking your question again, "
+                    "or [Chat on WhatsApp (+254731900577)](https://wa.me/254731900577) for immediate assistance."
+                )
+            
+            if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
+                return "The AI assistant service is undergoing configuration. Please try again shortly or contact us on WhatsApp."
+
+            return (
+                "I am momentarily unavailable. Please try again in a moment, "
+                "or [Chat on WhatsApp (+254731900577)](https://wa.me/254731900577) to reach us directly!"
+            )
+
+        candidates = response_data.get("candidates", [])
+        if candidates and "content" in candidates[0]:
+            parts = candidates[0]["content"].get("parts", [])
+            if parts and "text" in parts[0]:
+                return parts[0]["text"].strip()
+        
+        return (
+            "I couldn't process that query right now. Please try rephrasing your question or "
+            "[Chat on WhatsApp (+254731900577)](https://wa.me/254731900577) for help."
+        )
+
+    except requests.exceptions.Timeout:
+        logger.error("Gemini API request timed out")
+        return (
+            "My connection took a bit too long to respond. Please try asking your question again in a moment, "
+            "or [Chat on WhatsApp (+254731900577)](https://wa.me/254731900577)."
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error calling Gemini API: {e}")
+        return (
+            "An unexpected connection issue occurred. Please try again shortly or "
+            "[Chat on WhatsApp (+254731900577)](https://wa.me/254731900577)."
+        )
 
     # 4. Construct Gemini REST API Payload
     model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip() or "gemini-2.5-flash-lite"

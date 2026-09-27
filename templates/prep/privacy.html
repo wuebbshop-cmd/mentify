@@ -1,0 +1,82 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}Privacy Policy | Mentify Prep{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 24px;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); font-weight: 600; text-decoration: none;">Workspace</a> &rarr; Legal
+  </div>
+  <h1 style="margin-bottom: 4px; font-size: 1.55rem;">Mentify Prep Privacy Policy</h1>
+  <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">How your study data, uploaded lecture documents, practice tests, and credit transactions are safeguarded.</p>
+</div>
+
+<!-- Prep Legal Navigation Tabs -->
+<div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+  <a href="{% url 'prep:terms' %}" class="btn btn-outline btn-sm" style="font-weight: 500;">
+    Prep Terms of Service
+  </a>
+  <a href="{% url 'prep:privacy' %}" class="btn btn-sm" style="background: var(--green); border-color: var(--green); color: #fff; font-weight: 600;">
+    Prep Privacy Policy
+  </a>
+</div>
+
+<div class="card" style="padding: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); display: flex; flex-direction: column; gap: 24px;">
+  <div style="border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+    <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-weight: 700; font-size: 0.72rem; padding: 3px 8px;">
+      DATA PROTECTION &amp; PRIVACY
+    </span>
+    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+      Last updated: September 2026 &bull; Applies strictly to user data processed within the Mentify Prep revision workspace.
+    </div>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">1. Information Collected in Mentify Prep</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px;">
+      When you study on Mentify Prep, we collect only the essential academic data required to power your personalized revision:
+    </p>
+    <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; padding-left: 20px; margin: 0;">
+      <li><strong>Course Enrollments:</strong> The syllabus units and courses you add to your workspace dashboard.</li>
+      <li><strong>Uploaded Revision Materials:</strong> PDF notes, document outlines, and scanned past paper files you submit for indexing.</li>
+      <li><strong>Generated Study Outputs:</strong> Practice question variants, step-by-step mathematical proofs, and study pack export history.</li>
+      <li><strong>Wallet &amp; Payment Data:</strong> Credit balances, transaction audit logs, and Paystack / M-Pesa transaction reference codes. We never store payment PINs or sensitive financial credentials.</li>
+    </ul>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">2. Strict AI Privacy Guarantees</h2>
+    <div style="padding: 14px 18px; background: rgba(15, 118, 110, 0.06); border-left: 3px solid var(--green); border-radius: 4px; margin-bottom: 10px;">
+      <div style="font-weight: 700; color: var(--green); font-size: 0.92rem; margin-bottom: 4px;">Zero Public Model Training</div>
+      <p style="margin: 0; font-size: 0.86rem; color: var(--text); line-height: 1.55;">
+        Your uploaded documents, personalized test questions, and mathematical solution requests are used strictly to provide you with instant study assistance. <strong>We do not sell, rent, or use your private study uploads to train public foundation AI models.</strong>
+      </p>
+    </div>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">3. How Uploaded Documents Are Processed</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      When you upload a document, text and mathematical formulas are extracted locally using high-precision parsers or vision OCR. Once extracted, content is mapped to the relevant course topics and verified for academic quality before publication.
+    </p>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">4. Data Security &amp; Storage</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      We use encrypted storage and secure tokenized authentication to safeguard your workspace. All wallet operations and credit deductions are tracked in an immutable audit ledger accessible directly on your workspace dashboard.
+    </p>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">5. Your Rights &amp; Data Control</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      You maintain full control over your enrolled courses and personal uploads. You may remove enrolled courses from your dashboard or request permanent deletion of your uploaded documents at any time.
+    </p>
+  </div>
+
+  <div style="border-top: 1px solid var(--border); padding-top: 16px; font-size: 0.84rem; color: var(--text-muted);">
+    For privacy policies covering live tutoring sessions, guardian accounts, or general platform browsing, see the <a href="{% url 'accounts:privacy_policy' %}" style="color: var(--green); font-weight: 600;">Mentify Platform Privacy Policy</a>.
+  </div>
+</div>
+{% endblock %}

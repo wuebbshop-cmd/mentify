@@ -1,0 +1,52 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}Past CAT Questions | Mentify Prep{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+      <a href="{% url 'prep:courses' %}" style="color: var(--green);">Courses</a> &rarr; 
+      <a href="{% url 'prep:course_detail' course_code=course_code %}" style="color: var(--green);">{{ course_code }}</a> &rarr; 
+      CAT Questions
+    </div>
+    <h1>CAT Questions: {{ topic_title }}</h1>
+    <p style="margin: 0; color: var(--text-muted);">Authentic past Continuous Assessment Test (CAT) and final examination questions.</p>
+  </div>
+
+  <div style="display: flex; gap: 8px;">
+    <button class="btn btn-outline btn-sm" onclick="window.print()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+      Print Paper
+    </button>
+    <a href="{% url 'prep:topic_study' topic_id=topic_id %}" class="btn btn-outline btn-sm">
+      Read Notes
+    </a>
+  </div>
+</div>
+
+<!-- Authentic Question Cards (Flat, clean, no AI slop) -->
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  {% for q in questions %}
+  <div class="card" style="margin-bottom: 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="badge badge-danger">QUESTION {{ q.number }}</span>
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">[{{ q.marks }} MARKS]</span>
+      </div>
+      <span class="badge badge-accent">{{ q.type }}</span>
+    </div>
+
+    <!-- Authentic Exam Question Statement -->
+    <div style="font-size: 1.05rem; line-height: 1.6; color: var(--text); padding: 8px 0;">
+      {{ q.question_latex }}
+    </div>
+
+    <div style="border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 0.82rem; color: var(--text-muted);">Course: {{ course_code }} &bull; Topic: {{ topic_title }}</span>
+      <span class="badge badge-accent">Verified Syllabus Node</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

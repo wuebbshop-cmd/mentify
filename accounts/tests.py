@@ -63,3 +63,64 @@ class ProfileViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Profile.objects.filter(user=user).exists())
+
+
+class PasswordValidationTests(TestCase):
+    def registration_form(self, password):
+        from .forms import LearnerRegistrationForm
+
+        return LearnerRegistrationForm(
+            data={
+                "first_name": "Password",
+                "last_name": "Tester",
+                "email": "password-tester@example.com",
+                "phone": "",
+                "password1": password,
+                "password2": password,
+                "agree_to_terms": True,
+            }
+        )
+
+    def test_registration_rejects_password_without_a_number(self):
+        form = self.registration_form("LettersOnly")
+
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+            "at least one letter and one number",
+            form.errors["password2"].as_text(),
+        )
+
+    def test_registration_rejects_password_shorter_than_eight_characters(self):
+        form = self.registration_form("Abc123")
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("at least 8 characters", form.errors["password2"].as_text())
+
+    def test_registration_accepts_a_password_with_letters_numbers_and_eight_characters(self):
+        form = self.registration_form("Cobalt7Mango")
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.fields["password1"].widget.attrs["minlength"], 8)
+        self.assertEqual(form.fields["password1"].widget.attrs["autocomplete"], "new-password")
+
+    def test_password_reset_enforces_the_same_rules(self):
+        from .forms import MentifySetPasswordForm
+
+        user = User.objects.create_user(
+            username="password.reset",
+            email="password-reset@example.com",
+            password="Existing7Password",
+        )
+        form = MentifySetPasswordForm(
+            user,
+            data={
+                "new_password1": "LettersOnly",
+                "new_password2": "LettersOnly",
+            },
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+            "at least one letter and one number",
+            form.errors["new_password2"].as_text(),
+        )

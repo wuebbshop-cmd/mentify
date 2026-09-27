@@ -109,6 +109,9 @@ urlpatterns = [
     # Blog & Content Hub
     path("blog/", include("blog.urls")),
 
+    # Mentify Prep Engine
+    path("prep/", include("prep.urls")),
+
     # Root redirect
     path("", include("accounts.home_urls")),
 ]

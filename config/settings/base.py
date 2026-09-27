@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "live_sessions",
     "payments",
     "blog",
+    "prep",
 ]
 
 
@@ -108,7 +109,11 @@ LOGOUT_REDIRECT_URL = "/"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
+    },
+    {"NAME": "accounts.password_validators.LetterAndNumberPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -206,6 +211,8 @@ else:
 
 # ─── Cron Jobs ────────────────────────────────────────────────────────────────
 CRONJOBS = [
+    # Run hourly so the 72-hour trial and dated credit lots expire promptly.
+    ("0 * * * *", "django.core.management.call_command", ["expire_prep_credits"]),
     # Run daily at 1:00 AM Nairobi time - flag/suspend expired subscriptions
     ("0 1 * * *", "django.core.management.call_command", ["check_expired_subscriptions"]),
 ]
@@ -229,3 +236,19 @@ ADMIN_EMAILS = [
     for e in os.environ.get("ADMIN_EMAILS", "").split(",")
     if e.strip()
 ]
+
+
+# ─── Mentify Prep & AI Configuration ─────────────────────────────────────────
+DEEPSEEK_API = os.environ.get("DEEPSEEK_API", "")
+DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+DEEPSEEK_CHAT_MODEL = os.environ.get("DEEPSEEK_CHAT_MODEL", "deepseek-chat")
+DEEPSEEK_REASONER_MODEL = os.environ.get("DEEPSEEK_REASONER_MODEL", "deepseek-reasoner")
+MAX_TOKENS_EXPLANATION = int(os.environ.get("MAX_TOKENS_EXPLANATION", 8000))
+MAX_TOKENS_REASONING = int(os.environ.get("MAX_TOKENS_REASONING", 8000))
+PREP_CREDIT_TOKEN_UNIT = int(os.environ.get("PREP_CREDIT_TOKEN_UNIT", 1000))
+PREP_CREDIT_PROMPT_BUFFER = int(os.environ.get("PREP_CREDIT_PROMPT_BUFFER", 2000))
+
+TOGETHERAI_API = os.environ.get("TOGETHERAI_API", "")
+TOGETHERAI_ID = os.environ.get("TOGETHERAI_ID", "")
+TOGETHER_VISION_MODEL = os.environ.get("TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+TOGETHER_MAX_PAGES_PER_RUN = int(os.environ.get("TOGETHER_MAX_PAGES_PER_RUN", 15))

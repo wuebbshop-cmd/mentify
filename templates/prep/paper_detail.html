@@ -1,0 +1,262 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}{{ course_code }} — {{ paper_title }} | Mentify Prep{% endblock %}
+
+{% block extra_css %}
+<style>
+  .exam-question-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  body.dark-theme .exam-question-card {
+    background: #181818;
+    border-color: #333333;
+    border-left-color: #2dd4bf;
+  }
+  .exam-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .exam-problem-box {
+    font-size: 0.98rem;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  body.dark-theme .exam-problem-box {
+    background: #121212;
+    border-color: #2a2a2a;
+  }
+  .exam-solution-box {
+    margin-top: 18px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: var(--radius);
+  }
+  body.dark-theme .exam-solution-box {
+    background: #141414;
+    border-color: #2e2e2e;
+    border-left-color: #2dd4bf;
+  }
+  .markdown-rendered pre {
+    background: #1e1e1e !important;
+    color: #f3f4f6 !important;
+    padding: 16px 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin: 14px 0;
+    border: 1px solid #333333;
+  }
+  .markdown-rendered code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.88em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.06);
+    color: var(--text);
+  }
+  body.dark-theme .markdown-rendered code {
+    background: rgba(255,255,255,0.1);
+    color: #e4e4e4;
+  }
+  .markdown-rendered pre code {
+    background: transparent !important;
+    padding: 0 !important;
+    color: inherit !important;
+    border: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+  <div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+      <a href="{% url 'prep:courses' %}" style="color: var(--green); font-weight: 600;">Courses</a> &rarr; {{ course_code }}
+    </div>
+    <h1 style="margin-bottom: 4px;">{{ course_code }}: {{ paper_title }}</h1>
+    <p style="margin: 0; color: var(--text-muted);">{{ year }} &bull; Total Allocated Marks: {{ total_marks }}</p>
+  </div>
+
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <a href="{% url 'prep:export_paper' course_code=course_code paper_id=paper_id fmt='pdf' %}?section=questions" class="btn btn-outline btn-sm">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Questions PDF
+    </a>
+    <a href="{% url 'prep:export_paper' course_code=course_code paper_id=paper_id fmt='pdf' %}?section=answers" class="btn btn-outline btn-sm">
+      Answers PDF
+    </a>
+    <a href="{% url 'prep:course_detail' course_code=course_code %}" class="btn btn-outline btn-sm">
+      Course Topics
+    </a>
+  </div>
+</div>
+
+<!-- Questions List with Step-by-Step Proof Verification -->
+<div style="display: flex; flex-direction: column; gap: 20px;">
+  {% for q in questions %}
+  <div class="exam-question-card" id="q-card-{{ q.number }}">
+    <div class="exam-card-header">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span class="badge" style="background: #0f766e; color: #fff; font-size: 0.72rem; padding: 3px 8px; font-weight: 700; letter-spacing: 0.5px;">
+          QUESTION {{ q.number }}
+        </span>
+        <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">
+          {{ q.marks }} MARKS
+        </span>
+      </div>
+      <span class="badge badge-outline" style="font-size: 0.72rem;">Topic: {{ q.topic }}</span>
+    </div>
+
+    <!-- Authentic LaTeX Equation / Statement -->
+    <div class="exam-problem-box markdown-rendered" id="paper-q-content-{{ q.number }}">
+      <!-- Rendered via JS -->
+    </div>
+
+    <!-- Solution & Step-by-Step Proof Section -->
+    <div id="solution-container-{{ q.number }}" class="exam-solution-box" style="display: {% if q.solution_latex %}block{% else %}none{% endif %};">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <span style="font-size: 0.88rem; font-weight: 700; color: var(--green); display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Step-by-Step Solution &amp; Marking Scheme:
+        </span>
+        <span class="badge badge-accent" id="solution-badge-{{ q.number }}">Verified Solution</span>
+      </div>
+      <div id="solution-text-{{ q.number }}" class="markdown-rendered">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div style="border-top: 1px solid var(--border); margin-top: 18px; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="font-size: 0.8rem; color: var(--text-muted);">
+        Course: <strong>{{ course_code }}</strong> &bull; Authentic Assessment Archive
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        {% if q.solution_latex %}
+        <button class="btn btn-outline btn-sm" onclick="toggleSolutionDisplay({{ q.number }})">
+          Toggle Solution
+        </button>
+        {% else %}
+        <button class="btn btn-primary btn-sm" id="solve-btn-{{ q.number }}" style="background: var(--green); border-color: var(--green);" onclick="solveQuestionWithAI({{ q.number }}, '{{ q.question_latex|escapejs }}', '{{ course_code|escapejs }}', '{{ q.topic|escapejs }}')">
+          View Step-by-Step Proof &amp; Solution
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{{ questions|json_script:"paper-questions-data" }}
+
+<script>
+  const paperQuestions = JSON.parse(document.getElementById('paper-questions-data').textContent || '[]');
+
+  if (window.marked && typeof marked.use === 'function') {
+    marked.use({
+      breaks: true,
+      gfm: true
+    });
+  }
+
+  // Markdown + KaTeX Core Engine is provided by static/js/prep-renderer.js
+
+  function toggleSolutionDisplay(num) {
+    const el = document.getElementById('solution-container-' + num);
+    if (el) {
+      el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+    }
+  }
+
+  function solveQuestionWithAI(num, latex, course, topic) {
+    const btn = document.getElementById('solve-btn-' + num);
+    const container = document.getElementById('solution-container-' + num);
+    const textEl = document.getElementById('solution-text-' + num);
+    const badgeEl = document.getElementById('solution-badge-' + num);
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = "Formulating step-by-step derivation...";
+    }
+
+    fetch("{% url 'prep:api_solve_question' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({
+        question_latex: latex,
+        course_code: course,
+        topic_label: topic
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = "Toggle Solution";
+        btn.setAttribute("onclick", "toggleSolutionDisplay(" + num + ")");
+        btn.className = "btn btn-outline btn-sm";
+      }
+
+      if (data.success) {
+        container.style.display = 'block';
+        renderMarkdownWithKaTeX(data.solution, textEl);
+        
+        badgeEl.innerText = "Verified Solution";
+        badgeEl.className = "badge badge-accent";
+
+        const creditDisplay = document.querySelector('.credit-counter-value');
+        if (creditDisplay && data.credits_balance !== undefined) {
+          creditDisplay.innerText = data.credits_balance;
+        }
+      } else {
+        alert(data.error || "Failed to generate solution. Please check your credit balance.");
+      }
+    })
+    .catch(err => {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = "View Step-by-Step Proof & Solution";
+      }
+      alert("Error contacting solution service: " + err);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    paperQuestions.forEach(q => {
+      const qBox = document.getElementById('paper-q-content-' + q.number);
+      if (qBox && q.question_latex) {
+        renderMarkdownWithKaTeX(q.question_latex, qBox);
+      }
+      const solBox = document.getElementById('solution-text-' + q.number);
+      if (solBox && q.solution_latex) {
+        renderMarkdownWithKaTeX(q.solution_latex, solBox);
+      }
+    });
+  });
+</script>
+{% endblock %}

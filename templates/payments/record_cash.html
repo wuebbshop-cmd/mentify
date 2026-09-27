@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Record Cash Payment{% endblock %}
 
@@ -98,7 +99,7 @@
             Create a learner account inline below. It will automatically create the profile and you can immediately choose them from the dropdown list.
           </p>
 
-          <form method="post" id="create-learner-form">
+          <form method="post" id="create-learner-form" data-password-rules novalidate>
             {% csrf_token %}
             <input type="hidden" name="action" value="create_learner">
 
@@ -132,10 +133,12 @@
               <div class="form-group">
                 <label class="form-label">Password</label>
                 {{ learner_form.password1 }}
+                {% if learner_form.password1.errors %}<div class="form-error">{{ learner_form.password1.errors.as_text }}</div>{% endif %}
               </div>
               <div class="form-group">
                 <label class="form-label">Confirm</label>
                 {{ learner_form.password2 }}
+                {% if learner_form.password2.errors %}<div class="form-error">{{ learner_form.password2.errors.as_text }}</div>{% endif %}
               </div>
             </div>
 
@@ -149,4 +152,7 @@
 
   </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/password-rules.js' %}" defer></script>
 {% endblock %}

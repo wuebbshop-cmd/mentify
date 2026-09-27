@@ -48,8 +48,13 @@ class InlineLearnerCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["password1"].widget.attrs["class"] = "form-control"
-        self.fields["password2"].widget.attrs["class"] = "form-control"
+        for field_name in ("password1", "password2"):
+            self.fields[field_name].widget.attrs.update({
+                "class": "form-control",
+                "autocomplete": "new-password",
+                "minlength": 8,
+                "title": "Use at least 8 characters with at least one letter and one number.",
+            })
 
     def save(self, commit=True):
         user = super().save(commit=False)

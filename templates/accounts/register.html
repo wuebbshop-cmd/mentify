@@ -27,7 +27,7 @@
 
       <div class="divider-text">or register with email</div>
 
-      <form method="post" id="register-form" novalidate>
+      <form method="post" id="register-form" data-password-rules novalidate>
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -96,4 +96,7 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/password-rules.js' %}" defer></script>
 {% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}Terms of Service | Mentify Prep{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 24px;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); font-weight: 600; text-decoration: none;">Workspace</a> &rarr; Legal
+  </div>
+  <h1 style="margin-bottom: 4px; font-size: 1.55rem;">Mentify Prep Terms of Service</h1>
+  <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Terms governing course-anchored syllabus revision, credit subscriptions, practice variants, and document uploads.</p>
+</div>
+
+<!-- Prep Legal Navigation Tabs -->
+<div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+  <a href="{% url 'prep:terms' %}" class="btn btn-sm" style="background: var(--green); border-color: var(--green); color: #fff; font-weight: 600;">
+    Prep Terms of Service
+  </a>
+  <a href="{% url 'prep:privacy' %}" class="btn btn-outline btn-sm" style="font-weight: 500;">
+    Prep Privacy Policy
+  </a>
+</div>
+
+<div class="card" style="padding: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); display: flex; flex-direction: column; gap: 24px;">
+  <div style="border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+    <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-weight: 700; font-size: 0.72rem; padding: 3px 8px;">
+      MENTIFY PREP AGREEMENT
+    </span>
+    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+      Last updated: September 2026 &bull; Applies strictly to the Mentify Prep revision workspace and credit wallet.
+    </div>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">1. Purpose &amp; Academic Integrity</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      Mentify Prep is designed as an academic revision workspace to assist university and college students in preparing for Continuous Assessment Tests (CATs) and final examinations. Materials, derivations, and practice questions provided on this platform are study aids intended to reinforce curriculum mastery. Users agree to use all solutions, proofs, and study packs ethically and in full compliance with their academic institution's code of conduct.
+    </p>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">2. Credit Wallet, Trials &amp; Subscription Tiers</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px;">
+      Access to automated problem solving, question variant synthesis, and document ingestion is powered by your Mentify Prep credit wallet:
+    </p>
+    <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; padding-left: 20px; margin: 0;">
+      <li><strong>Free 30-Credit Trial:</strong> New accounts receive 30 complimentary starter credits valid for 72 hours, unlocking full access to all features (including complete syllabus notes, step-by-step proofs, and study pack PDF downloads).</li>
+      <li><strong>Monthly Subscriptions:</strong> Subscriptions (Basic, Plus, and Pro) provide 30-day recurring credit allocations and priority queues. Payments are processed securely via M-Pesa / Paystack.</li>
+      <li><strong>Credit Independence:</strong> Subscribing to a paid tier during your free trial immediately activates your 30-day subscription. Remaining trial credits are prioritized and consumed first, expiring naturally without affecting your paid subscription days.</li>
+      <li><strong>Top-Ups:</strong> Active subscribers may top up 100 credits for KES 150 at any time. Top-ups remain valid for 30 days from purchase.</li>
+      <li><strong>Consumption Deductions:</strong> Credits are deducted according to the published <a href="{% url 'prep:billing' %}#credit-rules" style="color: var(--green); font-weight: 600;">Credit Consumption Rules</a>. Cached past questions and notes are always free (0 credits).</li>
+    </ul>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">3. Uploading Materials &amp; Syllabus Documents</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      Students and tutors may upload course outlines, lecture notes, revision sheets, and past examination papers. By uploading files, you represent that you have lawful authorization to access and study the material. Uploaded materials enter a verification pipeline where text is extracted and reviewed for curriculum alignment before being indexed into the course catalogue.
+    </p>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">4. Intellectual Property &amp; Study Packs</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      Original course syllabi and institutional examination papers remain the property of their respective creators and institutions. You may download complete PDF and Word study packs for your personal, non-commercial revision. Re-selling, mass scraping, or distributing platform-generated solutions commercially is strictly prohibited.
+    </p>
+  </div>
+
+  <div>
+    <h2 style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px; font-weight: 600;">5. Account Security &amp; Fair Use</h2>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+      Each Mentify Prep account is for individual student use. Sharing accounts to circumvent credit limits, deploying automated scraping bots, or attempting to exploit wallet balances will result in immediate suspension.
+    </p>
+  </div>
+
+  <div style="border-top: 1px solid var(--border); padding-top: 16px; font-size: 0.84rem; color: var(--text-muted);">
+    For general tutoring, cohort classes, or platform-wide policies, please refer to the <a href="{% url 'accounts:terms' %}" style="color: var(--green); font-weight: 600;">Mentify Platform Terms</a>.
+  </div>
+</div>
+{% endblock %}

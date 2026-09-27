@@ -17,7 +17,7 @@
       <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
 
         <!-- Learner card -->
-        <a href="{% url 'accounts:register_learner' %}" id="role-learner-btn"
+        <a href="{% url 'accounts:register_learner' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" id="role-learner-btn"
            style="display:flex; align-items:center; gap:16px; padding:20px; background:var(--white); border:2px solid var(--border); border-radius:var(--radius-md); text-decoration:none; color:var(--text); transition:border-color .15s, box-shadow .15s;"
            onmouseover="this.style.borderColor='var(--green)'; this.style.boxShadow='0 2px 12px rgba(15,118,110,0.1)';"
            onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
@@ -36,7 +36,7 @@
         </a>
 
         <!-- Guardian card -->
-        <a href="{% url 'accounts:register_guardian' %}" id="role-guardian-btn"
+        <a href="{% url 'accounts:register_guardian' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" id="role-guardian-btn"
            style="display:flex; align-items:center; gap:16px; padding:20px; background:var(--white); border:2px solid var(--border); border-radius:var(--radius-md); text-decoration:none; color:var(--text); transition:border-color .15s, box-shadow .15s;"
            onmouseover="this.style.borderColor='var(--green)'; this.style.boxShadow='0 2px 12px rgba(15,118,110,0.1)';"
            onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
@@ -59,7 +59,7 @@
       <div class="divider"></div>
       <p style="text-align:center; color:var(--text-muted); font-size:.875rem; margin:0;">
         Already have an account?
-        <a href="{% url 'accounts:login' %}" style="color:var(--green); font-weight:600;">Sign in</a>
+        <a href="{% url 'accounts:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" style="color:var(--green); font-weight:600;">Sign in</a>
       </p>
     </div>
 

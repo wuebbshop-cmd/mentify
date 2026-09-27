@@ -1,0 +1,158 @@
+{% extends 'prep/base_prep.html' %}
+{% load static %}
+
+{% block title %}Mentify Prep — Syllabus Workspace{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ─── Calm Academic Workspace Styles ───────────────────────────── */
+  .stat-strip-item {
+    padding-right: 16px;
+  }
+
+  .course-clean-row {
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+  .course-clean-row:hover {
+    border-color: var(--green);
+  }
+  body.dark-theme .course-clean-row {
+    background: #181818;
+    border-color: #2e2e2e;
+  }
+  body.dark-theme .course-clean-row:hover {
+    border-color: #2dd4bf;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header" style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+  <div>
+    <h1 style="margin-bottom: 4px; font-size: 1.6rem; letter-spacing: -0.02em;">Workspace</h1>
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem;">Course-anchored syllabus notes, authentic CAT past papers, and practice variants.</p>
+  </div>
+  <a href="{% url 'prep:upload' %}" class="btn btn-danger btn-sm" style="font-weight: 500;">
+    + Upload Material
+  </a>
+</div>
+
+<!-- 1. Typographic Metrics Strip -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 24px; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border);">
+  <div class="stat-strip-item">
+    <div style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Enrolled Courses</div>
+    <div style="font-size: 1.65rem; font-weight: 700; color: var(--text);">{{ total_active_courses|default:0 }}</div>
+  </div>
+  <div class="stat-strip-item">
+    <div style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Banked Exam Questions</div>
+    <div style="font-size: 1.65rem; font-weight: 700; color: var(--text);">{{ total_questions|default:0 }}</div>
+  </div>
+  <div class="stat-strip-item">
+    <div style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Available Credits</div>
+    <div style="font-size: 1.65rem; font-weight: 700; color: var(--green);">{{ user_credits|default:0 }}</div>
+  </div>
+</div>
+
+<!-- 2. Your Courses (Streamlined Clickable Rows, No Undergraduate Badge, No Button Clutter) -->
+<section style="margin-bottom: 36px;">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.05rem; color: var(--text); font-weight: 600;">Your Courses</h3>
+    </div>
+    <a href="{% url 'prep:courses' %}" style="font-size: 0.82rem; color: var(--green); text-decoration: none; font-weight: 600;">Manage Courses &rarr;</a>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    {% for c in recent_courses %}
+    <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" class="course-clean-row">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-weight: 700; font-size: 1.02rem; color: var(--text);">{{ c.code }}</span>
+        {% if c.title and c.code != c.title %}
+          <span style="color: var(--text-muted);">&bull;</span>
+          <span style="color: var(--text); font-size: 0.94rem; font-weight: 500;">{{ c.title }}</span>
+        {% endif %}
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: var(--text-muted);">
+        <span>{{ c.topics_count }} Topics</span>
+        <span>&bull;</span>
+        <span>{{ c.papers_count }} Past Papers</span>
+        <span style="color: var(--green); font-weight: 600; margin-left: 6px;">Open Syllabus &rarr;</span>
+      </div>
+    </a>
+    {% empty %}
+    <div style="padding: 28px; text-align: center; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-md);">
+      <p style="margin-bottom: 6px; font-weight: 500; color: var(--text);">No courses enrolled yet.</p>
+      <p style="font-size: 0.85rem; margin-bottom: 12px;">Upload syllabus notes or past examination papers to get started.</p>
+      <a href="{% url 'prep:upload' %}" class="btn btn-danger btn-sm">Upload Material</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- 3. Recent Credit Activity (Collapsible Dropdown Accordion, Limited to Latest 10) -->
+<section style="margin-bottom: 32px;" id="credit-activity">
+  <details class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--white);" open>
+    <summary style="padding: 14px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: var(--surface); user-select: none; border-bottom: 1px solid var(--border);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(15, 118, 110, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 0.98rem; color: var(--text); font-weight: 600;">Recent Credit Activity</h3>
+          <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: var(--text-muted);">Audit ledger of your credit usage, top-ups, and monthly grants (Top 10)</p>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="badge" style="font-size: 0.72rem; padding: 2px 8px; background: var(--white); border: 1px solid var(--border); color: var(--text-muted);">
+          {{ recent_credit_transactions|length }} Logged
+        </span>
+        <span style="font-size: 0.78rem; color: var(--green); font-weight: 600;">Toggle Details &darr;</span>
+      </div>
+    </summary>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border); background: var(--surface); text-align: left; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em;">
+            <th style="padding: 10px 18px;">Date</th>
+            <th style="padding: 10px 18px;">Description</th>
+            <th style="padding: 10px 18px;">Reference</th>
+            <th style="padding: 10px 18px; text-align: right;">Credits</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in recent_credit_transactions %}
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 11px 18px; color: var(--text-muted); font-size: 0.82rem; white-space: nowrap;">{{ tx.created_at|date:"M d, H:i" }}</td>
+            <td style="padding: 11px 18px; font-weight: 500; color: var(--text);">{{ tx.description }}</td>
+            <td style="padding: 11px 18px; font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">{{ tx.reference_code|default:"—" }}</td>
+            <td style="padding: 11px 18px; text-align: right; font-weight: 700; color: {% if tx.amount > 0 %}var(--green){% else %}var(--danger){% endif %}; white-space: nowrap;">
+              {{ tx.amount|stringformat:"+d" }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+              No credit transactions recorded yet. Practice generation and document uploads will be audited here.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}Credits & Plans | Mentify Prep{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Credits & Subscription Plans</h1>
+  <p style="margin: 0; color: var(--text-muted);">View your credit balance, choose a subscription tier, or top up your wallet via M-Pesa.</p>
+</div>
+
+<!-- Active Wallet Summary with Instant M-Pesa Top-Up Action -->
+{% if is_trial %}
+<div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+  <div>
+    <div style="font-weight: 600; color: #2563eb; display: flex; align-items: center; gap: 8px;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2563eb;"></span>
+      Free Trial Active (30 Starter Credits)
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+      Explore all features: view complete lecture notes, generate practice questions, derive step-by-step proofs, and download study pack PDFs.
+      {% if plan_expires_at %}
+        &bull; <strong>Trial Ends:</strong> {{ plan_expires_at|date:"M d, Y H:i" }}
+      {% endif %}
+    </div>
+  </div>
+  <span class="badge" style="background: #2563eb; color: #fff; font-size: 0.78rem; padding: 4px 10px;">Free 30-Credit Trial</span>
+</div>
+{% endif %}
+
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 32px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Active Balance</div>
+    <div style="font-size: 2rem; font-weight: 700; color: var(--green);">{{ user_credits|default:30 }} Credits</div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+      Current Plan: <strong>{{ current_plan }}</strong> &bull;
+      <a href="{% url 'prep:dashboard' %}#credit-activity" style="color: var(--green); text-decoration: none; font-weight: 500;">View Activity on Dashboard &rarr;</a>
+    </div>
+  </div>
+
+  <div style="text-align: right;">
+    {% if can_top_up %}
+      <form method="post" action="{% url 'prep:initiate_payment' %}" style="margin: 0;">
+        {% csrf_token %}
+        <input type="hidden" name="package" value="topup_100">
+        <button type="submit" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger);">
+          Top Up KES 150 (100 Credits)
+        </button>
+      </form>
+      <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 5px;">Purchased top-ups expire 30 days after purchase.</div>
+    {% else %}
+      <div style="font-size: 0.85rem; color: var(--text-muted); max-width: 260px;">Subscribe to any monthly plan to unlock 30-day credit top-ups.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Monthly Subscription Plans with Color Distinctions -->
+<section style="margin-bottom: 40px;">
+  <div style="margin-bottom: 22px;">
+    <h3 style="margin-bottom: 4px; font-size: 1.15rem;">Monthly Subscription Plans</h3>
+    <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 0.9rem;">Fair, student-friendly pricing tailored for Continuous Assessment Tests and final exam revision.</p>
+    <div style="display: flex; align-items: center; gap: 6px; font-size: 0.84rem; color: var(--green); font-weight: 600;">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      All plans include full PDF & Word study pack downloads, step-by-step proofs, and all explanation levels.
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; align-items: stretch;">
+    {% for p in plans %}
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; position: relative; border-radius: 8px; padding: 24px; {% if p.is_popular %}border: 2px solid var(--green); border-top: 5px solid var(--green); box-shadow: 0 6px 24px rgba(15, 118, 110, 0.12); background: var(--white);{% else %}border: 1px solid var(--border); border-top: 4px solid {{ p.theme_color }}; background: var(--white);{% endif %}">
+      {% if p.is_popular %}
+      <div style="position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--green); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+        MOST POPULAR
+      </div>
+      {% endif %}
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0; font-size: 1.12rem; color: var(--text);">{{ p.name }}</h3>
+          <span class="badge" style="background: {{ p.theme_bg }}; color: {{ p.theme_color }}; font-weight: 700; font-size: 0.72rem; padding: 3px 8px; border-radius: 4px;">
+            {% if p.active %}ACTIVE PLAN{% else %}{{ p.badge_label }}{% endif %}
+          </span>
+        </div>
+        <div style="font-size: 1.65rem; font-weight: 700; color: var(--text); margin-bottom: 2px;">{{ p.price }}</div>
+        <div style="font-size: 0.88rem; color: {{ p.theme_color }}; font-weight: 600; margin-bottom: 10px;">{{ p.credits }}</div>
+
+        {% if p.tagline %}
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; min-height: 38px; line-height: 1.45; border-left: 2px solid {{ p.theme_color }}; padding-left: 8px;">
+          {{ p.tagline }}
+        </div>
+        {% endif %}
+
+        <ul style="list-style: none; padding: 0; margin: 0 0 24px 0; font-size: 0.86rem; line-height: 1.85;">
+          {% for f in p.features %}
+          <li style="display: flex; align-items: center; gap: 8px; color: var(--text);">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: {{ p.theme_color }}; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>{{ f }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        {% if p.active %}
+          <button class="btn btn-outline btn-block" disabled style="opacity: 0.7; cursor: default;">Current Plan</button>
+        {% else %}
+          <form method="post" action="{% url 'prep:initiate_payment' %}">
+            {% csrf_token %}
+            <input type="hidden" name="package" value="{{ p.id }}">
+            <button type="submit" class="btn btn-block" style="background: {{ p.theme_color }}; border-color: {{ p.theme_color }}; color: #fff; font-weight: 600; padding: 10px 16px; border-radius: var(--radius); transition: opacity 0.15s;">
+              Subscribe via M-Pesa
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Styled Credit Consumption Rules -->
+<section style="margin-bottom: 36px;" id="credit-rules">
+  <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--white);">
+    <!-- Rules Header Container -->
+    <div style="padding: 16px 22px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <h3 style="margin: 0 0 3px 0; font-size: 1.05rem; color: var(--text); font-weight: 600;">Credit Consumption Rules</h3>
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.84rem;">Transparent credit deductions per action; cached syllabus questions and lecture notes are always 100% free.</p>
+      </div>
+      <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-weight: 700; font-size: 0.75rem; padding: 4px 10px;">
+        PAY-PER-USE
+      </span>
+    </div>
+
+    <!-- Structured Rules List -->
+    <div style="display: flex; flex-direction: column;">
+      <!-- Row 1: Free Cached Notes & Questions -->
+      <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(15, 118, 110, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Cached Past Questions & Notes</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Instant access from syllabus database, all 3 explanation levels, and marking rubrics</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(15, 118, 110, 0.12); color: var(--green); font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          0 Credits (Free)
+        </span>
+      </div>
+
+      <!-- Row 2: Digital PDF Upload -->
+      <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(37, 99, 235, 0.1); color: #2563eb; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Document / PDF Upload</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Digital lecture notes, course outlines, and typed syllabus materials</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          2 Credits
+        </span>
+      </div>
+
+      <!-- Row 3: Handwritten Exam Scan -->
+      <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(230, 126, 34, 0.12); color: #d97706; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Handwritten Exam / Document Scan</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">High-precision scanning of handwritten examination sheets and camera photos</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(230, 126, 34, 0.12); color: #d97706; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          5 Credits
+        </span>
+      </div>
+
+      <!-- Row 4: Step-by-Step Proof -->
+      <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(124, 58, 237, 0.1); color: #7c3aed; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Step-by-Step Proof &amp; Derivation</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Rigorous vertical mathematical derivations, formal proofs, and intermediate steps</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          5 Credits
+        </span>
+      </div>
+
+      <!-- Row 5: Practice Question Variant -->
+      <div style="padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(15, 118, 110, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Practice Question Variant</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Topic-calibrated assessment problems formulated from authentic past paper standards</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(15, 118, 110, 0.12); color: var(--green); font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          1 Credit / question
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

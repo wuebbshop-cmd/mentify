@@ -1,0 +1,210 @@
+{% extends 'prep/base_prep.html' %}
+
+{% block title %}{{ course.code }} — Syllabus Topics | Mentify Prep{% endblock %}
+
+{% block extra_css %}
+<style>
+  .topic-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 22px 24px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .topic-card:hover {
+    border-color: var(--green);
+  }
+  body.dark-theme .topic-card {
+    background: #181818;
+    border-color: #2e2e2e;
+  }
+  body.dark-theme .topic-card:hover {
+    border-color: #2dd4bf;
+  }
+
+  .topic-unit-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+  body.dark-theme .topic-unit-label {
+    color: #2dd4bf;
+  }
+
+  .topic-headline {
+    margin: 0 0 12px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+  }
+
+  .subtopic-chip {
+    font-size: 0.78rem;
+    font-weight: 500;
+    background: var(--hover);
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    display: inline-block;
+  }
+  body.dark-theme .subtopic-chip {
+    background: #202020;
+    border-color: #333;
+    color: #ccc;
+  }
+
+  .topic-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    margin-top: 16px;
+  }
+
+  .topic-secondary-link {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .topic-secondary-link:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header (Streamlined Breadcrumb & Course Info, No Action Buttons) -->
+<div class="page-header" style="margin-bottom: 24px;">
+  <div style="font-size: 0.84rem; margin-bottom: 6px;">
+    <a href="{% url 'prep:courses' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">&larr; Courses</a>
+  </div>
+  <h1 style="margin: 0 0 8px; font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text);">
+    {{ course.code }}{% if course.title and course.code != course.title %} &bull; {{ course.title }}{% endif %}
+  </h1>
+  {% if course.description %}
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.5; max-width: 820px;">{{ course.description }}</p>
+  {% endif %}
+
+  <!-- Typographic Metrics Strip -->
+  <div style="display: flex; gap: 32px; flex-wrap: wrap; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border);">
+    <div>
+      <div style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 3px;">Syllabus Scope</div>
+      <div style="font-size: 1.35rem; font-weight: 700; color: var(--text);">{{ topics|length }} Units</div>
+    </div>
+    <div>
+      <div style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 3px;">Banked Past Questions</div>
+      <div style="font-size: 1.35rem; font-weight: 700; color: var(--text);">{{ total_questions_count|default:0 }} Questions</div>
+    </div>
+    <div>
+      <div style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 3px;">Explanation Levels</div>
+      <div style="font-size: 1.35rem; font-weight: 700; color: var(--green);">Levels 1 &ndash; 3</div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Gate Status & Ingested Document Pipeline (Only shown when documents are pending review) -->
+{% if pending_review_count > 0 %}
+<div class="card" style="margin-bottom: 24px; padding: 16px 20px; border-left: 4px solid #d97706; background: rgba(217, 119, 6, 0.04);">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+    <div>
+      <div style="font-weight: 700; color: #b45309; font-size: 0.95rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Stage 2: Tutor Review Gate Active ({{ pending_review_count }} Document{{ pending_review_count|pluralize }} Under Review)
+      </div>
+      <p style="margin: 0; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.45;">
+        The academic review team is currently verifying mathematical formulas and exam marking schemes for the document{{ pending_review_count|pluralize }} below before final publication. Preliminary units remain active for immediate study.
+      </p>
+    </div>
+    <span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-size: 0.72rem; font-weight: 700; padding: 4px 8px;">
+      IN REVIEW
+    </span>
+  </div>
+
+  {% if pending_documents %}
+  <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(217, 119, 6, 0.2);">
+    {% for doc in pending_documents %}
+    <div style="font-size: 0.78rem; background: var(--surface); border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px;">
+      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span style="font-weight: 600; color: var(--text);">{{ doc.filename }}</span>
+      <span style="color: var(--text-muted);">({{ doc.doc_type }})</span>
+      <span class="badge badge-outline" style="font-size: 0.65rem; padding: 2px 6px; color: #b45309; border-color: #fde68a;">
+        {{ doc.stage_display }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Syllabus Topics Header -->
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; margin-top: 28px;">
+  <div>
+    <h2 style="font-size: 1.15rem; font-weight: 600; margin: 0 0 2px; color: var(--text);">Syllabus Topics</h2>
+    <span style="font-size: 0.84rem; color: var(--text-muted);">Structured units with derivations, worked examples, and authentic exam questions.</span>
+  </div>
+  <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">{{ topics|length }} Topics</span>
+</div>
+
+<!-- Refined Topic Cards -->
+<div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px;">
+  {% for t in topics %}
+  <div class="topic-card">
+    <span class="topic-unit-label">Unit {{ forloop.counter|stringformat:"02d" }}</span>
+    <h3 class="topic-headline">{{ t.title }}</h3>
+
+    <!-- Subtopics Tags (Clean Plain-Text Tags Only, No Equations or LaTeX) -->
+    {% if t.subtopics %}
+    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+      {% for st in t.subtopics %}
+      <span class="subtopic-chip">{{ st }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Action Row (Primary CTA + Quiet Secondary Options, No Button Congestion) -->
+    <div class="topic-action-row">
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=past_questions" class="topic-secondary-link">
+          Past Questions ({{ t.authentic_count }})
+        </a>
+        <span style="color: var(--border);">&bull;</span>
+        <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=practice" class="topic-secondary-link">
+          Practice Variants
+        </a>
+      </div>
+
+      <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes" class="btn btn-primary btn-sm" style="padding: 7px 18px; font-weight: 500;">
+        Study Notes &rarr;
+      </a>
+    </div>
+  </div>
+  {% empty %}
+  <div style="padding: 36px 24px; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius-md); background: var(--surface);">
+    <div style="max-width: 480px; margin: 0 auto;">
+      <h3 style="margin-bottom: 8px; font-size: 1.1rem; color: var(--text);">No Syllabus Topics Indexed Yet</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin: 0;">
+        {% if course_documents %}
+          Uploaded materials are currently undergoing Stage 1 text extraction and Stage 2 tutor review. Syllabus units will appear here once extracted.
+        {% else %}
+          Upload course lecture notes or a syllabus outline to automatically extract and index syllabus units.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

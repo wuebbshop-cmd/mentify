@@ -7,6 +7,15 @@ from django.utils.translation import gettext_lazy as _
 from .models import User, Profile
 
 
+def apply_password_requirements(field: forms.Field) -> None:
+    """Provide browser-side guidance that matches the server-side validators."""
+    field.widget.attrs.update({
+        "autocomplete": "new-password",
+        "minlength": 8,
+        "title": "Use at least 8 characters with at least one letter and one number.",
+    })
+
+
 def build_username_from_email(email: str, *, existing_user: User | None = None) -> str:
     """Create a safe, unique username from an email address."""
     base = (email or "").split("@", 1)[0].strip().lower()
@@ -56,6 +65,8 @@ class LearnerRegistrationForm(UserCreationForm):
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
         self.fields["agree_to_terms"].widget.attrs["class"] = "form-check-input"
+        apply_password_requirements(self.fields["password1"])
+        apply_password_requirements(self.fields["password2"])
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
@@ -96,6 +107,8 @@ class TutorRegistrationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+        apply_password_requirements(self.fields["password1"])
+        apply_password_requirements(self.fields["password2"])
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -174,6 +187,8 @@ class MentifySetPasswordForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+        apply_password_requirements(self.fields["new_password1"])
+        apply_password_requirements(self.fields["new_password2"])
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -238,6 +253,8 @@ class PasswordChangeForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+        apply_password_requirements(self.fields["new_password1"])
+        apply_password_requirements(self.fields["new_password2"])
 
 
 class ContactForm(forms.Form):

@@ -289,7 +289,6 @@ small { font-size: .8rem; color: var(--text-light); }
 
 .dashboard-body {
   padding: 36px;
-  overflow-y: auto;
 }
 
 /* ─── Navbar ─────────────────────────────────────────────────── */
@@ -333,6 +332,7 @@ small { font-size: .8rem; color: var(--text-light); }
   color: var(--text-muted);
   font-size: .9rem;
   font-weight: 500;
+  white-space: nowrap;
   transition: background .15s, color .15s;
 }
 .navbar-nav .nav-link:hover,
@@ -1604,7 +1604,18 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .lesson-detail-grid { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .navbar-nav .nav-link {
+    padding: 6px 8px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 860px) {
   :root { --nav-h: 56px; }
   .container { padding: 0 16px; }
   .main-content { padding: 24px 0; }

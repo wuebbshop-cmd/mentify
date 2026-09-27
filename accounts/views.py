@@ -78,7 +78,7 @@ def home(request):
 def role_select(request):
     """Landing page where user picks their role before registering."""
     if request.user.is_authenticated:
-        return redirect(request.user.get_dashboard_url())
+        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
     return render(request, "accounts/role_select.html")
 
 
@@ -133,7 +133,7 @@ def cookie_policy(request):
 def register_learner(request):
     """Learner self-registration."""
     if request.user.is_authenticated:
-        return redirect(request.user.get_dashboard_url())
+        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
 
     if request.method == "POST":
         form = LearnerRegistrationForm(request.POST)
@@ -146,7 +146,8 @@ def register_learner(request):
             login(request, user)
             send_welcome_email(user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
-            return redirect(user.get_dashboard_url())
+            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
+            return redirect(next_url)
         messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
@@ -157,7 +158,7 @@ def register_learner(request):
 def register_guardian(request):
     """Guardian self-registration."""
     if request.user.is_authenticated:
-        return redirect(request.user.get_dashboard_url())
+        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
     if request.method == "POST":
         form = LearnerRegistrationForm(request.POST)
         if form.is_valid():
@@ -169,7 +170,8 @@ def register_guardian(request):
             login(request, user)
             send_welcome_email(user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
-            return redirect(user.get_dashboard_url())
+            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
+            return redirect(next_url)
         messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
@@ -179,7 +181,7 @@ def register_guardian(request):
 def register_tutor(request):
     """Tutor self-registration."""
     if request.user.is_authenticated:
-        return redirect(request.user.get_dashboard_url())
+        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
     if request.method == "POST":
         form = LearnerRegistrationForm(request.POST)
         if form.is_valid():
@@ -191,7 +193,8 @@ def register_tutor(request):
             login(request, user)
             send_welcome_email(user)
             messages.success(request, f"Welcome to Mentify, {user.first_name}!")
-            return redirect(user.get_dashboard_url())
+            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
+            return redirect(next_url)
         messages.error(request, _form_error_message(form))
     else:
         form = LearnerRegistrationForm()
@@ -329,7 +332,7 @@ def guardian_link_confirm(request, token):
 def login_view(request):
     """Custom login using email."""
     if request.user.is_authenticated:
-        return redirect(request.user.get_dashboard_url())
+        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
 
     if request.method == "POST":
         form = MentifyLoginForm(request, data=request.POST)
@@ -337,7 +340,7 @@ def login_view(request):
             user = form.get_user()
             promote_if_admin_email(user)  # auto-promote whitelisted admins
             login(request, user)
-            next_url = request.GET.get("next") or user.get_dashboard_url()
+            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
             messages.success(request, f"Welcome back, {user.first_name}!")
             return redirect(next_url)
         messages.error(request, _form_error_message(form, "Invalid email or password. Please try again."))
@@ -1016,6 +1019,7 @@ def google_login(request):
 
     action = request.GET.get("action", "login")
     role = request.GET.get("role", "learner")
+    next_param = request.GET.get("next")
 
     if not settings.GOOGLE_CLIENT_ID:
         messages.error(request, "Google sign-in is not configured yet.")
@@ -1025,6 +1029,8 @@ def google_login(request):
     request.session["oauth_state"] = state
     request.session["pending_action"] = action
     request.session["pending_role"] = role
+    if next_param:
+        request.session["oauth_next"] = next_param
 
     # Resolve redirect URL
     redirect_uri = settings.GOOGLE_REDIRECT_URI or request.build_absolute_uri(reverse("accounts:google_callback"))
@@ -1149,7 +1155,8 @@ def google_callback(request):
 
     login(request, user)
     promote_if_admin_email(user)  # auto-promote whitelisted admins
-    return redirect(user.get_dashboard_url())
+    next_url = request.session.pop("oauth_next", None) or user.get_dashboard_url()
+    return redirect(next_url)
 
 
 # ─── Custom HTTP Error Handlers ───────────────────────────────────────────────

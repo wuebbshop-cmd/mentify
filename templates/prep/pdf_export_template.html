@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{COURSE_UPPER}} &mdash; {{TOPIC_TITLE}}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    font-size: 10pt;
+    line-height: 1.65;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  .doc-header {
+    border-bottom: 2.5px solid #0f766e;
+    padding-bottom: 12px;
+    margin-bottom: 22px;
+  }
+  .badge-tag {
+    display: inline-block;
+    background: #0f766e;
+    color: #ffffff;
+    font-size: 8pt;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  h1 {
+    color: #0f766e;
+    font-size: 18pt;
+    font-weight: 800;
+    margin: 8px 0 4px 0;
+    line-height: 1.25;
+  }
+  .subtitle {
+    color: #64748b;
+    font-size: 9.5pt;
+    font-weight: 500;
+  }
+  h2 {
+    color: #0f766e;
+    font-size: 13.5pt;
+    font-weight: 700;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 5px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+  h3 {
+    color: #334155;
+    font-size: 11pt;
+    font-weight: 600;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  p {
+    margin: 8px 0;
+  }
+  ul, ol {
+    margin: 8px 0 12px 20px;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  blockquote {
+    border-left: 4px solid #0f766e;
+    background: #f8fafc;
+    border-radius: 0 4px 4px 0;
+    padding: 10px 16px;
+    margin: 14px 0;
+    color: #334155;
+    page-break-inside: avoid;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 7px 10px;
+    text-align: left;
+  }
+  th {
+    background: #0f766e;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+  pre {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    margin: 14px 0;
+    page-break-inside: avoid;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  code {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 8.5pt;
+    background: #f1f5f9;
+    color: #0f766e;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+  pre code {
+    background: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
+  }
+  .katex-display {
+    margin: 12px 0;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <span class="badge-tag">Mentify Prep &bull; Verified Syllabus Study Pack &bull; {{LEVEL_DISPLAY}}</span>
+  <h1>{{COURSE_UPPER}} &mdash; {{TOPIC_TITLE}}</h1>
+  <div class="subtitle">Canonical Academic Notes &bull; {{LEVEL_DISPLAY}} &bull; Full Derivations &amp; Code &bull; Generated {{DATE_STR}}</div>
+</div>
+
+<div id="content"></div>
+<div id="render-complete" style="display:none;"></div>
+
+<script id="raw-notes" type="text/plain">{{ESCAPED_JSON}}</script>
+
+<script>
+// Mentify Prep — Unified Markdown & KaTeX Rendering Pipeline v2 (inlined for PDF generation)
+// ARCHITECTURE: tokenize-first, single-pass, zero structural regex.
+
+(function(window) {
+  'use strict';
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function autoCloseEnvironments(latex) {
+    if (!latex) return '';
+    var fixed = latex.trim();
+    var envs = ['aligned', 'cases', 'matrix', 'pmatrix', 'bmatrix', 'vmatrix', 'gather', 'split', 'array', 'align'];
+    for (var i = 0; i < envs.length; i++) {
+      var env = envs[i];
+      var openRe = new RegExp('\\\\begin\\{' + env + '\\*?\\}', 'g');
+      var closeRe = new RegExp('\\\\end\\{' + env + '\\*?\\}', 'g');
+      var opens = (fixed.match(openRe) || []).length;
+      var closes = (fixed.match(closeRe) || []).length;
+      if (opens > closes) {
+        fixed = fixed.replace(/_\s*$/, '');
+        fixed = fixed.replace(/\\text\{[^}]*$/, '');
+        for (var k = 0; k < opens - closes; k++) fixed += '\n\\end{' + env + '}';
+      }
+    }
+    var ob = (fixed.match(/\{/g) || []).length;
+    var cb = (fixed.match(/\}/g) || []).length;
+    if (ob > cb) { for (var b = 0; b < ob - cb; b++) fixed += '}'; }
+    return fixed;
+  }
+
+  function tryRenderKaTeX(latex, displayMode) {
+    if (!latex || !latex.trim()) return '';
+    var cleaned = autoCloseEnvironments(latex);
+    if (window.katex && typeof window.katex.renderToString === 'function') {
+      try {
+        return window.katex.renderToString(cleaned, {
+          displayMode: displayMode, throwOnError: true, strict: false, trust: true
+        });
+      } catch (e) {
+        return '<span class="katex-fallback">' + escapeHtml(cleaned) + '</span>';
+      }
+    }
+    return '<span class="katex-fallback">' + escapeHtml(cleaned) + '</span>';
+  }
+
+  function minimalNormalise(text) {
+    text = text.replace(/\\n(?![a-zA-Z])/g, '\n');
+    text = text.replace(/Lindeberg\ufffdL\ufffdy/g, 'Lindeberg\u2013L\u00e9vy');
+    text = text.replace(/(\d+)\ufffd(\d+)/g, '$1\u2013$2');
+    text = text.replace(/([IVXLCDM]+)\ufffd([IVXLCDM]+)/g, '$1\u2013$2');
+    text = text.replace(/\s*\ufffd\s*/g, ' \u2014 ');
+    text = text.replace(/\ufffd/g, '\u2014');
+    text = text.replace(/\\\[([\s\S]*?)\\\]/g, function(_, inner) { return '$$\n' + inner.trim() + '\n$$'; });
+    text = text.replace(/\\\(([^\n\r]+?)\\\)/g, function(_, inner) { return '$' + inner.trim() + '$'; });
+    text = text.replace(/^\s*>\s*$/gm, '');
+    text = text.replace(/^\s*#\s*$/gm, '');
+    var envNames = '(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\\*?)';
+    var bareEnvRe = new RegExp('(^|\\n)([>\\s]*)(\\\\begin\\{' + envNames + '\\}[\\s\\S]*?\\\\end\\{' + envNames + '\\})', 'g');
+    text = text.replace(bareEnvRe, function(match, nl, bq, body, offset) {
+      var before = text.slice(0, offset);
+      var lastDd = before.lastIndexOf('$$');
+      if (lastDd !== -1) {
+        var afterDd = before.slice(lastDd + 2);
+        if (afterDd.indexOf('$$') === -1) return match;
+      }
+      return (nl || '') + '\n$$\n' + body.trim() + '\n$$\n';
+    });
+    text = text.replace(/\$([^\$\n\r]+?)\$\s*\n+\s*\$([^\$\n\r]+?)\$/g, function(_, a, b) {
+      return '$' + a + b + '$';
+    });
+    text = text.replace(
+      /(^|[^\$])\$([^\$\n\r]*[=+\-*/\(,\\])\r?\n[ \t]*([=+\-*/\)a-zA-Z0-9\\_^{}][^\$\n\r]*)\$([^\$]|$)/g,
+      function(_, prefix, p1, p2, suffix) {
+        return prefix + '$' + p1 + ' ' + p2 + '$' + suffix;
+      }
+    );
+
+    // Systemic LaTeX math hygiene and syntax repairs
+    // Command merged with single variable letter (e.g. \geqn -> \geq n)
+    text = text.replace(/\\(geq|leq|neq|approx|sim|equiv|times|subset|subseteq|supset|supseteq|notin|cap|cup)([a-zA-Z])(?![a-zA-Z])/g, '\\$1 $2');
+    // Strip invalid sizing commands directly on large operators (\big\bigcup -> \bigcup)
+    text = text.replace(/\\(?:big|Big|bigg|Bigg)\s*(?:\$\s*\$)?\s*\\(bigcup|bigcap|sum|prod|coprod)\b/g, '\\$1');
+    text = text.replace(/\$\s*\\(?:big|Big|bigg|Bigg)\s*\$\s*\\/g, '$\\');
+    text = text.replace(/\$\s*\\(?:big|Big|bigg|Bigg)[lr]?\s*\$/g, '');
+    // Remove rogue dollar signs inside sub/superscripts (e.g. N_\$\varepsilon -> N_\varepsilon)
+    text = text.replace(/([_^])\\?\$/g, '$1');
+    // Repair stuttering math expressions across split dollars (e.g. \min\{\varepsilon_1, \dots $\varepsilon_1, \dots, \varepsilon_n\})
+    text = text.replace(/\\min\s*\\\{\s*([^{}$\n\r]+?)\s*,\s*\\dots\s*\$\s*\\?\1\s*,\s*\\dots\s*,/g, '\\min\\{$1, \\dots,');
+    // Remove stray dollar after English sentence ending with period (e.g. 'is closed.$' -> 'is closed.')
+    text = text.replace(/([a-zA-Z]{2,}\s+[a-zA-Z]{2,}\.)\$/g, '$1');
+    // Ensure unclosed QED marker has closing dollar
+    text = text.replace(/(^|[^\\])\$\s*\\blacksquare(?!\$)/g, '$1$\\blacksquare$');
+    // Clean double backslashes before LaTeX commands in math (e.g. \\varepsilon -> \varepsilon)
+    text = text.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+    // Clean duplicated theorem/definition prefixes (e.g. **Definition 2**Definition 2.4 -> **Definition 2.4)
+    text = text.replace(/\*\*(Definition|Theorem|Lemma|Axiom|Example|Corollary|Remark)\s+\d+\s*\*\*(\1\s+\d+)/g, '**$2');
+    // Clean corrupted triple dollars and escaped trailing dollars (e.g. $\\$$)
+    text = text.replace(/\$[ \t]*\\\$[ \t]*\$/g, '');
+    // Clean rogue single dollars before QED symbols inside display math (e.g. $\square $$ -> \square\n$$)
+    text = text.replace(/\$\s*\\(blacksquare|square|qed)\s*\$?\s*\$\$/g, '\\$1\n$$');
+    text = text.replace(/\\(blacksquare|square|qed)\s*\$?\s*\$\$/g, '\\$1\n$$');
+    // Clean stray trailing dollars on prose lines (e.g. "with $$" or "with $")
+    text = text.replace(/([a-zA-Z0-9_])\s*\\?\${1,2}\s*$/gm, '$1');
+    // Strip empty list items left by truncated generation (e.g. "3." or "-" alone on a line)
+    text = text.replace(/^\s*(?:\d+\.|\*|-)\s*$/gm, '');
+    // Heal split decimals across accidental $$ insertions (e.g. 2.\n$$\n718282 -> 2.718282)
+    text = text.replace(/(\d+)\.\s*\n+\s*\$\$\s*\n+\s*(\d+)/g, '$1.$2');
+    // Ensure all \end{env} blocks are properly closed by $$ on the next line
+    text = text.replace(/(\\end\{(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\})([ \t]*)(?!\n[ \t]*\$\$)/g, '$1\n$$\n');
+
+    return text;
+  }
+
+  function createMathExtension() {
+    var envs = '(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\\*?)';
+    var envRe = new RegExp('^(?:[ \\t]*)?(\\\\begin\\{' + envs + '\\}[\\s\\S]+?\\\\end\\{' + envs + '\\})[ \\t]*(?:\\n|$)');
+
+    return {
+      extensions: [
+        {
+          name: 'blockMath',
+          level: 'block',
+          start: function (src) {
+            var i1 = src.indexOf('$$');
+            var i2 = src.indexOf('\\[');
+            var i3 = src.indexOf('\\begin{');
+            var valid = [i1, i2, i3].filter(function (x) { return x !== -1; });
+            return valid.length ? Math.min.apply(null, valid) : undefined;
+          },
+          tokenizer: function (src, tokens) {
+            var matchDd = src.match(/^(?:[ \\t]*)?\\$\\$([\\s\\S]+?)\\$\\$[ \\t]*(?:\\n|$)/);
+            if (matchDd) {
+              if (!/\\n\\s*#{1,6}\\s+/.test(matchDd[1]) && !/\\n\\s*\\n\\s*\\n/.test(matchDd[1])) {
+                return {
+                  type: 'blockMath',
+                  raw: matchDd[0],
+                  text: matchDd[1].trim()
+                };
+              }
+            }
+            var matchBracket = src.match(/^(?:[ \\t]*)?\\\\\\[([\\s\\S]+?)\\\\\\][ \\t]*(?:\\n|$)/);
+            if (matchBracket) {
+              if (!/\\n\\s*#{1,6}\\s+/.test(matchBracket[1])) {
+                return {
+                  type: 'blockMath',
+                  raw: matchBracket[0],
+                  text: matchBracket[1].trim()
+                };
+              }
+            }
+            var matchEnv = src.match(envRe);
+            if (matchEnv) {
+              return {
+                type: 'blockMath',
+                raw: matchEnv[0],
+                text: matchEnv[1].trim()
+              };
+            }
+          },
+          renderer: function (token) {
+            return '<div class="katex-display">' + tryRenderKaTeX(token.text, true) + '</div>\\n';
+          }
+        },
+        {
+          name: 'inlineMath',
+          level: 'inline',
+          start: function (src) {
+            var i1 = src.indexOf('$');
+            var i2 = src.indexOf('\\(');
+            var valid = [i1, i2].filter(function (x) { return x !== -1; });
+            return valid.length ? Math.min.apply(null, valid) : undefined;
+          },
+          tokenizer: function (src, tokens) {
+            var matchDollar = src.match(/^\\$(?!\\$)([^\\s\\$\\n\\r](?:[^\\$\\n\\r]*?[^\\s\\$\\n\\r])?)\\$(?!\\$)/);
+            if (matchDollar) {
+              return {
+                type: 'inlineMath',
+                raw: matchDollar[0],
+                text: matchDollar[1].trim()
+              };
+            }
+            var matchParen = src.match(/^\\\\\\((.+?)\\\\\\)/);
+            if (matchParen) {
+              return {
+                type: 'inlineMath',
+                raw: matchParen[0],
+                text: matchParen[1].trim()
+              };
+            }
+          },
+          renderer: function (token) {
+            return tryRenderKaTeX(token.text, false);
+          }
+        }
+      ]
+    };
+  }
+
+  var mathExtensionConfigured = false;
+  function ensureMarkedConfigured() {
+    if (mathExtensionConfigured) return;
+    if (window.marked && typeof window.marked.use === 'function') {
+      window.marked.use({ gfm: true, breaks: true });
+      window.marked.use(createMathExtension());
+      mathExtensionConfigured = true;
+    }
+  }
+
+  function renderMarkdownWithKaTeX(rawText, containerElement) {
+    if (!containerElement) return '';
+    if (!rawText) { containerElement.innerHTML = ''; return ''; }
+
+    ensureMarkedConfigured();
+    var text = minimalNormalise(String(rawText));
+    var htmlOutput = '';
+
+    if (window.marked && typeof window.marked.parse === 'function') {
+      htmlOutput = window.marked.parse(text);
+    } else {
+      htmlOutput = escapeHtml(text).replace(/\\n/g, '<br>');
+    }
+
+    containerElement.innerHTML = htmlOutput;
+
+    if (window.Prism && typeof window.Prism.highlightAllUnder === 'function') {
+      window.Prism.highlightAllUnder(containerElement);
+    } else if (window.Prism && typeof window.Prism.highlightAll === 'function') {
+      window.Prism.highlightAll();
+    }
+
+    return htmlOutput;
+  }
+
+  window.renderMarkdownWithKaTeX = renderMarkdownWithKaTeX;
+  window.tryRenderKaTeX = tryRenderKaTeX;
+
+})(window);
+</script>
+<script>
+{{RENDERER_JS}}
+</script>
+<script>
+function renderPDFContent() {
+  try {
+    var rawData = JSON.parse(document.getElementById('raw-notes').textContent);
+    renderMarkdownWithKaTeX(rawData, document.getElementById('content'));
+  } catch(e) {
+    console.error('PDF render error:', e);
+  } finally {
+    var el = document.getElementById('render-complete');
+    if (el) {
+      el.className = 'render-complete';
+      el.setAttribute('data-done', 'true');
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderPDFContent);
+} else {
+  renderPDFContent();
+}
+</script>
+</body>
+</html>
