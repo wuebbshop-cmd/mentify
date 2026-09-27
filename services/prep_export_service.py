@@ -500,6 +500,8 @@ def _build_paper_questions_html(
     include_answers: bool = True,
 ) -> str:
     """Build a question paper, answer key, or combined paper from one source."""
+    from services.prep_ai_router import normalize_math_delimiters
+
     course_upper = course_code.upper()
     if include_questions and include_answers:
         document_label = paper_title
@@ -512,21 +514,20 @@ def _build_paper_questions_html(
         num = q.get("number", 1)
         marks = q.get("marks", 10)
         topic = q.get("topic", "Mathematical Assessment")
-        q_latex = q.get("question_latex", "")
-        sol_latex = q.get("solution_latex", "")
+        q_latex = normalize_math_delimiters(q.get("question_latex", ""))
+        sol_latex = normalize_math_delimiters(q.get("solution_latex", ""))
 
-        heading = f"## Question {num} [{marks} Marks] &bull; {topic}"
+        heading = f"## Question {num} [{marks} Marks] - {topic}"
         if include_answers and not include_questions:
-            heading = f"## Answer {num} [{marks} Marks] &bull; {topic}"
+            heading = f"## Answer {num} [{marks} Marks] - {topic}"
         questions_markdown += f"{heading}\n\n"
         if include_questions:
             questions_markdown += f"{q_latex}\n\n"
         if include_answers and sol_latex:
-            questions_markdown += f"> **✓ Step-by-Step Verified Solution & Proof:**\n>\n"
-            sol_lines = sol_latex.strip().split("\n")
-            questions_markdown += "\n".join(f"> {line}" for line in sol_lines) + "\n\n"
+            questions_markdown += "### Step-by-Step Verified Solution\n\n"
+            questions_markdown += f"{sol_latex.strip()}\n\n"
         elif include_answers:
-            questions_markdown += "> **Solution status:** A verified solution is not available for this question.\n\n"
+            questions_markdown += "Solution status: A verified solution is not available for this question.\n\n"
         questions_markdown += "---\n\n"
 
     return _build_topic_notes_html(

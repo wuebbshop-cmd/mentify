@@ -136,6 +136,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         "approve_stage_3_publish",
         "move_to_stage_2_review",
         "requeue_stage_1_extraction",
+        "index_assessment_questions",
         "reject_document",
     ]
 
@@ -292,6 +293,8 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                 if not created and not paper.is_published:
                     paper.is_published = True
                     paper.save()
+                from services.prep_ingestion import index_assessment_questions
+                index_assessment_questions(doc, paper)
                 published_papers_count += 1
 
             # Log to student's history
@@ -334,6 +337,20 @@ class PrepDocumentAdmin(admin.ModelAdmin):
     def requeue_stage_1_extraction(self, request, queryset):
         count = queryset.update(stage="stage_1")
         self.message_user(request, f"{count} document(s) re-queued for Stage 1 Ingestion.")
+
+    @admin.action(description="Index approved assessment questions from extracted text")
+    def index_assessment_questions(self, request, queryset):
+        from services.prep_ingestion import index_assessment_questions
+
+        indexed = 0
+        skipped = 0
+        for doc in queryset.filter(doc_type__in=["Continuous Assessment Test (CAT)", "Final Examination Paper"]):
+            paper = PrepPaper.objects.filter(source_document=doc).first()
+            if not paper:
+                skipped += 1
+                continue
+            indexed += index_assessment_questions(doc, paper)
+        self.message_user(request, f"Indexed {indexed} question(s). Skipped {skipped} document(s) without a linked paper.")
 
     @admin.action(description="✕ Reject Selected Documents")
     def reject_document(self, request, queryset):

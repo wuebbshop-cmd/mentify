@@ -469,6 +469,118 @@ def _normalise_document_text(text: str) -> str:
     return _normalise_for_comparison(text)
 
 
+_ASSESSMENT_QUESTION_START = re.compile(
+    r"(?m)^\s*(?:question\s*)?(\d{1,2})\s*[\).:]\s+"
+)
+_ASSESSMENT_MARKS = re.compile(r"\(?\s*(\d{1,3})\s*(?:marks?|mks?)\s*\)?", re.IGNORECASE)
+_TOPIC_STOP_WORDS = {
+    "about", "after", "also", "answer", "assume", "below", "calculate", "course",
+    "define", "find", "following", "from", "given", "have", "into", "marks", "paper",
+    "prove", "question", "show", "that", "the", "then", "this", "using", "with", "write",
+}
+
+
+def extract_assessment_questions(text: str) -> list[dict]:
+    """Split explicitly numbered assessment questions without inventing content."""
+    if not text:
+        return []
+
+    cleaned = re.sub(r"(?m)^---\s*Page.*?---\s*$", "", text)
+    matches = list(_ASSESSMENT_QUESTION_START.finditer(cleaned))
+    questions = []
+    for index, match in enumerate(matches):
+        number = int(match.group(1))
+        if number < 1 or number > 99:
+            continue
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(cleaned)
+        prompt = cleaned[match.end():end].strip()
+        prompt = re.sub(r"\\hfill", " ", prompt)
+        prompt = re.sub(r"[ \t]+", " ", prompt)
+        prompt = re.sub(r"\n{3,}", "\n\n", prompt).strip()
+        if len(prompt) < 18:
+            continue
+        marks_match = _ASSESSMENT_MARKS.search(prompt)
+        marks = int(marks_match.group(1)) if marks_match else 0
+        if marks_match:
+            prompt = (prompt[:marks_match.start()] + prompt[marks_match.end():]).strip()
+        if len(prompt) < 12:
+            continue
+        questions.append({"number": number, "marks": marks, "question_latex": prompt})
+    return questions
+
+
+def _topic_match_for_question(course, question_text: str):
+    """Map only evidence-backed keyword matches; leave uncertain questions unassigned."""
+    question_words = {
+        word.casefold()
+        for word in re.findall(r"[A-Za-z]{3,}", question_text)
+        if word.casefold() not in _TOPIC_STOP_WORDS
+    }
+    best_topic = None
+    best_score = 0
+    for topic in course.topics.all():
+        labels = [topic.title] + list(topic.subtopics if isinstance(topic.subtopics, list) else [])
+        topic_words = {
+            word.casefold()
+            for label in labels
+            for word in re.findall(r"[A-Za-z]{3,}", str(label))
+            if word.casefold() not in _TOPIC_STOP_WORDS
+        }
+        score = len(question_words & topic_words)
+        if score > best_score:
+            best_topic, best_score = topic, score
+    return best_topic if best_score else None
+
+
+def assessment_question_rendering_issues(question_text: str) -> list[str]:
+    """Return deterministic extraction defects that must not reach learners.
+
+    Private-use glyphs and replacement characters are evidence that PDF text
+    extraction did not recover the mathematical notation. They are not valid
+    question content and must be reviewed or re-OCRed before publication.
+    """
+    source = str(question_text or "")
+    issues = []
+    if re.search(r"[\ue000-\uf8ff]", source):
+        issues.append("unreadable private-use glyphs from source extraction")
+    if "\ufffd" in source:
+        issues.append("unreadable replacement character from source extraction")
+    return issues
+
+
+def index_assessment_questions(prep_document, paper) -> int:
+    """Create verified question-bank rows from an approved assessment exactly once."""
+    from prep.models import PrepQuestion
+
+    if PrepQuestion.objects.filter(paper=paper).exists() or not prep_document.extracted_text.strip():
+        return 0
+
+    parsed_questions = extract_assessment_questions(prep_document.extracted_text)
+    if not parsed_questions:
+        return 0
+
+    created = 0
+    for item in parsed_questions:
+        topic = _topic_match_for_question(prep_document.course, item["question_latex"])
+        issues = assessment_question_rendering_issues(item["question_latex"])
+        PrepQuestion.objects.create(
+            paper=paper,
+            topic=topic,
+            question_type="authentic",
+            number=item["number"],
+            marks=item["marks"],
+            topic_label=topic.title if topic else "",
+            question_latex=item["question_latex"],
+            solution_latex="",
+            verification_status=(
+                "flagged" if issues else ("verified" if prep_document.stage == "stage_3" else "pending")
+            ),
+            verified_by=prep_document.reviewed_by if prep_document.stage == "stage_3" and not issues else None,
+        )
+        created += 1
+    return created
+
+
 def create_content_update_proposals(course, prep_document, candidates: list[dict]) -> list:
     """Create pending enrichment proposals without modifying approved topic data."""
     from prep.models import PrepContentUpdate, PrepTopic

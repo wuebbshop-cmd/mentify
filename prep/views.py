@@ -78,6 +78,38 @@ def clean_tag_label(label: str) -> str:
     return text
 
 
+def _catalog_search_key(value: str) -> str:
+    """Make course-code search insensitive to spaces, hyphens, and casing."""
+    return re.sub(r"[^a-z0-9]+", "", (value or "").casefold())
+
+
+def _find_catalog_courses(query: str, *, limit: int = 12, include_category: bool = False):
+    """Search the shared catalogue by normalized code, title, and optional category."""
+    query_key = _catalog_search_key(query)
+    if not query_key:
+        return []
+    courses = list(
+        PrepCourse.objects.filter(is_active=True).annotate(
+            topics_count=Count("topics", distinct=True),
+            papers_count=Count("papers", distinct=True),
+        )
+    )
+
+    def matches(course):
+        searchable = f"{course.code} {course.title}"
+        if include_category:
+            searchable += f" {course.category}"
+        return query_key in _catalog_search_key(searchable)
+
+    matching_courses = [course for course in courses if matches(course)]
+    matching_courses.sort(key=lambda course: (
+        _catalog_search_key(course.code) != query_key,
+        not _catalog_search_key(course.code).startswith(query_key),
+        course.code,
+    ))
+    return matching_courses[:limit]
+
+
 def _public_topic_notes(topic):
     """Return the newest complete shared Level 2 notes without generating content."""
     from services.prep_ai_router import _note_completion_issues
@@ -319,15 +351,7 @@ def prep_courses(request):
     search_results = []
     already_added_matches = []
     if query:
-        matches = (
-            PrepCourse.objects.filter(is_active=True)
-            .filter(Q(code__icontains=query) | Q(title__icontains=query))
-            .annotate(
-                topics_count=Count("topics", distinct=True),
-                papers_count=Count("papers", distinct=True),
-            )
-            .order_by("code")[:12]
-        )
+        matches = _find_catalog_courses(query)
         for course in matches:
             title = re.sub(
                 r"^" + re.escape(course.code) + r"[\s:\-\â€“\â€”]*",
@@ -404,7 +428,8 @@ def prep_course_detail(request, course_code):
     for t in topics_qs:
         auth_count = PrepQuestion.objects.filter(
             Q(topic=t) | Q(topic_label__icontains=t.title),
-            question_type="authentic"
+            question_type="authentic",
+            verification_status="verified",
         ).count()
         total_questions_count += auth_count
         raw_subtopics = t.subtopics if isinstance(t.subtopics, list) else []
@@ -423,7 +448,7 @@ def prep_course_detail(request, course_code):
             "title": p.title,
             "year": p.year,
             "marks": p.total_marks,
-            "questions_count": p.questions.count(),
+            "questions_count": p.questions.filter(verification_status="verified").count(),
         })
 
     pending_documents = []
@@ -515,7 +540,10 @@ def prep_topic_study(request, topic_id):
             & Q(topic_label__icontains=topic.title)
         )
     ) & Q(question_type="authentic")
-    authentic_records = PrepQuestion.objects.filter(q_filter).select_related("paper")
+    authentic_records = PrepQuestion.objects.filter(
+        q_filter,
+        verification_status="verified",
+    ).select_related("paper")
 
     for q in authentic_records[:15]:
         paper_label = q.paper.title if q.paper else f"{course_code} Examination"
@@ -605,7 +633,7 @@ def prep_paper_detail(request, course_code, paper_id):
 
     if paper:
         questions_list = []
-        for q in paper.questions.all().order_by("number"):
+        for q in paper.questions.filter(verification_status="verified").order_by("number"):
             questions_list.append({
                 "number": q.number,
                 "marks": q.marks,
@@ -824,11 +852,7 @@ def prep_upload(request):
     }
     if context["search_query"]:
         query = context["search_query"]
-        matches = list(
-            PrepCourse.objects.filter(is_active=True)
-            .filter(Q(code__icontains=query) | Q(title__icontains=query) | Q(category__icontains=query))
-            .annotate(topics_count=Count("topics", distinct=True), papers_count=Count("papers", distinct=True))[:10]
-        )
+        matches = _find_catalog_courses(query, limit=10, include_category=True)
         for match in matches:
             match.is_added = match.id in enrolled_ids
         context["matching_courses"] = matches
@@ -1415,7 +1439,10 @@ def prep_generate_practice_api(request):
         if topic_obj
         else 0
     )
-    fresh_needed = max(0, count - existing_generated)
+    # A verified shared set is reused exactly as it stands. Do not reserve
+    # credits for a larger later selection, because that must not append paid
+    # variants to an existing set.
+    fresh_needed = 0 if existing_generated else count
 
     if fresh_needed > 0:
         try:
@@ -1530,6 +1557,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
         authentic_records = PrepQuestion.objects.filter(
             topic_filter,
             question_type="authentic",
+            verification_status="verified",
         ).select_related("paper").order_by("paper", "number", "id")
         generated_records = PrepQuestion.objects.filter(
             topic=topic,
@@ -1575,18 +1603,24 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
         )
         return response
 
-    # 1. Fetch complete revision notes for the requested level
-    from services.prep_ai_router import get_or_generate_topic_notes
-    notes_res = get_or_generate_topic_notes(
-        course_code=course_code,
-        topic_title=topic_title,
-        subtopics=topic.subtopics if (topic and isinstance(topic.subtopics, list)) else [],
-        level=level,
-        course_obj=topic.course if topic else None,
-        topic_obj=topic,
-        generate_if_missing=False,
-    )
-    notes_content = notes_res.get("notes", "") or notes_res.get("content", "")
+    # 1. Export the same published shared source shown on the study page.
+    # This direct lookup avoids a second cache-key path producing a false
+    # "No validated notes" response on a mobile download request.
+    from services.prep_ai_router import get_or_generate_topic_notes, get_published_topic_note_levels
+    published_notes = get_published_topic_note_levels(topic) if topic else {}
+    notes_content = published_notes.get(level, "")
+    notes_res = {"notes": notes_content}
+    if not notes_content:
+        notes_res = get_or_generate_topic_notes(
+            course_code=course_code,
+            topic_title=topic_title,
+            subtopics=topic.subtopics if (topic and isinstance(topic.subtopics, list)) else [],
+            level=level,
+            course_obj=topic.course if topic else None,
+            topic_obj=topic,
+            generate_if_missing=False,
+        )
+        notes_content = notes_res.get("notes", "") or notes_res.get("content", "")
     if not notes_content:
         return HttpResponse(
             notes_res.get("error") or "No validated notes are available for this topic yet.",
@@ -1604,7 +1638,10 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
         )
     ) & Q(question_type="authentic")
     authentic_qs = []
-    for q in PrepQuestion.objects.filter(q_filter).select_related("paper")[:15]:
+    for q in PrepQuestion.objects.filter(
+        q_filter,
+        verification_status="verified",
+    ).select_related("paper")[:15]:
         authentic_qs.append({
             "number": q.number,
             "marks": q.marks,
@@ -1671,8 +1708,8 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
     total_marks = paper.total_marks if paper else 30
 
     questions_data = []
-    if paper and paper.questions.exists():
-        for q in paper.questions.all().order_by("number"):
+    if paper and paper.questions.filter(verification_status="verified").exists():
+        for q in paper.questions.filter(verification_status="verified").order_by("number"):
             questions_data.append({
                 "number": q.number,
                 "marks": q.marks,
@@ -1680,23 +1717,14 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
                 "question_latex": q.question_latex,
                 "solution_latex": q.solution_latex,
             })
+    elif paper:
+        return HttpResponse(
+            "This paper has no verified extractable questions yet.",
+            status=404,
+            content_type="text/plain; charset=utf-8",
+        )
     else:
-        questions_data = [
-            {
-                "number": 1,
-                "marks": 10,
-                "topic": "Metric Spaces",
-                "question_latex": r"Let $(X, d)$ be a metric space. Prove that every open ball $B_r(x) = \{y \in X : d(x, y) < r\}$ is an open set in $(X, d)$.",
-                "solution_latex": r"Proof: Let y in B_r(x). Take epsilon = r - d(x, y) > 0. For any z in B_epsilon(y), d(x, z) <= d(x, y) + d(y, z) < d(x, y) + r - d(x, y) = r. Hence B_epsilon(y) subset B_r(x), so B_r(x) is open. Q.E.D.",
-            },
-            {
-                "number": 2,
-                "marks": 10,
-                "topic": "Discrete Topology",
-                "question_latex": r"Show that the discrete metric $d(x, y) = 1$ if $x \neq y$ and $0$ if $x = y$ induces the discrete topology on any set $X$.",
-                "solution_latex": r"Proof: Every singleton {x} = B_{1/2}(x) is an open ball, so every singleton is open. Since any subset is a union of singletons, every subset is open. Q.E.D.",
-            },
-        ]
+        return HttpResponse("The requested paper was not found.", status=404)
 
     safe_id = paper_id.replace(" ", "_")
     section = request.GET.get("section", "both").strip().lower()

@@ -60,7 +60,10 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
 
 
 NOTES_CACHE_VERSION = "markdown-katex-v6"
-NOTE_VALIDATION_STATE = "validated"
+# v2 rechecks caches that were approved before escaped-dollar validation was
+# added. Safe legacy entries are republished once; malformed entries are never
+# served as validated notes.
+NOTE_VALIDATION_STATE = "validated-v2"
 NOTE_MAX_FAILED_GENERATION_CYCLES = 2
 
 
@@ -378,8 +381,43 @@ def repair_json_escaped_latex_newlines(content: str) -> str:
     ``eq`` inside a math expression. This is a narrow, deterministic repair;
     normal prose line breaks and arbitrary malformed LaTex are left untouched.
     """
-    if not isinstance(content, str) or "\n" not in content:
+    if not isinstance(content, str):
         return content or ""
+
+    def repair_escaped_dollars_inside_math(source: str) -> str:
+        """Remove an impossible literal dollar only when it occurs in math.
+
+        A provider occasionally emits ``\\$\\lim`` inside an already-open
+        expression. KaTeX treats that as a literal dollar, not a delimiter,
+        which corrupts the rest of the expression. A literal dollar is never
+        meaningful inside LaTeX math, so this is a bounded transport repair;
+        escaped currency in prose is deliberately left untouched.
+        """
+        output = []
+        mode = None
+        index = 0
+        while index < len(source):
+            char = source[index]
+            next_char = source[index + 1] if index + 1 < len(source) else ""
+            if char == "\\" and next_char == "$":
+                if mode is None:
+                    output.extend((char, next_char))
+                # Inside math, omit only the accidental literal dollar.
+                index += 2
+                continue
+            if char == "$":
+                if next_char == "$":
+                    mode = None if mode == "display" else ("display" if mode is None else mode)
+                    output.extend((char, next_char))
+                    index += 2
+                    continue
+                mode = None if mode == "inline" else ("inline" if mode is None else mode)
+            output.append(char)
+            index += 1
+        return "".join(output)
+
+    if "\n" not in content:
+        return repair_escaped_dollars_inside_math(content)
 
     suffixes = ("otin", "eq", "abla", "u", "atural", "ewcommand")
     output = []
@@ -429,7 +467,7 @@ def repair_json_escaped_latex_newlines(content: str) -> str:
         output.append(char)
         index += 1
 
-    return "".join(output)
+    return repair_escaped_dollars_inside_math("".join(output))
 
 
 def _publish_legacy_note_cache(entry, payload: dict, topic_title: str) -> dict | None:
@@ -472,7 +510,20 @@ def get_published_topic_note_levels(topic_obj) -> dict[str, str]:
             payload = _publish_legacy_note_cache(entry, payload, topic_obj.title)
         if not payload:
             continue
-        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        content = repair_json_escaped_latex_newlines(
+            str(payload.get("content") or payload.get("notes") or "")
+        ).strip()
+        # Never trust a historical validation marker blindly. This protects
+        # existing shared content when stricter renderer checks are introduced.
+        if not content or _note_completion_issues(content, topic_obj.title):
+            continue
+        if content != payload.get("content"):
+            payload = dict(payload)
+            payload["content"] = content
+            payload["validation_state"] = NOTE_VALIDATION_STATE
+            payload["validated_at"] = timezone.now().isoformat()
+            entry.payload = payload
+            entry.save(update_fields=["payload", "updated_at"])
         if content:
             levels[level] = content
     return levels
@@ -580,12 +631,18 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
         if not payload or payload.get("level") != level:
             continue
 
-        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        content = repair_json_escaped_latex_newlines(
+            str(payload.get("content") or payload.get("notes") or "")
+        ).strip()
         if payload.get("validation_state") != NOTE_VALIDATION_STATE:
             payload = _publish_legacy_note_cache(entry, payload, topic_title)
         if not payload:
             continue
-        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        content = repair_json_escaped_latex_newlines(
+            str(payload.get("content") or payload.get("notes") or "")
+        ).strip()
+        if not content or _note_completion_issues(content, topic_title):
+            continue
 
         entry.hit_count += 1
         entry.save(update_fields=["hit_count"])
@@ -801,13 +858,13 @@ from services.prep_blocks import (
 
 def normalize_math_delimiters(text: str) -> str:
     """
-    Safe non-destructive hygiene only:
-    1. Escaped literal newlines.
-    2. Unicode replacement characters.
-    No auto-closing environments, no regex guessing or string mutation.
+    Shared renderer hygiene for notes, authentic questions, generated questions,
+    and PDF exports. It performs only deterministic transport repairs and does
+    not guess at or auto-close mathematical expressions.
     """
     if not text:
         return ""
+    text = repair_json_escaped_latex_newlines(str(text))
     text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
     text = re.sub(r'(\d+)\ufffd(\d+)', r'\1–\2', text)
@@ -884,7 +941,8 @@ def get_or_generate_topic_notes(
         cached_content = repair_json_escaped_latex_newlines(
             str(cached.get("content", "") or "")
         )
-        if cached.get("validation_state") == NOTE_VALIDATION_STATE:
+        cached_issues = _note_completion_issues(cached_content, topic_title)
+        if cached.get("validation_state") == NOTE_VALIDATION_STATE and not cached_issues:
             # Strict read-only: never mutate or overwrite a valid cache on read.
             return {
                 "notes": cached_content,
@@ -897,7 +955,6 @@ def get_or_generate_topic_notes(
 
         # Notes created before the publication marker existed are checked once.
         # A successful check upgrades the shared row so no later student repeats it.
-        cached_issues = _note_completion_issues(cached_content, topic_title)
         if not cached_issues:
             from prep.models import PrepContentCache
 
@@ -1346,10 +1403,13 @@ def generate_similar_practice_questions(
             ).order_by("number")
         )
 
-    # If we already have enough generated questions in DB, return them ($0 cost!)
-    if len(existing_qs) >= count:
+    # A shared generated set is immutable once verified. Reopening the control
+    # must reuse it, never append paid variants because a later click selected
+    # a larger count. A deliberate replacement workflow can be added separately
+    # with tutor/admin review and an explicit archive step.
+    if existing_qs:
         results = []
-        for q in existing_qs[:count]:
+        for q in existing_qs:
             clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
             clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
             results.append({

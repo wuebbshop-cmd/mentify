@@ -5,6 +5,16 @@ import os
 
 DEBUG = False
 
+# Background email jobs have no request object from which to infer a host.
+# Keep local development configurable in base.py while ensuring production
+# emails never expose a localhost link when Render has no BASE_URL variable.
+_configured_base_url = os.environ.get("BASE_URL", "").strip().rstrip("/")
+BASE_URL = (
+    _configured_base_url
+    if _configured_base_url and "localhost" not in _configured_base_url and "127.0.0.1" not in _configured_base_url
+    else "https://mlaudit.info"
+)
+
 # Allowed hosts: custom domain, Render domains, and dynamic Render hostname.
 env_hosts = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]
 render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
