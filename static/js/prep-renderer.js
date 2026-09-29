@@ -209,9 +209,22 @@
     var quotedMath = [];
     var envNames = 'aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\\*?';
     var envStart = new RegExp('^\\s*\\\\begin\\{(?:' + envNames + ')\\}');
-    var envEnd = new RegExp('\\\\end\\{(?:' + envNames + ')\\}\\s*$');
     var environment = false;
+    var environmentStack = [];
     var environmentLines = [];
+
+    function updateEnvironmentStack(line) {
+      var tokenRe = new RegExp('\\\\(begin|end)\\{(' + envNames + ')\\}', 'g');
+      var match;
+      while ((match = tokenRe.exec(line)) !== null) {
+        if (match[1] === 'begin') {
+          environmentStack.push(match[2]);
+        } else if (environmentStack[environmentStack.length - 1] === match[2]) {
+          environmentStack.pop();
+        }
+      }
+      return environmentStack.length === 0;
+    }
 
     lines.forEach(function (line) {
       var quoteMatch = line.match(/^\\s*>\\s?(.*)$/);
@@ -241,19 +254,22 @@
 
       if (!environment && envStart.test(line) && !line.includes('$$')) {
         environment = true;
+        environmentStack = [];
         environmentLines = [line.trim()];
-        if (envEnd.test(line)) {
+        if (updateEnvironmentStack(line)) {
           output.push('$$', environmentLines.join('\n'), '$$');
           environment = false;
+          environmentStack = [];
           environmentLines = [];
         }
         return;
       }
       if (environment) {
         environmentLines.push(line.trim());
-        if (envEnd.test(line)) {
+        if (updateEnvironmentStack(line)) {
           output.push('$$', environmentLines.join('\n'), '$$');
           environment = false;
+          environmentStack = [];
           environmentLines = [];
         }
         return;

@@ -102,22 +102,32 @@
 
   <div style="display: flex; flex-direction: column; gap: 8px;">
     {% for c in recent_courses %}
-    <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" class="course-clean-row">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="dashboard-course-code" style="font-weight: 700; font-size: 1.02rem;">{{ c.code }}</span>
-        {% if c.title and c.code != c.title %}
-          <span style="color: var(--text-muted);">&bull;</span>
-          <span class="dashboard-course-title" style="font-size: 0.94rem; font-weight: 500;">{{ c.title }}</span>
-        {% endif %}
-      </div>
-
-      <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: var(--text-muted);">
-        <span>{{ c.topics_count }} Topics</span>
-        <span>&bull;</span>
-        <span>{{ c.papers_count }} Past Papers</span>
-        <span style="color: var(--green); font-weight: 600; margin-left: 6px;">Open Syllabus &rarr;</span>
-      </div>
-    </a>
+    <div class="course-clean-row">
+      <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" style="text-decoration: none; color: inherit; min-width: 0; flex: 1;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span class="dashboard-course-code" style="font-weight: 700; font-size: 1.02rem;">{{ c.code }}</span>
+          {% if c.title and c.code != c.title %}
+            <span style="color: var(--text-muted);">&bull;</span>
+            <span class="dashboard-course-title" style="font-size: 0.94rem; font-weight: 500;">{{ c.title }}</span>
+          {% endif %}
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-muted); margin-top: 8px;">
+          <span>{{ c.topics_count }} Topics</span>
+          <span>&bull;</span>
+          <span>{{ c.papers_count }} Past Papers</span>
+          <span style="color: var(--green); font-weight: 600;">Open Syllabus &rarr;</span>
+        </div>
+      </a>
+      {% if request.user.is_authenticated %}
+      <form method="post" action="{% url 'prep:remove_course' course_id=c.id %}" style="margin: 0; flex-shrink: 0;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="prep:dashboard">
+        <button type="submit" class="btn btn-outline btn-sm" title="Remove course from dashboard" onclick="return confirm('Remove {{ c.code }} from your dashboard?');" style="color: var(--danger); border-color: rgba(217, 48, 37, 0.35);">
+          Remove
+        </button>
+      </form>
+      {% endif %}
+    </div>
     {% empty %}
     <div style="padding: 28px; text-align: center; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-md);">
       <p style="margin-bottom: 6px; font-weight: 500; color: var(--text);">No courses enrolled yet.</p>

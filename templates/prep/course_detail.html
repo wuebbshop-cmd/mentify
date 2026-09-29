@@ -91,9 +91,29 @@
   <div style="font-size: 0.84rem; margin-bottom: 6px;">
     <a href="{% url 'prep:courses' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">&larr; Courses</a>
   </div>
-  <h1 style="margin: 0 0 8px; font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text);">
-    {{ course.code }}{% if course.title and course.code != course.title %} &bull; {{ course.title }}{% endif %}
-  </h1>
+  <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+    <h1 style="margin: 0; font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text);">
+      {{ course.code }}{% if course.title and course.code != course.title %} &bull; {{ course.title }}{% endif %}
+    </h1>
+    {% if request.user.is_authenticated and course.id %}
+      {% if course.is_enrolled %}
+      <form method="post" action="{% url 'prep:remove_course' course_id=course.id %}" style="margin: 0;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="btn btn-outline btn-sm" onclick="return confirm('Remove this course from your dashboard?');" style="color: var(--danger); border-color: rgba(217, 48, 37, 0.3);">
+          Remove from Dashboard
+        </button>
+      </form>
+      {% else %}
+      <form method="post" action="{% url 'prep:add_course' course_id=course.id %}" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-sm">
+          + Add to Dashboard
+        </button>
+      </form>
+      {% endif %}
+    {% endif %}
+  </div>
   {% if course.description %}
     <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.5; max-width: 820px;">{{ course.description }}</p>
   {% endif %}
@@ -115,7 +135,7 @@
   </div>
 </div>
 
-<!-- Review Gate Status & Ingested Document Pipeline (Only shown when documents are pending review) -->
+<!-- Tutor Review Status -->
 {% if pending_review_count > 0 %}
 <div class="card" style="margin-bottom: 24px; padding: 16px 20px; border-left: 4px solid #d97706; background: rgba(217, 119, 6, 0.04);">
   <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">

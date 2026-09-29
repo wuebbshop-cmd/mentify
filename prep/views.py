@@ -224,7 +224,7 @@ def prep_dashboard(request):
             papers_count=Count("papers", distinct=True),
         ).order_by("-enrollments__created_at")
         history_qs = PrepHistory.objects.filter(user=request.user).order_by("-created_at")[:5]
-        display_courses = enrolled_courses[:3]
+        display_courses = enrolled_courses
     else:
         wallet = None
         user_credits = 0
@@ -242,6 +242,7 @@ def prep_dashboard(request):
             if not clean_title:
                 clean_title = c.title
         recent_courses.append({
+            "id": c.id,
             "code": c.code,
             "slug": c.slug or c.code.replace(" ", "-"),
             "title": clean_title,
@@ -339,6 +340,7 @@ def prep_courses(request):
             if not clean_title:
                 clean_title = c.title
         courses_data.append({
+            "id": c.id,
             "code": c.code,
             "slug": c.slug or c.code.replace(" ", "-"),
             "title": clean_title,
@@ -405,6 +407,38 @@ def prep_add_course(request, course_id):
 
 
 @login_required
+def prep_remove_course(request, course_id):
+    """Remove a shared course from this user's dashboard only."""
+    if request.method != "POST":
+        return redirect("prep:dashboard")
+
+    enrollment = PrepCourseEnrollment.objects.filter(
+        user=request.user,
+        course_id=course_id,
+    ).first()
+    if enrollment:
+        code = enrollment.course.code
+        enrollment.delete()
+        messages.success(request, f"{code} was removed from your courses.")
+    else:
+        course = PrepCourse.objects.filter(id=course_id).first()
+        code = course.code if course else "Course"
+        messages.info(request, f"{code} is not currently in your courses.")
+
+    next_url = request.POST.get("next")
+    if next_url == "prep:courses":
+        return redirect("prep:courses")
+    elif next_url == "prep:dashboard":
+        return redirect("prep:dashboard")
+    elif next_url and next_url.startswith("/"):
+        return redirect(next_url)
+    referer = request.META.get("HTTP_REFERER")
+    if referer:
+        return redirect(referer)
+    return redirect("prep:dashboard")
+
+
+@login_required
 def prep_course_detail(request, course_code):
     """Syllabus Topics & Paper Breakdown for a Course."""
     clean_code = course_code.replace("-", " ").strip().upper()
@@ -428,7 +462,7 @@ def prep_course_detail(request, course_code):
     for t in topics_qs:
         auth_count = PrepQuestion.objects.filter(
             Q(topic=t) | Q(topic_label__icontains=t.title),
-            question_type="authentic",
+            question_type__in=["authentic", "adapted"],
             verification_status="verified",
         ).count()
         total_questions_count += auth_count
@@ -453,7 +487,7 @@ def prep_course_detail(request, course_code):
 
     pending_documents = []
     for d in course.documents.filter(stage__in=["stage_1", "stage_2"]).order_by("-created_at"):
-        pending_documents.append({
+        document_data = {
             "id": str(d.id),
             "filename": d.file.name.split("/")[-1] if d.file else "Document",
             "doc_type": d.doc_type,
@@ -462,7 +496,9 @@ def prep_course_detail(request, course_code):
             "academic_year": d.academic_year,
             "topic_name": d.topic_name,
             "created_at": d.created_at.strftime("%b %d, %Y"),
-        })
+        }
+        if d.stage == "stage_2":
+            pending_documents.append(document_data)
     pending_review_count = len(pending_documents)
 
     # Clean display title to avoid duplication
@@ -472,10 +508,13 @@ def prep_course_detail(request, course_code):
         if not display_title:
             display_title = course.title
 
+    is_enrolled = PrepCourseEnrollment.objects.filter(user=request.user, course=course).exists()
     course_obj = {
+        "id": course.id,
         "code": course.code,
         "title": display_title,
         "level": course.level,
+        "is_enrolled": is_enrolled,
         "description": course.description or "Canonical syllabus units, structured theorems, lecture notes, and past examination problems.",
     }
 
@@ -539,17 +578,23 @@ def prep_topic_study(request, topic_id):
             & Q(paper__course=topic.course)
             & Q(topic_label__icontains=topic.title)
         )
-    ) & Q(question_type="authentic")
+    ) & Q(
+        question_type__in=["authentic", "adapted"],
+        verification_status="verified",
+    )
     authentic_records = PrepQuestion.objects.filter(
         q_filter,
-        verification_status="verified",
     ).select_related("paper")
 
-    for q in authentic_records[:15]:
+    for q in authentic_records[:25]:
         paper_label = q.paper.title if q.paper else f"{course_code} Examination"
         year_label = q.paper.year if q.paper else "Official Examination"
         clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
         clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+        has_formatting_errors = (
+            bool(re.search(r"[\uf000-\uffff]||||||||||", q.question_latex or ""))
+            or (q.question_latex and len(q.question_latex.strip()) < 15)
+        )
         authentic_qs.append({
             "id": q.id,
             "number": q.number,
@@ -560,6 +605,9 @@ def prep_topic_study(request, topic_id):
             "question_latex": clean_q,
             "solution_latex": clean_sol,
             "has_solution": bool(clean_sol),
+            "is_flagged": False,
+            "has_formatting_errors": has_formatting_errors,
+            "is_adapted": q.question_type == "adapted",
         })
 
     # 2. Existing Practice Variants in DB
@@ -805,9 +853,11 @@ def prep_upload(request):
                 f"Course materials advanced to Stage 2: Tutor Review Gate ({res.get('credits_deducted', 2)} credits).",
             )
         except Exception as e:
-            messages.success(
+            prep_doc.tutor_review_notes = f"Ingestion failed before review: {str(e)[:1000]}"
+            prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
+            messages.error(
                 request,
-                f"'{uploaded_file.name}' uploaded and queued for Stage 1 Ingestion.",
+                f"'{uploaded_file.name}' was saved but ingestion failed. An administrator must requeue it before it can be reviewed.",
             )
 
         # Log History
@@ -1149,6 +1199,7 @@ from services.prep_ai_router import (
     get_or_generate_question_solution,
     get_or_generate_topic_notes,
     generate_similar_practice_questions,
+    generate_adapted_past_question,
 )
 
 
@@ -1261,6 +1312,125 @@ def prep_solve_question_api(request):
 
 
 @login_required
+def prep_adapt_question_api(request):
+    """Create a credit-paid, validated equivalent for an unreadable source question."""
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "POST method required."}, status=405)
+
+    try:
+        data = json.loads(request.body.decode("utf-8")) if request.body else request.POST
+    except Exception:
+        data = request.POST
+
+    try:
+        question_id = int(data.get("question_id"))
+    except (TypeError, ValueError):
+        return JsonResponse({"success": False, "error": "A valid question is required."}, status=400)
+
+    question = PrepQuestion.objects.select_related("paper__course", "topic__course").filter(
+        id=question_id,
+        question_type__in=["authentic", "adapted"],
+    ).first()
+    if not question:
+        return JsonResponse({"success": False, "error": "This question was not found."}, status=404)
+
+    target_topic = question.topic
+    topic_id_param = data.get("topic_id")
+    if not target_topic and topic_id_param and str(topic_id_param).isdigit():
+        target_topic = PrepTopic.objects.filter(id=int(topic_id_param)).first()
+    if not target_topic and question.paper:
+        target_topic = PrepTopic.objects.filter(
+            course=question.paper.course,
+            title__icontains=question.topic_label
+        ).first()
+
+    adapted_label = f"Adapted from Question {question.number}"
+    existing = PrepQuestion.objects.filter(
+        paper=question.paper,
+        topic=target_topic or question.topic,
+        question_type="adapted",
+        topic_label=adapted_label,
+        verification_status="verified",
+    ).first()
+    wallet = PrepWallet.get_or_create_wallet(request.user)
+    if existing:
+        return JsonResponse({
+            "success": True,
+            "cached": True,
+            "question_id": existing.id,
+            "question_latex": existing.question_latex,
+            "solution_latex": existing.solution_latex,
+            "marks": existing.marks,
+            "topic_label": existing.topic_label or "",
+            "credits_deducted": 0,
+            "credits_balance": wallet.credits_balance,
+        })
+
+    try:
+        enforce_subscription_limit(wallet, "practice_questions", 1)
+    except PlanLimitExceeded as exc:
+        return JsonResponse({"success": False, "error": str(exc)}, status=403)
+
+    minimum_cost = 5
+    required_balance = estimated_generation_credits(minimum=minimum_cost)
+    if get_available_credits(wallet) < required_balance:
+        return JsonResponse({
+            "success": False,
+            "error": f"Insufficient credits. At least {required_balance} credits are required to reconstruct this question.",
+            "credits_balance": wallet.credits_balance,
+        }, status=402)
+
+    result = generate_adapted_past_question(question)
+    if not result.get("success"):
+        return JsonResponse({"success": False, "error": result.get("error")}, status=422)
+
+    item = result["question"]
+    try:
+        credits_deducted = credits_for_usage(result.get("usage"), minimum=minimum_cost)
+        course_name = question.paper.course.code if question.paper else (question.topic.course.code if question.topic else "Course")
+        t_label = question.topic_label or (target_topic.title if target_topic else (question.topic.title if question.topic else "Mathematics"))
+        consume_credits(
+            wallet,
+            credits_deducted,
+            action_type="ai_practice_gen",
+            description=f"Adapted Past Question: {course_name} - {t_label}",
+            usage=result.get("usage"),
+            model_name=result.get("model", "deepseek-reasoner"),
+            metadata={"source_question_id": question.id, "adapted": True},
+        )
+    except InsufficientCredits:
+        return JsonResponse({
+            "success": False,
+            "error": "The adapted question requires more credits than are currently available.",
+            "credits_balance": get_available_credits(wallet),
+        }, status=402)
+
+    adapted = PrepQuestion.objects.create(
+        paper=question.paper,
+        topic=target_topic or question.topic,
+        question_type="adapted",
+        number=question.number,
+        marks=int(item.get("marks") or question.marks),
+        topic_label=adapted_label,
+        question_latex=item["question_latex"],
+        solution_latex=item["solution_latex"],
+        verification_status="verified",
+    )
+    wallet.refresh_from_db()
+    return JsonResponse({
+        "success": True,
+        "cached": False,
+        "question_id": adapted.id,
+        "question_latex": adapted.question_latex,
+        "solution_latex": adapted.solution_latex,
+        "marks": adapted.marks,
+        "topic_label": adapted.topic_label or "",
+        "credits_deducted": credits_deducted,
+        "credits_balance": wallet.credits_balance,
+    })
+
+
+@login_required
 def prep_topic_notes_api(request):
     """
     Retrieve or generate syllabus topic notes for a specific level (1, 2, or 3).
@@ -1299,7 +1469,7 @@ def prep_topic_notes_api(request):
     # This makes a visible shared level unconditionally free, even if an older
     # cache-key lookup would otherwise report that generation is required.
     from services.prep_ai_router import get_published_topic_note_levels
-    published_notes = get_published_topic_note_levels(topic_obj) if topic_obj else {}
+    published_notes = get_published_topic_note_levels(topic_obj, validated_only=True) if topic_obj else {}
     if level in published_notes:
         wallet.refresh_from_db()
         return JsonResponse({
@@ -1443,7 +1613,7 @@ def prep_generate_practice_api(request):
                     & Q(paper__course=topic_obj.course)
                     & Q(topic_label__icontains=topic_title)
                 )
-            ) & Q(question_type="authentic"),
+            ) & Q(question_type__in=["authentic", "adapted"], verification_status="verified"),
         )[:3]
         for q in auth_qs:
             authentic_samples.append(f"Q{q.number} ({q.marks} marks): {q.question_latex}")
@@ -1572,10 +1742,10 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
                 & Q(paper__course=topic.course)
                 & Q(topic_label__icontains=topic_title)
             )
-        ) & Q(question_type="authentic")
+        ) & Q(question_type__in=["authentic", "adapted"], verification_status="verified")
         authentic_records = PrepQuestion.objects.filter(
             topic_filter,
-            question_type="authentic",
+            question_type__in=["authentic", "adapted"],
             verification_status="verified",
         ).select_related("paper").order_by("paper", "number", "id")
         generated_records = PrepQuestion.objects.filter(
@@ -1626,7 +1796,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     # This direct lookup avoids a second cache-key path producing a false
     # "No validated notes" response on a mobile download request.
     from services.prep_ai_router import get_or_generate_topic_notes, get_published_topic_note_levels
-    published_notes = get_published_topic_note_levels(topic) if topic else {}
+    published_notes = get_published_topic_note_levels(topic, validated_only=True) if topic else {}
     notes_content = published_notes.get(level, "")
     notes_res = {"notes": notes_content}
     if not notes_content:
@@ -1641,11 +1811,11 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
         )
         notes_content = notes_res.get("notes", "") or notes_res.get("content", "")
     if not notes_content:
-        return HttpResponse(
-            notes_res.get("error") or "No validated notes are available for this topic yet.",
-            status=503,
-            content_type="text/plain; charset=utf-8",
-        )
+        err_msg = notes_res.get("error") or "Notes for this level are still being prepared. Please open the topic page first to load notes before exporting."
+        messages.warning(request, err_msg)
+        if topic:
+            return redirect(reverse("prep:topic_study", kwargs={"topic_id": topic_id}) + f"?tab=notes&level={level}")
+        return redirect("prep:dashboard")
 
     # 2. Fetch authentic questions mapped to this topic
     q_filter = (
@@ -1655,7 +1825,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
             & Q(paper__course=topic.course)
             & Q(topic_label__icontains=topic_title)
         )
-    ) & Q(question_type="authentic")
+        ) & Q(question_type__in=["authentic", "adapted"], verification_status="verified")
     authentic_qs = []
     for q in PrepQuestion.objects.filter(
         q_filter,

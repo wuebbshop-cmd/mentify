@@ -647,7 +647,7 @@
             </svg>
           </div>
           <span style="font-weight: 700; font-size: 0.88rem; color: var(--text);">Export PDF Study Pack</span>
-          <span id="export-pdf-level-badge" class="export-pdf-badge">Level 2</span>
+          <span id="export-pdf-level-badge" class="export-pdf-badge">Core Concepts</span>
         </a>
         <button type="button" class="export-pdf-chevron-btn" onclick="togglePdfLevelMenu(event)" title="Select tone level to export" aria-label="Select export level">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
@@ -656,18 +656,18 @@
 
       <div id="pdf-level-dropdown" class="export-pdf-menu">
         <div style="padding: 8px 16px 6px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border);">
-          Select Export Level
+          Select Notes Style
         </div>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_1" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
-          <span style="font-weight: 600;">Level 1: Intuition &amp; Basics</span>
+          <span style="font-weight: 600;">Foundation &amp; Intuition</span>
           <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
         </a>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_2" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
-          <span style="font-weight: 600;">Level 2: University Standard</span>
+          <span style="font-weight: 600;">Core Concepts</span>
           <span class="badge badge-accent" style="font-size: 0.68rem; padding: 2px 6px;">DEFAULT</span>
         </a>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_3" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
-          <span style="font-weight: 600;">Level 3: Exam Mode &amp; High Yield</span>
+          <span style="font-weight: 600;">Exam Focus</span>
           <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
         </a>
         <div style="height: 1px; margin: 4px 0; background: var(--border);"></div>
@@ -708,13 +708,13 @@
         Tone &amp; Depth:
       </span>
       <button type="button" class="level-btn" id="btn-lvl-1" onclick="loadNotesLevel('level_1')">
-        Level 1: Intuition &amp; Basics
+        Foundation &amp; Intuition
       </button>
       <button type="button" class="level-btn active" id="btn-lvl-2" onclick="loadNotesLevel('level_2')">
-        Level 2: University Standard
+        Core Concepts
       </button>
       <button type="button" class="level-btn" id="btn-lvl-3" onclick="loadNotesLevel('level_3')">
-        Level 3: Exam Mode &amp; High Yield
+        Exam Focus
       </button>
     </div>
 
@@ -737,11 +737,12 @@
   <!-- Notes Content Canvas -->
   <div class="card" style="padding: 28px; min-height: 320px;">
     <div id="notes-loading" style="display: none; text-align: center; padding: 48px 0;">
+      <div aria-hidden="true" style="width: 34px; height: 34px; margin: 0 auto 16px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: notes-spin 0.8s linear infinite;"></div>
       <div style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">
-        Synthesizing explanation for this level...
+        Preparing your notes...
       </div>
       <div style="font-size: 0.85rem; color: var(--text-muted);">
-        Formulating rigorous university definitions, theorems, and worked examples.
+        Please keep this page open while your notes are prepared.
       </div>
     </div>
 
@@ -767,6 +768,10 @@
   </div>
 </div>
 
+<style>
+  @keyframes notes-spin { to { transform: rotate(360deg); } }
+</style>
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════════
      PILLAR 2: AUTHENTIC PAST EXAMINATION QUESTIONS
@@ -788,7 +793,7 @@
         <div class="exam-card-header">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span class="badge" style="background: #0f766e; color: #fff; font-size: 0.72rem; padding: 3px 8px; font-weight: 700; letter-spacing: 0.5px;">
-              OFFICIAL PAST EXAM
+              {% if q.is_flagged %}SOURCE NEEDS RECONSTRUCTION{% elif q.is_adapted %}ADAPTED PAST QUESTION{% else %}OFFICIAL PAST EXAM{% endif %}
             </span>
             <span class="exam-q-title">
               Question {{ q.number }}
@@ -804,12 +809,37 @@
         </div>
 
         <!-- Problem Statement Canvas -->
+        {% if q.is_flagged %}
+        <div class="exam-problem-box" style="background: rgba(245, 158, 11, 0.05); border: 1px dashed rgba(245, 158, 11, 0.4); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 12px;">
+          <div style="font-weight: 600; font-size: 0.84rem; color: #b45309; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Source Past Paper OCR Formatting Glitches Detected
+          </div>
+          <p style="margin: 0 0 8px; font-size: 0.82rem; color: var(--text-muted);">
+            The scanned source for this past question had OCR extraction errors or missing math symbols and is awaiting tutor review.
+          </p>
+          {% if q.question_latex %}
+          <div class="markdown-rendered" id="auth-q-content-{{ q.id }}" style="font-size: 0.88rem; opacity: 0.75; border-top: 1px dashed var(--border); padding-top: 8px;"></div>
+          {% endif %}
+        </div>
+        {% else %}
+        {% if q.has_formatting_errors %}
+        <div style="margin-bottom: 6px;">
+          <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #b45309; font-size: 0.7rem; font-weight: 600; padding: 2px 7px;">
+            OCR Artifacts Detected &bull; Awaiting Review
+          </span>
+        </div>
+        {% endif %}
         <div class="exam-problem-box markdown-rendered" id="auth-q-content-{{ q.id }}">
           <!-- Rendered via JS -->
         </div>
+        {% endif %}
 
         <!-- Actions -->
         <div class="exam-actions-row">
+          {% if q.is_flagged %}
+          <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #b45309; font-size: 0.72rem; padding: 5px 8px;">Awaiting tutor review before publication</span>
+          {% else %}
           <button type="button" class="btn btn-outline btn-sm" onclick="toggleSolution('auth-sol-{{ q.id }}', '{{ q.id }}')">
             Reveal Verified Solution &amp; Marking Rubric
           </button>
@@ -817,6 +847,7 @@
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             View Step-by-Step Proof &amp; Solution
           </button>
+          {% endif %}
         </div>
 
         <!-- Solution Box -->
@@ -1120,6 +1151,13 @@
 
   // ─── PDF Export Helper for Dynamic Level ──────────────────────────────────
   let currentActiveLevel = 'level_2';
+  let notesRequestInFlight = false;
+
+  window.addEventListener('beforeunload', function(e) {
+    if (!notesRequestInFlight) return;
+    e.preventDefault();
+    e.returnValue = 'Your notes are still being prepared. Please wait for them to finish.';
+  });
 
   function updateExportPdfButton(level) {
     currentActiveLevel = level;
@@ -1129,11 +1167,11 @@
       const baseExportUrl = "{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}";
       mainBtn.href = `${baseExportUrl}?level=${level}`;
       const labelMap = {
-        'level_1': 'Level 1',
-        'level_2': 'Level 2',
-        'level_3': 'Level 3',
+        'level_1': 'Foundation & Intuition',
+        'level_2': 'Core Concepts',
+        'level_3': 'Exam Focus',
       };
-      badge.textContent = labelMap[level] || 'Level 2';
+      badge.textContent = labelMap[level] || 'Core Concepts';
     }
   }
 
@@ -1172,6 +1210,7 @@
 
     loadingEl.style.display = 'block';
     bodyEl.style.opacity = '0.3';
+    notesRequestInFlight = true;
 
     fetch("{% url 'prep:api_topic_notes' %}", {
       method: 'POST',
@@ -1188,6 +1227,7 @@
     })
     .then(r => r.json())
     .then(data => {
+      notesRequestInFlight = false;
       loadingEl.style.display = 'none';
       bodyEl.style.opacity = '1';
 
@@ -1200,6 +1240,7 @@
       }
     })
     .catch(err => {
+      notesRequestInFlight = false;
       loadingEl.style.display = 'none';
       bodyEl.style.opacity = '1';
       console.error(err);
@@ -1338,6 +1379,83 @@
     });
   }
 
+  // --- Reconstruct Flagged Past Question via AI (credits charged) ---
+  function adaptPastQuestion(questionId) {
+    const card = document.getElementById('auth-card-' + questionId);
+    if (!card) return;
+
+    const btn = card.querySelector('button');
+    if (btn) { btn.disabled = true; btn.textContent = 'Reconstructing...'; }
+
+    fetch("{% url 'prep:api_adapt_question' %}", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+      body: JSON.stringify({ question_id: questionId, topic_id: topicId }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.success) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Reconstruct Clean Question (AI)'; }
+        alert(data.error || 'Could not reconstruct this question at this time.');
+        return;
+      }
+      const newId = data.question_id;
+      authQuestionsMap[newId] = data;
+
+      // Replace flagged placeholder card with the adapted question
+      const adapted = document.createElement('div');
+      adapted.className = 'exam-question-card';
+      adapted.id = 'auth-card-' + newId;
+      const marksText = escapeHtml(String(data.marks || 10));
+      const topicText = escapeHtml(data.topic_label || topicTitle);
+      adapted.innerHTML = `
+        <div class="exam-card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="badge" style="background:#0f766e;color:#fff;font-size:0.72rem;padding:3px 8px;font-weight:700;">ADAPTED PAST QUESTION</span>
+            <span class="exam-q-title">Question</span>
+            <span class="badge badge-accent" style="font-size:0.75rem;font-weight:700;">${marksText} MARKS</span>
+          </div>
+          <div class="exam-paper-meta">
+            <span>AI Reconstructed &bull; ${topicText}</span>
+          </div>
+        </div>
+        <div class="exam-problem-box markdown-rendered" id="auth-q-content-${newId}"></div>
+        <div class="exam-actions-row">
+          <button type="button" class="btn btn-outline btn-sm" onclick="toggleSolution('auth-sol-${newId}', '${newId}')">
+            Reveal Verified Solution &amp; Marking Rubric
+          </button>
+        </div>
+        <div id="auth-sol-${newId}" class="exam-solution-box" style="display:none;">
+          <div style="font-size:0.88rem;font-weight:700;color:var(--green);margin-bottom:8px;">
+            Step-by-Step Verified Solution &amp; Marking Scheme:
+          </div>
+          <div id="auth-sol-content-${newId}" class="markdown-rendered"></div>
+        </div>
+      `;
+
+      card.replaceWith(adapted);
+
+      const qBox = document.getElementById('auth-q-content-' + newId);
+      if (qBox && data.question_latex) renderMarkdownWithKaTeX(data.question_latex, qBox);
+
+      const sBox = document.getElementById('auth-sol-content-' + newId);
+      if (sBox && data.solution_latex) {
+        renderMarkdownWithKaTeX(data.solution_latex, sBox);
+        sBox.dataset.rendered = 'true';
+      }
+
+      if (data.credits_balance !== undefined) {
+        const bal = document.getElementById('wallet-balance-indicator');
+        if (bal) bal.textContent = data.credits_balance;
+      }
+    })
+    .catch(err => {
+      if (btn) { btn.disabled = false; btn.textContent = 'Generate Similar Question'; }
+      console.error(err);
+      alert('Error connecting to reconstruction service. Please try again.');
+    });
+  }
+
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -1389,8 +1507,9 @@
         } else if (document.getElementById('pillar-notes').style.display !== 'none') {
           const notesBody = document.getElementById('notes-body');
           if (notesBody) {
-            notesBody.innerHTML = '<p style="color: var(--text-muted);">Validated notes are not available for this level yet. Select a level to prepare them.</p>';
+            notesBody.replaceChildren();
           }
+          loadNotesLevel('level_2');
         }
       } catch (e) {
         console.error("Error parsing initial notes JSON:", e);

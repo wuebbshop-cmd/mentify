@@ -142,9 +142,16 @@
             {{ c.topics }} topics &bull; {{ c.papers }} past papers{% if c.category %} &bull; {{ c.category }}{% endif %}
           </p>
         </div>
-        <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" class="course-action-link">
-          Open Syllabus &rarr;
-        </a>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="{% url 'prep:course_detail' course_code=c.slug|default:c.code %}" class="course-action-link">
+            Open Syllabus &rarr;
+          </a>
+          <form method="post" action="{% url 'prep:remove_course' course_id=c.id %}" style="margin: 0;">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="prep:courses">
+            <button type="submit" class="btn btn-outline btn-sm" title="Remove course from your list" onclick="return confirm('Remove this course from your course list?');">Remove</button>
+          </form>
+        </div>
       </div>
     {% empty %}
       <div style="padding: 28px 8px; text-align: center; color: var(--text-muted);">

@@ -545,14 +545,24 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("unreadable private-use glyphs from source extraction")
     if "\ufffd" in source:
         issues.append("unreadable replacement character from source extraction")
+    if len(re.sub(r"\s+", " ", source).strip()) < 18:
+        issues.append("question text is too short to be a complete assessment item")
+    if source.count("$$") % 2:
+        issues.append("unclosed display-math delimiter")
+    if source.count("\\(") != source.count("\\)"):
+        issues.append("unclosed inline-math delimiter")
+    if len(re.findall(r"\\begin\{([^{}]+)\}", source)) != len(re.findall(r"\\end\{([^{}]+)\}", source)):
+        issues.append("unclosed LaTeX environment")
+    if source.rstrip().endswith(("\\", "=", ":", "|")):
+        issues.append("question text appears truncated")
     return issues
 
 
 def index_assessment_questions(prep_document, paper) -> int:
-    """Create verified question-bank rows from an approved assessment exactly once."""
+    """Index assessment rows idempotently and reconcile their review status."""
     from prep.models import PrepQuestion
 
-    if PrepQuestion.objects.filter(paper=paper).exists() or not prep_document.extracted_text.strip():
+    if not prep_document.extracted_text.strip():
         return 0
 
     parsed_questions = extract_assessment_questions(prep_document.extracted_text)
@@ -563,21 +573,61 @@ def index_assessment_questions(prep_document, paper) -> int:
     for item in parsed_questions:
         topic = _topic_match_for_question(prep_document.course, item["question_latex"])
         issues = assessment_question_rendering_issues(item["question_latex"])
-        PrepQuestion.objects.create(
+        status = "flagged" if issues else ("verified" if prep_document.stage == "stage_3" else "pending")
+        question = PrepQuestion.objects.filter(
             paper=paper,
-            topic=topic,
             question_type="authentic",
             number=item["number"],
-            marks=item["marks"],
-            topic_label=topic.title if topic else "",
-            question_latex=item["question_latex"],
-            solution_latex="",
-            verification_status=(
-                "flagged" if issues else ("verified" if prep_document.stage == "stage_3" else "pending")
-            ),
-            verified_by=prep_document.reviewed_by if prep_document.stage == "stage_3" and not issues else None,
+        ).first()
+        if question is None:
+            question = PrepQuestion(
+                paper=paper,
+                question_type="authentic",
+                number=item["number"],
+            )
+            created += 1
+
+        question.topic = topic
+        question.marks = item["marks"]
+        question.topic_label = topic.title if topic else ""
+        question.question_latex = item["question_latex"]
+        question.verification_status = status
+        question.verified_by = (
+            prep_document.reviewed_by
+            if status == "verified" and prep_document.stage == "stage_3"
+            else None
         )
-        created += 1
+        question.save()
+
+        if status == "flagged" and topic:
+            # Keep unreadable source text private and publish only a validated
+            # adapted replacement. The existing replacement makes re-indexing
+            # idempotent and avoids repeated provider calls.
+            adapted_label = f"Adapted from Question {question.number}"
+            adapted_exists = PrepQuestion.objects.filter(
+                paper=paper,
+                topic=topic,
+                question_type="adapted",
+                topic_label=adapted_label,
+                verification_status="verified",
+            ).exists()
+            if not adapted_exists:
+                from services.prep_ai_router import generate_adapted_past_question
+
+                adapted_result = generate_adapted_past_question(question)
+                if adapted_result.get("success"):
+                    adapted_item = adapted_result["question"]
+                    PrepQuestion.objects.create(
+                        paper=paper,
+                        topic=topic,
+                        question_type="adapted",
+                        number=question.number,
+                        marks=int(adapted_item.get("marks") or question.marks),
+                        topic_label=adapted_label,
+                        question_latex=adapted_item["question_latex"],
+                        solution_latex=adapted_item["solution_latex"],
+                        verification_status="verified",
+                    )
     return created
 
 

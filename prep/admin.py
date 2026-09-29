@@ -15,6 +15,7 @@ from .models import (
     PrepQuestion,
     PrepContentCache,
     PrepNoteGenerationGuard,
+    PrepNoteRepair,
     PrepWallet,
     PrepCreditGrant,
     PrepTransaction,
@@ -259,11 +260,29 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         published_papers_count = 0
         applied_updates_count = 0
         published_documents_count = 0
+        ingestion_failures = 0
         now = timezone.now()
 
         for doc in queryset:
             if doc.is_duplicate:
                 continue
+
+            # Admin publication is the final ingestion gate. Older uploads or
+            # failed requests may still be at Stage 1 with no extracted text;
+            # never publish those rows until ingestion succeeds.
+            if doc.stage == "stage_1" or not doc.extracted_text.strip():
+                from services.prep_ingestion import process_prep_document
+
+                try:
+                    ingestion_result = process_prep_document(doc)
+                except Exception as exc:
+                    ingestion_result = {"success": False, "error": str(exc)}
+                if not ingestion_result.get("success") or not doc.extracted_text.strip():
+                    ingestion_failures += 1
+                    doc.tutor_review_notes = f"Publication blocked: ingestion failed. {ingestion_result.get('error', 'No extracted content was produced.')[:1000]}"
+                    doc.save(update_fields=["tutor_review_notes", "updated_at"])
+                    continue
+
             doc.stage = "stage_3"
             doc.reviewed_by = request.user
             doc.reviewed_at = now
@@ -325,7 +344,8 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         self.message_user(
             request,
             f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
-            f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s)."
+            f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
+            f"Blocked {ingestion_failures} document(s) whose ingestion did not complete."
         )
 
     @admin.action(description="⚡ Stage 2: Move to Tutor Review Gate")
@@ -335,8 +355,29 @@ class PrepDocumentAdmin(admin.ModelAdmin):
 
     @admin.action(description="↺ Re-queue for Stage 1 Ingestion / OCR Extraction")
     def requeue_stage_1_extraction(self, request, queryset):
-        count = queryset.update(stage="stage_1")
-        self.message_user(request, f"{count} document(s) re-queued for Stage 1 Ingestion.")
+        from services.prep_ingestion import process_prep_document
+
+        processed = 0
+        failed = 0
+        for document in queryset:
+            document.stage = "stage_1"
+            document.save(update_fields=["stage", "updated_at"])
+            try:
+                result = process_prep_document(document)
+                if result.get("success"):
+                    processed += 1
+                else:
+                    failed += 1
+                    document.tutor_review_notes = f"Re-ingestion failed: {result.get('error', 'Unknown ingestion error')[:1000]}"
+                    document.save(update_fields=["tutor_review_notes", "updated_at"])
+            except Exception as exc:
+                failed += 1
+                document.tutor_review_notes = f"Re-ingestion failed: {str(exc)[:1000]}"
+                document.save(update_fields=["tutor_review_notes", "updated_at"])
+        self.message_user(
+            request,
+            f"Reprocessed {processed} document(s). {failed} document(s) still require attention.",
+        )
 
     @admin.action(description="Index approved assessment questions from extracted text")
     def index_assessment_questions(self, request, queryset):
@@ -619,6 +660,17 @@ class PrepNoteGenerationGuardAdmin(admin.ModelAdmin):
     def reset_generation_guards(self, request, queryset):
         count = queryset.update(status="open", failed_attempts=0, last_error="", last_failed_at=None, notification_sent_at=None)
         self.message_user(request, f"Reset {count} note generation guard(s).")
+
+
+@admin.register(PrepNoteRepair)
+class PrepNoteRepairAdmin(admin.ModelAdmin):
+    list_display = ("topic", "level", "status", "attempts", "updated_at")
+    list_filter = ("status", "level", "topic__course")
+    search_fields = ("topic__title", "topic__course__code", "source_signature", "last_error")
+    readonly_fields = (
+        "topic", "level", "source_signature", "cache_key", "original_content",
+        "current_content", "validation_issues", "attempts", "created_at", "updated_at",
+    )
 
 
 @admin.register(PrepWallet)

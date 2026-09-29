@@ -457,10 +457,10 @@ def _build_topic_notes_html(
 
     level_labels = {
         "level_1": "Level 1: Intuition & Foundations",
-        "level_2": "Level 2: Undergraduate Standard",
+        "level_2": "Core Concepts",
         "level_3": "Level 3: Exam Mode & High Yield",
     }
-    level_display = level_labels.get(level, "Level 2: Undergraduate Standard")
+    level_display = level_labels.get(level, "Core Concepts")
 
     template_path = os.path.join(settings.BASE_DIR, "templates", "prep", "pdf_export_template.html")
     try:
@@ -1057,10 +1057,10 @@ def export_topic_notes_pdf(
     """
     level_labels = {
         "level_1": "Level 1: Intuition & Foundations",
-        "level_2": "Level 2: Undergraduate Standard",
+        "level_2": "Core Concepts",
         "level_3": "Level 3: Exam Mode & High Yield",
     }
-    level_display = level_labels.get(level, "Level 2: Undergraduate Standard")
+    level_display = level_labels.get(level, "Core Concepts")
 
     try:
         html = _build_topic_notes_html(

@@ -16,6 +16,7 @@ urlpatterns = [
     path("", views.prep_dashboard, name="dashboard"),
     path("courses/", views.prep_courses, name="courses"),
     path("courses/<int:course_id>/add/", views.prep_add_course, name="add_course"),
+    path("courses/<int:course_id>/remove/", views.prep_remove_course, name="remove_course"),
     path("courses/<str:course_code>/", views.prep_course_detail, name="course_detail"),
     path("topic/<str:topic_id>/", views.prep_topic_study, name="topic_study"),
     path("papers/", views.prep_past_papers, name="past_papers"),
@@ -35,6 +36,7 @@ urlpatterns = [
     path("api/solve-question/", views.prep_solve_question_api, name="api_solve_question"),
     path("api/topic-notes/", views.prep_topic_notes_api, name="api_topic_notes"),
     path("api/generate-practice/", views.prep_generate_practice_api, name="api_generate_practice"),
+    path("api/adapt-question/", views.prep_adapt_question_api, name="api_adapt_question"),
     # Live Student Notification Endpoints
     path("api/notifications/", views.prep_notifications_api, name="api_notifications"),
     path("api/notifications/read/", views.prep_mark_notification_read_api, name="api_notifications_read"),

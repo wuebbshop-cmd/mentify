@@ -89,3 +89,22 @@ class TopicQuestionCourseIsolationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "monte_carlo_pi")
+
+    def test_flagged_source_question_is_not_displayed_before_adaptation(self):
+        PrepQuestion.objects.create(
+            topic=self.real_functions,
+            question_type="authentic",
+            verification_status="flagged",
+            number=2,
+            marks=10,
+            question_latex="Incomplete source question",
+            solution_latex="",
+        )
+
+        response = self.client.get(
+            reverse("prep:topic_study", kwargs={"topic_id": self.real_functions.id})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Incomplete source question")
+        self.assertNotContains(response, "SOURCE NEEDS RECONSTRUCTION")

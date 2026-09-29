@@ -316,6 +316,41 @@ class PrepNoteGenerationGuard(models.Model):
         return f"{self.topic} {self.level}: {self.status} ({self.failed_attempts} failures)"
 
 
+class PrepNoteRepair(models.Model):
+    """Quarantined note content and bounded targeted-repair attempts."""
+
+    STATUS_CHOICES = [
+        ("open", "Repair Pending"),
+        ("validated", "Repair Validated"),
+        ("needs_review", "Needs Manual Review"),
+    ]
+
+    topic = models.ForeignKey(PrepTopic, on_delete=models.CASCADE, related_name="note_repairs")
+    level = models.CharField(max_length=20)
+    source_signature = models.CharField(max_length=64, db_index=True)
+    cache_key = models.CharField(max_length=255)
+    original_content = models.TextField()
+    current_content = models.TextField()
+    validation_issues = models.JSONField(default=list)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open", db_index=True)
+    last_error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["topic", "level", "source_signature"],
+                name="unique_prep_note_repair",
+            ),
+        ]
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return f"{self.topic} {self.level}: {self.status} ({self.attempts} attempts)"
+
+
 class PrepWallet(models.Model):
     """User credit balance and monthly exam readiness plan."""
     PLAN_CHOICES = [

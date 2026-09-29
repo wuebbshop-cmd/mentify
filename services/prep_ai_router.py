@@ -42,6 +42,7 @@ def compute_cache_key(content_type: str, *parts) -> str:
 def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtopics: list | None) -> str:
     """Fingerprint the approved syllabus inputs that determine generated notes."""
     topic_summary = getattr(topic_obj, "summary", "") if topic_obj else ""
+    source_context = _approved_course_source_context(course_obj, topic_title)
     curriculum = []
     if course_obj:
         try:
@@ -56,6 +57,7 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
         topic_summary,
         json.dumps(subtopics or [], ensure_ascii=True, sort_keys=True),
         json.dumps(curriculum, ensure_ascii=True),
+        hashlib.sha256(source_context.encode("utf-8", errors="ignore")).hexdigest(),
     )[:16]
 
 
@@ -91,6 +93,60 @@ def _required_note_sections(topic_title: str) -> list[str]:
     )
     section_count = 4 if is_overview else 5
     return [f"## {index}." for index in range(1, section_count + 1)]
+
+
+def _note_allows_code(course_obj, topic_title: str, summary: str = "", subtopics=None) -> bool:
+    """Allow code only when course metadata or the approved topic scope requires it."""
+    category = str(getattr(course_obj, "category", "") or "").lower()
+    scope = " ".join([
+        str(getattr(course_obj, "code", "") or ""),
+        str(getattr(course_obj, "title", "") or ""),
+        str(getattr(course_obj, "description", "") or ""),
+        str(topic_title or ""),
+        str(summary or ""),
+        " ".join(str(item) for item in (subtopics or [])),
+    ]).lower()
+    explicit_code_terms = (
+        "programming", "software", "python", "r language", "r programming", "data frame",
+        "source code", "computer algorithm", "coding", "syntax", "plotting",
+    )
+    return category == "computing" or any(term in scope for term in explicit_code_terms)
+
+
+def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
+    """Return bounded excerpts from approved coursework for grounded generation."""
+    if not course_obj:
+        return ""
+    from prep.models import PrepDocument
+
+    documents = PrepDocument.objects.filter(
+        course=course_obj,
+        stage="stage_3",
+    ).exclude(extracted_text="").order_by("-updated_at", "-id")
+    topic_words = [word for word in re.findall(r"[A-Za-z0-9]+", topic_title.lower()) if len(word) > 3]
+    selected = []
+    seen_hashes = set()
+    total_length = 0
+    for document in documents:
+        text = str(document.extracted_text or "").strip()
+        if not text:
+            continue
+        text_hash = hashlib.sha256(text.encode("utf-8", errors="ignore")).hexdigest()
+        if text_hash in seen_hashes:
+            continue
+        is_topic_document = any(word in text.lower() for word in topic_words[:4])
+        is_course_document = str(document.topic_name or "").strip().lower() == "full syllabus"
+        if not is_topic_document and not is_course_document:
+            continue
+        seen_hashes.add(text_hash)
+        excerpt_limit = min(limit - total_length, limit if is_topic_document else 5000)
+        if excerpt_limit <= 0:
+            break
+        selected.append(text[:excerpt_limit])
+        total_length += excerpt_limit
+        if total_length >= limit:
+            break
+    return "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(selected)[:limit]
 
 
 def _table_cell_count(line: str) -> int:
@@ -132,6 +188,204 @@ def _markdown_table_issues(content: str) -> list[str]:
             index += 1
 
     return issues
+
+
+def _markdown_theorem_issues(content: str) -> list[str]:
+    """Reject theorem titles split into Markdown list-looking fragments."""
+    lines = content.splitlines()
+    issues: list[str] = []
+    theorem_start = re.compile(r"^\s*>\s*\*\*(?:Theorem|Definition|Lemma|Corollary)\b")
+
+    for index, line in enumerate(lines):
+        if not re.match(r"^\s*(?:>\s*)?-[A-Za-z]", line):
+            continue
+        previous_lines = lines[max(0, index - 2):index]
+        if any(theorem_start.match(previous) for previous in previous_lines):
+            issues.append(f"theorem blockquote title is split near line {index + 1}")
+
+    return issues
+
+
+def _note_format_issues(content: str) -> list[str]:
+    """Return local Markdown/LaTeX issues without requiring note sections."""
+    issues = []
+    if content.count("```") % 2:
+        issues.append("unclosed fenced code block")
+    structural_source = re.sub(r"```[\s\S]*?```", "", content)
+    if structural_source.count("$$") % 2:
+        issues.append("unclosed display-math block")
+    issues.extend(_display_math_issues(content))
+    issues.extend(_latex_syntax_issues(content))
+    environments = re.findall(r"\\begin\{([^{}]+)\}", structural_source)
+    for environment in set(environments):
+        if environments.count(environment) != len(re.findall(rf"\\end\{{{re.escape(environment)}\}}", structural_source)):
+            issues.append(f"unclosed LaTeX environment {environment}")
+    if re.search(r"\\\s*$", content):
+        issues.append("content ends at an escape delimiter")
+    last_nonempty_line = next((line.strip() for line in reversed(content.splitlines()) if line.strip()), "")
+    if last_nonempty_line == "|" or (last_nonempty_line.startswith("|") and not last_nonempty_line.endswith("|")):
+        issues.append("content ends with an incomplete Markdown table fragment")
+    issues.extend(_markdown_table_issues(content))
+    issues.extend(_markdown_theorem_issues(content))
+    return issues
+
+
+def _note_repair_scope(content: str, topic_title: str) -> tuple[str, str, str]:
+    """Select one invalid section while preserving every other section verbatim."""
+    headings = list(re.finditer(r"(?m)^\s*##\s+\d+\.[^\n]*", content))
+    sections = []
+    for index, heading in enumerate(headings):
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(content)
+        section = content[heading.start():end]
+        issues = _note_format_issues(section)
+        if issues:
+            sections.append((heading.start(), end, section))
+    if len(sections) == 1:
+        start, end, section = sections[0]
+        return content[:start], section, content[end:]
+    return "", content, ""
+
+
+def _note_needs_section_regeneration(issues: list[str]) -> bool:
+    """Identify failures that cannot be fixed with an old_block/new_block patch."""
+    return any(
+        issue.startswith("missing section")
+        or issue in {
+            "unclosed display-math block",
+            "unclosed fenced code block",
+            "content ends at an escape delimiter",
+            "final section has insufficient content",
+            "code block is not allowed for this topic",
+        }
+        for issue in issues
+    )
+
+
+def _regenerate_invalid_note_sections(
+    topic_obj,
+    level: str,
+    source_signature: str,
+    cache_key: str,
+    content: str,
+    issues: list[str],
+):
+    """Regenerate only the contiguous invalid/missing section range."""
+    from prep.models import PrepContentCache, PrepNoteRepair
+
+    required_numbers = [int(heading.split()[1].rstrip(".")) for heading in _required_note_sections(topic_obj.title)]
+    headings = list(re.finditer(r"(?m)^\s*##\s+(\d+)\.[^\n]*", content))
+    section_issues = {}
+    existing_numbers = {int(heading.group(1)) for heading in headings}
+    missing_numbers = set(required_numbers) - existing_numbers
+    for index, heading in enumerate(headings):
+        number = int(heading.group(1))
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(content)
+        local_issues = _note_format_issues(content[heading.start():end])
+        if missing_numbers and number == max(existing_numbers, default=number):
+            local_issues = [issue for issue in local_issues if issue != "final section has insufficient content"]
+        if local_issues:
+            section_issues[number] = local_issues
+
+    affected_numbers = set(section_issues) | missing_numbers
+    if not affected_numbers:
+        return None
+
+    first_number = min(affected_numbers)
+    last_number = max(affected_numbers)
+    first_match = next((heading for heading in headings if int(heading.group(1)) == first_number), None)
+    next_match = next(
+        (heading for heading in headings if int(heading.group(1)) > last_number),
+        None,
+    )
+    prefix = content[:first_match.start()] if first_match else content
+    suffix = content[next_match.start():] if next_match else ""
+    requested_sections = ", ".join(f"## {number}." for number in range(first_number, last_number + 1))
+    allows_code = _note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics)
+    source_excerpt = _approved_course_source_context(topic_obj.course, topic_obj.title)
+
+    repair, _ = PrepNoteRepair.objects.get_or_create(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+        defaults={
+            "cache_key": cache_key,
+            "original_content": content,
+            "current_content": content,
+            "validation_issues": issues,
+        },
+    )
+    if repair.status == "validated" or repair.status == "needs_review":
+        return None
+
+    working_content = repair.current_content or content
+    for _ in range(repair.attempts, 2):
+        repair.attempts += 1
+        repair.validation_issues = issues
+        repair.save(update_fields=["attempts", "validation_issues", "updated_at"])
+        code_instruction = (
+            "Code is permitted only when directly required by the topic.\n"
+            if allows_code
+            else "Do not include R, Python, pseudocode, or any fenced code blocks.\n"
+        )
+        prompt = (
+            f"Regenerate only these incomplete note sections: {requested_sections}.\n"
+            f"Topic: {topic_obj.title}\nLevel: {level}\n"
+            "Preserve the existing valid sections exactly. Return only the replacement sections, "
+            "including their Markdown headings. Use the required Markdown and KaTeX rules.\n"
+            + code_instruction
+            + "Validation errors:\n" + json.dumps(issues) + "\n"
+            + "Approved coursework source:\n" + source_excerpt + "\n"
+            "Existing note context:\n" + working_content[:4000]
+        )
+        result = route_math_request(prompt, topic_obj.course.code, topic_label=topic_obj.title, is_complex_proof=False)
+        if not result.get("success") or not result.get("content"):
+            continue
+        replacement = normalize_math_delimiters(result["content"]).strip()
+        candidate = prefix.rstrip() + "\n\n" + replacement
+        if suffix:
+            candidate += "\n\n" + suffix.lstrip()
+        candidate_issues = _note_completion_issues(
+            candidate,
+            topic_obj.title,
+            allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+        )
+        if candidate_issues:
+            working_content = candidate
+            issues = candidate_issues
+            repair.current_content = candidate
+            repair.validation_issues = candidate_issues
+            repair.save(update_fields=["current_content", "validation_issues", "updated_at"])
+            continue
+
+        entry = PrepContentCache.objects.filter(cache_key=cache_key).first()
+        if not entry:
+            return None
+        payload = _cache_payload_as_dict(entry.payload) or {}
+        payload.update({
+            "content": candidate,
+            "validation_state": NOTE_VALIDATION_STATE,
+            "validated_at": timezone.now().isoformat(),
+            "level": level,
+        })
+        entry.payload = payload
+        entry.save(update_fields=["payload", "updated_at"])
+        repair.current_content = candidate
+        repair.validation_issues = []
+        repair.status = "validated"
+        repair.save(update_fields=["current_content", "validation_issues", "status", "updated_at"])
+        return {
+            "notes": candidate,
+            "cached": False,
+            "repaired": True,
+            "usage": result.get("usage", {}),
+            "model": result.get("model_used", "deepseek-chat"),
+        }
+
+    repair.status = "needs_review"
+    repair.last_error = "; ".join(issues)
+    repair.save(update_fields=["status", "last_error", "updated_at"])
+    _record_note_generation_failure(topic_obj, level, source_signature, repair.last_error, force_review=True)
+    return None
 
 
 def _display_math_issues(content: str) -> list[str]:
@@ -184,6 +438,11 @@ def _latex_syntax_issues(content: str) -> list[str]:
     # Validate inline math after removing complete display blocks. Dollar signs
     # in code have already been removed above.
     source_without_display = re.sub(r"\$\$[\s\S]*?\$\$", "", source)
+    source_without_display = re.sub(r"\\\[[\s\S]*?\\\]", "", source_without_display)
+    source_without_display = re.sub(r"`+[^`]*`+", "", source_without_display)
+    for environment in sorted(set(re.findall(r"\\begin\{([^{}]+)\}", source_without_display))):
+        issues.append(f"LaTeX environment {environment} is outside display math")
+
     inline_dollars = _unescaped_token_count(source_without_display, "$")
     if inline_dollars % 2:
         issues.append("unmatched inline-math delimiter")
@@ -263,7 +522,7 @@ def _code_block_issues(content: str) -> list[str]:
     return issues
 
 
-def _note_completion_issues(content: str, topic_title: str) -> list[str]:
+def _note_completion_issues(content: str, topic_title: str, *, allow_code: bool | None = None) -> list[str]:
     """Detect incomplete note output before it is displayed or cached."""
     if not isinstance(content, str) or not content.strip():
         return ["empty content"]
@@ -287,22 +546,9 @@ def _note_completion_issues(content: str, topic_title: str) -> list[str]:
     if structural_source.count("$$") % 2:
         issues.append("unclosed display-math block")
 
-    issues.extend(_display_math_issues(content))
-    issues.extend(_latex_syntax_issues(content))
-
-    environments = re.findall(r"\\begin\{([^{}]+)\}", structural_source)
-    for environment in set(environments):
-        if environments.count(environment) != len(re.findall(rf"\\end\{{{re.escape(environment)}\}}", structural_source)):
-            issues.append(f"unclosed LaTeX environment {environment}")
-
-    if re.search(r"\\\s*$", content):
-        issues.append("content ends at an escape delimiter")
-
-    last_nonempty_line = next((line.strip() for line in reversed(content.splitlines()) if line.strip()), "")
-    if last_nonempty_line == "|" or (last_nonempty_line.startswith("|") and not last_nonempty_line.endswith("|")):
-        issues.append("content ends with an incomplete Markdown table fragment")
-
-    issues.extend(_markdown_table_issues(content))
+    issues.extend(_note_format_issues(content))
+    if allow_code is False and re.search(r"```[A-Za-z0-9_+-]*\s*\n", content):
+        issues.append("code block is not allowed for this topic")
     return issues
 
 
@@ -470,12 +716,12 @@ def repair_json_escaped_latex_newlines(content: str) -> str:
     return repair_escaped_dollars_inside_math("".join(output))
 
 
-def _publish_legacy_note_cache(entry, payload: dict, topic_title: str) -> dict | None:
+def _publish_legacy_note_cache(entry, payload: dict, topic_title: str, *, allow_code: bool | None = None) -> dict | None:
     """Validate an unmarked legacy note once, then persist its publication state."""
     content = repair_json_escaped_latex_newlines(
         str(payload.get("content") or payload.get("notes") or "")
     ).strip()
-    if not content or _note_completion_issues(content, topic_title):
+    if not content or _note_completion_issues(content, topic_title, allow_code=allow_code):
         return None
 
     published_payload = dict(payload)
@@ -487,7 +733,7 @@ def _publish_legacy_note_cache(entry, payload: dict, topic_title: str) -> dict |
     return published_payload
 
 
-def get_published_topic_note_levels(topic_obj) -> dict[str, str]:
+def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) -> dict[str, str]:
     """Return all shared, published note levels without invoking AI generation."""
     if not topic_obj:
         return {}
@@ -506,16 +752,28 @@ def get_published_topic_note_levels(topic_obj) -> dict[str, str]:
         level = payload.get("level")
         if level not in {"level_1", "level_2", "level_3"} or level in levels:
             continue
+        if validated_only and payload.get("validation_state") != NOTE_VALIDATION_STATE:
+            continue
         if payload.get("validation_state") != NOTE_VALIDATION_STATE:
-            payload = _publish_legacy_note_cache(entry, payload, topic_obj.title)
+            payload = _publish_legacy_note_cache(
+                entry,
+                payload,
+                topic_obj.title,
+                allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+            )
         if not payload:
             continue
-        content = repair_json_escaped_latex_newlines(
+        content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
-        # Never trust a historical validation marker blindly. This protects
-        # existing shared content when stricter renderer checks are introduced.
-        if not content or _note_completion_issues(content, topic_obj.title):
+        content_issues = _note_completion_issues(
+            content,
+            topic_obj.title,
+            allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+        )
+        if content_issues:
+            # A new policy can invalidate an older published row without
+            # changing the underlying syllabus source.
             continue
         if content != payload.get("content"):
             payload = dict(payload)
@@ -580,7 +838,14 @@ def _notify_note_generation_failure(guard_id: int) -> None:
             guard.save(update_fields=["notification_sent_at", "updated_at"])
 
 
-def _record_note_generation_failure(topic_obj, level: str, source_signature: str, error: str) -> None:
+def _record_note_generation_failure(
+    topic_obj,
+    level: str,
+    source_signature: str,
+    error: str,
+    *,
+    force_review: bool = False,
+) -> None:
     if not topic_obj:
         return
     from prep.models import PrepNoteGenerationGuard
@@ -593,7 +858,7 @@ def _record_note_generation_failure(topic_obj, level: str, source_signature: str
     guard.failed_attempts += 1
     guard.last_error = error[:4000]
     guard.last_failed_at = timezone.now()
-    if guard.failed_attempts >= NOTE_MAX_FAILED_GENERATION_CYCLES:
+    if force_review or guard.failed_attempts >= NOTE_MAX_FAILED_GENERATION_CYCLES:
         guard.status = "needs_review"
     guard.save(update_fields=["failed_attempts", "last_error", "last_failed_at", "status", "updated_at"])
     if guard.status == "needs_review":
@@ -631,7 +896,7 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
         if not payload or payload.get("level") != level:
             continue
 
-        content = repair_json_escaped_latex_newlines(
+        content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
         if payload.get("validation_state") != NOTE_VALIDATION_STATE:
@@ -660,6 +925,92 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
             "level": level,
             "model": payload.get("model", "Shared Cache"),
         }
+    return None
+
+
+# ─── Targeted invalid-note repair ────────────────────────────────────────────
+
+def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, content, issues):
+    """Quarantine invalid notes and attempt bounded block-level repair."""
+    from prep.models import PrepContentCache, PrepNoteRepair
+
+    repair, _ = PrepNoteRepair.objects.get_or_create(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+        defaults={"cache_key": cache_key, "original_content": content, "current_content": content, "validation_issues": issues},
+    )
+    if repair.status == "validated":
+        return {"notes": repair.current_content, "usage": {}}
+    if repair.status == "needs_review" or repair.attempts >= 3:
+        return None
+
+    working_content = repair.current_content or content
+    for _ in range(repair.attempts, 3):
+        repair.attempts += 1
+        repair.validation_issues = issues
+        repair.save(update_fields=["attempts", "validation_issues", "updated_at"])
+        prefix, repair_scope, suffix = _note_repair_scope(working_content, topic_obj.title)
+        result = call_together_repair(
+            [
+                {"role": "system", "content": "Return JSON only. Repair one Markdown/LaTeX block surgically. Never split words, theorem titles, or sentences across lines. Preserve Markdown blockquote prefixes on every theorem line."},
+                {"role": "user", "content": "Return old_block and new_block. Change only the reported issue; preserve all other text.\nIssues: " + json.dumps(issues) + "\nSource (only the affected section when identifiable):\n" + repair_scope},
+            ],
+            model=getattr(settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash"),
+            max_tokens=2000,
+        )
+        if not result.get("success"):
+            continue
+        try:
+            patch = robust_json_loads(str(result.get("content") or ""))
+            old_block = str(patch.get("old_block") or "")
+            new_block = str(patch.get("new_block") or "")
+            if not old_block or not new_block or repair_scope.count(old_block) != 1:
+                raise ValueError("repair block missing or not unique")
+            repaired_scope = repair_scope.replace(old_block, new_block, 1)
+            candidate = prefix + repaired_scope + suffix
+            candidate_issues = _note_completion_issues(
+                candidate,
+                topic_obj.title,
+                allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+            )
+            if candidate_issues:
+                working_content = candidate
+                issues = candidate_issues
+                repair.current_content = candidate
+                repair.validation_issues = candidate_issues
+                repair.save(update_fields=["current_content", "validation_issues", "updated_at"])
+                continue
+            entry = PrepContentCache.objects.filter(cache_key=cache_key).first()
+            if not entry:
+                return None
+            payload = _cache_payload_as_dict(entry.payload) or {}
+            payload.update({"content": candidate, "validation_state": NOTE_VALIDATION_STATE, "validated_at": timezone.now().isoformat()})
+            entry.payload = payload
+            entry.save(update_fields=["payload", "updated_at"])
+            repair.current_content = candidate
+            repair.validation_issues = []
+            repair.status = "validated"
+            repair.save(update_fields=["current_content", "validation_issues", "status", "updated_at"])
+            return {"notes": candidate, "cached": False, "repaired": True, "usage": result.get("usage", {})}
+        except Exception as exc:
+            logger.warning(
+                "[Topic Notes] targeted repair patch rejected for %s: %s",
+                topic_obj.title,
+                exc,
+            )
+            continue
+
+    repair.status = "needs_review"
+    repair.last_error = "; ".join(issues)
+    repair.save(update_fields=["status", "last_error", "updated_at"])
+    _record_note_generation_failure(
+        topic_obj,
+        level,
+        source_signature,
+        repair.last_error,
+        force_review=True,
+    )
     return None
 
 
@@ -735,6 +1086,7 @@ def call_deepseek(
         "model": model,
         "messages": messages,
         "max_tokens": max_tokens,
+
         "temperature": temperature,
     }
 
@@ -792,10 +1144,39 @@ def call_deepseek(
             }
         else:
             logger.error(f"[DeepSeek API Error] HTTP {resp.status_code}: {resp.text}")
+
             return {"success": False, "error": f"HTTP {resp.status_code}: {resp.text}"}
     except Exception as e:
         logger.error(f"[DeepSeek API Exception] {e}")
         return {"success": False, "error": str(e)}
+
+
+def call_together_repair(messages: list[dict], model: str, max_tokens: int = 2000) -> dict:
+    """Make one bounded Together.ai repair call with no continuation."""
+    api_key = getattr(settings, "TOGETHERAI_API", "") or os.environ.get("TOGETHERAI_API", "")
+    if not api_key:
+        return {"success": False, "error": "TOGETHERAI_API key is not configured."}
+
+    try:
+        response = requests.post(
+            "https://api.together.xyz/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": 0.1},
+            timeout=60,
+        )
+        if response.status_code != 200:
+            return {"success": False, "error": f"Together HTTP {response.status_code}: {response.text[:500]}"}
+        data = response.json()
+        choice = data["choices"][0]
+        return {
+            "success": True,
+            "content": choice.get("message", {}).get("content", "").strip(),
+            "model_used": model,
+            "usage": data.get("usage", {}),
+        }
+    except Exception as exc:
+        logger.warning("[Together Repair] request failed: %s", exc)
+        return {"success": False, "error": str(exc)}
 
 
 def route_math_request(
@@ -833,10 +1214,11 @@ def route_math_request(
             "4. Do NOT output any HTML tags (<div>, <span>, <br>, etc.). Use Markdown only.\n"
             "5. Headings use ## or ### — one heading per line with a blank line before and after. Never put math delimiters ($ or $$) in heading lines.\n"
             "6. Theorems, Definitions, Lemmas: format as blockquotes — a '> ' prefix on each line, blank line before and after.\n"
-            "7. NEVER chain equalities horizontally (e.g. NEVER write 'A = B = C = D'). Always format derivations vertically using \\begin{aligned}...\\end{aligned} inside $$...$$.\n"
-            "8. Fenced code blocks use triple backticks with a language tag (e.g. ```R or ```python). NEVER write multi-line code inline.\n"
-            "9. In Markdown tables, EVERY row must start with '|' and end with '|'. If math in table cells uses absolute values, norms, or determinants, ALWAYS use \\lvert x \\rvert, \\lVert x \\rVert, or \\det(A). NEVER use raw unescaped '|' (like '|x|') inside table cells because raw pipes split markdown table columns.\n"
-            "10. Do not include conversational greetings or filler text."
+            "7. Never split a word, theorem title, or sentence across lines. Keep the complete title on one logical Markdown line, and preserve '> ' on every continuation line inside a blockquote.\n"
+            "8. NEVER chain equalities horizontally (e.g. NEVER write 'A = B = C = D'). Always format derivations vertically using \\begin{aligned}...\\end{aligned} inside $$...$$.\n"
+            "9. If code is explicitly required by the topic, fenced code blocks must use a language tag and remain complete. Otherwise, do not output code blocks.\n"
+            "10. In Markdown tables, EVERY row must start with '|' and end with '|'. If math in table cells uses absolute values, norms, or determinants, ALWAYS use \\lvert x \\rvert, \\lVert x \\rVert, or \\det(A). NEVER use raw unescaped '|' (like '|x|') inside table cells because raw pipes split markdown table columns.\n"
+            "11. Do not include conversational greetings or filler text."
         )
 
     messages = [
@@ -866,6 +1248,7 @@ def normalize_math_delimiters(text: str) -> str:
         return ""
     text = repair_json_escaped_latex_newlines(str(text))
     text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
+    text = re.sub(r"\\inf(?![A-Za-z])", r"\\infty", text)
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
     text = re.sub(r'(\d+)\ufffd(\d+)', r'\1–\2', text)
     text = re.sub(r'([IVXLCDM]+)\ufffd([IVXLCDM]+)', r'\1–\2', text)
@@ -908,13 +1291,19 @@ def get_or_generate_topic_notes(
     if topic_obj and not subtopics:
         if isinstance(getattr(topic_obj, "subtopics", None), list):
             subtopics = topic_obj.subtopics
+    allows_code = _note_allows_code(
+        course_obj,
+        topic_title,
+        getattr(topic_obj, "summary", "") if topic_obj else "",
+        subtopics,
+    )
 
     # A published shared note belongs to this specific approved topic and
     # level. Serve it before the historical signature-key path so unrelated
     # course changes cannot make later students regenerate already-approved
     # content. A material change to this topic removes these entries via the
     # PrepTopic signal above.
-    published_levels = get_published_topic_note_levels(topic_obj)
+    published_levels = get_published_topic_note_levels(topic_obj, validated_only=True)
     if level in published_levels:
         return {
             "notes": published_levels[level],
@@ -941,7 +1330,7 @@ def get_or_generate_topic_notes(
         cached_content = repair_json_escaped_latex_newlines(
             str(cached.get("content", "") or "")
         )
-        cached_issues = _note_completion_issues(cached_content, topic_title)
+        cached_issues = _note_completion_issues(cached_content, topic_title, allow_code=allows_code)
         if cached.get("validation_state") == NOTE_VALIDATION_STATE and not cached_issues:
             # Strict read-only: never mutate or overwrite a valid cache on read.
             return {
@@ -987,12 +1376,49 @@ def get_or_generate_topic_notes(
                 "generation_required": True,
                 "error": "Validated replacement notes are required for this topic and level.",
             }
-        # An invalid cache is a system defect, not a fresh student request.
-        # Remove it now so the regenerated validated note replaces it and can
-        # be served without an additional student charge.
-        from prep.models import PrepContentCache
-        PrepContentCache.objects.filter(cache_key=cache_key).delete()
-        regenerated_from_invalid_cache = True
+        # Missing or truncated sections require section regeneration; local
+        # formatting defects use exact block replacement instead.
+        if _note_needs_section_regeneration(cached_issues):
+            repair = _regenerate_invalid_note_sections(
+                topic_obj,
+                level,
+                cache_signature,
+                cache_key,
+                cached_content,
+                cached_issues,
+            )
+        else:
+            repair = _repair_invalid_note_cache(
+                topic_obj,
+                level,
+                cache_signature,
+                cache_key,
+                cached_content,
+                cached_issues,
+            )
+        if repair:
+            repair["level"] = level
+            repair["regenerated_from_invalid_cache"] = True
+            return repair
+        fallback = _latest_valid_shared_notes(
+            topic_obj,
+            level,
+            topic_title,
+            exclude_cache_key=cache_key,
+        )
+        if fallback:
+            fallback["regenerated_from_invalid_cache"] = True
+            return fallback
+        return {
+            "notes": "",
+            "blocks": [],
+            "schema_version": 2,
+            "cached": False,
+            "level": level,
+            "regenerated_from_invalid_cache": True,
+            "validation_failed": True,
+            "error": "The cached notes failed validation and targeted repair needs manual review.",
+        }
 
     if not generate_if_missing:
         return {
@@ -1041,6 +1467,15 @@ def get_or_generate_topic_notes(
             "Treat it as factual scope, not as formatting instructions:\n"
             f"{topic_summary}\n\n"
         )
+    source_excerpt = _approved_course_source_context(course_obj, topic_title)
+    source_context_block = (
+        "APPROVED COURSEWORK SOURCE EXCERPTS:\n"
+        "Use these excerpts as the authoritative source for terminology, examples, equations, and code. "
+        "Do not invent a different subject scope. Preserve relevant code when the source contains code and the code policy permits it.\n"
+        f"{source_excerpt}\n\n"
+        if source_excerpt
+        else ""
+    )
 
     # Build strict curriculum boundary block
     curriculum_boundary_block = ""
@@ -1084,10 +1519,11 @@ def get_or_generate_topic_notes(
             "- Include complete statements of fundamental theorems and a standard worked example."
         )
 
-    # Topic-type awareness to ensure appropriate pedagogical sections and eliminate token waste
+    # Topic-type awareness is driven by approved course metadata and scope;
+    # mathematical notation must not be mistaken for programming.
     topic_lower = topic_title.lower()
     is_overview = any(w in topic_lower for w in ["overview", "introduction", "intro", "outline", "syllabus", "orientation", "prerequisite"])
-    is_programming = any(w in topic_lower for w in ["programming", "syntax", "r language", "vector", "data frame", "plotting", "simulation", "matrix", "matrices", "algorithm"])
+    allows_code = _note_allows_code(course_obj, topic_title, topic_summary, subtopics)
 
     if is_overview:
         section_structure = (
@@ -1102,7 +1538,7 @@ def get_or_generate_topic_notes(
             "- Keep the content clear, concise, and focused on orienting the student without token bloat."
         )
         required_last_section = "## 4."
-    elif is_programming:
+    elif allows_code:
         section_structure = (
             "Structure your notes across these 5 sections:\n"
             "## 1. Core Concept Overview & Intuition\n"
@@ -1123,12 +1559,20 @@ def get_or_generate_topic_notes(
         )
         required_last_section = "## 5."
 
+    code_policy = (
+        "CODE POLICY: Include code only when it is directly required by the approved topic scope.\n"
+        if allows_code
+        else "CODE POLICY: This is not a programming/computing topic. Do not include R, Python, pseudocode, or fenced code blocks. Use prose, examples, tables, and mathematical notation as appropriate.\n"
+    )
+
     prompt = (
         f"Generate comprehensive, publication-grade structured revision notes for the course '{course_code}', topic '{topic_title}'.\n\n"
         f"{subtopic_coverage_block}"
         f"{approved_context_block}"
+        f"{source_context_block}"
         f"{curriculum_boundary_block}"
         f"{level_instruction}\n\n"
+        f"{code_policy}\n"
         "STRICT AUTHORING FORMAT — follow every rule below exactly, no exceptions:\n"
         "1. Inline math: use $...$ with NO inner spaces (e.g. $x \\in \\mathbb{R}$, NEVER $ x $). Close all inline math before punctuation or paragraph breaks.\n"
         "2. Display math: use $$...$$ on dedicated separate lines (the opening $$ on its own line, the equation on its own lines, and the closing $$ on its own line). NEVER use a blank line inside a display-math block or place English prose inside it.\n"
@@ -1136,11 +1580,12 @@ def get_or_generate_topic_notes(
         "4. Do NOT output any HTML tags (<div>, <span>, <br>, etc.). Use only Markdown.\n"
         "5. Headings use ## or ### on their own line with a blank line before and after. Never put math delimiters ($ or $$) in heading lines.\n"
         "6. Format every theorem, definition, lemma, or corollary as a Markdown blockquote: '> **Theorem X.Y (Title):** Statement…' — blank line before and after.\n"
-        "7. NEVER chain equalities horizontally (e.g. NEVER 'A = B = C = D'). Always break derivations vertically using \\begin{aligned}...\\end{aligned} inside $$...$$, showing each intermediate step.\n"
-        "8. Fenced code blocks use triple backticks with a language tag (e.g. ```R). NEVER write multi-line code inline.\n"
-        "9. Do NOT place Markdown bold/italic (**text** or *text*) inside math mode ($...$ or $$...$$). Use \\text{...} inside math for words. Every {, [, \\left, and \\right must have its matching closing counterpart in the same math block.\n"
-        "10. In Markdown tables: EVERY table row must start with '|' and end with '|'. If math in table cells uses absolute values, norms, or determinants, ALWAYS write \\lvert x \\rvert, \\lVert x \\rVert, or \\det(A). NEVER write raw '|' (like '|x|') inside table cells because unescaped pipes break the table column structure.\n"
-        f"11. MANDATORY: Generate notes completely through to the end of the final section ({required_last_section}). Never truncate.\n\n"
+        "7. Never split a word, theorem title, or sentence across lines. Keep the complete title on one logical Markdown line, and preserve '> ' on every continuation line inside a blockquote.\n"
+        "8. NEVER chain equalities horizontally (e.g. NEVER 'A = B = C = D'). Always break derivations vertically using \\begin{aligned}...\\end{aligned} inside $$...$$, showing each intermediate step.\n"
+        "9. If code is permitted by the CODE POLICY, fenced code blocks must use a language tag and remain complete. Otherwise, do not output code blocks.\n"
+        "10. Do NOT place Markdown bold/italic (**text** or *text*) inside math mode ($...$ or $$...$$). Use \\text{...} inside math for words. Every {, [, \\left, and \\right must have its matching closing counterpart in the same math block.\n"
+        "11. In Markdown tables: EVERY table row must start with '|' and end with '|'. If math in table cells uses absolute values, norms, or determinants, ALWAYS write \\lvert x \\rvert, \\lVert x \\rVert, or \\det(A). NEVER write raw '|' (like '|x|') inside table cells because unescaped pipes break the table column structure.\n"
+        f"12. MANDATORY: Generate notes completely through to the end of the final section ({required_last_section}). Never truncate.\n\n"
         f"{section_structure}"
     )
 
@@ -1148,36 +1593,35 @@ def get_or_generate_topic_notes(
     result = route_math_request(prompt, course_code, topic_label=topic_title, is_complex_proof=False)
 
     if result.get("success"):
-        content = repair_json_escaped_latex_newlines(result["content"])
+        content = normalize_math_delimiters(result["content"])
 
         # Continue boundedly until all required sections and delimiters are complete.
         # This protects against responses that contain the final heading but stop
         # before its body, which the old heading-only check accepted.
         for continuation_attempt in range(2):
-            completion_issues = _note_completion_issues(content, topic_title)
+            completion_issues = _note_completion_issues(content, topic_title, allow_code=allows_code)
             if not completion_issues:
                 break
-            logger.info(
-                "[Topic Notes] Incomplete generation for %s (attempt %d): %s. Requesting continuation...",
-                topic_title,
-                continuation_attempt + 1,
-                "; ".join(completion_issues),
-            )
-            if any(
-                "incomplete Markdown table row" in issue
-                or "incomplete Markdown table fragment" in issue
+            needs_continuation = any(
+                issue.startswith("missing section")
+                or issue in {
+                    "unclosed display-math block",
+                    "unclosed fenced code block",
+                    "content ends at an escape delimiter",
+                    "final section has insufficient content",
+                }
                 for issue in completion_issues
-            ):
-                # Do not leave a partial final row in place when the model
-                # supplies the completed row in its continuation.
-                content = re.sub(r"\n[ \t]*\|[^\n]*\Z", "", content).rstrip()
+            )
+            if not needs_continuation:
+                break
+
             cont_messages = [
                 {"role": "user", "content": prompt},
                 {"role": "assistant", "content": content},
                 {
                     "role": "user",
                     "content": (
-                        f"Please continue directly from where you stopped and complete the notes through "
+                        f"Continue directly from where you stopped and complete the notes through "
                         f"{required_last_section}. Do not repeat previous text. Resolve these issues: "
                         f"{'; '.join(completion_issues)}. End only after the final section has substantial content "
                         "and all Markdown and LaTeX delimiters are closed."
@@ -1189,16 +1633,15 @@ def get_or_generate_topic_notes(
                 model=result.get("model_used", "deepseek-chat"),
                 max_tokens=4000,
             )
-            if cont_res.get("success") and cont_res.get("content"):
-                content = content + "\n\n" + cont_res["content"].strip()
-                result["usage"] = _merge_usage(result.get("usage", {}), cont_res.get("usage", {}))
-            else:
+            if not cont_res.get("success") or not cont_res.get("content"):
                 break
+            content = content + "\n\n" + cont_res["content"].strip()
+            result["usage"] = _merge_usage(result.get("usage", {}), cont_res.get("usage", {}))
 
         # Preserve the generated Markdown source. The browser renderer is the
         # single owner of Markdown and KaTeX interpretation.
         content = str(content).strip()
-        completion_issues = _note_completion_issues(content, topic_title)
+        completion_issues = _note_completion_issues(content, topic_title, allow_code=allows_code)
         if completion_issues:
             logger.error(
                 "[Topic Notes] Refusing to cache incomplete notes for %s %s: %s",
@@ -1206,12 +1649,38 @@ def get_or_generate_topic_notes(
                 topic_title,
                 "; ".join(completion_issues),
             )
-            _record_note_generation_failure(
+            from prep.models import PrepContentCache
+
+            # Quarantine fresh invalid output through the same targeted repair
+            # path used for an invalid cache entry before requiring review.
+            entry, _ = PrepContentCache.objects.get_or_create(
+                cache_key=cache_key,
+                defaults={
+                    "content_type": "topic_notes",
+                    "prompt_hash": p_hash,
+                    "payload": {
+                        "schema_version": 2,
+                        "content": content,
+                        "level": level,
+                        "model": result.get("model_used", "deepseek-chat"),
+                    },
+                    "course": course_obj,
+                    "topic": topic_obj,
+                },
+            )
+            repaired = _repair_invalid_note_cache(
                 topic_obj,
                 level,
                 cache_signature,
-                "; ".join(completion_issues),
+                cache_key,
+                content,
+                completion_issues,
             )
+            if repaired:
+                repaired["level"] = level
+                repaired["regenerated_from_invalid_cache"] = regenerated_from_invalid_cache
+                _clear_note_generation_guard(topic_obj, level, cache_signature)
+                return repaired
             fallback = _latest_valid_shared_notes(
                 topic_obj,
                 level,
@@ -1295,18 +1764,19 @@ def robust_json_loads(raw_text: str):
         cleaned = cleaned[:-3]
     cleaned = cleaned.strip()
 
+    # Parse valid JSON before applying legacy array-extraction heuristics;
+    # LaTeX strings may contain square brackets inside otherwise valid objects.
+    try:
+        return json.loads(cleaned, strict=False)
+    except Exception:
+        pass
+
     if "[" in cleaned:
         start_idx = cleaned.find("[")
         cleaned = cleaned[start_idx:]
         if "]" in cleaned:
             end_idx = cleaned.rfind("]") + 1
             cleaned = cleaned[:end_idx]
-
-    # Strategy 1: Direct parse with strict=False
-    try:
-        return json.loads(cleaned, strict=False)
-    except Exception:
-        pass
 
     # Strategy 2: Escape unescaped backslashes commonly found in LaTeX formulas
     try:
@@ -1700,7 +2170,74 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
         }
 
     return {
-        "solution": "Solution derivation is being processed. Please try again shortly.",
+        "solution": "",
         "cached": False,
-        "error": result.get("error"),
+        "error": result.get("error") or "Solution derivation is unavailable. Please try again shortly.",
     }
+
+
+def generate_adapted_past_question(question_obj) -> dict:
+    """Reconstruct one unreadable past-paper question from its context.
+
+    The result is an adapted question, never a claim that the OCR text was
+    recovered exactly. It is validated structurally before the caller saves
+    it to the shared topic question bank.
+    """
+    question_text = str(question_obj.question_latex or "").strip()
+    topic = question_obj.topic
+    course_code = question_obj.paper.course.code if question_obj.paper else topic.course.code
+    topic_title = question_obj.topic_label or (topic.title if topic else "Mathematics")
+    prompt = (
+        f"Reconstruct one clear, original practice question closely matching an unreadable past-paper question "
+        f"from {course_code}, topic '{topic_title}'.\n\n"
+        f"Unreadable source extraction:\n{question_text}\n\n"
+        "Use the topic context, visible fragments, marks, and standard examination conventions. "
+        "Do not pretend to reproduce the original wording. Create a mathematically coherent equivalent "
+        "that tests the same likely skill. Include a complete step-by-step solution. Return only one JSON "
+        "object with keys: marks, topic_label, question_latex, solution_latex, hint. Use Markdown and KaTeX "
+        "delimiters exactly as requested, with no HTML and no code fences around the JSON."
+    )
+    system_prompt = (
+        "You are a careful university mathematics examiner. Return only valid JSON. "
+        "All LaTeX backslashes inside JSON strings must be escaped. Keep the adapted question at the same "
+        "academic level and topic as the source."
+    )
+    result = route_math_request(
+        prompt,
+        course_code,
+        topic_label=topic_title,
+        is_complex_proof=True,
+        system_prompt=system_prompt,
+    )
+    if not result.get("success"):
+        return {
+            "success": False,
+            "usage": result.get("usage", {}),
+            "model": result.get("model_used", "deepseek-reasoner"),
+            "error": result.get("error") or "The adapted question could not be generated.",
+        }
+
+    try:
+        item = robust_json_loads(str(result.get("content") or "").strip())
+        if isinstance(item, list):
+            item = item[0] if len(item) == 1 else None
+        if not isinstance(item, dict):
+            raise ValueError("response was not one question object")
+        issues = _practice_question_issues([item], 1)
+        if issues:
+            raise ValueError("; ".join(issues))
+        item["question_latex"] = normalize_math_delimiters(item["question_latex"])
+        item["solution_latex"] = normalize_math_delimiters(item["solution_latex"])
+        return {
+            "success": True,
+            "question": item,
+            "usage": result.get("usage", {}),
+            "model": result.get("model_used", "deepseek-reasoner"),
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "usage": result.get("usage", {}),
+            "model": result.get("model_used", "deepseek-reasoner"),
+            "error": f"The adapted question did not pass validation: {exc}",
+        }

@@ -115,17 +115,17 @@ def contact_page(request):
             subject = f"Contact form message from {name}"
             body = f"Name: {name}\nEmail: {email}\n\n{message}"
 
-            # Route to CONTACT_RECIPIENT_EMAIL (real inbox, e.g. techbidmarketplace@gmail.com).
-            # reply_to is set to the visitor's email so you can reply directly from Gmail.
+            # Route to CONTACT_RECIPIENT_EMAIL and preserve the visitor address for replies.
             recipient = getattr(settings, "CONTACT_RECIPIENT_EMAIL", "techbidmarketplace@gmail.com")
             try:
-                from services.email_service import send_email_notification
-                sent = send_email_notification(
+                email_message = EmailMessage(
                     subject=subject,
-                    recipient=recipient,
                     body=body,
-                    reply_to=email,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[recipient],
+                    reply_to=[email],
                 )
+                sent = bool(email_message.send(fail_silently=False))
             except Exception:
                 sent = False
 

@@ -1,23 +1,38 @@
 import json
 from unittest.mock import patch
 
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from accounts.models import User
-from prep.models import PrepContentCache, PrepCourse, PrepQuestion, PrepTopic, PrepWallet
+from prep.models import (
+    PrepContentCache,
+    PrepCourse,
+    PrepDocument,
+    PrepNoteGenerationGuard,
+    PrepQuestion,
+    PrepTopic,
+    PrepWallet,
+)
 from services.prep_ai_router import (
     NOTE_VALIDATION_STATE,
     NOTES_CACHE_VERSION,
     _display_math_issues,
     _latex_syntax_issues,
+    _markdown_theorem_issues,
+    _note_allows_code,
+    _note_completion_issues,
+    _approved_course_source_context,
     _note_completion_issues,
     _topic_notes_cache_signature,
     compute_cache_key,
     generate_similar_practice_questions,
     get_published_topic_note_levels,
     get_or_generate_topic_notes,
+    get_or_generate_question_solution,
+    normalize_math_delimiters,
     repair_json_escaped_latex_newlines,
+    robust_json_loads,
 )
 
 
@@ -84,6 +99,19 @@ $$
 $$"""
         self.assertEqual(_latex_syntax_issues(content), [])
 
+    def test_nested_latex_environments_must_be_inside_display_math(self):
+        equation = """\\begin{aligned}
+c_k &= \\begin{cases} [a_k, c_k], & \\text{if } f(a_k) f(c_k) < 0, \\\\
+[c_k, b_k], & \\text{if } f(c_k) f(b_k) < 0.
+\\end{cases}
+\\end{aligned}"""
+
+        issues = _latex_syntax_issues(equation)
+
+        self.assertIn("LaTeX environment aligned is outside display math", issues)
+        self.assertIn("LaTeX environment cases is outside display math", issues)
+        self.assertEqual(_latex_syntax_issues(f"$$\n{equation}\n$$"), [])
+
     def test_code_block_dollar_signs_are_not_math_validation_errors(self):
         content = """```R
 result <- frame$column
@@ -97,6 +125,48 @@ $$ not mathematical output
             "missing section ## 4.",
             "missing section ## 5.",
         ])
+
+    def test_rejects_split_theorem_title_that_looks_like_a_list_item(self):
+        content = "> **Theorem 3.5 (Invariance of Sufficiency Under One\n-to-One Transformations):** If T is sufficient."
+
+        self.assertTrue(any("theorem blockquote title is split" in issue for issue in _markdown_theorem_issues(content)))
+
+    def test_non_computing_topics_reject_code_but_computing_topics_allow_it(self):
+        code_notes = "## 1. Confidence\n\nText.\n\n```R\nmean(c(1, 2, 3))\n```"
+        statistics_course = PrepCourse(category="Statistics")
+        computing_course = PrepCourse(category="Computing")
+        programming_statistics_course = PrepCourse(
+            category="Statistics",
+            title="Programming Language for Statistics 1",
+        )
+
+        self.assertFalse(_note_allows_code(statistics_course, "Confidence Intervals", "Statistical estimation"))
+        self.assertTrue(_note_allows_code(computing_course, "R Programming", "Statistical programming"))
+        self.assertTrue(_note_allows_code(programming_statistics_course, "Course Overview", "Uses R"))
+        self.assertTrue(any("code block is not allowed" in issue for issue in _note_completion_issues(
+            code_notes,
+            "Confidence Intervals",
+            allow_code=False,
+        )))
+        self.assertNotIn("code block is not allowed", _note_completion_issues(
+            code_notes,
+            "R Programming",
+            allow_code=True,
+        ))
+
+    def test_normalize_math_delimiters_repairs_invalid_inf_command(self):
+        self.assertEqual(
+            normalize_math_delimiters("Consistency as n \\to \\inf."),
+            "Consistency as n \\to \\infty.",
+        )
+
+    def test_json_parser_preserves_square_brackets_inside_latex_strings(self):
+        repair = {
+            "old_block": r"\\begin{cases} [a_k, c_k] \\end{cases}",
+            "new_block": r"$$\\begin{cases} [a_k, c_k] \\end{cases}$$",
+        }
+
+        self.assertEqual(robust_json_loads(json.dumps(repair)), repair)
 
 
 class InvalidCachedNoteRecoveryTests(TestCase):
@@ -144,26 +214,31 @@ $$
             slug="sequences",
         )
 
-    @patch("services.prep_ai_router.route_math_request")
-    def test_invalid_cache_is_replaced_and_marked_as_free_recovery(self, route_request):
+    @patch("services.prep_ai_router.call_together_repair")
+    @override_settings(TOGETHER_REPAIR_MODEL="configured-targeted-repair-model")
+    def test_invalid_cache_is_replaced_and_marked_as_free_recovery(self, repair_request):
         signature = _topic_notes_cache_signature(
             self.course, self.topic, self.topic.title, self.topic.subtopics
         )
         cache_key = compute_cache_key(
             "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
         )
+        broken_block = "$$\n\\left\\lvert a_m-a_n\\right\n\n\\right\\rvert\n$$"
+        broken_notes = self.valid_notes.replace(
+            "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$",
+            broken_block,
+        )
         PrepContentCache.objects.create(
             cache_key=cache_key,
             content_type="topic_notes",
             prompt_hash="old",
-            payload={"content": "$$\\left( x \\right\n\n\\right)$$"},
+            payload={"content": broken_notes},
             course=self.course,
             topic=self.topic,
         )
-        route_request.return_value = {
+        repair_request.return_value = {
             "success": True,
-            "content": self.valid_notes,
-            "model_used": "test-model",
+            "content": json.dumps({"old_block": broken_block, "new_block": "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$"}),
             "usage": {"total_tokens": 0},
         }
 
@@ -178,8 +253,246 @@ $$
         self.assertFalse(result["cached"])
         self.assertTrue(result["regenerated_from_invalid_cache"])
         self.assertEqual(
-            PrepContentCache.objects.get(cache_key=cache_key).payload["content"], self.valid_notes.strip()
+            PrepContentCache.objects.get(cache_key=cache_key).payload["content"].strip(), self.valid_notes.strip()
         )
+        self.assertEqual(
+            repair_request.call_args.kwargs["model"],
+            "configured-targeted-repair-model",
+        )
+        repair_source = repair_request.call_args.args[0][1]["content"]
+        self.assertIn("## 5. Five", repair_source)
+        self.assertNotIn("## 1. One", repair_source)
+        self.assertNotIn("## 4. Four", repair_source)
+
+    @patch("services.prep_ai_router.call_together_repair")
+    @override_settings(TOGETHER_REPAIR_MODEL="configured-targeted-repair-model")
+    def test_screenshot_nested_environment_is_sent_to_configured_targeted_repair(self, repair_request):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        cache_key = compute_cache_key(
+            "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
+        )
+        valid_equation = "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$"
+        slash = chr(92)
+        broken_block = (
+            slash + "begin{aligned}\n"
+            + "c_k &= " + slash + "begin{cases} [a_k, c_k], & "
+            + slash + "text{if } f(a_k) f(c_k) < 0, " + slash + slash + "\n"
+            + "[c_k, b_k], & " + slash + "text{if } f(c_k) f(b_k) < 0.\n"
+            + slash + "end{cases}\n"
+            + slash + "end{aligned}"
+        )
+        corrected_block = "$$\n" + broken_block + "\n$$"
+        broken_notes = self.valid_notes.replace(valid_equation, broken_block)
+        PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="topic_notes",
+            prompt_hash="nested-environment",
+            payload={"content": broken_notes, "level": "level_2"},
+            course=self.course,
+            topic=self.topic,
+        )
+        repair_request.return_value = {
+            "success": True,
+            "content": json.dumps({"old_block": broken_block, "new_block": corrected_block}),
+            "usage": {"total_tokens": 0},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertEqual(repair_request.call_count, 1, repair_request.call_args_list)
+        self.assertTrue(result.get("repaired"), result)
+        self.assertEqual(result["notes"], self.valid_notes.replace(valid_equation, corrected_block))
+        repair_request.assert_called_once()
+        self.assertEqual(repair_request.call_args.kwargs["model"], "configured-targeted-repair-model")
+        repair_source = repair_request.call_args.args[0][1]["content"]
+        self.assertIn("LaTeX environment aligned is outside display math", repair_source)
+        self.assertIn(broken_block, repair_source)
+        self.assertNotIn("## 1. One", repair_source)
+        saved_payload = PrepContentCache.objects.get(cache_key=cache_key).payload
+        self.assertEqual(saved_payload["content"], result["notes"])
+        self.assertEqual(saved_payload["validation_state"], NOTE_VALIDATION_STATE)
+
+    @patch("services.prep_ai_router.call_together_repair")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_fresh_invalid_notes_use_targeted_repair_before_review_lock(self, route_request, repair_request):
+        broken_block = "$$\n\\left\\lvert a_m-a_n\\right\n\n\\right\\rvert\n$$"
+        broken_notes = self.valid_notes.replace(
+            "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$",
+            broken_block,
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": broken_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+        repair_request.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "old_block": broken_block,
+                "new_block": "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$",
+            }),
+            "usage": {},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_1",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(result.get("repaired"), result)
+        self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        repair_request.assert_called_once()
+        self.assertFalse(PrepContentCache.objects.get(topic=self.topic).payload.get("validation_state") is None)
+
+    @patch("services.prep_ai_router.call_deepseek")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_missing_sections_use_bounded_continuation_before_targeted_repair(
+        self,
+        route_request,
+        continuation_request,
+    ):
+        truncated_notes = self.valid_notes.split("## 4.", 1)[0].rstrip()
+        route_request.return_value = {
+            "success": True,
+            "content": truncated_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+        continuation_request.return_value = {
+            "success": True,
+            "content": "## 4." + self.valid_notes.split("## 4.", 1)[1],
+            "usage": {},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_1",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertFalse(result.get("validation_failed", False))
+        self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        continuation_request.assert_called_once()
+
+    @patch("services.prep_ai_router.call_together_repair")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_cached_missing_sections_use_regeneration_not_block_repair(
+        self,
+        route_request,
+        repair_request,
+    ):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        cache_key = compute_cache_key(
+            "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
+        )
+        truncated_notes = self.valid_notes.split("## 4.", 1)[0].rstrip()
+        PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="topic_notes",
+            prompt_hash="truncated",
+            payload={"content": truncated_notes, "level": "level_2"},
+            course=self.course,
+            topic=self.topic,
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": "## 4." + self.valid_notes.split("## 4.", 1)[1],
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(route_request.called, route_request.call_args_list)
+        self.assertTrue(result.get("repaired"), result)
+        self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        route_request.assert_called_once()
+        repair_request.assert_not_called()
+
+    @patch("services.email_service.send_prep_note_generation_failure_email", return_value=True)
+    @patch("services.prep_ai_router.call_together_repair")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_three_failed_targeted_repairs_store_notes_and_notify_admin(
+        self,
+        route_request,
+        repair_request,
+        send_failure_email,
+    ):
+        broken_block = "$$\n\\left\\lvert a_m-a_n\\right\n\n\\right\\rvert\n$$"
+        route_request.return_value = {
+            "success": True,
+            "content": self.valid_notes.replace(
+                "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$",
+                broken_block,
+            ),
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+        repair_request.return_value = {"success": False, "error": "repair unavailable"}
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_1",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        guard = PrepNoteGenerationGuard.objects.get(topic=self.topic, level="level_1")
+        cache = PrepContentCache.objects.get(topic=self.topic, content_type="topic_notes")
+        self.assertTrue(result["validation_failed"])
+        self.assertEqual(repair_request.call_count, 3)
+        self.assertEqual(guard.status, "needs_review")
+        self.assertEqual(guard.failed_attempts, 1)
+        self.assertTrue(cache.payload["content"])
+        self.assertIsNone(cache.payload.get("validation_state"))
+        send_failure_email.assert_called_once_with(guard)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_missing_level_one_and_three_use_the_same_validated_generation_path(self, route_request):
+        route_request.return_value = {
+            "success": True,
+            "content": self.valid_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+
+        for level in ("level_1", "level_3"):
+            result = get_or_generate_topic_notes(
+                self.course.code,
+                self.topic.title,
+                level=level,
+                course_obj=self.course,
+                topic_obj=self.topic,
+            )
+
+            self.assertEqual(result["level"], level)
+            self.assertTrue(result["notes"])
+            self.assertFalse(result.get("validation_failed", False))
+
+        self.assertEqual(route_request.call_count, 2)
 
     def test_cache_only_read_keeps_invalid_entry_for_free_recovery(self):
         signature = _topic_notes_cache_signature(
@@ -252,6 +565,19 @@ $$
         self.assertEqual(response.status_code, 422)
 
     @patch("services.prep_ai_router.route_math_request")
+    def test_failed_solution_generation_returns_an_error_without_placeholder(self, route_request):
+        route_request.return_value = {"success": False, "error": "Provider unavailable"}
+
+        result = get_or_generate_question_solution(
+            "Define strong consistency.",
+            self.course.code,
+            self.topic.title,
+        )
+
+        self.assertEqual(result["solution"], "")
+        self.assertEqual(result["error"], "Provider unavailable")
+
+    @patch("services.prep_ai_router.route_math_request")
     def test_prior_valid_shared_notes_are_served_when_the_current_generation_fails(self, route_request):
         PrepContentCache.objects.create(
             cache_key="notes:legacy:validation-testing:sequences:level_2",
@@ -298,11 +624,40 @@ $$
         self.assertEqual(first_read["level_2"], self.valid_notes.strip())
         self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
 
-        with patch("services.prep_ai_router._note_completion_issues") as validation:
-            second_read = get_published_topic_note_levels(self.topic)
-
+        second_read = get_published_topic_note_levels(self.topic)
         self.assertEqual(second_read["level_2"], self.valid_notes.strip())
-        validation.assert_not_called()
+
+    def test_approved_coursework_source_is_available_to_note_generation(self):
+        PrepDocument.objects.create(
+            course=self.course,
+            topic_name="Full Syllabus",
+            extracted_text="Approved R example: mean(c(1, 2, 3))",
+            stage="stage_3",
+        )
+
+        source = _approved_course_source_context(self.course, "Sequences")
+
+        self.assertIn("Approved R example", source)
+
+    def test_published_note_normalizes_invalid_inf_without_ai_generation(self):
+        invalid_inf = self.valid_notes.replace("a_m-a_n", "a_m-a_n \\inf")
+        PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:invalid-inf",
+            content_type="topic_notes",
+            prompt_hash="published-version",
+            payload={
+                "content": invalid_inf,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+
+        published = get_published_topic_note_levels(self.topic)
+
+        self.assertIn("\\infty", published["level_2"])
+        self.assertNotRegex(published["level_2"], r"\\inf(?![A-Za-z])")
 
     def test_published_note_bypasses_signature_changes_from_other_topics(self):
         PrepContentCache.objects.create(
@@ -509,6 +864,10 @@ class TopicStudyQuestionRenderingTests(TestCase):
     @patch("services.prep_ai_router.call_deepseek")
     @patch("services.prep_ai_router.route_math_request")
     def test_invalid_practice_set_is_corrected_before_it_is_saved(self, route_request, continue_request):
+        PrepQuestion.objects.filter(
+            topic=self.topic,
+            question_type="generated",
+        ).delete()
         incomplete_set = [
             {
                 "number": 1,
