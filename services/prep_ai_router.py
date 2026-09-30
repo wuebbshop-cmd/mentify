@@ -51,20 +51,17 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
             )
         except Exception as exc:
             logger.warning("[Topic Notes] Could not fingerprint curriculum: %s", exc)
-
     return compute_prompt_hash(
         topic_title,
         topic_summary,
         json.dumps(subtopics or [], ensure_ascii=True, sort_keys=True),
         json.dumps(curriculum, ensure_ascii=True),
+        json.dumps(_course_study_profile(course_obj), ensure_ascii=True, sort_keys=True),
         hashlib.sha256(source_context.encode("utf-8", errors="ignore")).hexdigest(),
     )[:16]
 
 
-NOTES_CACHE_VERSION = "markdown-katex-v6"
-# v2 rechecks caches that were approved before escaped-dollar validation was
-# added. Safe legacy entries are republished once; malformed entries are never
-# served as validated notes.
+NOTES_CACHE_VERSION = "markdown-katex-v7-profiled"
 NOTE_VALIDATION_STATE = "validated-v2"
 NOTE_MAX_FAILED_GENERATION_CYCLES = 2
 
@@ -84,8 +81,21 @@ def _merge_usage(*usage_items) -> dict:
     return merged
 
 
-def _required_note_sections(topic_title: str) -> list[str]:
+def _course_study_profile(course_obj) -> dict:
+    profile = getattr(course_obj, "study_profile", None)
+    return profile if isinstance(profile, dict) and profile.get("subject_family") else {}
+
+
+def _course_study_profile_version(course_obj) -> int:
+    return int(getattr(course_obj, "study_profile_version", 0) or 0)
+
+
+def _required_note_sections(topic_title: str, study_profile: dict | None = None) -> list[str]:
     """Return the section headings a generated topic note must contain."""
+    if study_profile and isinstance(study_profile.get("note_structure"), list):
+        section_count = len(study_profile["note_structure"])
+        if section_count:
+            return [f"## {index}." for index in range(1, section_count + 1)]
     topic_lower = (topic_title or "").lower()
     is_overview = any(
         word in topic_lower
@@ -96,21 +106,49 @@ def _required_note_sections(topic_title: str) -> list[str]:
 
 
 def _note_allows_code(course_obj, topic_title: str, summary: str = "", subtopics=None) -> bool:
-    """Allow code only when course metadata or the approved topic scope requires it."""
-    category = str(getattr(course_obj, "category", "") or "").lower()
-    scope = " ".join([
-        str(getattr(course_obj, "code", "") or ""),
-        str(getattr(course_obj, "title", "") or ""),
-        str(getattr(course_obj, "description", "") or ""),
+    """Allow code only when notes-backed profile and this topic support it."""
+    scope_parts = [
         str(topic_title or ""),
         str(summary or ""),
         " ".join(str(item) for item in (subtopics or [])),
-    ]).lower()
+    ]
+    profile = _course_study_profile(course_obj)
+    if profile:
+        capabilities = profile.get("capabilities") if isinstance(profile.get("capabilities"), dict) else {}
+        if not capabilities.get("code"):
+            return False
+    else:
+        scope_parts.extend([
+            str(getattr(course_obj, "title", "") or ""),
+            str(getattr(course_obj, "description", "") or ""),
+        ])
+    scope = " ".join(scope_parts).lower()
     explicit_code_terms = (
         "programming", "software", "python", "r language", "r programming", "data frame",
         "source code", "computer algorithm", "coding", "syntax", "plotting",
     )
-    return category == "computing" or any(term in scope for term in explicit_code_terms)
+    profile = _course_study_profile(course_obj)
+    family = str(profile.get("subject_family") or "").lower()
+    return any(term in scope for term in explicit_code_terms) or (
+        family == "computing" and bool(re.search(r"\br\b", scope))
+    )
+
+
+def _note_allows_math(course_obj) -> bool | None:
+    """Return the approved source capability, or None for legacy courses."""
+    profile = _course_study_profile(course_obj)
+    if not profile:
+        return None
+    capabilities = profile.get("capabilities") if isinstance(profile.get("capabilities"), dict) else {}
+    return bool(capabilities.get("math_notation") or capabilities.get("chemical_equations"))
+
+
+def _note_validation_options(course_obj, topic_title: str, summary: str = "", subtopics=None) -> dict:
+    return {
+        "allow_code": _note_allows_code(course_obj, topic_title, summary, subtopics),
+        "allow_math": _note_allows_math(course_obj),
+        "study_profile": _course_study_profile(course_obj),
+    }
 
 
 def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
@@ -122,6 +160,7 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
     documents = PrepDocument.objects.filter(
         course=course_obj,
         stage="stage_3",
+        doc_type__in=["Lecture Notes", "Revision Sheet"],
     ).exclude(extracted_text="").order_by("-updated_at", "-id")
     topic_words = [word for word in re.findall(r"[A-Za-z0-9]+", topic_title.lower()) if len(word) > 3]
     selected = []
@@ -300,7 +339,13 @@ def _regenerate_invalid_note_sections(
     prefix = content[:first_match.start()] if first_match else content
     suffix = content[next_match.start():] if next_match else ""
     requested_sections = ", ".join(f"## {number}." for number in range(first_number, last_number + 1))
-    allows_code = _note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics)
+    validation_options = _note_validation_options(
+        topic_obj.course,
+        topic_obj.title,
+        topic_obj.summary,
+        topic_obj.subtopics,
+    )
+    allows_code = validation_options["allow_code"]
     source_excerpt = _approved_course_source_context(topic_obj.course, topic_obj.title)
 
     repair, _ = PrepNoteRepair.objects.get_or_create(
@@ -347,7 +392,7 @@ def _regenerate_invalid_note_sections(
         candidate_issues = _note_completion_issues(
             candidate,
             topic_obj.title,
-            allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+            **validation_options,
         )
         if candidate_issues:
             working_content = candidate
@@ -366,6 +411,7 @@ def _regenerate_invalid_note_sections(
             "validation_state": NOTE_VALIDATION_STATE,
             "validated_at": timezone.now().isoformat(),
             "level": level,
+            "study_profile_version": _course_study_profile_version(topic_obj.course),
         })
         entry.payload = payload
         entry.save(update_fields=["payload", "updated_at"])
@@ -471,7 +517,6 @@ def _latex_syntax_issues(content: str) -> list[str]:
     for index, match in enumerate(re.finditer(r"\$\$([\s\S]*?)\$\$", source), start=1):
         expression = match.group(1)
         curly_depth = 0
-        square_depth = 0
         backslashes = 0
 
         for char in expression:
@@ -489,18 +534,9 @@ def _latex_syntax_issues(content: str) -> list[str]:
                 if curly_depth < 0:
                     issues.append(f"display-math block {index} has an unmatched closing brace")
                     curly_depth = 0
-            elif char == "[":
-                square_depth += 1
-            elif char == "]":
-                square_depth -= 1
-                if square_depth < 0:
-                    issues.append(f"display-math block {index} has an unmatched closing bracket")
-                    square_depth = 0
 
         if curly_depth:
             issues.append(f"display-math block {index} has unmatched braces")
-        if square_depth:
-            issues.append(f"display-math block {index} has unmatched brackets")
 
     return issues
 
@@ -522,13 +558,25 @@ def _code_block_issues(content: str) -> list[str]:
     return issues
 
 
-def _note_completion_issues(content: str, topic_title: str, *, allow_code: bool | None = None) -> list[str]:
+def _note_completion_issues(
+    content: str,
+    topic_title: str,
+    *,
+    allow_code: bool | None = None,
+    allow_math: bool | None = None,
+    study_profile: dict | None = None,
+) -> list[str]:
     """Detect incomplete note output before it is displayed or cached."""
     if not isinstance(content, str) or not content.strip():
         return ["empty content"]
 
     issues: list[str] = []
-    for heading in _required_note_sections(topic_title):
+    family = str((study_profile or {}).get("subject_family") or "").strip().lower()
+    if family in {"social_science", "humanities", "business_economics", "general_science"}:
+        if _nontechnical_solution_has_proof_scaffold(content):
+            issues.append("mathematical proof scaffold is not allowed for this subject family")
+
+    for heading in _required_note_sections(topic_title, study_profile):
         if not re.search(rf"(?m)^\s*{re.escape(heading)}(?:\s|$)", content):
             issues.append(f"missing section {heading}")
 
@@ -549,6 +597,10 @@ def _note_completion_issues(content: str, topic_title: str, *, allow_code: bool 
     issues.extend(_note_format_issues(content))
     if allow_code is False and re.search(r"```[A-Za-z0-9_+-]*\s*\n", content):
         issues.append("code block is not allowed for this topic")
+    if allow_math is False:
+        math_source = re.sub(r"```[\s\S]*?```", "", content)
+        if re.search(r"\$\$?|\\\\\[|\\\\\(|\\\\begin\{|\\\\(?:frac|int|sum|prod|lim|mathbb)", math_source):
+            issues.append("math notation is not supported by the approved course notes")
     return issues
 
 
@@ -716,12 +768,26 @@ def repair_json_escaped_latex_newlines(content: str) -> str:
     return repair_escaped_dollars_inside_math("".join(output))
 
 
-def _publish_legacy_note_cache(entry, payload: dict, topic_title: str, *, allow_code: bool | None = None) -> dict | None:
+def _publish_legacy_note_cache(
+    entry,
+    payload: dict,
+    topic_title: str,
+    *,
+    allow_code: bool | None = None,
+    allow_math: bool | None = None,
+    study_profile: dict | None = None,
+) -> dict | None:
     """Validate an unmarked legacy note once, then persist its publication state."""
     content = repair_json_escaped_latex_newlines(
         str(payload.get("content") or payload.get("notes") or "")
     ).strip()
-    if not content or _note_completion_issues(content, topic_title, allow_code=allow_code):
+    if not content or _note_completion_issues(
+        content,
+        topic_title,
+        allow_code=allow_code,
+        allow_math=allow_math,
+        study_profile=study_profile,
+    ):
         return None
 
     published_payload = dict(payload)
@@ -752,6 +818,14 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         level = payload.get("level")
         if level not in {"level_1", "level_2", "level_3"} or level in levels:
             continue
+        if int(payload.get("study_profile_version", 0) or 0) != _course_study_profile_version(topic_obj.course):
+            continue
+        validation_options = _note_validation_options(
+            topic_obj.course,
+            topic_obj.title,
+            topic_obj.summary,
+            topic_obj.subtopics,
+        )
         if validated_only and payload.get("validation_state") != NOTE_VALIDATION_STATE:
             continue
         if payload.get("validation_state") != NOTE_VALIDATION_STATE:
@@ -759,18 +833,14 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
                 entry,
                 payload,
                 topic_obj.title,
-                allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+                **validation_options,
             )
         if not payload:
             continue
         content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
-        content_issues = _note_completion_issues(
-            content,
-            topic_obj.title,
-            allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
-        )
+        content_issues = _note_completion_issues(content, topic_obj.title, **validation_options)
         if content_issues:
             # A new policy can invalidate an older published row without
             # changing the underlying syllabus source.
@@ -780,6 +850,7 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             payload["content"] = content
             payload["validation_state"] = NOTE_VALIDATION_STATE
             payload["validated_at"] = timezone.now().isoformat()
+            payload["study_profile_version"] = _course_study_profile_version(topic_obj.course)
             entry.payload = payload
             entry.save(update_fields=["payload", "updated_at"])
         if content:
@@ -877,6 +948,25 @@ def _clear_note_generation_guard(topic_obj, level: str, source_signature: str) -
     ).delete()
 
 
+def _mark_cached_note_valid(topic_obj, level: str, source_signature: str, content: str) -> None:
+    if not topic_obj:
+        return
+    from prep.models import PrepNoteRepair
+
+    PrepNoteRepair.objects.filter(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+    ).exclude(status="validated").update(
+        current_content=content,
+        validation_issues=[],
+        status="validated",
+        last_error="",
+        updated_at=timezone.now(),
+    )
+    _clear_note_generation_guard(topic_obj, level, source_signature)
+
+
 def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclude_cache_key: str = "") -> dict | None:
     """Return a prior valid shared version only after current generation fails."""
     if not topic_obj:
@@ -890,23 +980,31 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
     ).order_by("-updated_at")
     if exclude_cache_key:
         entries = entries.exclude(cache_key=exclude_cache_key)
+    validation_options = _note_validation_options(
+        topic_obj.course,
+        topic_title,
+        topic_obj.summary,
+        topic_obj.subtopics,
+    )
 
     for entry in entries:
         payload = _cache_payload_as_dict(entry.payload)
         if not payload or payload.get("level") != level:
+            continue
+        if int(payload.get("study_profile_version", 0) or 0) != _course_study_profile_version(topic_obj.course):
             continue
 
         content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
         if payload.get("validation_state") != NOTE_VALIDATION_STATE:
-            payload = _publish_legacy_note_cache(entry, payload, topic_title)
+            payload = _publish_legacy_note_cache(entry, payload, topic_title, **validation_options)
         if not payload:
             continue
         content = repair_json_escaped_latex_newlines(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
-        if not content or _note_completion_issues(content, topic_title):
+        if not content or _note_completion_issues(content, topic_title, **validation_options):
             continue
 
         entry.hit_count += 1
@@ -946,6 +1044,12 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
         return None
 
     working_content = repair.current_content or content
+    validation_options = _note_validation_options(
+        topic_obj.course,
+        topic_obj.title,
+        topic_obj.summary,
+        topic_obj.subtopics,
+    )
     for _ in range(repair.attempts, 3):
         repair.attempts += 1
         repair.validation_issues = issues
@@ -972,7 +1076,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             candidate_issues = _note_completion_issues(
                 candidate,
                 topic_obj.title,
-                allow_code=_note_allows_code(topic_obj.course, topic_obj.title, topic_obj.summary, topic_obj.subtopics),
+                **validation_options,
             )
             if candidate_issues:
                 working_content = candidate
@@ -985,7 +1089,12 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             if not entry:
                 return None
             payload = _cache_payload_as_dict(entry.payload) or {}
-            payload.update({"content": candidate, "validation_state": NOTE_VALIDATION_STATE, "validated_at": timezone.now().isoformat()})
+            payload.update({
+                "content": candidate,
+                "validation_state": NOTE_VALIDATION_STATE,
+                "validated_at": timezone.now().isoformat(),
+                "study_profile_version": _course_study_profile_version(topic_obj.course),
+            })
             entry.payload = payload
             entry.save(update_fields=["payload", "updated_at"])
             repair.current_content = candidate
@@ -1248,7 +1357,6 @@ def normalize_math_delimiters(text: str) -> str:
         return ""
     text = repair_json_escaped_latex_newlines(str(text))
     text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
-    text = re.sub(r"\\inf(?![A-Za-z])", r"\\infty", text)
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
     text = re.sub(r'(\d+)\ufffd(\d+)', r'\1–\2', text)
     text = re.sub(r'([IVXLCDM]+)\ufffd([IVXLCDM]+)', r'\1–\2', text)
@@ -1291,12 +1399,11 @@ def get_or_generate_topic_notes(
     if topic_obj and not subtopics:
         if isinstance(getattr(topic_obj, "subtopics", None), list):
             subtopics = topic_obj.subtopics
-    allows_code = _note_allows_code(
-        course_obj,
-        topic_title,
-        getattr(topic_obj, "summary", "") if topic_obj else "",
-        subtopics,
-    )
+    topic_summary = str(getattr(topic_obj, "summary", "") or "").strip() if topic_obj else ""
+    study_profile = _course_study_profile(course_obj)
+    validation_options = _note_validation_options(course_obj, topic_title, topic_summary, subtopics)
+    allows_code = validation_options["allow_code"]
+    allows_math = validation_options["allow_math"]
 
     # A published shared note belongs to this specific approved topic and
     # level. Serve it before the historical signature-key path so unrelated
@@ -1318,9 +1425,6 @@ def get_or_generate_topic_notes(
     # curriculum state, rather than only its title. This prevents a valid but
     # stale note from surviving a reviewed syllabus update.
     cache_signature = _topic_notes_cache_signature(course_obj, topic_obj, topic_title, subtopics)
-    blocked = _blocked_note_generation(topic_obj, level, cache_signature)
-    if blocked:
-        return blocked
     cache_key = compute_cache_key(
         "notes", NOTES_CACHE_VERSION, course_code, topic_title, level, cache_signature
     )
@@ -1330,9 +1434,10 @@ def get_or_generate_topic_notes(
         cached_content = repair_json_escaped_latex_newlines(
             str(cached.get("content", "") or "")
         )
-        cached_issues = _note_completion_issues(cached_content, topic_title, allow_code=allows_code)
+        cached_issues = _note_completion_issues(cached_content, topic_title, **validation_options)
         if cached.get("validation_state") == NOTE_VALIDATION_STATE and not cached_issues:
             # Strict read-only: never mutate or overwrite a valid cache on read.
+            _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
             return {
                 "notes": cached_content,
                 "blocks": cached.get("blocks"),
@@ -1351,6 +1456,7 @@ def get_or_generate_topic_notes(
             cached["validation_state"] = NOTE_VALIDATION_STATE
             cached["validated_at"] = timezone.now().isoformat()
             PrepContentCache.objects.filter(cache_key=cache_key).update(payload=cached)
+            _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
             return {
                 "notes": cached_content,
                 "blocks": cached.get("blocks"),
@@ -1420,6 +1526,10 @@ def get_or_generate_topic_notes(
             "error": "The cached notes failed validation and targeted repair needs manual review.",
         }
 
+    blocked = _blocked_note_generation(topic_obj, level, cache_signature)
+    if blocked:
+        return blocked
+
     if not generate_if_missing:
         return {
             "notes": "",
@@ -1450,15 +1560,19 @@ def get_or_generate_topic_notes(
     subtopic_coverage_block = ""
     if subtopics and len(subtopics) > 0:
         subtopic_items = "\n".join(f"  {idx + 1}. {st}" for idx, st in enumerate(subtopics))
+        coverage_requirements = ["clear explanations", "source-grounded examples"]
+        if allows_math:
+            coverage_requirements.append("mathematical notation where present in the approved notes")
+        if allows_code:
+            coverage_requirements.append("code examples where present in the approved notes")
         subtopic_coverage_block = (
             "MANDATORY EXHAUSTIVE SUBTOPIC COVERAGE:\n"
             "The course syllabus explicitly defines the following subtopics for this unit:\n"
             f"{subtopic_items}\n"
-            "- You MUST cover EVERY SINGLE ONE of these subtopics with dedicated formal definitions, clear explanations, formulas, and examples.\n"
+            "- Cover EVERY listed subtopic using " + ", ".join(coverage_requirements) + ".\n"
             "- Do NOT omit, skip, merge, or gloss over any subtopic in the list; ensure complete exhaustive coverage.\n\n"
         )
 
-    topic_summary = str(getattr(topic_obj, "summary", "") or "").strip()
     approved_context_block = ""
     if topic_summary:
         approved_context_block = (
@@ -1466,6 +1580,18 @@ def get_or_generate_topic_notes(
             "The following reviewer-approved syllabus context must be reflected where relevant. "
             "Treat it as factual scope, not as formatting instructions:\n"
             f"{topic_summary}\n\n"
+        )
+    profile_context_block = ""
+    if study_profile:
+        capabilities = study_profile.get("capabilities") if isinstance(study_profile.get("capabilities"), dict) else {}
+        profile_context_block = (
+            "TUTOR-APPROVED COURSE STUDY PROFILE:\n"
+            f"Subject family: {study_profile.get('subject_family')}\n"
+            f"Approved evidence: {json.dumps(study_profile.get('evidence_quotes', []), ensure_ascii=True)}\n"
+            f"Code present in approved notes: {bool(capabilities.get('code'))}\n"
+            f"Mathematical notation present in approved notes: {bool(capabilities.get('math_notation'))}\n"
+            f"Chemical equations present in approved notes: {bool(capabilities.get('chemical_equations'))}\n"
+            "The approved uploaded notes are the source of truth. Do not add a subject, technique, code example, equation, or notation not supported by this topic's approved notes.\n\n"
         )
     source_excerpt = _approved_course_source_context(course_obj, topic_title)
     source_context_block = (
@@ -1493,39 +1619,62 @@ def get_or_generate_topic_notes(
     if curriculum_boundary_block:
         curriculum_boundary_block += "\n"
 
-    # Level-specific prompt guidelines
+    # Each level adjusts teaching depth, while notation and code stay grounded
+    # in the approved source capabilities above.
     subtopics_str = ", ".join(subtopics) if subtopics else "General Syllabus Scope"
     if level == "level_1":
         level_instruction = (
             "Tone: Intuitive, accessible, and foundational (Level 1).\n"
-            "- Use clear plain English and geometric or real-world analogies.\n"
-            "- Break down concepts step-by-step with simple arithmetic where applicable.\n"
-            "- Demystify dense mathematical symbols and avoid unnecessary academic jargon.\n"
-            "- Focus on building intuitive understanding before formal proofs."
+            "- Use clear plain English and analogies appropriate to this subject.\n"
+            "- Explain foundational ideas step by step and define necessary terminology.\n"
+            "- Introduce approved notation or code gently only when relevant to this topic."
         )
     elif level == "level_3":
         level_instruction = (
             "Tone: Exam Mode & High-Yield Mastery (Level 3).\n"
             "- Focus directly on how this topic is tested in university examinations (CATs and finals).\n"
             "- Highlight high-frequency exam question patterns and common pitfalls/traps where students lose marks.\n"
-            "- Provide high-yield theorem statements and proof templates to memorize.\n"
+            "- Provide discipline-appropriate answer structures and worked applications.\n"
             "- Include examination marking rubric tips and time-management strategies."
         )
     else:  # level_2
         level_instruction = (
             "Tone: University Undergraduate Standard (Level 2).\n"
-            "- Deliver standard university lecture notes with formal definitions and academic rigor.\n"
-            "- Use precise LaTeX mathematical notation for all theorems and formulas.\n"
-            "- Include complete statements of fundamental theorems and a standard worked example."
+            "- Deliver standard university notes with precise definitions and academic rigor.\n"
+            "- Include a representative worked example or application grounded in the approved notes.\n"
+            "- Use formal notation only where supported by the approved source and relevant to this topic."
         )
+    if study_profile and study_profile.get("subject_family") in {
+        "social_science", "humanities", "business_economics", "general_science",
+    }:
+        level_instruction = (
+            f"Tone: University-level {study_profile['subject_family'].replace('_', ' ')} teaching (Level {level[-1]}).\n"
+            "- Explain the approved concepts, evidence, context, and applications clearly.\n"
+            "- Do not introduce mathematical derivations or programming unless the approved source capability explicitly allows them."
+        )
+    if allows_math:
+        level_instruction += "\n- Include relevant source-supported equations or derivations at the depth appropriate to this level."
+    else:
+        level_instruction += "\n- Do not add equations, mathematical derivations, or proof templates."
+    if allows_code:
+        level_instruction += "\n- Include source-supported code examples when relevant to this topic."
+    else:
+        level_instruction += "\n- Do not include code or programming syntax."
 
     # Topic-type awareness is driven by approved course metadata and scope;
     # mathematical notation must not be mistaken for programming.
     topic_lower = topic_title.lower()
     is_overview = any(w in topic_lower for w in ["overview", "introduction", "intro", "outline", "syllabus", "orientation", "prerequisite"])
-    allows_code = _note_allows_code(course_obj, topic_title, topic_summary, subtopics)
+    profile_sections = study_profile.get("note_structure") if isinstance(study_profile.get("note_structure"), list) else []
 
-    if is_overview:
+    if study_profile and profile_sections:
+        section_structure = (
+            "Use this approved subject-specific structure, keeping the numbered headings exactly as shown:\n"
+            + "\n".join(f"## {index}. {title}" for index, title in enumerate(profile_sections, start=1))
+            + "\n\nCover only the current topic and the uploaded notes' content. Do not add unsupported subjects."
+        )
+        required_last_section = f"## {len(profile_sections)}."
+    elif is_overview:
         section_structure = (
             "Structure your notes across these 4 orientation sections:\n"
             "## 1. Course Scope, Objectives & Learning Roadmap\n"
@@ -1560,37 +1709,68 @@ def get_or_generate_topic_notes(
         required_last_section = "## 5."
 
     code_policy = (
-        "CODE POLICY: Include code only when it is directly required by the approved topic scope.\n"
+        "CODE POLICY: Include code only when approved notes support it and it is relevant to this topic. Use source-grounded examples only.\n"
         if allows_code
-        else "CODE POLICY: This is not a programming/computing topic. Do not include R, Python, pseudocode, or fenced code blocks. Use prose, examples, tables, and mathematical notation as appropriate.\n"
+        else "CODE POLICY: Do not include code, pseudocode, programming syntax, or fenced code blocks.\n"
+    )
+    math_policy = (
+        "MATHEMATICS POLICY: Use equations and notation only when evidenced in approved notes and relevant to this topic. Do not invent formulas.\n"
+        if allows_math is not False
+        else "MATHEMATICS POLICY: Approved notes contain no mathematical notation. Do not include equations, formulas, symbolic derivations, LaTeX, or mathematical examples.\n"
+    )
+    authoring_rules = (
+        "Use clear Markdown prose, lists, and headings. Do not use math delimiters, LaTeX commands, equations, formulas, or symbolic derivations. "
+        "Do not add a formula merely to make the notes look technical. Every factual claim and example must stay within the approved notes.\n"
+        if allows_math is False
+        else (
+            "STRICT MATHEMATICAL AUTHORING FORMAT:\n"
+            "1. Inline math uses $...$ with no inner spaces and closes before punctuation or paragraph breaks.\n"
+            "2. Display math uses $$...$$ on dedicated lines; do not put prose or blank structural breaks inside it.\n"
+            "3. Enclose every LaTeX environment in display math.\n"
+            "4. Do not output HTML.\n"
+            "5. Put Markdown headings on their own lines; do not put math delimiters in headings.\n"
+            "6. Preserve complete words, theorem titles, and blockquote prefixes.\n"
+            "7. Do not chain long equalities; use aligned derivations when the source requires them.\n"
+            "8. Use complete, language-tagged code blocks only when the CODE POLICY permits code.\n"
+            "9. Keep all math delimiters and LaTeX groups balanced.\n"
+            "10. Keep Markdown table rows complete and escape mathematical pipes.\n"
+        )
     )
 
     prompt = (
         f"Generate comprehensive, publication-grade structured revision notes for the course '{course_code}', topic '{topic_title}'.\n\n"
         f"{subtopic_coverage_block}"
         f"{approved_context_block}"
+        f"{profile_context_block}"
         f"{source_context_block}"
         f"{curriculum_boundary_block}"
         f"{level_instruction}\n\n"
         f"{code_policy}\n"
-        "STRICT AUTHORING FORMAT — follow every rule below exactly, no exceptions:\n"
-        "1. Inline math: use $...$ with NO inner spaces (e.g. $x \\in \\mathbb{R}$, NEVER $ x $). Close all inline math before punctuation or paragraph breaks.\n"
-        "2. Display math: use $$...$$ on dedicated separate lines (the opening $$ on its own line, the equation on its own lines, and the closing $$ on its own line). NEVER use a blank line inside a display-math block or place English prose inside it.\n"
-        "3. ALL LaTeX environments (\\begin{aligned}, \\begin{cases}, \\begin{matrix}, \\begin{pmatrix}, etc.) MUST be enclosed inside $$...$$ on dedicated lines. NEVER output a naked \\begin{...} outside $$...$$.\n"
-        "4. Do NOT output any HTML tags (<div>, <span>, <br>, etc.). Use only Markdown.\n"
-        "5. Headings use ## or ### on their own line with a blank line before and after. Never put math delimiters ($ or $$) in heading lines.\n"
-        "6. Format every theorem, definition, lemma, or corollary as a Markdown blockquote: '> **Theorem X.Y (Title):** Statement…' — blank line before and after.\n"
-        "7. Never split a word, theorem title, or sentence across lines. Keep the complete title on one logical Markdown line, and preserve '> ' on every continuation line inside a blockquote.\n"
-        "8. NEVER chain equalities horizontally (e.g. NEVER 'A = B = C = D'). Always break derivations vertically using \\begin{aligned}...\\end{aligned} inside $$...$$, showing each intermediate step.\n"
-        "9. If code is permitted by the CODE POLICY, fenced code blocks must use a language tag and remain complete. Otherwise, do not output code blocks.\n"
-        "10. Do NOT place Markdown bold/italic (**text** or *text*) inside math mode ($...$ or $$...$$). Use \\text{...} inside math for words. Every {, [, \\left, and \\right must have its matching closing counterpart in the same math block.\n"
-        "11. In Markdown tables: EVERY table row must start with '|' and end with '|'. If math in table cells uses absolute values, norms, or determinants, ALWAYS write \\lvert x \\rvert, \\lVert x \\rVert, or \\det(A). NEVER write raw '|' (like '|x|') inside table cells because unescaped pipes break the table column structure.\n"
+        f"{math_policy}\n"
+        f"{authoring_rules}"
         f"12. MANDATORY: Generate notes completely through to the end of the final section ({required_last_section}). Never truncate.\n\n"
         f"{section_structure}"
     )
 
+    note_system_prompt = None
+    if study_profile:
+        note_system_prompt = (
+            f"You are an expert university tutor for the approved subject family {study_profile.get('subject_family')}. "
+            "Treat uploaded notes and quoted evidence as the sole factual scope. Do not infer content from course codes, exams, or generic conventions. "
+            + ("Do not use equations, mathematical symbols, LaTeX, or code because the approved notes contain none. " if not allows_math and not allows_code else "")
+            + ("Include code only where the approved topic notes support it. " if allows_code else "Do not include code or pseudocode. ")
+            + ("Use mathematical notation only where the approved notes support it. " if allows_math else "Do not include mathematical notation or equations. ")
+            + "Follow the supplied note structure exactly and return only the notes."
+        )
+
     p_hash = compute_prompt_hash(course_code, topic_title, level, prompt)
-    result = route_math_request(prompt, course_code, topic_label=topic_title, is_complex_proof=False)
+    result = route_math_request(
+        prompt,
+        course_code,
+        topic_label=topic_title,
+        is_complex_proof=False,
+        system_prompt=note_system_prompt,
+    )
 
     if result.get("success"):
         content = normalize_math_delimiters(result["content"])
@@ -1599,7 +1779,7 @@ def get_or_generate_topic_notes(
         # This protects against responses that contain the final heading but stop
         # before its body, which the old heading-only check accepted.
         for continuation_attempt in range(2):
-            completion_issues = _note_completion_issues(content, topic_title, allow_code=allows_code)
+            completion_issues = _note_completion_issues(content, topic_title, **validation_options)
             if not completion_issues:
                 break
             needs_continuation = any(
@@ -1641,7 +1821,7 @@ def get_or_generate_topic_notes(
         # Preserve the generated Markdown source. The browser renderer is the
         # single owner of Markdown and KaTeX interpretation.
         content = str(content).strip()
-        completion_issues = _note_completion_issues(content, topic_title, allow_code=allows_code)
+        completion_issues = _note_completion_issues(content, topic_title, **validation_options)
         if completion_issues:
             logger.error(
                 "[Topic Notes] Refusing to cache incomplete notes for %s %s: %s",
@@ -1717,6 +1897,7 @@ def get_or_generate_topic_notes(
             "course": course_code,
             "topic": topic_title,
             "level": level,
+            "study_profile_version": _course_study_profile_version(course_obj),
             "generated_at": timezone.now().isoformat(),
         }
         store_cached_content(cache_key, "topic_notes", p_hash, payload, course=course_obj, topic=topic_obj)
@@ -1837,6 +2018,8 @@ def _practice_question_issues(items, expected_count: int) -> list[str]:
             issues.append(f"question {index} has invalid marks")
 
         source = f"{question or ''}\n{solution or ''}"
+        if re.search(r"\\infty\s+S\b", str(question or "")):
+            issues.append(f"question {index}: possible infimum operator corrupted to infinity")
         issues.extend(f"question {index}: {issue}" for issue in _display_math_issues(source))
         issues.extend(f"question {index}: {issue}" for issue in _latex_syntax_issues(source))
         issues.extend(f"question {index}: {issue}" for issue in _code_block_issues(source))
@@ -2109,41 +2292,108 @@ def generate_similar_practice_questions(
     }
 
 
+def _question_solution_uses_nontechnical_format(course_obj=None, study_profile: dict | None = None) -> bool:
+    """Return True when the course should be answered with explanatory analysis rather than proof-style math."""
+    profile = study_profile if isinstance(study_profile, dict) else _course_study_profile(course_obj)
+    family = str(profile.get("subject_family") or "").strip().lower()
+    return family in {"social_science", "humanities", "business_economics", "general_science"}
+
+
+def _nontechnical_solution_has_proof_scaffold(solution: str) -> bool:
+    """Detect legacy math-proof scaffolding that should not be served for non-technical courses."""
+    text = str(solution or "").lower()
+    if any(marker in text for marker in (
+        "problem statement & given conditions",
+        "step-by-step rigorous proof / derivation",
+        "final result / q.e.d.",
+    )):
+        return True
+    return any(
+        re.match(r"^\s*(?:#{1,6}\s+|\d+[.)]\s+|\*\*)", line)
+        and re.search(r"\b(?:proof|derivation|theorem|q\.e\.d\.)\b", line)
+        for line in text.splitlines()
+    )
+
+
 def get_or_generate_question_solution(question_latex: str, course_code: str, topic_label: str = "", question_obj=None) -> dict:
     """
-    Retrieve verified step-by-step solution proof for a question.
-    Checks DB cache first ($0 token spend). If not cached, routes to DeepSeek-R1.
+    Retrieve a verified answer for a question.
+    Non-technical subjects use explanatory, source-grounded answers rather than a mathematics proof template.
     """
-    cache_key = compute_cache_key("solution", course_code, question_latex[:50])
+    course_obj = None
+    if question_obj:
+        topic_obj = getattr(question_obj, "topic", None)
+        if topic_obj:
+            course_obj = getattr(topic_obj, "course", None)
+        elif getattr(question_obj, "paper", None):
+            course_obj = question_obj.paper.course
+    study_profile = _course_study_profile(course_obj)
+    is_nontechnical = _question_solution_uses_nontechnical_format(course_obj=course_obj, study_profile=study_profile)
+    cache_key = compute_cache_key(
+        "solution",
+        course_code,
+        question_latex[:50],
+        f"profile-v{_course_study_profile_version(course_obj)}",
+        "explanatory-v1" if is_nontechnical else "technical-v1",
+    )
     cached = get_cached_content(cache_key)
     if cached:
-        return {
-            "solution": cached["solution"],
-            "reasoning": cached.get("reasoning", ""),
-            "cached": True,
-            "model": cached.get("model", "Cache"),
-        }
+        cached_solution = str(cached.get("solution") or "")
+        if not is_nontechnical or not _nontechnical_solution_has_proof_scaffold(cached_solution):
+            return {
+                "solution": cached_solution,
+                "reasoning": cached.get("reasoning", ""),
+                "cached": True,
+                "model": cached.get("model", "Cache"),
+            }
+        logger.warning("[Question Solution] Ignoring proof-style cached answer for non-technical course %s", course_code)
 
     # First attempt deterministic evaluation if algebraic
     sympy_res = evaluate_symbolic_math(question_latex)
 
-    prompt = (
-        f"Provide a rigorous, step-by-step mathematical proof and solution for this examination question "
-        f"from course {course_code} ({topic_label}):\n\n"
-        f"$$\n{question_latex}\n$$\n\n"
-        "Structure your response:\n"
-        "1. **Problem Statement & Given Conditions**\n"
-        "2. **Step-by-Step Rigorous Proof / Derivation** with complete intermediate steps (never chain equalities horizontally)\n"
-        "3. **Final Result / Q.E.D.**"
-    )
+    if is_nontechnical:
+        prompt = (
+            f"Provide a clear, academically rigorous explanatory answer for this question from course {course_code} "
+            f"({topic_label}):\n\n"
+            f"{question_latex}\n\n"
+            "Structure your response:\n"
+            "1. **Key Concept / Definition**\n"
+            "2. **Explanation and Analysis**\n"
+            "3. **Examples / Evidence / Application**\n"
+            "4. **Conclusion / Main Point**\n\n"
+            "Use definitions, theories, case examples, and clear academic reasoning. Do not convert it into a proof, derivation, or theorem exercise."
+        )
+        system_prompt = (
+            "You are an expert university tutor in the social sciences and humanities. "
+            "Answer with clear academic explanation, definitions, theories, case evidence, and examples. "
+            "Do not rewrite the question as a mathematical proof or theorem derivation."
+        )
+        is_complex_proof = False
+    else:
+        prompt = (
+            f"Provide a rigorous, step-by-step mathematical proof and solution for this examination question "
+            f"from course {course_code} ({topic_label}):\n\n"
+            f"$$\n{question_latex}\n$$\n\n"
+            "Structure your response:\n"
+            "1. **Problem Statement & Given Conditions**\n"
+            "2. **Step-by-Step Rigorous Proof / Derivation** with complete intermediate steps (never chain equalities horizontally)\n"
+            "3. **Final Result / Q.E.D.**"
+        )
+        system_prompt = None
+        is_complex_proof = True
 
     p_hash = compute_prompt_hash(course_code, question_latex)
-    # Complex proof -> DeepSeek-R1
-    result = route_math_request(prompt, course_code, topic_label=topic_label, is_complex_proof=True)
+    result = route_math_request(prompt, course_code, topic_label=topic_label, is_complex_proof=is_complex_proof, system_prompt=system_prompt)
 
     if result.get("success"):
         solution_text = normalize_math_delimiters(result["content"])
         reasoning_text = result.get("reasoning_content", "")
+        if is_nontechnical and _nontechnical_solution_has_proof_scaffold(solution_text):
+            return {
+                "solution": "",
+                "cached": False,
+                "error": "The generated answer used a mathematical proof format and was rejected. Please retry.",
+            }
 
         # Save to question object in DB if provided
         if question_obj and not question_obj.solution_latex:
@@ -2187,12 +2437,27 @@ def generate_adapted_past_question(question_obj) -> dict:
     topic = question_obj.topic
     course_code = question_obj.paper.course.code if question_obj.paper else topic.course.code
     topic_title = question_obj.topic_label or (topic.title if topic else "Mathematics")
+    course_obj = question_obj.paper.course if question_obj.paper else topic.course
+    topic_context = []
+    if topic:
+        if topic.summary.strip():
+            topic_context.append("Approved topic summary:\n" + topic.summary.strip())
+        subtopics = topic.subtopics if isinstance(topic.subtopics, list) else []
+        if subtopics:
+            topic_context.append("Approved topic subtopics:\n" + "\n".join(f"- {item}" for item in subtopics))
+    source_context = _approved_course_source_context(course_obj, topic_title, limit=4000)
+    if source_context:
+        topic_context.append("Approved course material excerpts:\n" + source_context)
+    topic_context_block = "\n\n".join(topic_context) or "No approved topic notes are available. Use only the explicit topic and source fragments."
     prompt = (
         f"Reconstruct one clear, original practice question closely matching an unreadable past-paper question "
         f"from {course_code}, topic '{topic_title}'.\n\n"
+        f"Use this approved syllabus context to constrain the reconstruction:\n{topic_context_block}\n\n"
         f"Unreadable source extraction:\n{question_text}\n\n"
-        "Use the topic context, visible fragments, marks, and standard examination conventions. "
-        "Do not pretend to reproduce the original wording. Create a mathematically coherent equivalent "
+        f"Marks on the source: {question_obj.marks}.\n"
+        "Use the approved topic context, visible fragments, source marks, and standard examination conventions. "
+        "Do not introduce material outside the stated topic or pretend to reproduce the original wording. "
+        "Create a mathematically coherent equivalent "
         "that tests the same likely skill. Include a complete step-by-step solution. Return only one JSON "
         "object with keys: marks, topic_label, question_latex, solution_latex, hint. Use Markdown and KaTeX "
         "delimiters exactly as requested, with no HTML and no code fences around the JSON."
@@ -2202,42 +2467,53 @@ def generate_adapted_past_question(question_obj) -> dict:
         "All LaTeX backslashes inside JSON strings must be escaped. Keep the adapted question at the same "
         "academic level and topic as the source."
     )
-    result = route_math_request(
-        prompt,
-        course_code,
-        topic_label=topic_title,
-        is_complex_proof=True,
-        system_prompt=system_prompt,
-    )
-    if not result.get("success"):
-        return {
-            "success": False,
-            "usage": result.get("usage", {}),
-            "model": result.get("model_used", "deepseek-reasoner"),
-            "error": result.get("error") or "The adapted question could not be generated.",
-        }
+    usage = {}
+    model = "deepseek-reasoner"
+    last_error = "The adapted question could not be generated."
+    for attempt in range(2):
+        request_prompt = prompt
+        if attempt:
+            request_prompt += (
+                "\n\nYour previous response failed structural validation: "
+                f"{last_error}. Return one concise, complete JSON object only. "
+                "The marks field must be a single integer, and every JSON string must be complete."
+            )
+        result = route_math_request(
+            request_prompt,
+            course_code,
+            topic_label=topic_title,
+            is_complex_proof=True,
+            system_prompt=system_prompt,
+        )
+        model = result.get("model_used", model)
+        usage = _merge_usage(usage, result.get("usage", {}))
+        if not result.get("success"):
+            last_error = result.get("error") or "The AI provider could not generate the adapted question."
+            break
 
-    try:
-        item = robust_json_loads(str(result.get("content") or "").strip())
-        if isinstance(item, list):
-            item = item[0] if len(item) == 1 else None
-        if not isinstance(item, dict):
-            raise ValueError("response was not one question object")
-        issues = _practice_question_issues([item], 1)
-        if issues:
-            raise ValueError("; ".join(issues))
-        item["question_latex"] = normalize_math_delimiters(item["question_latex"])
-        item["solution_latex"] = normalize_math_delimiters(item["solution_latex"])
-        return {
-            "success": True,
-            "question": item,
-            "usage": result.get("usage", {}),
-            "model": result.get("model_used", "deepseek-reasoner"),
-        }
-    except Exception as exc:
-        return {
-            "success": False,
-            "usage": result.get("usage", {}),
-            "model": result.get("model_used", "deepseek-reasoner"),
-            "error": f"The adapted question did not pass validation: {exc}",
-        }
+        try:
+            item = robust_json_loads(str(result.get("content") or "").strip())
+            if isinstance(item, list):
+                item = item[0] if len(item) == 1 else None
+            if not isinstance(item, dict):
+                raise ValueError("response was not one question object")
+            issues = _practice_question_issues([item], 1)
+            if issues:
+                raise ValueError("; ".join(issues))
+            item["question_latex"] = normalize_math_delimiters(item["question_latex"])
+            item["solution_latex"] = normalize_math_delimiters(item["solution_latex"])
+            from services.prep_ingestion import assessment_question_rendering_issues
+
+            source_issues = assessment_question_rendering_issues(item["question_latex"])
+            if source_issues:
+                raise ValueError("reconstructed question failed extraction validation: " + "; ".join(source_issues))
+            return {"success": True, "question": item, "usage": usage, "model": model}
+        except Exception as exc:
+            last_error = str(exc)
+
+    return {
+        "success": False,
+        "usage": usage,
+        "model": model,
+        "error": f"The adapted question did not pass validation: {last_error}",
+    }

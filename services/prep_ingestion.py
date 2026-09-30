@@ -425,6 +425,209 @@ def extract_topic_candidates(text: str) -> list[dict]:
     return topics
 
 
+COURSE_STUDY_FAMILIES = {
+    "mathematics": {
+        "category": "Mathematics",
+        "note_structure": [
+            "Conceptual Overview",
+            "Definitions and Notation",
+            "Theorems and Core Results",
+            "Worked Examples",
+            "Revision Summary and Common Errors",
+        ],
+    },
+    "statistics": {
+        "category": "Statistics",
+        "note_structure": [
+            "Purpose and Statistical Context",
+            "Definitions and Assumptions",
+            "Methods and Interpretation",
+            "Worked Applications",
+            "Revision Summary and Common Errors",
+        ],
+    },
+    "computing": {
+        "category": "Computing",
+        "note_structure": [
+            "Concept and Use Case",
+            "Data, Syntax, and Core Concepts",
+            "Methods and Operations",
+            "Worked Implementation from the Notes",
+            "Testing, Interpretation, and Common Errors",
+        ],
+    },
+    "engineering": {
+        "category": "Engineering",
+        "note_structure": [
+            "Engineering Context and System",
+            "Principles and Assumptions",
+            "Methods and Design Decisions",
+            "Worked Application from the Notes",
+            "Safety, Limitations, and Revision Summary",
+        ],
+    },
+    "chemistry": {
+        "category": "Chemistry",
+        "note_structure": [
+            "Chemical Context and Key Concepts",
+            "Species, Properties, and Principles",
+            "Reactions and Mechanisms",
+            "Worked Applications from the Notes",
+            "Safety, Conditions, and Revision Summary",
+        ],
+    },
+    "physics": {
+        "category": "Physics",
+        "note_structure": [
+            "Physical Context and Models",
+            "Principles and Assumptions",
+            "Laws and Relationships",
+            "Worked Applications from the Notes",
+            "Units, Limitations, and Revision Summary",
+        ],
+    },
+    "social_science": {
+        "category": "Social Sciences",
+        "note_structure": [
+            "Core Concepts and Context",
+            "Theories and Key Thinkers",
+            "Social Processes and Evidence",
+            "Applications and Case Studies",
+            "Revision Summary and Critical Questions",
+        ],
+    },
+    "humanities": {
+        "category": "Humanities",
+        "note_structure": [
+            "Historical and Cultural Context",
+            "Key Ideas, Texts, and Terms",
+            "Interpretations and Evidence",
+            "Examples and Critical Analysis",
+            "Revision Summary and Questions",
+        ],
+    },
+    "business_economics": {
+        "category": "Business & Economics",
+        "note_structure": [
+            "Context and Key Concepts",
+            "Principles and Frameworks",
+            "Processes and Evidence",
+            "Worked Applications from the Notes",
+            "Limitations and Revision Summary",
+        ],
+    },
+    "general_science": {
+        "category": "General Sciences",
+        "note_structure": [
+            "Context and Core Concepts",
+            "Terms and Principles",
+            "Processes and Evidence",
+            "Applications from the Notes",
+            "Limitations and Revision Summary",
+        ],
+    },
+}
+
+
+def _source_capabilities(text: str) -> dict[str, bool]:
+    """Detect notation and code actually present in source notes."""
+    source = str(text or "")
+    code = bool(
+        re.search(r"(?is)```(?:r|python|sql|javascript|java|c\+\+|bash)\s*\n", source)
+        or re.search(r"(?m)^\s*[A-Za-z_][\w.]*\s*(?:<-|:=)\s*\S+", source)
+        or re.search(r"(?m)^\s*(?:def|class)\s+[A-Za-z_]\w*\s*\(", source)
+    )
+    math = bool(
+        re.search(r"\$\$|\$[^$\n]+\$|\\(?:frac|int|sum|prod|lim|mathbb|begin\{)|\\\(|\\\[", source)
+    )
+    chemical_equations = bool(
+        re.search(
+            r"(?:\d*\s*[A-Z][a-z]?\d*\s*)+(?:->|→|⇌|⟶)\s*(?:\d*\s*[A-Z][a-z]?\d*\s*)+",
+            source,
+        )
+    )
+    return {"code": code, "math_notation": math, "chemical_equations": chemical_equations}
+
+
+def extract_course_study_profile(course, notes_text: str, source_document=None) -> dict | None:
+    """Ask the configured model to classify course notes using verbatim evidence.
+
+    The returned profile is a proposal only. Subject family uses verbatim model
+    evidence; notation and code capabilities are detected deterministically.
+    """
+    source = str(notes_text or "").strip()
+    if len(source) < 120:
+        return None
+    api_key = getattr(settings, "DEEPSEEK_API", "") or os.environ.get("DEEPSEEK_API", "")
+    if not api_key:
+        return None
+
+    allowed_families = ", ".join(COURSE_STUDY_FAMILIES)
+    prompt = (
+        "Classify the subject family of this university lecture-note/syllabus source. "
+        "The uploaded notes are the source of truth; do not infer discipline from the course code. "
+        "Choose one family from: " + allowed_families + ". Return JSON only with keys: "
+        "subject_family, confidence (0..1), evidence_quotes (1-3 exact verbatim excerpts). "
+        "Do not treat a subject name in a proposed topic as evidence if the notes do not discuss it.\n\n"
+        f"Course label for reference only: {course.code} - {course.title}\n\n"
+        "SOURCE NOTES:\n" + source[:12000]
+    )
+    try:
+        response = requests.post(
+            f"{getattr(settings, 'DEEPSEEK_BASE_URL', 'https://api.deepseek.com').rstrip('/')}/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"),
+                "messages": [
+                    {"role": "system", "content": "Return one valid JSON object only. Do not invent evidence."},
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0,
+                "max_tokens": 900,
+            },
+            timeout=30,
+        )
+        response.raise_for_status()
+        raw = str(response.json()["choices"][0]["message"]["content"]).strip()
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.IGNORECASE)
+        result = json.loads(raw)
+        family = str(result.get("subject_family") or "").strip().lower()
+        confidence = float(result.get("confidence", 0))
+        evidence = [str(item).strip() for item in result.get("evidence_quotes", []) if str(item).strip()]
+        source_folded = source.casefold()
+        if family not in COURSE_STUDY_FAMILIES or not 0 <= confidence <= 1 or not evidence:
+            return None
+        if any(quote.casefold() not in source_folded for quote in evidence):
+            logger.warning("[Course Profile] Rejected ungrounded classifier evidence for %s", course.code)
+            return None
+
+        detected = _source_capabilities(source)
+        # Capabilities are deterministic source facts; a classifier's false
+        # negative must not suppress notation or code visibly present in notes.
+        capabilities = detected
+        profile_template = COURSE_STUDY_FAMILIES[family]
+        return {
+            "schema_version": 1,
+            "subject_family": family,
+            "category": profile_template["category"],
+            "confidence": confidence,
+            "evidence_quotes": evidence,
+            "source_sha256": hashlib.sha256(source.encode("utf-8", errors="ignore")).hexdigest(),
+            "capabilities": capabilities,
+            "note_structure": profile_template["note_structure"],
+            "source_document_id": str(getattr(source_document, "id", "")),
+            "rules": {
+                "authority": "uploaded lecture notes and syllabus only",
+                "code": "may be generated only when source notes contain code evidence",
+                "math_notation": "may be generated only when source notes contain notation evidence",
+                "chemical_equations": "may be generated only when source notes contain reaction evidence",
+            },
+        }
+    except Exception as exc:
+        logger.warning("[Course Profile] Classification failed for %s: %s", course.code, exc)
+        return None
+
+
 def extract_and_index_topics(course, text: str, prep_doc=None) -> list:
     """Legacy explicit upsert helper retained for scripts and controlled admin use."""
     from prep.models import PrepTopic
@@ -553,6 +756,16 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("unclosed inline-math delimiter")
     if len(re.findall(r"\\begin\{([^{}]+)\}", source)) != len(re.findall(r"\\end\{([^{}]+)\}", source)):
         issues.append("unclosed LaTeX environment")
+    if re.search(
+        r"(?im)^\s*(?:\*\*|\\textbf\{\s*)?question\s+"
+        r"(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b",
+        source,
+    ):
+        issues.append("question text contains a following question heading")
+    if re.search(r"(?i)\bdownloaded\s+by\b", source):
+        issues.append("question text contains document download metadata")
+    if re.search(r"\\infty\s+S\b", source):
+        issues.append("question text may have a corrupted infimum operator before S")
     if source.rstrip().endswith(("\\", "=", ":", "|")):
         issues.append("question text appears truncated")
     return issues
@@ -631,11 +844,50 @@ def index_assessment_questions(prep_document, paper) -> int:
     return created
 
 
-def create_content_update_proposals(course, prep_document, candidates: list[dict]) -> list:
+def create_content_update_proposals(
+    course,
+    prep_document,
+    candidates: list[dict],
+    course_profile: dict | None = None,
+) -> list:
     """Create pending enrichment proposals without modifying approved topic data."""
     from prep.models import PrepContentUpdate, PrepTopic
 
     proposals = []
+    if course_profile and prep_document.doc_type in {"Lecture Notes", "Revision Sheet"}:
+        course_profile = dict(course_profile)
+        course_profile["covers_full_syllabus"] = (
+            str(prep_document.topic_name or "").strip().casefold() == "full syllabus"
+        )
+        course_profile["topic_outline"] = [
+            {
+                "order": int(candidate.get("order") or 1),
+                "title": str(candidate.get("title") or "").strip(),
+                "subtopics": candidate.get("subtopics") if isinstance(candidate.get("subtopics"), list) else [],
+                "summary": str(candidate.get("summary") or "").strip(),
+            }
+            for candidate in candidates
+            if str(candidate.get("title") or "").strip()
+        ]
+        existing_profile = PrepContentUpdate.objects.filter(
+            document=prep_document,
+            update_type="course_profile",
+        ).first()
+        if not existing_profile and course_profile.get("source_sha256") != (
+            (course.study_profile or {}).get("source_sha256") if isinstance(course.study_profile, dict) else None
+        ):
+            proposals.append(PrepContentUpdate.objects.create(
+                document=prep_document,
+                topic=None,
+                update_type="course_profile",
+                proposed_data=course_profile,
+                rationale=(
+                    f"AI classified the uploaded notes as {course_profile['subject_family']} "
+                    f"(confidence {course_profile['confidence']:.2f}) using quoted source evidence. "
+                    "Review before applying the subject profile to the shared course."
+                ),
+            ))
+
     for candidate in candidates:
         order = int(candidate.get("order") or 1)
         title = str(candidate.get("title") or f"Unit {order}").strip()
@@ -889,19 +1141,24 @@ def process_prep_document(prep_document) -> dict:
             "updates_proposed": 0,
         }
 
-    # 3. Reviewable course-content extraction. Notes and assessments can both
-    # surface missing syllabus coverage, but nothing changes until tutor review.
+    # 3. Only lecture notes/revision sheets define course identity and syllabus.
+    # Assessment papers are question sources, never course-profile/topic sources.
     topic_candidates = []
     content_updates = []
-    if prep_document.doc_type in [
-        "Lecture Notes",
-        "Revision Sheet",
-        "Continuous Assessment Test (CAT)",
-        "Final Examination Paper",
-    ] or "outline" in file_name or "syllabus" in file_name:
+    if prep_document.doc_type in {"Lecture Notes", "Revision Sheet"}:
         try:
             topic_candidates = extract_topic_candidates(text)
-            content_updates = create_content_update_proposals(prep_document.course, prep_document, topic_candidates)
+            course_profile = extract_course_study_profile(
+                prep_document.course,
+                text,
+                source_document=prep_document,
+            )
+            content_updates = create_content_update_proposals(
+                prep_document.course,
+                prep_document,
+                topic_candidates,
+                course_profile=course_profile,
+            )
             logger.info(
                 "[Prep Ingestion] Proposed %s content updates from %s topic candidates for %s",
                 len(content_updates),

@@ -35,67 +35,32 @@
 
 {% block content %}
 <div class="page-header">
-  <h1>Find or Add a Course</h1>
-  <p style="margin: 0; color: var(--text-muted);">Search the Mentify Prep catalogue first. Add an existing course to your list, or upload material only when it is missing.</p>
+  <h1>Upload Course Materials</h1>
+  <p style="margin: 0; color: var(--text-muted);">Choose an existing course or create a new one, then upload a group of related documents together.</p>
 </div>
 
-<section class="card mb-xl" style="padding: 20px;">
-  <form method="get" action="{% url 'prep:upload' %}" style="display: flex; align-items: end; gap: 10px; flex-wrap: wrap;">
-    <div style="flex: 1 1 280px;">
-      <label for="course-search" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Search by course code, title, or discipline</label>
-      <input type="search" id="course-search" name="q" value="{{ search_query }}" placeholder="e.g. SMA 300, real analysis, statistics"
-             style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
-    </div>
-    <button type="submit" class="btn btn-primary" style="padding: 9px 20px;">Search Courses</button>
-    {% if search_query %}
-      <a href="{% url 'prep:upload' %}" class="btn btn-outline">Clear</a>
-    {% endif %}
-  </form>
-
-  {% if search_query %}
-    <div style="margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px;">
-      {% for course in matching_courses %}
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border);">
-          <div>
-            <div style="font-weight: 700; color: var(--text);">{{ course.code }}{% if course.title and course.title != course.code %} <span style="font-weight: 500; color: var(--text-muted);">&bull; {{ course.title }}</span>{% endif %}</div>
-            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">{{ course.level }} &bull; {{ course.topics_count }} topics &bull; {{ course.papers_count }} papers</div>
-          </div>
-          {% if course.is_added %}
-            <button type="button" class="btn btn-outline btn-sm" disabled style="opacity: 0.7; cursor: default;">Already Added</button>
-          {% else %}
-            <form method="post" action="{% url 'prep:add_course' course_id=course.id %}">
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{% url 'prep:course_detail' course_code=course.slug|default:course.code %}">
-              <button type="submit" class="btn btn-primary btn-sm">Add to My Courses</button>
-            </form>
-          {% endif %}
-        </div>
-      {% empty %}
-        <div style="padding: 8px 0 2px; color: var(--text-muted); font-size: 0.9rem;">No matching catalogue course was found.</div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  {% if not search_query %}
-    <div style="margin-top: 12px; color: var(--text-muted); font-size: 0.85rem;">Search before uploading so you do not duplicate a course that is already available.</div>
-  {% endif %}
-</section>
-
-{% if show_upload_form %}
-<!-- Upload form is available only after a catalogue search has no match. -->
 <div class="card mb-xl">
   <div style="padding: 18px 20px 0;">
-    <h2 style="font-size: 1.15rem; margin: 0 0 4px;">Upload Material for a New Course</h2>
-    <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">The new course becomes part of the shared Mentify Prep catalogue. Its uploaded material is still reviewed before publication.</p>
+    <h2 style="font-size: 1.15rem; margin: 0 0 4px;">Document group</h2>
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">All selected files share the document type, academic period, and topic metadata below. Upload up to 10 files per group.</p>
   </div>
   <form method="post" enctype="multipart/form-data" id="upload-doc-form" onsubmit="return validateForm()">
     {% csrf_token %}
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px;">
-      <!-- Course Code / Title -->
       <div>
-        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Course Code & Title *</label>
-        <input type="text" name="course_name" id="course_name" required placeholder="e.g. SMA 300 - Real Analysis I" 
+        <label for="course-select" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Course *</label>
+        <select name="course_id" id="course-select" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
+          <option value="">Create a new course</option>
+          {% for course in upload_courses %}
+            <option value="{{ course.id }}" {% if selected_course_id == course.id|stringformat:'s' %}selected{% endif %}>{{ course.code }} — {{ course.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="course_name" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">New Course Code &amp; Title</label>
+        <input type="text" name="course_name" id="course_name" placeholder="e.g. SMA 300 - Real Analysis I" {% if selected_course_id %}disabled{% else %}required{% endif %}
                style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
       </div>
 
@@ -130,10 +95,10 @@
     <div style="margin-bottom: 20px; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
         <div>
-          <label style="font-weight: 600; font-size: 0.9rem; color: var(--text); display: block; margin-bottom: 2px;">Attach Document (PDF, Word, or Markdown) *</label>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">Supports PDF (.pdf), Word (.docx), and Markdown notes (.md, .txt) up to 15 MB</span>
+          <label for="prep-files" style="font-weight: 600; font-size: 0.9rem; color: var(--text); display: block; margin-bottom: 2px;">Attach Documents *</label>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">PDF, Word, Markdown, or text; up to 15 MB each, 10 files per group.</span>
         </div>
-        <input type="file" name="file" id="prep-file" accept=".pdf,.docx,.doc,.md,.txt" required onchange="checkFileSize(this)">
+        <input type="file" name="files" id="prep-files" accept=".pdf,.docx,.doc,.md,.txt" multiple required onchange="checkFileSize(this)">
       </div>
     </div>
 
@@ -147,11 +112,6 @@
     </div>
   </form>
 </div>
-{% elif search_query and matching_courses %}
-<div style="margin: -8px 0 28px; font-size: 0.88rem; color: var(--text-muted);">
-  Found your course? Add it above. If it is not the right course, <a href="{% url 'prep:upload' %}?q={{ search_query|urlencode }}&upload=1" style="color: var(--green); font-weight: 600;">upload material for a new course</a>.
-</div>
-{% endif %}
 
 <!-- Verification & Processing Steps Flow -->
 <section id="how-it-works" style="margin-top: 32px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 22px; box-shadow: var(--shadow);">
@@ -216,21 +176,39 @@
 </section>
 
 <script>
+  const courseSelect = document.getElementById('course-select');
+  const courseNameInput = document.getElementById('course_name');
+
+  function updateCourseInput() {
+    const useExistingCourse = Boolean(courseSelect.value);
+    courseNameInput.disabled = useExistingCourse;
+    courseNameInput.required = !useExistingCourse;
+  }
+
+  courseSelect.addEventListener('change', updateCourseInput);
+
   function checkFileSize(input) {
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      const maxBytes = 15 * 1024 * 1024;
-      if (file.size > maxBytes) {
-        alert("The selected file exceeds the 15 MB limit. Please select a smaller PDF file.");
-        input.value = "";
-      }
+    const files = Array.from(input.files || []);
+    if (files.length > 10) {
+      alert("Select no more than 10 documents in one group.");
+      input.value = "";
+      return;
+    }
+    const oversized = files.find(file => file.size > 15 * 1024 * 1024);
+    if (oversized) {
+      alert(`${oversized.name} exceeds the 15 MB per-file limit.`);
+      input.value = "";
     }
   }
 
   function validateForm() {
-    const fileInput = document.getElementById('prep-file');
-    if (!fileInput.files || !fileInput.files[0]) {
-      alert("Please select a PDF file.");
+    const fileInput = document.getElementById('prep-files');
+    if (!fileInput.files || !fileInput.files.length) {
+      alert("Please select at least one document.");
+      return false;
+    }
+    if (!courseSelect.value && !courseNameInput.value.trim()) {
+      alert("Choose an existing course or enter a new course code and title.");
       return false;
     }
     return true;

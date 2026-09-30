@@ -16,6 +16,10 @@ class PrepCourse(models.Model):
             ("Statistics", "Statistics"),
             ("Computing", "Computing"),
             ("Engineering", "Engineering"),
+            ("Chemistry", "Chemistry"),
+            ("Physics", "Physics"),
+            ("Social Sciences", "Social Sciences"),
+            ("Humanities", "Humanities"),
             ("Business & Economics", "Business & Economics"),
             ("General Sciences", "General Sciences"),
             ("Other", "Other"),
@@ -24,6 +28,8 @@ class PrepCourse(models.Model):
     )
     level = models.CharField(max_length=100, default="Undergraduate")
     description = models.TextField(blank=True, help_text="Canonical course objectives, syllabus scope, and references.")
+    study_profile = models.JSONField(default=dict, blank=True, help_text="Tutor-approved, source-grounded subject rules for notes and topics.")
+    study_profile_version = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -72,6 +78,7 @@ class PrepTopic(models.Model):
     order = models.PositiveIntegerField(default=1)
     summary = models.TextField(blank=True, help_text="LaTeX notes, fundamental theorems, and core formulas.")
     subtopics = models.JSONField(default=list, blank=True, help_text="Ordered list of subtopics under this unit.")
+    is_active = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -156,6 +163,7 @@ class PrepDocument(models.Model):
 class PrepContentUpdate(models.Model):
     """A reviewable proposal to enrich, not overwrite, the shared course graph."""
     UPDATE_TYPES = [
+        ("course_profile", "Course Study Profile"),
         ("new_topic", "New Topic"),
         ("add_subtopics", "Add Missing Subtopics"),
         ("fill_summary", "Fill Missing Topic Summary"),

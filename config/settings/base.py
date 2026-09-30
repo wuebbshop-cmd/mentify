@@ -236,6 +236,11 @@ ADMIN_EMAILS = [
     for e in os.environ.get("ADMIN_EMAILS", "").split(",")
     if e.strip()
 ]
+ADMIN_EMAILS_NOTIFICATIONS = [
+    e.strip().lower()
+    for e in os.environ.get("ADMIN_EMAILS_NOTIFICATIONS", "").split(",")
+    if e.strip()
+]
 
 
 # ─── Mentify Prep & AI Configuration ─────────────────────────────────────────

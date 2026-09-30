@@ -107,14 +107,14 @@ def send_email_verification_email(user, verification_url: str) -> bool:
 
 
 def send_prep_note_generation_failure_email(guard) -> bool:
-    """Alert every configured administrator when a topic requires human review."""
+    """Alert configured notification recipients when a topic requires review."""
     recipients = list(dict.fromkeys(
         email.strip().lower()
-        for email in getattr(settings, "ADMIN_EMAILS", [])
+        for email in getattr(settings, "ADMIN_EMAILS_NOTIFICATIONS", [])
         if email and email.strip()
     ))
     if not recipients:
-        logger.warning("No ADMIN_EMAILS configured for Prep note-generation failure alerts.")
+        logger.warning("No ADMIN_EMAILS_NOTIFICATIONS configured for Prep note-generation failure alerts.")
         return False
 
     from django.urls import reverse

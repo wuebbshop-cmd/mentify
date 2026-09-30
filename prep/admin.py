@@ -25,6 +25,42 @@ from .models import (
 from services.credit_service import grant_credits, grant_subscription
 
 
+def _apply_approved_course_profile(document, profile_data: dict) -> bool:
+    from services.prep_ingestion import COURSE_STUDY_FAMILIES
+
+    course = document.course
+    family = str(profile_data.get("subject_family") or "")
+    family_config = COURSE_STUDY_FAMILIES.get(family)
+    if (
+        not family_config
+        or document.doc_type not in {"Lecture Notes", "Revision Sheet"}
+        or str(profile_data.get("source_document_id")) != str(document.pk)
+    ):
+        return False
+
+    profile = dict(profile_data)
+    profile["version"] = course.study_profile_version + 1
+    course.category = family_config["category"]
+    course.study_profile = profile
+    course.study_profile_version += 1
+    course.save(update_fields=["category", "study_profile", "study_profile_version", "updated_at"])
+
+    outline = profile.get("topic_outline")
+    if profile.get("covers_full_syllabus") and isinstance(outline, list) and outline:
+        approved_topics = {
+            (int(item.get("order") or 1), " ".join(str(item.get("title") or "").casefold().split()))
+            for item in outline
+            if isinstance(item, dict) and str(item.get("title") or "").strip()
+        }
+        for topic in course.topics.all():
+            key = (topic.order, " ".join(topic.title.casefold().split()))
+            should_be_active = key in approved_topics
+            if topic.is_active != should_be_active:
+                topic.is_active = should_be_active
+                topic.save(update_fields=["is_active"])
+    return True
+
+
 class VerificationQueueFilter(admin.SimpleListFilter):
     """Filter to quickly identify documents needing tutor/admin attention."""
     title = "Review Status"
@@ -137,6 +173,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         "approve_stage_3_publish",
         "move_to_stage_2_review",
         "requeue_stage_1_extraction",
+        "propose_course_study_profile",
         "index_assessment_questions",
         "reject_document",
     ]
@@ -148,7 +185,10 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             data = update.proposed_data if isinstance(update.proposed_data, dict) else {}
             topic = update.topic
 
-            if update.update_type == "new_topic":
+            if update.update_type == "course_profile":
+                if not _apply_approved_course_profile(document, data):
+                    continue
+            elif update.update_type == "new_topic":
                 order = int(data.get("order") or 1)
                 title = str(data.get("title") or "").strip()
                 if not title:
@@ -346,6 +386,35 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
             f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
             f"Blocked {ingestion_failures} document(s) whose ingestion did not complete."
+        )
+
+    @admin.action(description="Propose subject profile from selected lecture notes")
+    def propose_course_study_profile(self, request, queryset):
+        from services.prep_ingestion import (
+            create_content_update_proposals,
+            extract_course_study_profile,
+        )
+
+        proposed = 0
+        skipped = 0
+        for document in queryset.filter(doc_type__in=["Lecture Notes", "Revision Sheet"]):
+            profile = extract_course_study_profile(
+                document.course,
+                document.extracted_text,
+                source_document=document,
+            )
+            if not profile:
+                skipped += 1
+                continue
+            proposed += len(create_content_update_proposals(
+                document.course,
+                document,
+                [],
+                course_profile=profile,
+            ))
+        self.message_user(
+            request,
+            f"Created {proposed} course-profile proposal(s) from notes. {skipped} document(s) had insufficient grounded evidence.",
         )
 
     @admin.action(description="⚡ Stage 2: Move to Tutor Review Gate")
@@ -606,7 +675,7 @@ class PrepContentUpdateAdmin(admin.ModelAdmin):
     list_filter = ("status", "update_type", "document__course")
     search_fields = ("document__course__code", "document__course__title", "topic__title", "rationale")
     readonly_fields = ("document", "topic", "update_type", "proposed_data", "rationale", "created_at")
-    actions = ("approve_summary_addenda", "reject_selected_updates",)
+    actions = ("approve_summary_addenda", "approve_course_profiles", "reject_selected_updates",)
 
     @admin.action(description="Approve selected summary proposals as addenda")
     def approve_summary_addenda(self, request, queryset):
@@ -628,6 +697,23 @@ class PrepContentUpdateAdmin(admin.ModelAdmin):
             update.save(update_fields=["status", "reviewed_by", "reviewed_at"])
             applied += 1
         self.message_user(request, f"Applied {applied} summary addendum(s).")
+
+    @admin.action(description="Approve selected AI course profiles from notes")
+    def approve_course_profiles(self, request, queryset):
+        now = timezone.now()
+        applied = 0
+        for update in queryset.filter(status="pending", update_type="course_profile").select_related(
+            "document__course"
+        ):
+            data = update.proposed_data if isinstance(update.proposed_data, dict) else {}
+            if not _apply_approved_course_profile(update.document, data):
+                continue
+            update.status = "approved"
+            update.reviewed_by = request.user
+            update.reviewed_at = now
+            update.save(update_fields=["status", "reviewed_by", "reviewed_at"])
+            applied += 1
+        self.message_user(request, f"Applied {applied} source-grounded course profile(s).")
 
     @admin.action(description="Reject selected content update proposals")
     def reject_selected_updates(self, request, queryset):

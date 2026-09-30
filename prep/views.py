@@ -90,7 +90,7 @@ def _find_catalog_courses(query: str, *, limit: int = 12, include_category: bool
         return []
     courses = list(
         PrepCourse.objects.filter(is_active=True).annotate(
-            topics_count=Count("topics", distinct=True),
+            topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
             papers_count=Count("papers", distinct=True),
         )
     )
@@ -151,7 +151,7 @@ def prep_public_library(request):
     courses = (
         PrepCourse.objects.filter(is_active=True)
         .annotate(
-            topic_count=Count("topics", distinct=True),
+            topic_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
             paper_count=Count("papers", filter=Q(papers__is_published=True), distinct=True),
         )
         .order_by("category", "code")
@@ -162,7 +162,7 @@ def prep_public_library(request):
 def prep_public_course(request, course_slug):
     """Public, canonical course syllabus page with internal links to each topic."""
     course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
-    topics = list(course.topics.order_by("order", "id"))
+    topics = list(course.topics.filter(is_active=True).order_by("order", "id"))
     for topic in topics:
         topic.question_count = _public_topic_questions(topic).count()
 
@@ -180,7 +180,7 @@ def prep_public_course(request, course_slug):
 def prep_public_topic(request, course_slug, topic_id, topic_slug):
     """Public topic resource containing only validated notes and verified shared Q&A."""
     course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
-    topic = get_object_or_404(PrepTopic, pk=topic_id, course=course)
+    topic = get_object_or_404(PrepTopic, pk=topic_id, course=course, is_active=True)
     if topic.slug != topic_slug:
         return redirect(
             "prep:public_topic",
@@ -209,7 +209,7 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
 def prep_dashboard(request):
     """Mentify Prep Hub Main Landing Page with real database metrics."""
     courses_qs = PrepCourse.objects.filter(is_active=True).annotate(
-        topics_count=Count("topics", distinct=True),
+        topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
         papers_count=Count("papers", distinct=True),
     )
 
@@ -220,7 +220,7 @@ def prep_dashboard(request):
         enrolled_courses = PrepCourse.objects.filter(
             enrollments__user=request.user,
         ).annotate(
-            topics_count=Count("topics", distinct=True),
+            topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
             papers_count=Count("papers", distinct=True),
         ).order_by("-enrollments__created_at")
         history_qs = PrepHistory.objects.filter(user=request.user).order_by("-created_at")[:5]
@@ -328,7 +328,7 @@ def prep_courses(request):
         id__in=enrolled_course_ids,
         is_active=True,
     ).annotate(
-        topics_count=Count("topics", distinct=True),
+        topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
         papers_count=Count("papers", distinct=True),
     ).order_by("code")
 
@@ -458,7 +458,7 @@ def prep_course_detail(request, course_code):
     topics_data = []
     course_papers = []
     total_questions_count = 0
-    topics_qs = course.topics.all().order_by("order")
+    topics_qs = course.topics.filter(is_active=True).order_by("order")
     for t in topics_qs:
         auth_count = PrepQuestion.objects.filter(
             Q(topic=t) | Q(topic_label__icontains=t.title),
@@ -546,7 +546,7 @@ def prep_topic_study(request, topic_id):
 
     topic = None
     if str(topic_id).isdigit():
-        topic = PrepTopic.objects.filter(id=int(topic_id)).select_related("course").first()
+        topic = PrepTopic.objects.filter(id=int(topic_id), is_active=True).select_related("course").first()
 
     if not topic:
         messages.info(request, "The requested syllabus topic was not found.")
@@ -757,125 +757,134 @@ def prep_practice(request, topic_id):
 
 
 def prep_upload(request):
-    """Document Ingestion Hub with user-specified document metadata and database record creation."""
+    """Upload one document group to an existing course or create a new course."""
     if request.method == "POST":
         if not request.user.is_authenticated:
             messages.info(request, "Please sign in or create a free account to upload study materials.")
             return redirect(f"/accounts/login/?next={request.path}")
-        wallet = PrepWallet.get_or_create_wallet(request.user)
+
+        course_id = request.POST.get("course_id", "").strip()
         course_name = request.POST.get("course_name", "").strip()
         doc_type = request.POST.get("doc_type", "Lecture Notes")
         academic_year = request.POST.get("academic_year", "").strip()
         topic_name = request.POST.get("topic_name", "").strip()
-        uploaded_file = request.FILES.get("file")
+        uploaded_files = request.FILES.getlist("files") or request.FILES.getlist("file")
 
-        if not course_name:
-            messages.error(request, "Please specify the Course Name or Code.")
+        if not uploaded_files:
+            messages.error(request, "Please attach at least one document file to upload.")
             return redirect("prep:upload")
 
-        if not uploaded_file:
-            messages.error(request, "Please attach a document file to upload.")
+        if len(uploaded_files) > 10:
+            messages.error(request, "Upload up to 10 documents in one batch.")
             return redirect("prep:upload")
 
-        # Supported formats check (.pdf, .docx, .doc, .md, .txt)
         valid_extensions = (".pdf", ".docx", ".doc", ".md", ".txt")
-        file_ext = os.path.splitext(uploaded_file.name.lower())[1]
-        if file_ext not in valid_extensions:
-            messages.error(request, "Unsupported file format. Please upload a PDF (.pdf), Word document (.docx), or Markdown file (.md, .txt).")
-            return redirect("prep:upload")
-
-        # 15 MB File Limit Check
         max_bytes = 15 * 1024 * 1024
-        if uploaded_file.size > max_bytes:
-            messages.error(request, "File size exceeds the 15 MB limit. Please upload a smaller document.")
+        invalid_file = next(
+            (
+                uploaded_file
+                for uploaded_file in uploaded_files
+                if os.path.splitext(uploaded_file.name.lower())[1] not in valid_extensions
+                or uploaded_file.size > max_bytes
+            ),
+            None,
+        )
+        if invalid_file:
+            file_ext = os.path.splitext(invalid_file.name.lower())[1]
+            if file_ext not in valid_extensions:
+                messages.error(
+                    request,
+                    f"'{invalid_file.name}' has an unsupported format. Use PDF, Word, Markdown, or text files.",
+                )
+            else:
+                messages.error(request, f"'{invalid_file.name}' exceeds the 15 MB per-file limit.")
             return redirect("prep:upload")
 
-        # Courses are shared across Mentify Prep. Uploading new material adds to
-        # the global catalogue after it has been indexed and reviewed.
-        course_code, course_title = parse_course_code_and_title(course_name)
-        course = PrepCourse.objects.filter(code__iexact=course_code).first()
-        if not course:
-            course = PrepCourse.objects.create(
-                code=course_code,
-                title=course_title,
-                level="Undergraduate",
-                category="Mathematics" if "SMA" in course_code else ("Statistics" if "SST" in course_code else "Computing"),
-            )
-            PrepCourseEnrollment.objects.create(user=request.user, course=course, source="upload")
-        else:
-            PrepCourseEnrollment.objects.get_or_create(
-                user=request.user,
-                course=course,
-                defaults={"source": "upload"},
-            )
+        valid_doc_types = dict(PrepDocument.DOC_TYPES)
+        if doc_type not in valid_doc_types:
+            messages.error(request, "Choose a valid document type.")
+            return redirect("prep:upload")
 
-        # Create Document in Stage 1
-        prep_doc = PrepDocument.objects.create(
+        if course_id:
+            try:
+                course = PrepCourse.objects.get(pk=int(course_id), is_active=True)
+            except (ValueError, PrepCourse.DoesNotExist):
+                messages.error(request, "Choose an active course from the list or select a new course.")
+                return redirect("prep:upload")
+        else:
+            if not course_name:
+                messages.error(request, "Choose an existing course or enter a course code and title.")
+                return redirect("prep:upload")
+            course_code, course_title = parse_course_code_and_title(course_name)
+            course = PrepCourse.objects.filter(code__iexact=course_code).first()
+            if not course:
+                course = PrepCourse.objects.create(
+                    code=course_code,
+                    title=course_title,
+                    level="Undergraduate",
+                    category="Other",
+                )
+
+        PrepCourseEnrollment.objects.get_or_create(
             user=request.user,
             course=course,
-            doc_type=doc_type,
-            academic_year=academic_year,
-            topic_name=topic_name,
-            file=uploaded_file,
-            file_size_bytes=uploaded_file.size,
-            stage="stage_1",
+            defaults={"source": "upload"},
         )
 
-        # Trigger Step 3 Ingestion Pipeline (pdfplumber + Together Vision OCR + Topic Extraction)
         from services.prep_ingestion import process_prep_document
-        try:
-            res = process_prep_document(prep_doc)
-            if not res.get("success"):
-                messages.error(request, res.get("error", "The document could not be processed."))
-                return redirect("prep:upload")
-            if res.get("duplicate"):
-                messages.info(
-                    request,
-                    f"'{uploaded_file.name}' matches material already submitted for {course.code}. It was saved for audit but no duplicate indexing or credits were applied.",
+        succeeded = 0
+        duplicates = 0
+        failures = []
+        for uploaded_file in uploaded_files:
+            prep_doc = PrepDocument.objects.create(
+                user=request.user,
+                course=course,
+                doc_type=doc_type,
+                academic_year=academic_year,
+                topic_name=topic_name,
+                file=uploaded_file,
+                file_size_bytes=uploaded_file.size,
+                stage="stage_1",
+            )
+
+            try:
+                result = process_prep_document(prep_doc)
+                if not result.get("success"):
+                    failure = result.get("error", "The document could not be processed.")
+                    failures.append(f"{uploaded_file.name}: {failure}")
+                    prep_doc.tutor_review_notes = f"Ingestion failed before review. {failure[:900]}"
+                    prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
+                    continue
+                if result.get("duplicate"):
+                    duplicates += 1
+                else:
+                    succeeded += 1
+
+                course_slug = course.slug or course.code.replace(" ", "-")
+                PrepHistory.objects.create(
+                    user=request.user,
+                    title=f"Uploaded {uploaded_file.name}",
+                    course_code=course.code,
+                    item_type=doc_type,
+                    url=reverse("prep:course_detail", kwargs={"course_code": course_slug}),
                 )
-                return redirect("prep:course_detail", course_code=course.slug or course.code)
-            method = res.get("method_used", "")
-            if method == "digital_pdfplumber":
-                method_label = "Digital PDF Parser ($0)"
-            elif method == "digital_docx":
-                method_label = "Word Parser ($0)"
-            elif method == "digital_markdown":
-                method_label = "Markdown Parser ($0)"
-            else:
-                method_label = "Vision OCR"
+            except Exception as exc:
+                failures.append(f"{uploaded_file.name}: ingestion failed")
+                prep_doc.tutor_review_notes = f"Ingestion failed before review: {str(exc)[:1000]}"
+                prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
 
-            updates_count = res.get("updates_proposed", 0)
-            updates_txt = f" {updates_count} course update(s) are ready for tutor review." if updates_count else " No new course changes were detected."
+        if succeeded:
+            messages.success(request, f"Processed {succeeded} document(s) for {course.code}; they are in the tutor review queue.")
+        if duplicates:
+            messages.info(request, f"{duplicates} duplicate document(s) were saved for audit and not re-indexed.")
+        if failures:
+            messages.error(request, f"{len(failures)} document(s) need attention: " + "; ".join(failures)[:800])
 
-            messages.success(
-                request,
-                f"'{uploaded_file.name}' successfully parsed via {method_label}.{updates_txt} "
-                f"Course materials advanced to Stage 2: Tutor Review Gate ({res.get('credits_deducted', 2)} credits).",
-            )
-        except Exception as e:
-            prep_doc.tutor_review_notes = f"Ingestion failed before review: {str(e)[:1000]}"
-            prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
-            messages.error(
-                request,
-                f"'{uploaded_file.name}' was saved but ingestion failed. An administrator must requeue it before it can be reviewed.",
-            )
-
-        # Log History
-        course_slug = course.slug or course.code.replace(" ", "-")
-        PrepHistory.objects.create(
-            user=request.user,
-            title=f"Uploaded {uploaded_file.name}",
-            course_code=course.code,
-            item_type=doc_type,
-            url=reverse("prep:course_detail", kwargs={"course_code": course_slug}),
-        )
-
-        return redirect("prep:course_detail", course_code=course_slug)
+        return redirect(f"{reverse('prep:upload')}?course_id={course.pk}")
 
     # Recent uploads for this user (if authenticated)
     recent_uploads = []
     user_credits = 30
-    enrolled_ids = set()
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
         user_credits = wallet.credits_balance
@@ -890,27 +899,17 @@ def prep_upload(request):
                 "date": d.created_at.strftime("%Y-%m-%d"),
                 "stage": d.get_stage_display(),
             })
-        enrolled_ids = set(
-            PrepCourseEnrollment.objects.filter(user=request.user).values_list("course_id", flat=True)
-        )
-
+    selected_course_id = request.GET.get("course_id", "").strip()
+    courses = PrepCourse.objects.filter(is_active=True).order_by("code")
+    if not selected_course_id.isdigit() or not courses.filter(pk=selected_course_id).exists():
+        selected_course_id = ""
     context = {
         "active_tab": "upload",
         "user_credits": user_credits,
         "recent_uploads": recent_uploads,
-        "search_query": request.GET.get("q", "").strip(),
+        "upload_courses": courses,
+        "selected_course_id": selected_course_id,
     }
-    if context["search_query"]:
-        query = context["search_query"]
-        matches = _find_catalog_courses(query, limit=10, include_category=True)
-        for match in matches:
-            match.is_added = match.id in enrolled_ids
-        context["matching_courses"] = matches
-    else:
-        context["matching_courses"] = []
-    context["show_upload_form"] = request.GET.get("upload") == "1" or (
-        bool(context["search_query"]) and not context["matching_courses"]
-    )
     return render(request, "prep/upload.html", context)
 
 
@@ -1200,6 +1199,8 @@ from services.prep_ai_router import (
     get_or_generate_topic_notes,
     generate_similar_practice_questions,
     generate_adapted_past_question,
+    _nontechnical_solution_has_proof_scaffold,
+    _question_solution_uses_nontechnical_format,
 )
 
 
@@ -1235,14 +1236,23 @@ def prep_solve_question_api(request):
                 topic_label = q_obj.topic_label or (q_obj.topic.title if q_obj.topic else topic_label)
                 # If already solved in DB, return at 0 credits
                 if q_obj.solution_latex:
-                    return JsonResponse({
-                        "success": True,
-                        "solution": q_obj.solution_latex,
-                        "cached": True,
-                        "credits_deducted": 0,
-                        "model": "Database Verified Cache ($0)",
-                        "credits_balance": wallet.credits_balance,
-                    })
+                    course_obj = q_obj.paper.course if q_obj.paper else (q_obj.topic.course if q_obj.topic else None)
+                    stale_proof_answer = (
+                        _question_solution_uses_nontechnical_format(course_obj)
+                        and _nontechnical_solution_has_proof_scaffold(q_obj.solution_latex)
+                    )
+                    if stale_proof_answer:
+                        q_obj.solution_latex = ""
+                        q_obj.save(update_fields=["solution_latex"])
+                    else:
+                        return JsonResponse({
+                            "success": True,
+                            "solution": q_obj.solution_latex,
+                            "cached": True,
+                            "credits_deducted": 0,
+                            "model": "Database Verified Cache ($0)",
+                            "credits_balance": wallet.credits_balance,
+                        })
         except Exception:
             pass
 
@@ -1337,7 +1347,7 @@ def prep_adapt_question_api(request):
     target_topic = question.topic
     topic_id_param = data.get("topic_id")
     if not target_topic and topic_id_param and str(topic_id_param).isdigit():
-        target_topic = PrepTopic.objects.filter(id=int(topic_id_param)).first()
+        target_topic = PrepTopic.objects.filter(id=int(topic_id_param), is_active=True).first()
     if not target_topic and question.paper:
         target_topic = PrepTopic.objects.filter(
             course=question.paper.course,
@@ -1455,7 +1465,7 @@ def prep_topic_notes_api(request):
 
     topic_obj = None
     if topic_id and str(topic_id).isdigit():
-        topic_obj = PrepTopic.objects.filter(id=int(topic_id)).first()
+        topic_obj = PrepTopic.objects.filter(id=int(topic_id), is_active=True).first()
         if topic_obj:
             topic_title = topic_obj.title
             course_code = topic_obj.course.code
@@ -1589,7 +1599,7 @@ def prep_generate_practice_api(request):
 
     topic_obj = None
     if topic_id and str(topic_id).isdigit():
-        topic_obj = PrepTopic.objects.filter(id=int(topic_id)).first()
+        topic_obj = PrepTopic.objects.filter(id=int(topic_id), is_active=True).first()
         if topic_obj:
             topic_title = topic_obj.title
             course_code = topic_obj.course.code
@@ -1721,7 +1731,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     """Export syllabus topic notes in PDF or DOCX format."""
     topic = None
     if str(topic_id).isdigit():
-        topic = PrepTopic.objects.filter(id=int(topic_id)).first()
+        topic = PrepTopic.objects.filter(id=int(topic_id), is_active=True).first()
 
     course_code = topic.course.code if topic else "SMA 300"
     topic_title = topic.title if topic else "Metric Spaces & Topology"

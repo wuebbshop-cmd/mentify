@@ -10,6 +10,7 @@ from prep.models import (
     PrepCourse,
     PrepDocument,
     PrepNoteGenerationGuard,
+    PrepNoteRepair,
     PrepQuestion,
     PrepTopic,
     PrepWallet,
@@ -17,6 +18,7 @@ from prep.models import (
 from services.prep_ai_router import (
     NOTE_VALIDATION_STATE,
     NOTES_CACHE_VERSION,
+    _nontechnical_solution_has_proof_scaffold,
     _display_math_issues,
     _latex_syntax_issues,
     _markdown_theorem_issues,
@@ -36,7 +38,7 @@ from services.prep_ai_router import (
 )
 
 
-class NoteMathValidationTests(SimpleTestCase):
+class NoteMathValidationTests(TestCase):
     def test_repairs_json_decoded_notin_only_inside_math(self):
         source = "For $b \notin (a, b)$, continue.\nOutside prose stays unchanged."
         repaired = repair_json_escaped_latex_newlines(source)
@@ -99,6 +101,16 @@ $$
 $$"""
         self.assertEqual(_latex_syntax_issues(content), [])
 
+    def test_half_open_interval_notation_is_not_rejected_as_unbalanced(self):
+        content = r"""$$
+[a, b) = \\{x \\in \\mathbb{R} : a \\leq x < b\\}
+$$
+$$
+(-\\infty, b] = \\{x \\in \\mathbb{R} : x \\leq b\\}
+$$"""
+
+        self.assertEqual(_latex_syntax_issues(content), [])
+
     def test_nested_latex_environments_must_be_inside_display_math(self):
         equation = """\\begin{aligned}
 c_k &= \\begin{cases} [a_k, c_k], & \\text{if } f(a_k) f(c_k) < 0, \\\\
@@ -154,10 +166,10 @@ $$ not mathematical output
             allow_code=True,
         ))
 
-    def test_normalize_math_delimiters_repairs_invalid_inf_command(self):
+    def test_normalize_math_delimiters_preserves_infimum_and_infinity_commands(self):
         self.assertEqual(
-            normalize_math_delimiters("Consistency as n \\to \\inf."),
-            "Consistency as n \\to \\infty.",
+            normalize_math_delimiters("The infimum is $\\inf S$; limits may tend to $\\infty$."),
+            "The infimum is $\\inf S$; limits may tend to $\\infty$.",
         )
 
     def test_json_parser_preserves_square_brackets_inside_latex_strings(self):
@@ -167,6 +179,153 @@ $$ not mathematical output
         }
 
         self.assertEqual(robust_json_loads(json.dumps(repair)), repair)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_social_science_question_solution_uses_explanatory_template(self, mock_route):
+        course = PrepCourse.objects.create(
+            code="ASC 100",
+            title="Introduction to Sociology",
+            slug="asc-100",
+            category="Social Sciences",
+            study_profile={
+                "subject_family": "social_science",
+                "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            },
+            study_profile_version=1,
+        )
+        topic = PrepTopic.objects.create(
+            course=course,
+            title="Social Organisation",
+            slug="social-organisation",
+            order=1,
+        )
+        question = PrepQuestion.objects.create(
+            topic=topic,
+            question_type="authentic",
+            number=1,
+            marks=15,
+            topic_label="Social Organisation",
+            question_latex="(a) What is social organisation?\n\n(b) With examples, describe the five forms of social organisation.",
+            solution_latex="",
+            verification_status="verified",
+        )
+        mock_route.return_value = {
+            "success": True,
+            "content": "### Definition\n\nSocial organisation is the patterned relationship between people in society.",
+            "model_used": "deepseek-chat",
+            "usage": {"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
+        }
+
+        get_or_generate_question_solution(
+            question.question_latex,
+            course.code,
+            topic_label=question.topic_label,
+            question_obj=question,
+        )
+
+        prompt = mock_route.call_args[0][0]
+        self.assertIn("Key Concept / Definition", prompt)
+        self.assertNotIn("Problem Statement & Given Conditions", prompt)
+        self.assertNotIn("Q.E.D.", prompt)
+        self.assertEqual(mock_route.call_args.kwargs["is_complex_proof"], False)
+
+    def test_legacy_proof_scaffold_is_detected_for_nontechnical_answer_cleanup(self):
+        self.assertTrue(_nontechnical_solution_has_proof_scaffold(
+            "## 2. Step-by-Step Rigorous Proof / Derivation\n\nThe explanation follows."
+        ))
+        self.assertTrue(_nontechnical_solution_has_proof_scaffold("### 2. Proof and Derivation"))
+        self.assertFalse(_nontechnical_solution_has_proof_scaffold(
+            "## Explanation and Analysis\n\nSocial organisation describes patterned relationships."
+        ))
+
+    def test_nontechnical_notes_reject_mathematical_proof_scaffold(self):
+        profile = {
+            "subject_family": "social_science",
+            "note_structure": ["One", "Two", "Three", "Four", "Five"],
+        }
+        content = "## 1. One\n\n## 2. Step-by-Step Rigorous Proof / Derivation\n\n" + ("Explanation. " * 30)
+
+        issues = _note_completion_issues(content, "Social Organisation", study_profile=profile)
+
+        self.assertIn("mathematical proof scaffold is not allowed for this subject family", issues)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_nontechnical_proof_response_is_rejected_before_storage(self, mock_route):
+        course = PrepCourse.objects.create(
+            code="SOC 100",
+            title="Sociology",
+            slug="soc-100-proof-rejection",
+            category="Social Sciences",
+            study_profile={
+                "subject_family": "social_science",
+                "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            },
+            study_profile_version=1,
+        )
+        topic = PrepTopic.objects.create(course=course, title="Social Organisation", slug="social-organisation-rejection")
+        question = PrepQuestion.objects.create(
+            topic=topic,
+            question_type="authentic",
+            number=1,
+            marks=10,
+            question_latex="Explain social organisation.",
+            solution_latex="",
+        )
+        mock_route.return_value = {
+            "success": True,
+            "content": "## 2. Step-by-Step Rigorous Proof / Derivation\n\nInvalid answer.",
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_question_solution(
+            question.question_latex,
+            course.code,
+            topic_label=topic.title,
+            question_obj=question,
+        )
+
+        question.refresh_from_db()
+        self.assertEqual(result["solution"], "")
+        self.assertIn("proof format", result["error"])
+        self.assertEqual(question.solution_latex, "")
+        self.assertFalse(PrepContentCache.objects.filter(course=course, content_type="solution_derivation").exists())
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_nontechnical_proof_cache_is_ignored(self, mock_route):
+        course = PrepCourse.objects.create(
+            code="SOC 101",
+            title="Sociology",
+            slug="soc-101-proof-cache",
+            study_profile={
+                "subject_family": "social_science",
+                "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            },
+            study_profile_version=1,
+        )
+        question = "Explain social organisation."
+        cache_key = compute_cache_key(
+            "solution", course.code, question[:50], "profile-v1", "explanatory-v1"
+        )
+        PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="solution_derivation",
+            prompt_hash="legacy-proof-answer",
+            payload={"solution": "### 2. Proof and Derivation", "model": "old-model"},
+            course=course,
+        )
+        mock_route.return_value = {
+            "success": True,
+            "content": "## Explanation and Analysis\n\nA clear, source-grounded answer.",
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_question_solution(question, course.code, topic_label="Social Organisation")
+
+        self.assertFalse(result["cached"])
+        self.assertIn("Explanation and Analysis", result["solution"])
+        mock_route.assert_called_once()
 
 
 class InvalidCachedNoteRecoveryTests(TestCase):
@@ -213,6 +372,61 @@ $$
             title="Sequences",
             slug="sequences",
         )
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_revalidated_legacy_cache_clears_stale_review_guard(self, generation_request):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        cache_key = compute_cache_key(
+            "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
+        )
+        cache = PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="topic_notes",
+            prompt_hash="legacy-valid-intervals",
+            payload={"content": self.valid_notes, "level": "level_2"},
+            course=self.course,
+            topic=self.topic,
+        )
+        guard = PrepNoteGenerationGuard.objects.create(
+            topic=self.topic,
+            level="level_2",
+            source_signature=signature,
+            failed_attempts=2,
+            status="needs_review",
+            last_error="old validator rejected valid interval brackets",
+        )
+        repair = PrepNoteRepair.objects.create(
+            topic=self.topic,
+            level="level_2",
+            source_signature=signature,
+            cache_key=cache_key,
+            original_content=self.valid_notes,
+            current_content=self.valid_notes,
+            validation_issues=["old unmatched interval bracket error"],
+            attempts=3,
+            status="needs_review",
+            last_error="old validator rejected valid interval brackets",
+        )
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        self.assertTrue(result["cached"])
+        self.assertFalse(PrepNoteGenerationGuard.objects.filter(pk=guard.pk).exists())
+        repair.refresh_from_db()
+        self.assertEqual(repair.status, "validated")
+        self.assertEqual(repair.validation_issues, [])
+        cache.refresh_from_db()
+        self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
+        generation_request.assert_not_called()
 
     @patch("services.prep_ai_router.call_together_repair")
     @override_settings(TOGETHER_REPAIR_MODEL="configured-targeted-repair-model")
@@ -547,6 +761,44 @@ $$
         self.assertEqual(response.json()["credits_deducted"], 0)
         self.assertEqual(wallet.credits_balance, before)
 
+    @patch("prep.views.get_available_credits", return_value=100)
+    @patch("prep.views.get_or_generate_question_solution")
+    def test_stale_proof_solution_is_not_returned_for_social_science(self, generate_solution, _credits):
+        self.course.study_profile = {
+            "subject_family": "social_science",
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+        }
+        self.course.save(update_fields=["study_profile"])
+        question = PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            number=1,
+            marks=10,
+            topic_label=self.topic.title,
+            question_latex="Explain social organisation.",
+            solution_latex="## 2. Step-by-Step Rigorous Proof / Derivation\n\nLegacy answer.",
+            verification_status="verified",
+        )
+        generate_solution.return_value = {
+            "solution": "## Explanation and Analysis\n\nA source-grounded answer.",
+            "cached": True,
+            "model": "test-model",
+        }
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_solve_question"),
+            data=json.dumps({"question_id": question.id}),
+            content_type="application/json",
+        )
+
+        question.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Explanation and Analysis", response.json()["solution"])
+        self.assertNotIn("Step-by-Step Rigorous Proof", response.json()["solution"])
+        self.assertEqual(question.solution_latex, "")
+        generate_solution.assert_called_once()
+
     @patch("prep.views.get_or_generate_topic_notes")
     def test_rejected_note_generation_is_not_reported_as_a_server_error(self, generate_notes):
         generate_notes.return_value = {
@@ -639,7 +891,18 @@ $$
 
         self.assertIn("Approved R example", source)
 
-    def test_published_note_normalizes_invalid_inf_without_ai_generation(self):
+    def test_examination_papers_are_not_note_generation_sources(self):
+        PrepDocument.objects.create(
+            course=self.course,
+            doc_type="Final Examination Paper",
+            topic_name="Full Syllabus",
+            extracted_text="Exam-only formula: $x^2 + y^2 = z^2$",
+            stage="stage_3",
+        )
+
+        self.assertEqual(_approved_course_source_context(self.course, "Sequences"), "")
+
+    def test_published_note_preserves_infimum_without_ai_generation(self):
         invalid_inf = self.valid_notes.replace("a_m-a_n", "a_m-a_n \\inf")
         PrepContentCache.objects.create(
             cache_key="notes:published:validation-testing:sequences:invalid-inf",
@@ -656,8 +919,7 @@ $$
 
         published = get_published_topic_note_levels(self.topic)
 
-        self.assertIn("\\infty", published["level_2"])
-        self.assertNotRegex(published["level_2"], r"\\inf(?![A-Za-z])")
+        self.assertIn("\\inf", published["level_2"])
 
     def test_published_note_bypasses_signature_changes_from_other_topics(self):
         PrepContentCache.objects.create(
