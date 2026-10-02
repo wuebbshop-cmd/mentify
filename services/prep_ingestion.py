@@ -26,14 +26,17 @@ try:
 except ImportError:
     pdfplumber = None
 import requests
+from PIL import Image, ImageDraw
 from django.conf import settings
 from django.utils import timezone
 from django.utils.text import slugify
 from django.urls import reverse
 
 from services.github_service import GitHubService
+from prep.visual_matching import map_pdf_topic_sections, score_topic_context
 
 logger = logging.getLogger(__name__)
+VISUAL_CROP_VERSION = "figure-sibling-label-ownership-v9"
 
 
 def extract_text_docx(docx_source) -> tuple[str, bool, int]:
@@ -160,6 +163,682 @@ def extract_text_pdfplumber(pdf_source) -> tuple[str, bool, int]:
         return "", False, 0
 
 
+_VISUAL_REFERENCE_RE = re.compile(
+    r"(?i)\b(?:flow[\s-]*chart|figure|fig\.?|graph|plot|diagram|chart)\s*(?:\d+[a-z]?)?"
+)
+_VISUAL_INSPECTION_VERSION = "visual-candidates-v1"
+
+
+def _pdf_page_document(pdf_source):
+    if fitz is None:
+        return None
+    if isinstance(pdf_source, bytes):
+        return fitz.open(stream=pdf_source, filetype="pdf")
+    if hasattr(pdf_source, "read"):
+        try:
+            pdf_source.seek(0)
+        except Exception:
+            pass
+        return fitz.open(stream=pdf_source.read(), filetype="pdf")
+    return fitz.open(pdf_source)
+
+
+def _union_pdf_rect(first, second):
+    return fitz.Rect(
+        min(first.x0, second.x0),
+        min(first.y0, second.y0),
+        max(first.x1, second.x1),
+        max(first.y1, second.y1),
+    )
+
+
+def _visual_crop_rect(
+    page,
+    rect,
+    reasons,
+    *,
+    existing_padding: float = 0,
+    sibling_rects=(),
+    excluded_labels=None,
+):
+    rect = fitz.Rect(rect)
+    vector_crop = "vector_drawing_cluster" in reasons
+    def remove_old_padding(box):
+        box = fitz.Rect(box)
+        if not existing_padding:
+            return box
+        return fitz.Rect(
+            min(box.x1, box.x0 + existing_padding),
+            min(box.y1, box.y0 + existing_padding),
+            max(box.x0, box.x1 - existing_padding),
+            max(box.y0, box.y1 - existing_padding),
+        )
+
+    region = remove_old_padding(rect)
+    siblings = [remove_old_padding(box) for box in sibling_rects]
+    crop_padding = 2 if vector_crop else 6
+    crop_rect = fitz.Rect(
+        max(page.rect.x0, region.x0 - crop_padding),
+        max(page.rect.y0, region.y0 - crop_padding),
+        min(page.rect.x1, region.x1 + crop_padding),
+        min(page.rect.y1, region.y1 + crop_padding),
+    )
+    if not vector_crop:
+        return crop_rect
+
+    for sibling in siblings:
+        vertical_overlap = min(region.y1, sibling.y1) - max(region.y0, sibling.y0)
+        horizontal_overlap = min(region.x1, sibling.x1) - max(region.x0, sibling.x0)
+        if vertical_overlap > 0 and sibling.x0 >= region.x1:
+            crop_rect.x1 = min(crop_rect.x1, region.x1)
+        elif vertical_overlap > 0 and sibling.x1 <= region.x0:
+            crop_rect.x0 = max(crop_rect.x0, (sibling.x1 + region.x0) / 2)
+        if horizontal_overlap > 0 and sibling.y0 >= region.y1:
+            crop_rect.y1 = min(crop_rect.y1, (region.y1 + sibling.y0) / 2)
+        elif horizontal_overlap > 0 and sibling.y1 <= region.y0:
+            crop_rect.y0 = max(crop_rect.y0, (sibling.y1 + region.y0) / 2)
+
+    label_halo = fitz.Rect(
+        max(page.rect.x0, region.x0 - min(100, max(36, region.width * 0.42))),
+        max(page.rect.y0, region.y0 - min(56, max(20, region.height * 0.20))),
+        min(page.rect.x1, region.x1 + min(100, max(36, region.width * 0.42))),
+        min(page.rect.y1, region.y1 + min(56, max(20, region.height * 0.20))),
+    )
+    text_lines = {}
+    for word in page.get_text("words"):
+        text_lines.setdefault((word[5], word[6]), []).append(word)
+    for words in text_lines.values():
+        line_text = " ".join(str(word[4]) for word in words).strip()
+        if not line_text or len(line_text) > 36 or len(words) > 5:
+            continue
+        if line_text.isupper() and sum(char.isalpha() for char in line_text) >= 8:
+            continue
+        if re.search(r"[!?;:]", line_text) or ("." in line_text and "(" not in line_text):
+            continue
+        line_rect = fitz.Rect(words[0][:4])
+        for word in words[1:]:
+            line_rect |= fitz.Rect(word[:4])
+        if "=" in line_text and not region.intersects(line_rect):
+            continue
+        line_center = fitz.Point((line_rect.x0 + line_rect.x1) / 2, (line_rect.y0 + line_rect.y1) / 2)
+        if any(
+            sibling.x0 >= region.x1
+            and region.y0 <= line_center.y <= region.y1
+            and region.x1 < line_center.x < sibling.x0
+            for sibling in siblings
+        ):
+            if excluded_labels is not None:
+                excluded_labels.append(line_rect)
+            continue
+        if any(
+            sibling.x1 <= region.x0
+            and region.y0 <= line_center.y <= region.y1
+            and sibling.x1 < line_center.x < region.x0
+            for sibling in siblings
+        ):
+            crop_rect |= line_rect
+            continue
+        own_distance = max(region.x0 - line_center.x, 0, line_center.x - region.x1) ** 2
+        own_distance += max(region.y0 - line_center.y, 0, line_center.y - region.y1) ** 2
+        sibling_distances = [
+            max(sibling.x0 - line_center.x, 0, line_center.x - sibling.x1) ** 2
+            + max(sibling.y0 - line_center.y, 0, line_center.y - sibling.y1) ** 2
+            for sibling in siblings
+        ]
+        if sibling_distances and min(sibling_distances) < own_distance:
+            if excluded_labels is not None:
+                excluded_labels.append(line_rect)
+            continue
+        if label_halo.intersects(line_rect):
+            crop_rect |= line_rect
+    return fitz.Rect(
+        max(page.rect.x0, crop_rect.x0 - 2),
+        max(page.rect.y0, crop_rect.y0 - 2),
+        min(page.rect.x1, crop_rect.x1 + 2),
+        min(page.rect.y1, crop_rect.y1 + 2),
+    )
+
+
+def _mask_excluded_visual_labels(crop_bytes, crop_rect, excluded_labels):
+    image = Image.open(io.BytesIO(crop_bytes)).convert("RGB")
+    draw = ImageDraw.Draw(image)
+    for label_rect in excluded_labels:
+        overlap = fitz.Rect(label_rect) & crop_rect
+        if overlap.width <= 0 or overlap.height <= 0:
+            continue
+        left = max(0, int((overlap.x0 - crop_rect.x0) * 2) - 1)
+        top = max(0, int((overlap.y0 - crop_rect.y0) * 2) - 1)
+        right = min(image.width, int((overlap.x1 - crop_rect.x0) * 2) + 1)
+        bottom = min(image.height, int((overlap.y1 - crop_rect.y0) * 2) + 1)
+        if left < right and top < bottom:
+            draw.rectangle((left, top, right - 1, bottom - 1), fill="white")
+    output = io.BytesIO()
+    image.save(output, format="JPEG", quality=90)
+    return output.getvalue()
+
+
+def _rects_near(first, second, gap: float = 20) -> bool:
+    return not (
+        first.x1 + gap < second.x0
+        or second.x1 + gap < first.x0
+        or first.y1 + gap < second.y0
+        or second.y1 + gap < first.y0
+    )
+
+
+def _cluster_visual_rects(rectangles, *, gap: float = 20):
+    clusters = []
+    for rectangle in rectangles:
+        rect = fitz.Rect(rectangle)
+        index = 0
+        while index < len(clusters):
+            if _rects_near(rect, clusters[index], gap):
+                rect = _union_pdf_rect(rect, clusters.pop(index))
+                index = 0
+            else:
+                index += 1
+        clusters.append(rect)
+    return clusters
+
+
+def _page_context(text: str, limit: int = 1800) -> str:
+    if not text:
+        return ""
+    snippets = []
+    for match in list(_VISUAL_REFERENCE_RE.finditer(text))[:4]:
+        start = max(0, match.start() - 280)
+        end = min(len(text), match.end() + 520)
+        snippets.append(text[start:end].strip())
+    if not snippets:
+        return re.sub(r"\s+", " ", text).strip()[:limit]
+    return "\n...\n".join(dict.fromkeys(snippets))[:limit]
+
+
+def _text_near_visual_region(page, rect, padding: float = 140) -> str:
+    expanded = fitz.Rect(
+        max(page.rect.x0, rect.x0 - padding),
+        max(page.rect.y0, rect.y0 - padding),
+        min(page.rect.x1, rect.x1 + padding),
+        min(page.rect.y1, rect.y1 + padding),
+    )
+    nearby = [word for word in page.get_text("words") if fitz.Rect(word[:4]).intersects(expanded)]
+    nearby.sort(key=lambda word: (round(word[1] / 6), word[0]))
+    return " ".join(word[4] for word in nearby)
+
+
+def _visual_neighbor_text(page, rect, padding: float = 140) -> tuple[str, str]:
+    before = []
+    after = []
+    for word in page.get_text("words"):
+        word_rect = fitz.Rect(word[:4])
+        if word_rect.x0 > page.rect.width * 0.94 or word_rect.x1 < page.rect.width * 0.06:
+            continue
+        if word_rect.y1 <= rect.y0 and rect.y0 - word_rect.y1 <= padding:
+            before.append(word)
+        elif word_rect.y0 >= rect.y1 and word_rect.y0 - rect.y1 <= padding:
+            after.append(word)
+    before.sort(key=lambda word: (round(word[1] / 6), word[0]))
+    after.sort(key=lambda word: (round(word[1] / 6), word[0]))
+    return " ".join(word[4] for word in before), " ".join(word[4] for word in after)
+
+
+def inspect_pdf_visual_candidates(pdf_source, *, max_candidates: int = 100) -> tuple[list[dict], list[dict]]:
+    """Collect page metrics and crops for likely non-text PDF visuals locally."""
+    if fitz is None:
+        return [], []
+    try:
+        document = _pdf_page_document(pdf_source)
+    except Exception as exc:
+        logger.warning("[PDF Visuals] Could not open PDF for page inspection: %s", exc)
+        return [], []
+    if document is None:
+        return [], []
+
+    source_identity = hashlib.sha256(pdf_source).hexdigest() if isinstance(pdf_source, bytes) else ""
+    page_evidence = []
+    visual_candidates = []
+    try:
+        for page_index, page in enumerate(document, start=1):
+            text = page.get_text("text") or ""
+            references = [match.group(0) for match in _VISUAL_REFERENCE_RE.finditer(text)][:12]
+            image_rectangles = []
+            images = page.get_images(full=True)
+            for image in images:
+                for image_rect in page.get_image_rects(image[0]):
+                    rect = fitz.Rect(image_rect)
+                    coverage = rect.get_area() / max(page.rect.get_area(), 1)
+                    if (
+                        rect.y0 < page.rect.height * 0.9
+                        and rect.width >= page.rect.width * 0.12
+                        and rect.height >= page.rect.height * 0.05
+                        and coverage >= 0.003
+                    ):
+                        image_rectangles.append(rect)
+
+            drawing_rectangles = []
+            drawings = page.get_drawings()
+            for drawing in drawings:
+                rect = fitz.Rect(drawing.get("rect", (0, 0, 0, 0)))
+                if rect.width >= 3 or rect.height >= 3:
+                    drawing_rectangles.append(rect)
+            clusters = _cluster_visual_rects(drawing_rectangles)
+            vector_candidates = [
+                rect for rect in clusters
+                if rect.width >= page.rect.width * 0.16
+                and rect.height >= page.rect.height * 0.055
+                and (bool(references) or rect.get_area() >= page.rect.get_area() * 0.012)
+            ]
+
+            regions = [(rect, ["embedded_image_region"]) for rect in image_rectangles]
+            regions.extend((rect, ["vector_drawing_cluster"]) for rect in vector_candidates)
+            merged_regions = []
+            for rect, reasons in regions:
+                for existing in merged_regions:
+                    if _rects_near(rect, existing[0], gap=12):
+                        existing[0] = _union_pdf_rect(rect, existing[0])
+                        existing[1].extend(reason for reason in reasons if reason not in existing[1])
+                        break
+                else:
+                    merged_regions.append([rect, list(reasons)])
+
+            page_evidence.append({
+                "page_number": page_index,
+                "text_chars": len(text),
+                "word_count": len(text.split()),
+                "image_count": len(images),
+                "drawing_count": len(drawings),
+                "visual_references": references,
+                "candidate_region_count": len(merged_regions),
+            })
+
+            for rect, reasons in merged_regions:
+                if len(visual_candidates) >= max(0, max_candidates):
+                    continue
+                sibling_rects = [other[0] for other in merged_regions if other[0] is not rect]
+                excluded_labels = []
+                crop_rect = _visual_crop_rect(
+                    page,
+                    rect,
+                    reasons,
+                    sibling_rects=sibling_rects,
+                    excluded_labels=excluded_labels,
+                )
+                if crop_rect.width < 20 or crop_rect.height < 20:
+                    continue
+                try:
+                    pixmap = page.get_pixmap(
+                        matrix=fitz.Matrix(2, 2),
+                        clip=crop_rect,
+                        alpha=False,
+                    )
+                    crop_bytes = pixmap.tobytes("jpeg")
+                    if excluded_labels:
+                        crop_bytes = _mask_excluded_visual_labels(crop_bytes, crop_rect, excluded_labels)
+                except Exception as exc:
+                    logger.warning("[PDF Visuals] Could not crop page %s: %s", page_index, exc)
+                    continue
+
+                box = [round(crop_rect.x0, 2), round(crop_rect.y0, 2), round(crop_rect.x1, 2), round(crop_rect.y1, 2)]
+                key_input = (
+                    f"{_VISUAL_INSPECTION_VERSION}|{source_identity}|{page_index}|{box}|"
+                    f"{hashlib.sha256(crop_bytes).hexdigest()}"
+                )
+                region_context = _text_near_visual_region(page, crop_rect)
+                context_before, context_after = _visual_neighbor_text(page, crop_rect)
+                region_references = [
+                    match.group(0) for match in _VISUAL_REFERENCE_RE.finditer(region_context)
+                ]
+                page_references = " ".join(region_references).lower()
+                has_flowchart_ref = bool(re.search(r"\bflow[\s-]*chart\b", page_references))
+                has_diagram_ref = has_flowchart_ref or bool(re.search(r"\bdiagram\b", page_references))
+                has_graph_ref = bool(re.search(r"\b(?:graph|plot)\b", page_references)) or (
+                    not has_flowchart_ref and bool(re.search(r"\bchart\b", page_references))
+                )
+                visual_type = (
+                    "graph" if has_graph_ref and not has_diagram_ref
+                    else "diagram" if has_diagram_ref and not has_graph_ref
+                    else "unclassified"
+                )
+                visual_candidates.append({
+                    "candidate_key": hashlib.sha256(key_input.encode("utf-8")).hexdigest(),
+                    "page_number": page_index,
+                    "bbox": box,
+                    "candidate_reasons": reasons,
+                    "context_text": _page_context(region_context or text),
+                    "context_before": context_before,
+                    "context_after": context_after,
+                    "context_crop_bytes": page.get_pixmap(
+                        matrix=fitz.Matrix(1.5, 1.5),
+                        clip=fitz.Rect(
+                            page.rect.x0,
+                            max(page.rect.y0, crop_rect.y0 - 140),
+                            page.rect.x1,
+                            min(page.rect.y1, crop_rect.y1 + 140),
+                        ),
+                        alpha=False,
+                    ).tobytes("jpeg"),
+                    "visual_type": visual_type,
+                    "crop_bytes": crop_bytes,
+                })
+    except Exception as exc:
+        logger.warning("[PDF Visuals] Page inspection stopped: %s", exc)
+    finally:
+        document.close()
+    return page_evidence, visual_candidates
+
+
+def store_pdf_visual_candidates(prep_document, pdf_source, *, max_candidates: int = 100) -> int:
+    """Persist page evidence and source crops without invoking vision services."""
+    from django.core.files.base import ContentFile
+    from prep.models import PrepDocumentVisual
+
+    page_evidence, candidates = inspect_pdf_visual_candidates(
+        pdf_source,
+        max_candidates=max_candidates,
+    )
+    prep_document.page_evidence = page_evidence
+    prep_document.save(update_fields=["page_evidence", "updated_at"])
+    for candidate in candidates:
+        visual, created = PrepDocumentVisual.objects.get_or_create(
+            candidate_key=candidate["candidate_key"],
+            defaults={
+                "document": prep_document,
+                "page_number": candidate["page_number"],
+                "bbox": candidate["bbox"],
+                "candidate_reasons": candidate["candidate_reasons"],
+                "context_text": candidate["context_text"],
+                "visual_type": candidate["visual_type"],
+            },
+        )
+        if created:
+            visual.crop.save(
+                f"document-{prep_document.pk}-page-{candidate['page_number']}-{candidate['candidate_key'][:8]}.jpg",
+                ContentFile(candidate["crop_bytes"]),
+                save=True,
+            )
+        if candidate.get("context_crop_bytes") and not visual.context_crop:
+            visual.context_crop.save(
+                f"document-{prep_document.pk}-page-{candidate['page_number']}-{candidate['candidate_key'][:8]}-context.jpg",
+                ContentFile(candidate["context_crop_bytes"]),
+                save=True,
+            )
+        metadata = dict(visual.extracted_content) if isinstance(visual.extracted_content, dict) else {}
+        metadata.update({
+            "context_before": candidate.get("context_before", ""),
+            "context_after": candidate.get("context_after", ""),
+        })
+        if metadata != (visual.extracted_content or {}):
+            visual.extracted_content = metadata
+            visual.save(update_fields=["extracted_content", "updated_at"])
+    return len(candidates)
+
+
+def assign_visuals_to_topics(prep_document, topics, *, allow_auto_approval: bool | None = None) -> dict[str, int]:
+    """Assign source visuals only when page evidence clearly identifies a syllabus topic."""
+    from prep.models import PrepDocumentVisual
+
+    if allow_auto_approval is None:
+        allow_auto_approval = prep_document.stage == "stage_3"
+
+    text = str(prep_document.extracted_text or "")
+    page_header = re.compile(r"(?m)^--- Page (\d+)(?:\s+\([^\n]*\))? ---\s*$")
+    matches = list(page_header.finditer(text))
+    page_texts = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        page_texts[int(match.group(1))] = text[match.end():end]
+    section_topics, ambiguous_section_pages = map_pdf_topic_sections(text, topics)
+
+    counts = {"approved": 0, "review": 0, "rejected": 0}
+    candidates = PrepDocumentVisual.objects.filter(document=prep_document)
+    for visual in candidates:
+        if visual.status not in {"candidate", "approved", "needs_review", "rejected"}:
+            continue
+        metadata = dict(visual.extracted_content) if isinstance(visual.extracted_content, dict) else {}
+        if visual.status != "candidate" and not metadata.get("auto_decision"):
+            continue
+        context = "\n".join((page_texts.get(visual.page_number, ""), visual.context_text or ""))
+        topic, score, margin, evidence = score_topic_context(context, topics)
+        section_topic = section_topics.get(visual.page_number)
+        if visual.page_number in ambiguous_section_pages:
+            topic, score, margin, evidence = None, 0, 0, []
+            match_method = "ambiguous_pdf_topic_section_boundary"
+        elif section_topic:
+            context_topic, score, margin, evidence = score_topic_context(context, topics)
+            topic = section_topic
+            section_title = str(getattr(section_topic, "title", "")).casefold()
+            context_title = str(getattr(context_topic, "title", "")).casefold() if context_topic else ""
+            match_method = (
+                "pdf_topic_section_and_context"
+                if context_title == section_title and score >= 6 and margin >= 3 and len(evidence) >= 2
+                else "pdf_topic_section_context_needs_review"
+            )
+        else:
+            match_method = "page_context"
+        metadata.update({
+            "auto_topic": str(topic.get("title", "") if isinstance(topic, dict) else getattr(topic, "title", "")) if topic else "",
+            "auto_topic_score": score,
+            "auto_topic_margin": margin,
+            "auto_match_terms": evidence,
+            "auto_match_method": match_method,
+        })
+        confident = topic is not None and score >= 6 and margin >= 3 and len(evidence) >= 2
+        if match_method == "pdf_topic_section_context_needs_review":
+            visual.status = "needs_review"
+            metadata["auto_decision"] = "needs_review_ambiguous_section_context"
+            counts["review"] += 1
+        elif confident and allow_auto_approval:
+            visual.status = "approved"
+            metadata["auto_decision"] = "approved_high_confidence"
+            counts["approved"] += 1
+        elif confident:
+            visual.status = "needs_review"
+            metadata["auto_decision"] = "suggested_high_confidence_pending_source_approval"
+            counts["review"] += 1
+        elif visual.page_number in ambiguous_section_pages:
+            visual.status = "needs_review"
+            metadata["auto_decision"] = "needs_review_ambiguous_section_boundary"
+            counts["review"] += 1
+        elif visual.page_number <= 1:
+            visual.status = "rejected"
+            metadata["auto_decision"] = "rejected_unmatched_cover_page"
+            counts["rejected"] += 1
+        else:
+            visual.status = "needs_review"
+            metadata["auto_decision"] = "needs_review_ambiguous_context"
+            counts["review"] += 1
+        visual.extracted_content = metadata
+        visual.save(update_fields=["status", "extracted_content", "updated_at"])
+    return counts
+
+
+def _visual_source_conflicts(analysis: dict, source_context: str, visual_type: str) -> list[str]:
+    """Find direct source contradictions that invalidate confidence-only acceptance."""
+    conflicts = []
+    source_text = str(source_context or "").upper()
+    normalized_context = re.sub(r"\s+", "", source_text)
+    source_identifiers = {
+        re.sub(r"\s+", "", match.group(0))
+        for match in re.finditer(r"(?<![A-Z0-9])[A-Z]{1,3}\s*\d+[A-Z]?(?![A-Z0-9])", source_text)
+    }
+    labels = analysis.get("visible_labels", [])
+    for label in labels if isinstance(labels, list) else []:
+        normalized_label = re.sub(r"\s+", "", label).upper() if isinstance(label, str) else ""
+        if not re.fullmatch(r"[A-Z]{1,3}\d+[A-Z]?", normalized_label):
+            continue
+        if normalized_label in normalized_context:
+            continue
+        suffix = re.search(r"\d+[A-Z]?$", normalized_label)
+        alternatives = sorted(
+            identifier for identifier in source_identifiers
+            if suffix and identifier.endswith(suffix.group(0))
+        )
+        if alternatives:
+            conflicts.append(
+                f"Model label {label!r} conflicts with source-page identifier(s): {', '.join(alternatives)}."
+            )
+
+    if visual_type == "graph":
+        claims = " ".join(str(analysis.get(key) or "") for key in (
+            "caption", "elements", "relationships", "qualitative_summary",
+        )).lower()
+        context = str(source_context or "").lower()
+        if re.search(r"\bkink(?:ed)?\b", context) and not re.search(r"\bkink(?:ed)?\b", claims):
+            conflicts.append("Source text explicitly describes a kinked graph, but the model did not report the kink.")
+        source_explains_mr_discontinuity = (
+            re.search(r"\b(?:mr|marginal revenue)\b", context)
+            and re.search(r"\bdiscontinu\w*", context)
+        )
+        if source_explains_mr_discontinuity and not re.search(r"\bdiscontinu\w*", claims):
+            conflicts.append("Source text explicitly describes discontinuous marginal revenue, but the model omitted it.")
+    return conflicts
+
+
+def inspect_visual_candidate_with_vision(visual_candidate) -> dict:
+    """Inspect one stored crop with vision and persist structured, reviewable evidence."""
+    api_key = getattr(settings, "TOGETHERAI_API", "") or os.environ.get("TOGETHERAI_API", "")
+    if not api_key:
+        return {"success": False, "error": "TOGETHERAI_API is not configured."}
+    inspection_image = visual_candidate.context_crop or visual_candidate.crop
+    if not inspection_image:
+        return {"success": False, "error": "Visual candidate has no stored crop."}
+
+    vision_model = getattr(settings, "TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+    try:
+        inspection_image.open("rb")
+        image_bytes = inspection_image.read()
+    except Exception as exc:
+        visual_candidate.status = "error"
+        visual_candidate.inspection_error = str(exc)[:2000]
+        visual_candidate.save(update_fields=["status", "inspection_error", "updated_at"])
+        return {"success": False, "error": visual_candidate.inspection_error}
+    finally:
+        try:
+            inspection_image.close()
+        except Exception:
+            pass
+    if not image_bytes:
+        return {"success": False, "error": "Stored visual crop is empty."}
+
+    prompt = (
+        "Inspect this figure with its neighboring source-page text from a university course document. "
+        "Use the surrounding text before and after the figure to determine which concept and note section it supports. "
+        "Transcribe only visible evidence; use nearby text only to interpret labels, never to invent pixels or numeric values. "
+        "Classify flowcharts as diagrams, not graphs. For a graph, copy numeric values only when visibly printed; "
+        "otherwise describe supported qualitative relationships and leave data_points empty. "
+        "Return JSON only with keys: visual_type (graph, diagram, table, illustration, unclassified), caption, "
+        "visible_labels (array), axes (object with x_label, y_label, units), elements (array of visible elements), "
+        "relationships (array), data_points (array of visibly printed numeric values only), "
+        "qualitative_summary, uncertainties (array), confidence (number 0..1).\n\n"
+        f"Text immediately before the figure:\n{(visual_candidate.extracted_content or {}).get('context_before', '')[:600]}\n\n"
+        f"Text immediately after the figure:\n{(visual_candidate.extracted_content or {}).get('context_after', '')[:600]}\n\n"
+        f"Additional page context:\n{visual_candidate.context_text[:1200]}"
+    )
+    payload = {
+        "model": vision_model,
+        "messages": [
+            {"role": "system", "content": "Return one valid JSON object only. Do not infer exact data that is not visible."},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{base64.b64encode(image_bytes).decode('ascii')}"},
+                    },
+                ],
+            },
+        ],
+        "temperature": 0,
+        "max_tokens": 1200,
+        "reasoning": {"enabled": False},
+    }
+    usage = {}
+    try:
+        response = requests.post(
+            "https://api.together.xyz/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json=payload,
+            timeout=60,
+        )
+        response.raise_for_status()
+        body = response.json()
+        usage = body.get("usage") if isinstance(body.get("usage"), dict) else {}
+        choice = (body.get("choices") or [{}])[0]
+        message = choice.get("message") if isinstance(choice.get("message"), dict) else {}
+        raw_content = message.get("content")
+        if not raw_content:
+            finish_reason = str(choice.get("finish_reason") or "unknown")
+            visual_candidate.status = "error"
+            visual_candidate.vision_model = vision_model
+            visual_candidate.vision_usage = usage
+            visual_candidate.inspection_error = (
+                f"Vision response contained no final content (finish_reason={finish_reason})."
+            )
+            visual_candidate.save(update_fields=[
+                "status", "vision_model", "vision_usage", "inspection_error", "updated_at",
+            ])
+            return {"success": False, "error": visual_candidate.inspection_error, "usage": usage}
+
+        raw = str(raw_content).strip()
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.IGNORECASE)
+        analysis = json.loads(raw)
+        if not isinstance(analysis, dict):
+            raise ValueError("vision response was not a JSON object")
+        visual_type = str(analysis.get("visual_type") or "unclassified").lower()
+        valid_types = {choice[0] for choice in visual_candidate.VISUAL_TYPES}
+        if visual_type not in valid_types:
+            raise ValueError(f"unsupported visual_type: {visual_type}")
+        confidence = float(analysis.get("confidence", 0))
+        if not 0 <= confidence <= 1:
+            raise ValueError("confidence must be between 0 and 1")
+        labels = analysis.get("visible_labels", [])
+        if not isinstance(labels, list) or any(not isinstance(label, str) for label in labels):
+            raise ValueError("visible_labels must be an array of strings")
+
+        source_conflicts = _visual_source_conflicts(
+            analysis,
+            visual_candidate.context_text,
+            visual_type,
+        )
+        if source_conflicts:
+            analysis["source_conflicts"] = source_conflicts
+
+        visual_candidate.visual_type = visual_type
+        visual_candidate.labels = labels
+        visual_candidate.extracted_content = analysis
+        visual_candidate.confidence = confidence
+        visual_candidate.status = (
+            "needs_review"
+            if source_conflicts or confidence < 0.8
+            else "inspected"
+        )
+        visual_candidate.vision_model = vision_model
+        visual_candidate.vision_usage = usage
+        visual_candidate.inspection_error = ""
+        visual_candidate.save(update_fields=[
+            "visual_type", "labels", "extracted_content", "confidence", "status",
+            "vision_model", "vision_usage", "inspection_error", "updated_at",
+        ])
+        return {
+            "success": True,
+            "visual_type": visual_type,
+            "confidence": confidence,
+            "status": visual_candidate.status,
+            "source_conflicts": source_conflicts,
+            "usage": usage,
+        }
+    except Exception as exc:
+        visual_candidate.status = "error"
+        visual_candidate.vision_model = vision_model
+        visual_candidate.vision_usage = usage
+        visual_candidate.inspection_error = str(exc)[:2000]
+        visual_candidate.save(update_fields=[
+            "status", "vision_model", "vision_usage", "inspection_error", "updated_at",
+        ])
+        return {"success": False, "error": visual_candidate.inspection_error, "usage": usage}
+
+
 def render_pdf_pages_to_images(pdf_source, max_pages: int = 15, dpi: int = 150) -> list[bytes]:
     """
     Render PDF pages to high-resolution JPEG images using PyMuPDF (fitz).
@@ -255,6 +934,7 @@ def extract_scanned_ocr_together(pdf_source, max_pages: int = 15) -> str:
                 ],
                 "max_tokens": 1500,
                 "temperature": 0.2,
+                "reasoning": {"enabled": False},
             }
 
             resp = requests.post(url, headers=headers, json=payload, timeout=45)
@@ -271,6 +951,47 @@ def extract_scanned_ocr_together(pdf_source, max_pages: int = 15) -> str:
             page_transcriptions.append(f"--- Page {idx} (OCR Exception: {ex}) ---")
 
     return "\n\n".join(page_transcriptions).strip()
+
+
+_PAGE_TEXT_HEADER_RE = re.compile(r"(?m)^--- Page (\d+)(?: \([^\n]*\))? ---\s*$")
+
+
+def _split_page_transcriptions(text: str) -> dict[int, str]:
+    matches = list(_PAGE_TEXT_HEADER_RE.finditer(str(text or "")))
+    if not matches:
+        clean = str(text or "").strip()
+        return {1: clean} if clean else {}
+    pages = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        page_text = text[match.end():end].strip()
+        if page_text.startswith("(OCR Error:") or page_text.startswith("(OCR Exception:"):
+            page_text = ""
+        pages[int(match.group(1))] = page_text
+    return pages
+
+
+def merge_local_and_ocr_pages(local_text: str, ocr_text: str, *, minimum_local_words: int = 25) -> str:
+    """Use OCR only to supplement pages whose local PDF text is weak."""
+    local_pages = _split_page_transcriptions(local_text)
+    ocr_pages = _split_page_transcriptions(ocr_text)
+    if not local_pages and not ocr_pages:
+        return ""
+
+    merged = []
+    for page_number in sorted(set(local_pages) | set(ocr_pages)):
+        local_page = local_pages.get(page_number, "").strip()
+        ocr_page = ocr_pages.get(page_number, "").strip()
+        local_is_weak = len(local_page.split()) < minimum_local_words
+        if ocr_page and (not local_page or (local_is_weak and len(ocr_page.split()) > len(local_page.split()))):
+            page_content = ocr_page
+            source_label = "Vision OCR supplement"
+        else:
+            page_content = local_page
+            source_label = "Local extraction"
+        if page_content:
+            merged.append(f"--- Page {page_number} ({source_label}) ---\n{page_content}")
+    return "\n\n".join(merged)
 
 
 def upload_to_github_storage(file_obj, course_code: str) -> str:
@@ -342,38 +1063,71 @@ def extract_topic_candidates(text: str) -> list[dict]:
                     current_topic["summary"] = (current_topic["summary"] + " " + desc_col).strip()
 
     # 2. Heading-based extraction (e.g. ### Module 1: ..., ## Unit 1: ..., # Chapter 1: ...)
-    if len(topics) < 2:
+    # Prefer explicit syllabus headings over cover-page table rows. Some PDFs
+    # put course metadata in a table-shaped cover block that looks like units.
+    if text:
         heading_pattern = re.compile(
             r'^(?:#{1,6}\s*(?:(?:\bUnit\b|\bModule\b|\bChapter\b|\bTopic\b)\s*)?|(?:\bUnit\b|\bModule\b|\bChapter\b|\bTopic\b)\s+)(\d+)[\.:\-\)]\s*([^\n\r]+)',
             re.MULTILINE | re.IGNORECASE
         )
         matches = list(heading_pattern.finditer(text))
+        bare_topic_pattern = re.compile(r'^\s*(\d+)\:\s*([^\n\r]+)', re.MULTILINE)
+        first_explicit_heading = min((match.start() for match in matches), default=len(text))
+        matches += [
+            match for match in bare_topic_pattern.finditer(text)
+            if match.start() < first_explicit_heading
+        ]
+        matches.sort(key=lambda match: match.start())
+        heading_topics = {}
         for i, m in enumerate(matches):
             num = int(m.group(1))
             title = m.group(2).strip().strip("#* ").strip()
-            if len(title) > 2 and not any(t["order"] == num for t in topics):
+            if len(title) > 2 and num not in heading_topics:
                 start_pos = m.end()
                 end_pos = matches[i + 1].start() if i + 1 < len(matches) else len(text)
                 section_text = text[start_pos:end_pos]
 
                 # Extract subtopics from bullet points like * **Subtopic**:
                 subtopics = []
-                sub_matches = re.findall(r'^\s*[\*\-]\s+\*\*([^*:]+)\*\*', section_text, re.MULTILINE)
-                for sm in sub_matches:
-                    clean_st = sm.strip()
-                    if clean_st and clean_st not in subtopics:
-                        subtopics.append(clean_st)
+                started_bullets = False
+                for line in section_text.splitlines():
+                    clean_line = line.strip()
+                    bullet_match = re.match(
+                        r'^(?:[\*\-•])\s+(?:\*\*)?([^*:\n]+?)(?:\*\*)?\s*$',
+                        clean_line,
+                    )
+                    if bullet_match:
+                        started_bullets = True
+                        clean_st = bullet_match.group(1).strip()
+                        if clean_st and clean_st not in subtopics:
+                            subtopics.append(clean_st)
+                    elif started_bullets and clean_line:
+                        break
 
                 # Extract summary from first meaningful paragraph
-                para_match = re.search(r'^\s*([A-Za-z][^\n\r]+)', section_text, re.MULTILINE)
-                summary = para_match.group(1).strip() if para_match else f"Syllabus coverage and foundational theorems for {title}."
+                summary = ""
+                summary_source = section_text.split("•", 1)[0]
+                for line in summary_source.splitlines():
+                    clean_line = line.strip()
+                    if (
+                        len(clean_line) >= 20
+                        and re.match(r"[A-Za-z]", clean_line)
+                        and not re.match(r"(?i)(downloaded by|lomoar|scan to|studocu)", clean_line)
+                    ):
+                        summary = clean_line
+                        break
+                summary = summary or f"Syllabus coverage and foundational theorems for {title}."
 
-                topics.append({
+                heading_topics[num] = {
                     "order": num,
                     "title": title,
                     "subtopics": subtopics,
                     "summary": summary,
-                })
+                }
+        if heading_topics:
+            topics = [topic for topic in topics if topic["order"] not in heading_topics]
+            topics.extend(heading_topics.values())
+            topics.sort(key=lambda topic: topic["order"])
 
     # 3. If still fewer than 2 topics and text is rich, call DeepSeek to extract structured syllabus topics
     if len(topics) < 2 and len(text) > 300:
@@ -676,6 +1430,7 @@ _ASSESSMENT_QUESTION_START = re.compile(
     r"(?m)^\s*(?:question\s*)?(\d{1,2})\s*[\).:]\s+"
 )
 _ASSESSMENT_MARKS = re.compile(r"\(?\s*(\d{1,3})\s*(?:marks?|mks?)\s*\)?", re.IGNORECASE)
+_AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD = 0.8
 _TOPIC_STOP_WORDS = {
     "about", "after", "also", "answer", "assume", "below", "calculate", "course",
     "define", "find", "following", "from", "given", "have", "into", "marks", "paper",
@@ -684,19 +1439,19 @@ _TOPIC_STOP_WORDS = {
 
 
 def extract_assessment_questions(text: str) -> list[dict]:
-    """Split explicitly numbered assessment questions without inventing content."""
+    """Split numbered questions while retaining their original source page."""
     if not text:
         return []
 
-    cleaned = re.sub(r"(?m)^---\s*Page.*?---\s*$", "", text)
-    matches = list(_ASSESSMENT_QUESTION_START.finditer(cleaned))
+    page_headers = list(_PAGE_TEXT_HEADER_RE.finditer(text))
+    matches = list(_ASSESSMENT_QUESTION_START.finditer(text))
     questions = []
     for index, match in enumerate(matches):
         number = int(match.group(1))
         if number < 1 or number > 99:
             continue
-        end = matches[index + 1].start() if index + 1 < len(matches) else len(cleaned)
-        prompt = cleaned[match.end():end].strip()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        prompt = _PAGE_TEXT_HEADER_RE.sub("", text[match.end():end]).strip()
         prompt = re.sub(r"\\hfill", " ", prompt)
         prompt = re.sub(r"[ \t]+", " ", prompt)
         prompt = re.sub(r"\n{3,}", "\n\n", prompt).strip()
@@ -708,7 +1463,17 @@ def extract_assessment_questions(text: str) -> list[dict]:
             prompt = (prompt[:marks_match.start()] + prompt[marks_match.end():]).strip()
         if len(prompt) < 12:
             continue
-        questions.append({"number": number, "marks": marks, "question_latex": prompt})
+        source_page = next(
+            (int(header.group(1)) for header in reversed(page_headers) if header.start() < match.start()),
+            None,
+        )
+        questions.append({
+            "number": number,
+            "marks": marks,
+            "question_latex": prompt,
+            "source_page_number": source_page,
+            "extraction_confidence": None,
+        })
     return questions
 
 
@@ -772,7 +1537,7 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
 
 
 def index_assessment_questions(prep_document, paper) -> int:
-    """Index assessment rows idempotently and reconcile their review status."""
+    """Index source questions and automatically reconstruct flagged rows safely."""
     from prep.models import PrepQuestion
 
     if not prep_document.extracted_text.strip():
@@ -786,7 +1551,7 @@ def index_assessment_questions(prep_document, paper) -> int:
     for item in parsed_questions:
         topic = _topic_match_for_question(prep_document.course, item["question_latex"])
         issues = assessment_question_rendering_issues(item["question_latex"])
-        status = "flagged" if issues else ("verified" if prep_document.stage == "stage_3" else "pending")
+        status = "flagged" if issues else "auto_validated"
         question = PrepQuestion.objects.filter(
             paper=paper,
             question_type="authentic",
@@ -799,48 +1564,95 @@ def index_assessment_questions(prep_document, paper) -> int:
                 number=item["number"],
             )
             created += 1
+        elif question.verification_status == "verified" and question.verified_by_id and not issues:
+            status = "verified"
+        elif question.verification_status == "flagged" and not issues:
+            status = "flagged"
 
         question.topic = topic
         question.marks = item["marks"]
         question.topic_label = topic.title if topic else ""
+        question.source_document = prep_document
+        question.source_page_number = item.get("source_page_number")
+        question.extraction_confidence = item.get("extraction_confidence")
         question.question_latex = item["question_latex"]
         question.verification_status = status
+        if issues:
+            prior_metadata = question.reconstruction_metadata if isinstance(question.reconstruction_metadata, dict) else {}
+            question.reconstruction_metadata = {
+                **prior_metadata,
+                "review_status": "source_flagged",
+                "reason": "Automatic source extraction failed deterministic integrity checks.",
+                "source_document_id": str(prep_document.pk),
+                "source_page_number": item.get("source_page_number"),
+                "original_transcription": item["question_latex"],
+                "original_extraction_issues": issues,
+            }
         question.verified_by = (
-            prep_document.reviewed_by
-            if status == "verified" and prep_document.stage == "stage_3"
+            question.verified_by
+            if status == "verified"
             else None
         )
         question.save()
 
-        if status == "flagged" and topic:
-            # Keep unreadable source text private and publish only a validated
-            # adapted replacement. The existing replacement makes re-indexing
-            # idempotent and avoids repeated provider calls.
-            adapted_label = f"Adapted from Question {question.number}"
-            adapted_exists = PrepQuestion.objects.filter(
+        if not issues or not topic:
+            continue
+
+        existing_adaptation = PrepQuestion.objects.filter(reconstructed_from=question).first()
+        if existing_adaptation:
+            continue
+
+        try:
+            from services.prep_ai_router import generate_adapted_past_question
+
+            adapted_result = generate_adapted_past_question(question)
+            if not adapted_result.get("success"):
+                logger.warning(
+                    "[Question Index] Automatic reconstruction failed for %s Q%s: %s",
+                    prep_document.course.code,
+                    question.number,
+                    adapted_result.get("error", "unknown error"),
+                )
+                continue
+
+            adapted_item = adapted_result["question"]
+            adapted_issues = assessment_question_rendering_issues(adapted_item.get("question_latex", ""))
+            metadata = adapted_result.get("reconstruction_metadata")
+            metadata = dict(metadata) if isinstance(metadata, dict) else {}
+            confidence = metadata.get("model_confidence")
+            accepted = (
+                not adapted_issues
+                and isinstance(confidence, (int, float))
+                and not isinstance(confidence, bool)
+                and _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD <= confidence <= 1
+            )
+            metadata.update({
+                "review_status": "auto_validated" if accepted else "pending",
+                "auto_validation_threshold": _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD,
+                "adapted_question_validation_issues": adapted_issues,
+            })
+            PrepQuestion.objects.create(
                 paper=paper,
                 topic=topic,
+                source_document=prep_document,
+                source_page_number=item.get("source_page_number"),
+                extraction_confidence=item.get("extraction_confidence"),
+                reconstructed_from=question,
                 question_type="adapted",
-                topic_label=adapted_label,
-                verification_status="verified",
-            ).exists()
-            if not adapted_exists:
-                from services.prep_ai_router import generate_adapted_past_question
-
-                adapted_result = generate_adapted_past_question(question)
-                if adapted_result.get("success"):
-                    adapted_item = adapted_result["question"]
-                    PrepQuestion.objects.create(
-                        paper=paper,
-                        topic=topic,
-                        question_type="adapted",
-                        number=question.number,
-                        marks=int(adapted_item.get("marks") or question.marks),
-                        topic_label=adapted_label,
-                        question_latex=adapted_item["question_latex"],
-                        solution_latex=adapted_item["solution_latex"],
-                        verification_status="verified",
-                    )
+                number=question.number,
+                marks=int(adapted_item.get("marks") or question.marks),
+                topic_label=f"Reconstructed from Question {question.number}",
+                question_latex=adapted_item["question_latex"],
+                solution_latex=adapted_item["solution_latex"],
+                verification_status="reconstructed" if accepted else "pending",
+                reconstruction_metadata=metadata,
+            )
+        except Exception:
+            logger.exception(
+                "[Question Index] Automatic reconstruction raised for %s Q%s",
+                prep_document.course.code,
+                question.number,
+            )
     return created
 
 
@@ -1005,8 +1817,8 @@ def process_prep_document(prep_document) -> dict:
     if not prep_document.file:
         return {"success": False, "error": "No file attached to document."}
 
-    file_content = prep_document.file.read()
-    prep_document.file.seek(0)
+    with prep_document.file.open("rb") as uploaded_file:
+        file_content = uploaded_file.read()
 
     # Stop exact duplicates before storage, OCR, AI extraction, or credit use.
     prep_document.file_sha256 = hashlib.sha256(file_content).hexdigest()
@@ -1036,6 +1848,7 @@ def process_prep_document(prep_document) -> dict:
 
     # 1. Format-Aware Extraction Engine ($0 LLM Token Cost for Digital)
     file_name = prep_document.file.name.lower() if prep_document.file.name else ""
+    is_pdf = file_name.endswith(".pdf")
 
     if file_name.endswith(".docx") or file_name.endswith(".doc"):
         text, is_digital, page_count = extract_text_docx(file_content)
@@ -1077,7 +1890,8 @@ def process_prep_document(prep_document) -> dict:
             }
 
     # 2. Permanent GitHub Storage only after the request is eligible to run.
-    github_url = upload_to_github_storage(prep_document.file, prep_document.course.code)
+    with prep_document.file.open("rb") as uploaded_file:
+        github_url = upload_to_github_storage(uploaded_file, prep_document.course.code)
     if github_url:
         prep_document.github_raw_url = github_url
 
@@ -1091,7 +1905,7 @@ def process_prep_document(prep_document) -> dict:
                 "error": "The scanned document could not be read. Please upload a clearer scan or a digital original.",
                 "credits_balance": get_available_credits(wallet) if wallet else None,
             }
-        text = ocr_text
+        text = merge_local_and_ocr_pages(text, ocr_text)
 
     prep_document.extracted_text = text
     prep_document.text_sha256 = hashlib.sha256(_normalise_document_text(text).encode("utf-8")).hexdigest() if text.strip() else ""
@@ -1141,13 +1955,20 @@ def process_prep_document(prep_document) -> dict:
             "updates_proposed": 0,
         }
 
+    visual_candidate_count = 0
+    if is_pdf:
+        visual_candidate_count = store_pdf_visual_candidates(prep_document, file_content)
+
     # 3. Only lecture notes/revision sheets define course identity and syllabus.
     # Assessment papers are question sources, never course-profile/topic sources.
     topic_candidates = []
     content_updates = []
+    visual_topic_assignments = {"approved": 0, "review": 0, "rejected": 0}
     if prep_document.doc_type in {"Lecture Notes", "Revision Sheet"}:
         try:
             topic_candidates = extract_topic_candidates(text)
+            if visual_candidate_count and topic_candidates:
+                visual_topic_assignments = assign_visuals_to_topics(prep_document, topic_candidates)
             course_profile = extract_course_study_profile(
                 prep_document.course,
                 text,
@@ -1168,6 +1989,10 @@ def process_prep_document(prep_document) -> dict:
         except Exception as e:
             logger.error(f"[Topic Extraction] Error extracting topics: {e}")
 
+    from prep.document_validation import validate_prep_document
+
+    prep_document.validation_report = validate_prep_document(prep_document, text)
+
     # 4. Advance Pipeline to Stage 2: Tutor Review Gate
     prep_document.stage = "stage_2"
     prep_document.save()
@@ -1180,7 +2005,11 @@ def process_prep_document(prep_document) -> dict:
                 credit_cost,
                 action_type=action_type,
                 description=f"Document Ingestion: {prep_document.course.code} ({method_used})",
-                metadata={"method_used": method_used, "pages": page_count},
+                metadata={
+                    "method_used": method_used,
+                    "pages": page_count,
+                    "visual_candidates": visual_candidate_count,
+                },
             )
         except InsufficientCredits:
             return {
@@ -1209,6 +2038,10 @@ def process_prep_document(prep_document) -> dict:
         "credits_deducted": credit_cost,
         "pages": page_count,
         "extracted_length": len(text),
+        "visual_candidates": visual_candidate_count,
+        "visual_topic_assignments": visual_topic_assignments,
+        "validation_status": prep_document.validation_report.get("status"),
+        "validation_issue_count": len(prep_document.validation_report.get("issues", [])),
         "topics_indexed": len(topic_candidates),
         "updates_proposed": len(content_updates),
         "github_url": prep_document.github_raw_url,

@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from prep.models import PrepContentCache, PrepCourse, PrepPaper, PrepQuestion, PrepTopic
+from prep.views import _public_topic_notes
 
 
 class PublicPrepSeoTests(TestCase):
@@ -72,3 +73,35 @@ class PublicPrepSeoTests(TestCase):
         self.assertContains(response, "/prep/library/")
         self.assertContains(response, f"/prep/library/{self.course.slug}/")
         self.assertContains(response, f"/prep/library/{self.course.slug}/{self.topic.id}-{self.topic.slug}/")
+
+    def test_public_notes_withhold_an_image_without_approved_crop_reference(self):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            title="Unsafe Figure Topic",
+            slug="unsafe-figure-topic",
+            order=2,
+        )
+        content = (
+            "## 1. One\n\nA source-grounded introduction with explanatory material.\n\n"
+            "## 2. Two\n\nAn explanation of the topic and its supported definitions.\n\n"
+            "## 3. Three\n\nA relevant source-grounded example.\n\n"
+            "## 4. Four\n\n![Unapproved diagram](/media/invented/diagram.png)\n\n"
+            "## 5. Five\n\nA substantial final review section that summarizes the approved material, explains a common misconception, and reminds students how to check their answers against the source."
+        )
+        PrepContentCache.objects.create(
+            cache_key="notes:published:unsafe-figure-topic:level_2",
+            content_type="topic_notes",
+            prompt_hash="unsafe-figure-test",
+            course=self.course,
+            topic=topic,
+            payload={
+                "content": content,
+                "level": "level_2",
+                "validation_state": "validated-v3-source-modalities",
+                "source_references": [],
+            },
+        )
+
+        public_notes, _ = _public_topic_notes(topic)
+
+        self.assertEqual(public_notes, "")

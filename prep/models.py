@@ -78,6 +78,8 @@ class PrepTopic(models.Model):
     order = models.PositiveIntegerField(default=1)
     summary = models.TextField(blank=True, help_text="LaTeX notes, fundamental theorems, and core formulas.")
     subtopics = models.JSONField(default=list, blank=True, help_text="Ordered list of subtopics under this unit.")
+    content_rules = models.JSONField(default=dict, blank=True, help_text="Reviewer-approved, source-grounded modality rules for this topic.")
+    content_rules_version = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -93,6 +95,13 @@ class PrepTopic(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"topic-{self.order}-{self.title[:30]}")
+        update_fields = kwargs.get("update_fields")
+        if self.pk and (update_fields is None or "content_rules" in update_fields):
+            previous_rules = type(self).objects.filter(pk=self.pk).values_list("content_rules", flat=True).first()
+            if previous_rules is not None and previous_rules != (self.content_rules or {}):
+                self.content_rules_version += 1
+                if update_fields is not None:
+                    kwargs["update_fields"] = set(update_fields) | {"content_rules_version"}
         super().save(*args, **kwargs)
 
 
@@ -128,6 +137,8 @@ class PrepDocument(models.Model):
     file_size_bytes = models.PositiveIntegerField(default=0)
     github_raw_url = models.URLField(max_length=500, blank=True, help_text="Raw GitHub permanent reference URL")
     extracted_text = models.TextField(blank=True, help_text="Extracted plain text or structured LaTeX")
+    page_evidence = models.JSONField(default=list, blank=True)
+    validation_report = models.JSONField(default=dict, blank=True)
     file_sha256 = models.CharField(max_length=64, blank=True, db_index=True)
     text_sha256 = models.CharField(max_length=64, blank=True, db_index=True)
     is_duplicate = models.BooleanField(default=False, db_index=True)
@@ -160,10 +171,57 @@ class PrepDocument(models.Model):
         return f"{self.course.code} - {self.doc_type} ({self.get_stage_display()})"
 
 
+class PrepDocumentVisual(models.Model):
+    """A source-page visual candidate and its bounded, optional inspection result."""
+    VISUAL_TYPES = [
+        ("graph", "Graph or Plot"),
+        ("diagram", "Diagram or Flowchart"),
+        ("table", "Table"),
+        ("illustration", "Illustration"),
+        ("unclassified", "Unclassified Visual"),
+    ]
+    STATUSES = [
+        ("candidate", "Candidate Captured"),
+        ("inspected", "Vision Inspected"),
+        ("needs_review", "Needs Review"),
+        ("approved", "Tutor Approved"),
+        ("rejected", "Rejected as Irrelevant"),
+        ("error", "Inspection Error"),
+    ]
+
+    document = models.ForeignKey(PrepDocument, on_delete=models.CASCADE, related_name="visual_candidates")
+    candidate_key = models.CharField(max_length=64, unique=True, db_index=True)
+    page_number = models.PositiveIntegerField(db_index=True)
+    bbox = models.JSONField(default=list, help_text="Crop bounds in PDF points: [x0, y0, x1, y1].")
+    candidate_reasons = models.JSONField(default=list, blank=True)
+    context_text = models.TextField(blank=True)
+    crop = models.FileField(upload_to="prep/visual-crops/%Y/%m/", blank=True)
+    context_crop = models.FileField(upload_to="prep/visual-context/%Y/%m/", blank=True)
+    visual_type = models.CharField(max_length=20, choices=VISUAL_TYPES, default="unclassified")
+    labels = models.JSONField(default=list, blank=True)
+    extracted_content = models.JSONField(default=dict, blank=True)
+    reconstruction_proposal = models.JSONField(default=dict, blank=True)
+    confidence = models.FloatField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUSES, default="candidate", db_index=True)
+    vision_model = models.CharField(max_length=120, blank=True)
+    vision_usage = models.JSONField(default=dict, blank=True)
+    inspection_error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["document", "page_number", "id"]
+        indexes = [models.Index(fields=["document", "page_number", "status"])]
+
+    def __str__(self):
+        return f"{self.document.course.code}: page {self.page_number} {self.visual_type}"
+
+
 class PrepContentUpdate(models.Model):
     """A reviewable proposal to enrich, not overwrite, the shared course graph."""
     UPDATE_TYPES = [
         ("course_profile", "Course Study Profile"),
+        ("topic_content_rules", "Topic Content Rules"),
         ("new_topic", "New Topic"),
         ("add_subtopics", "Add Missing Subtopics"),
         ("fill_summary", "Fill Missing Topic Summary"),
@@ -231,8 +289,12 @@ class PrepQuestion(models.Model):
     VERIFICATION_CHOICES = [
         ("pending", "Pending Verification"),
         ("verified", "Verified (Tutor / SymPy)"),
+        ("auto_validated", "Auto-validated source extraction"),
+        ("reconstructed", "AI-reconstructed equivalent"),
         ("flagged", "Flagged for Correction"),
     ]
+    LEARNER_VISIBLE_STATUSES = ("verified", "auto_validated", "reconstructed")
+    ANSWERABLE_STATUSES = ("verified", "auto_validated", "reconstructed")
 
     QUESTION_TYPES = [
         ("authentic", "Authentic Past Paper"),
@@ -242,6 +304,23 @@ class PrepQuestion(models.Model):
 
     paper = models.ForeignKey(PrepPaper, on_delete=models.SET_NULL, null=True, blank=True, related_name="questions")
     topic = models.ForeignKey(PrepTopic, on_delete=models.SET_NULL, null=True, blank=True, related_name="questions")
+    source_document = models.ForeignKey(
+        PrepDocument,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="sourced_questions",
+    )
+    source_page_number = models.PositiveIntegerField(null=True, blank=True)
+    extraction_confidence = models.FloatField(null=True, blank=True)
+    reconstructed_from = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="adapted_reconstructions",
+    )
+    reconstruction_metadata = models.JSONField(default=dict, blank=True)
     question_type = models.CharField(max_length=20, choices=QUESTION_TYPES, default="authentic", db_index=True)
     number = models.PositiveIntegerField(default=1)
     marks = models.PositiveIntegerField(default=10)

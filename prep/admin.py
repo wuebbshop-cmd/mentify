@@ -27,6 +27,7 @@ from services.credit_service import grant_credits, grant_subscription
 
 def _apply_approved_course_profile(document, profile_data: dict) -> bool:
     from services.prep_ingestion import COURSE_STUDY_FAMILIES
+    from prep.content_rules import validate_content_rule_set
 
     course = document.course
     family = str(profile_data.get("subject_family") or "")
@@ -35,6 +36,10 @@ def _apply_approved_course_profile(document, profile_data: dict) -> bool:
         not family_config
         or document.doc_type not in {"Lecture Notes", "Revision Sheet"}
         or str(profile_data.get("source_document_id")) != str(document.pk)
+    ):
+        return False
+    if profile_data.get("content_rules") and validate_content_rule_set(
+        profile_data["content_rules"], source_document_id=str(document.pk)
     ):
         return False
 
@@ -121,7 +126,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
     search_fields = ("course__code", "course__title", "topic_name", "academic_year", "user__email", "extracted_text")
     readonly_fields = (
         "id", "file_size_display", "file_preview_link", "file_sha256", "text_sha256",
-        "is_duplicate", "duplicate_of", "created_at", "updated_at",
+        "is_duplicate", "duplicate_of", "validation_report", "created_at", "updated_at",
     )
     inlines = [PrepPaperInline]
     date_hierarchy = "created_at"
@@ -158,6 +163,11 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             "fields": ("extracted_text",),
             "description": "Raw extracted text or parsed LaTeX from pdfplumber / Together.ai Vision OCR.",
         }),
+        ("Automated Validation Report", {
+            "classes": ("collapse",),
+            "fields": ("validation_report",),
+            "description": "Review findings and source provenance. Error-level conflicts with approved modality rules block publication.",
+        }),
         ("Duplicate & Update Analysis", {
             "classes": ("collapse",),
             "fields": ("is_duplicate", "duplicate_of", "file_sha256", "text_sha256"),
@@ -188,6 +198,20 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             if update.update_type == "course_profile":
                 if not _apply_approved_course_profile(document, data):
                     continue
+            elif update.update_type == "topic_content_rules" and topic:
+                from prep.content_rules import validate_content_rule_set
+
+                if (
+                    topic.course_id != document.course_id
+                    or document.doc_type not in {"Lecture Notes", "Revision Sheet"}
+                    or not isinstance(data.get("content_rules"), dict)
+                    or validate_content_rule_set(
+                        data["content_rules"], source_document_id=str(document.pk)
+                    )
+                ):
+                    continue
+                topic.content_rules = data["content_rules"]
+                topic.save(update_fields=["content_rules"])
             elif update.update_type == "new_topic":
                 order = int(data.get("order") or 1)
                 title = str(data.get("title") or "").strip()
@@ -301,6 +325,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         applied_updates_count = 0
         published_documents_count = 0
         ingestion_failures = 0
+        validation_failures = 0
         now = timezone.now()
 
         for doc in queryset:
@@ -323,6 +348,21 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                     doc.save(update_fields=["tutor_review_notes", "updated_at"])
                     continue
 
+            from prep.document_validation import validate_prep_document
+
+            doc.validation_report = validate_prep_document(doc)
+            doc.save(update_fields=["validation_report", "updated_at"])
+            blocking_issues = [
+                issue for issue in doc.validation_report.get("issues", [])
+                if issue.get("severity") == "error"
+            ]
+            if blocking_issues:
+                validation_failures += 1
+                reasons = "; ".join(issue.get("message", "Validation error") for issue in blocking_issues)
+                doc.tutor_review_notes = f"Publication blocked by validation: {reasons}"[:2000]
+                doc.save(update_fields=["tutor_review_notes", "updated_at"])
+                continue
+
             doc.stage = "stage_3"
             doc.reviewed_by = request.user
             doc.reviewed_at = now
@@ -330,6 +370,14 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                 doc.tutor_review_notes = f"Approved and verified for syllabus inclusion by {request.user.get_full_name() or request.user.email}."
             doc.save()
             applied_updates_count += self._apply_safe_content_updates(doc, request.user, now)
+            if doc.doc_type in {"Lecture Notes", "Revision Sheet"} and doc.visual_candidates.exists():
+                from services.prep_ingestion import assign_visuals_to_topics
+
+                assign_visuals_to_topics(
+                    doc,
+                    list(doc.course.topics.filter(is_active=True).order_by("order", "id")),
+                    allow_auto_approval=True,
+                )
             published_documents_count += 1
 
             # Auto-create or publish derived paper if doc is CAT or Exam
@@ -385,7 +433,8 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             request,
             f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
             f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
-            f"Blocked {ingestion_failures} document(s) whose ingestion did not complete."
+            f"Blocked {ingestion_failures} document(s) whose ingestion did not complete and "
+            f"{validation_failures} document(s) with validation errors."
         )
 
     @admin.action(description="Propose subject profile from selected lecture notes")
@@ -551,6 +600,13 @@ class PrepQuestionAdmin(admin.ModelAdmin):
     )
     list_filter = ("verification_status", "paper__course", "paper", "topic")
     search_fields = ("question_latex", "solution_latex", "topic_label", "paper__title")
+    readonly_fields = (
+        "source_document",
+        "source_page_number",
+        "extraction_confidence",
+        "reconstructed_from",
+        "reconstruction_metadata",
+    )
     actions = ["verify_questions", "flag_questions", "mark_pending"]
 
     fieldsets = (
@@ -566,6 +622,16 @@ class PrepQuestionAdmin(admin.ModelAdmin):
                 "solution_latex",
             ),
             "description": "Enter clean LaTeX formulas (e.g. $B_r(x)$, \\mathbb{R}^n, \\int_0^\\infty).",
+        }),
+        ("Source & Reconstruction Provenance", {
+            "fields": (
+                "source_document",
+                "source_page_number",
+                "extraction_confidence",
+                "reconstructed_from",
+                "reconstruction_metadata",
+            ),
+            "classes": ("collapse",),
         }),
         ("Tutor / SymPy Verification Status", {
             "fields": (
@@ -590,6 +656,8 @@ class PrepQuestionAdmin(admin.ModelAdmin):
     def verification_badge(self, obj):
         badges = {
             "verified": ("#16a34a", "#dcfce7", "✓ Verified (Tutor/SymPy)"),
+            "auto_validated": ("#0369a1", "#e0f2fe", "✓ Auto-validated source extraction"),
+            "reconstructed": ("#7c3aed", "#ede9fe", "↻ AI-reconstructed (confidence checked)"),
             "pending": ("#d97706", "#fef3c7", "⏳ Pending Review"),
             "flagged": ("#dc2626", "#fee2e2", "⚠ Flagged for Correction"),
         }
@@ -610,17 +678,44 @@ class PrepQuestionAdmin(admin.ModelAdmin):
 
     @admin.action(description="✓ Mark Selected Questions as Verified (Tutor / SymPy Approved)")
     def verify_questions(self, request, queryset):
-        count = queryset.update(verification_status="verified", verified_by=request.user)
+        count = 0
+        for question in queryset:
+            question.verification_status = "verified"
+            question.verified_by = request.user
+            if question.question_type == "adapted":
+                metadata = question.reconstruction_metadata if isinstance(question.reconstruction_metadata, dict) else {}
+                question.reconstruction_metadata = {
+                    **metadata,
+                    "review_status": "approved",
+                    "reviewed_by": str(request.user.pk),
+                    "reviewed_at": timezone.now().isoformat(),
+                }
+            question.save(update_fields=["verification_status", "verified_by", "reconstruction_metadata"])
+            count += 1
         self.message_user(request, f"Marked {count} question(s) as officially verified.")
 
     @admin.action(description="⚠ Flag Selected Questions for Mathematical Correction")
     def flag_questions(self, request, queryset):
-        count = queryset.update(verification_status="flagged")
+        count = 0
+        for question in queryset:
+            question.verification_status = "flagged"
+            if question.question_type == "adapted":
+                metadata = question.reconstruction_metadata if isinstance(question.reconstruction_metadata, dict) else {}
+                question.reconstruction_metadata = {**metadata, "review_status": "needs_correction"}
+            question.save(update_fields=["verification_status", "reconstruction_metadata"])
+            count += 1
         self.message_user(request, f"Flagged {count} question(s) for correction.")
 
     @admin.action(description="⏳ Move to Pending Verification")
     def mark_pending(self, request, queryset):
-        count = queryset.update(verification_status="pending")
+        count = 0
+        for question in queryset:
+            question.verification_status = "pending"
+            if question.question_type == "adapted":
+                metadata = question.reconstruction_metadata if isinstance(question.reconstruction_metadata, dict) else {}
+                question.reconstruction_metadata = {**metadata, "review_status": "pending"}
+            question.save(update_fields=["verification_status", "reconstruction_metadata"])
+            count += 1
         self.message_user(request, f"Moved {count} question(s) to pending review.")
 
 

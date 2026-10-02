@@ -23,8 +23,14 @@ except ImportError:
     sp = None
 from django.conf import settings
 from django.utils import timezone
+from prep.content_rules import CONTENT_MODALITIES, legacy_course_rules, resolve_content_rules
+from prep.visual_matching import map_pdf_topic_sections
+from services.prep_blocks import split_markdown_table_row
 
 logger = logging.getLogger(__name__)
+
+_NON_MATH_LATEX_ENVIRONMENTS = {"center", "document", "figure", "tikzpicture"}
+_VISUAL_NOTE_ROUTING_VERSION = "pdf-topic-sections-required-figures-v1"
 
 
 def compute_prompt_hash(*args) -> str:
@@ -42,27 +48,28 @@ def compute_cache_key(content_type: str, *parts) -> str:
 def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtopics: list | None) -> str:
     """Fingerprint the approved syllabus inputs that determine generated notes."""
     topic_summary = getattr(topic_obj, "summary", "") if topic_obj else ""
+    topic_rules = getattr(topic_obj, "content_rules", {}) if topic_obj else {}
     source_context = _approved_course_source_context(course_obj, topic_title)
-    curriculum = []
-    if course_obj:
-        try:
-            curriculum = list(
-                course_obj.topics.order_by("order", "id").values_list("order", "title")
-            )
-        except Exception as exc:
-            logger.warning("[Topic Notes] Could not fingerprint curriculum: %s", exc)
     return compute_prompt_hash(
         topic_title,
         topic_summary,
+        json.dumps(topic_rules or {}, ensure_ascii=True, sort_keys=True),
+        _topic_content_rules_version(topic_obj),
         json.dumps(subtopics or [], ensure_ascii=True, sort_keys=True),
-        json.dumps(curriculum, ensure_ascii=True),
         json.dumps(_course_study_profile(course_obj), ensure_ascii=True, sort_keys=True),
+        _VISUAL_NOTE_ROUTING_VERSION,
         hashlib.sha256(source_context.encode("utf-8", errors="ignore")).hexdigest(),
+        json.dumps(
+            _approved_course_source_references(course_obj, topic_title),
+            ensure_ascii=True,
+            sort_keys=True,
+        ),
     )[:16]
 
 
-NOTES_CACHE_VERSION = "markdown-katex-v7-profiled"
-NOTE_VALIDATION_STATE = "validated-v2"
+NOTES_CACHE_VERSION = "markdown-katex-v11-figure-map-validation"
+NOTE_VALIDATION_STATE = "validated-v6-figure-map-validation"
+ANSWER_VALIDATION_VERSION = "answer-validation-v2-approved-sources"
 NOTE_MAX_FAILED_GENERATION_CYCLES = 2
 
 
@@ -88,6 +95,10 @@ def _course_study_profile(course_obj) -> dict:
 
 def _course_study_profile_version(course_obj) -> int:
     return int(getattr(course_obj, "study_profile_version", 0) or 0)
+
+
+def _topic_content_rules_version(topic_obj) -> int:
+    return int(getattr(topic_obj, "content_rules_version", 0) or 0)
 
 
 def _required_note_sections(topic_title: str, study_profile: dict | None = None) -> list[str]:
@@ -143,18 +154,144 @@ def _note_allows_math(course_obj) -> bool | None:
     return bool(capabilities.get("math_notation") or capabilities.get("chemical_equations"))
 
 
-def _note_validation_options(course_obj, topic_title: str, summary: str = "", subtopics=None) -> dict:
+def _resolved_note_content_rules(course_obj, topic_obj=None) -> tuple[dict | None, list[str]]:
+    profile = getattr(course_obj, "study_profile", None)
+    profile = profile if isinstance(profile, dict) else {}
+    course_rules = profile.get("content_rules") if _course_study_profile_version(course_obj) else None
+    topic_rules = getattr(topic_obj, "content_rules", None) if topic_obj else None
+    if not course_rules and not topic_rules:
+        return None, []
+    if not course_rules:
+        course_rules = legacy_course_rules({"capabilities": profile.get("capabilities", {})})
+    try:
+        return resolve_content_rules(course_rules, topic_rules), []
+    except (TypeError, ValueError) as exc:
+        return None, [str(exc)]
+
+
+def _note_validation_options(
+    course_obj,
+    topic_title: str,
+    summary: str = "",
+    subtopics=None,
+    *,
+    topic_obj=None,
+) -> dict:
+    content_rules, content_rule_issues = _resolved_note_content_rules(course_obj, topic_obj)
+    allow_code = _note_allows_code(course_obj, topic_title, summary, subtopics)
+    allow_math = _note_allows_math(course_obj)
+    profile = getattr(course_obj, "study_profile", None)
+    profile = profile if isinstance(profile, dict) else {}
+    has_explicit_course_rules = bool(
+        _course_study_profile_version(course_obj) and profile.get("content_rules")
+    )
+    if content_rules:
+        modalities = content_rules.get("modalities", {})
+        code_policy = modalities.get("code", {}).get("policy", "disallowed")
+        equation_policy = modalities.get("equations", {}).get("policy", "disallowed")
+        chemical_policy = modalities.get("chemical_equations", {}).get("policy", "disallowed")
+        if has_explicit_course_rules:
+            allow_code = code_policy in {"allowed", "required"}
+            allow_math = (
+                equation_policy in {"allowed", "required"}
+                or chemical_policy in {"allowed", "required"}
+            )
+        else:
+            allow_code = allow_code and code_policy != "disallowed"
+            if equation_policy == "disallowed" and chemical_policy == "disallowed":
+                allow_math = False
     return {
-        "allow_code": _note_allows_code(course_obj, topic_title, summary, subtopics),
-        "allow_math": _note_allows_math(course_obj),
+        "allow_code": allow_code,
+        "allow_math": allow_math,
+        "allow_chemical_equations": (
+            content_rules["modalities"].get("chemical_equations", {}).get("policy") in {"allowed", "required"}
+            if content_rules else bool(profile.get("capabilities", {}).get("chemical_equations"))
+        ),
         "study_profile": _course_study_profile(course_obj),
+        "content_rules": content_rules,
+        "content_rule_issues": content_rule_issues,
+        "source_references": _approved_course_source_references(course_obj, topic_title),
     }
 
 
-def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
-    """Return bounded excerpts from approved coursework for grounded generation."""
+def _note_modalities(content: str) -> set[str]:
+    """Detect structured modalities without treating ordinary prose as figures."""
+    detected = {"text"} if content.strip() else set()
+    code_blocks = list(re.finditer(r"(?m)^```([^\n]*)\n[\s\S]*?^```[ \t]*$", content))
+    if any(match.group(1).strip().lower() != "mermaid" for match in code_blocks):
+        detected.add("code")
+
+    mermaid_blocks = [
+        match.group(1) for match in re.finditer(
+            r"(?ms)^```mermaid\s*\n([\s\S]*?)^```[ \t]*$", content
+        )
+    ]
+    source = re.sub(r"(?m)^```[^\n]*\n[\s\S]*?^```[ \t]*$", "", content)
+    if (
+        re.search(r"\$\$[\s\S]+?\$\$|(?<!\$)\$[^$\n]+\$(?!\$)", source)
+        or re.search(r"\\(?:begin\{(?:aligned|align\*?|cases|matrix|pmatrix|bmatrix|gather|split|array)\}|frac\b|int\b|sum\b|prod\b|mathbb\b)", source)
+    ):
+        detected.add("equations")
+
+    chemical_species = r"(?:[A-Z][a-z]?\d*(?:\([aqslg]+\))?)"
+    if re.search(
+        rf"{chemical_species}(?:\s*\+\s*{chemical_species})*\s*(?:<=>|⇌|↔|->|→)\s*{chemical_species}",
+        source,
+    ):
+        detected.add("chemical_equations")
+
+    lines = content.splitlines()
+    for header, separator in zip(lines, lines[1:]):
+        header_cells = split_markdown_table_row(header)
+        separator_cells = split_markdown_table_row(separator)
+        if (
+            header_cells is not None
+            and len(header_cells) > 1
+            and separator_cells is not None
+            and len(separator_cells) == len(header_cells)
+            and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator_cells)
+        ):
+            detected.add("tables")
+            break
+
+    image_alts = [
+        match.group(1).strip().lower()
+        for match in re.finditer(r"!\[([^\]]*)\]\(([^)]+)\)", content)
+    ]
+    if re.search(r"\\begin\{tikzpicture\}|```mermaid\s*\n[\s\S]*?\bflowchart\b", content, re.I):
+        detected.add("arrow_diagrams")
+    if any(re.search(r"\b(?:diagram|flowchart|flow chart)\b", alt) for alt in image_alts):
+        detected.add("arrow_diagrams")
+    if re.search(r"\\(?:addplot|begin\{axis\})", content) or any(
+        re.search(r"\b(?:graph|plot|chart)\b", alt) for alt in image_alts
+    ):
+        detected.add("graphs")
+    if any(re.search(r"\b(?:xychart|quadrantchart)\b", block, re.I) for block in mermaid_blocks):
+        detected.add("graphs")
+    return detected
+
+
+def _note_code_language_issues(content: str) -> list[str]:
+    allowed_languages = {
+        "bash", "c", "c++", "c#", "csharp", "cpp", "css", "go", "html", "java",
+        "javascript", "js", "json", "julia", "kotlin", "lua", "markdown", "mermaid",
+        "php", "powershell", "ps1", "python", "py", "r", "rscript", "ruby", "rust",
+        "scala", "shell", "sql", "swift", "text", "typescript", "ts", "xml", "yaml", "yml",
+    }
+    issues = []
+    for index, match in enumerate(re.finditer(r"```([^\n`]*)\n[\s\S]*?```", content), start=1):
+        language = match.group(1).strip().lower()
+        if not language:
+            issues.append(f"code block {index} has no declared language")
+        elif language not in allowed_languages:
+            issues.append(f"code block {index} uses unknown language '{language}'")
+    return issues
+
+
+def _approved_course_source_documents(course_obj, topic_title: str) -> list[tuple[object, bool]]:
+    """Select approved lecture/revision sources using the same topic match as prompts."""
     if not course_obj:
-        return ""
+        return []
     from prep.models import PrepDocument
 
     documents = PrepDocument.objects.filter(
@@ -165,7 +302,6 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
     topic_words = [word for word in re.findall(r"[A-Za-z0-9]+", topic_title.lower()) if len(word) > 3]
     selected = []
     seen_hashes = set()
-    total_length = 0
     for document in documents:
         text = str(document.extracted_text or "").strip()
         if not text:
@@ -173,24 +309,309 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
         text_hash = hashlib.sha256(text.encode("utf-8", errors="ignore")).hexdigest()
         if text_hash in seen_hashes:
             continue
-        is_topic_document = any(word in text.lower() for word in topic_words[:4])
+        document_topic = " ".join(str(document.topic_name or "").casefold().split())
+        requested_topic = " ".join(str(topic_title or "").casefold().split())
+        has_assigned_visual = any(
+            " ".join(str((visual.extracted_content or {}).get("auto_topic") or "").casefold().split())
+            == requested_topic
+            for visual in document.visual_candidates.filter(status="approved").only("extracted_content")
+            if isinstance(visual.extracted_content, dict)
+        )
+        is_topic_document = (
+            document_topic == requested_topic
+            or any(word in text.lower() for word in topic_words[:4])
+            or has_assigned_visual
+        )
         is_course_document = str(document.topic_name or "").strip().lower() == "full syllabus"
         if not is_topic_document and not is_course_document:
             continue
         seen_hashes.add(text_hash)
+        selected.append((document, is_topic_document))
+    return selected
+
+
+def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
+    """Return bounded excerpts from approved coursework for grounded generation."""
+    selected = _approved_course_source_documents(course_obj, topic_title)
+    if not selected:
+        return ""
+    total_length = 0
+    excerpts = []
+    for document, is_topic_document in selected:
+        text = str(document.extracted_text or "").strip()
         excerpt_limit = min(limit - total_length, limit if is_topic_document else 5000)
         if excerpt_limit <= 0:
             break
-        selected.append(text[:excerpt_limit])
+        excerpts.append(text[:excerpt_limit])
         total_length += excerpt_limit
         if total_length >= limit:
             break
-    return "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(selected)[:limit]
+    return "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(excerpts)[:limit]
 
 
-def _table_cell_count(line: str) -> int:
-    """Count Markdown table cells while ignoring the outer pipe characters."""
-    return len(line.strip().strip("|").split("|"))
+def _approved_course_source_references(course_obj, topic_title: str, *, limit: int = 40) -> list[dict]:
+    """Return page and approved-figure references for the source excerpts used in notes."""
+    page_header = re.compile(r"(?m)^--- Page (\d+)(?:\s+\([^\n]*\))? ---\s*$")
+    references = []
+    topics = list(course_obj.topics.filter(is_active=True).order_by("order", "id")) if course_obj else []
+    requested_topic = " ".join(str(topic_title or "").casefold().split())
+    remaining_context_page_budget = limit
+    for document, _is_topic_document in _approved_course_source_documents(course_obj, topic_title):
+        text = str(document.extracted_text or "")
+        matches = list(page_header.finditer(text))
+        section_pages, ambiguous_section_pages = map_pdf_topic_sections(text, topics)
+        document_topic = " ".join(str(document.topic_name or "").casefold().split())
+        page_texts = {}
+        if matches:
+            for index, match in enumerate(matches):
+                end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+                page_texts[int(match.group(1))] = text[match.end():end]
+        assigned_visuals = {}
+        if getattr(document, "pk", None):
+            for visual in document.visual_candidates.filter(status="approved").order_by("page_number", "id"):
+                metadata = visual.extracted_content if isinstance(visual.extracted_content, dict) else {}
+                assigned_topic = " ".join(str(metadata.get("auto_topic") or "").casefold().split())
+                if (
+                    assigned_topic != requested_topic
+                    or metadata.get("auto_decision") != "approved_high_confidence"
+                    or visual.page_number in ambiguous_section_pages
+                ):
+                    continue
+                section_topic = section_pages.get(visual.page_number)
+                if section_topic and " ".join(str(section_topic.title).casefold().split()) != requested_topic:
+                    continue
+                crop_name = visual.crop.name if visual.crop else ""
+                try:
+                    crop_url = visual.crop.url if visual.crop else ""
+                except (ValueError, OSError):
+                    crop_url = ""
+                if not crop_name or not crop_url:
+                    continue
+                try:
+                    context_crop_url = visual.context_crop.url if visual.context_crop else ""
+                except (ValueError, OSError):
+                    context_crop_url = ""
+                assigned_visuals.setdefault(visual.page_number, []).append({
+                    "visual_id": str(visual.pk),
+                    "page_number": visual.page_number,
+                    "visual_type": visual.visual_type,
+                    "crop": crop_name,
+                    "crop_url": crop_url,
+                    "bbox": visual.bbox,
+                    "caption": metadata.get("caption", ""),
+                    "labels": visual.labels if isinstance(visual.labels, list) else [],
+                    "auto_topic": metadata.get("auto_topic", ""),
+                    "auto_decision": metadata.get("auto_decision", ""),
+                    "auto_match_method": metadata.get("auto_match_method", "page_context"),
+                    "auto_match_terms": metadata.get("auto_match_terms", []),
+                    "context_before": metadata.get("context_before", ""),
+                    "context_after": metadata.get("context_after", ""),
+                    "context_crop_url": context_crop_url,
+                })
+
+        if document_topic == requested_topic:
+            pages = {
+                page_number
+                for page_number in page_texts
+                if page_number not in ambiguous_section_pages
+                and (
+                    page_number not in section_pages
+                    or " ".join(str(section_pages[page_number].title).casefold().split()) == requested_topic
+                )
+            }
+        else:
+            pages = {
+                page_number
+                for page_number, section_topic in section_pages.items()
+                if " ".join(str(section_topic.title).casefold().split()) == requested_topic
+            }
+        pages.update(assigned_visuals)
+        visual_pages = sorted(assigned_visuals)
+        remaining_pages = sorted(pages - set(visual_pages))
+        context_pages = remaining_pages[:remaining_context_page_budget]
+        remaining_context_page_budget -= len(context_pages)
+        pages = visual_pages + context_pages
+        if not pages and not matches:
+            pages = [None]
+
+        if not pages:
+            references.append({
+                "document_id": str(document.pk),
+                "source_sha256": document.file_sha256 or "",
+                "page_number": None,
+                "visuals": [],
+            })
+            continue
+
+        for page_number in pages:
+            references.append({
+                "document_id": str(document.pk),
+                "source_sha256": document.file_sha256 or "",
+                "page_number": page_number,
+                "visuals": assigned_visuals.get(page_number, []),
+            })
+    return references
+
+
+_APPROVED_VISUAL_MARKER_RE = re.compile(r"\[\[VISUAL:([A-Za-z0-9-]+)\]\]")
+
+
+def _source_figure_caption(visual: dict) -> str:
+    candidates = [visual.get("caption"), visual.get("context_after"), visual.get("context_before")]
+    for candidate in candidates:
+        caption = re.sub(r"\s+", " ", str(candidate or "")).strip()
+        if not caption or re.search(r"(?i)downloaded by|lOMoARcPSD|scan to|studocu|coursehero", caption):
+            continue
+        caption = re.split(r"(?<=[.!?])\s+", caption, maxsplit=1)[0]
+        caption = re.sub(r"^\W*\d+\s+", "", caption).strip(" -|")
+        if len(caption.split()) >= 4 and not re.search(r"\(\s*(?:and\s*)?\)", caption, re.IGNORECASE):
+            return caption[:220]
+    return str(visual.get("visual_type") or "Source figure").replace("_", " ").title()
+
+
+def _approved_visual_manifest(source_references: list[dict] | None, *, limit: int | None = None) -> list[dict]:
+    """Return a short list of approved crop records that have a renderable URL."""
+    manifest = []
+    for reference in source_references or []:
+        for visual in reference.get("visuals", []):
+            if not isinstance(visual, dict) or not visual.get("visual_id") or not visual.get("crop_url"):
+                continue
+            manifest.append({
+                "id": str(visual["visual_id"]),
+                "type": visual.get("visual_type", "unclassified"),
+                "page": visual.get("page_number"),
+                "caption": _source_figure_caption(visual),
+                "labels": visual.get("labels", []),
+                "auto_topic": visual.get("auto_topic", ""),
+                "auto_decision": visual.get("auto_decision", ""),
+                "auto_match_method": visual.get("auto_match_method", "page_context"),
+                "auto_match_terms": visual.get("auto_match_terms", []),
+                "context_before": visual.get("context_before", ""),
+                "context_after": visual.get("context_after", ""),
+                "context_crop_url": visual.get("context_crop_url", ""),
+                "required": (
+                    bool(visual.get("auto_topic"))
+                    and visual.get("auto_decision") == "approved_high_confidence"
+                ),
+                "marker": f"[[VISUAL:{visual['visual_id']}]]",
+            })
+            if limit is not None and len(manifest) >= limit:
+                return manifest
+    return manifest
+
+
+def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
+    """Place assigned source figures after the generated paragraph matching their context."""
+    paragraphs = [
+        match for match in re.finditer(r"(?ms)(?:^|\n\s*\n)([^\n][\s\S]*?)(?=\n\s*\n|$)", content)
+        if match.group(1).strip() and not match.group(1).lstrip().startswith("!")
+    ]
+    insertions = []
+    generic = {"figure", "graph", "diagram", "curve", "source", "page", "shows", "shown", "this", "that"}
+    for visual in manifest:
+        marker = visual.get("marker")
+        if not visual.get("required") or not marker or marker in content:
+            continue
+        context_text = " ".join((
+            " ".join(visual.get("auto_match_terms", [])),
+            visual.get("caption", ""),
+            " ".join(visual.get("labels", [])),
+            visual.get("context_before", ""),
+            visual.get("context_after", ""),
+        ))
+        context_terms = {
+            token.casefold() for token in re.findall(r"[A-Za-z0-9]+", context_text)
+            if len(token) > 3 and token.casefold() not in generic
+        }
+        best = None
+        best_score = 0
+        for paragraph in paragraphs:
+            paragraph_terms = {
+                token.casefold() for token in re.findall(r"[A-Za-z0-9]+", paragraph.group(1))
+            }
+            score = len(context_terms & paragraph_terms)
+            if score > best_score:
+                best = paragraph
+                best_score = score
+        if best and best_score:
+            insertions.append((best.end(), f"\n\n{marker}"))
+    for position, insertion in sorted(insertions, reverse=True):
+        content = content[:position] + insertion + content[position:]
+    return content
+
+
+def _dedupe_approved_visual_images(content: str, source_references: list[dict] | None) -> str:
+    """Keep each approved source crop at most once in a note level."""
+    approved_urls = {
+        visual.get("crop_url")
+        for reference in source_references or []
+        for visual in reference.get("visuals", [])
+        if isinstance(visual, dict) and visual.get("crop_url")
+    }
+    seen = set()
+
+    def replace(match):
+        image_url = match.group(2).strip()
+        if image_url not in approved_urls:
+            return match.group(0)
+        if image_url in seen:
+            return ""
+        seen.add(image_url)
+        return match.group(0)
+
+    content = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, str(content or ""))
+    return re.sub(r"\n{3,}", "\n\n", content)
+
+
+def _normalize_approved_visual_captions(content: str, source_references: list[dict] | None) -> str:
+    captions = {}
+    for reference in source_references or []:
+        for visual in reference.get("visuals", []):
+            if not isinstance(visual, dict) or not visual.get("crop_url"):
+                continue
+            caption = _source_figure_caption(visual)
+            if caption:
+                captions[visual["crop_url"]] = caption
+
+    def replace(match):
+        caption = captions.get(match.group(2).strip())
+        if not caption:
+            return match.group(0)
+        safe_caption = re.sub(r"[\r\n]+", " ", caption).replace("]", "\\]")
+        return f"![{safe_caption}]({match.group(2)})"
+
+    return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, str(content or ""))
+
+
+def _resolve_approved_visual_markers(content: str, source_references: list[dict] | None) -> str:
+    """Replace model figure tokens only with crops present in the approved source manifest."""
+    approved = {
+        str(visual.get("visual_id")): (reference, visual)
+        for reference in source_references or []
+        for visual in reference.get("visuals", [])
+        if isinstance(visual, dict) and visual.get("visual_id") and visual.get("crop_url")
+    }
+
+    def replace(match):
+        approved_entry = approved.get(match.group(1))
+        if not approved_entry:
+            return match.group(0)
+        reference, visual = approved_entry
+        crop_url = str(visual.get("crop_url") or "").strip()
+        if not crop_url:
+            return match.group(0)
+        caption = _source_figure_caption(visual)
+        if not caption:
+            labels = visual.get("labels") if isinstance(visual.get("labels"), list) else []
+            caption = ", ".join(str(label) for label in labels[:6]) or str(visual.get("visual_type") or "Source figure").title()
+        page_number = visual.get("page_number") or reference.get("page_number")
+        if page_number:
+            caption += f" (source page {page_number})"
+        caption = re.sub(r"[\r\n]+", " ", caption).replace("]", "\\]")
+        safe_url = crop_url.replace(" ", "%20").replace(")", "%29")
+        return f"![{caption}]({safe_url})"
+
+    return _APPROVED_VISUAL_MARKER_RE.sub(replace, str(content or ""))
 
 
 def _markdown_table_issues(content: str) -> list[str]:
@@ -200,15 +621,64 @@ def _markdown_table_issues(content: str) -> list[str]:
     index = 0
 
     while index < len(lines) - 1:
-        header = lines[index].strip()
-        separator = lines[index + 1].strip()
-        is_header = header.startswith("|") and header.endswith("|") and "|" in header[1:-1]
-        is_separator = bool(re.fullmatch(r"\|\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|", separator))
+        header_cells = split_markdown_table_row(lines[index])
+        separator_cells = split_markdown_table_row(lines[index + 1])
+        is_header = header_cells is not None and len(header_cells) > 1
+        is_separator = (
+            separator_cells is not None
+            and len(separator_cells) > 1
+            and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator_cells)
+        )
         if not (is_header and is_separator):
             index += 1
             continue
 
-        expected_cells = _table_cell_count(header)
+        expected_cells = len(header_cells)
+        if len(separator_cells) != expected_cells:
+            issues.append(f"incomplete Markdown table separator near line {index + 2}")
+        index += 2
+        while index < len(lines):
+            row = lines[index].strip()
+            if not row:
+                index += 1
+                continue
+            row_cells = split_markdown_table_row(row)
+            if not row.startswith("|"):
+                break
+            if row_cells is None:
+                issues.append(f"incomplete Markdown table row near line {index + 1}")
+            elif len(row_cells) != expected_cells:
+                issues.append(
+                    f"incomplete Markdown table row near line {index + 1} "
+                    f"(expected {expected_cells} cells, found {len(row_cells)})"
+                )
+            index += 1
+
+    return issues
+
+
+def _figure_reference_issues(content: str) -> list[str]:
+    """Reject figure maps with blank markers and prose containing empty figure placeholders."""
+    lines = str(content or "").splitlines()
+    issues = []
+    index = 0
+    while index < len(lines) - 1:
+        headers = split_markdown_table_row(lines[index])
+        if headers is None:
+            index += 1
+            continue
+        marker_columns = [
+            column for column, header in enumerate(headers)
+            if re.search(r"\bfigure\s+(?:marker|reference|id)\b", header, re.IGNORECASE)
+        ]
+        if not marker_columns:
+            index += 1
+            continue
+        separator = split_markdown_table_row(lines[index + 1])
+        if not separator or not all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator):
+            index += 1
+            continue
+        marker_column = marker_columns[0]
         index += 2
         while index < len(lines):
             row = lines[index].strip()
@@ -217,15 +687,14 @@ def _markdown_table_issues(content: str) -> list[str]:
                 continue
             if not row.startswith("|"):
                 break
-            if not row.endswith("|"):
-                issues.append(f"incomplete Markdown table row near line {index + 1}")
-            elif _table_cell_count(row) != expected_cells:
-                issues.append(
-                    f"incomplete Markdown table row near line {index + 1} "
-                    f"(expected {expected_cells} cells, found {_table_cell_count(row)})"
-                )
+            cells = split_markdown_table_row(row)
+            marker = cells[marker_column].strip() if cells and marker_column < len(cells) else ""
+            if not re.search(r"!\[[^\]]*\]\([^)]+\)|\[\[VISUAL:[^\]]+\]\]", marker):
+                issues.append(f"figure marker table row has no figure for line {index + 1}")
             index += 1
 
+    if re.search(r"\b(?:figures?|diagrams?|graphs?)\s*\(\s*(?:and\s*)?\)", content, re.IGNORECASE):
+        issues.append("figure summary contains empty reference placeholders")
     return issues
 
 
@@ -250,6 +719,12 @@ def _note_format_issues(content: str) -> list[str]:
     issues = []
     if content.count("```") % 2:
         issues.append("unclosed fenced code block")
+    if re.search(r"\[\[VISUAL:[^\]]*\]\]", content):
+        issues.append("visual marker does not resolve to an approved source crop")
+    if re.search(r"<\s*(?:img|picture|source|svg|iframe|object|embed)\b", content, re.IGNORECASE):
+        issues.append("raw HTML visual markup is not allowed; use an approved visual marker")
+    if re.search(r"```mermaid\b|\\begin\{tikzpicture\}|\\begin\{axis\}", content, re.IGNORECASE):
+        issues.append("generated diagram markup is not supported without an approved source crop")
     structural_source = re.sub(r"```[\s\S]*?```", "", content)
     if structural_source.count("$$") % 2:
         issues.append("unclosed display-math block")
@@ -265,6 +740,7 @@ def _note_format_issues(content: str) -> list[str]:
     if last_nonempty_line == "|" or (last_nonempty_line.startswith("|") and not last_nonempty_line.endswith("|")):
         issues.append("content ends with an incomplete Markdown table fragment")
     issues.extend(_markdown_table_issues(content))
+    issues.extend(_figure_reference_issues(content))
     issues.extend(_markdown_theorem_issues(content))
     return issues
 
@@ -289,6 +765,8 @@ def _note_needs_section_regeneration(issues: list[str]) -> bool:
     """Identify failures that cannot be fixed with an old_block/new_block patch."""
     return any(
         issue.startswith("missing section")
+        or issue.startswith("figure marker table row has no figure")
+        or issue == "figure summary contains empty reference placeholders"
         or issue in {
             "unclosed display-math block",
             "unclosed fenced code block",
@@ -344,6 +822,7 @@ def _regenerate_invalid_note_sections(
         topic_obj.title,
         topic_obj.summary,
         topic_obj.subtopics,
+        topic_obj=topic_obj,
     )
     allows_code = validation_options["allow_code"]
     source_excerpt = _approved_course_source_context(topic_obj.course, topic_obj.title)
@@ -412,6 +891,9 @@ def _regenerate_invalid_note_sections(
             "validated_at": timezone.now().isoformat(),
             "level": level,
             "study_profile_version": _course_study_profile_version(topic_obj.course),
+            "topic_content_rules_version": _topic_content_rules_version(topic_obj),
+            "source_references": validation_options["source_references"],
+            "source_signature": source_signature,
         })
         entry.payload = payload
         entry.save(update_fields=["payload", "updated_at"])
@@ -425,6 +907,7 @@ def _regenerate_invalid_note_sections(
             "repaired": True,
             "usage": result.get("usage", {}),
             "model": result.get("model_used", "deepseek-chat"),
+            "source_references": validation_options["source_references"],
         }
 
     repair.status = "needs_review"
@@ -487,6 +970,8 @@ def _latex_syntax_issues(content: str) -> list[str]:
     source_without_display = re.sub(r"\\\[[\s\S]*?\\\]", "", source_without_display)
     source_without_display = re.sub(r"`+[^`]*`+", "", source_without_display)
     for environment in sorted(set(re.findall(r"\\begin\{([^{}]+)\}", source_without_display))):
+        if environment in _NON_MATH_LATEX_ENVIRONMENTS:
+            continue
         issues.append(f"LaTeX environment {environment} is outside display math")
 
     inline_dollars = _unescaped_token_count(source_without_display, "$")
@@ -564,13 +1049,18 @@ def _note_completion_issues(
     *,
     allow_code: bool | None = None,
     allow_math: bool | None = None,
+    allow_chemical_equations: bool | None = None,
     study_profile: dict | None = None,
+    content_rules: dict | None = None,
+    content_rule_issues: list[str] | None = None,
+    source_references: list[dict] | None = None,
 ) -> list[str]:
     """Detect incomplete note output before it is displayed or cached."""
     if not isinstance(content, str) or not content.strip():
         return ["empty content"]
 
     issues: list[str] = []
+    issues.extend(f"approved content rules are invalid: {issue}" for issue in (content_rule_issues or []))
     family = str((study_profile or {}).get("subject_family") or "").strip().lower()
     if family in {"social_science", "humanities", "business_economics", "general_science"}:
         if _nontechnical_solution_has_proof_scaffold(content):
@@ -595,12 +1085,77 @@ def _note_completion_issues(
         issues.append("unclosed display-math block")
 
     issues.extend(_note_format_issues(content))
-    if allow_code is False and re.search(r"```[A-Za-z0-9_+-]*\s*\n", content):
+    issues.extend(_note_code_language_issues(content))
+    if allow_code is False and re.search(r"```(?!mermaid\b)[A-Za-z0-9_+-]*\s*\n", content, re.IGNORECASE):
         issues.append("code block is not allowed for this topic")
     if allow_math is False:
         math_source = re.sub(r"```[\s\S]*?```", "", content)
         if re.search(r"\$\$?|\\\\\[|\\\\\(|\\\\begin\{|\\\\(?:frac|int|sum|prod|lim|mathbb)", math_source):
             issues.append("math notation is not supported by the approved course notes")
+    if allow_chemical_equations is False and "chemical_equations" in _note_modalities(content):
+        issues.append("chemical equations are not supported by the approved course notes")
+    if content_rules:
+        detected_modalities = _note_modalities(content)
+        source_visuals_by_url = {
+            visual.get("crop_url"): visual
+            for reference in (source_references or [])
+            for visual in reference.get("visuals", [])
+            if isinstance(visual, dict) and visual.get("crop_url")
+        }
+        for image in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", content):
+            visual = source_visuals_by_url.get(image.group(1).strip())
+            if not visual:
+                continue
+            visual_modality = {
+                "graph": "graphs",
+                "diagram": "arrow_diagrams",
+                "table": "tables",
+            }.get(visual.get("visual_type"))
+            if visual_modality:
+                detected_modalities.add(visual_modality)
+        modalities = content_rules.get("modalities", {})
+        for modality in CONTENT_MODALITIES:
+            policy = modalities.get(modality, {}).get("policy", "disallowed")
+            if policy == "disallowed" and modality in detected_modalities:
+                issues.append(f"{modality} modality is disallowed by approved course/topic rules")
+            elif policy == "required" and modality not in detected_modalities:
+                issues.append(f"required {modality} modality is missing from the notes")
+
+    detected_modalities = _note_modalities(content)
+    if detected_modalities & {"graphs", "arrow_diagrams"} and not source_references:
+        issues.append("visual modality has no approved source-page provenance")
+    for image in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", content):
+        image_path = image.group(1).strip()
+        approved_crops = {
+            visual.get("crop_url")
+            for reference in (source_references or [])
+            for visual in reference.get("visuals", [])
+            if isinstance(visual, dict) and visual.get("crop_url")
+        }
+        if image_path not in approved_crops:
+            issues.append("embedded figure does not reference an approved source crop")
+    required_visuals = {
+        str(visual.get("visual_id")): str(visual.get("crop_url"))
+        for reference in (source_references or [])
+        for visual in reference.get("visuals", [])
+        if isinstance(visual, dict)
+        and visual.get("visual_id")
+        and visual.get("crop_url")
+        and visual.get("auto_topic")
+        and visual.get("auto_decision") == "approved_high_confidence"
+    }
+    embedded_urls = {
+        match.group(1).strip()
+        for match in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", content)
+    }
+    missing_visual_ids = [
+        visual_id for visual_id, crop_url in required_visuals.items()
+        if crop_url not in embedded_urls
+    ]
+    if missing_visual_ids:
+        issues.append(
+            "required approved source visual missing: " + ", ".join(sorted(missing_visual_ids))
+        )
     return issues
 
 
@@ -775,25 +1330,54 @@ def _publish_legacy_note_cache(
     *,
     allow_code: bool | None = None,
     allow_math: bool | None = None,
+    allow_chemical_equations: bool | None = None,
     study_profile: dict | None = None,
+    content_rules: dict | None = None,
+    content_rule_issues: list[str] | None = None,
+    source_references: list[dict] | None = None,
 ) -> dict | None:
     """Validate an unmarked legacy note once, then persist its publication state."""
     content = repair_json_escaped_latex_newlines(
         str(payload.get("content") or payload.get("notes") or "")
     ).strip()
+    original_content = content
+    manifest = _approved_visual_manifest(source_references)
+    content = _insert_required_visual_markers(content, manifest)
+    content = _resolve_approved_visual_markers(content, source_references)
+    content = _dedupe_approved_visual_images(content, source_references)
+    content = _normalize_approved_visual_captions(content, source_references).strip()
     if not content or _note_completion_issues(
         content,
         topic_title,
         allow_code=allow_code,
         allow_math=allow_math,
+        allow_chemical_equations=allow_chemical_equations,
         study_profile=study_profile,
+        content_rules=content_rules,
+        content_rule_issues=content_rule_issues,
+        source_references=source_references,
     ):
         return None
 
     published_payload = dict(payload)
     published_payload["content"] = content
+    published_payload["level"] = payload.get("level") or "level_2"
     published_payload["validation_state"] = NOTE_VALIDATION_STATE
     published_payload["validated_at"] = timezone.now().isoformat()
+    published_payload["source_references"] = source_references or []
+    published_payload["study_profile_version"] = _course_study_profile_version(entry.topic.course) if entry.topic else 0
+    published_payload["topic_content_rules_version"] = _topic_content_rules_version(entry.topic) if entry.topic else 0
+    if content != original_content:
+        from services.prep_blocks import parse_markdown_to_blocks
+
+        published_payload["blocks"] = parse_markdown_to_blocks(content)
+    if entry.topic:
+        published_payload["source_signature"] = _topic_notes_cache_signature(
+            entry.topic.course,
+            entry.topic,
+            entry.topic.title,
+            entry.topic.subtopics,
+        )
     entry.payload = published_payload
     entry.save(update_fields=["payload", "updated_at"])
     return published_payload
@@ -807,6 +1391,12 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
     from prep.models import PrepContentCache
 
     levels: dict[str, str] = {}
+    source_signature = _topic_notes_cache_signature(
+        topic_obj.course,
+        topic_obj,
+        topic_obj.title,
+        topic_obj.subtopics,
+    )
     entries = PrepContentCache.objects.filter(
         content_type="topic_notes",
         topic=topic_obj,
@@ -815,16 +1405,26 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         payload = _cache_payload_as_dict(entry.payload)
         if not payload:
             continue
-        level = payload.get("level")
+        level = payload.get("level") or "level_2"
         if level not in {"level_1", "level_2", "level_3"} or level in levels:
             continue
+        payload_signature = str(payload.get("source_signature") or "")
+        payload_validation_state = str(payload.get("validation_state") or "")
+        if payload_validation_state:
+            if payload_validation_state != NOTE_VALIDATION_STATE or payload_signature != source_signature:
+                continue
+        elif validated_only:
+            continue
         if int(payload.get("study_profile_version", 0) or 0) != _course_study_profile_version(topic_obj.course):
+            continue
+        if int(payload.get("topic_content_rules_version", 0) or 0) != _topic_content_rules_version(topic_obj):
             continue
         validation_options = _note_validation_options(
             topic_obj.course,
             topic_obj.title,
             topic_obj.summary,
             topic_obj.subtopics,
+            topic_obj=topic_obj,
         )
         if validated_only and payload.get("validation_state") != NOTE_VALIDATION_STATE:
             continue
@@ -851,6 +1451,14 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             payload["validation_state"] = NOTE_VALIDATION_STATE
             payload["validated_at"] = timezone.now().isoformat()
             payload["study_profile_version"] = _course_study_profile_version(topic_obj.course)
+            payload["topic_content_rules_version"] = _topic_content_rules_version(topic_obj)
+            payload["source_references"] = _approved_course_source_references(topic_obj.course, topic_obj.title)
+            payload["source_signature"] = source_signature
+            entry.payload = payload
+            entry.save(update_fields=["payload", "updated_at"])
+        elif not payload.get("level"):
+            payload = dict(payload)
+            payload["level"] = level
             entry.payload = payload
             entry.save(update_fields=["payload", "updated_at"])
         if content:
@@ -985,6 +1593,7 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
         topic_title,
         topic_obj.summary,
         topic_obj.subtopics,
+        topic_obj=topic_obj,
     )
 
     for entry in entries:
@@ -992,6 +1601,8 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
         if not payload or payload.get("level") != level:
             continue
         if int(payload.get("study_profile_version", 0) or 0) != _course_study_profile_version(topic_obj.course):
+            continue
+        if int(payload.get("topic_content_rules_version", 0) or 0) != _topic_content_rules_version(topic_obj):
             continue
 
         content = normalize_math_delimiters(
@@ -1022,6 +1633,7 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
             "stale": True,
             "level": level,
             "model": payload.get("model", "Shared Cache"),
+            "source_references": payload.get("source_references", validation_options["source_references"]),
         }
     return None
 
@@ -1049,6 +1661,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
         topic_obj.title,
         topic_obj.summary,
         topic_obj.subtopics,
+        topic_obj=topic_obj,
     )
     for _ in range(repair.attempts, 3):
         repair.attempts += 1
@@ -1094,6 +1707,9 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 "validation_state": NOTE_VALIDATION_STATE,
                 "validated_at": timezone.now().isoformat(),
                 "study_profile_version": _course_study_profile_version(topic_obj.course),
+                "topic_content_rules_version": _topic_content_rules_version(topic_obj),
+                "source_references": validation_options["source_references"],
+                "source_signature": source_signature,
             })
             entry.payload = payload
             entry.save(update_fields=["payload", "updated_at"])
@@ -1101,7 +1717,13 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             repair.validation_issues = []
             repair.status = "validated"
             repair.save(update_fields=["current_content", "validation_issues", "status", "updated_at"])
-            return {"notes": candidate, "cached": False, "repaired": True, "usage": result.get("usage", {})}
+            return {
+                "notes": candidate,
+                "cached": False,
+                "repaired": True,
+                "usage": result.get("usage", {}),
+                "source_references": validation_options["source_references"],
+            }
         except Exception as exc:
             logger.warning(
                 "[Topic Notes] targeted repair patch rejected for %s: %s",
@@ -1294,6 +1916,8 @@ def route_math_request(
     topic_label: str = "",
     is_complex_proof: bool | None = None,
     system_prompt: str | None = None,
+    max_tokens_override: int | None = None,
+    auto_continue: bool = True,
 ) -> dict:
     """
     Intelligently routes request to:
@@ -1311,6 +1935,8 @@ def route_math_request(
     else:
         model = getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat")
         max_tokens = int(getattr(settings, "MAX_TOKENS_EXPLANATION", 6000) or 6000)
+    if max_tokens_override is not None:
+        max_tokens = min(max_tokens, max(1, int(max_tokens_override)))
 
     if not system_prompt:
         system_prompt = (
@@ -1335,7 +1961,12 @@ def route_math_request(
         {"role": "user", "content": prompt},
     ]
 
-    return call_deepseek(messages=messages, model=model, max_tokens=max_tokens)
+    return call_deepseek(
+        messages=messages,
+        model=model,
+        max_tokens=max_tokens,
+        auto_continue=auto_continue,
+    )
 
 
 # ─── 3. High-Level AI Operations with Cache Guard ────────────────────────────
@@ -1358,10 +1989,6 @@ def normalize_math_delimiters(text: str) -> str:
     text = repair_json_escaped_latex_newlines(str(text))
     text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
-    text = re.sub(r'(\d+)\ufffd(\d+)', r'\1–\2', text)
-    text = re.sub(r'([IVXLCDM]+)\ufffd([IVXLCDM]+)', r'\1–\2', text)
-    text = re.sub(r'\s*\ufffd\s*', ' — ', text)
-    text = text.replace('\ufffd', '—')
     text = re.sub(r"^\s*>\s*$", "", text, flags=re.MULTILINE)
     text = re.sub(r"^\s*#\s*$", "", text, flags=re.MULTILINE)
     return text
@@ -1396,14 +2023,31 @@ def get_or_generate_topic_notes(
     # Resolve course and topic objects before building the cache fingerprint.
     if topic_obj and not course_obj:
         course_obj = getattr(topic_obj, "course", None)
+
     if topic_obj and not subtopics:
         if isinstance(getattr(topic_obj, "subtopics", None), list):
             subtopics = topic_obj.subtopics
     topic_summary = str(getattr(topic_obj, "summary", "") or "").strip() if topic_obj else ""
     study_profile = _course_study_profile(course_obj)
-    validation_options = _note_validation_options(course_obj, topic_title, topic_summary, subtopics)
+    validation_options = _note_validation_options(
+        course_obj,
+        topic_title,
+        topic_summary,
+        subtopics,
+        topic_obj=topic_obj,
+    )
     allows_code = validation_options["allow_code"]
     allows_math = validation_options["allow_math"]
+    if validation_options["content_rule_issues"]:
+        return {
+            "notes": "",
+            "blocks": [],
+            "schema_version": 2,
+            "cached": False,
+            "level": level,
+            "validation_failed": True,
+            "error": "; ".join(validation_options["content_rule_issues"]),
+        }
 
     # A published shared note belongs to this specific approved topic and
     # level. Serve it before the historical signature-key path so unrelated
@@ -1419,6 +2063,7 @@ def get_or_generate_topic_notes(
             "cached": True,
             "level": level,
             "model": "Published Shared Notes",
+            "source_references": validation_options["source_references"],
         }
 
     # The signature makes cache reuse contingent on the approved topic and
@@ -1445,6 +2090,7 @@ def get_or_generate_topic_notes(
                 "cached": True,
                 "level": level,
                 "model": cached.get("model", "Cache"),
+                "source_references": cached.get("source_references", validation_options["source_references"]),
             }
 
         # Notes created before the publication marker existed are checked once.
@@ -1464,6 +2110,7 @@ def get_or_generate_topic_notes(
                 "cached": True,
                 "level": level,
                 "model": cached.get("model", "Cache"),
+                "source_references": cached.get("source_references", validation_options["source_references"]),
             }
         logger.warning(
             "[Topic Notes] Ignoring incomplete cached notes for %s %s: %s",
@@ -1588,9 +2235,9 @@ def get_or_generate_topic_notes(
             "TUTOR-APPROVED COURSE STUDY PROFILE:\n"
             f"Subject family: {study_profile.get('subject_family')}\n"
             f"Approved evidence: {json.dumps(study_profile.get('evidence_quotes', []), ensure_ascii=True)}\n"
-            f"Code present in approved notes: {bool(capabilities.get('code'))}\n"
-            f"Mathematical notation present in approved notes: {bool(capabilities.get('math_notation'))}\n"
-            f"Chemical equations present in approved notes: {bool(capabilities.get('chemical_equations'))}\n"
+            f"Code permitted by approved course/topic rules: {allows_code}\n"
+            f"Mathematical notation permitted by approved course/topic rules: {allows_math}\n"
+            f"Chemical equations permitted by approved course/topic rules: {validation_options['allow_chemical_equations']}\n"
             "The approved uploaded notes are the source of truth. Do not add a subject, technique, code example, equation, or notation not supported by this topic's approved notes.\n\n"
         )
     source_excerpt = _approved_course_source_context(course_obj, topic_title)
@@ -1601,6 +2248,19 @@ def get_or_generate_topic_notes(
         f"{source_excerpt}\n\n"
         if source_excerpt
         else ""
+    )
+    approved_visual_manifest = _approved_visual_manifest(validation_options["source_references"])
+    source_reference_block = (
+        "APPROVED FIGURE CHOICES (the server stores page provenance):\n"
+        + json.dumps(approved_visual_manifest, ensure_ascii=True, sort_keys=True)
+        + "\nUse a figure only by inserting its exact [[VISUAL:id]] marker at the relevant position. "
+        "Do not write Markdown image URLs, invent a figure, generate Mermaid/TikZ/plot code, or request an unlisted figure. "
+        "Do not create a Figure Recall Map, marker table, or memory-device sentence with empty figure placeholders. "
+        "Place each required marker directly beside the explanation it illustrates. "
+        "Figures marked required were mapped to this topic from source-page evidence and must be included beside the matching explanation. "
+        "If a listed optional figure is not relevant, omit it.\n\n"
+        if approved_visual_manifest
+        else "NO APPROVED SOURCE FIGURE IS AVAILABLE. Do not add an image, diagram, graph, Mermaid/TikZ, or plot code.\n\n"
     )
 
     # Build strict curriculum boundary block
@@ -1743,6 +2403,7 @@ def get_or_generate_topic_notes(
         f"{approved_context_block}"
         f"{profile_context_block}"
         f"{source_context_block}"
+        f"{source_reference_block}"
         f"{curriculum_boundary_block}"
         f"{level_instruction}\n\n"
         f"{code_policy}\n"
@@ -1773,7 +2434,10 @@ def get_or_generate_topic_notes(
     )
 
     if result.get("success"):
-        content = normalize_math_delimiters(result["content"])
+        content = _resolve_approved_visual_markers(
+            normalize_math_delimiters(result["content"]),
+            validation_options["source_references"],
+        )
 
         # Continue boundedly until all required sections and delimiters are complete.
         # This protects against responses that contain the final heading but stop
@@ -1784,6 +2448,7 @@ def get_or_generate_topic_notes(
                 break
             needs_continuation = any(
                 issue.startswith("missing section")
+                or issue.startswith("required approved source visual missing")
                 or issue in {
                     "unclosed display-math block",
                     "unclosed fenced code block",
@@ -1815,11 +2480,19 @@ def get_or_generate_topic_notes(
             )
             if not cont_res.get("success") or not cont_res.get("content"):
                 break
-            content = content + "\n\n" + cont_res["content"].strip()
+            continuation = _resolve_approved_visual_markers(
+                cont_res["content"].strip(),
+                validation_options["source_references"],
+            )
+            content = content + "\n\n" + continuation
             result["usage"] = _merge_usage(result.get("usage", {}), cont_res.get("usage", {}))
 
         # Preserve the generated Markdown source. The browser renderer is the
         # single owner of Markdown and KaTeX interpretation.
+        content = _insert_required_visual_markers(content, approved_visual_manifest)
+        content = _resolve_approved_visual_markers(content, validation_options["source_references"])
+        content = _dedupe_approved_visual_images(content, validation_options["source_references"])
+        content = _normalize_approved_visual_captions(content, validation_options["source_references"])
         content = str(content).strip()
         completion_issues = _note_completion_issues(content, topic_title, **validation_options)
         if completion_issues:
@@ -1843,6 +2516,7 @@ def get_or_generate_topic_notes(
                         "content": content,
                         "level": level,
                         "model": result.get("model_used", "deepseek-chat"),
+                        "source_references": validation_options["source_references"],
                     },
                     "course": course_obj,
                     "topic": topic_obj,
@@ -1898,6 +2572,9 @@ def get_or_generate_topic_notes(
             "topic": topic_title,
             "level": level,
             "study_profile_version": _course_study_profile_version(course_obj),
+            "topic_content_rules_version": _topic_content_rules_version(topic_obj),
+            "source_references": validation_options["source_references"],
+            "source_signature": cache_signature,
             "generated_at": timezone.now().isoformat(),
         }
         store_cached_content(cache_key, "topic_notes", p_hash, payload, course=course_obj, topic=topic_obj)
@@ -1910,6 +2587,7 @@ def get_or_generate_topic_notes(
             "level": level,
             "model": result.get("model_used"),
             "usage": result.get("usage", {}),
+            "source_references": validation_options["source_references"],
             "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
         }
 
@@ -2091,6 +2769,26 @@ def generate_similar_practice_questions(
     if topic_obj and not course_obj:
         course_obj = getattr(topic_obj, "course", None)
 
+    verified_samples = []
+    source_questions = []
+    if topic_obj:
+        from services.prep_ingestion import assessment_question_rendering_issues
+
+        for sample in PrepQuestion.objects.filter(
+            topic=topic_obj,
+            question_type__in=["authentic", "adapted"],
+            verification_status__in=PrepQuestion.ANSWERABLE_STATUSES,
+        ).order_by("number", "id")[:20]:
+            if assessment_question_rendering_issues(sample.question_latex):
+                continue
+            verified_samples.append(
+                f"Q{sample.number} ({sample.marks} marks): {sample.question_latex}"
+            )
+            source_questions.append(sample)
+            if len(verified_samples) >= 3:
+                break
+    authentic_samples = verified_samples
+
     # Enforce syllabus sequence constraints (prohibiting future topics)
     prev_topics = []
     future_topics = []
@@ -2107,6 +2805,19 @@ def generate_similar_practice_questions(
             logger.warning(f"[PracticeGen] Could not resolve curriculum sequence: {e}")
         if isinstance(getattr(topic_obj, "subtopics", None), list):
             subtopics = topic_obj.subtopics
+
+    validation_options = _note_validation_options(
+        course_obj,
+        topic_title,
+        getattr(topic_obj, "summary", "") if topic_obj else "",
+        subtopics,
+        topic_obj=topic_obj,
+    )
+    source_question_ids = [str(question.pk) for question in source_questions]
+    source_question_texts = {
+        re.sub(r"\s+", " ", question.question_latex.strip()).casefold()
+        for question in source_questions
+    }
 
     curriculum_boundary_block = ""
     if future_topics:
@@ -2149,6 +2860,7 @@ def generate_similar_practice_questions(
         f"{samples_context}\n"
         f"{curriculum_boundary_block}"
         f"Generate exactly {needed} practice questions.\n"
+        f"Verified source question IDs used as style/evidence: {json.dumps(source_question_ids)}.\n"
         "RULES:\n"
         "- Questions must test strictly the current topic, with absolutely zero leakage of future topics.\n"
         "- In question_latex and solution_latex, write clear multi-line formatting with `\\n\\n` between question parts (e.g. `(i)`, `(ii)`).\n"
@@ -2244,6 +2956,54 @@ def generate_similar_practice_questions(
             "error": "The generated practice set did not pass validation and was not saved. Please try again.",
         }
 
+    variant_issues = []
+    for index, item in enumerate(parsed_questions, start=1):
+        question_text = normalize_math_delimiters(str(item.get("question_latex") or "")).strip()
+        solution_text = normalize_math_delimiters(str(item.get("solution_latex") or "")).strip()
+        normalized_question = re.sub(r"\s+", " ", question_text).casefold()
+        if normalized_question in source_question_texts:
+            variant_issues.append(f"question {index} is an exact duplicate of a verified source question")
+        question_issues_for_variant = _question_solution_issues(
+            question_text,
+            is_nontechnical=_question_solution_uses_nontechnical_format(
+                course_obj=course_obj,
+                study_profile=validation_options["study_profile"],
+            ),
+            allow_code=validation_options["allow_code"],
+            allow_math=validation_options["allow_math"],
+            allow_chemical_equations=validation_options["allow_chemical_equations"],
+            content_rules=validation_options["content_rules"],
+            content_rule_issues=validation_options["content_rule_issues"],
+            source_references=validation_options["source_references"],
+        )
+        solution_issues_for_variant = _question_solution_issues(
+            solution_text,
+            is_nontechnical=_question_solution_uses_nontechnical_format(
+                course_obj=course_obj,
+                study_profile=validation_options["study_profile"],
+            ),
+            allow_code=validation_options["allow_code"],
+            allow_math=validation_options["allow_math"],
+            allow_chemical_equations=validation_options["allow_chemical_equations"],
+            content_rules=validation_options["content_rules"],
+            content_rule_issues=validation_options["content_rule_issues"],
+            source_references=validation_options["source_references"],
+        )
+        variant_issues.extend(f"question {index} problem: {issue}" for issue in question_issues_for_variant)
+        variant_issues.extend(f"question {index} solution: {issue}" for issue in solution_issues_for_variant)
+
+    if variant_issues:
+        logger.error("[PracticeGen] Refusing variant set for %s: %s", topic_title, "; ".join(variant_issues))
+        return {
+            "success": False,
+            "questions": [],
+            "fresh_generated_count": 0,
+            "cached": False,
+            "model": result.get("model_used", "deepseek-chat"),
+            "usage": result.get("usage", {}),
+            "error": "The generated practice set failed source, modality, or answer validation and was not saved.",
+        }
+
     from django.db import transaction
 
     newly_created = []
@@ -2261,6 +3021,17 @@ def generate_similar_practice_questions(
                 question_latex=clean_q,
                 solution_latex=clean_sol,
                 verification_status="verified",
+                reconstruction_metadata={
+                    "variant_status": "validated",
+                    "source_question_ids": source_question_ids,
+                    "source_course_code": course_code,
+                    "study_profile_version": _course_study_profile_version(course_obj),
+                    "topic_content_rules_version": _topic_content_rules_version(topic_obj),
+                    "source_signature": _topic_notes_cache_signature(
+                        course_obj, topic_obj, topic_title, subtopics
+                    ),
+                    "validation_version": ANSWER_VALIDATION_VERSION,
+                },
             )
             start_num += 1
             newly_created.append(q_record)
@@ -2315,12 +3086,109 @@ def _nontechnical_solution_has_proof_scaffold(solution: str) -> bool:
     )
 
 
+def _question_solution_issues(
+    solution: str,
+    *,
+    is_nontechnical: bool,
+    allow_code: bool | None,
+    allow_math: bool | None,
+    allow_chemical_equations: bool | None,
+    content_rules: dict | None,
+    content_rule_issues: list[str],
+    source_references: list[dict],
+) -> list[str]:
+    """Validate generated, cached, and stored answers against current policy."""
+    if not isinstance(solution, str) or len(solution.strip()) < 20:
+        return ["answer is empty or incomplete"]
+    issues = list(content_rule_issues or [])
+    if is_nontechnical and _nontechnical_solution_has_proof_scaffold(solution):
+        issues.append("mathematical proof scaffold is not allowed for this subject family")
+    issues.extend(_note_format_issues(solution))
+    issues.extend(_code_block_issues(solution))
+    if allow_code is False and re.search(r"```(?!mermaid\b)[A-Za-z0-9_+-]*\s*\n", solution, re.IGNORECASE):
+        issues.append("code block is not allowed by approved course/topic rules")
+    if allow_math is False:
+        math_source = re.sub(r"```[\s\S]*?```", "", solution)
+        if re.search(r"\$\$?|\\\\\[|\\\\\(|\\\\begin\{|\\\\(?:frac|int|sum|prod|lim|mathbb)", math_source):
+            issues.append("math notation is not supported by approved course/topic rules")
+    if allow_chemical_equations is False and "chemical_equations" in _note_modalities(solution):
+        issues.append("chemical equations are not supported by approved course/topic rules")
+
+    detected = _note_modalities(solution)
+    if content_rules:
+        modalities = content_rules.get("modalities", {})
+        for modality in CONTENT_MODALITIES:
+            policy = modalities.get(modality, {}).get("policy", "disallowed")
+            if policy == "disallowed" and modality in detected:
+                issues.append(f"{modality} modality is disallowed by approved course/topic rules")
+    if detected & {"graphs", "arrow_diagrams"} and not source_references:
+        issues.append("visual answer has no approved source-page provenance")
+
+    approved_crops = {
+        visual.get("crop_url")
+        for reference in source_references or []
+        for visual in reference.get("visuals", [])
+        if isinstance(visual, dict) and visual.get("crop_url")
+    }
+    for image in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", solution):
+        if image.group(1).strip() not in approved_crops:
+            issues.append("answer embeds a figure that is not an approved source crop")
+    if re.search(r"<\s*(?:img|picture|source|svg|iframe|object|embed)\b", solution, re.IGNORECASE):
+        issues.append("raw HTML visual markup is not allowed in answers")
+    return list(dict.fromkeys(issues))
+
+
+def validated_question_solution(question_obj, solution_text: str | None = None) -> str:
+    """Return an answer only when the question is answerable and the answer passes current rules."""
+    if not question_obj or getattr(question_obj, "verification_status", "pending") not in {
+        "verified", "auto_validated", "reconstructed",
+    }:
+        return ""
+    solution = str(solution_text if solution_text is not None else getattr(question_obj, "solution_latex", "") or "")
+    solution = normalize_math_delimiters(solution).strip()
+    if not solution:
+        return ""
+
+    topic = getattr(question_obj, "topic", None)
+    course = getattr(topic, "course", None) if topic else None
+    if course is None and getattr(question_obj, "paper", None):
+        course = question_obj.paper.course
+    topic_title = (getattr(topic, "title", "") or getattr(question_obj, "topic_label", "") or "Question Answer").strip()
+    options = _note_validation_options(
+        course,
+        topic_title,
+        str(getattr(topic, "summary", "") or "") if topic else "",
+        getattr(topic, "subtopics", []) if topic else [],
+        topic_obj=topic,
+    )
+    issues = _question_solution_issues(
+        solution,
+        is_nontechnical=_question_solution_uses_nontechnical_format(course_obj=course),
+        allow_code=options["allow_code"],
+        allow_math=options["allow_math"],
+        allow_chemical_equations=options["allow_chemical_equations"],
+        content_rules=options["content_rules"],
+        content_rule_issues=options["content_rule_issues"],
+        source_references=options["source_references"],
+    )
+    return "" if issues else solution
+
+
 def get_or_generate_question_solution(question_latex: str, course_code: str, topic_label: str = "", question_obj=None) -> dict:
     """
     Retrieve a verified answer for a question.
     Non-technical subjects use explanatory, source-grounded answers rather than a mathematics proof template.
     """
+    answerable_statuses = {"verified", "auto_validated", "reconstructed"}
+    if question_obj and getattr(question_obj, "verification_status", "pending") not in answerable_statuses:
+        return {
+            "solution": "",
+            "cached": False,
+            "error": "This question is pending tutor review and cannot be answered yet.",
+        }
+
     course_obj = None
+    topic_obj = None
     if question_obj:
         topic_obj = getattr(question_obj, "topic", None)
         if topic_obj:
@@ -2329,24 +3197,106 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             course_obj = question_obj.paper.course
     study_profile = _course_study_profile(course_obj)
     is_nontechnical = _question_solution_uses_nontechnical_format(course_obj=course_obj, study_profile=study_profile)
+    topic_title = (getattr(topic_obj, "title", "") or topic_label or "Question Answer").strip()
+    topic_summary = str(getattr(topic_obj, "summary", "") or "").strip() if topic_obj else ""
+    subtopics = getattr(topic_obj, "subtopics", []) if topic_obj else []
+    subtopics = subtopics if isinstance(subtopics, list) else []
+    validation_options = _note_validation_options(
+        course_obj,
+        topic_title,
+        topic_summary,
+        subtopics,
+        topic_obj=topic_obj,
+    )
+    if validation_options["content_rule_issues"]:
+        return {
+            "solution": "",
+            "cached": False,
+            "validation_failed": True,
+            "error": "; ".join(validation_options["content_rule_issues"]),
+        }
+    question_type = getattr(question_obj, "question_type", "unlinked") if question_obj else "unlinked"
+    question_type_guidance = {
+        "authentic": "This is an authentic source question. Answer the exact question without changing its meaning.",
+        "adapted": "This is an AI-adapted equivalent, not the original question wording. Answer only the displayed adapted question and do not claim to recover the original.",
+        "generated": "This is a generated practice question. Answer the question as written and keep the solution within the approved topic scope.",
+    }.get(question_type, "Answer the question as written and do not claim unsupported source provenance.")
+    modality_guidance = (
+        f"Approved modalities: {json.dumps({name: rule.get('policy') for name, rule in (validation_options['content_rules'] or {}).get('modalities', {}).items()}, ensure_ascii=True, sort_keys=True)}. "
+        f"Math allowed: {validation_options['allow_math']}; code allowed: {validation_options['allow_code']}; "
+        f"chemical equations allowed: {validation_options['allow_chemical_equations']}."
+    )
+    question_digest = hashlib.sha256(str(question_latex or "").encode("utf-8", errors="ignore")).hexdigest()
+    source_signature = _topic_notes_cache_signature(
+        course_obj,
+        topic_obj,
+        topic_title,
+        subtopics,
+    )
     cache_key = compute_cache_key(
         "solution",
+        ANSWER_VALIDATION_VERSION,
         course_code,
-        question_latex[:50],
+        question_digest,
+        question_type,
         f"profile-v{_course_study_profile_version(course_obj)}",
-        "explanatory-v1" if is_nontechnical else "technical-v1",
+        f"topic-content-rules-v{_topic_content_rules_version(topic_obj)}",
+        source_signature,
+        "explanatory-v2" if is_nontechnical else "technical-v2",
     )
+
+    def valid_answer(answer_text: str) -> list[str]:
+        return _question_solution_issues(
+            answer_text,
+            is_nontechnical=is_nontechnical,
+            allow_code=validation_options["allow_code"],
+            allow_math=validation_options["allow_math"],
+            allow_chemical_equations=validation_options["allow_chemical_equations"],
+            content_rules=validation_options["content_rules"],
+            content_rule_issues=validation_options["content_rule_issues"],
+            source_references=validation_options["source_references"],
+        )
+
+    if question_obj and question_obj.solution_latex:
+        stored_solution = normalize_math_delimiters(question_obj.solution_latex).strip()
+        stored_issues = valid_answer(stored_solution)
+        if not stored_issues:
+            return {
+                "solution": stored_solution,
+                "reasoning": "",
+                "cached": True,
+                "model": "Validated Question Record",
+                "source_references": validation_options["source_references"],
+            }
+        logger.warning(
+            "[Question Solution] Ignoring stored answer for Q%s: %s",
+            getattr(question_obj, "number", "?"),
+            "; ".join(stored_issues),
+        )
+        question_obj.solution_latex = ""
+        question_obj.save(update_fields=["solution_latex"])
+
     cached = get_cached_content(cache_key)
     if cached:
+        if cached.get("answer_validation_version") != ANSWER_VALIDATION_VERSION:
+            logger.warning("[Question Solution] Ignoring legacy answer cache for %s", course_code)
+            cached = None
+    if cached:
         cached_solution = str(cached.get("solution") or "")
-        if not is_nontechnical or not _nontechnical_solution_has_proof_scaffold(cached_solution):
+        cached_issues = valid_answer(cached_solution)
+        if not cached_issues:
             return {
                 "solution": cached_solution,
                 "reasoning": cached.get("reasoning", ""),
                 "cached": True,
                 "model": cached.get("model", "Cache"),
+                "source_references": cached.get("source_references", validation_options["source_references"]),
             }
-        logger.warning("[Question Solution] Ignoring proof-style cached answer for non-technical course %s", course_code)
+        logger.warning(
+            "[Question Solution] Ignoring invalid cached answer for %s: %s",
+            course_code,
+            "; ".join(cached_issues),
+        )
 
     # First attempt deterministic evaluation if algebraic
     sympy_res = evaluate_symbolic_math(question_latex)
@@ -2354,8 +3304,10 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
     if is_nontechnical:
         prompt = (
             f"Provide a clear, academically rigorous explanatory answer for this question from course {course_code} "
-            f"({topic_label}):\n\n"
+            f"({topic_label}), question type {question_type}):\n\n"
+            f"{question_type_guidance}\n{modality_guidance}\n\n"
             f"{question_latex}\n\n"
+            f"Approved topic summary:\n{topic_summary or 'No approved topic summary is available.'}\n\n"
             "Structure your response:\n"
             "1. **Key Concept / Definition**\n"
             "2. **Explanation and Analysis**\n"
@@ -2372,8 +3324,10 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
     else:
         prompt = (
             f"Provide a rigorous, step-by-step mathematical proof and solution for this examination question "
-            f"from course {course_code} ({topic_label}):\n\n"
+            f"from course {course_code} ({topic_label}), question type {question_type}):\n\n"
+            f"{question_type_guidance}\n{modality_guidance}\n\n"
             f"$$\n{question_latex}\n$$\n\n"
+            f"Approved topic summary:\n{topic_summary or 'No approved topic summary is available.'}\n\n"
             "Structure your response:\n"
             "1. **Problem Statement & Given Conditions**\n"
             "2. **Step-by-Step Rigorous Proof / Derivation** with complete intermediate steps (never chain equalities horizontally)\n"
@@ -2382,33 +3336,75 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
         system_prompt = None
         is_complex_proof = True
 
-    p_hash = compute_prompt_hash(course_code, question_latex)
+    source_excerpt = _approved_course_source_context(course_obj, topic_title, limit=5000)
+    prompt += (
+        "\n\nAPPROVED SOURCE MATERIAL (factual scope):\n"
+        + (source_excerpt or "No approved lecture/revision excerpts are available; do not invent source facts.")
+        + "\n\n"
+        + "Applicable approved modality rules:\n"
+        + json.dumps(validation_options["content_rules"] or {}, ensure_ascii=True, sort_keys=True)
+        + "\n\n"
+        + "Approved source/page/figure references for internal grounding:\n"
+        + json.dumps(validation_options["source_references"], ensure_ascii=True, sort_keys=True)
+        + "\nUse only question-relevant approved material. Any figure must use an exact approved [[VISUAL:id]] marker; never invent figure IDs, data, labels, or URLs."
+    )
+
+    p_hash = compute_prompt_hash(
+        course_code,
+        question_latex,
+        question_type,
+        ANSWER_VALIDATION_VERSION,
+        source_signature,
+        json.dumps(validation_options["source_references"], ensure_ascii=True, sort_keys=True),
+    )
     result = route_math_request(prompt, course_code, topic_label=topic_label, is_complex_proof=is_complex_proof, system_prompt=system_prompt)
 
     if result.get("success"):
-        solution_text = normalize_math_delimiters(result["content"])
+        solution_text = _resolve_approved_visual_markers(
+            normalize_math_delimiters(result["content"]),
+            validation_options["source_references"],
+        )
         reasoning_text = result.get("reasoning_content", "")
-        if is_nontechnical and _nontechnical_solution_has_proof_scaffold(solution_text):
+        answer_issues = valid_answer(solution_text)
+        if answer_issues:
+            if is_nontechnical and _nontechnical_solution_has_proof_scaffold(solution_text):
+                error = "The generated answer used a mathematical proof format and was rejected. Please retry."
+            else:
+                error = "The generated answer failed validation and was not saved: " + "; ".join(answer_issues)
             return {
                 "solution": "",
                 "cached": False,
-                "error": "The generated answer used a mathematical proof format and was rejected. Please retry.",
+                "validation_failed": True,
+                "error": error,
             }
 
         # Save to question object in DB if provided
         if question_obj and not question_obj.solution_latex:
             question_obj.solution_latex = solution_text
-            question_obj.verification_status = "verified"
-            question_obj.save(update_fields=["solution_latex", "verification_status"])
+            question_obj.save(update_fields=["solution_latex"])
 
         payload = {
             "solution": solution_text,
             "reasoning": reasoning_text,
             "model": result.get("model_used", "deepseek-reasoner"),
             "course": course_code,
+            "topic": topic_title,
+            "question_type": question_type,
+            "source_signature": source_signature,
+            "source_references": validation_options["source_references"],
+            "study_profile_version": _course_study_profile_version(course_obj),
+            "topic_content_rules_version": _topic_content_rules_version(topic_obj),
+            "answer_validation_version": ANSWER_VALIDATION_VERSION,
             "generated_at": timezone.now().isoformat(),
         }
-        store_cached_content(cache_key, "solution_derivation", p_hash, payload)
+        store_cached_content(
+            cache_key,
+            "solution_derivation",
+            p_hash,
+            payload,
+            course=course_obj,
+            topic=topic_obj,
+        )
 
         return {
             "solution": solution_text,
@@ -2417,6 +3413,7 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             "model": result.get("model_used"),
             "usage": result.get("usage", {}),
             "sympy_check": sympy_res if sympy_res.get("success") else None,
+            "source_references": validation_options["source_references"],
         }
 
     return {
@@ -2434,6 +3431,9 @@ def generate_adapted_past_question(question_obj) -> dict:
     it to the shared topic question bank.
     """
     question_text = str(question_obj.question_latex or "").strip()
+    from services.prep_ingestion import assessment_question_rendering_issues
+
+    original_extraction_issues = assessment_question_rendering_issues(question_text)
     topic = question_obj.topic
     course_code = question_obj.paper.course.code if question_obj.paper else topic.course.code
     topic_title = question_obj.topic_label or (topic.title if topic else "Mathematics")
@@ -2446,6 +3446,21 @@ def generate_adapted_past_question(question_obj) -> dict:
         if subtopics:
             topic_context.append("Approved topic subtopics:\n" + "\n".join(f"- {item}" for item in subtopics))
     source_context = _approved_course_source_context(course_obj, topic_title, limit=4000)
+    source_document = question_obj.source_document
+    if source_document is None and question_obj.paper_id:
+        source_document = question_obj.paper.source_document
+    source_page_context = ""
+    if source_document and question_obj.source_page_number:
+        page_headers = list(re.finditer(
+            r"(?m)^--- Page (\d+)(?:\s+\([^\n]*\))? ---\s*$",
+            str(source_document.extracted_text or ""),
+        ))
+        for index, header in enumerate(page_headers):
+            if int(header.group(1)) != question_obj.source_page_number:
+                continue
+            end = page_headers[index + 1].start() if index + 1 < len(page_headers) else len(source_document.extracted_text)
+            source_page_context = str(source_document.extracted_text)[header.end():end].strip()[:2000]
+            break
     if source_context:
         topic_context.append("Approved course material excerpts:\n" + source_context)
     topic_context_block = "\n\n".join(topic_context) or "No approved topic notes are available. Use only the explicit topic and source fragments."
@@ -2454,12 +3469,17 @@ def generate_adapted_past_question(question_obj) -> dict:
         f"from {course_code}, topic '{topic_title}'.\n\n"
         f"Use this approved syllabus context to constrain the reconstruction:\n{topic_context_block}\n\n"
         f"Unreadable source extraction:\n{question_text}\n\n"
+        f"Source document ID: {source_document.pk if source_document else 'unknown'}\n"
+        f"Source page: {question_obj.source_page_number if question_obj.source_page_number else 'unknown'}\n"
+        f"Source-page context (verbatim):\n{source_page_context or 'No page-level text available.'}\n\n"
         f"Marks on the source: {question_obj.marks}.\n"
         "Use the approved topic context, visible fragments, source marks, and standard examination conventions. "
         "Do not introduce material outside the stated topic or pretend to reproduce the original wording. "
         "Create a mathematically coherent equivalent "
         "that tests the same likely skill. Include a complete step-by-step solution. Return only one JSON "
-        "object with keys: marks, topic_label, question_latex, solution_latex, hint. Use Markdown and KaTeX "
+        "object with keys: marks, topic_label, question_latex, solution_latex, hint, confidence. "
+        "Confidence is your estimate from 0 to 1, not proof of original wording. "
+        "Use Markdown and KaTeX "
         "delimiters exactly as requested, with no HTML and no code fences around the JSON."
     )
     system_prompt = (
@@ -2484,6 +3504,8 @@ def generate_adapted_past_question(question_obj) -> dict:
             topic_label=topic_title,
             is_complex_proof=True,
             system_prompt=system_prompt,
+            max_tokens_override=1400,
+            auto_continue=False,
         )
         model = result.get("model_used", model)
         usage = _merge_usage(usage, result.get("usage", {}))
@@ -2502,12 +3524,42 @@ def generate_adapted_past_question(question_obj) -> dict:
                 raise ValueError("; ".join(issues))
             item["question_latex"] = normalize_math_delimiters(item["question_latex"])
             item["solution_latex"] = normalize_math_delimiters(item["solution_latex"])
-            from services.prep_ingestion import assessment_question_rendering_issues
-
             source_issues = assessment_question_rendering_issues(item["question_latex"])
             if source_issues:
                 raise ValueError("reconstructed question failed extraction validation: " + "; ".join(source_issues))
-            return {"success": True, "question": item, "usage": usage, "model": model}
+            raw_confidence = item.get("confidence")
+            reconstruction_confidence = (
+                float(raw_confidence)
+                if isinstance(raw_confidence, (int, float))
+                and not isinstance(raw_confidence, bool)
+                and 0 <= raw_confidence <= 1
+                else None
+            )
+            source_document_id = str(source_document.pk) if source_document else None
+            source_page_number = question_obj.source_page_number
+            metadata = {
+                "review_status": "pending",
+                "reason": "The original extraction was flagged and is retained unchanged.",
+                "source_question_id": str(question_obj.pk),
+                "source_document_id": source_document_id,
+                "source_page_number": source_page_number,
+                "source_sha256": source_document.file_sha256 if source_document else "",
+                "original_transcription": question_text,
+                "original_extraction_issues": original_extraction_issues or ["manually flagged for reconstruction"],
+                "adapted_question_validation_issues": source_issues,
+                "source_page_context": source_page_context,
+                "approved_course_context": source_context,
+                "model_confidence": reconstruction_confidence,
+                "model": model,
+                "usage": usage,
+            }
+            return {
+                "success": True,
+                "question": item,
+                "reconstruction_metadata": metadata,
+                "usage": usage,
+                "model": model,
+            }
         except Exception as exc:
             last_error = str(exc)
 

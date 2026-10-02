@@ -91,12 +91,17 @@ class Command(BaseCommand):
 
             adapted_label = f"Adapted from Question {question.number}"
             existing = PrepQuestion.objects.filter(
-                paper=question.paper,
-                topic=topic,
                 question_type="adapted",
-                topic_label=adapted_label,
-                verification_status="verified",
+                reconstructed_from=question,
             ).first()
+            if existing is None:
+                existing = PrepQuestion.objects.filter(
+                    paper=question.paper,
+                    topic=topic,
+                    question_type="adapted",
+                    topic_label=adapted_label,
+                    verification_status__in=["pending", "verified"],
+                ).first()
             if existing:
                 already_repaired += 1
                 continue
@@ -126,13 +131,28 @@ class Command(BaseCommand):
                 PrepQuestion.objects.create(
                     paper=question.paper,
                     topic=topic,
+                    source_document=question.source_document or (
+                        question.paper.source_document if question.paper_id else None
+                    ),
+                    source_page_number=question.source_page_number,
+                    extraction_confidence=question.extraction_confidence,
+                    reconstructed_from=question,
+                    reconstruction_metadata=result.get("reconstruction_metadata", {
+                        "review_status": "pending",
+                        "reason": "Adapted from a flagged source question.",
+                        "source_question_id": str(question.pk),
+                        "source_document_id": str(question.source_document_id) if question.source_document_id else None,
+                        "source_page_number": question.source_page_number,
+                        "original_transcription": question.question_latex,
+                        "original_extraction_issues": issues,
+                    }),
                     question_type="adapted",
                     number=question.number,
                     marks=int(item.get("marks") or question.marks),
                     topic_label=adapted_label,
                     question_latex=item["question_latex"],
                     solution_latex=item["solution_latex"],
-                    verification_status="verified",
+                    verification_status="pending",
                 )
                 repaired += 1
             except Exception as exc:

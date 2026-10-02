@@ -33,6 +33,34 @@ VALID_CALLOUT_STYLES = {
 }
 
 
+def split_markdown_table_row(line: str) -> List[str] | None:
+    """Split a pipe-delimited row without treating escaped pipes as separators."""
+    stripped = line.strip()
+    if not stripped.startswith("|") or not stripped.endswith("|"):
+        return None
+
+    cells = []
+    current = []
+    escaped = False
+    last_was_separator = False
+    for char in stripped:
+        if char == "|" and not escaped:
+            cells.append("".join(current).strip())
+            current = []
+            last_was_separator = True
+        else:
+            current.append(char)
+            last_was_separator = False
+        if char == "\\":
+            escaped = not escaped
+        else:
+            escaped = False
+
+    if not last_was_separator or len(cells) < 3 or cells[0] != "":
+        return None
+    return cells[1:]
+
+
 def validate_structured_blocks(blocks: Any) -> Tuple[bool, str]:
     """
     Server-side validation for structured block notes.
@@ -194,8 +222,6 @@ def parse_markdown_to_blocks(raw_markdown: str) -> List[Dict[str, Any]]:
     text = str(raw_markdown).replace("\r\n", "\n").replace("\r", "\n")
     # Normalize escaped newlines
     text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
-    # Normalize unicode replacement characters
-    text = text.replace('\ufffd', '—')
 
     lines = text.split("\n")
     blocks: List[Dict[str, Any]] = []
@@ -308,22 +334,22 @@ def parse_markdown_to_blocks(raw_markdown: str) -> List[Dict[str, Any]]:
             continue
 
         # 7. Markdown Tables (| ... |)
-        if stripped.startswith("|") and stripped.endswith("|") and "|" in stripped[1:-1]:
+        if split_markdown_table_row(stripped) is not None:
             table_lines = [stripped]
             i += 1
-            while i < n and lines[i].strip().startswith("|") and lines[i].strip().endswith("|"):
+            while i < n and split_markdown_table_row(lines[i]) is not None:
                 table_lines.append(lines[i].strip())
                 i += 1
 
             if len(table_lines) >= 2:
-                headers = [c.strip() for c in table_lines[0].split("|")[1:-1]]
+                headers = split_markdown_table_row(table_lines[0]) or []
                 row_start = 1
-                # Skip separator row if present (|---|---|)
-                if re.match(r"^[|\s\-:]+$", table_lines[1]):
+                separator_cells = split_markdown_table_row(table_lines[1])
+                if separator_cells and all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator_cells):
                     row_start = 2
                 rows = []
                 for tl in table_lines[row_start:]:
-                    cells = [c.strip() for c in tl.split("|")[1:-1]]
+                    cells = split_markdown_table_row(tl) or []
                     # Normalise cell count to match headers
                     if len(cells) < len(headers):
                         cells.extend([""] * (len(headers) - len(cells)))

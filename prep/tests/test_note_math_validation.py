@@ -1,30 +1,42 @@
 import json
+import tempfile
 from unittest.mock import patch
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from accounts.models import User
+from prep.management.commands.reindex_course_topics import Command as ReindexCourseTopicsCommand
 from prep.models import (
     PrepContentCache,
     PrepCourse,
     PrepDocument,
+    PrepDocumentVisual,
     PrepNoteGenerationGuard,
     PrepNoteRepair,
     PrepQuestion,
     PrepTopic,
     PrepWallet,
 )
+from prep.content_rules import CONTENT_MODALITIES
 from services.prep_ai_router import (
+    ANSWER_VALIDATION_VERSION,
     NOTE_VALIDATION_STATE,
     NOTES_CACHE_VERSION,
     _nontechnical_solution_has_proof_scaffold,
     _display_math_issues,
     _latex_syntax_issues,
+    _markdown_table_issues,
     _markdown_theorem_issues,
     _note_allows_code,
     _note_completion_issues,
     _approved_course_source_context,
+    _approved_course_source_references,
+    _approved_visual_manifest,
+    _dedupe_approved_visual_images,
+    _insert_required_visual_markers,
+    _normalize_approved_visual_captions,
     _note_completion_issues,
     _topic_notes_cache_signature,
     compute_cache_key,
@@ -35,7 +47,22 @@ from services.prep_ai_router import (
     normalize_math_delimiters,
     repair_json_escaped_latex_newlines,
     robust_json_loads,
+    store_cached_content,
 )
+from services.prep_blocks import parse_markdown_to_blocks
+
+
+class ReindexCourseTopicReportTests(SimpleTestCase):
+    def test_numbered_nested_headings_are_not_reported_as_unrelated(self):
+        notes = "## 1. Concepts\n### 1.1 Subtopic\n#### 1.1.1 Detail\n## 2. Applications"
+
+        self.assertEqual(ReindexCourseTopicsCommand._heading_issues(notes), [])
+
+    def test_unnumbered_top_level_heading_is_reported(self):
+        self.assertEqual(
+            ReindexCourseTopicsCommand._heading_issues("## 1. Concepts\n## Appendix"),
+            ["unrelated heading: ## Appendix"],
+        )
 
 
 class NoteMathValidationTests(TestCase):
@@ -124,6 +151,15 @@ c_k &= \\begin{cases} [a_k, c_k], & \\text{if } f(a_k) f(c_k) < 0, \\\\
         self.assertIn("LaTeX environment cases is outside display math", issues)
         self.assertEqual(_latex_syntax_issues(f"$$\n{equation}\n$$"), [])
 
+    def test_tikz_and_center_environments_are_not_misclassified_as_math(self):
+        diagram = (
+            "\\begin{center}\n\\begin{tikzpicture}\n"
+            "\\draw (0,0) -- (1,1);\n"
+            "\\end{tikzpicture}\n\\end{center}"
+        )
+
+        self.assertEqual(_latex_syntax_issues(diagram), [])
+
     def test_code_block_dollar_signs_are_not_math_validation_errors(self):
         content = """```R
 result <- frame$column
@@ -137,6 +173,62 @@ $$ not mathematical output
             "missing section ## 4.",
             "missing section ## 5.",
         ])
+
+    def test_notes_reject_unknown_code_languages(self):
+        issues = _note_completion_issues(
+            "```madeuplang\nrun something\n```",
+            "Sequences",
+            allow_code=True,
+        )
+
+        self.assertIn("code block 1 uses unknown language 'madeuplang'", issues)
+
+    def test_mermaid_diagram_is_not_treated_as_programming_code(self):
+        content = "```mermaid\nflowchart TD\n  Start --> Finish\n```"
+        source_references = [{"document_id": "approved-doc", "page_number": 12, "visuals": []}]
+
+        issues = _note_completion_issues(
+            content,
+            "Sequences",
+            allow_code=False,
+            source_references=source_references,
+        )
+
+        self.assertNotIn("code block is not allowed for this topic", issues)
+        self.assertFalse(any("unknown language" in issue for issue in issues))
+
+    def test_embedded_figure_must_link_to_an_approved_crop(self):
+        content = "![Demand graph](invented-graph.svg)"
+        source_references = [{
+            "document_id": "approved-doc",
+            "page_number": 12,
+            "visuals": [{"visual_type": "graph", "crop": "approved-page-12.jpg"}],
+        }]
+
+        issues = _note_completion_issues(
+            content,
+            "Sequences",
+            source_references=source_references,
+        )
+
+        self.assertIn("embedded figure does not reference an approved source crop", issues)
+
+    def test_raw_html_image_is_rejected(self):
+        sections = [
+            f"## {index}. Section {index}\n\nThis section contains grounded explanatory material for students."
+            for index in range(1, 5)
+        ]
+        sections.append(
+            "## 5. Final Review\n\n"
+            + '<img src="/media/invented/diagram.png">\n\n'
+            + "The final review gives a source-grounded recap, explains a common misconception, "
+            + "and reminds students to check their interpretation against the assigned topic."
+        )
+        content = "\n\n".join(sections)
+
+        issues = _note_completion_issues(content, "Sequences")
+
+        self.assertIn("raw HTML visual markup is not allowed; use an approved visual marker", issues)
 
     def test_rejects_split_theorem_title_that_looks_like_a_list_item(self):
         content = "> **Theorem 3.5 (Invariance of Sufficiency Under One\n-to-One Transformations):** If T is sufficient."
@@ -171,6 +263,15 @@ $$ not mathematical output
             normalize_math_delimiters("The infimum is $\\inf S$; limits may tend to $\\infty$."),
             "The infimum is $\\inf S$; limits may tend to $\\infty$.",
         )
+
+    def test_escaped_pipe_in_math_table_cell_is_not_split_or_truncated(self):
+        markdown = "| Expression | Meaning |\n| --- | --- |\n| $a \\| b$ | One expression cell |"
+
+        blocks = parse_markdown_to_blocks(markdown)
+
+        self.assertEqual(_markdown_table_issues(markdown), [])
+        self.assertEqual(blocks[0]["headers"], ["Expression", "Meaning"])
+        self.assertEqual(blocks[0]["rows"], [["$a \\| b$", "One expression cell"]])
 
     def test_json_parser_preserves_square_brackets_inside_latex_strings(self):
         repair = {
@@ -305,7 +406,7 @@ $$ not mathematical output
         )
         question = "Explain social organisation."
         cache_key = compute_cache_key(
-            "solution", course.code, question[:50], "profile-v1", "explanatory-v1"
+            "solution", course.code, question[:50], "profile-v1", "topic-content-rules-v0", "explanatory-v1"
         )
         PrepContentCache.objects.create(
             cache_key=cache_key,
@@ -761,9 +862,9 @@ $$
         self.assertEqual(response.json()["credits_deducted"], 0)
         self.assertEqual(wallet.credits_balance, before)
 
+    @patch("services.prep_ai_router.route_math_request")
     @patch("prep.views.get_available_credits", return_value=100)
-    @patch("prep.views.get_or_generate_question_solution")
-    def test_stale_proof_solution_is_not_returned_for_social_science(self, generate_solution, _credits):
+    def test_stale_proof_solution_is_not_returned_for_social_science(self, _credits, route_request):
         self.course.study_profile = {
             "subject_family": "social_science",
             "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
@@ -779,10 +880,11 @@ $$
             solution_latex="## 2. Step-by-Step Rigorous Proof / Derivation\n\nLegacy answer.",
             verification_status="verified",
         )
-        generate_solution.return_value = {
-            "solution": "## Explanation and Analysis\n\nA source-grounded answer.",
-            "cached": True,
-            "model": "test-model",
+        route_request.return_value = {
+            "success": True,
+            "content": "## Explanation and Analysis\n\nA source-grounded answer that explains the concept clearly without a proof scaffold.",
+            "model_used": "test-model",
+            "usage": {"total_tokens": 10},
         }
         self.client.force_login(self.user)
 
@@ -796,8 +898,145 @@ $$
         self.assertEqual(response.status_code, 200)
         self.assertIn("Explanation and Analysis", response.json()["solution"])
         self.assertNotIn("Step-by-Step Rigorous Proof", response.json()["solution"])
-        self.assertEqual(question.solution_latex, "")
-        generate_solution.assert_called_once()
+        question.refresh_from_db()
+        self.assertIn("Explanation and Analysis", question.solution_latex)
+        self.assertNotIn("Step-by-Step Rigorous Proof", question.solution_latex)
+        route_request.assert_called_once()
+
+    @patch("prep.views.get_or_generate_question_solution")
+    def test_pending_question_with_stored_solution_is_blocked_before_api_cache_return(self, generate_solution):
+        question = PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            number=8,
+            marks=10,
+            topic_label=self.topic.title,
+            question_latex="Pending source question.",
+            solution_latex="Stale solution must not be shown.",
+            verification_status="pending",
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_solve_question"),
+            data=json.dumps({"question_id": question.id}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("pending tutor review", response.json()["error"])
+        self.assertNotIn("solution", response.json())
+        generate_solution.assert_not_called()
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_service_does_not_answer_flagged_question_object(self, route_request):
+        question = PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            number=9,
+            marks=5,
+            topic_label=self.topic.title,
+            question_latex="Unreadable source question.",
+            verification_status="flagged",
+        )
+
+        result = get_or_generate_question_solution(
+            question.question_latex,
+            self.course.code,
+            topic_label=self.topic.title,
+            question_obj=question,
+        )
+
+        self.assertEqual(result["solution"], "")
+        self.assertIn("pending tutor review", result["error"])
+        route_request.assert_not_called()
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_answer_cache_tracks_approved_source_and_rejects_invalid_cached_figure(self, route_request):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            source = PrepDocument.objects.create(
+                course=self.course,
+                doc_type="Lecture Notes",
+                topic_name=self.topic.title,
+                file=SimpleUploadedFile("sequence-answer-notes.pdf", b"source PDF"),
+                extracted_text="--- Page 8 ---\nA bounded monotone sequence converges to a finite limit.",
+                file_sha256="9" * 64,
+                stage="stage_3",
+            )
+            question = PrepQuestion.objects.create(
+                paper=None,
+                topic=self.topic,
+                source_document=source,
+                source_page_number=8,
+                question_type="authentic",
+                number=10,
+                marks=6,
+                topic_label=self.topic.title,
+                question_latex="Explain why a bounded monotone sequence converges.",
+                verification_status="auto_validated",
+            )
+            answer = "A bounded monotone sequence converges because its terms approach the supremum or infimum of its range."
+            route_request.side_effect = [
+                {"success": True, "content": answer, "model_used": "test-model", "usage": {"total_tokens": 10}},
+                {"success": True, "content": answer + " The source's hypotheses must still be checked.", "model_used": "test-model", "usage": {"total_tokens": 12}},
+                {"success": True, "content": answer, "model_used": "test-model", "usage": {"total_tokens": 10}},
+            ]
+
+            with patch("services.prep_ai_router.store_cached_content", wraps=store_cached_content) as cache_writer:
+                first = get_or_generate_question_solution(
+                    question.question_latex,
+                    self.course.code,
+                    topic_label=self.topic.title,
+                    question_obj=question,
+                )
+            self.assertTrue(first.get("solution"), first)
+            cache_writer.assert_called_once()
+            cache_rows = list(PrepContentCache.objects.filter(content_type="solution_derivation").values(
+                "cache_key", "course_id", "topic_id", "payload"
+            ))
+            self.assertTrue(cache_rows, {"cache_writer_call": str(cache_writer.call_args), "course_id": str(self.course.pk)})
+            first_cache = PrepContentCache.objects.get(content_type="solution_derivation", course=self.course)
+
+            self.assertEqual(first["solution"], answer)
+            self.assertEqual(first_cache.payload["answer_validation_version"], ANSWER_VALIDATION_VERSION)
+            self.assertEqual(first_cache.payload["source_references"][0]["document_id"], str(source.pk))
+            self.assertEqual(first_cache.payload["source_references"][0]["page_number"], 8)
+            self.assertIn("question type authentic", route_request.call_args_list[0].args[0])
+            self.assertIn("Page 8", route_request.call_args_list[0].args[0])
+
+            source.extracted_text = "--- Page 8 ---\nThe source now describes an alternating sequence and a different limit argument."
+            source.save(update_fields=["extracted_text"])
+            question.solution_latex = ""
+            question.save(update_fields=["solution_latex"])
+            second = get_or_generate_question_solution(
+                question.question_latex,
+                self.course.code,
+                topic_label=self.topic.title,
+                question_obj=question,
+            )
+            self.assertFalse(second["cached"])
+            self.assertEqual(route_request.call_count, 2)
+
+            second_cache = PrepContentCache.objects.exclude(pk=first_cache.pk).get(
+                content_type="solution_derivation",
+                course=self.course,
+            )
+            second_cache.payload["solution"] = "![Unapproved answer figure](/media/fake/plot.png)"
+            second_cache.save(update_fields=["payload"])
+            question.solution_latex = ""
+            question.save(update_fields=["solution_latex"])
+
+            third = get_or_generate_question_solution(
+                question.question_latex,
+                self.course.code,
+                topic_label=self.topic.title,
+                question_obj=question,
+            )
+
+            self.assertEqual(third["solution"], answer)
+            self.assertNotIn("Unapproved answer figure", third["solution"])
+            self.assertFalse(third["cached"])
+            self.assertEqual(route_request.call_count, 3)
 
     @patch("prep.views.get_or_generate_topic_notes")
     def test_rejected_note_generation_is_not_reported_as_a_server_error(self, generate_notes):
@@ -875,9 +1114,194 @@ $$
         cache.refresh_from_db()
         self.assertEqual(first_read["level_2"], self.valid_notes.strip())
         self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
+        self.assertEqual(cache.payload["source_references"], [])
+        self.assertTrue(cache.payload["source_signature"])
 
         second_read = get_published_topic_note_levels(self.topic)
         self.assertEqual(second_read["level_2"], self.valid_notes.strip())
+
+    def test_legacy_note_is_refreshed_with_required_visual_before_publication(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            source = PrepDocument.objects.create(
+                course=self.course,
+                topic_name="Full syllabus",
+                file=SimpleUploadedFile("sequence-source.pdf", b"pdf"),
+                extracted_text="--- Page 1 ---\nSequence convergence is illustrated by the source graph.",
+                stage="stage_3",
+            )
+            visual = PrepDocumentVisual.objects.create(
+                document=source,
+                candidate_key="c3" * 32,
+                page_number=1,
+                bbox=[10, 20, 210, 160],
+                crop=SimpleUploadedFile("sequence.jpg", b"sequence", content_type="image/jpeg"),
+                context_crop=SimpleUploadedFile("sequence-context.jpg", b"context", content_type="image/jpeg"),
+                visual_type="graph",
+                status="approved",
+                extracted_content={
+                    "auto_topic": self.topic.title,
+                    "auto_decision": "approved_high_confidence",
+                    "auto_match_terms": ["sequence", "convergence"],
+                    "context_after": "Sequence convergence is illustrated by the source graph.",
+                },
+            )
+            legacy_content = self.valid_notes.replace(
+                "## 1. One\n\nText.",
+                "## 1. One\n\nSequence convergence is illustrated by the source graph.",
+            )
+            cache = PrepContentCache.objects.create(
+                cache_key="notes:legacy:validation-testing:sequences:level_2",
+                content_type="topic_notes",
+                prompt_hash="legacy-without-visual-routing",
+                payload={"content": legacy_content, "level": "level_2"},
+                course=self.course,
+                topic=self.topic,
+            )
+
+            published = get_published_topic_note_levels(self.topic)
+
+            cache.refresh_from_db()
+            self.assertIn(f"]({visual.crop.url})", published["level_2"])
+            self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
+            self.assertEqual(
+                str(visual.pk),
+                cache.payload["source_references"][0]["visuals"][0]["visual_id"],
+            )
+
+    def test_topic_rule_change_unpublishes_notes_from_the_previous_rule_version(self):
+        PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:topic-rules-v0",
+            content_type="topic_notes",
+            prompt_hash="published-before-topic-rule-change",
+            payload={
+                "content": self.valid_notes,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": _topic_notes_cache_signature(
+                    self.course,
+                    self.topic,
+                    self.topic.title,
+                    self.topic.subtopics,
+                ),
+                "study_profile_version": self.course.study_profile_version,
+                "topic_content_rules_version": self.topic.content_rules_version,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+        self.assertIn("level_2", get_published_topic_note_levels(self.topic, validated_only=True))
+
+        self.topic.content_rules = {
+            "schema_version": 1,
+            "modalities": {
+                "graphs": {
+                    "policy": "disallowed",
+                    "rationale": "Graphs are not part of this topic's approved source.",
+                },
+            },
+        }
+        self.topic.save(update_fields=["content_rules"])
+        self.topic.refresh_from_db()
+
+        self.assertEqual(self.topic.content_rules_version, 1)
+        self.assertEqual(get_published_topic_note_levels(self.topic, validated_only=True), {})
+
+    def test_old_validated_visual_routing_cache_is_not_published(self):
+        for version, signature in (
+            ("validated-v3-source-modalities", "old-routing-signature"),
+            (NOTE_VALIDATION_STATE, "old-routing-signature"),
+        ):
+            PrepContentCache.objects.create(
+                cache_key=f"notes:published:validation-testing:sequences:{version}",
+                content_type="topic_notes",
+                prompt_hash=version,
+                payload={
+                    "content": self.valid_notes,
+                    "level": "level_2",
+                    "validation_state": version,
+                    "source_signature": signature,
+                    "study_profile_version": self.course.study_profile_version,
+                    "topic_content_rules_version": self.topic.content_rules_version,
+                },
+                course=self.course,
+                topic=self.topic,
+            )
+
+        self.assertEqual(get_published_topic_note_levels(self.topic), {})
+
+    def test_currently_marked_cache_with_blank_figure_map_is_not_published(self):
+        malformed = (
+            self.valid_notes
+            + "\n\n### Figure Recall Map\n\n"
+            + "| Figure marker | Concept |\n|---|---|\n|  | Demand curve |\n\n"
+            + "The figures ( and ) illustrate demand shifts."
+        )
+        PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:malformed-figure-map",
+            content_type="topic_notes",
+            prompt_hash="current-but-malformed",
+            payload={
+                "content": malformed,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": _topic_notes_cache_signature(
+                    self.course,
+                    self.topic,
+                    self.topic.title,
+                    self.topic.subtopics,
+                ),
+                "study_profile_version": self.course.study_profile_version,
+                "topic_content_rules_version": self.topic.content_rules_version,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+
+        self.assertEqual(get_published_topic_note_levels(self.topic), {})
+
+    def test_note_validation_requires_every_high_confidence_source_visual(self):
+        references = [{"visuals": [{
+            "visual_id": str(index),
+            "crop_url": f"/media/figure-{index}.jpg",
+            "auto_topic": self.topic.title,
+            "auto_decision": "approved_high_confidence",
+        } for index in range(1, 8)]}]
+
+        issues = _note_completion_issues(
+            self.valid_notes,
+            self.topic.title,
+            source_references=references,
+        )
+
+        self.assertTrue(any(issue.startswith("required approved source visual missing:") for issue in issues), issues)
+        manifest = _approved_visual_manifest(references)
+        self.assertEqual(len(manifest), 7)
+        self.assertTrue(all(visual["required"] for visual in manifest))
+
+    def test_note_validation_rejects_blank_figure_markers_and_placeholders(self):
+        content = (
+            self.valid_notes
+            + "\n\n### Figure Recall Map\n\n"
+            + "| Figure marker | Concept |\n|---|---|\n|  | Demand curve |\n\n"
+            + "The two demand figures ( and ) illustrate the shifts."
+        )
+
+        issues = _note_completion_issues(content, "Sequences")
+
+        self.assertTrue(any(issue.startswith("figure marker table row has no figure") for issue in issues), issues)
+        self.assertIn("figure summary contains empty reference placeholders", issues)
+
+    def test_note_validation_accepts_source_image_in_figure_marker_table(self):
+        image_url = "/media/ppf.jpg"
+        content = (
+            self.valid_notes
+            + f"\n\n| Figure marker | Concept |\n|---|---|\n| ![PPF]({image_url}) | Production possibility frontier |"
+        )
+        references = [{"visuals": [{"crop_url": image_url}]}]
+
+        issues = _note_completion_issues(content, "Sequences", source_references=references)
+
+        self.assertFalse(any(issue.startswith("figure marker table row has no figure") for issue in issues), issues)
 
     def test_approved_coursework_source_is_available_to_note_generation(self):
         PrepDocument.objects.create(
@@ -890,6 +1314,445 @@ $$
         source = _approved_course_source_context(self.course, "Sequences")
 
         self.assertIn("Approved R example", source)
+
+    @patch("services.prep_ai_router._repair_invalid_note_cache", return_value=None)
+    @patch("services.prep_ai_router.route_math_request")
+    def test_all_levels_reject_topic_disallowed_graphs_before_validation_cache(self, route_request, _repair):
+        course_rules = {
+            "schema_version": 1,
+            "modalities": {
+                modality: {"policy": "allowed", "evidence_required": True}
+                for modality in CONTENT_MODALITIES
+            },
+        }
+        course_rules["modalities"]["text"]["policy"] = "required"
+        self.course.study_profile = {
+            "subject_family": "statistics",
+            "capabilities": {"code": False, "math_notation": True, "chemical_equations": False},
+            "content_rules": course_rules,
+        }
+        self.course.study_profile_version = 1
+        self.course.save(update_fields=["study_profile", "study_profile_version"])
+        self.topic.content_rules = {
+            "schema_version": 1,
+            "modalities": {
+                "graphs": {
+                    "policy": "disallowed",
+                    "rationale": "The approved topic source does not support generated graphs.",
+                },
+            },
+        }
+        self.topic.save(update_fields=["content_rules"])
+        invalid_notes = self.valid_notes.replace(
+            "This final section has enough explanatory material",
+            "![Unsupported graph](generated-graph.svg)\n\n"
+            "This final section has enough explanatory material",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": invalid_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+
+        for level in ("level_1", "level_2", "level_3"):
+            result = get_or_generate_topic_notes(
+                self.course.code,
+                self.topic.title,
+                level=level,
+                course_obj=self.course,
+                topic_obj=self.topic,
+            )
+
+            self.assertTrue(result.get("validation_failed"), result)
+            self.assertEqual(result.get("notes"), "")
+
+        self.assertEqual(route_request.call_count, 3)
+        for cache in PrepContentCache.objects.filter(topic=self.topic, content_type="topic_notes"):
+            self.assertNotEqual(cache.payload.get("validation_state"), NOTE_VALIDATION_STATE)
+
+    @patch("services.prep_ai_router._repair_invalid_note_cache", return_value=None)
+    @patch("services.prep_ai_router.route_math_request")
+    def test_all_levels_reject_sociology_proof_scaffolds_before_validation_cache(self, route_request, _repair):
+        self.course.study_profile = {
+            "subject_family": "social_science",
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            "note_structure": ["One", "Two", "Three", "Four", "Five"],
+        }
+        self.course.study_profile_version = 1
+        self.course.save(update_fields=["study_profile", "study_profile_version"])
+        invalid_notes = self.valid_notes.replace(
+            "## 2. Two",
+            "## 2. Step-by-Step Rigorous Proof / Derivation",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": invalid_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+
+        for level in ("level_1", "level_2", "level_3"):
+            result = get_or_generate_topic_notes(
+                self.course.code,
+                self.topic.title,
+                level=level,
+                course_obj=self.course,
+                topic_obj=self.topic,
+            )
+
+            self.assertTrue(result.get("validation_failed"), result)
+            self.assertEqual(result.get("notes"), "")
+
+        self.assertEqual(route_request.call_count, 3)
+        for cache in PrepContentCache.objects.filter(topic=self.topic, content_type="topic_notes"):
+            self.assertNotEqual(cache.payload.get("validation_state"), NOTE_VALIDATION_STATE)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_invalid_approved_rules_stop_note_generation_before_model_call(self, route_request):
+        self.course.study_profile = {
+            "subject_family": "statistics",
+            "capabilities": {"code": True, "math_notation": True},
+            "content_rules": {"schema_version": 99, "modalities": {}},
+        }
+        self.course.study_profile_version = 1
+        self.course.save(update_fields=["study_profile", "study_profile_version"])
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(result.get("validation_failed"), result)
+        self.assertEqual(result.get("notes"), "")
+        route_request.assert_not_called()
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_generated_note_cache_keeps_approved_page_and_figure_references(self, route_request):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            signature_before_source = _topic_notes_cache_signature(
+                self.course, self.topic, self.topic.title, self.topic.subtopics
+            )
+            source = PrepDocument.objects.create(
+                course=self.course,
+                topic_name="Sequences",
+                file=SimpleUploadedFile("sequence-notes.pdf", b"pdf"),
+                extracted_text=(
+                    "--- Page 4 ---\nSequences are bounded and convergent. "
+                    "An approved sequence graph illustrates the limit."
+                ),
+                file_sha256="d" * 64,
+                stage="stage_3",
+            )
+            visual = PrepDocumentVisual.objects.create(
+                document=source,
+                candidate_key="e" * 64,
+                page_number=4,
+                bbox=[20, 30, 200, 240],
+                crop="prep/visual-crops/sequence-page-4.jpg",
+                visual_type="graph",
+                status="approved",
+                extracted_content={
+                    "caption": "Sequence limit illustration",
+                    "auto_topic": self.topic.title,
+                    "auto_decision": "approved_high_confidence",
+                    "auto_match_terms": ["sequence", "convergence"],
+                    "context_after": "The sequence graph illustrates convergence.",
+                },
+            )
+            route_request.return_value = {
+                "success": True,
+                "content": self.valid_notes.replace(
+                    "## 1. One\n\nText.",
+                    "## 1. One\n\nThe sequence graph illustrates convergence.",
+                ),
+                "model_used": "test-notes-model",
+                "usage": {},
+            }
+
+            result = get_or_generate_topic_notes(
+                self.course.code,
+                self.topic.title,
+                level="level_2",
+                course_obj=self.course,
+                topic_obj=self.topic,
+            )
+
+            signature_after_source = _topic_notes_cache_signature(
+                self.course, self.topic, self.topic.title, self.topic.subtopics
+            )
+            cache = PrepContentCache.objects.get(topic=self.topic, content_type="topic_notes")
+            references = cache.payload["source_references"]
+            self.assertTrue(result["notes"], result)
+            self.assertNotEqual(signature_before_source, signature_after_source)
+            self.assertEqual(references[0]["document_id"], str(source.pk))
+            self.assertEqual(references[0]["source_sha256"], "d" * 64)
+            self.assertEqual(references[0]["page_number"], 4)
+            self.assertEqual(references[0]["visuals"][0]["visual_id"], str(visual.pk))
+            self.assertEqual(references[0]["visuals"][0]["crop"], visual.crop.name)
+            self.assertEqual(references[0]["visuals"][0]["crop_url"], visual.crop.url)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_approved_visual_marker_resolves_to_crop_url_before_cache(self, route_request):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            source = PrepDocument.objects.create(
+                course=self.course,
+                topic_name="Sequences",
+                file=SimpleUploadedFile("sequence-figure.pdf", b"pdf"),
+                extracted_text="--- Page 4 ---\nSequences have terms that approach a limit; Figure 2 shows the source graph.",
+                file_sha256="f" * 64,
+                stage="stage_3",
+            )
+            visual = PrepDocumentVisual.objects.create(
+                document=source,
+                candidate_key="f1" * 32,
+                page_number=4,
+                bbox=[10, 20, 210, 160],
+                crop=SimpleUploadedFile("sequence-plot.jpg", b"approved-crop", content_type="image/jpeg"),
+                visual_type="graph",
+                labels=["n", "a_n"],
+                extracted_content={
+                    "caption": "Sequence terms",
+                    "auto_topic": self.topic.title,
+                    "auto_decision": "approved_high_confidence",
+                },
+                status="approved",
+            )
+            unapproved_visual = PrepDocumentVisual.objects.create(
+                document=source,
+                candidate_key="f2" * 32,
+                page_number=4,
+                bbox=[15, 25, 215, 165],
+                crop=SimpleUploadedFile("unreviewed-plot.jpg", b"unreviewed-crop", content_type="image/jpeg"),
+                visual_type="graph",
+                labels=["wrong", "labels"],
+                status="needs_review",
+            )
+            marker = f"[[VISUAL:{visual.pk}]]"
+            generated = self.valid_notes.replace("## 3. Three", f"{marker}\n\n## 3. Three")
+            route_request.return_value = {
+                "success": True,
+                "content": generated,
+                "model_used": "test-model",
+                "usage": {},
+            }
+
+            result = get_or_generate_topic_notes(
+                self.course.code,
+                self.topic.title,
+                level="level_2",
+                course_obj=self.course,
+                topic_obj=self.topic,
+            )
+
+            cache = PrepContentCache.objects.get(topic=self.topic, content_type="topic_notes")
+            prompt = route_request.call_args.args[0]
+            self.assertIn(f"]({visual.crop.url})", result["notes"])
+            self.assertNotIn("[[VISUAL:", result["notes"])
+            self.assertIn(marker, prompt)
+            self.assertNotIn(f"[[VISUAL:{unapproved_visual.pk}]]", prompt)
+            self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
+            self.assertEqual(cache.payload["source_references"][0]["visuals"][0]["visual_id"], str(visual.pk))
+
+    def test_topic_assigned_visual_includes_page_without_topic_title_keyword(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            source = PrepDocument.objects.create(
+                course=self.course,
+                topic_name="Full syllabus",
+                file=SimpleUploadedFile("source-pages.pdf", b"pdf"),
+                extracted_text=(
+                    "--- Page 2 ---\nThe course introduces sequences.\n\n"
+                    "--- Page 4 ---\nThe PPF illustrates scarcity and opportunity cost."
+                ),
+                file_sha256="a" * 64,
+                stage="stage_3",
+            )
+            visual = PrepDocumentVisual.objects.create(
+                document=source,
+                candidate_key="a1" * 32,
+                page_number=4,
+                bbox=[10, 20, 210, 160],
+                crop=SimpleUploadedFile("ppf.jpg", b"ppf-crop", content_type="image/jpeg"),
+                context_crop=SimpleUploadedFile("ppf-context.jpg", b"page-context", content_type="image/jpeg"),
+                visual_type="graph",
+                status="approved",
+                extracted_content={
+                    "auto_topic": self.topic.title,
+                    "auto_decision": "approved_high_confidence",
+                    "auto_match_terms": ["opportunity", "cost"],
+                    "context_before": "The straight PPF illustrates constant opportunity cost.",
+                    "context_after": "Beans and maize production possibilities.",
+                },
+            )
+
+            references = _approved_course_source_references(self.course, self.topic.title)
+
+            self.assertIn(4, [reference["page_number"] for reference in references])
+            figure = next(
+                item for reference in references for item in reference["visuals"]
+                if item["visual_id"] == str(visual.pk)
+            )
+            self.assertEqual(figure["auto_topic"], self.topic.title)
+            self.assertEqual(figure["context_before"], "The straight PPF illustrates constant opportunity cost.")
+            self.assertTrue(figure["context_crop_url"])
+
+    def test_visual_from_next_pdf_topic_section_is_excluded(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            other_topic = PrepTopic.objects.create(
+                course=self.course,
+                order=2,
+                title="Other Topic",
+                slug="other-topic",
+            )
+            source = PrepDocument.objects.create(
+                course=self.course,
+                topic_name="Full syllabus",
+                file=SimpleUploadedFile("sectioned-source.pdf", b"pdf"),
+                extracted_text=(
+                    "--- Page 1 ---\n1: Sequences\nA sequence graph appears here.\n\n"
+                    "--- Page 2 ---\nTopic 2: Other Topic\nA second topic figure appears here."
+                ),
+                stage="stage_3",
+            )
+            visual = PrepDocumentVisual.objects.create(
+                document=source,
+                candidate_key="b2" * 32,
+                page_number=2,
+                bbox=[10, 20, 210, 160],
+                crop=SimpleUploadedFile("other-topic.jpg", b"other-topic", content_type="image/jpeg"),
+                visual_type="graph",
+                status="approved",
+                extracted_content={
+                    "auto_topic": self.topic.title,
+                    "auto_decision": "approved_high_confidence",
+                },
+            )
+
+            references = _approved_course_source_references(self.course, self.topic.title)
+
+            self.assertNotIn(2, [reference["page_number"] for reference in references])
+            self.assertNotIn(
+                str(visual.pk),
+                [item["visual_id"] for reference in references for item in reference["visuals"]],
+            )
+            self.assertEqual(other_topic.title, "Other Topic")
+
+    def test_required_visual_is_inserted_after_matching_note_paragraph(self):
+        notes = (
+            "## 1. Concepts\n\n"
+            "Scarcity means limited resources and opportunity cost is the next best alternative.\n\n"
+            "## 2. Applications\n\n"
+            "Economic choices affect the production of goods."
+        )
+        manifest = [{
+            "marker": "[[VISUAL:123]]",
+            "required": True,
+            "auto_match_terms": ["opportunity", "cost", "scarcity"],
+            "context_before": "The straight PPF illustrates opportunity cost.",
+            "context_after": "Resources produce beans and maize.",
+        }]
+
+        updated = _insert_required_visual_markers(notes, manifest)
+
+        self.assertLess(updated.index("opportunity cost"), updated.index("[[VISUAL:123]]"))
+        self.assertLess(updated.index("[[VISUAL:123]]"), updated.index("## 2."))
+
+    def test_approved_visual_is_not_duplicated_in_one_note_level(self):
+        image = "![PPF](https://example.test/ppf.jpg)"
+        notes = f"Explanation one.\n\n{image}\n\nExplanation two.\n\n{image}"
+        references = [{"visuals": [{"crop_url": "https://example.test/ppf.jpg"}]}]
+
+        deduplicated = _dedupe_approved_visual_images(notes, references)
+
+        self.assertEqual(deduplicated.count(image), 1)
+
+    def test_approved_visual_caption_uses_neighboring_source_evidence(self):
+        image = "![Unclassified (source page 4)](/media/ppf.jpg)"
+        references = [{"visuals": [{
+            "crop_url": "/media/ppf.jpg",
+            "caption": "The slope of the PPF is marginal rate of transformation (MRT).",
+        }]}]
+
+        updated = _normalize_approved_visual_captions(image, references)
+
+        self.assertEqual(
+            updated,
+            "![The slope of the PPF is marginal rate of transformation (MRT).](/media/ppf.jpg)",
+        )
+
+    def test_approved_visual_caption_falls_back_to_neighboring_text(self):
+        image = "![Unclassified (source page 4)](/media/ppf.jpg)"
+        references = [{"visuals": [{
+            "crop_url": "/media/ppf.jpg",
+            "context_after": "The straight PPF represents constant opportunity cost.",
+        }]}]
+
+        updated = _normalize_approved_visual_captions(image, references)
+
+        self.assertEqual(
+            updated,
+            "![The straight PPF represents constant opportunity cost.](/media/ppf.jpg)",
+        )
+
+    def test_approved_visual_caption_ignores_download_footer(self):
+        image = "![Unclassified (source page 23)](/media/equilibrium.jpg)"
+        references = [{"visuals": [{
+            "crop_url": "/media/equilibrium.jpg",
+            "visual_type": "graph",
+            "context_after": "Downloaded by Student Example (student@example.test)",
+            "context_before": "The equilibrium graph shows excess demand when price rises above equilibrium.",
+        }]}]
+
+        updated = _normalize_approved_visual_captions(image, references)
+
+        self.assertEqual(
+            updated,
+            "![The equilibrium graph shows excess demand when price rises above equilibrium.](/media/equilibrium.jpg)",
+        )
+
+    def test_approved_visual_caption_uses_generic_type_when_context_is_only_a_footer(self):
+        image = "![Downloaded by Student Example (source page 23)](/media/graph.jpg)"
+        references = [{"visuals": [{
+            "crop_url": "/media/graph.jpg",
+            "visual_type": "graph",
+            "context_after": "Downloaded by Student Example (student@example.test)",
+            "context_before": "lOMoARcPSD|12345",
+        }]}]
+
+        updated = _normalize_approved_visual_captions(image, references)
+
+        self.assertEqual(updated, "![Graph](/media/graph.jpg)")
+
+    @patch("services.prep_ai_router._repair_invalid_note_cache", return_value=None)
+    @patch("services.prep_ai_router.route_math_request")
+    def test_unapproved_visual_marker_returns_no_publishable_notes(self, route_request, _repair):
+        invalid_notes = self.valid_notes.replace("## 3. Three", "[[VISUAL:999999]]\n\n## 3. Three")
+        route_request.return_value = {
+            "success": True,
+            "content": invalid_notes,
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(result.get("validation_failed"), result)
+        self.assertEqual(result.get("notes"), "")
+        self.assertIn("NO APPROVED SOURCE FIGURE IS AVAILABLE", route_request.call_args.args[0])
+        self.assertFalse(PrepContentCache.objects.filter(
+            topic=self.topic,
+            content_type="topic_notes",
+            payload__validation_state=NOTE_VALIDATION_STATE,
+        ).exists())
 
     def test_examination_papers_are_not_note_generation_sources(self):
         PrepDocument.objects.create(
@@ -912,6 +1775,12 @@ $$
                 "content": invalid_inf,
                 "level": "level_2",
                 "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": _topic_notes_cache_signature(
+                    self.course,
+                    self.topic,
+                    self.topic.title,
+                    self.topic.subtopics,
+                ),
             },
             course=self.course,
             topic=self.topic,
@@ -930,6 +1799,12 @@ $$
                 "content": self.valid_notes,
                 "level": "level_2",
                 "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": _topic_notes_cache_signature(
+                    self.course,
+                    self.topic,
+                    self.topic.title,
+                    self.topic.subtopics,
+                ),
             },
             course=self.course,
             topic=self.topic,
@@ -1050,6 +1925,137 @@ class SharedPracticeQuestionTests(TestCase):
         self.assertEqual(second["fresh_generated_count"], 0)
         route_request.assert_called_once()
 
+    @patch("services.prep_ai_router.route_math_request")
+    def test_variant_metadata_links_to_verified_source_and_rule_versions(self, route_request):
+        source = PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            verification_status="verified",
+            number=9,
+            marks=5,
+            topic_label=self.topic.title,
+            question_latex="Explain the monotone sequence convergence theorem.",
+            solution_latex="Use the theorem hypotheses and conclude convergence.",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": json.dumps([{
+                "number": 1,
+                "marks": 5,
+                "topic_label": "Sequence properties",
+                "question_latex": "Compare two monotone sequences and state the convergence condition.",
+                "solution_latex": "Check monotonicity and boundedness, then apply the convergence theorem.",
+                "hint": "Start with the two defining hypotheses.",
+            }]),
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = generate_similar_practice_questions(
+            self.course.code,
+            self.topic.title,
+            question_count=1,
+            topic_obj=self.topic,
+            course_obj=self.course,
+        )
+
+        variant = PrepQuestion.objects.get(topic=self.topic, question_type="generated")
+        self.assertTrue(result["success"], result)
+        self.assertEqual(variant.verification_status, "verified")
+        self.assertEqual(variant.reconstruction_metadata["variant_status"], "validated")
+        self.assertEqual(variant.reconstruction_metadata["source_question_ids"], [str(source.pk)])
+        self.assertEqual(variant.reconstruction_metadata["source_course_code"], self.course.code)
+        self.assertIn("validation_version", variant.reconstruction_metadata)
+        self.assertTrue(variant.reconstruction_metadata["source_signature"])
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_exact_duplicate_of_verified_source_is_not_saved(self, route_request):
+        source_text = "Explain the monotone sequence convergence theorem."
+        PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            verification_status="verified",
+            number=9,
+            marks=5,
+            topic_label=self.topic.title,
+            question_latex=source_text,
+            solution_latex="Use the theorem hypotheses and conclude convergence.",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": json.dumps([{
+                "number": 1,
+                "marks": 5,
+                "topic_label": "Sequence properties",
+                "question_latex": source_text,
+                "solution_latex": "Use the theorem hypotheses and conclude convergence.",
+                "hint": "Use the stated theorem.",
+            }]),
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = generate_similar_practice_questions(
+            self.course.code,
+            self.topic.title,
+            question_count=1,
+            topic_obj=self.topic,
+            course_obj=self.course,
+        )
+
+        self.assertFalse(result["success"])
+        self.assertIn("failed source, modality, or answer validation", result["error"])
+        self.assertFalse(PrepQuestion.objects.filter(topic=self.topic, question_type="generated").exists())
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_practice_prompt_uses_only_verified_question_samples(self, route_request):
+        PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            number=1,
+            marks=5,
+            topic_label=self.topic.title,
+            question_latex="VERIFIED_SAMPLE_MARKER: source-approved sequence question.",
+            verification_status="verified",
+        )
+        PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            number=2,
+            marks=5,
+            topic_label=self.topic.title,
+            question_latex="PENDING_SAMPLE_MARKER: unreviewed extraction.",
+            verification_status="pending",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": json.dumps([{
+                "number": 1,
+                "marks": 5,
+                "topic_label": "Sequence properties",
+                "question_latex": "Explain one property of a verified sequence.",
+                "solution_latex": "Use the definition and justify the conclusion with a complete explanation.",
+                "hint": "Start from the definition.",
+            }]),
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = generate_similar_practice_questions(
+            self.course.code,
+            self.topic.title,
+            question_count=1,
+            authentic_samples=["CALLER_SUPPLIED_UNVERIFIED_MARKER"],
+            topic_obj=self.topic,
+            course_obj=self.course,
+        )
+
+        prompt = route_request.call_args.args[0]
+        self.assertTrue(result["success"], result)
+        self.assertIn("VERIFIED_SAMPLE_MARKER", prompt)
+        self.assertNotIn("PENDING_SAMPLE_MARKER", prompt)
+        self.assertNotIn("CALLER_SUPPLIED_UNVERIFIED_MARKER", prompt)
+
     @patch("services.prep_ai_router.call_deepseek")
     @patch("services.prep_ai_router.route_math_request")
     def test_incomplete_practice_set_is_not_saved(self, route_request, continue_request):
@@ -1122,6 +2128,54 @@ class TopicStudyQuestionRenderingTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find")
+
+    @patch("services.prep_ai_router.get_or_generate_topic_notes")
+    def test_topic_page_displays_auto_validated_and_reconstructed_but_hides_pending(self, generate_notes):
+        generate_notes.return_value = {"notes": "## 1. Valid Notes", "cached": True}
+        original = PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            verification_status="flagged",
+            number=1,
+            marks=5,
+            question_latex="FLAGGED_ORIGINAL_MARKER",
+        )
+        PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="authentic",
+            verification_status="auto_validated",
+            number=2,
+            marks=5,
+            question_latex="AUTO_VALIDATED_SOURCE_MARKER",
+        )
+        PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="adapted",
+            verification_status="reconstructed",
+            reconstructed_from=original,
+            number=1,
+            marks=5,
+            topic_label="Reconstructed from Question 1",
+            question_latex="AUTO_RECONSTRUCTED_MARKER",
+            reconstruction_metadata={"review_status": "auto_validated", "model_confidence": 0.93},
+        )
+        PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="adapted",
+            verification_status="pending",
+            number=3,
+            marks=5,
+            question_latex="PENDING_ADAPTATION_MARKER",
+        )
+
+        response = self.client.get(reverse("prep:topic_study", kwargs={"topic_id": self.topic.id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "AUTO_VALIDATED_SOURCE_MARKER")
+        self.assertContains(response, "AUTO_RECONSTRUCTED_MARKER")
+        self.assertContains(response, "ADAPTED PAST QUESTION")
+        self.assertNotContains(response, "FLAGGED_ORIGINAL_MARKER")
+        self.assertNotContains(response, "PENDING_ADAPTATION_MARKER")
 
     @patch("services.prep_ai_router.call_deepseek")
     @patch("services.prep_ai_router.route_math_request")

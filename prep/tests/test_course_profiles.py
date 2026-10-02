@@ -11,7 +11,13 @@ from django.utils import timezone
 from accounts.models import User
 from prep.admin import PrepDocumentAdmin
 from prep.models import PrepContentUpdate, PrepCourse, PrepDocument, PrepTopic
-from services.prep_ai_router import get_or_generate_topic_notes, _note_allows_code, _note_completion_issues
+from prep.content_rules import legacy_course_rules, resolve_content_rules, validate_content_rule_set
+from services.prep_ai_router import (
+    get_or_generate_topic_notes,
+    _note_allows_code,
+    _note_completion_issues,
+    _note_validation_options,
+)
 from services.prep_ingestion import create_content_update_proposals, extract_course_study_profile
 
 
@@ -138,6 +144,68 @@ class CourseStudyProfileExtractionTests(TestCase):
         self.assertFalse(PrepContentUpdate.objects.filter(document=exam, update_type="course_profile").exists())
 
 
+class ContentRuleSchemaTests(TestCase):
+    def test_legacy_false_flags_remain_source_gated_not_permanently_disallowed(self):
+        rules = legacy_course_rules({
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False}
+        })
+
+        resolved = resolve_content_rules(rules)
+
+        self.assertEqual(resolved["modalities"]["code"]["policy"], "allowed")
+        self.assertTrue(resolved["modalities"]["code"]["evidence_required"])
+
+    def test_topic_rules_can_narrow_but_not_widen_course_rules(self):
+        evidence = [{"document_id": "doc-1", "page": 4, "excerpt": "R code examples."}]
+        course_rules = {
+            "schema_version": 1,
+            "modalities": {
+                "code": {"policy": "disallowed", "rationale": "No code in this course."},
+                "equations": {"policy": "allowed", "max_complexity": "extended", "evidence": evidence},
+            },
+        }
+        topic_rules = {
+            "schema_version": 1,
+            "modalities": {
+                "code": {"policy": "allowed", "evidence": evidence},
+            },
+        }
+
+        self.assertEqual(validate_content_rule_set(course_rules), [])
+        self.assertEqual(validate_content_rule_set(topic_rules), [])
+        with self.assertRaisesRegex(ValueError, "cannot enable course-disallowed"):
+            resolve_content_rules(course_rules, topic_rules)
+
+    def test_topic_rule_cannot_exceed_course_complexity(self):
+        evidence = [{"document_id": "doc-1", "page": 2, "excerpt": "Basic equations."}]
+        course_rules = {
+            "schema_version": 1,
+            "modalities": {"equations": {"policy": "allowed", "max_complexity": "basic", "evidence": evidence}},
+        }
+        topic_rules = {
+            "schema_version": 1,
+            "modalities": {"equations": {"policy": "allowed", "max_complexity": "extended", "evidence": evidence}},
+        }
+
+        resolved = resolve_content_rules(course_rules, topic_rules)
+
+        self.assertEqual(resolved["modalities"]["equations"]["max_complexity"], "basic")
+
+    def test_rule_evidence_must_reference_the_approved_source(self):
+        rules = {
+            "schema_version": 1,
+            "modalities": {"graphs": {
+                "policy": "allowed",
+                "evidence": [{"document_id": "other-doc", "page": 3, "excerpt": "Graph labels."}],
+            }},
+        }
+
+        self.assertIn(
+            "graphs evidence must reference the approved source document",
+            validate_content_rule_set(rules, source_document_id="approved-doc"),
+        )
+
+
 class ApprovedCourseStudyProfileTests(TestCase):
     def setUp(self):
         self.media_directory = tempfile.TemporaryDirectory()
@@ -212,6 +280,65 @@ class ApprovedCourseStudyProfileTests(TestCase):
         self.assertEqual(self.course.study_profile["subject_family"], "social_science")
         self.assertEqual(update.status, "approved")
 
+    def test_approved_topic_rules_are_persisted_and_versioned(self):
+        rules = {
+            "schema_version": 1,
+            "modalities": {
+                "graphs": {
+                    "policy": "disallowed",
+                    "rationale": "The approved sociology materials contain no graph-based instruction.",
+                },
+            },
+        }
+        update = PrepContentUpdate.objects.create(
+            document=self.document,
+            topic=self.topic,
+            update_type="topic_content_rules",
+            proposed_data={"content_rules": rules},
+            rationale="Reviewer-approved topic modality rule.",
+        )
+        model_admin = PrepDocumentAdmin(PrepDocument, admin.site)
+
+        applied = model_admin._apply_safe_content_updates(self.document, self.user, timezone.now())
+
+        self.topic.refresh_from_db()
+        update.refresh_from_db()
+        self.assertEqual(applied, 1)
+        self.assertEqual(self.topic.content_rules, rules)
+        self.assertEqual(self.topic.content_rules_version, 1)
+        self.assertEqual(update.status, "approved")
+
+    def test_topic_rules_from_unapproved_source_remain_pending(self):
+        rules = {
+            "schema_version": 1,
+            "modalities": {
+                "graphs": {
+                    "policy": "allowed",
+                    "evidence": [{
+                        "document_id": "different-document",
+                        "page": 4,
+                        "excerpt": "A labelled supply curve.",
+                    }],
+                },
+            },
+        }
+        update = PrepContentUpdate.objects.create(
+            document=self.document,
+            topic=self.topic,
+            update_type="topic_content_rules",
+            proposed_data={"content_rules": rules},
+        )
+        model_admin = PrepDocumentAdmin(PrepDocument, admin.site)
+
+        applied = model_admin._apply_safe_content_updates(self.document, self.user, timezone.now())
+
+        self.topic.refresh_from_db()
+        update.refresh_from_db()
+        self.assertEqual(applied, 0)
+        self.assertEqual(self.topic.content_rules, {})
+        self.assertEqual(self.topic.content_rules_version, 0)
+        self.assertEqual(update.status, "pending")
+
     @patch("services.prep_ai_router.route_math_request")
     def test_profile_controls_note_structure_and_forbids_unsupported_code_and_math(self, route_request):
         self.course.study_profile = self.profile
@@ -266,6 +393,80 @@ class ApprovedCourseStudyProfileTests(TestCase):
         self.assertTrue(_note_allows_code(self.course, "Matrices in R"))
 
     @patch("services.prep_ai_router.route_math_request")
+    def test_explicit_approved_rules_override_legacy_false_capability_flags(self, route_request):
+        evidence = [{
+            "document_id": str(self.document.pk),
+            "page": 1,
+            "excerpt": "R programming notes define matrix operations and products.",
+        }]
+        self.course.study_profile = {
+            **self.profile,
+            "subject_family": "computing",
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            "note_structure": [
+                "Intuition and Core Concepts",
+                "Mathematical Formalization",
+                "R Operations",
+                "Worked Matrix Example",
+                "Exam Applications and Common Errors",
+            ],
+            "content_rules": {
+                "schema_version": 1,
+                "modalities": {
+                    "text": {"policy": "required", "evidence_required": True},
+                    "equations": {"policy": "allowed", "evidence": evidence},
+                    "chemical_equations": {"policy": "disallowed", "rationale": "No reaction notation in this topic."},
+                    "code": {"policy": "allowed", "evidence": evidence},
+                    "graphs": {"policy": "disallowed", "rationale": "No graph source is approved for this topic."},
+                    "tables": {"policy": "allowed", "evidence_required": True},
+                    "arrow_diagrams": {"policy": "disallowed", "rationale": "No diagram source is approved for this topic."},
+                },
+            },
+        }
+        self.course.study_profile_version = 1
+        self.course.save(update_fields=["study_profile", "study_profile_version"])
+        self.document.topic_name = "Matrices in R"
+        self.document.extracted_text = (
+            "--- Page 1 ---\nR programming notes define matrix operations and products. "
+            "Matrix multiplication is represented by $AB=C$.\n```R\nA <- matrix(1:4, nrow=2)\n```"
+        )
+        self.document.save(update_fields=["topic_name", "extracted_text"])
+        self.topic.title = "Matrices in R"
+        self.topic.save(update_fields=["title"])
+        note_content = "\n\n".join([
+            "## 1. Intuition and Core Concepts\n\nMatrices organize values in rows and columns for structured computation.",
+            "## 2. Mathematical Formalization\n\nThe source represents a matrix product as $AB=C$ and explains how dimensions determine valid multiplication.",
+            "## 3. R Operations\n\nThe approved notes use R syntax to create matrices and select rows and columns.",
+            "## 4. Worked Matrix Example\n\n```R\nA <- matrix(1:4, nrow=2)\n```\nThis source example creates a two-row matrix.",
+            "## 5. Exam Applications and Common Errors\n\nCheck matrix dimensions before multiplying. Explain each operation and keep R indexing conventions clear. The final check is to interpret the resulting values in the context of the exercise.",
+        ])
+        route_request.return_value = {
+            "success": True,
+            "content": note_content,
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        options = _note_validation_options(
+            self.course,
+            self.topic.title,
+            self.topic.summary,
+            self.topic.subtopics,
+            topic_obj=self.topic,
+        )
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(options["allow_code"])
+        self.assertTrue(options["allow_math"])
+        self.assertEqual(result["notes"], note_content)
+
+    @patch("services.prep_ai_router.route_math_request")
     def test_all_note_levels_respect_math_and_code_capabilities(self, route_request):
         self.course.study_profile = {
             **self.profile,
@@ -304,3 +505,6 @@ class ApprovedCourseStudyProfileTests(TestCase):
         for prompt in prompts:
             self.assertIn("Include relevant source-supported equations", prompt)
             self.assertIn("Include source-supported code examples", prompt)
+        self.assertIn("Tone: Intuitive, accessible, and foundational (Level 1)", prompts[0])
+        self.assertIn("Tone: University Undergraduate Standard (Level 2)", prompts[1])
+        self.assertIn("Tone: Exam Mode & High-Yield Mastery (Level 3)", prompts[2])

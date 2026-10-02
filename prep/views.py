@@ -112,16 +112,20 @@ def _find_catalog_courses(query: str, *, limit: int = 12, include_category: bool
 
 def _public_topic_notes(topic):
     """Return the newest complete shared Level 2 notes without generating content."""
-    from services.prep_ai_router import _note_completion_issues
+    from services.prep_ai_router import _cache_payload_as_dict, get_published_topic_note_levels
 
-    cached_notes = PrepContentCache.objects.filter(
-        topic=topic,
-        content_type="topic_notes",
-    ).order_by("-updated_at", "-id")
-    for entry in cached_notes:
-        content = str(entry.payload.get("content", "") or "").strip()
-        if content and not _note_completion_issues(content, topic.title):
-            return content, entry.updated_at
+    published_levels = get_published_topic_note_levels(topic, validated_only=False)
+    content = published_levels.get("level_2", "")
+    if content:
+        entries = PrepContentCache.objects.filter(
+            topic=topic,
+            content_type="topic_notes",
+        ).order_by("-updated_at", "-id")
+        for entry in entries:
+            payload = _cache_payload_as_dict(entry.payload)
+            if payload and payload.get("level") == "level_2" and payload.get("content") == content:
+                return content, entry.updated_at
+        return content, None
     return "", None
 
 
@@ -138,7 +142,7 @@ def _public_topic_questions(topic):
     return (
         PrepQuestion.objects.filter(
             topic_match,
-            verification_status="verified",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         )
         .filter(Q(paper__isnull=True) | Q(paper__is_published=True))
         .select_related("paper")
@@ -463,7 +467,7 @@ def prep_course_detail(request, course_code):
         auth_count = PrepQuestion.objects.filter(
             Q(topic=t) | Q(topic_label__icontains=t.title),
             question_type__in=["authentic", "adapted"],
-            verification_status="verified",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         ).count()
         total_questions_count += auth_count
         raw_subtopics = t.subtopics if isinstance(t.subtopics, list) else []
@@ -482,7 +486,9 @@ def prep_course_detail(request, course_code):
             "title": p.title,
             "year": p.year,
             "marks": p.total_marks,
-            "questions_count": p.questions.filter(verification_status="verified").count(),
+            "questions_count": p.questions.filter(
+                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+            ).count(),
         })
 
     pending_documents = []
@@ -568,7 +574,7 @@ def prep_topic_study(request, topic_id):
     )
 
     # 1. Authentic KU CAT Questions for this topic
-    from services.prep_ai_router import normalize_math_delimiters
+    from services.prep_ai_router import normalize_math_delimiters, validated_question_solution
 
     authentic_qs = []
     q_filter = (
@@ -580,7 +586,7 @@ def prep_topic_study(request, topic_id):
         )
     ) & Q(
         question_type__in=["authentic", "adapted"],
-        verification_status="verified",
+        verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
     )
     authentic_records = PrepQuestion.objects.filter(
         q_filter,
@@ -590,7 +596,7 @@ def prep_topic_study(request, topic_id):
         paper_label = q.paper.title if q.paper else f"{course_code} Examination"
         year_label = q.paper.year if q.paper else "Official Examination"
         clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
-        clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+        clean_sol = validated_question_solution(q)
         has_formatting_errors = (
             bool(re.search(r"[\uf000-\uffff]||||||||||", q.question_latex or ""))
             or (q.question_latex and len(q.question_latex.strip()) < 15)
@@ -619,7 +625,7 @@ def prep_topic_study(request, topic_id):
     ).order_by("number")[:10]
     for q in gen_records:
         clean_g_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
-        clean_g_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+        clean_g_sol = validated_question_solution(q)
         generated_qs.append({
             "id": q.id,
             "number": q.number,
@@ -676,18 +682,21 @@ def prep_paper_detail(request, course_code, paper_id):
     """View questions of a specific CAT / Examination paper from DB."""
     clean_course = course_code.replace("-", " ").upper()
     wallet = PrepWallet.get_or_create_wallet(request.user)
+    from services.prep_ai_router import validated_question_solution
 
     paper = PrepPaper.objects.filter(id=paper_id).prefetch_related("questions").first()
 
     if paper:
         questions_list = []
-        for q in paper.questions.filter(verification_status="verified").order_by("number"):
+        for q in paper.questions.filter(
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+        ).order_by("number"):
             questions_list.append({
                 "number": q.number,
                 "marks": q.marks,
                 "topic": q.topic_label or "Mathematical Assessment",
                 "question_latex": q.question_latex,
-                "solution_latex": q.solution_latex,
+                "solution_latex": validated_question_solution(q),
             })
         paper_title = paper.title
         total_marks = paper.total_marks
@@ -1231,28 +1240,26 @@ def prep_solve_question_api(request):
         try:
             q_obj = PrepQuestion.objects.filter(id=int(question_id)).first()
             if q_obj:
+                if q_obj.verification_status not in PrepQuestion.ANSWERABLE_STATUSES:
+                    return JsonResponse({
+                        "success": False,
+                        "error": "This question is pending tutor review and cannot be answered yet.",
+                        "verification_status": q_obj.verification_status,
+                    }, status=409)
                 question_latex = q_obj.question_latex
                 course_code = q_obj.paper.course.code if q_obj.paper else (q_obj.topic.course.code if q_obj.topic else course_code)
                 topic_label = q_obj.topic_label or (q_obj.topic.title if q_obj.topic else topic_label)
                 # If already solved in DB, return at 0 credits
-                if q_obj.solution_latex:
-                    course_obj = q_obj.paper.course if q_obj.paper else (q_obj.topic.course if q_obj.topic else None)
-                    stale_proof_answer = (
-                        _question_solution_uses_nontechnical_format(course_obj)
-                        and _nontechnical_solution_has_proof_scaffold(q_obj.solution_latex)
-                    )
-                    if stale_proof_answer:
-                        q_obj.solution_latex = ""
-                        q_obj.save(update_fields=["solution_latex"])
-                    else:
-                        return JsonResponse({
-                            "success": True,
-                            "solution": q_obj.solution_latex,
-                            "cached": True,
-                            "credits_deducted": 0,
-                            "model": "Database Verified Cache ($0)",
-                            "credits_balance": wallet.credits_balance,
-                        })
+                stored_solution = validated_question_solution(q_obj)
+                if stored_solution:
+                    return JsonResponse({
+                        "success": True,
+                        "solution": stored_solution,
+                        "cached": True,
+                        "credits_deducted": 0,
+                        "model": "Database Validated Cache ($0)",
+                        "credits_balance": wallet.credits_balance,
+                    })
         except Exception:
             pass
 
@@ -1355,12 +1362,15 @@ def prep_adapt_question_api(request):
         ).first()
 
     adapted_label = f"Adapted from Question {question.number}"
+    from services.prep_ai_router import validated_question_solution
+
     existing = PrepQuestion.objects.filter(
         paper=question.paper,
         topic=target_topic or question.topic,
         question_type="adapted",
         topic_label=adapted_label,
-        verification_status="verified",
+        reconstructed_from=question,
+        verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
     ).first()
     wallet = PrepWallet.get_or_create_wallet(request.user)
     if existing:
@@ -1369,7 +1379,7 @@ def prep_adapt_question_api(request):
             "cached": True,
             "question_id": existing.id,
             "question_latex": existing.question_latex,
-            "solution_latex": existing.solution_latex,
+            "solution_latex": validated_question_solution(existing),
             "marks": existing.marks,
             "topic_label": existing.topic_label or "",
             "credits_deducted": 0,
@@ -1395,6 +1405,22 @@ def prep_adapt_question_api(request):
         return JsonResponse({"success": False, "error": result.get("error")}, status=422)
 
     item = result["question"]
+    answer_candidate = PrepQuestion(
+        paper=question.paper,
+        topic=target_topic or question.topic,
+        question_type="adapted",
+        verification_status="reconstructed",
+        topic_label=adapted_label,
+        question_latex=item["question_latex"],
+        solution_latex=item["solution_latex"],
+    )
+    validated_answer = validated_question_solution(answer_candidate)
+    if not validated_answer:
+        return JsonResponse({
+            "success": False,
+            "error": "The adapted solution failed current course/topic answer validation and was not saved.",
+        }, status=422)
+    item["solution_latex"] = validated_answer
     try:
         credits_deducted = credits_for_usage(result.get("usage"), minimum=minimum_cost)
         course_name = question.paper.course.code if question.paper else (question.topic.course.code if question.topic else "Course")
@@ -1415,16 +1441,33 @@ def prep_adapt_question_api(request):
             "credits_balance": get_available_credits(wallet),
         }, status=402)
 
+    reconstruction_metadata = result.get("reconstruction_metadata")
+    reconstruction_metadata = reconstruction_metadata if isinstance(reconstruction_metadata, dict) else {}
+    model_confidence = reconstruction_metadata.get("model_confidence")
+    auto_validated = (
+        isinstance(model_confidence, (int, float))
+        and not isinstance(model_confidence, bool)
+        and 0.8 <= model_confidence <= 1
+    )
+    reconstruction_metadata.update({
+        "review_status": "auto_validated" if auto_validated else "pending",
+        "auto_validation_threshold": 0.8,
+    })
     adapted = PrepQuestion.objects.create(
         paper=question.paper,
         topic=target_topic or question.topic,
+        source_document=question.source_document or (question.paper.source_document if question.paper_id else None),
+        source_page_number=question.source_page_number,
+        extraction_confidence=question.extraction_confidence,
+        reconstructed_from=question,
         question_type="adapted",
         number=question.number,
         marks=int(item.get("marks") or question.marks),
         topic_label=adapted_label,
         question_latex=item["question_latex"],
         solution_latex=item["solution_latex"],
-        verification_status="verified",
+        verification_status="reconstructed" if auto_validated else "pending",
+        reconstruction_metadata=reconstruction_metadata,
     )
     wallet.refresh_from_db()
     return JsonResponse({
@@ -1432,7 +1475,7 @@ def prep_adapt_question_api(request):
         "cached": False,
         "question_id": adapted.id,
         "question_latex": adapted.question_latex,
-        "solution_latex": adapted.solution_latex,
+        "solution_latex": validated_question_solution(adapted),
         "marks": adapted.marks,
         "topic_label": adapted.topic_label or "",
         "credits_deducted": credits_deducted,
@@ -1623,7 +1666,10 @@ def prep_generate_practice_api(request):
                     & Q(paper__course=topic_obj.course)
                     & Q(topic_label__icontains=topic_title)
                 )
-            ) & Q(question_type__in=["authentic", "adapted"], verification_status="verified"),
+            ) & Q(
+                question_type__in=["authentic", "adapted"],
+                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+            ),
         )[:3]
         for q in auth_qs:
             authentic_samples.append(f"Q{q.number} ({q.marks} marks): {q.question_latex}")
@@ -1744,6 +1790,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     if section == "questions_answers":
         if not topic:
             return HttpResponse("The requested syllabus topic was not found.", status=404)
+        from services.prep_ai_router import validated_question_solution
 
         topic_filter = (
             Q(topic=topic)
@@ -1752,11 +1799,14 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
                 & Q(paper__course=topic.course)
                 & Q(topic_label__icontains=topic_title)
             )
-        ) & Q(question_type__in=["authentic", "adapted"], verification_status="verified")
+        ) & Q(
+            question_type__in=["authentic", "adapted"],
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+        )
         authentic_records = PrepQuestion.objects.filter(
             topic_filter,
             question_type__in=["authentic", "adapted"],
-            verification_status="verified",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         ).select_related("paper").order_by("paper", "number", "id")
         generated_records = PrepQuestion.objects.filter(
             topic=topic,
@@ -1775,7 +1825,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
                     "marks": question.marks,
                     "topic": f"{source_label}: {question.topic_label or topic_title}",
                     "question_latex": question.question_latex,
-                    "solution_latex": question.solution_latex,
+                    "solution_latex": validated_question_solution(question),
                 })
 
         if not questions_data:
@@ -1805,7 +1855,11 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     # 1. Export the same published shared source shown on the study page.
     # This direct lookup avoids a second cache-key path producing a false
     # "No validated notes" response on a mobile download request.
-    from services.prep_ai_router import get_or_generate_topic_notes, get_published_topic_note_levels
+    from services.prep_ai_router import (
+        get_or_generate_topic_notes,
+        get_published_topic_note_levels,
+        validated_question_solution,
+    )
     published_notes = get_published_topic_note_levels(topic, validated_only=True) if topic else {}
     notes_content = published_notes.get(level, "")
     notes_res = {"notes": notes_content}
@@ -1835,7 +1889,10 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
             & Q(paper__course=topic.course)
             & Q(topic_label__icontains=topic_title)
         )
-        ) & Q(question_type__in=["authentic", "adapted"], verification_status="verified")
+        ) & Q(
+            question_type__in=["authentic", "adapted"],
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+        )
     authentic_qs = []
     for q in PrepQuestion.objects.filter(
         q_filter,
@@ -1847,7 +1904,7 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
             "paper_title": q.paper.title if q.paper else f"{course_code} Examination",
             "year": q.paper.year if q.paper else "Official Examination",
             "question_latex": q.question_latex,
-            "solution_latex": q.solution_latex,
+            "solution_latex": validated_question_solution(q),
         })
 
     # 3. Fetch practice questions for this topic
@@ -1856,14 +1913,14 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
         for q in PrepQuestion.objects.filter(
             topic=topic,
             question_type="generated",
-            verification_status="verified",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         ).order_by("number")[:10]:
             practice_qs.append({
                 "number": q.number,
                 "marks": q.marks,
                 "topic": q.topic_label or topic_title,
                 "question_latex": q.question_latex,
-                "solution_latex": q.solution_latex,
+                "solution_latex": validated_question_solution(q),
             })
 
     clean_slug = topic_title.lower().replace(" ", "_")[:35]
@@ -1899,6 +1956,8 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
 @login_required
 def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
     """Export a past paper as questions, answers, or the existing combined pack."""
+    from services.prep_ai_router import validated_question_solution
+
     paper = PrepPaper.objects.filter(id=paper_id).prefetch_related("questions").first()
 
     clean_course = course_code.replace("-", " ").upper()
@@ -1907,14 +1966,18 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
     total_marks = paper.total_marks if paper else 30
 
     questions_data = []
-    if paper and paper.questions.filter(verification_status="verified").exists():
-        for q in paper.questions.filter(verification_status="verified").order_by("number"):
+    if paper and paper.questions.filter(
+        verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+    ).exists():
+        for q in paper.questions.filter(
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+        ).order_by("number"):
             questions_data.append({
                 "number": q.number,
                 "marks": q.marks,
                 "topic": q.topic_label or "Mathematical Assessment",
                 "question_latex": q.question_latex,
-                "solution_latex": q.solution_latex,
+                "solution_latex": validated_question_solution(q),
             })
     elif paper:
         return HttpResponse(
