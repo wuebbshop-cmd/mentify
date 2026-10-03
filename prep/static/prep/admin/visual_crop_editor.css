@@ -1,0 +1,65 @@
+.visual-crop-editor {
+    max-width: 1000px;
+    margin: 8px 0 18px;
+}
+
+.visual-crop-stage {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    margin: 8px 0;
+    line-height: 0;
+    touch-action: none;
+    user-select: none;
+}
+
+.visual-source-page {
+    display: block;
+    width: auto;
+    max-width: min(100%, 900px);
+    max-height: 900px;
+    height: auto;
+    border: 1px solid #89939d;
+    background: #fff;
+}
+
+.visual-crop-selection {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid #e11d48;
+    background: rgb(225 29 72 / 6%);
+    cursor: move;
+}
+
+.visual-crop-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #be123c;
+    box-shadow: 0 0 0 1px #881337;
+}
+
+.visual-crop-handle.n { top: -7px; left: calc(50% - 6px); cursor: ns-resize; }
+.visual-crop-handle.ne { top: -7px; right: -7px; cursor: nesw-resize; }
+.visual-crop-handle.e { top: calc(50% - 6px); right: -7px; cursor: ew-resize; }
+.visual-crop-handle.se { right: -7px; bottom: -7px; cursor: nwse-resize; }
+.visual-crop-handle.s { bottom: -7px; left: calc(50% - 6px); cursor: ns-resize; }
+.visual-crop-handle.sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
+.visual-crop-handle.w { top: calc(50% - 6px); left: -7px; cursor: ew-resize; }
+.visual-crop-handle.nw { top: -7px; left: -7px; cursor: nwse-resize; }
+
+.visual-crop-save-hint {
+    display: inline-block;
+    margin-left: 10px;
+    color: #475569;
+}
+
+@media (max-width: 700px) {
+    .visual-crop-save-hint {
+        display: block;
+        margin: 8px 0;
+    }
+}

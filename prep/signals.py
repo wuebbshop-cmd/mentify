@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from .models import PrepContentCache, PrepNoteGenerationGuard, PrepTopic, PrepWallet
+from .models import PrepContentCache, PrepCourseEnrollment, PrepNoteGenerationGuard, PrepTopic, PrepWallet
 
 
 @receiver(post_save, sender=get_user_model())
@@ -32,3 +32,11 @@ def invalidate_notes_after_topic_source_change(sender, instance, created, **kwar
     if not created and getattr(instance, "_invalidate_topic_notes", False):
         PrepContentCache.objects.filter(topic=instance, content_type="topic_notes").delete()
         PrepNoteGenerationGuard.objects.filter(topic=instance).delete()
+
+
+@receiver(post_save, sender=PrepCourseEnrollment)
+def add_shared_cost_shares_for_new_course_member(sender, instance, created, **kwargs):
+    if created and instance.user.role == "learner":
+        from services.prep_course_billing import add_course_member_shares
+
+        add_course_member_shares(instance.user, instance.course)

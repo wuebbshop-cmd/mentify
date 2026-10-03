@@ -1,8 +1,19 @@
+import json
+from pathlib import Path
+from uuid import uuid4
+
+import fitz
 from django.contrib import admin
+from django import forms
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
+from django.db.models import Q
+from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.urls import reverse
+from django.urls import path, reverse
 from django.db.models import Count
 
 from .models import (
@@ -10,6 +21,7 @@ from .models import (
     PrepCourseEnrollment,
     PrepTopic,
     PrepDocument,
+    PrepDocumentVisual,
     PrepContentUpdate,
     PrepPaper,
     PrepQuestion,
@@ -103,6 +115,95 @@ class PrepPaperInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     fields = ("id", "title", "year", "total_marks", "is_published")
+
+
+def _open_visual_source_page(visual):
+    if not visual.document.file:
+        raise ValueError("The source PDF is not available.")
+    with visual.document.file.open("rb") as source_file:
+        pdf_bytes = source_file.read()
+    source = fitz.open(stream=pdf_bytes, filetype="pdf")
+    page_index = visual.page_number - 1
+    if page_index < 0 or page_index >= len(source):
+        source.close()
+        raise ValueError("The visual page number is outside the source PDF.")
+    return source, source[page_index]
+
+
+class VisualTopicFilter(admin.SimpleListFilter):
+    title = "Topic"
+    parameter_name = "visual_topic"
+
+    def lookups(self, request, model_admin):
+        topics = PrepTopic.objects.filter(
+            course__documents__visual_candidates__isnull=False,
+        ).select_related("course").distinct().order_by("course__code", "order", "title")
+        course_id = request.GET.get("document__course__id__exact")
+        if course_id and course_id.isdigit():
+            topics = topics.filter(course_id=course_id)
+        return [(str(topic.pk), f"{topic.course.code} / {topic.title}") for topic in topics]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+        topic = PrepTopic.objects.filter(pk=self.value()).first()
+        if not topic:
+            return queryset.none()
+        return queryset.filter(
+            Q(reviewed_topic=topic)
+            | Q(extracted_content__auto_topic=topic.title)
+            | Q(document__topic_name=topic.title)
+        )
+
+
+class PrepDocumentVisualReviewForm(forms.ModelForm):
+    bbox = forms.JSONField(widget=forms.HiddenInput)
+
+    class Meta:
+        model = PrepDocumentVisual
+        fields = ("status", "reviewed_topic", "review_notes", "bbox")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            topics = PrepTopic.objects.filter(course_id=self.instance.document.course_id)
+            self.fields["reviewed_topic"].queryset = topics
+            if not self.instance.reviewed_topic_id:
+                metadata = self.instance.extracted_content
+                suggested_topic = metadata.get("auto_topic") if isinstance(metadata, dict) else ""
+                match = topics.filter(title__iexact=suggested_topic).first() if suggested_topic else None
+                if match:
+                    self.initial["reviewed_topic"] = match.pk
+            self.initial["bbox"] = self.instance.bbox
+
+    def clean_bbox(self):
+        bbox = self.cleaned_data["bbox"]
+        if (
+            not isinstance(bbox, list)
+            or len(bbox) != 4
+            or any(not isinstance(value, (int, float)) or isinstance(value, bool) for value in bbox)
+        ):
+            raise forms.ValidationError("Select a valid crop rectangle on the source page.")
+        x0, y0, x1, y1 = map(float, bbox)
+        if x1 - x0 < 20 or y1 - y0 < 20:
+            raise forms.ValidationError("The crop must be at least 20 PDF points wide and high.")
+        try:
+            source, page = _open_visual_source_page(self.instance)
+        except (OSError, ValueError, fitz.FileDataError) as exc:
+            raise forms.ValidationError(f"Could not read the source page: {exc}") from exc
+        try:
+            page_rect = page.rect
+            if x0 < page_rect.x0 or y0 < page_rect.y0 or x1 > page_rect.x1 or y1 > page_rect.y1:
+                raise forms.ValidationError("Keep the crop rectangle inside the source page.")
+        finally:
+            source.close()
+        return [round(x0, 2), round(y0, 2), round(x1, 2), round(y1, 2)]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get("status") == "approved" and not cleaned_data.get("reviewed_topic"):
+            self.add_error("reviewed_topic", "Choose the topic this figure belongs to before approving it.")
+        return cleaned_data
 
 
 @admin.register(PrepDocument)
@@ -326,6 +427,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         published_documents_count = 0
         ingestion_failures = 0
         validation_failures = 0
+        courses_to_precompute = set()
         now = timezone.now()
 
         for doc in queryset:
@@ -379,6 +481,8 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                     allow_auto_approval=True,
                 )
             published_documents_count += 1
+            if doc.doc_type in {"Lecture Notes", "Revision Sheet"}:
+                courses_to_precompute.add(doc.course_id)
 
             # Auto-create or publish derived paper if doc is CAT or Exam
             if doc.doc_type in ["Continuous Assessment Test (CAT)", "Final Examination Paper"]:
@@ -429,10 +533,19 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             except Exception as e:
                 pass
 
+        queued_precomputations = 0
+        for course_id in courses_to_precompute:
+            from services.prep_note_precompute import enqueue_course_level_two_precompute
+
+            course = PrepCourse.objects.get(pk=course_id)
+            _, queued = enqueue_course_level_two_precompute(course)
+            queued_precomputations += int(queued)
+
         self.message_user(
             request,
             f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
             f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
+            f"Queued Level 2 note preparation for {queued_precomputations} course(s). "
             f"Blocked {ingestion_failures} document(s) whose ingestion did not complete and "
             f"{validation_failures} document(s) with validation errors."
         )
@@ -543,6 +656,249 @@ class PrepQuestionInline(admin.StackedInline):
         "question_latex",
         "solution_latex",
     )
+
+
+@admin.register(PrepDocumentVisual)
+class PrepDocumentVisualAdmin(admin.ModelAdmin):
+    form = PrepDocumentVisualReviewForm
+    list_display = (
+        "page_number",
+        "document_link",
+        "visual_type",
+        "topic_display",
+        "status",
+        "updated_at",
+    )
+    list_filter = ("status", "visual_type", "document__course", VisualTopicFilter)
+    search_fields = (
+        "document__course__code",
+        "document__course__title",
+        "document__topic_name",
+        "reviewed_topic__title",
+    )
+    readonly_fields = (
+        "document",
+        "page_number",
+        "visual_type",
+        "candidate_reasons",
+        "crop_editor",
+        "crop_preview",
+        "context_preview",
+        "context_text",
+        "neighboring_text",
+        "labels",
+        "extracted_content",
+        "reviewed_by",
+        "reviewed_at",
+        "created_at",
+        "updated_at",
+    )
+    fieldsets = (
+        ("Figure and Source Context", {
+            "fields": (
+                "document",
+                "page_number",
+                "visual_type",
+                "crop_editor",
+                "bbox",
+                "crop_preview",
+                "context_preview",
+                "neighboring_text",
+                "context_text",
+                "candidate_reasons",
+                "labels",
+                "extracted_content",
+            ),
+        }),
+        ("Review Decision", {
+            "fields": ("status", "reviewed_topic", "review_notes"),
+        }),
+        ("Review Audit", {
+            "fields": ("reviewed_by", "reviewed_at", "created_at", "updated_at"),
+        }),
+    )
+    ordering = ("status", "document__course__code", "page_number")
+    list_per_page = 25
+
+    class Media:
+        js = ("prep/admin/visual_crop_editor.js",)
+        css = {"all": ("prep/admin/visual_crop_editor.css",)}
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                "<path:object_id>/source-page/",
+                self.admin_site.admin_view(self.source_page_preview),
+                name="prep_prepdocumentvisual_source_page",
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            "document", "document__course", "reviewed_topic", "reviewed_by"
+        )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="Source document")
+    def document_link(self, obj):
+        url = reverse("admin:prep_prepdocument_change", args=(obj.document_id,))
+        return format_html('<a href="{}">{}</a>', url, obj.document)
+
+    @admin.display(description="Assigned topic")
+    def topic_display(self, obj):
+        if obj.reviewed_topic_id:
+            return obj.reviewed_topic.title
+        metadata = obj.extracted_content if isinstance(obj.extracted_content, dict) else {}
+        return metadata.get("auto_topic") or "Unassigned"
+
+    @staticmethod
+    def _image_preview(field, label):
+        try:
+            url = field.url if field else ""
+        except (ValueError, OSError):
+            url = ""
+        if not url:
+            return "No image available"
+        return format_html(
+            '<a href="{}" target="_blank"><img src="{}" alt="{}" '
+            'style="display:block;max-width:100%;max-height:520px;border:1px solid #bbb"></a>',
+            url,
+            url,
+            label,
+        )
+
+    @admin.display(description="Figure crop")
+    def crop_preview(self, obj):
+        return self._image_preview(obj.crop, f"Page {obj.page_number} figure crop")
+
+    @admin.display(description="Full-width neighboring context")
+    def context_preview(self, obj):
+        return self._image_preview(obj.context_crop, f"Page {obj.page_number} surrounding context")
+
+    @admin.display(description="Adjust crop on original PDF page")
+    def crop_editor(self, obj):
+        if not obj or not obj.pk:
+            return "Save the visual before adjusting its crop."
+        try:
+            source, page = _open_visual_source_page(obj)
+        except (OSError, ValueError, fitz.FileDataError):
+            return "Original PDF page is unavailable."
+        try:
+            page_width = page.rect.width
+            page_height = page.rect.height
+        finally:
+            source.close()
+        preview_url = reverse("admin:prep_prepdocumentvisual_source_page", args=(obj.pk,))
+        bbox_json = json.dumps(obj.bbox)
+        return format_html(
+            '<div class="visual-crop-editor" data-page-width="{}" data-page-height="{}" '
+            'data-saved-bbox="{}" data-preview-url="{}">'
+            '<p>Drag inside the red box to move it. Drag an edge or corner to include clipped labels.</p>'
+            '<div class="visual-crop-stage"><img class="visual-source-page" src="{}" alt="Original page {}">'
+            '<div class="visual-crop-selection" aria-label="Selected crop">'
+            '<button type="button" class="visual-crop-handle n" data-edge="n" aria-label="Resize top"></button>'
+            '<button type="button" class="visual-crop-handle ne" data-edge="ne" aria-label="Resize top right"></button>'
+            '<button type="button" class="visual-crop-handle e" data-edge="e" aria-label="Resize right"></button>'
+            '<button type="button" class="visual-crop-handle se" data-edge="se" aria-label="Resize bottom right"></button>'
+            '<button type="button" class="visual-crop-handle s" data-edge="s" aria-label="Resize bottom"></button>'
+            '<button type="button" class="visual-crop-handle sw" data-edge="sw" aria-label="Resize bottom left"></button>'
+            '<button type="button" class="visual-crop-handle w" data-edge="w" aria-label="Resize left"></button>'
+            '<button type="button" class="visual-crop-handle nw" data-edge="nw" aria-label="Resize top left"></button>'
+            '</div></div>'
+            '<button type="button" class="button visual-crop-reset">Reset crop</button>'
+            '<span class="visual-crop-save-hint">Crop changes are rendered from the original PDF when saved.</span>'
+            '</div>',
+            page_width,
+            page_height,
+            bbox_json,
+            preview_url,
+            preview_url,
+            obj.page_number,
+        )
+
+    def source_page_preview(self, request, object_id):
+        visual = self.get_object(request, object_id)
+        if not visual:
+            raise Http404("Visual candidate not found.")
+        if not self.has_view_or_change_permission(request, visual):
+            raise PermissionDenied
+        try:
+            source, page = _open_visual_source_page(visual)
+            try:
+                page_image = page.get_pixmap(matrix=fitz.Matrix(1.2, 1.2), alpha=False).tobytes("png")
+            finally:
+                source.close()
+        except (OSError, ValueError, fitz.FileDataError) as exc:
+            raise Http404("Could not render the original source page.") from exc
+        response = HttpResponse(page_image, content_type="image/png")
+        response["Cache-Control"] = "private, no-store"
+        return response
+
+    @staticmethod
+    def _render_crop(visual, bbox):
+        try:
+            source, page = _open_visual_source_page(visual)
+        except (OSError, ValueError, fitz.FileDataError) as exc:
+            raise ValidationError(f"Could not read the source PDF: {exc}") from exc
+        try:
+            rect = fitz.Rect(bbox)
+            if not page.rect.contains(rect) or rect.width < 20 or rect.height < 20:
+                raise ValidationError("The crop rectangle must be inside the source page and at least 20 points wide and high.")
+            return page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=rect, alpha=False).tobytes("jpeg")
+        finally:
+            source.close()
+
+    @admin.display(description="Text before and after figure")
+    def neighboring_text(self, obj):
+        metadata = obj.extracted_content if isinstance(obj.extracted_content, dict) else {}
+        return format_html(
+            "<strong>Before</strong><pre>{}</pre><strong>After</strong><pre>{}</pre>",
+            metadata.get("context_before", ""),
+            metadata.get("context_after", ""),
+        )
+
+    def save_model(self, request, obj, form, change):
+        crop_bytes = self._render_crop(obj, obj.bbox) if change and "bbox" in form.changed_data else None
+        metadata = dict(obj.extracted_content) if isinstance(obj.extracted_content, dict) else {}
+        if obj.status == "approved":
+            if not obj.reviewed_topic_id or obj.reviewed_topic.course_id != obj.document.course_id:
+                raise forms.ValidationError("Choose a topic from this document's course before approving.")
+            metadata.update({
+                "auto_topic": obj.reviewed_topic.title,
+                "auto_decision": "tutor_approved",
+                "auto_match_method": "tutor_review",
+            })
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+        elif obj.status == "rejected":
+            metadata.update({
+                "auto_decision": "tutor_rejected",
+                "auto_match_method": "tutor_review",
+            })
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+        else:
+            if metadata.get("auto_decision") in {"tutor_approved", "tutor_rejected"}:
+                metadata.pop("auto_decision", None)
+                metadata["auto_match_method"] = "tutor_review_reopened"
+            obj.reviewed_by = None
+            obj.reviewed_at = None
+        obj.extracted_content = metadata
+        super().save_model(request, obj, form, change)
+        if crop_bytes:
+            original_path = Path(obj.crop.name)
+            obj.crop.save(
+                f"{original_path.stem}-edited-{uuid4().hex[:8]}.jpg",
+                ContentFile(crop_bytes),
+                save=False,
+            )
+            obj.save(update_fields=["crop", "updated_at"])
 
 
 @admin.register(PrepPaper)
@@ -839,7 +1195,15 @@ class PrepNoteGenerationGuardAdmin(admin.ModelAdmin):
 
     @admin.action(description="Allow another validated note generation attempt")
     def reset_generation_guards(self, request, queryset):
+        guards = list(queryset.values("topic_id", "level", "source_signature"))
         count = queryset.update(status="open", failed_attempts=0, last_error="", last_failed_at=None, notification_sent_at=None)
+        for guard in guards:
+            PrepNoteRepair.objects.filter(
+                topic_id=guard["topic_id"],
+                level=guard["level"],
+                source_signature=guard["source_signature"],
+                status="needs_review",
+            ).update(status="open", attempts=0, last_error="")
         self.message_user(request, f"Reset {count} note generation guard(s).")
 
 

@@ -8,10 +8,14 @@ import json
 
 import fitz
 from PIL import Image
+from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
 
+from accounts.models import User
+from prep.admin import PrepDocumentVisualAdmin
 from prep.models import PrepCourse, PrepDocument, PrepDocumentVisual, PrepTopic
 from services.prep_ingestion import (
     inspect_pdf_visual_candidates,
@@ -638,6 +642,123 @@ class PdfVisualStorageTests(TestCase):
             visual.extracted_content["auto_match_method"],
             "pdf_topic_section_context_needs_review",
         )
+
+    def test_admin_can_review_visual_and_manual_assignment_is_preserved(self):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            course = PrepCourse.objects.create(
+                code="VIS 120",
+                title="Visual Admin Review Testing",
+                slug="visual-admin-review-testing",
+            )
+            selected_topic = PrepTopic.objects.create(
+                course=course,
+                order=1,
+                title="Scarcity and Choice",
+                slug="visual-review-scarcity",
+            )
+            heading_topic = PrepTopic.objects.create(
+                course=course,
+                order=2,
+                title="Market Structures",
+                slug="visual-review-markets",
+            )
+            document = PrepDocument.objects.create(
+                course=course,
+                file=SimpleUploadedFile("visual-review.pdf", build_pdf(draw_graph=True)),
+                stage="stage_3",
+                extracted_text="--- Page 1 ---\n2: Market Structures\nA graph shows price and quantity.",
+            )
+            visual = PrepDocumentVisual.objects.create(
+                document=document,
+                candidate_key="a5" * 32,
+                page_number=1,
+                bbox=[20, 30, 200, 200],
+                crop=SimpleUploadedFile("review-figure.jpg", b"figure", content_type="image/jpeg"),
+                context_crop=SimpleUploadedFile("review-context.jpg", b"context", content_type="image/jpeg"),
+                status="needs_review",
+                extracted_content={"context_before": "Market Structures heading"},
+            )
+            reviewer = User.objects.create_user(
+                username="visual_admin_reviewer",
+                email="visual-admin-reviewer@example.test",
+                password="Valid123",
+            )
+            reviewer.is_staff = True
+            reviewer.is_superuser = True
+            reviewer.save(update_fields=["is_staff", "is_superuser"])
+            self.client.force_login(reviewer)
+
+            self.assertIsInstance(admin.site._registry[PrepDocumentVisual], PrepDocumentVisualAdmin)
+            change_url = reverse("admin:prep_prepdocumentvisual_change", args=[visual.pk])
+            response = self.client.get(change_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, "Full-width neighboring context")
+            self.assertContains(response, "Adjust crop on original PDF page")
+            self.assertContains(response, "Market Structures heading")
+            source_page_url = reverse("admin:prep_prepdocumentvisual_source_page", args=[visual.pk])
+            source_page_response = self.client.get(source_page_url)
+            self.assertEqual(source_page_response.status_code, 200)
+            self.assertEqual(source_page_response["Content-Type"], "image/png")
+            old_crop_name = visual.crop.name
+
+            response = self.client.post(change_url, {
+                "status": "approved",
+                "reviewed_topic": str(selected_topic.pk),
+                "review_notes": "Figure evidence supports this topic.",
+                "bbox": json.dumps([80, 100, 480, 540]),
+                "_save": "Save",
+            })
+
+            self.assertEqual(response.status_code, 302)
+            visual.refresh_from_db()
+            self.assertEqual(visual.status, "approved")
+            self.assertEqual(visual.reviewed_topic, selected_topic)
+            self.assertEqual(visual.reviewed_by, reviewer)
+            self.assertIsNotNone(visual.reviewed_at)
+            self.assertEqual(visual.review_notes, "Figure evidence supports this topic.")
+            self.assertEqual(visual.extracted_content["auto_decision"], "tutor_approved")
+            self.assertEqual(visual.bbox, [80, 100, 480, 540])
+            self.assertNotEqual(visual.crop.name, old_crop_name)
+            with visual.crop.storage.open(visual.crop.name, "rb") as crop_file:
+                updated_crop = crop_file.read()
+            self.assertTrue(updated_crop.startswith(b"\xff\xd8"))
+            self.assertEqual(Image.open(BytesIO(updated_crop)).size, (800, 880))
+            topic_list_url = reverse("admin:prep_prepdocumentvisual_changelist")
+            topic_list_response = self.client.get(topic_list_url, {"visual_topic": str(selected_topic.pk)})
+            self.assertEqual(topic_list_response.status_code, 200)
+            self.assertContains(topic_list_response, selected_topic.title)
+
+            assignments = assign_visuals_to_topics(
+                document,
+                [selected_topic, heading_topic],
+                allow_auto_approval=True,
+            )
+            visual.refresh_from_db()
+            self.assertEqual(assignments["approved"], 0)
+            self.assertEqual(visual.reviewed_topic, selected_topic)
+            self.assertEqual(visual.extracted_content["auto_decision"], "tutor_approved")
+
+            rejected_visual = PrepDocumentVisual.objects.create(
+                document=document,
+                candidate_key="a6" * 32,
+                page_number=1,
+                bbox=[210, 30, 390, 200],
+                crop=SimpleUploadedFile("irrelevant-figure.jpg", b"figure", content_type="image/jpeg"),
+                status="needs_review",
+            )
+            rejected_url = reverse("admin:prep_prepdocumentvisual_change", args=[rejected_visual.pk])
+            response = self.client.post(rejected_url, {
+                "status": "rejected",
+                "reviewed_topic": "",
+                "review_notes": "This figure is unrelated to the course topic.",
+                "bbox": json.dumps(rejected_visual.bbox),
+                "_save": "Save",
+            })
+            self.assertEqual(response.status_code, 302)
+            rejected_visual.refresh_from_db()
+            self.assertEqual(rejected_visual.status, "rejected")
+            self.assertEqual(rejected_visual.reviewed_by, reviewer)
+            self.assertEqual(rejected_visual.extracted_content["auto_decision"], "tutor_rejected")
 
     @patch("services.prep_ingestion.upload_to_github_storage", return_value="")
     def test_document_ingestion_keeps_text_and_persists_visual_candidates_without_vision(self, _upload):

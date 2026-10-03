@@ -1505,6 +1505,8 @@ def prep_topic_notes_api(request):
         level = "level_2"
 
     wallet = PrepWallet.get_or_create_wallet(request.user)
+    balance_before_notes = get_available_credits(wallet)
+    credits_deducted = 0
 
     topic_obj = None
     if topic_id and str(topic_id).isdigit():
@@ -1518,9 +1520,21 @@ def prep_topic_notes_api(request):
 
     subtopics = topic_obj.subtopics if (topic_obj and isinstance(topic_obj.subtopics, list)) else []
 
+    from services.prep_course_billing import ensure_note_access
+    if topic_obj:
+        allowed, available_credits = ensure_note_access(request.user, topic_obj, level)
+        credits_deducted = max(0, balance_before_notes - available_credits)
+        if not allowed:
+            return JsonResponse({
+                "success": False,
+                "error": "Your course share for this topic is not covered by your current credits. Top up to unlock this and later topics.",
+                "level": level,
+                "credits_balance": available_credits,
+                "credits_deducted": credits_deducted,
+            }, status=402)
+
     # Use the same published-level source that rendered the notes on the page.
-    # This makes a visible shared level unconditionally free, even if an older
-    # cache-key lookup would otherwise report that generation is required.
+    # Shared notes are returned only after this learner's course share is settled.
     from services.prep_ai_router import get_published_topic_note_levels
     published_notes = get_published_topic_note_levels(topic_obj, validated_only=True) if topic_obj else {}
     if level in published_notes:
@@ -1530,7 +1544,7 @@ def prep_topic_notes_api(request):
             "notes": published_notes[level],
             "level": level,
             "cached": True,
-            "credits_deducted": 0,
+            "credits_deducted": credits_deducted,
             "credits_balance": wallet.credits_balance,
             "model": "Published Shared Notes",
         })
@@ -1548,12 +1562,29 @@ def prep_topic_notes_api(request):
         generate_if_missing=False,
     )
 
+    if cached_res.get("needs_review"):
+        wallet.refresh_from_db()
+        return JsonResponse({
+            "success": False,
+            "needs_review": True,
+            "error": cached_res.get("error") or "These notes are awaiting tutor review.",
+            "level": level,
+            "credits_deducted": 0,
+            "credits_balance": wallet.credits_balance,
+        }, status=409)
+
     if cached_res.get("notes") or cached_res.get("content"):
         res = cached_res
     else:
         required_balance = estimated_generation_credits(minimum=1)
+        trial_exempt = False
+        if topic_obj:
+            from services.prep_course_billing import is_trial_exempt_for_course_cost
+
+            trial_exempt = is_trial_exempt_for_course_cost(wallet, "topic_notes", level)
         if (
             not cached_res.get("regenerated_from_invalid_cache")
+            and not trial_exempt
             and get_available_credits(wallet) < required_balance
         ):
             return JsonResponse({
@@ -1574,14 +1605,50 @@ def prep_topic_notes_api(request):
             topic_obj=topic_obj,
         )
 
+    if res.get("needs_review"):
+        wallet.refresh_from_db()
+        return JsonResponse({
+            "success": False,
+            "needs_review": True,
+            "error": res.get("error") or "These notes are awaiting tutor review.",
+            "level": level,
+            "credits_deducted": 0,
+            "credits_balance": wallet.credits_balance,
+        }, status=409)
+
     if res.get("error") and not res.get("notes"):
         # The provider may return structurally invalid notes. That is an
         # expected validation rejection, not an application/server failure.
         status = 422 if res.get("validation_failed") else 502
         return JsonResponse({"success": False, "error": res["error"]}, status=status)
 
-    credits_deducted = 0
-    if not res.get("cached") and not res.get("regenerated_from_invalid_cache"):
+    cost = None
+    if topic_obj and not res.get("cached"):
+        from services.prep_course_billing import create_shared_course_cost, settle_course_cost_share
+        from services.prep_ai_router import _topic_notes_cache_signature
+
+        usage = res.get("usage") or {}
+        cost = create_shared_course_cost(
+            course=topic_obj.course,
+            cost_type="topic_notes",
+            total_credits=credits_for_usage(usage, minimum=1),
+            source_key=(
+                f"topic-notes:{topic_obj.pk}:{level}:"
+                f"{_topic_notes_cache_signature(topic_obj.course, topic_obj, topic_title, subtopics)}"
+            ),
+            topic=topic_obj,
+            level=level,
+            usage=usage,
+            model_name=res.get("model", "deepseek-chat"),
+        )
+        current_share = cost.shares.filter(user=request.user).first()
+        paid_before = current_share.paid_credits if current_share else 0
+        for share in cost.shares.select_related("user", "cost").all():
+            settle_course_cost_share(share)
+        if current_share:
+            current_share.refresh_from_db(fields=["paid_credits"])
+            credits_deducted += current_share.paid_credits - paid_before
+    elif not topic_obj and not res.get("cached") and not res.get("regenerated_from_invalid_cache"):
         credits_deducted = credits_for_usage(res.get("usage"), minimum=1)
         try:
             consume_credits(
@@ -1597,6 +1664,19 @@ def prep_topic_notes_api(request):
                 "success": False,
                 "error": "These notes require more credits than are currently available. Please subscribe or top up, then try again.",
                 "credits_balance": get_available_credits(wallet),
+            }, status=402)
+
+    if topic_obj:
+        balance_before_final_settlement = get_available_credits(wallet)
+        allowed, available_credits = ensure_note_access(request.user, topic_obj, level)
+        credits_deducted += max(0, balance_before_final_settlement - available_credits)
+        if not allowed:
+            return JsonResponse({
+                "success": False,
+                "error": "Your course share for this topic is not covered by your current credits. Top up to unlock this and later topics.",
+                "level": level,
+                "credits_balance": available_credits,
+                "credits_deducted": credits_deducted,
             }, status=402)
 
     wallet.refresh_from_db()

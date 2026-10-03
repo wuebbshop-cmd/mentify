@@ -70,6 +70,87 @@ class PrepCourseEnrollment(models.Model):
         return f"{self.user} added {self.course.code}"
 
 
+class PrepCourseSharedCost(models.Model):
+    """A source upload or generated note cost shared by a course's catalog members."""
+    COST_TYPES = [
+        ("upload", "Course Resource Upload"),
+        ("topic_notes", "AI Topic Notes"),
+    ]
+
+    course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="shared_costs")
+    cost_type = models.CharField(max_length=20, choices=COST_TYPES, db_index=True)
+    document = models.ForeignKey(
+        "PrepDocument", on_delete=models.SET_NULL, null=True, blank=True, related_name="shared_costs"
+    )
+    topic = models.ForeignKey(
+        "PrepTopic", on_delete=models.SET_NULL, null=True, blank=True, related_name="shared_costs"
+    )
+    level = models.CharField(max_length=20, blank=True)
+    source_transaction = models.OneToOneField(
+        "PrepTransaction", on_delete=models.SET_NULL, null=True, blank=True, related_name="shared_course_cost"
+    )
+    source_key = models.CharField(max_length=255, unique=True)
+    total_credits = models.PositiveIntegerField()
+    per_student_credits = models.PositiveIntegerField()
+    member_count_at_creation = models.PositiveIntegerField(default=0)
+    usage = models.JSONField(default=dict, blank=True)
+    model_name = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+
+    def __str__(self):
+        return f"{self.course.code} {self.cost_type}: {self.total_credits} credits"
+
+
+class PrepCourseCostShare(models.Model):
+    """A learner's payable share for one shared course cost."""
+    cost = models.ForeignKey(PrepCourseSharedCost, on_delete=models.CASCADE, related_name="shares")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="prep_course_cost_shares")
+    required_credits = models.PositiveIntegerField()
+    paid_credits = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    settled_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["cost", "user"], name="unique_prep_course_cost_share"),
+        ]
+        ordering = ["cost__created_at", "cost_id"]
+
+    @property
+    def is_settled(self):
+        return self.paid_credits >= self.required_credits
+
+
+class PrepNotePrecomputeJob(models.Model):
+    """Durable queue item for preparing shared Level 2 notes after publication."""
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("running", "Running"),
+        ("complete", "Complete"),
+        ("failed", "Failed"),
+    ]
+
+    course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="note_precompute_jobs")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
+    attempts = models.PositiveIntegerField(default=0)
+    last_error = models.TextField(blank=True)
+    queued_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course"],
+                name="unique_prep_note_precompute_course",
+            ),
+        ]
+        ordering = ["queued_at", "id"]
+
+
 class PrepTopic(models.Model):
     """Syllabus module/topic under a canonical course."""
     course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="topics")
@@ -203,6 +284,22 @@ class PrepDocumentVisual(models.Model):
     reconstruction_proposal = models.JSONField(default=dict, blank=True)
     confidence = models.FloatField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUSES, default="candidate", db_index=True)
+    reviewed_topic = models.ForeignKey(
+        PrepTopic,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_visual_candidates",
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_prep_visuals",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_notes = models.TextField(blank=True)
     vision_model = models.CharField(max_length=120, blank=True)
     vision_usage = models.JSONField(default=dict, blank=True)
     inspection_error = models.TextField(blank=True)

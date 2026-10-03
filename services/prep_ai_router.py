@@ -30,7 +30,25 @@ from services.prep_blocks import split_markdown_table_row
 logger = logging.getLogger(__name__)
 
 _NON_MATH_LATEX_ENVIRONMENTS = {"center", "document", "figure", "tikzpicture"}
-_VISUAL_NOTE_ROUTING_VERSION = "pdf-topic-sections-required-figures-v1"
+_VISUAL_NOTE_ROUTING_VERSION = "figure-placement-server-owned-v6-numbered-siblings"
+_APPROVED_VISUAL_DECISIONS = {"approved_high_confidence", "tutor_approved"}
+_ADMINISTRATIVE_NOTE_PATTERN = re.compile(
+    r"(?im)^\s*(?:lecturer|instructor|course coordinator|course code|course title|institutional context|"
+    r"prepared by|compiled by|downloaded by|contact details|contact information|e-?mail address|"
+    r"telephone number|phone number|platform identifier)\s*[:\-]"
+    r"|\b(?:the\s+)?(?:course|unit|module)\s+(?:is|was)\s+(?:taught|offered|delivered)\s+(?:by|at)\b"
+    r"|\b(?:course materials|document)\s+(?:are|is|were|was)\s+associated\s+with\b"
+    r"|\b(?:downloaded by|not sponsored or endorsed|contact details|e-?mail address|telephone number)\b",
+)
+_ADMIN_COVER_SIGNAL_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in (
+    r"\blecturer\b",
+    r"\binstructor\b|\bcourse coordinator\b",
+    r"\buniversity\b|\bfaculty\b|\bdepartment\b",
+    r"\bcourse\s+code\b|\bacademic\s+year\b|\bsemester\b",
+    r"\be-?mail\b|\btelephone\b|\bphone\b|\bcontact\s+details\b",
+    r"\bdownloaded\s+by\b|\bnot\s+sponsored\s+or\s+endorsed\b",
+    r"\bstudocu\b|\blomoarcpsd\b",
+))
 
 
 def compute_prompt_hash(*args) -> str:
@@ -67,8 +85,8 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
     )[:16]
 
 
-NOTES_CACHE_VERSION = "markdown-katex-v11-figure-map-validation"
-NOTE_VALIDATION_STATE = "validated-v6-figure-map-validation"
+NOTES_CACHE_VERSION = "markdown-katex-v16-numbered-figure-context"
+NOTE_VALIDATION_STATE = "validated-v11-numbered-figure-context"
 ANSWER_VALIDATION_VERSION = "answer-validation-v2-approved-sources"
 NOTE_MAX_FAILED_GENERATION_CYCLES = 2
 
@@ -338,7 +356,7 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
     total_length = 0
     excerpts = []
     for document, is_topic_document in selected:
-        text = str(document.extracted_text or "").strip()
+        text = _strip_course_administrative_front_matter(str(document.extracted_text or "")).strip()
         excerpt_limit = min(limit - total_length, limit if is_topic_document else 5000)
         if excerpt_limit <= 0:
             break
@@ -347,6 +365,94 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
         if total_length >= limit:
             break
     return "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(excerpts)[:limit]
+
+
+def _strip_course_administrative_front_matter(text: str) -> str:
+    """Remove title-page administration and contact/platform boilerplate before prompting."""
+    page_header = re.compile(r"(?m)^--- Page (\d+)(?:\s+\([^\n]*\))? ---\s*$")
+    instructional_cue = re.compile(
+        r"\b(?:what\s+is|definition|example|formula|equation|theorem|proof|principle|theory|"
+        r"concept|process|reaction|velocity|mass|force|energy|structure|function|causes|effects|"
+        r"properties|method|steps?)\b",
+        re.IGNORECASE,
+    )
+
+    def clean_page_body(body: str) -> str:
+        kept_lines = []
+        for line in body.splitlines():
+            if _ADMINISTRATIVE_NOTE_PATTERN.search(line):
+                continue
+            if not line.strip():
+                if kept_lines and kept_lines[-1]:
+                    kept_lines.append("")
+                continue
+            if re.match(
+                r"(?i)^\s*(?:lecturer|instructor|course coordinator|course code|course title|"
+                r"prepared by|compiled by|author|email|e-?mail|phone|telephone|contact|faculty|"
+                r"department|university|institution|academic year|semester|downloaded by)\s*[:\-]",
+                line,
+            ):
+                continue
+            kept_lines.append(line.rstrip())
+        return "\n".join(kept_lines).strip()
+
+    matches = list(page_header.finditer(text))
+    if not matches:
+        return clean_page_body(text)
+
+    pages = []
+    preamble = clean_page_body(text[:matches[0].start()])
+    if preamble:
+        pages.append(preamble)
+    first_instructional_page_seen = False
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        body = text[match.end():end]
+        normalized = re.sub(r"(.)\1+", r"\1", body.casefold())
+        signal_count = sum(bool(pattern.search(normalized)) for pattern in _ADMIN_COVER_SIGNAL_PATTERNS)
+        if (
+            not first_instructional_page_seen
+            and signal_count >= 2
+            and not instructional_cue.search(normalized)
+        ):
+            continue
+        cleaned_body = clean_page_body(body)
+        if cleaned_body:
+            first_instructional_page_seen = True
+            pages.append(f"--- Page {match.group(1)} ---\n{cleaned_body}")
+    return "\n\n".join(pages)
+
+
+_NUMBERED_FIGURE_CONTEXT_RE = re.compile(
+    r"(?i)\b(?:figure|fig\.?|graph|diagram|chart)\s*(\d+)\s*[:.)-]\s*"
+)
+
+
+def _scope_numbered_sibling_figure_contexts(visuals: list[dict]) -> None:
+    if len(visuals) < 2 or any(
+        not isinstance(visual.get("bbox"), (list, tuple)) or len(visual["bbox"]) != 4
+        for visual in visuals
+    ):
+        return
+
+    contexts = {
+        " ".join(str(visual.get(key) or "").split())
+        for visual in visuals
+        for key in ("context_before", "context_after")
+        if visual.get(key)
+    }
+    for context in sorted(contexts, key=len, reverse=True):
+        matches = list(_NUMBERED_FIGURE_CONTEXT_RE.finditer(context))
+        numbers = [int(match.group(1)) for match in matches]
+        if numbers != list(range(1, len(visuals) + 1)):
+            continue
+
+        reading_order = sorted(visuals, key=lambda visual: (visual["bbox"][1], visual["bbox"][0]))
+        for index, visual in enumerate(reading_order):
+            start = matches[index].start()
+            end = matches[index + 1].start() if index + 1 < len(matches) else len(context)
+            visual["figure_context"] = context[start:end].strip()
+        return
 
 
 def _approved_course_source_references(course_obj, topic_title: str, *, limit: int = 40) -> list[dict]:
@@ -368,17 +474,32 @@ def _approved_course_source_references(course_obj, topic_title: str, *, limit: i
                 page_texts[int(match.group(1))] = text[match.end():end]
         assigned_visuals = {}
         if getattr(document, "pk", None):
-            for visual in document.visual_candidates.filter(status="approved").order_by("page_number", "id"):
+            for visual in document.visual_candidates.filter(status="approved").select_related(
+                "reviewed_topic", "reviewed_by"
+            ).order_by("page_number", "id"):
                 metadata = visual.extracted_content if isinstance(visual.extracted_content, dict) else {}
-                assigned_topic = " ".join(str(metadata.get("auto_topic") or "").casefold().split())
+                decision = metadata.get("auto_decision")
+                tutor_approved = (
+                    decision == "tutor_approved"
+                    and visual.reviewed_topic_id
+                    and visual.reviewed_topic.course_id == document.course_id
+                    and visual.reviewed_by_id
+                    and visual.reviewed_at
+                )
+                assigned_title = visual.reviewed_topic.title if tutor_approved else metadata.get("auto_topic")
+                assigned_topic = " ".join(str(assigned_title or "").casefold().split())
                 if (
                     assigned_topic != requested_topic
-                    or metadata.get("auto_decision") != "approved_high_confidence"
-                    or visual.page_number in ambiguous_section_pages
+                    or (decision not in _APPROVED_VISUAL_DECISIONS and not tutor_approved)
+                    or (visual.page_number in ambiguous_section_pages and not tutor_approved)
                 ):
                     continue
                 section_topic = section_pages.get(visual.page_number)
-                if section_topic and " ".join(str(section_topic.title).casefold().split()) != requested_topic:
+                if (
+                    section_topic
+                    and " ".join(str(section_topic.title).casefold().split()) != requested_topic
+                    and not tutor_approved
+                ):
                     continue
                 crop_name = visual.crop.name if visual.crop else ""
                 try:
@@ -408,6 +529,9 @@ def _approved_course_source_references(course_obj, topic_title: str, *, limit: i
                     "context_after": metadata.get("context_after", ""),
                     "context_crop_url": context_crop_url,
                 })
+
+            for page_visuals in assigned_visuals.values():
+                _scope_numbered_sibling_figure_contexts(page_visuals)
 
         if document_topic == requested_topic:
             pages = {
@@ -457,7 +581,12 @@ _APPROVED_VISUAL_MARKER_RE = re.compile(r"\[\[VISUAL:([A-Za-z0-9-]+)\]\]")
 
 
 def _source_figure_caption(visual: dict) -> str:
-    candidates = [visual.get("caption"), visual.get("context_after"), visual.get("context_before")]
+    candidates = [
+        visual.get("figure_context"),
+        visual.get("caption"),
+        visual.get("context_after"),
+        visual.get("context_before"),
+    ]
     for candidate in candidates:
         caption = re.sub(r"\s+", " ", str(candidate or "")).strip()
         if not caption or re.search(r"(?i)downloaded by|lOMoARcPSD|scan to|studocu|coursehero", caption):
@@ -473,13 +602,16 @@ def _approved_visual_manifest(source_references: list[dict] | None, *, limit: in
     """Return a short list of approved crop records that have a renderable URL."""
     manifest = []
     for reference in source_references or []:
-        for visual in reference.get("visuals", []):
+        visuals = reference.get("visuals", [])
+        _scope_numbered_sibling_figure_contexts(visuals)
+        for visual in visuals:
             if not isinstance(visual, dict) or not visual.get("visual_id") or not visual.get("crop_url"):
                 continue
             manifest.append({
                 "id": str(visual["visual_id"]),
                 "type": visual.get("visual_type", "unclassified"),
                 "page": visual.get("page_number"),
+                "crop_url": visual.get("crop_url", ""),
                 "caption": _source_figure_caption(visual),
                 "labels": visual.get("labels", []),
                 "auto_topic": visual.get("auto_topic", ""),
@@ -488,10 +620,11 @@ def _approved_visual_manifest(source_references: list[dict] | None, *, limit: in
                 "auto_match_terms": visual.get("auto_match_terms", []),
                 "context_before": visual.get("context_before", ""),
                 "context_after": visual.get("context_after", ""),
+                "placement_context": visual.get("figure_context", ""),
                 "context_crop_url": visual.get("context_crop_url", ""),
                 "required": (
                     bool(visual.get("auto_topic"))
-                    and visual.get("auto_decision") == "approved_high_confidence"
+                    and visual.get("auto_decision") in _APPROVED_VISUAL_DECISIONS
                 ),
                 "marker": f"[[VISUAL:{visual['visual_id']}]]",
             })
@@ -501,7 +634,19 @@ def _approved_visual_manifest(source_references: list[dict] | None, *, limit: in
 
 
 def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
-    """Place assigned source figures after the generated paragraph matching their context."""
+    """Place assigned source figures beside the generated paragraph matching their context."""
+    for visual in manifest:
+        marker = visual.get("marker")
+        if marker:
+            content = content.replace(marker, "")
+        crop_url = str(visual.get("crop_url") or "")
+        if crop_url:
+            content = re.sub(
+                r"!\[[^\]]*\]\(" + re.escape(crop_url) + r"\)",
+                "",
+                content,
+            )
+    content = re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", content)
     paragraphs = [
         match for match in re.finditer(r"(?ms)(?:^|\n\s*\n)([^\n][\s\S]*?)(?=\n\s*\n|$)", content)
         if match.group(1).strip() and not match.group(1).lstrip().startswith("!")
@@ -510,15 +655,21 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
     generic = {"figure", "graph", "diagram", "curve", "source", "page", "shows", "shown", "this", "that"}
     for visual in manifest:
         marker = visual.get("marker")
-        if not visual.get("required") or not marker or marker in content:
+        if not visual.get("required") or not marker:
             continue
-        context_text = " ".join((
-            " ".join(visual.get("auto_match_terms", [])),
-            visual.get("caption", ""),
-            " ".join(visual.get("labels", [])),
-            visual.get("context_before", ""),
-            visual.get("context_after", ""),
-        ))
+        if visual.get("placement_context"):
+            context_text = " ".join((
+                visual.get("placement_context", ""),
+                " ".join(visual.get("labels", [])),
+            ))
+        else:
+            context_text = " ".join((
+                " ".join(visual.get("auto_match_terms", [])),
+                visual.get("caption", ""),
+                " ".join(visual.get("labels", [])),
+                visual.get("context_before", ""),
+                visual.get("context_after", ""),
+            ))
         context_terms = {
             token.casefold() for token in re.findall(r"[A-Za-z0-9]+", context_text)
             if len(token) > 3 and token.casefold() not in generic
@@ -698,6 +849,42 @@ def _figure_reference_issues(content: str) -> list[str]:
     return issues
 
 
+_MISSING_VISUAL_REFERENCE_ISSUE = "notes refer to a figure that is not included nearby"
+
+
+def _unavailable_visual_reference_issues(content: str) -> list[str]:
+    """Reject wording that points students to a figure not shown nearby."""
+    source = re.sub(r"```[\s\S]*?```", "", str(content or ""))
+    blocks = re.split(r"\n\s*\n", source)
+    reference_pattern = re.compile(
+        r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:in\s+)?(?:the\s+)?"
+        r"(?:figure|diagram|graph|plot|chart|table)"
+        r"|(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table|fig\.?\s*\d+)"
+        r"|(?:figure|diagram|graph|plot|chart|table)\s+(?:above|below|on\s+the\s+(?:left|right)))\b",
+        re.IGNORECASE,
+    )
+    image_pattern = re.compile(r"!\[[^\]]*\]\([^)]+\)")
+    for index, block in enumerate(blocks):
+        if not reference_pattern.search(block):
+            continue
+        nearby_blocks = blocks[max(0, index - 1):min(len(blocks), index + 2)]
+        if not any(image_pattern.search(nearby) for nearby in nearby_blocks):
+            return [_MISSING_VISUAL_REFERENCE_ISSUE]
+    return []
+
+
+def _only_missing_visual_reference_issue(issues: list[str]) -> bool:
+    return bool(issues) and all(issue == _MISSING_VISUAL_REFERENCE_ISSUE for issue in issues)
+
+
+def _course_administrative_metadata_issues(content: str) -> list[str]:
+    """Keep lecturer, contact, and document-distribution metadata out of study notes."""
+    source = re.sub(r"```[\s\S]*?```", "", str(content or ""))
+    if _ADMINISTRATIVE_NOTE_PATTERN.search(source):
+        return ["notes contain course-administration metadata instead of study content"]
+    return []
+
+
 def _markdown_theorem_issues(content: str) -> list[str]:
     """Reject theorem titles split into Markdown list-looking fragments."""
     lines = content.splitlines()
@@ -741,6 +928,7 @@ def _note_format_issues(content: str) -> list[str]:
         issues.append("content ends with an incomplete Markdown table fragment")
     issues.extend(_markdown_table_issues(content))
     issues.extend(_figure_reference_issues(content))
+    issues.extend(_unavailable_visual_reference_issues(content))
     issues.extend(_markdown_theorem_issues(content))
     return issues
 
@@ -861,7 +1049,13 @@ def _regenerate_invalid_note_sections(
             + "Approved coursework source:\n" + source_excerpt + "\n"
             "Existing note context:\n" + working_content[:4000]
         )
-        result = route_math_request(prompt, topic_obj.course.code, topic_label=topic_obj.title, is_complex_proof=False)
+        result = route_math_request(
+            prompt,
+            topic_obj.course.code,
+            topic_label=topic_obj.title,
+            is_complex_proof=False,
+            thinking_enabled=False,
+        )
         if not result.get("success") or not result.get("content"):
             continue
         replacement = normalize_math_delimiters(result["content"]).strip()
@@ -1085,6 +1279,8 @@ def _note_completion_issues(
         issues.append("unclosed display-math block")
 
     issues.extend(_note_format_issues(content))
+    issues.extend(_unavailable_visual_reference_issues(content))
+    issues.extend(_course_administrative_metadata_issues(content))
     issues.extend(_note_code_language_issues(content))
     if allow_code is False and re.search(r"```(?!mermaid\b)[A-Za-z0-9_+-]*\s*\n", content, re.IGNORECASE):
         issues.append("code block is not allowed for this topic")
@@ -1142,7 +1338,7 @@ def _note_completion_issues(
         and visual.get("visual_id")
         and visual.get("crop_url")
         and visual.get("auto_topic")
-        and visual.get("auto_decision") == "approved_high_confidence"
+        and visual.get("auto_decision") in _APPROVED_VISUAL_DECISIONS
     }
     embedded_urls = {
         match.group(1).strip()
@@ -1482,6 +1678,15 @@ def _blocked_note_generation(topic_obj, level: str, source_signature: str) -> di
     guard = _note_generation_guard(topic_obj, level, source_signature)
     if not guard or guard.status != "needs_review":
         return None
+    from prep.models import PrepNoteRepair
+
+    repair = PrepNoteRepair.objects.filter(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+    ).first()
+    if not repair or repair.status != "needs_review":
+        return None
     _notify_note_generation_failure(guard.pk)
     return {
         "notes": "",
@@ -1491,8 +1696,8 @@ def _blocked_note_generation(topic_obj, level: str, source_signature: str) -> di
         "validation_failed": True,
         "needs_review": True,
         "error": (
-            "Validated notes could not be produced after two complete attempts. "
-            "This topic is awaiting tutor/admin review before another generation is allowed."
+            "Validated notes could not be produced for this level. "
+            "It is awaiting tutor/admin review and will not be regenerated until the review is resolved or its source changes."
         ),
     }
 
@@ -1656,6 +1861,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
         return None
 
     working_content = repair.current_content or content
+    repair_usage = {}
     validation_options = _note_validation_options(
         topic_obj.course,
         topic_obj.title,
@@ -1676,6 +1882,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             model=getattr(settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash"),
             max_tokens=2000,
         )
+        repair_usage = _merge_usage(repair_usage, result.get("usage", {}))
         if not result.get("success"):
             continue
         try:
@@ -1721,7 +1928,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 "notes": candidate,
                 "cached": False,
                 "repaired": True,
-                "usage": result.get("usage", {}),
+                "usage": repair_usage,
                 "source_references": validation_options["source_references"],
             }
         except Exception as exc:
@@ -1797,6 +2004,7 @@ def call_deepseek(
     max_tokens: int = 6000,
     temperature: float = 0.2,
     auto_continue: bool = True,
+    thinking_enabled: bool | None = None,
 ) -> dict:
     """
     Make a guarded API call to DeepSeek.
@@ -1820,6 +2028,8 @@ def call_deepseek(
 
         "temperature": temperature,
     }
+    if thinking_enabled is not None:
+        payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
 
     try:
         resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=90)
@@ -1845,6 +2055,8 @@ def call_deepseek(
                     "max_tokens": max_tokens,
                     "temperature": temperature,
                 }
+                if thinking_enabled is not None:
+                    cont_payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
                 try:
                     cont_resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=cont_payload, timeout=90)
                     if cont_resp.status_code == 200:
@@ -1865,6 +2077,24 @@ def call_deepseek(
                             content = content + "\n\n" + cont_content
                 except Exception as cont_err:
                     logger.warning(f"[DeepSeek] Auto-continuation failed: {cont_err}")
+
+            if not content:
+                response_id = str(data.get("id") or "unavailable")
+                error = (
+                    "DeepSeek returned empty assistant content "
+                    f"(finish_reason={finish_reason}, reasoning_content_present={bool(reasoning)}, "
+                    f"response_id={response_id})."
+                )
+                logger.warning("[DeepSeek] %s model=%s usage=%s", error, model, usage)
+                return {
+                    "success": False,
+                    "empty_response": True,
+                    "error": error,
+                    "finish_reason": finish_reason,
+                    "response_id": response_id,
+                    "model_used": model,
+                    "usage": usage,
+                }
 
             return {
                 "success": True,
@@ -1918,6 +2148,7 @@ def route_math_request(
     system_prompt: str | None = None,
     max_tokens_override: int | None = None,
     auto_continue: bool = True,
+    thinking_enabled: bool | None = None,
 ) -> dict:
     """
     Intelligently routes request to:
@@ -1966,6 +2197,7 @@ def route_math_request(
         model=model,
         max_tokens=max_tokens,
         auto_continue=auto_continue,
+        thinking_enabled=thinking_enabled,
     )
 
 
@@ -2076,6 +2308,34 @@ def get_or_generate_topic_notes(
     cached = get_cached_content(cache_key)
     regenerated_from_invalid_cache = False
     if cached and isinstance(cached, dict) and ("content" in cached or "blocks" in cached):
+        cached_text = repair_json_escaped_latex_newlines(
+            str(cached.get("content", "") or "")
+        )
+        if not cached_text.strip() and isinstance(cached.get("blocks"), list) and cached["blocks"]:
+            cached_text = blocks_to_markdown(cached["blocks"]).strip()
+            cached["content"] = cached_text
+        if not cached_text.strip():
+            blocked = _blocked_note_generation(topic_obj, level, cache_signature)
+            if blocked:
+                return blocked
+            if not generate_if_missing:
+                return {
+                    "notes": "",
+                    "blocks": [],
+                    "schema_version": 2,
+                    "cached": False,
+                    "level": level,
+                    "regenerated_from_invalid_cache": True,
+                    "generation_required": True,
+                    "error": "The cached note is empty; a validated replacement is required.",
+                }
+            from prep.models import PrepContentCache
+
+            logger.warning("[Topic Notes] Discarding empty cache for %s %s", course_code, topic_title)
+            PrepContentCache.objects.filter(cache_key=cache_key).delete()
+            cached = None
+            regenerated_from_invalid_cache = True
+    if cached and isinstance(cached, dict) and ("content" in cached or "blocks" in cached):
         cached_content = repair_json_escaped_latex_newlines(
             str(cached.get("content", "") or "")
         )
@@ -2112,6 +2372,9 @@ def get_or_generate_topic_notes(
                 "model": cached.get("model", "Cache"),
                 "source_references": cached.get("source_references", validation_options["source_references"]),
             }
+        blocked = _blocked_note_generation(topic_obj, level, cache_signature)
+        if blocked:
+            return blocked
         logger.warning(
             "[Topic Notes] Ignoring incomplete cached notes for %s %s: %s",
             course_code,
@@ -2162,6 +2425,22 @@ def get_or_generate_topic_notes(
         if fallback:
             fallback["regenerated_from_invalid_cache"] = True
             return fallback
+        if _only_missing_visual_reference_issue(cached_issues):
+            from prep.models import PrepContentCache
+
+            cached["validation_state"] = NOTE_VALIDATION_STATE
+            cached["validated_at"] = timezone.now().isoformat()
+            PrepContentCache.objects.filter(cache_key=cache_key).update(payload=cached)
+            _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
+            return {
+                "notes": cached_content,
+                "blocks": cached.get("blocks"),
+                "schema_version": cached.get("schema_version", 1),
+                "cached": True,
+                "level": level,
+                "model": cached.get("model", "Cache"),
+                "source_references": cached.get("source_references", validation_options["source_references"]),
+            }
         return {
             "notes": "",
             "blocks": [],
@@ -2257,10 +2536,27 @@ def get_or_generate_topic_notes(
         "Do not write Markdown image URLs, invent a figure, generate Mermaid/TikZ/plot code, or request an unlisted figure. "
         "Do not create a Figure Recall Map, marker table, or memory-device sentence with empty figure placeholders. "
         "Place each required marker directly beside the explanation it illustrates. "
+        "In the surrounding prose, define every symbol and variable at first use, explain visual labels and units, and state what each axis, node, or arrow means. "
+        "The explanation must still make sense if the image does not load. "
         "Figures marked required were mapped to this topic from source-page evidence and must be included beside the matching explanation. "
         "If a listed optional figure is not relevant, omit it.\n\n"
         if approved_visual_manifest
-        else "NO APPROVED SOURCE FIGURE IS AVAILABLE. Do not add an image, diagram, graph, Mermaid/TikZ, or plot code.\n\n"
+        else (
+            "NO APPROVED SOURCE FIGURE IS AVAILABLE. Do not add an image, diagram, graph, Mermaid/TikZ, or plot code.\n"
+            "If the approved source discusses a visual concept, include a **Text-only visual walkthrough:** that defines each variable and label, explains the axes or arrow relationships, and states the supported conclusion in plain language. "
+            "Use only source evidence; if a label, value, or relationship cannot be verified, say so instead of guessing. "
+            "Never tell the student to look at an absent figure (for example, do not write 'as shown in the graph').\n\n"
+        )
+    )
+    visual_independence_block = (
+        "UNIVERSAL VISUAL AND NOTATION REQUIREMENTS (all disciplines):\n"
+        "Define every variable, symbol, abbreviation, and unit when it first appears. Explain what each visual label represents. "
+        "When discussing a graph, state the axes, units, direction or comparison, and conclusion in words when supported by the source. "
+        "When discussing an arrowed or structural diagram, name the relevant parts and explain each supported relationship or direction. "
+        "Never make the student infer the explanation solely from an image. "
+        "For each visual concept without its own approved source image, include a **Text-only visual walkthrough:** that makes the concept understandable without the image. "
+        "Use only source-supported facts; explicitly say when a label, value, or relationship is unavailable or awaiting review instead of guessing. "
+        "Do not refer to a missing image as if it were shown.\n\n"
     )
 
     # Build strict curriculum boundary block
@@ -2404,6 +2700,9 @@ def get_or_generate_topic_notes(
         f"{profile_context_block}"
         f"{source_context_block}"
         f"{source_reference_block}"
+        f"{visual_independence_block}"
+        "NON-STUDY ADMINISTRATIVE DETAILS POLICY (all disciplines):\n"
+        "Do not include lecturer or instructor names or credentials, course codes, course delivery details, university/faculty/department names as course metadata, contact details, email addresses, phone numbers, download records, hosting-platform disclaimers, or title-page administration. These are not study content even when present in the source. Discuss institutions or their people only when they are themselves the subject of the lesson, not as information about who offers or distributes this course.\n\n"
         f"{curriculum_boundary_block}"
         f"{level_instruction}\n\n"
         f"{code_policy}\n"
@@ -2431,13 +2730,47 @@ def get_or_generate_topic_notes(
         topic_label=topic_title,
         is_complex_proof=False,
         system_prompt=note_system_prompt,
+        thinking_enabled=False,
     )
 
-    if result.get("success"):
-        content = _resolve_approved_visual_markers(
-            normalize_math_delimiters(result["content"]),
-            validation_options["source_references"],
+    if result.get("empty_response") or (
+        result.get("success") and not str(result.get("content") or "").strip()
+    ):
+        first_error = result.get("error") or "The first model response contained no note text."
+        first_usage = result.get("usage", {})
+        retry_result = route_math_request(
+            prompt,
+            course_code,
+            topic_label=topic_title,
+            is_complex_proof=False,
+            system_prompt=note_system_prompt,
+            thinking_enabled=False,
         )
+        retry_usage = retry_result.get("usage", {})
+        retry_result["usage"] = _merge_usage(first_usage, retry_usage)
+        retry_content = str(retry_result.get("content") or "").strip()
+        if retry_result.get("empty_response") or not retry_result.get("success") or not retry_content:
+            retry_error = retry_result.get("error") or "The retry also returned empty note content."
+            error = f"Initial note response was empty ({first_error}); one retry failed ({retry_error})."
+            logger.error("[Topic Notes] %s course=%s topic=%s level=%s", error, course_code, topic_title, level)
+            _record_note_generation_failure(topic_obj, level, cache_signature, error, force_review=True)
+            return {
+                "notes": "",
+                "blocks": [],
+                "cached": False,
+                "level": level,
+                "model": retry_result.get("model_used") or result.get("model_used"),
+                "usage": retry_result["usage"],
+                "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
+                "needs_review": True,
+                "validation_failed": True,
+                "empty_response": True,
+                "error": error,
+            }
+        result = retry_result
+
+    if result.get("success"):
+        content = normalize_math_delimiters(result["content"])
 
         # Continue boundedly until all required sections and delimiters are complete.
         # This protects against responses that contain the final heading but stop
@@ -2477,6 +2810,7 @@ def get_or_generate_topic_notes(
                 cont_messages,
                 model=result.get("model_used", "deepseek-chat"),
                 max_tokens=4000,
+                thinking_enabled=False,
             )
             if not cont_res.get("success") or not cont_res.get("content"):
                 break
@@ -2532,6 +2866,7 @@ def get_or_generate_topic_notes(
             )
             if repaired:
                 repaired["level"] = level
+                repaired["usage"] = _merge_usage(result.get("usage", {}), repaired.get("usage", {}))
                 repaired["regenerated_from_invalid_cache"] = regenerated_from_invalid_cache
                 _clear_note_generation_guard(topic_obj, level, cache_signature)
                 return repaired
@@ -2544,18 +2879,27 @@ def get_or_generate_topic_notes(
             if fallback:
                 fallback["regenerated_from_invalid_cache"] = regenerated_from_invalid_cache
                 return fallback
-            return {
-                "notes": "",
-                "blocks": [],
-                "schema_version": 2,
-                "cached": False,
-                "level": level,
-                "model": result.get("model_used"),
-                "usage": result.get("usage", {}),
-                "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
-                "validation_failed": True,
-                "error": "The notes generation was incomplete. Please retry.",
-            }
+            if _only_missing_visual_reference_issue(completion_issues):
+                logger.warning(
+                    "[Topic Notes] Publishing %s %s after visual-reference repair attempts; "
+                    "the notes remain text-first and this wording issue is non-blocking.",
+                    course_code,
+                    topic_title,
+                )
+                completion_issues = []
+            else:
+                return {
+                    "notes": "",
+                    "blocks": [],
+                    "schema_version": 2,
+                    "cached": False,
+                    "level": level,
+                    "model": result.get("model_used"),
+                    "usage": result.get("usage", {}),
+                    "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
+                    "validation_failed": True,
+                    "error": "The notes generation was incomplete. Please retry.",
+                }
         blocks = parse_markdown_to_blocks(content)
         is_valid, validation_err = validate_structured_blocks(blocks)
         if not is_valid:

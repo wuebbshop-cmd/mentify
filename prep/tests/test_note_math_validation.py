@@ -11,6 +11,7 @@ from prep.management.commands.reindex_course_topics import Command as ReindexCou
 from prep.models import (
     PrepContentCache,
     PrepCourse,
+    PrepCourseEnrollment,
     PrepDocument,
     PrepDocumentVisual,
     PrepNoteGenerationGuard,
@@ -29,8 +30,12 @@ from services.prep_ai_router import (
     _latex_syntax_issues,
     _markdown_table_issues,
     _markdown_theorem_issues,
+    _note_repair_scope,
     _note_allows_code,
     _note_completion_issues,
+    call_deepseek,
+    _course_administrative_metadata_issues,
+    _insert_required_visual_markers,
     _approved_course_source_context,
     _approved_course_source_references,
     _approved_visual_manifest,
@@ -39,6 +44,7 @@ from services.prep_ai_router import (
     _normalize_approved_visual_captions,
     _note_completion_issues,
     _topic_notes_cache_signature,
+    _strip_course_administrative_front_matter,
     compute_cache_key,
     generate_similar_practice_questions,
     get_published_topic_note_levels,
@@ -66,6 +72,64 @@ class ReindexCourseTopicReportTests(SimpleTestCase):
 
 
 class NoteMathValidationTests(TestCase):
+    def test_server_placement_replaces_a_model_figure_in_the_wrong_section(self):
+        crop_url = "/media/approved-equilibrium.jpg"
+        content = (
+            "## 1. Demand\n\nDemand slopes downward as price rises.\n\n"
+            f"![Equilibrium graph]({crop_url})\n\n"
+            "## 2. Equilibrium\n\nThe market clears when quantity demanded equals quantity supplied."
+        )
+        marker = "[[VISUAL:equilibrium-figure]]"
+        manifest = [{
+            "id": "equilibrium-figure",
+            "marker": marker,
+            "crop_url": crop_url,
+            "required": True,
+            "auto_match_terms": ["equilibrium", "market clears"],
+            "caption": "Equilibrium graph",
+            "labels": [],
+            "context_before": "At equilibrium the market clears.",
+            "context_after": "Quantity demanded equals quantity supplied.",
+        }]
+
+        placed = _insert_required_visual_markers(content, manifest)
+        image_position = placed.index(marker)
+        demand_heading = placed.index("## 1. Demand")
+        equilibrium_heading = placed.index("## 2. Equilibrium")
+
+        self.assertEqual(placed.count(marker), 1)
+        self.assertNotIn(crop_url, placed)
+        self.assertGreater(image_position, equilibrium_heading)
+        self.assertGreater(equilibrium_heading, demand_heading)
+
+    @patch("services.prep_ai_router.requests.post")
+    @override_settings(DEEPSEEK_API="test-key")
+    def test_empty_deepseek_completion_is_reported_with_finish_details(self, post):
+        post.return_value.status_code = 200
+        post.return_value.json.return_value = {
+            "id": "completion-test-123",
+            "choices": [{
+                "message": {"content": "", "reasoning_content": "internal only"},
+                "finish_reason": "stop",
+            }],
+            "usage": {"prompt_tokens": 30, "completion_tokens": 0, "total_tokens": 30},
+        }
+
+        result = call_deepseek(
+            [{"role": "user", "content": "Write notes."}],
+            model="deepseek-flash",
+            auto_continue=False,
+            thinking_enabled=False,
+        )
+
+        self.assertFalse(result["success"])
+        self.assertTrue(result["empty_response"])
+        self.assertEqual(result["finish_reason"], "stop")
+        self.assertEqual(result["response_id"], "completion-test-123")
+        self.assertIn("reasoning_content_present=True", result["error"])
+        self.assertEqual(result["usage"]["completion_tokens"], 0)
+        self.assertEqual(post.call_args.kwargs["json"]["thinking"], {"type": "disabled"})
+
     def test_repairs_json_decoded_notin_only_inside_math(self):
         source = "For $b \notin (a, b)$, continue.\nOutside prose stays unchanged."
         repaired = repair_json_escaped_latex_newlines(source)
@@ -212,6 +276,51 @@ $$ not mathematical output
         )
 
         self.assertIn("embedded figure does not reference an approved source crop", issues)
+
+    def test_missing_visual_references_are_flagged_for_repair_across_disciplines(self):
+        examples = [
+            ("Economics", "As shown in the graph, quantity demanded exceeds quantity supplied."),
+            ("Physics", "As illustrated in the diagram above, the force points toward the plate."),
+            ("Chemistry", "Refer to the figure below for the reaction pathway."),
+        ]
+        for discipline, content in examples:
+            with self.subTest(discipline=discipline):
+                issues = _note_completion_issues(content, "Visual Concepts")
+                self.assertIn("notes refer to a figure that is not included nearby", issues)
+
+    def test_course_front_matter_is_removed_without_removing_subject_content(self):
+        source = (
+            "--- Page 1 ---\nCourse code: ASC 100\nLecturer: Dr Example\n"
+            "University: Example University\nDownloaded by learner@example.test\n\n"
+            "--- Page 2 ---\nWhat is sociology?\n"
+            "A university can be studied as a social institution."
+        )
+
+        cleaned = _strip_course_administrative_front_matter(source)
+
+        self.assertNotIn("Dr Example", cleaned)
+        self.assertNotIn("Example University", cleaned)
+        self.assertNotIn("Downloaded by", cleaned)
+        self.assertIn("What is sociology?", cleaned)
+        self.assertIn("A university can be studied as a social institution.", cleaned)
+
+    def test_course_administration_is_rejected_but_subject_discussion_is_allowed(self):
+        self.assertTrue(_course_administrative_metadata_issues(
+            "The course is taught by Dr Example at Example University."
+        ))
+        self.assertEqual(
+            _course_administrative_metadata_issues(
+                "Universities are social institutions that can be studied sociologically."
+            ),
+            [],
+        )
+
+    def test_visual_reference_with_nearby_figure_is_allowed(self):
+        content = "As shown in the graph, the curve rises.\n\n![Approved graph](/media/approved-graph.jpg)"
+
+        issues = _note_completion_issues(content, "Visual Concepts")
+
+        self.assertNotIn("notes refer to a figure that is not included nearby", issues)
 
     def test_raw_html_image_is_rejected(self):
         sections = [
@@ -647,7 +756,7 @@ $$
             "success": True,
             "content": broken_notes,
             "model_used": "test-notes-model",
-            "usage": {},
+            "usage": {"prompt_tokens": 80, "completion_tokens": 20, "total_tokens": 100},
         }
         repair_request.return_value = {
             "success": True,
@@ -655,7 +764,7 @@ $$
                 "old_block": broken_block,
                 "new_block": "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$",
             }),
-            "usage": {},
+            "usage": {"prompt_tokens": 10, "completion_tokens": 15, "total_tokens": 25},
         }
 
         result = get_or_generate_topic_notes(
@@ -668,6 +777,7 @@ $$
 
         self.assertTrue(result.get("repaired"), result)
         self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        self.assertEqual(result["usage"]["total_tokens"], 125)
         repair_request.assert_called_once()
         self.assertFalse(PrepContentCache.objects.get(topic=self.topic).payload.get("validation_state") is None)
 
@@ -785,6 +895,39 @@ $$
         self.assertIsNone(cache.payload.get("validation_state"))
         send_failure_email.assert_called_once_with(guard)
 
+    @patch("services.prep_ai_router.call_together_repair", return_value={"success": False, "error": "repair unavailable"})
+    @patch("services.prep_ai_router.route_math_request")
+    def test_unrepaired_missing_figure_wording_does_not_block_self_contained_notes(
+        self,
+        route_request,
+        repair_request,
+    ):
+        self_contained_notes = self.valid_notes.replace(
+            "## 3. Three\n\nText.",
+            "## 3. Three\n\nAs shown in the graph, the quantity rises. The relationship is explained here in text.",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": self_contained_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertEqual(result["notes"].strip(), self_contained_notes.strip())
+        self.assertTrue(result.get("validation_failed") is not True)
+        self.assertEqual(repair_request.call_count, 3)
+        cache = PrepContentCache.objects.get(topic=self.topic, content_type="topic_notes")
+        self.assertEqual(cache.payload.get("validation_state"), NOTE_VALIDATION_STATE)
+        self.assertFalse(PrepNoteGenerationGuard.objects.filter(topic=self.topic, level="level_2").exists())
+
     @patch("services.prep_ai_router.route_math_request")
     def test_missing_level_one_and_three_use_the_same_validated_generation_path(self, route_request):
         route_request.return_value = {
@@ -839,6 +982,7 @@ $$
 
     @patch("prep.views.get_or_generate_topic_notes")
     def test_invalid_cache_recovery_does_not_deduct_student_credits(self, generate_notes):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
         wallet = PrepWallet.get_or_create_wallet(self.user)
         before = wallet.credits_balance
         generate_notes.return_value = {
@@ -861,6 +1005,37 @@ $$
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["credits_deducted"], 0)
         self.assertEqual(wallet.credits_balance, before)
+
+    @patch("prep.views.get_or_generate_topic_notes")
+    def test_active_trial_can_generate_level_two_with_no_remaining_trial_credits(self, generate_notes):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
+        wallet = PrepWallet.get_or_create_wallet(self.user)
+        wallet.credit_grants.update(remaining_credits=0)
+        wallet.credits_balance = 0
+        wallet.save(update_fields=["credits_balance"])
+        generate_notes.side_effect = [
+            {"notes": "", "generation_required": True, "cached": False},
+            {
+                "notes": self.valid_notes,
+                "cached": False,
+                "level": "level_2",
+                "model": "test-model",
+                "usage": {"total_tokens": 1500},
+            },
+        ]
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({"topic_id": self.topic.pk, "level": "level_2"}),
+            content_type="application/json",
+        )
+
+        wallet.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["credits_deducted"], 0)
+        self.assertEqual(wallet.credits_balance, 0)
+        self.assertEqual(generate_notes.call_count, 2)
 
     @patch("services.prep_ai_router.route_math_request")
     @patch("prep.views.get_available_credits", return_value=100)
@@ -1045,6 +1220,7 @@ $$
             "error": "The notes generation was incomplete. Please retry.",
             "validation_failed": True,
         }
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
         self.client.force_login(self.user)
 
         response = self.client.post(
@@ -1502,9 +1678,18 @@ $$
                 course=self.course,
                 topic_name="Sequences",
                 file=SimpleUploadedFile("sequence-figure.pdf", b"pdf"),
-                extracted_text="--- Page 4 ---\nSequences have terms that approach a limit; Figure 2 shows the source graph.",
+                extracted_text=(
+                    "--- Page 4 ---\n2: Other Topic\n"
+                    "Sequences have terms that approach a limit; Figure 2 shows the source graph."
+                ),
                 file_sha256="f" * 64,
                 stage="stage_3",
+            )
+            PrepTopic.objects.create(
+                course=self.course,
+                order=2,
+                title="Other Topic",
+                slug="other-topic",
             )
             visual = PrepDocumentVisual.objects.create(
                 document=source,
@@ -1516,10 +1701,15 @@ $$
                 labels=["n", "a_n"],
                 extracted_content={
                     "caption": "Sequence terms",
+                    "context_before": "Sequence terms approach a finite limit.",
                     "auto_topic": self.topic.title,
-                    "auto_decision": "approved_high_confidence",
+                    "auto_decision": "tutor_approved",
+                    "auto_match_method": "tutor_review",
                 },
                 status="approved",
+                reviewed_topic=self.topic,
+                reviewed_by=self.user,
+                reviewed_at=self.user.date_joined,
             )
             unapproved_visual = PrepDocumentVisual.objects.create(
                 document=source,
@@ -1532,7 +1722,10 @@ $$
                 status="needs_review",
             )
             marker = f"[[VISUAL:{visual.pk}]]"
-            generated = self.valid_notes.replace("## 3. Three", f"{marker}\n\n## 3. Three")
+            generated = self.valid_notes.replace(
+                "## 3. Three",
+                f"{marker}\n\n## 3. Three\n\nSequence terms approach a finite limit.",
+            )
             route_request.return_value = {
                 "success": True,
                 "content": generated,
@@ -1660,6 +1853,48 @@ $$
         self.assertLess(updated.index("opportunity cost"), updated.index("[[VISUAL:123]]"))
         self.assertLess(updated.index("[[VISUAL:123]]"), updated.index("## 2."))
 
+    def test_sibling_figure_context_is_scoped_by_source_order_for_caption_and_placement(self):
+        shared_context = (
+            "Graph 1: The substitute-price curve slopes upward. "
+            "Graph 2: The complement-price curve slopes downward."
+        )
+        references = [{
+            "page_number": 14,
+            "visuals": [
+                {
+                    "visual_id": "right-graph",
+                    "page_number": 14,
+                    "bbox": [300, 20, 500, 200],
+                    "crop_url": "/media/right-graph.jpg",
+                    "auto_topic": "Price theory",
+                    "auto_decision": "approved_high_confidence",
+                    "context_after": shared_context,
+                },
+                {
+                    "visual_id": "left-graph",
+                    "page_number": 14,
+                    "bbox": [20, 20, 220, 200],
+                    "crop_url": "/media/left-graph.jpg",
+                    "auto_topic": "Price theory",
+                    "auto_decision": "approved_high_confidence",
+                    "context_after": shared_context,
+                },
+            ],
+        }]
+        manifest = _approved_visual_manifest(references)
+        captions = {visual["id"]: visual["caption"].lower() for visual in manifest}
+        notes = (
+            "## 1. Substitutes\n\nA fall in the price of a substitute reduces demand.\n\n"
+            "## 2. Complements\n\nA fall in the price of a complement raises demand."
+        )
+
+        placed = _insert_required_visual_markers(notes, manifest)
+
+        self.assertIn("substitute-price", captions["left-graph"])
+        self.assertIn("complement-price", captions["right-graph"])
+        self.assertLess(placed.index("[[VISUAL:left-graph]]"), placed.index("## 2. Complements"))
+        self.assertGreater(placed.index("[[VISUAL:right-graph]]"), placed.index("## 2. Complements"))
+
     def test_approved_visual_is_not_duplicated_in_one_note_level(self):
         image = "![PPF](https://example.test/ppf.jpg)"
         notes = f"Explanation one.\n\n{image}\n\nExplanation two.\n\n{image}"
@@ -1748,11 +1983,216 @@ $$
         self.assertTrue(result.get("validation_failed"), result)
         self.assertEqual(result.get("notes"), "")
         self.assertIn("NO APPROVED SOURCE FIGURE IS AVAILABLE", route_request.call_args.args[0])
+        self.assertIn("Text-only visual walkthrough:", route_request.call_args.args[0])
+        self.assertIn("UNIVERSAL VISUAL AND NOTATION REQUIREMENTS (all disciplines)", route_request.call_args.args[0])
+        self.assertIn("Define every variable, symbol, abbreviation, and unit", route_request.call_args.args[0])
+        self.assertIn("explain each supported relationship or direction", route_request.call_args.args[0])
+        self.assertIn("NON-STUDY ADMINISTRATIVE DETAILS POLICY (all disciplines)", route_request.call_args.args[0])
         self.assertFalse(PrepContentCache.objects.filter(
             topic=self.topic,
             content_type="topic_notes",
             payload__validation_state=NOTE_VALIDATION_STATE,
         ).exists())
+
+    @patch("prep.views.get_or_generate_topic_notes")
+    def test_review_blocked_notes_do_not_fall_through_to_generation(self, note_service):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        PrepNoteGenerationGuard.objects.create(
+            topic=self.topic,
+            level="level_2",
+            source_signature=signature,
+            failed_attempts=1,
+            status="needs_review",
+            last_error="empty content",
+        )
+        note_service.return_value = {
+            "notes": "",
+            "blocks": [],
+            "cached": False,
+            "level": "level_2",
+            "needs_review": True,
+            "validation_failed": True,
+            "error": "This note level is awaiting tutor review.",
+        }
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({
+                "topic_id": self.topic.pk,
+                "course_code": self.course.code,
+                "topic_title": self.topic.title,
+                "level": "level_2",
+            }),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertTrue(response.json()["needs_review"])
+        self.assertEqual(note_service.call_count, 1)
+        self.assertFalse(note_service.call_args.kwargs["generate_if_missing"])
+
+    @patch("services.prep_ai_router._repair_invalid_note_cache")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_stale_review_guard_allows_retry_when_no_repair_was_recorded(self, route_request, repair):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        cache_key = compute_cache_key(
+            "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
+        )
+        PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="topic_notes",
+            prompt_hash="empty-invalid-note",
+            payload={"content": "", "level": "level_2"},
+            course=self.course,
+            topic=self.topic,
+        )
+        guard = PrepNoteGenerationGuard.objects.create(
+            topic=self.topic,
+            level="level_2",
+            source_signature=signature,
+            failed_attempts=1,
+            status="needs_review",
+            last_error="empty content",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": self.valid_notes,
+            "model_used": "test-notes-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        self.assertFalse(result.get("cached"))
+        self.assertFalse(PrepNoteGenerationGuard.objects.filter(pk=guard.pk).exists())
+        repair.assert_not_called()
+        route_request.assert_called_once()
+
+    def test_figure_reference_issue_is_scoped_to_its_note_section(self):
+        notes = self.valid_notes.replace(
+            "## 3. Three\n\nText.",
+            "## 3. Three\n\nAs shown in the graph, the quantity increases.",
+        )
+
+        prefix, repair_scope, suffix = _note_repair_scope(notes, self.topic.title)
+
+        self.assertIn("As shown in the graph", repair_scope)
+        self.assertNotIn("## 1. One", repair_scope)
+        self.assertNotIn("## 4. Four", repair_scope)
+        self.assertIn("## 1. One", prefix)
+        self.assertIn("## 4. Four", suffix)
+
+    def test_admin_retry_action_reopens_the_matching_note_repair(self):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        guard = PrepNoteGenerationGuard.objects.create(
+            topic=self.topic,
+            level="level_2",
+            source_signature=signature,
+            failed_attempts=1,
+            status="needs_review",
+            last_error="empty content",
+        )
+        repair = PrepNoteRepair.objects.create(
+            topic=self.topic,
+            level="level_2",
+            source_signature=signature,
+            cache_key="notes:retry-action-test",
+            original_content="partial notes",
+            current_content="partial notes",
+            validation_issues=["missing section ## 2."],
+            attempts=3,
+            status="needs_review",
+            last_error="repair exhausted",
+        )
+        self.user.is_staff = True
+        self.user.is_superuser = True
+        self.user.save(update_fields=["is_staff", "is_superuser"])
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("admin:prep_prepnotegenerationguard_changelist"),
+            {
+                "action": "reset_generation_guards",
+                "_selected_action": [str(guard.pk)],
+                "index": "0",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        guard.refresh_from_db()
+        repair.refresh_from_db()
+        self.assertEqual(guard.status, "open")
+        self.assertEqual(guard.failed_attempts, 0)
+        self.assertEqual(repair.status, "open")
+        self.assertEqual(repair.attempts, 0)
+        self.assertEqual(repair.current_content, "partial notes")
+
+    @patch("services.prep_ai_router._repair_invalid_note_cache")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_empty_cached_note_uses_one_provider_retry_and_validates_replacement(self, route_request, repair):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        cache_key = compute_cache_key(
+            "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
+        )
+        PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="topic_notes",
+            prompt_hash="empty-note-cache",
+            payload={"content": "", "level": "level_2"},
+            course=self.course,
+            topic=self.topic,
+        )
+        route_request.side_effect = [
+            {
+                "success": False,
+                "empty_response": True,
+                "finish_reason": "stop",
+                "response_id": "empty-first-attempt",
+                "error": "DeepSeek returned empty assistant content (finish_reason=stop).",
+                "usage": {"prompt_tokens": 10, "completion_tokens": 0, "total_tokens": 10},
+            },
+            {
+                "success": True,
+                "content": self.valid_notes,
+                "model_used": "test-model",
+                "usage": {"prompt_tokens": 10, "completion_tokens": 100, "total_tokens": 110},
+            },
+        ]
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertEqual(result["notes"], self.valid_notes.strip())
+        self.assertTrue(result["regenerated_from_invalid_cache"])
+        self.assertEqual(route_request.call_count, 2)
+        self.assertEqual(result["usage"]["total_tokens"], 120)
+        repair.assert_not_called()
+        self.assertTrue(all(call.kwargs["thinking_enabled"] is False for call in route_request.call_args_list))
+        cached = PrepContentCache.objects.get(cache_key=cache_key)
+        self.assertEqual(cached.payload["content"], self.valid_notes.strip())
+        self.assertEqual(cached.payload["validation_state"], NOTE_VALIDATION_STATE)
 
     def test_examination_papers_are_not_note_generation_sources(self):
         PrepDocument.objects.create(

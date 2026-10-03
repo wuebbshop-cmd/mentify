@@ -594,6 +594,8 @@ def assign_visuals_to_topics(prep_document, topics, *, allow_auto_approval: bool
     for visual in candidates:
         if visual.status not in {"candidate", "approved", "needs_review", "rejected"}:
             continue
+        if visual.reviewed_at and visual.status in {"approved", "rejected"}:
+            continue
         metadata = dict(visual.extracted_content) if isinstance(visual.extracted_content, dict) else {}
         if visual.status != "candidate" and not metadata.get("auto_decision"):
             continue
@@ -1807,9 +1809,7 @@ def process_prep_document(prep_document) -> dict:
     """
     from prep.models import PrepDocument, PrepWallet, PrepNotification
     from services.credit_service import (
-        InsufficientCredits,
         PlanLimitExceeded,
-        consume_credits,
         enforce_subscription_limit,
         get_available_credits,
     )
@@ -1873,21 +1873,16 @@ def process_prep_document(prep_document) -> dict:
             credit_cost = 5
             action_type = "upload_ocr"
 
-    # Enforce the plan allowance and available balance before any paid OCR or
-    # downstream indexing work starts. Local text extraction above is free.
+    # Enforce plan quotas before any paid OCR or downstream indexing work.
+    # Upload credits are shared course costs and are settled per catalog member.
     wallet = PrepWallet.get_or_create_wallet(prep_document.user) if prep_document.user else None
+    uploader_upload_credits = 0
     if wallet:
         quota_name = "scanned_uploads" if action_type == "upload_ocr" else "document_uploads"
         try:
             enforce_subscription_limit(wallet, quota_name)
         except PlanLimitExceeded as exc:
             return {"success": False, "error": str(exc), "credits_balance": get_available_credits(wallet)}
-        if get_available_credits(wallet) < credit_cost:
-            return {
-                "success": False,
-                "error": f"Insufficient credits. This upload requires {credit_cost} credits.",
-                "credits_balance": wallet.credits_balance,
-            }
 
     # 2. Permanent GitHub Storage only after the request is eligible to run.
     with prep_document.file.open("rb") as uploaded_file:
@@ -1997,26 +1992,26 @@ def process_prep_document(prep_document) -> dict:
     prep_document.stage = "stage_2"
     prep_document.save()
 
-    # 5. Atomic Credit Wallet Deduction
+    # 5. Record and settle the shared course upload cost.
     if prep_document.user:
-        try:
-            consume_credits(
-                wallet,
-                credit_cost,
-                action_type=action_type,
-                description=f"Document Ingestion: {prep_document.course.code} ({method_used})",
-                metadata={
-                    "method_used": method_used,
-                    "pages": page_count,
-                    "visual_candidates": visual_candidate_count,
-                },
-            )
-        except InsufficientCredits:
-            return {
-                "success": False,
-                "error": f"Insufficient credits. This upload requires {credit_cost} credits.",
-                "credits_balance": get_available_credits(wallet),
-            }
+        from services.prep_course_billing import create_shared_course_cost, settle_course_cost_share
+
+        shared_cost = create_shared_course_cost(
+            course=prep_document.course,
+            cost_type="upload",
+            total_credits=credit_cost,
+            source_key=f"upload:{prep_document.pk}",
+            document=prep_document,
+            usage={"total_tokens": 0, "upload_credits": credit_cost},
+            model_name=method_used,
+        )
+        uploader_share = shared_cost.shares.filter(user=prep_document.user).first()
+        uploader_paid_before = uploader_share.paid_credits if uploader_share else 0
+        for share in shared_cost.shares.select_related("user", "cost").all():
+            settle_course_cost_share(share)
+        if uploader_share:
+            uploader_share.refresh_from_db(fields=["paid_credits"])
+            uploader_upload_credits = uploader_share.paid_credits - uploader_paid_before
 
         # 6. Live Student Notification
         clean_filename = prep_document.file.name.split("/")[-1]
@@ -2035,7 +2030,8 @@ def process_prep_document(prep_document) -> dict:
         "document_id": str(prep_document.id),
         "stage": prep_document.stage,
         "method_used": method_used,
-        "credits_deducted": credit_cost,
+        "credits_deducted": uploader_upload_credits,
+        "shared_credits_created": credit_cost,
         "pages": page_count,
         "extracted_length": len(text),
         "visual_candidates": visual_candidate_count,

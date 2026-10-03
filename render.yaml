@@ -12,7 +12,7 @@ services:
     
     # ─── Start Command ───────────────────────────────────────────────
     # Runs database migrations on startup + starts Gunicorn
-    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 3 --worker-class sync --timeout 60
+    startCommand: python manage.py migrate --noinput && python manage.py reconcile_prep_course_costs --enqueue-published && gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 3 --worker-class sync --timeout 60
     
     # ─── Environment Variables ───────────────────────────────────────
     # IMPORTANT: Set these in Render dashboard Environment section BEFORE deploy
@@ -44,6 +44,60 @@ services:
       - key: SUPPORT_EMAIL
         value: mentify@mlaudit.info
       - key: CONTACT_RECIPIENT_EMAIL
+        sync: false
+
+  - type: worker
+    name: eduai-note-worker
+    runtime: python
+    pythonVersion: 3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py run_prep_note_worker
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_SSL
+        sync: false
+      - key: DB_TABLE_PREFIX
+        sync: false
+      - key: DB_TABLE_SUFFIX
+        sync: false
+      - key: ALLOWED_HOSTS
+        value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
+      - key: DEEPSEEK_API
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: TOGETHERAI_API
+        sync: false
+      - key: TOGETHERAI_ID
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO
+        sync: false
+      - key: GITHUB_BRANCH
+        value: main
+      - key: GITHUB_UPLOAD_DIR
+        value: mentify-uploads
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        value: mentify@mlaudit.info
+      - key: SUPPORT_EMAIL
+        value: mentify@mlaudit.info
+      - key: ADMIN_EMAILS_NOTIFICATIONS
         sync: false
     
     # ─── Health Check ────────────────────────────────────────────────

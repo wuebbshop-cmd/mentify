@@ -187,7 +187,8 @@ class Command(BaseCommand):
                 str((visual.extracted_content or {}).get("auto_topic") or "")
                 for visual in PrepDocumentVisual.objects.filter(document=source_document, status="approved")
                 if isinstance(visual.extracted_content, dict)
-                and visual.extracted_content.get("auto_decision") == "approved_high_confidence"
+                and visual.extracted_content.get("auto_decision")
+                in {"approved_high_confidence", "tutor_approved"}
             }
         plan["topics"] = []
         plan["provider_calls"] = 0

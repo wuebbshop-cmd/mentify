@@ -9,7 +9,7 @@ from django.test import RequestFactory, SimpleTestCase, TestCase, override_setti
 from prep.document_validation import build_document_validation_report
 from prep.content_rules import CONTENT_MODALITIES
 from prep.admin import PrepDocumentAdmin
-from prep.models import PrepCourse, PrepDocument, PrepDocumentVisual, PrepPaper
+from prep.models import PrepCourse, PrepDocument, PrepDocumentVisual, PrepNotePrecomputeJob, PrepPaper
 from accounts.models import User
 
 
@@ -253,6 +253,33 @@ class DocumentValidationReportTests(SimpleTestCase):
 
 
 class DocumentValidationPublicationGateTests(TestCase):
+    @patch.object(PrepDocumentAdmin, "message_user")
+    def test_published_lecture_notes_queue_level_two_precomputation(self, _message):
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            user = User.objects.create_user(username="publisher", password="Pass12345")
+            course = PrepCourse.objects.create(
+                code="VAL 201",
+                title="Publication Queue Testing",
+                slug="publication-queue-testing",
+            )
+            PrepDocument.objects.create(
+                course=course,
+                doc_type="Lecture Notes",
+                file=SimpleUploadedFile("published-notes.pdf", b"pdf"),
+                extracted_text="--- Page 1 ---\nScarcity and opportunity cost are key concepts.",
+                stage="stage_2",
+            )
+            request = RequestFactory().post("/admin/prep/prepdocument/")
+            request.user = user
+            model_admin = PrepDocumentAdmin(PrepDocument, AdminSite())
+
+            model_admin.approve_stage_3_publish(request, PrepDocument.objects.filter(course=course))
+
+            self.assertEqual(
+                PrepNotePrecomputeJob.objects.filter(course=course, status="pending").count(),
+                1,
+            )
+
     @patch.object(PrepDocumentAdmin, "message_user")
     def test_disallowed_modality_cannot_be_published_or_create_a_paper(self, _message):
         with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
