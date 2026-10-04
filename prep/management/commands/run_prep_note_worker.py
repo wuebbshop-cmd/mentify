@@ -18,8 +18,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         once = options["once"]
         poll_seconds = max(1.0, options["poll_seconds"])
+        last_expiry_sweep = 0.0
         while True:
             try:
+                if time.time() - last_expiry_sweep >= 3600:
+                    self._expire_due_credits()
+                    last_expiry_sweep = time.time()
                 self._recover_stale_jobs()
                 job = self._claim_job()
             except OperationalError:
@@ -33,6 +37,13 @@ class Command(BaseCommand):
                 time.sleep(poll_seconds)
                 continue
             self._process_job(job)
+
+    def _expire_due_credits(self):
+        from prep.models import PrepWallet
+        from services.credit_service import expire_wallet_credits
+
+        for wallet in PrepWallet.objects.all().iterator():
+            expire_wallet_credits(wallet)
 
     def _recover_stale_jobs(self):
         cutoff = timezone.now() - timedelta(minutes=30)

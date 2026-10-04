@@ -35,6 +35,15 @@ ALLOWED_HOSTS = list(set(
 
 # Database: production uses MySQL from DB_* environment variables in base.py.
 
+# Render's local filesystem is ephemeral. Keep uploaded PDFs and generated
+# visual crops on the configured durable GitHub media store instead.
+STORAGES = {
+    **STORAGES,
+    "default": {
+        "BACKEND": "services.github_media_storage.GitHubMediaStorage",
+    },
+}
+
 # Security: HTTPS and HSTS.
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000

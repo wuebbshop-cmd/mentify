@@ -1202,7 +1202,9 @@
     const bodyEl = document.getElementById('notes-body');
     const statusBadge = document.getElementById('notes-status-badge');
 
-    if (publishedNotesByLevel[level]) {
+    // Level 2 must pass through the API so course-cost shares are settled
+    // before shared notes are displayed. Levels 1 and 3 may use their cache directly.
+    if (publishedNotesByLevel[level] && level !== 'level_2') {
       if (statusBadge) { statusBadge.textContent = ''; }
       setupNotesPagination(publishedNotesByLevel[level]);
       return;
@@ -1225,7 +1227,21 @@
         level: level,
       }),
     })
-    .then(r => r.json())
+    .then(async response => {
+      const raw = await response.text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseError) {
+        throw new Error(
+          `Notes request failed (${response.status}). The server returned a non-JSON response.`
+        );
+      }
+      if (!response.ok) {
+        throw new Error(data.error || `Notes request failed (${response.status}).`);
+      }
+      return data;
+    })
     .then(data => {
       notesRequestInFlight = false;
       loadingEl.style.display = 'none';
@@ -1244,7 +1260,7 @@
       loadingEl.style.display = 'none';
       bodyEl.style.opacity = '1';
       console.error(err);
-      alert('Network error while fetching notes.');
+      alert(err.message || 'Unable to load notes. Please try again.');
     });
   }
 

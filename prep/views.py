@@ -219,7 +219,7 @@ def prep_dashboard(request):
 
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
-        user_credits = wallet.credits_balance
+        user_credits = get_available_credits(wallet)
         recent_credit_transactions = wallet.transactions.all()[:10]
         enrolled_courses = PrepCourse.objects.filter(
             enrollments__user=request.user,
@@ -323,6 +323,7 @@ def prep_dashboard(request):
 def prep_courses(request):
     """Personal course list with search across the shared course catalogue."""
     wallet = PrepWallet.get_or_create_wallet(request.user)
+    user_credits = get_available_credits(wallet)
     query = request.GET.get("q", "").strip()
     enrolled_course_ids = set(
         PrepCourseEnrollment.objects.filter(user=request.user).values_list("course_id", flat=True)
@@ -381,7 +382,7 @@ def prep_courses(request):
 
     context = {
         "active_tab": "courses",
-        "user_credits": wallet.credits_balance,
+        "user_credits": user_credits,
         "courses": courses_data,
         "search_query": query,
         "search_results": search_results,
