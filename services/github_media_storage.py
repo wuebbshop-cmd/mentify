@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import os
 from io import BytesIO
 from urllib.parse import quote
 
@@ -22,10 +24,20 @@ class GitHubMediaStorage(Storage):
         return GitHubService(token=token, repo_name=repo, branch=branch, upload_dir=upload_dir)
 
     def _save(self, name, content):
-        result = self._service().upload_file(content, subdir="prep-media")
-        if not result:
-            raise OSError("GitHub media upload returned no path.")
-        return result.repo_path
+        content_bytes = content.read()
+        return self._upload_compact(name, content_bytes)
+
+    def save_existing(self, name, content_bytes: bytes) -> str:
+        """Upload an existing local file to a deterministic path for resumable migration."""
+        return self._upload_compact(name, content_bytes)
+
+    def _upload_compact(self, name, content_bytes: bytes) -> str:
+        safe_name = "".join(char if char.isalnum() or char in "._-" else "_" for char in os.path.basename(name))
+        digest = hashlib.sha256(content_bytes).hexdigest()[:16]
+        safe_name = safe_name[:40]
+        repo_path = f"{self._service().upload_dir}/prep-media/{digest}-{safe_name}"
+        self._service()._commit_file(repo_path, content_bytes, f"[Mentify] Migrate {safe_name}")
+        return repo_path
 
     def _open(self, name, mode="rb"):
         if "b" not in mode:

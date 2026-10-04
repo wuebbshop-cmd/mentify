@@ -42,6 +42,7 @@ class GitHubService:
         resp = self.session.get(
             f"{self.base_url}/repos/{self.repo_name}/contents/{path}",
             params={"ref": self.branch},
+            timeout=30,
         )
         if resp.status_code >= 300:
             return None
@@ -58,17 +59,25 @@ class GitHubService:
             "content": encoded,
             "branch": self.branch,
         }
-        sha = self._get_file_sha(path)
-        if sha:
-            payload["sha"] = sha
-
-        resp = self.session.put(
-            f"{self.base_url}/repos/{self.repo_name}/contents/{path}",
-            json=payload,
-            timeout=30,
-        )
-        if resp.status_code >= 300:
-            raise RuntimeError(f"GitHub upload failed: {resp.status_code} {resp.text}")
+        last_error = None
+        for _ in range(3):
+            sha = self._get_file_sha(path)
+            if sha:
+                payload["sha"] = sha
+            try:
+                resp = self.session.put(
+                    f"{self.base_url}/repos/{self.repo_name}/contents/{path}",
+                    json=payload,
+                    timeout=60,
+                )
+                if resp.status_code < 300:
+                    return
+                last_error = RuntimeError(f"GitHub upload failed: {resp.status_code} {resp.text}")
+                if resp.status_code == 422:
+                    payload.pop("sha", None)
+            except requests.RequestException as exc:
+                last_error = exc
+        raise RuntimeError(f"GitHub upload failed after retries: {last_error}")
 
     def upload_file(self, file_obj, subdir: str | None = None) -> GitHubUploadResult | None:
         """
