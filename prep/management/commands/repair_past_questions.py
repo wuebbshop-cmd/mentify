@@ -182,7 +182,7 @@ class Command(BaseCommand):
                     metadata.update({
                         "review_status": "deterministically_repaired",
                         "reason": (
-                            "Only unambiguous leading extraction braces or a following paper header were removed."
+                            "Only unambiguous leading extraction debris or a following paper header was removed."
                         ),
                         "deterministic_repair_issues": issues,
                     })

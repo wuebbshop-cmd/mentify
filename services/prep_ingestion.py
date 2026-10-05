@@ -981,7 +981,9 @@ def _strip_assessment_document_footers(text: str) -> str:
 
 def _strip_safe_question_extraction_artifacts(text: str) -> str:
     """Remove only known extraction debris whose boundaries are unambiguous."""
-    cleaned = re.sub(r"^\s*\}+", "", str(text or ""), count=1).lstrip()
+    cleaned = str(text or "")
+    cleaned = re.sub(r"^\s*\*\*\s*(?=\r?\n|$)", "", cleaned, count=1).lstrip()
+    cleaned = re.sub(r"^\s*\}+", "", cleaned, count=1).lstrip()
     header = _ASSESSMENT_PAPER_HEADER_RE.search(cleaned)
     if header:
         cleaned = cleaned[:header.start()].rstrip()
@@ -1579,8 +1581,8 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
     issues = []
     if re.match(r"^\s*\}+", source):
         issues.append("question text begins with stray closing LaTeX braces")
-    if source.count("**") % 2:
-        issues.append("question text contains an unmatched Markdown bold marker")
+    if re.match(r"^\s*\*\*\s*(?:\r?\n|$)", source):
+        issues.append("question text begins with a stray Markdown bold marker")
     if _ASSESSMENT_PAPER_HEADER_RE.search(source):
         issues.append("question text contains the next examination paper header")
     if re.search(r"[\ue000-\uf8ff]", source):

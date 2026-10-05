@@ -139,6 +139,25 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
                     assessment_question_rendering_issues(content),
                 )
 
+    def test_only_flags_and_strips_a_standalone_leading_bold_artifact(self):
+        content = "**\n\nExplain how the estimator is unbiased and justify your answer."
+
+        self.assertIn(
+            "question text begins with a stray Markdown bold marker",
+            assessment_question_rendering_issues(content),
+        )
+        cleaned = _strip_safe_question_extraction_artifacts(content)
+        self.assertEqual(
+            cleaned,
+            "Explain how the estimator is unbiased and justify your answer.",
+        )
+        self.assertFalse(assessment_question_rendering_issues(cleaned))
+
+    def test_allows_asterisks_inside_question_content(self):
+        content = "In Python, evaluate the expression 3 ** 2 and explain its value."
+
+        self.assertFalse(assessment_question_rendering_issues(content))
+
     def test_flags_question_that_ends_before_its_referenced_table(self):
         content = (
             r"\begin{enumerate}"
