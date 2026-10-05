@@ -31,9 +31,11 @@ from services.prep_ai_router import (
     _markdown_table_issues,
     _markdown_theorem_issues,
     _note_repair_scope,
+    _parse_topic_note_repair_patch,
     _note_allows_code,
     _note_completion_issues,
     call_deepseek,
+    call_together_repair,
     _course_administrative_metadata_issues,
     _insert_required_visual_markers,
     _approved_course_source_context,
@@ -129,6 +131,59 @@ class NoteMathValidationTests(TestCase):
         self.assertIn("reasoning_content_present=True", result["error"])
         self.assertEqual(result["usage"]["completion_tokens"], 0)
         self.assertEqual(post.call_args.kwargs["json"]["thinking"], {"type": "disabled"})
+
+    @patch("services.prep_ai_router.requests.post")
+    @override_settings(TOGETHERAI_API="test-key")
+    def test_empty_together_repair_completion_is_not_reported_as_success(self, post):
+        post.return_value.status_code = 200
+        post.return_value.text = ""
+        post.return_value.json.return_value = {
+            "choices": [{
+                "message": {"content": "", "reasoning_content": "reasoning only"},
+                "finish_reason": "length",
+            }],
+            "usage": {"prompt_tokens": 20, "completion_tokens": 5, "total_tokens": 25},
+        }
+
+        result = call_together_repair(
+            [{"role": "user", "content": "Return an old_block/new_block patch."}],
+            model="test-repair-model",
+        )
+
+        self.assertFalse(result["success"])
+        self.assertIn("empty final content", result["error"])
+        self.assertIn("reasoning_content_present=True", result["error"])
+        self.assertEqual(result["usage"]["total_tokens"], 25)
+        self.assertEqual(
+            post.call_args.kwargs["json"]["response_format"],
+            {"type": "json_object"},
+        )
+
+    @patch("services.prep_ai_router.requests.post")
+    @override_settings(TOGETHERAI_API="test-key")
+    def test_together_repair_retries_without_json_mode_when_model_rejects_it(self, post):
+        rejected = type("Response", (), {
+            "status_code": 400,
+            "text": "response_format is not supported",
+        })()
+        success = type("Response", (), {
+            "status_code": 200,
+            "text": "",
+            "json": lambda self: {
+                "choices": [{"message": {"content": '{"old_block":"bad","new_block":"fixed"}'}}],
+                "usage": {},
+            },
+        })()
+        post.side_effect = [rejected, success]
+
+        result = call_together_repair(
+            [{"role": "user", "content": "Return an old_block/new_block patch."}],
+            model="custom-repair-model",
+        )
+
+        self.assertTrue(result["success"], result)
+        self.assertEqual(post.call_count, 2)
+        self.assertNotIn("response_format", post.call_args.kwargs["json"])
 
     def test_repairs_json_decoded_notin_only_inside_math(self):
         source = "For $b \notin (a, b)$, continue.\nOutside prose stays unchanged."
@@ -389,6 +444,107 @@ $$ not mathematical output
         }
 
         self.assertEqual(robust_json_loads(json.dumps(repair)), repair)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_generation_pipeline_handles_notes_for_multiple_syllabus_courses(self, route_request):
+        course_cases = [
+            (
+                "ASC 100",
+                "INTRODUCTION TO  SOCIOLOGY",
+                "Social Sciences",
+                "Social Structure",
+                "Institutions, roles, relationships, and the organization of social life",
+            ),
+            (
+                "EET 100",
+                "Macroeconomic Theory",
+                "Other",
+                "Theory of the consumer",
+                "Preferences, constraints, and the choices consumers make",
+            ),
+            (
+                "SMA 300",
+                "Real Analysis I",
+                "Mathematics",
+                "Sequences",
+                "Convergence, boundedness, subsequences, and Cauchy criteria",
+            ),
+            (
+                "SST 301",
+                "Programming Language for Statistics 1",
+                "Computing",
+                "Matrices in R",
+                "Matrix creation, indexing, arithmetic, and data manipulation",
+            ),
+            (
+                "SST 305",
+                "Theory of Estimation",
+                "Statistics",
+                "Properties of Estimators",
+                "Unbiasedness, consistency, efficiency, and sufficiency",
+            ),
+        ]
+        headings = (
+            "Core Concepts",
+            "Definitions and Scope",
+            "Key Properties",
+            "Worked Applications",
+            "Exam Review",
+        )
+        expected_notes = []
+        for code, title, category, topic_title, focus in course_cases:
+            note = "\n\n".join(
+                f"## {index}. {heading}\n\n"
+                f"{topic_title} in {title} concerns {focus}. "
+                "Explain each idea in the approved course scope, connect it to an appropriate example, "
+                "and state how learners should interpret the result."
+                for index, heading in enumerate(headings, start=1)
+            )
+            expected_notes.append(note)
+        route_request.side_effect = [
+            {
+                "success": True,
+                "content": note,
+                "model_used": "test-notes-model",
+                "usage": {"total_tokens": 12},
+            }
+            for note in expected_notes
+        ]
+
+        for (code, title, category, topic_title, _focus), expected in zip(course_cases, expected_notes):
+            course = PrepCourse.objects.create(
+                code=code,
+                title=title,
+                slug=code.lower().replace(" ", "-"),
+                category=category,
+            )
+            topic = PrepTopic.objects.create(
+                course=course,
+                order=1,
+                title=topic_title,
+                slug=topic_title.lower().replace(" ", "-"),
+            )
+
+            result = get_or_generate_topic_notes(
+                course.code,
+                topic.title,
+                level="level_2",
+                course_obj=course,
+                topic_obj=topic,
+            )
+
+            self.assertEqual(result.get("notes"), expected, result)
+            self.assertFalse(result.get("error"), result)
+            cached = PrepContentCache.objects.get(topic=topic, content_type="topic_notes")
+            self.assertEqual(cached.payload["validation_state"], NOTE_VALIDATION_STATE)
+
+        self.assertEqual(route_request.call_count, len(course_cases))
+
+    def test_note_repair_parser_accepts_fenced_json_after_a_short_preamble(self):
+        repair = {"old_block": "broken equation", "new_block": "corrected equation"}
+        response = "Patch:\n```json\n" + json.dumps(repair) + "\n```"
+
+        self.assertEqual(_parse_topic_note_repair_patch(response), repair)
 
     @patch("services.prep_ai_router.route_math_request")
     def test_social_science_question_solution_uses_explanatory_template(self, mock_route):
@@ -690,6 +846,57 @@ $$
 
     @patch("services.prep_ai_router.call_together_repair")
     @override_settings(TOGETHER_REPAIR_MODEL="configured-targeted-repair-model")
+    def test_empty_repair_response_is_retried_with_explicit_json_feedback(self, repair_request):
+        signature = _topic_notes_cache_signature(
+            self.course, self.topic, self.topic.title, self.topic.subtopics
+        )
+        cache_key = compute_cache_key(
+            "notes", NOTES_CACHE_VERSION, self.course.code, self.topic.title, "level_2", signature
+        )
+        valid_equation = "$$\n\\left\\lvert a_m-a_n\\right\\rvert \\leq \\varepsilon\n$$"
+        broken_block = "$$\n\\left\\lvert a_m-a_n\\right\n\n\\right\\rvert\n$$"
+        broken_notes = self.valid_notes.replace(valid_equation, broken_block)
+        PrepContentCache.objects.create(
+            cache_key=cache_key,
+            content_type="topic_notes",
+            prompt_hash="empty-repair-response",
+            payload={"content": broken_notes, "level": "level_2"},
+            course=self.course,
+            topic=self.topic,
+        )
+        repair_request.side_effect = [
+            {
+                "success": False,
+                "error": "Together repair returned empty final content (finish_reason=length).",
+                "usage": {"total_tokens": 5},
+            },
+            {
+                "success": True,
+                "content": (
+                    "```json\n"
+                    + json.dumps({"old_block": broken_block, "new_block": valid_equation})
+                    + "\n```"
+                ),
+                "usage": {"total_tokens": 8},
+            },
+        ]
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(result.get("repaired"), result)
+        self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
+        self.assertEqual(repair_request.call_count, 2)
+        self.assertIn("previous response was rejected", repair_request.call_args_list[1].args[0][1]["content"])
+        self.assertEqual(result["usage"]["total_tokens"], 13)
+
+    @patch("services.prep_ai_router.call_together_repair")
+    @override_settings(TOGETHER_REPAIR_MODEL="configured-targeted-repair-model")
     def test_screenshot_nested_environment_is_sent_to_configured_targeted_repair(self, repair_request):
         signature = _topic_notes_cache_signature(
             self.course, self.topic, self.topic.title, self.topic.subtopics
@@ -779,6 +986,10 @@ $$
         self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
         self.assertEqual(result["usage"]["total_tokens"], 125)
         repair_request.assert_called_once()
+        prompt = route_request.call_args.args[0]
+        self.assertIn("Teach as if explaining the idea to a child for the first time", prompt)
+        self.assertIn("Use familiar everyday words, short sentences, and one new idea at a time", prompt)
+        self.assertIn("give its meaning immediately in plain words", prompt)
         self.assertFalse(PrepContentCache.objects.get(topic=self.topic).payload.get("validation_state") is None)
 
     @patch("services.prep_ai_router.call_deepseek")
@@ -1230,6 +1441,27 @@ $$
         )
 
         self.assertEqual(response.status_code, 422)
+
+    @patch("prep.views.get_or_generate_topic_notes", side_effect=RuntimeError("provider output failed"))
+    def test_unexpected_notes_api_failure_returns_json_and_logs_internal_exception(self, generate_notes):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({
+                "course_code": self.course.code,
+                "topic_title": "Sequences",
+                "level": "level_2",
+            }),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertEqual(response.json()["success"], False)
+        self.assertIn("server error", response.json()["error"])
+        self.assertNotIn("provider output failed", response.content.decode("utf-8"))
+        generate_notes.assert_called_once()
 
     @patch("services.prep_ai_router.route_math_request")
     def test_failed_solution_generation_returns_an_error_without_placeholder(self, route_request):
@@ -1983,7 +2215,8 @@ $$
         self.assertTrue(result.get("validation_failed"), result)
         self.assertEqual(result.get("notes"), "")
         self.assertIn("NO APPROVED SOURCE FIGURE IS AVAILABLE", route_request.call_args.args[0])
-        self.assertIn("Text-only visual walkthrough:", route_request.call_args.args[0])
+        self.assertNotIn("Text-only visual walkthrough:", route_request.call_args.args[0])
+        self.assertIn("without labeling it as a walkthrough", route_request.call_args.args[0])
         self.assertIn("UNIVERSAL VISUAL AND NOTATION REQUIREMENTS (all disciplines)", route_request.call_args.args[0])
         self.assertIn("Define every variable, symbol, abbreviation, and unit", route_request.call_args.args[0])
         self.assertIn("explain each supported relationship or direction", route_request.call_args.args[0])
@@ -2554,7 +2787,7 @@ class TopicStudyQuestionRenderingTests(TestCase):
             verification_status="verified",
             number=1,
             marks=5,
-            question_latex="Find $x$.",
+            question_latex="Find the value of $x$ and explain how it follows from the equation.",
             solution_latex="$x = 1$.",
         )
 

@@ -29,7 +29,22 @@ from services.prep_blocks import split_markdown_table_row
 
 logger = logging.getLogger(__name__)
 
-_NON_MATH_LATEX_ENVIRONMENTS = {"center", "document", "figure", "tikzpicture"}
+_NON_MATH_LATEX_ENVIRONMENTS = {
+    "center",
+    "description",
+    "document",
+    "enumerate",
+    "figure",
+    "flushleft",
+    "flushright",
+    "itemize",
+    "quote",
+    "quotation",
+    "table",
+    "tabular",
+    "tikzpicture",
+    "verbatim",
+}
 _VISUAL_NOTE_ROUTING_VERSION = "figure-placement-server-owned-v6-numbered-siblings"
 _APPROVED_VISUAL_DECISIONS = {"approved_high_confidence", "tutor_approved"}
 _ADMINISTRATIVE_NOTE_PATTERN = re.compile(
@@ -949,6 +964,32 @@ def _note_repair_scope(content: str, topic_title: str) -> tuple[str, str, str]:
     return "", content, ""
 
 
+def _parse_topic_note_repair_patch(raw_response: str) -> dict:
+    """Parse a JSON repair patch, tolerating a short model preamble or code fence."""
+    raw_response = str(raw_response or "").strip()
+    if not raw_response:
+        raise ValueError("repair model returned an empty response")
+
+    candidates = [raw_response]
+    object_start = raw_response.find("{")
+    object_end = raw_response.rfind("}")
+    if object_start >= 0 and object_end > object_start:
+        candidates.append(raw_response[object_start:object_end + 1])
+
+    for candidate in candidates:
+        try:
+            patch = robust_json_loads(candidate)
+        except ValueError:
+            continue
+        if isinstance(patch, dict):
+            old_block = patch.get("old_block")
+            new_block = patch.get("new_block")
+            if isinstance(old_block, str) and isinstance(new_block, str):
+                return patch
+
+    raise ValueError("repair response did not contain a JSON object with string old_block and new_block fields")
+
+
 def _note_needs_section_regeneration(issues: list[str]) -> bool:
     """Identify failures that cannot be fixed with an old_block/new_block patch."""
     return any(
@@ -1862,6 +1903,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
 
     working_content = repair.current_content or content
     repair_usage = {}
+    last_repair_error = ""
     validation_options = _note_validation_options(
         topic_obj.course,
         topic_obj.title,
@@ -1874,21 +1916,31 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
         repair.validation_issues = issues
         repair.save(update_fields=["attempts", "validation_issues", "updated_at"])
         prefix, repair_scope, suffix = _note_repair_scope(working_content, topic_obj.title)
+        repair_instruction = (
+            "Return old_block and new_block as string fields in one JSON object. "
+            "Change only the reported issue; preserve all other text."
+        )
+        if last_repair_error:
+            repair_instruction += (
+                f"\nYour previous response was rejected: {last_repair_error}. "
+                "Return the required JSON object only, with no reasoning or surrounding prose."
+            )
         result = call_together_repair(
             [
-                {"role": "system", "content": "Return JSON only. Repair one Markdown/LaTeX block surgically. Never split words, theorem titles, or sentences across lines. Preserve Markdown blockquote prefixes on every theorem line."},
-                {"role": "user", "content": "Return old_block and new_block. Change only the reported issue; preserve all other text.\nIssues: " + json.dumps(issues) + "\nSource (only the affected section when identifiable):\n" + repair_scope},
+                {"role": "system", "content": "Repair one Markdown/LaTeX block surgically. Never split words, theorem titles, or sentences across lines. Preserve Markdown blockquote prefixes on every theorem line."},
+                {"role": "user", "content": repair_instruction + "\nIssues: " + json.dumps(issues) + "\nSource (only the affected section when identifiable):\n" + repair_scope},
             ],
             model=getattr(settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash"),
             max_tokens=2000,
         )
         repair_usage = _merge_usage(repair_usage, result.get("usage", {}))
         if not result.get("success"):
+            last_repair_error = str(result.get("error") or "repair provider returned an unsuccessful response")
             continue
         try:
-            patch = robust_json_loads(str(result.get("content") or ""))
-            old_block = str(patch.get("old_block") or "")
-            new_block = str(patch.get("new_block") or "")
+            patch = _parse_topic_note_repair_patch(result.get("content", ""))
+            old_block = patch["old_block"]
+            new_block = patch["new_block"]
             if not old_block or not new_block or repair_scope.count(old_block) != 1:
                 raise ValueError("repair block missing or not unique")
             repaired_scope = repair_scope.replace(old_block, new_block, 1)
@@ -1931,7 +1983,8 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 "usage": repair_usage,
                 "source_references": validation_options["source_references"],
             }
-        except Exception as exc:
+        except ValueError as exc:
+            last_repair_error = str(exc)
             logger.warning(
                 "[Topic Notes] targeted repair patch rejected for %s: %s",
                 topic_obj.title,
@@ -1941,6 +1994,8 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
 
     repair.status = "needs_review"
     repair.last_error = "; ".join(issues)
+    if last_repair_error:
+        repair.last_error += f"; targeted repair failed: {last_repair_error}"
     repair.save(update_fields=["status", "last_error", "updated_at"])
     _record_note_generation_failure(
         topic_obj,
@@ -2119,21 +2174,55 @@ def call_together_repair(messages: list[dict], model: str, max_tokens: int = 200
         return {"success": False, "error": "TOGETHERAI_API key is not configured."}
 
     try:
+        request_body = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": 0.1,
+            "response_format": {"type": "json_object"},
+        }
         response = requests.post(
             "https://api.together.xyz/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": 0.1},
+            json=request_body,
             timeout=60,
         )
+        if response.status_code == 400 and "response_format" in response.text.lower():
+            logger.warning(
+                "[Together Repair] model %s rejected JSON mode; retrying once without it",
+                model,
+            )
+            request_body.pop("response_format")
+            response = requests.post(
+                "https://api.together.xyz/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json=request_body,
+                timeout=60,
+            )
         if response.status_code != 200:
             return {"success": False, "error": f"Together HTTP {response.status_code}: {response.text[:500]}"}
         data = response.json()
         choice = data["choices"][0]
+        message = choice.get("message", {})
+        content = message.get("content")
+        usage = data.get("usage", {})
+        if not isinstance(content, str) or not content.strip():
+            finish_reason = choice.get("finish_reason") or "unknown"
+            reasoning_present = bool(message.get("reasoning_content"))
+            return {
+                "success": False,
+                "error": (
+                    "Together repair returned empty final content "
+                    f"(finish_reason={finish_reason}; reasoning_content_present={reasoning_present})."
+                ),
+                "model_used": model,
+                "usage": usage,
+            }
         return {
             "success": True,
-            "content": choice.get("message", {}).get("content", "").strip(),
+            "content": content.strip(),
             "model_used": model,
-            "usage": data.get("usage", {}),
+            "usage": usage,
         }
     except Exception as exc:
         logger.warning("[Together Repair] request failed: %s", exc)
@@ -2543,9 +2632,9 @@ def get_or_generate_topic_notes(
         if approved_visual_manifest
         else (
             "NO APPROVED SOURCE FIGURE IS AVAILABLE. Do not add an image, diagram, graph, Mermaid/TikZ, or plot code.\n"
-            "If the approved source discusses a visual concept, include a **Text-only visual walkthrough:** that defines each variable and label, explains the axes or arrow relationships, and states the supported conclusion in plain language. "
-            "Use only source evidence; if a label, value, or relationship cannot be verified, say so instead of guessing. "
-            "Never tell the student to look at an absent figure (for example, do not write 'as shown in the graph').\n\n"
+            "Explain any relevant visual relationship naturally in the surrounding lesson, without labeling it as a walkthrough, "
+            "announcing that an image is unavailable, or repeating caveats about missing figures. "
+            "Use only source-supported facts and never tell the student to look at an absent image.\n\n"
         )
     )
     visual_independence_block = (
@@ -2554,8 +2643,8 @@ def get_or_generate_topic_notes(
         "When discussing a graph, state the axes, units, direction or comparison, and conclusion in words when supported by the source. "
         "When discussing an arrowed or structural diagram, name the relevant parts and explain each supported relationship or direction. "
         "Never make the student infer the explanation solely from an image. "
-        "For each visual concept without its own approved source image, include a **Text-only visual walkthrough:** that makes the concept understandable without the image. "
-        "Use only source-supported facts; explicitly say when a label, value, or relationship is unavailable or awaiting review instead of guessing. "
+        "When no source image is available, explain a relevant visual concept in ordinary prose only when that adds useful understanding; do not announce the absence of an image or repeat a disclaimer. "
+        "Use only source-supported facts; omit details that are unavailable instead of guessing. "
         "Do not refer to a missing image as if it were shown.\n\n"
     )
 
@@ -2580,10 +2669,12 @@ def get_or_generate_topic_notes(
     subtopics_str = ", ".join(subtopics) if subtopics else "General Syllabus Scope"
     if level == "level_1":
         level_instruction = (
-            "Tone: Intuitive, accessible, and foundational (Level 1).\n"
-            "- Use clear plain English and analogies appropriate to this subject.\n"
-            "- Explain foundational ideas step by step and define necessary terminology.\n"
-            "- Introduce approved notation or code gently only when relevant to this topic."
+            "Tone: Patient, very simple, and foundational (Level 1). Teach as if explaining the idea to a child for the first time, "
+            "while speaking respectfully to an adult learner.\n"
+            "- Use familiar everyday words, short sentences, and one new idea at a time. Assume the learner may need extra time; never skip a reasoning step.\n"
+            "- Start with a concrete everyday example or analogy before introducing an abstract definition. Explain what the example shows and where the analogy stops being exact.\n"
+            "- Avoid jargon. When a necessary course term first appears, give its meaning immediately in plain words and use a simple example before using it again.\n"
+            "- If approved symbols, equations, or code are needed, introduce only one small piece at a time, say what every part means in ordinary language, and explain the result in words. Do not make the notes more technical than the source requires."
         )
     elif level == "level_3":
         level_instruction = (
@@ -2603,10 +2694,9 @@ def get_or_generate_topic_notes(
     if study_profile and study_profile.get("subject_family") in {
         "social_science", "humanities", "business_economics", "general_science",
     }:
-        level_instruction = (
-            f"Tone: University-level {study_profile['subject_family'].replace('_', ' ')} teaching (Level {level[-1]}).\n"
-            "- Explain the approved concepts, evidence, context, and applications clearly.\n"
-            "- Do not introduce mathematical derivations or programming unless the approved source capability explicitly allows them."
+        level_instruction += (
+            f"\nSubject-family guidance ({study_profile['subject_family'].replace('_', ' ')}): explain the approved concepts, evidence, context, and applications accurately. "
+            "Do not introduce mathematical derivations or programming unless the approved source capability explicitly allows them."
         )
     if allows_math:
         level_instruction += "\n- Include relevant source-supported equations or derivations at the depth appropriate to this level."
@@ -3012,7 +3102,7 @@ def robust_json_loads(raw_text: str):
     if objects:
         return objects
 
-    raise ValueError(f"Could not parse question JSON: {cleaned[:200]}")
+    raise ValueError(f"Could not parse JSON response: {cleaned[:200]}")
 
 
 def _practice_question_issues(items, expected_count: int) -> list[str]:
@@ -3070,12 +3160,14 @@ def generate_similar_practice_questions(
     # 1. Check existing generated questions in DB for this topic
     existing_qs = []
     if topic_obj:
+        from services.prep_ingestion import learner_visible_assessment_questions
+
         existing_qs = list(
-            PrepQuestion.objects.filter(
+            learner_visible_assessment_questions(PrepQuestion.objects.filter(
                 topic=topic_obj,
                 question_type="generated",
-                verification_status="verified",
-            ).order_by("number")
+                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+            ).order_by("number", "id"))
         )
 
     # A shared generated set is immutable once verified. Reopening the control
@@ -3767,6 +3859,18 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
     }
 
 
+def _strip_question_number_heading(question_text: str) -> str:
+    """Remove one redundant generated label; the UI supplies the displayed number."""
+    return re.sub(
+        r"(?im)^\s*(?:(?:\*\*|__)\s*)?(?:question|q\.?)\s+"
+        r"(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)"
+        r"\s*[:.)-]?\s*(?:(?:\*\*|__)\s*)?",
+        "",
+        str(question_text or ""),
+        count=1,
+    ).strip()
+
+
 def generate_adapted_past_question(question_obj) -> dict:
     """Reconstruct one unreadable past-paper question from its context.
 
@@ -3822,6 +3926,9 @@ def generate_adapted_past_question(question_obj) -> dict:
         "Create a mathematically coherent equivalent "
         "that tests the same likely skill. Include a complete step-by-step solution. Return only one JSON "
         "object with keys: marks, topic_label, question_latex, solution_latex, hint, confidence. "
+        "The question_latex value must contain only the problem statement: do not add a 'Question N' label, "
+        "numbered title, or heading because the application adds the question number. "
+        "Use valid balanced LaTeX text lists (for example enumerate) outside math delimiters when needed. "
         "Confidence is your estimate from 0 to 1, not proof of original wording. "
         "Use Markdown and KaTeX "
         "delimiters exactly as requested, with no HTML and no code fences around the JSON."
@@ -3846,10 +3953,11 @@ def generate_adapted_past_question(question_obj) -> dict:
             request_prompt,
             course_code,
             topic_label=topic_title,
-            is_complex_proof=True,
+            is_complex_proof=False,
             system_prompt=system_prompt,
-            max_tokens_override=1400,
+            max_tokens_override=3000,
             auto_continue=False,
+            thinking_enabled=False,
         )
         model = result.get("model_used", model)
         usage = _merge_usage(usage, result.get("usage", {}))
@@ -3863,11 +3971,15 @@ def generate_adapted_past_question(question_obj) -> dict:
                 item = item[0] if len(item) == 1 else None
             if not isinstance(item, dict):
                 raise ValueError("response was not one question object")
+            item["question_latex"] = _strip_question_number_heading(
+                normalize_math_delimiters(item.get("question_latex", ""))
+            )
+            item["solution_latex"] = normalize_math_delimiters(
+                item.get("solution_latex", "")
+            )
             issues = _practice_question_issues([item], 1)
             if issues:
                 raise ValueError("; ".join(issues))
-            item["question_latex"] = normalize_math_delimiters(item["question_latex"])
-            item["solution_latex"] = normalize_math_delimiters(item["solution_latex"])
             source_issues = assessment_question_rendering_issues(item["question_latex"])
             if source_issues:
                 raise ValueError("reconstructed question failed extraction validation: " + "; ".join(source_issues))

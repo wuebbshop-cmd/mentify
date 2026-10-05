@@ -186,6 +186,44 @@ class PrepTopic(models.Model):
         super().save(*args, **kwargs)
 
 
+class PrepTopicChatSession(models.Model):
+    """A learner's persistent, topic-scoped study conversation."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="prep_topic_chat_sessions")
+    topic = models.ForeignKey(PrepTopic, on_delete=models.CASCADE, related_name="chat_sessions")
+    title = models.CharField(max_length=160, default="Topic study chat")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at", "-id"]
+
+
+class PrepTopicChatMessage(models.Model):
+    """One bounded learner/assistant turn retained for the topic history panel."""
+    ROLES = [("user", "Learner"), ("assistant", "Assistant")]
+
+    session = models.ForeignKey(PrepTopicChatSession, on_delete=models.CASCADE, related_name="messages")
+    role = models.CharField(max_length=20, choices=ROLES)
+    content = models.TextField()
+    input_tokens = models.PositiveIntegerField(default=0)
+    output_tokens = models.PositiveIntegerField(default=0)
+    credits_charged = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+
+
+class PrepTopicChatUpload(models.Model):
+    """Validated text extracted from a learner upload available to one chat."""
+    session = models.ForeignKey(PrepTopicChatSession, on_delete=models.CASCADE, related_name="uploads")
+    original_name = models.CharField(max_length=255)
+    extracted_text = models.TextField()
+    page_count = models.PositiveIntegerField(default=1)
+    source_type = models.CharField(max_length=30, default="text_pdf")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class PrepDocument(models.Model):
     """Raw uploaded document (notes or CAT papers) progressing through the 3-stage pipeline."""
     DOC_TYPES = [

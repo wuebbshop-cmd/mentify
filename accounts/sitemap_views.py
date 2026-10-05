@@ -62,6 +62,7 @@ def sitemap(request):
     try:
         from prep.models import PrepContentCache, PrepCourse, PrepQuestion, PrepTopic
         from services.prep_ai_router import _note_completion_issues
+        from services.prep_ingestion import learner_visible_assessment_questions
 
         # Mentify Prep public marketing and footer pages
         prep_pages.extend([
@@ -92,10 +93,14 @@ def sitemap(request):
         for topic in PrepTopic.objects.filter(course__is_active=True).select_related("course").only(
             "id", "slug", "created_at", "course__slug"
         ):
-            has_verified_questions = PrepQuestion.objects.filter(
-                topic=topic,
-                verification_status="verified",
-            ).filter(Q(paper__isnull=True) | Q(paper__is_published=True)).exists()
+            has_verified_questions = bool(
+                learner_visible_assessment_questions(
+                    PrepQuestion.objects.filter(
+                        topic=topic,
+                        verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+                    ).filter(Q(paper__isnull=True) | Q(paper__is_published=True))
+                )
+            )
             if topic.id not in notes_dates and not has_verified_questions:
                 continue
             lastmod = notes_dates.get(topic.id, topic.created_at).date().isoformat()

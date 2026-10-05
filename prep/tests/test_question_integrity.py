@@ -16,6 +16,7 @@ from services.prep_ingestion import (
     assessment_question_rendering_issues,
     extract_assessment_questions,
     index_assessment_questions,
+    learner_visible_assessment_questions,
 )
 
 
@@ -38,6 +39,46 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
         self.assertNotIn("--- Page 5 ---", questions[0]["question_latex"])
         self.assertEqual(questions[1]["source_page_number"], 5)
         self.assertIsNone(questions[0]["extraction_confidence"])
+
+    def test_question_splitter_recognizes_word_number_markdown_and_latex_headings(self):
+        source = (
+            "**QUESTION ONE** Explain why a convergent sequence is bounded.\n"
+            "\\section*{Question Three (6 marks)}\n"
+            "Show that the limit is unique."
+        )
+
+        questions = extract_assessment_questions(source)
+
+        self.assertEqual([question["number"] for question in questions], [1, 3])
+        self.assertIn("Explain why a convergent sequence", questions[0]["question_latex"])
+        self.assertIn("Show that the limit is unique", questions[1]["question_latex"])
+
+    def test_question_splitter_removes_scan_and_page_footers(self):
+        source = (
+            "--- Page 8 ---\n"
+            "3. Find the derived set of the integers and decide whether it is closed.\n"
+            "Page 3 of 5\n"
+            "INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION\n"
+            "Scanned with CamScanner\n"
+            "4. Prove that every convergent sequence is Cauchy."
+        )
+
+        questions = extract_assessment_questions(source)
+
+        self.assertEqual(len(questions), 2)
+        self.assertNotIn("Page 3 of 5", questions[0]["question_latex"])
+        self.assertNotIn("INVOLVEMENT IN ANY EXAMINATION IRREGULARITY", questions[0]["question_latex"])
+        self.assertNotIn("Scanned with CamScanner", questions[0]["question_latex"])
+        self.assertIn("Prove that every convergent sequence", questions[1]["question_latex"])
+
+    def test_flags_page_footer_in_existing_question_text(self):
+        issues = assessment_question_rendering_issues(
+            "Find the derived set of the integers.\n"
+            "Page 3 of 5\n"
+            "INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION"
+        )
+
+        self.assertIn("question text contains document page or scan footer", issues)
 
     def test_flags_question_content_that_contains_the_following_question_heading(self):
         content = "Part (e): Prove the intersection is open.\n\n**Question Three (20 marks)**"
@@ -62,6 +103,36 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
             "question text may have a corrupted infimum operator before S",
             assessment_question_rendering_issues(content),
         )
+
+    def test_flags_observed_pdf_glyph_empty_placeholder_and_detached_index_corruption(self):
+        examples = (
+            "Explain the estimate (cid:40) and its role in this calculation.",
+            r"Estimate the parameter using this model and report the result [].",
+            "For a, b, c, .... n, describe the sequence and its convergence.",
+        )
+        expected_issues = (
+            "unreadable PDF character-map placeholder",
+            "question text contains an empty extraction placeholder",
+            "question text contains a corrupted ellipsis or detached indices",
+        )
+
+        for example, expected_issue in zip(examples, expected_issues):
+            with self.subTest(example=example):
+                self.assertIn(expected_issue, assessment_question_rendering_issues(example))
+
+    def test_flags_unbalanced_latex_in_questions_before_display(self):
+        issues = assessment_question_rendering_issues(
+            r"Evaluate this expression and explain the result: $$\frac{1}{2$$."
+        )
+
+        self.assertTrue(any("unmatched braces" in issue for issue in issues), issues)
+
+    def test_allows_balanced_list_environment_in_latex_question_text(self):
+        issues = assessment_question_rendering_issues(
+            r"Choose the correct result: \begin{enumerate}\item first option\end{enumerate}"
+        )
+
+        self.assertFalse(any("outside display math" in issue for issue in issues), issues)
 
     def test_rejects_corrupted_r_boolean_operator(self):
         issues = _practice_question_issues([
@@ -193,6 +264,18 @@ class TopicQuestionCourseIsolationTests(TestCase):
         self.assertNotContains(response, "PENDING_ADAPTATION_MARKER")
         self.assertNotContains(response, "SOURCE NEEDS RECONSTRUCTION")
 
+    def test_verified_but_corrupted_question_is_not_learner_visible(self):
+        corrupted = PrepQuestion.objects.create(
+            topic=self.real_functions,
+            question_type="authentic",
+            verification_status="verified",
+            number=3,
+            marks=5,
+            question_latex="Explain this estimate (cid:40) using the supplied data.",
+        )
+
+        self.assertEqual(learner_visible_assessment_questions([corrupted]), [])
+
 
 class ExistingPastQuestionRepairTests(TestCase):
     def setUp(self):
@@ -295,6 +378,9 @@ class ExistingPastQuestionRepairTests(TestCase):
         self.assertIsNone(adapted.reconstruction_metadata["model_confidence"])
         self.assertEqual(PrepQuestion.objects.filter(reconstructed_from=source).count(), 1)
         self.assertEqual(route_request.call_count, 1)
+        self.assertFalse(route_request.call_args.kwargs["is_complex_proof"])
+        self.assertEqual(route_request.call_args.kwargs["max_tokens_override"], 3000)
+        self.assertFalse(route_request.call_args.kwargs["thinking_enabled"])
         prompt = route_request.call_args.args[0]
         self.assertIn(self.topic.summary, prompt)
         self.assertIn("Atomic vectors", prompt)
@@ -303,6 +389,55 @@ class ExistingPastQuestionRepairTests(TestCase):
         self.assertIn("Source page: 9", prompt)
         self.assertIn("Source-page context (verbatim)", prompt)
         self.assertIn("R notes explain atomic vectors", prompt)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_high_confidence_reconstruction_is_auto_published_after_validation(self, route_request):
+        source = PrepQuestion.objects.create(
+            paper=self.paper,
+            topic=self.topic,
+            question_type="authentic",
+            number=4,
+            marks=10,
+            topic_label=self.topic.title,
+            source_document=self.source_document,
+            question_latex="BAD_SOURCE_MARKER \ue000: Explain this R data type problem.",
+            verification_status="verified",
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "marks": 10,
+                "topic_label": self.topic.title,
+                "question_latex": (
+                    "Question 4: Explain how an atomic vector stores values of one basic type in R.\n"
+                    "\\begin{enumerate}\\item State what typeof() reports.\\end{enumerate}"
+                ),
+                "solution_latex": (
+                    "An atomic vector stores values of one underlying type. "
+                    "The `typeof()` function reports that storage type."
+                ),
+                "hint": "Check the storage mode.",
+                "confidence": 0.94,
+            }),
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        call_command(
+            "repair_past_questions",
+            course_code="SST 301",
+            apply=True,
+            stdout=io.StringIO(),
+        )
+        adapted = PrepQuestion.objects.get(reconstructed_from=source)
+
+        self.assertEqual(adapted.verification_status, "reconstructed")
+        self.assertEqual(adapted.reconstruction_metadata["review_status"], "auto_validated")
+        self.assertEqual(adapted.reconstruction_metadata["model_confidence"], 0.94)
+        self.assertNotIn("Question 4:", adapted.question_latex)
+        self.assertIn("\\begin{enumerate}", adapted.question_latex)
+        self.assertFalse(assessment_question_rendering_issues(adapted.question_latex))
+        self.assertEqual(route_request.call_count, 1)
 
     @patch("services.prep_ai_router.route_math_request")
     def test_failed_reconstruction_leaves_source_flagged_and_creates_no_replacement(self, route_request):
@@ -351,11 +486,66 @@ class ExistingPastQuestionRepairTests(TestCase):
             verification_status="verified",
         )
 
-        call_command("repair_past_questions", course_code="SST 301", stdout=io.StringIO())
+        output = io.StringIO()
+        call_command("repair_past_questions", course_code="SST 301", stdout=output)
 
         route_request.assert_not_called()
         source.refresh_from_db()
         self.assertEqual(source.verification_status, "verified")
+        self.assertIn("Candidate limit: all", output.getvalue())
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_damaged_duplicate_is_not_reconstructed_when_clean_copy_covers_source(self, route_request):
+        source_text = (
+            "(a) Determine the derived set of the integers and state whether it is closed.\n"
+            "(b) Prove that every convergent sequence in the real numbers is Cauchy.\n"
+            "(c) Find the limit superior and limit inferior of an alternating sequence."
+        )
+        self.source_document.extracted_text = (
+            "--- Page 9 ---\n"
+            "3. " + source_text + "\nPage 3 of 5\n"
+            "INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION"
+        )
+        self.source_document.save(update_fields=["extracted_text"])
+        source = PrepQuestion.objects.create(
+            paper=self.paper,
+            topic=self.topic,
+            question_type="authentic",
+            number=3,
+            marks=10,
+            topic_label=self.topic.title,
+            source_document=self.source_document,
+            source_page_number=9,
+            question_latex="**",
+            verification_status="flagged",
+        )
+        clean_copy = PrepQuestion.objects.create(
+            paper=self.paper,
+            topic=self.topic,
+            question_type="authentic",
+            number=3,
+            marks=10,
+            topic_label=self.topic.title,
+            source_document=self.source_document,
+            source_page_number=9,
+            question_latex=source_text,
+            verification_status="auto_validated",
+        )
+        output = io.StringIO()
+        errors = io.StringIO()
+
+        call_command(
+            "repair_past_questions",
+            course_code="SST 301",
+            apply=True,
+            stdout=output,
+            stderr=errors,
+        )
+
+        route_request.assert_not_called()
+        self.assertFalse(PrepQuestion.objects.filter(reconstructed_from=source).exists())
+        self.assertIn(f"clean indexed question id={clean_copy.id}", errors.getvalue())
+        self.assertIn("covered_by_clean_duplicate=1", output.getvalue())
 
 
 class QuestionIndexProvenanceTests(TestCase):
@@ -396,6 +586,142 @@ class QuestionIndexProvenanceTests(TestCase):
         self.assertIn("Explain why every convergent sequence", question.question_latex)
         self.assertEqual(question.reconstruction_metadata, {})
         route_request.assert_not_called()
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_reindex_preserves_distinct_repeated_number_instances(self, route_request):
+        course = PrepCourse.objects.create(
+            code="QPX 105",
+            title="Repeated Question Index Testing",
+            slug="repeated-question-index-testing",
+        )
+        document = PrepDocument.objects.create(
+            course=course,
+            doc_type="Final Examination Paper",
+            file=SimpleUploadedFile("repeated-questions.pdf", b"source PDF"),
+            extracted_text=(
+                "**QUESTION ONE** Explain why every convergent sequence is bounded.\n"
+                "**QUESTION ONE** Give a separate example showing boundedness does not imply convergence."
+            ),
+            stage="stage_3",
+        )
+        paper = PrepPaper.objects.create(
+            id="repeated-question-index-paper",
+            course=course,
+            title="Final Examination",
+            year="2026",
+            total_marks=10,
+            source_document=document,
+        )
+
+        created_first_run = index_assessment_questions(document, paper, reconstruct_invalid=False)
+        created_second_run = index_assessment_questions(document, paper, reconstruct_invalid=False)
+        questions = list(
+            PrepQuestion.objects.filter(paper=paper, question_type="authentic").order_by("id")
+        )
+
+        self.assertEqual(created_first_run, 2)
+        self.assertEqual(created_second_run, 0)
+        self.assertEqual(len(questions), 2)
+        self.assertNotEqual(questions[0].question_latex, questions[1].question_latex)
+        self.assertTrue(all(question.number == 1 for question in questions))
+        route_request.assert_not_called()
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_reindex_does_not_overwrite_clean_tutor_verified_question(self, route_request):
+        course = PrepCourse.objects.create(
+            code="QPX 107",
+            title="Tutor Verified Reindex Testing",
+            slug="tutor-verified-reindex-testing",
+        )
+        document = PrepDocument.objects.create(
+            course=course,
+            doc_type="Final Examination Paper",
+            file=SimpleUploadedFile("verified-question.pdf", b"source PDF"),
+            extracted_text=(
+                "1. Explain why every convergent sequence is bounded and include a clear example."
+            ),
+            stage="stage_3",
+        )
+        paper = PrepPaper.objects.create(
+            id="tutor-verified-reindex-paper",
+            course=course,
+            title="Final Examination",
+            year="2026",
+            total_marks=5,
+            source_document=document,
+        )
+        reviewer = User.objects.create_user(
+            username="reindex-reviewer",
+            email="reindex-reviewer@example.test",
+            password="test-password",
+        )
+        original_text = "Tutor-approved: prove that a convergent sequence is bounded."
+        PrepQuestion.objects.create(
+            paper=paper,
+            source_document=document,
+            question_type="authentic",
+            verification_status="verified",
+            verified_by=reviewer,
+            number=1,
+            marks=5,
+            question_latex=original_text,
+        )
+
+        created = index_assessment_questions(document, paper, reconstruct_invalid=False)
+
+        self.assertEqual(created, 0)
+        self.assertEqual(
+            PrepQuestion.objects.filter(paper=paper, question_type="authentic").count(),
+            1,
+        )
+        self.assertEqual(
+            PrepQuestion.objects.get(paper=paper, question_type="authentic").question_latex,
+            original_text,
+        )
+        route_request.assert_not_called()
+
+    @patch("prep.management.commands.reindex_assessment_questions.index_assessment_questions")
+    def test_reindex_command_dry_run_does_not_write_or_call_ai(self, index_questions):
+        course = PrepCourse.objects.create(
+            code="QPX 106",
+            title="Assessment Command Testing",
+            slug="assessment-command-testing",
+        )
+        document = PrepDocument.objects.create(
+            course=course,
+            doc_type="Final Examination Paper",
+            file=SimpleUploadedFile("assessment.pdf", b"source PDF"),
+            extracted_text="1. Explain why every convergent sequence is bounded.",
+            stage="stage_3",
+        )
+        PrepPaper.objects.create(
+            id="assessment-command-paper",
+            course=course,
+            title="Final Examination",
+            year="2026",
+            total_marks=5,
+            source_document=document,
+        )
+        self.assertEqual(
+            PrepDocument.objects.filter(
+                pk=document.pk,
+                stage="stage_3",
+                doc_type__in=["Continuous Assessment Test (CAT)", "Final Examination Paper"],
+            ).count(),
+            1,
+        )
+        self.assertEqual(document.derived_papers.count(), 1)
+        output = io.StringIO()
+
+        call_command(
+            "reindex_assessment_questions",
+            course_codes=["QPX 106"],
+            stdout=output,
+        )
+
+        self.assertIn("DRY RUN", output.getvalue())
+        self.assertIn("parsed_questions=1", output.getvalue())
+        index_questions.assert_not_called()
 
     @patch("services.prep_ai_router.route_math_request")
     def test_damaged_question_is_flagged_with_page_and_never_auto_reconstructed(self, route_request):
@@ -496,7 +822,7 @@ class QuestionIndexProvenanceTests(TestCase):
         self.assertEqual(adapted.reconstruction_metadata["model_confidence"], 0.93)
         self.assertIn("Approved topic summary", route_request.call_args.args[0])
         self.assertIn("Source page: 6", route_request.call_args.args[0])
-        self.assertEqual(route_request.call_args.kwargs["max_tokens_override"], 1400)
+        self.assertEqual(route_request.call_args.kwargs["max_tokens_override"], 3000)
         self.assertFalse(route_request.call_args.kwargs["auto_continue"])
         route_request.assert_called_once()
 

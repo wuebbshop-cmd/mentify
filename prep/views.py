@@ -1,5 +1,7 @@
 import os
 import re
+import logging
+from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -32,6 +34,27 @@ from services.credit_service import (
     grant_subscription,
     has_active_subscription,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def _json_api_error_boundary(view_func):
+    """Keep unexpected API failures observable in logs and JSON-shaped for clients."""
+    @wraps(view_func)
+    def wrapped(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except Exception:
+            logger.exception("Unhandled error in JSON API endpoint %s", view_func.__name__)
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Topic notes could not be loaded because of a server error. Please retry.",
+                },
+                status=500,
+            )
+
+    return wrapped
 
 
 def parse_course_code_and_title(raw_name: str) -> tuple[str, str]:
@@ -131,6 +154,8 @@ def _public_topic_notes(topic):
 
 def _public_topic_questions(topic):
     """Return shared verified questions using the same course-safe matching as study pages."""
+    from services.prep_ingestion import learner_visible_assessment_questions
+
     topic_match = (
         Q(topic=topic)
         | (
@@ -139,7 +164,7 @@ def _public_topic_questions(topic):
             & Q(topic_label__icontains=topic.title)
         )
     )
-    return (
+    records = (
         PrepQuestion.objects.filter(
             topic_match,
             verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
@@ -148,6 +173,7 @@ def _public_topic_questions(topic):
         .select_related("paper")
         .order_by("question_type", "paper__created_at", "number", "id")
     )
+    return learner_visible_assessment_questions(records)
 
 
 def prep_public_library(request):
@@ -168,7 +194,7 @@ def prep_public_course(request, course_slug):
     course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
     topics = list(course.topics.filter(is_active=True).order_by("order", "id"))
     for topic in topics:
-        topic.question_count = _public_topic_questions(topic).count()
+        topic.question_count = len(_public_topic_questions(topic))
 
     return render(
         request,
@@ -267,14 +293,23 @@ def prep_dashboard(request):
 
     total_papers = PrepPaper.objects.filter(is_published=True).count()
     total_topics = PrepTopic.objects.count()
-    total_questions = PrepQuestion.objects.count()
+    from services.prep_ingestion import learner_visible_assessment_questions
+
+    total_questions = len(learner_visible_assessment_questions(
+        PrepQuestion.objects.filter(
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+        )
+    ))
 
     featured_topics = []
     for t in PrepTopic.objects.select_related("course")[:4]:
-        auth_cnt = PrepQuestion.objects.filter(
+        from services.prep_ingestion import learner_visible_assessment_questions
+
+        auth_cnt = len(learner_visible_assessment_questions(PrepQuestion.objects.filter(
             Q(topic=t) | Q(topic_label__icontains=t.title),
-            question_type="authentic"
-        ).count()
+            question_type__in=["authentic", "adapted"],
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+        )))
         featured_topics.append({
             "id": t.id,
             "title": t.title,
@@ -463,13 +498,15 @@ def prep_course_detail(request, course_code):
     topics_data = []
     course_papers = []
     total_questions_count = 0
+    from services.prep_ingestion import learner_visible_assessment_questions
+
     topics_qs = course.topics.filter(is_active=True).order_by("order")
     for t in topics_qs:
-        auth_count = PrepQuestion.objects.filter(
+        auth_count = len(learner_visible_assessment_questions(PrepQuestion.objects.filter(
             Q(topic=t) | Q(topic_label__icontains=t.title),
             question_type__in=["authentic", "adapted"],
             verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
-        ).count()
+        )))
         total_questions_count += auth_count
         raw_subtopics = t.subtopics if isinstance(t.subtopics, list) else []
         clean_subtopics = [clean_tag_label(str(st)) for st in raw_subtopics if clean_tag_label(str(st))]
@@ -487,9 +524,9 @@ def prep_course_detail(request, course_code):
             "title": p.title,
             "year": p.year,
             "marks": p.total_marks,
-            "questions_count": p.questions.filter(
+            "questions_count": len(learner_visible_assessment_questions(p.questions.filter(
                 verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
-            ).count(),
+            ))),
         })
 
     pending_documents = []
@@ -589,11 +626,13 @@ def prep_topic_study(request, topic_id):
         question_type__in=["authentic", "adapted"],
         verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
     )
-    authentic_records = PrepQuestion.objects.filter(
-        q_filter,
-    ).select_related("paper")
+    from services.prep_ingestion import learner_visible_assessment_questions
 
-    for q in authentic_records[:25]:
+    authentic_records = learner_visible_assessment_questions(
+        PrepQuestion.objects.filter(q_filter).select_related("paper").order_by("paper", "number", "id")
+    )
+
+    for q in authentic_records:
         paper_label = q.paper.title if q.paper else f"{course_code} Examination"
         year_label = q.paper.year if q.paper else "Official Examination"
         clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
@@ -619,11 +658,15 @@ def prep_topic_study(request, topic_id):
 
     # 2. Existing Practice Variants in DB
     generated_qs = []
-    gen_records = PrepQuestion.objects.filter(
-        topic=topic,
-        question_type="generated",
-        verification_status="verified",
-    ).order_by("number")[:10]
+    from services.prep_ingestion import learner_visible_assessment_questions
+
+    gen_records = learner_visible_assessment_questions(
+        PrepQuestion.objects.filter(
+            topic=topic,
+            question_type="generated",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+        ).order_by("number", "id")
+    )[:10]
     for q in gen_records:
         clean_g_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
         clean_g_sol = validated_question_solution(q)
@@ -689,9 +732,13 @@ def prep_paper_detail(request, course_code, paper_id):
 
     if paper:
         questions_list = []
-        for q in paper.questions.filter(
-            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
-        ).order_by("number"):
+        from services.prep_ingestion import learner_visible_assessment_questions
+
+        for q in learner_visible_assessment_questions(
+            paper.questions.filter(
+                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+            ).order_by("number", "id")
+        ):
             questions_list.append({
                 "number": q.number,
                 "marks": q.marks,
@@ -1247,6 +1294,15 @@ def prep_solve_question_api(request):
                         "error": "This question is pending tutor review and cannot be answered yet.",
                         "verification_status": q_obj.verification_status,
                     }, status=409)
+                from services.prep_ingestion import assessment_question_rendering_issues
+
+                question_issues = assessment_question_rendering_issues(q_obj.question_latex)
+                if question_issues:
+                    return JsonResponse({
+                        "success": False,
+                        "error": "This question did not pass the current formatting and extraction checks.",
+                        "validation_issues": question_issues,
+                    }, status=409)
                 question_latex = q_obj.question_latex
                 course_code = q_obj.paper.course.code if q_obj.paper else (q_obj.topic.course.code if q_obj.topic else course_code)
                 topic_label = q_obj.topic_label or (q_obj.topic.title if q_obj.topic else topic_label)
@@ -1375,6 +1431,15 @@ def prep_adapt_question_api(request):
     ).first()
     wallet = PrepWallet.get_or_create_wallet(request.user)
     if existing:
+        from services.prep_ingestion import assessment_question_rendering_issues
+
+        existing_issues = assessment_question_rendering_issues(existing.question_latex)
+        if existing_issues:
+            return JsonResponse({
+                "success": False,
+                "error": "The saved adapted question did not pass the current formatting and extraction checks.",
+                "validation_issues": existing_issues,
+            }, status=409)
         return JsonResponse({
             "success": True,
             "cached": True,
@@ -1485,6 +1550,7 @@ def prep_adapt_question_api(request):
 
 
 @login_required
+@_json_api_error_boundary
 def prep_topic_notes_api(request):
     """
     Retrieve or generate syllabus topic notes for a specific level (1, 2, or 3).
@@ -1739,7 +1805,9 @@ def prep_generate_practice_api(request):
     # Gather authentic sample questions for this topic as guidance
     authentic_samples = []
     if topic_obj:
-        auth_qs = PrepQuestion.objects.filter(
+        from services.prep_ingestion import learner_visible_assessment_questions
+
+        auth_qs = learner_visible_assessment_questions(PrepQuestion.objects.filter(
             (
                 Q(topic=topic_obj)
                 | (
@@ -1751,17 +1819,20 @@ def prep_generate_practice_api(request):
                 question_type__in=["authentic", "adapted"],
                 verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
             ),
-        )[:3]
+        ).order_by("paper", "number", "id"))[:3]
         for q in auth_qs:
             authentic_samples.append(f"Q{q.number} ({q.marks} marks): {q.question_latex}")
 
     # Check existing generated questions in DB
+    if topic_obj:
+        from services.prep_ingestion import learner_visible_assessment_questions
+
     existing_generated = (
-        PrepQuestion.objects.filter(
+        len(learner_visible_assessment_questions(PrepQuestion.objects.filter(
             topic=topic_obj,
             question_type="generated",
-            verification_status="verified",
-        ).count()
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+        )))
         if topic_obj
         else 0
     )
@@ -1892,22 +1963,30 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
         generated_records = PrepQuestion.objects.filter(
             topic=topic,
             question_type="generated",
-            verification_status="verified",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         ).order_by("number", "id")
+        from services.prep_ingestion import learner_visible_assessment_questions
+
+        authentic_records = learner_visible_assessment_questions(authentic_records)
+        generated_records = learner_visible_assessment_questions(generated_records)
 
         questions_data = []
-        for source_label, records in (
-            ("Authentic past question", authentic_records),
-            ("Generated practice question", generated_records),
-        ):
-            for question in records:
-                questions_data.append({
-                    "number": len(questions_data) + 1,
-                    "marks": question.marks,
-                    "topic": f"{source_label}: {question.topic_label or topic_title}",
-                    "question_latex": question.question_latex,
-                    "solution_latex": validated_question_solution(question),
-                })
+        for question in authentic_records:
+            questions_data.append({
+                "number": len(questions_data) + 1,
+                "marks": question.marks,
+                "topic": f"Authentic past question: {question.topic_label or topic_title}",
+                "question_latex": question.question_latex,
+                "solution_latex": validated_question_solution(question),
+            })
+        for question in generated_records:
+            questions_data.append({
+                "number": len(questions_data) + 1,
+                "marks": question.marks,
+                "topic": f"Generated practice question: {question.topic_label or topic_title}",
+                "question_latex": question.question_latex,
+                "solution_latex": validated_question_solution(question),
+            })
 
         if not questions_data:
             return HttpResponse(
@@ -1975,10 +2054,14 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
             verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         )
     authentic_qs = []
-    for q in PrepQuestion.objects.filter(
-        q_filter,
-        verification_status="verified",
-    ).select_related("paper")[:15]:
+    from services.prep_ingestion import learner_visible_assessment_questions
+
+    topic_questions = learner_visible_assessment_questions(
+        PrepQuestion.objects.filter(q_filter, verification_status="verified")
+        .select_related("paper")
+        .order_by("paper", "number", "id")
+    )
+    for q in topic_questions:
         authentic_qs.append({
             "number": q.number,
             "marks": q.marks,
@@ -1991,11 +2074,11 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     # 3. Fetch practice questions for this topic
     practice_qs = []
     if topic:
-        for q in PrepQuestion.objects.filter(
+        for q in learner_visible_assessment_questions(PrepQuestion.objects.filter(
             topic=topic,
             question_type="generated",
             verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
-        ).order_by("number")[:10]:
+        ).order_by("number", "id"))[:10]:
             practice_qs.append({
                 "number": q.number,
                 "marks": q.marks,
@@ -2050,9 +2133,13 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
     if paper and paper.questions.filter(
         verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
     ).exists():
-        for q in paper.questions.filter(
-            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
-        ).order_by("number"):
+        from services.prep_ingestion import learner_visible_assessment_questions
+
+        for q in learner_visible_assessment_questions(
+            paper.questions.filter(
+                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
+            ).order_by("number", "id")
+        ):
             questions_data.append({
                 "number": q.number,
                 "marks": q.marks,

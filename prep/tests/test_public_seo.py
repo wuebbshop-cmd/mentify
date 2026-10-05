@@ -48,6 +48,16 @@ class PublicPrepSeoTests(TestCase):
             question_latex="Find the limit of the sequence.",
             solution_latex="The sequence converges.",
         )
+        PrepQuestion.objects.create(
+            paper=paper,
+            topic=self.topic,
+            question_type="authentic",
+            verification_status="verified",
+            number=2,
+            marks=5,
+            question_latex="PUBLIC_CORRUPTED_MARKER: explain this value (cid:40) from the source.",
+            solution_latex="Should not be shown.",
+        )
 
     def test_public_library_and_resources_are_anonymous_and_indexable(self):
         library = self.client.get(reverse("prep:public_library"))
@@ -63,6 +73,8 @@ class PublicPrepSeoTests(TestCase):
         self.assertEqual(topic.status_code, 200)
         self.assertContains(topic, "A sequence is an ordered list.")
         self.assertContains(topic, "Find the limit of the sequence.")
+        self.assertNotContains(topic, "PUBLIC_CORRUPTED_MARKER")
+        self.assertNotContains(topic, "Should not be shown.")
         self.assertContains(topic, 'name="robots" content="index, follow')
         self.assertContains(topic, '"@type":"LearningResource"')
 

@@ -956,6 +956,20 @@ def extract_scanned_ocr_together(pdf_source, max_pages: int = 15) -> str:
 
 
 _PAGE_TEXT_HEADER_RE = re.compile(r"(?m)^--- Page (\d+)(?: \([^\n]*\))? ---\s*$")
+_ASSESSMENT_PAGE_FOOTER_RE = re.compile(r"(?im)^[ \t]*Page\s+\d+\s+of\s+\d+[ \t]*$\r?\n?")
+_ASSESSMENT_EXAM_FOOTER_RE = re.compile(
+    r"(?im)^[ \t]*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY "
+    r"SHALL LEAD TO DISCONTINUATION[ \t]*$\r?\n?"
+)
+_ASSESSMENT_SCANNER_FOOTER_RE = re.compile(r"(?im)^[ \t]*Scanned with CamScanner[ \t]*$\r?\n?")
+
+
+def _strip_assessment_document_footers(text: str) -> str:
+    """Remove recurring scan/page footers from extracted question text."""
+    cleaned = _ASSESSMENT_PAGE_FOOTER_RE.sub("", str(text or ""))
+    cleaned = _ASSESSMENT_EXAM_FOOTER_RE.sub("", cleaned)
+    cleaned = _ASSESSMENT_SCANNER_FOOTER_RE.sub("", cleaned)
+    return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
 
 def _split_page_transcriptions(text: str) -> dict[int, str]:
@@ -1428,9 +1442,24 @@ def _normalise_document_text(text: str) -> str:
     return _normalise_for_comparison(text)
 
 
+_ASSESSMENT_QUESTION_NUMBER = r"(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)"
 _ASSESSMENT_QUESTION_START = re.compile(
-    r"(?m)^\s*(?:question\s*)?(\d{1,2})\s*[\).:]\s+"
+    r"(?im)^[ \t]*(?:(?:\\noindent\s*)|(?:\\(?:section\*?|subsection\*?|textbf|underline)\s*\{\s*)|(?:\*\*|__|#{1,6}\s*))*"
+    r"(?:(?:question\s+|q\.?\s*)(?P<explicit_number>" + _ASSESSMENT_QUESTION_NUMBER + r")\b"
+    r"(?!\s+and\s+any\s+other\b)|(?P<bare_number>\d{1,2})\s*[\).:]\s+)"
 )
+_ASSESSMENT_QUESTION_NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+}
 _ASSESSMENT_MARKS = re.compile(r"\(?\s*(\d{1,3})\s*(?:marks?|mks?)\s*\)?", re.IGNORECASE)
 _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD = 0.8
 _TOPIC_STOP_WORDS = {
@@ -1449,22 +1478,23 @@ def extract_assessment_questions(text: str) -> list[dict]:
     matches = list(_ASSESSMENT_QUESTION_START.finditer(text))
     questions = []
     for index, match in enumerate(matches):
-        number = int(match.group(1))
+        raw_number = match.group("explicit_number") or match.group("bare_number")
+        number = _ASSESSMENT_QUESTION_NUMBER_WORDS.get(raw_number.casefold())
+        if number is None:
+            number = int(raw_number)
         if number < 1 or number > 99:
             continue
         end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
-        prompt = _PAGE_TEXT_HEADER_RE.sub("", text[match.end():end]).strip()
+        prompt = _strip_assessment_document_footers(
+            _PAGE_TEXT_HEADER_RE.sub("", text[match.end():end])
+        )
         prompt = re.sub(r"\\hfill", " ", prompt)
         prompt = re.sub(r"[ \t]+", " ", prompt)
         prompt = re.sub(r"\n{3,}", "\n\n", prompt).strip()
-        if len(prompt) < 18:
-            continue
         marks_match = _ASSESSMENT_MARKS.search(prompt)
         marks = int(marks_match.group(1)) if marks_match else 0
         if marks_match:
             prompt = (prompt[:marks_match.start()] + prompt[marks_match.end():]).strip()
-        if len(prompt) < 12:
-            continue
         source_page = next(
             (int(header.group(1)) for header in reversed(page_headers) if header.start() < match.start()),
             None,
@@ -1477,6 +1507,18 @@ def extract_assessment_questions(text: str) -> list[dict]:
             "extraction_confidence": None,
         })
     return questions
+
+
+def learner_visible_assessment_questions(question_records):
+    """Return only published-status questions that pass current rendering checks."""
+    from prep.models import PrepQuestion
+
+    return [
+        question
+        for question in question_records
+        if question.verification_status in PrepQuestion.LEARNER_VISIBLE_STATUSES
+        and not assessment_question_rendering_issues(question.question_latex)
+    ]
 
 
 def _topic_match_for_question(course, question_text: str):
@@ -1509,14 +1551,22 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
     extraction did not recover the mathematical notation. They are not valid
     question content and must be reviewed or re-OCRed before publication.
     """
+    from services.prep_ai_router import _display_math_issues, _latex_syntax_issues
+
     source = str(question_text or "")
     issues = []
     if re.search(r"[\ue000-\uf8ff]", source):
         issues.append("unreadable private-use glyphs from source extraction")
     if "\ufffd" in source:
         issues.append("unreadable replacement character from source extraction")
+    if re.search(r"(?i)\(\s*(?:cid|glyph|char)\s*:\s*\d+\s*\)", source):
+        issues.append("unreadable PDF character-map placeholder")
     if len(re.sub(r"\s+", " ", source).strip()) < 18:
         issues.append("question text is too short to be a complete assessment item")
+    if re.search(r"(?<!\\)\[\s*\]", source):
+        issues.append("question text contains an empty extraction placeholder")
+    if re.search(r"\b[A-Za-z]\s*,\s*[A-Za-z]\s*,\s*[A-Za-z]\s*,\s*\.{4,}\s*[A-Za-z]\b", source):
+        issues.append("question text contains a corrupted ellipsis or detached indices")
     if source.count("$$") % 2:
         issues.append("unclosed display-math delimiter")
     if source.count("\\(") != source.count("\\)"):
@@ -1531,14 +1581,26 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("question text contains a following question heading")
     if re.search(r"(?i)\bdownloaded\s+by\b", source):
         issues.append("question text contains document download metadata")
+    if (
+        _ASSESSMENT_PAGE_FOOTER_RE.search(source)
+        or _ASSESSMENT_EXAM_FOOTER_RE.search(source)
+        or _ASSESSMENT_SCANNER_FOOTER_RE.search(source)
+    ):
+        issues.append("question text contains document page or scan footer")
     if re.search(r"\\infty\s+S\b", source):
         issues.append("question text may have a corrupted infimum operator before S")
     if source.rstrip().endswith(("\\", "=", ":", "|")):
         issues.append("question text appears truncated")
+    issues.extend(_display_math_issues(source))
+    issues.extend(
+        issue
+        for issue in _latex_syntax_issues(source)
+        if " is outside display math" not in issue
+    )
     return issues
 
 
-def index_assessment_questions(prep_document, paper) -> int:
+def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: bool = True) -> int:
     """Index source questions and automatically reconstruct flagged rows safely."""
     from prep.models import PrepQuestion
 
@@ -1549,16 +1611,75 @@ def index_assessment_questions(prep_document, paper) -> int:
     if not parsed_questions:
         return 0
 
+    occurrences_by_number = {}
+    for item in parsed_questions:
+        occurrences_by_number[item["number"]] = occurrences_by_number.get(item["number"], 0) + 1
+
+    used_question_ids = set()
     created = 0
     for item in parsed_questions:
         topic = _topic_match_for_question(prep_document.course, item["question_latex"])
         issues = assessment_question_rendering_issues(item["question_latex"])
         status = "flagged" if issues else "auto_validated"
-        question = PrepQuestion.objects.filter(
+        candidates = list(PrepQuestion.objects.filter(
             paper=paper,
             question_type="authentic",
             number=item["number"],
-        ).first()
+        ).order_by("id"))
+        normalized_text = _normalise_document_text(item["question_latex"])
+        question = next(
+            (
+                candidate
+                for candidate in candidates
+                if candidate.pk not in used_question_ids
+                and _normalise_document_text(candidate.question_latex) == normalized_text
+            ),
+            None,
+        )
+        if question is None and occurrences_by_number[item["number"]] == 1:
+            manually_verified = next(
+                (
+                    candidate
+                    for candidate in candidates
+                    if candidate.pk not in used_question_ids
+                    and candidate.verification_status == "verified"
+                    and candidate.verified_by_id
+                ),
+                None,
+            )
+            if manually_verified and not assessment_question_rendering_issues(
+                manually_verified.question_latex
+            ):
+                used_question_ids.add(manually_verified.pk)
+                continue
+        if question is None:
+            question = next(
+                (
+                    candidate
+                    for candidate in candidates
+                    if candidate.pk not in used_question_ids
+                    and candidate.source_document_id == prep_document.pk
+                    and not (
+                        candidate.verification_status == "verified"
+                        and candidate.verified_by_id
+                    )
+                ),
+                None,
+            )
+        if question is None and occurrences_by_number[item["number"]] == 1:
+            question = next(
+                (
+                    candidate
+                    for candidate in candidates
+                    if candidate.pk not in used_question_ids
+                    and candidate.source_document_id is None
+                    and not (
+                        candidate.verification_status == "verified"
+                        and candidate.verified_by_id
+                    )
+                ),
+                None,
+            )
         if question is None:
             question = PrepQuestion(
                 paper=paper,
@@ -1570,7 +1691,6 @@ def index_assessment_questions(prep_document, paper) -> int:
             status = "verified"
         elif question.verification_status == "flagged" and not issues:
             status = "flagged"
-
         question.topic = topic
         question.marks = item["marks"]
         question.topic_label = topic.title if topic else ""
@@ -1596,8 +1716,9 @@ def index_assessment_questions(prep_document, paper) -> int:
             else None
         )
         question.save()
+        used_question_ids.add(question.pk)
 
-        if not issues or not topic:
+        if not reconstruct_invalid or not issues or not topic:
             continue
 
         existing_adaptation = PrepQuestion.objects.filter(reconstructed_from=question).first()
