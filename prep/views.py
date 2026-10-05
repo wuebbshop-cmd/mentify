@@ -4,7 +4,7 @@ import logging
 from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
@@ -15,6 +15,7 @@ from .models import (
     PrepDocument,
     PrepPaper,
     PrepQuestion,
+    PrepTopicChatSession,
     PrepContentCache,
     PrepWallet,
     PrepCourseEnrollment,
@@ -581,12 +582,15 @@ def prep_topic_study(request, topic_id):
     """
     Topic Study Engine:
     1. Toned Notes (Level 1 Intuition, Level 2 Standard, Level 3 Exam Mode)
-    2. Authentic Past Examination Questions tagged to this syllabus topic
-    3. Practice & Variant Generator (1 to 5 questions per run)
+    2. Topic-scoped tutor grounded in validated notes and approved course material
+    3. Authentic Past Examination Questions tagged to this syllabus topic
+    4. Practice & Variant Generator (1 to 5 questions per run)
     """
     wallet = PrepWallet.get_or_create_wallet(request.user)
     from_tab = request.GET.get("from")
-    active_subtab = request.GET.get("tab", "notes")  # 'notes', 'past_questions', 'practice'
+    active_subtab = request.GET.get("tab", "notes")
+    if active_subtab not in {"notes", "assistant", "past_questions", "practice"}:
+        active_subtab = "notes"
 
     topic = None
     if str(topic_id).isdigit():
@@ -685,6 +689,8 @@ def prep_topic_study(request, topic_id):
     # repeat validation, or a synthesis screen for shared verified notes.
     from services.prep_ai_router import get_published_topic_note_levels
     published_notes_by_level = get_published_topic_note_levels(topic)
+    from services.prep_topic_tutor import list_topic_conversations
+    assistant_conversations = list_topic_conversations(request.user, topic)
     initial_notes = published_notes_by_level.get("level_2", "")
     initial_notes_error = ""
     if not initial_notes:
@@ -703,6 +709,7 @@ def prep_topic_study(request, topic_id):
         "active_tab": "history" if from_tab == "history" else "courses",
         "active_subtab": active_subtab,
         "from_history": from_tab == "history",
+        "is_enrolled": PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists(),
         "user_credits": wallet.credits_balance,
         "topic": topic_dict,
         "initial_notes": initial_notes,
@@ -711,8 +718,132 @@ def prep_topic_study(request, topic_id):
         "initial_notes_stale": False,
         "authentic_questions": authentic_qs,
         "generated_questions": generated_qs,
+        "assistant_conversations": assistant_conversations,
     }
     return render(request, "prep/topic_study.html", context)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def prep_topic_tutor_api(request, topic_id):
+    """Load or send a private topic conversation and optional bounded study uploads."""
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    if not (
+        request.user.is_staff
+        or request.user.is_superuser
+        or PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists()
+    ):
+        return JsonResponse(
+            {"success": False, "error": "Add this course to your study list before opening its topic tutor."},
+            status=403,
+        )
+
+    from services.prep_topic_tutor import (
+        MAX_MESSAGE_CHARS,
+        TopicTutorError,
+        list_topic_conversations,
+        send_topic_message,
+        serialize_topic_conversation,
+    )
+
+    if request.method == "GET":
+        session_id = request.GET.get("session_id", "").strip()
+        conversations = list_topic_conversations(request.user, topic)
+        current = None
+        if session_id:
+            try:
+                current = topic.chat_sessions.get(pk=int(session_id), user=request.user)
+            except (ValueError, PrepTopicChatSession.DoesNotExist):
+                return JsonResponse(
+                    {"success": False, "error": "That conversation was not found for this topic."},
+                    status=404,
+                )
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        return JsonResponse({
+            "success": True,
+            "conversations": conversations,
+            "conversation": serialize_topic_conversation(current) if current else None,
+            "credits_balance": get_available_credits(wallet),
+        })
+
+    session = None
+    session_id = request.POST.get("session_id", "").strip()
+    if session_id:
+        try:
+            session = topic.chat_sessions.get(pk=int(session_id), user=request.user)
+        except (ValueError, PrepTopicChatSession.DoesNotExist):
+            return JsonResponse(
+                {"success": False, "error": "That conversation was not found for this topic."},
+                status=404,
+            )
+
+    message_text = request.POST.get("message", "").strip()
+    if not message_text:
+        return JsonResponse({"success": False, "error": "Enter a question about this topic."}, status=400)
+    if len(message_text) > MAX_MESSAGE_CHARS:
+        return JsonResponse(
+            {"success": False, "error": f"Keep each message under {MAX_MESSAGE_CHARS} characters."},
+            status=400,
+        )
+
+    from services.prep_course_billing import ensure_note_access
+    allowed, available_credits = ensure_note_access(request.user, topic, "level_2")
+    if not allowed:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": (
+                    "Your course materials are not covered by the current credit balance. "
+                    "Top up to unlock this topic's notes and tutor."
+                ),
+                "credits_balance": available_credits,
+            },
+            status=402,
+        )
+
+    try:
+        result = send_topic_message(
+            user=request.user,
+            topic=topic,
+            session=session,
+            user_message=request.POST.get("message", ""),
+            uploaded_files=request.FILES.getlist("files"),
+        )
+    except TopicTutorError as exc:
+        wallet = PrepWallet.get_or_create_wallet(request.user)
+        return JsonResponse(
+            {
+                "success": False,
+                "error": str(exc),
+                "credits_balance": get_available_credits(wallet),
+                "credits_charged": exc.credits_charged,
+            },
+            status=exc.status,
+        )
+    except Exception:
+        logger.exception("Topic tutor request failed for topic %s and user %s", topic.pk, request.user.pk)
+        return JsonResponse(
+            {"success": False, "error": "The topic tutor could not complete this request. Please try again."},
+            status=500,
+        )
+
+    wallet = PrepWallet.get_or_create_wallet(request.user)
+    result_session = result.get("session")
+    result["conversation"] = (
+        serialize_topic_conversation(result_session) if result_session else None
+    )
+    result["conversations"] = list_topic_conversations(request.user, topic)
+    return JsonResponse({
+        "success": True,
+        "answer": result["answer"],
+        "session_id": result_session.pk if result_session else None,
+        "conversation": result["conversation"],
+        "conversations": result["conversations"],
+        "credits_charged": result["credits_charged"],
+        "ocr_credits": result.get("ocr_credits", 0),
+        "credits_balance": get_available_credits(wallet),
+        "uploads": result.get("uploads", []),
+    })
 
 
 @login_required

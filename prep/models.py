@@ -217,6 +217,13 @@ class PrepTopicChatMessage(models.Model):
 class PrepTopicChatUpload(models.Model):
     """Validated text extracted from a learner upload available to one chat."""
     session = models.ForeignKey(PrepTopicChatSession, on_delete=models.CASCADE, related_name="uploads")
+    message = models.ForeignKey(
+        PrepTopicChatMessage,
+        on_delete=models.CASCADE,
+        related_name="uploads",
+        null=True,
+        blank=True,
+    )
     original_name = models.CharField(max_length=255)
     extracted_text = models.TextField()
     page_count = models.PositiveIntegerField(default=1)
@@ -656,6 +663,8 @@ class PrepTransaction(models.Model):
         ("deep_reasoning", "Complex Proof / Derivation (5 credits)"),
         ("ai_practice_gen", "AI Practice Question Generation"),
         ("topic_notes", "AI Topic Notes Generation"),
+        ("topic_tutor", "Topic Tutor AI Reply"),
+        ("topic_tutor_ocr", "Topic Tutor Upload OCR"),
         ("topup_purchase", "M-Pesa / Paystack Credit Top-Up"),
         ("monthly_grant", "Monthly Plan Credit Allocation"),
         ("credit_expiry", "Expired Credits"),

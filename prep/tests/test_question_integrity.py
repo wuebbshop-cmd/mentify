@@ -13,6 +13,7 @@ from prep.models import PrepCourse, PrepDocument, PrepPaper, PrepQuestion, PrepT
 from prep.admin import PrepQuestionAdmin
 from services.prep_ai_router import _practice_question_issues
 from services.prep_ingestion import (
+    _strip_safe_question_extraction_artifacts,
     assessment_question_rendering_issues,
     extract_assessment_questions,
     index_assessment_questions,
@@ -126,6 +127,57 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
         )
 
         self.assertTrue(any("unmatched braces" in issue for issue in issues), issues)
+
+    def test_flags_stray_leading_closing_braces(self):
+        for content in (
+            "}\n\n\\begin{enumerate}\\item State the result.\\end{enumerate}",
+            "}}\n\nExplain why the estimator is unbiased.",
+        ):
+            with self.subTest(content=content):
+                self.assertIn(
+                    "question text begins with stray closing LaTeX braces",
+                    assessment_question_rendering_issues(content),
+                )
+
+    def test_flags_question_that_ends_before_its_referenced_table(self):
+        content = (
+            r"\begin{enumerate}"
+            r"\item[(a)] Calculate the interval."
+            r"\item[(b)] A researcher measured the wing lengths and following table:"
+            r"\end{enumerate}"
+        )
+
+        self.assertIn(
+            "question refers to a following table or visual that is missing",
+            assessment_question_rendering_issues(content),
+        )
+
+    def test_allows_a_table_included_after_its_reference(self):
+        content = (
+            r"A researcher recorded values in the following table:"
+            r"\begin{tabular}{|c|c|} A & 2 \\ B & 3 \end{tabular}"
+            r" Use the table to calculate the mean."
+        )
+
+        self.assertFalse(assessment_question_rendering_issues(content))
+
+    def test_flags_a_following_paper_header_embedded_in_question_text(self):
+        content = (
+            "A complete examination problem with enough detail to stand alone. (20 marks)\n\n"
+            "\\begin{center}\n"
+            "\\textbf{KENYATTA UNIVERSITY} \\\\\n"
+            "\\textbf{EXAMINATION FOR THE DEGREE OF BACHELOR OF SCIENCE} \\\\\n"
+            "\\end{center}\n"
+            "\\noindent \\textbf{INSTRUCTIONS:} ANSWER QUESTION ONE"
+        )
+
+        self.assertIn(
+            "question text contains the next examination paper header",
+            assessment_question_rendering_issues(content),
+        )
+        cleaned = _strip_safe_question_extraction_artifacts("}\n\n" + content)
+        self.assertFalse(assessment_question_rendering_issues(cleaned))
+        self.assertNotIn("KENYATTA UNIVERSITY", cleaned)
 
     def test_allows_balanced_list_environment_in_latex_question_text(self):
         issues = assessment_question_rendering_issues(
@@ -272,6 +324,23 @@ class TopicQuestionCourseIsolationTests(TestCase):
             number=3,
             marks=5,
             question_latex="Explain this estimate (cid:40) using the supplied data.",
+        )
+
+        self.assertEqual(learner_visible_assessment_questions([corrupted]), [])
+
+    def test_auto_validated_question_with_extraction_artifacts_is_not_displayed(self):
+        corrupted = PrepQuestion.objects.create(
+            topic=self.real_functions,
+            question_type="authentic",
+            verification_status="auto_validated",
+            number=4,
+            marks=20,
+            question_latex=(
+                "}\n\n\\begin{enumerate}"
+                "\\item[(a)] State a result."
+                "\\item[(b)] Use the data in the following table:"
+                "\\end{enumerate}"
+            ),
         )
 
         self.assertEqual(learner_visible_assessment_questions([corrupted]), [])
@@ -546,6 +615,49 @@ class ExistingPastQuestionRepairTests(TestCase):
         self.assertFalse(PrepQuestion.objects.filter(reconstructed_from=source).exists())
         self.assertIn(f"clean indexed question id={clean_copy.id}", errors.getvalue())
         self.assertIn("covered_by_clean_duplicate=1", output.getvalue())
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_deterministic_only_repair_cleans_unambiguous_debris_and_hides_incomplete_question(
+        self, route_request
+    ):
+        cleanable = PrepQuestion.objects.create(
+            paper=self.paper,
+            topic=self.topic,
+            question_type="authentic",
+            number=4,
+            marks=5,
+            question_latex="}\n\nExplain how a numeric vector stores values in R.",
+            verification_status="auto_validated",
+        )
+        incomplete = PrepQuestion.objects.create(
+            paper=self.paper,
+            topic=self.topic,
+            question_type="authentic",
+            number=5,
+            marks=20,
+            question_latex=(
+                "}\n\n\\begin{enumerate}"
+                "\\item[(a)] Calculate the interval."
+                "\\item[(b)] Use the data in the following table:"
+                "\\end{enumerate}"
+            ),
+            verification_status="auto_validated",
+        )
+
+        call_command("repair_past_questions", apply=True, deterministic_only=True, stdout=io.StringIO())
+
+        cleanable.refresh_from_db()
+        incomplete.refresh_from_db()
+        self.assertEqual(cleanable.question_latex, "Explain how a numeric vector stores values in R.")
+        self.assertEqual(cleanable.verification_status, "auto_validated")
+        self.assertEqual(
+            cleanable.reconstruction_metadata["review_status"],
+            "deterministically_repaired",
+        )
+        self.assertEqual(incomplete.verification_status, "flagged")
+        self.assertEqual(incomplete.reconstruction_metadata["review_status"], "source_flagged")
+        self.assertFalse(learner_visible_assessment_questions([incomplete]))
+        route_request.assert_not_called()
 
 
 class QuestionIndexProvenanceTests(TestCase):

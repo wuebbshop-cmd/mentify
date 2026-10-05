@@ -8,6 +8,7 @@ from prep.models import PrepQuestion
 from services.prep_ingestion import (
     _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD,
     _strip_assessment_document_footers,
+    _strip_safe_question_extraction_artifacts,
     assessment_question_rendering_issues,
     extract_assessment_questions,
 )
@@ -87,6 +88,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--course-code", help="Limit the audit to one course code.")
+        parser.add_argument("--question-id", type=int, help="Limit repair to one question record ID.")
         parser.add_argument(
             "--limit",
             type=int,
@@ -103,9 +105,16 @@ class Command(BaseCommand):
             action="store_true",
             help="Make one deliberate AI retry for valid existing adaptations below the confidence threshold.",
         )
+        parser.add_argument(
+            "--deterministic-only",
+            action="store_true",
+            help="Remove only unambiguous extraction debris and flag other invalid visible rows; never call AI.",
+        )
 
     def handle(self, *args, **options):
-        questions = PrepQuestion.objects.filter(question_type="authentic").select_related(
+        deterministic_only = options["deterministic_only"]
+        question_types = ("authentic", "adapted") if deterministic_only else ("authentic",)
+        questions = PrepQuestion.objects.filter(question_type__in=question_types).select_related(
             "paper__course", "topic__course"
         ).order_by("id")
         course_code = options.get("course_code")
@@ -114,9 +123,14 @@ class Command(BaseCommand):
                 Q(paper__course__code__iexact=course_code)
                 | Q(topic__course__code__iexact=course_code)
             )
+        question_id = options.get("question_id")
+        if question_id:
+            questions = questions.filter(pk=question_id)
 
         candidates = []
         for question in questions.iterator():
+            if deterministic_only and question.verification_status not in PrepQuestion.LEARNER_VISIBLE_STATUSES:
+                continue
             issues = assessment_question_rendering_issues(question.question_latex)
             if question.verification_status != "flagged" and not issues:
                 continue
@@ -136,6 +150,8 @@ class Command(BaseCommand):
             )
 
         repaired = 0
+        safely_cleaned = 0
+        hidden_invalid = 0
         failed = 0
         skipped_without_context = 0
         already_repaired = 0
@@ -149,6 +165,55 @@ class Command(BaseCommand):
                     f"Q{question.number} id={question.id} course={code} topic={topic_name} "
                     f"status={question.verification_status} issues={'; '.join(issues) or 'manually flagged'}"
                 )
+                continue
+
+            if deterministic_only:
+                original_text = question.question_latex
+                cleaned_text = _strip_safe_question_extraction_artifacts(original_text)
+                cleaned_issues = assessment_question_rendering_issues(cleaned_text)
+                metadata = (
+                    question.reconstruction_metadata
+                    if isinstance(question.reconstruction_metadata, dict)
+                    else {}
+                )
+                metadata = dict(metadata)
+                if cleaned_text != original_text and not cleaned_issues:
+                    metadata.setdefault("original_transcription", original_text)
+                    metadata.update({
+                        "review_status": "deterministically_repaired",
+                        "reason": (
+                            "Only unambiguous leading extraction braces or a following paper header were removed."
+                        ),
+                        "deterministic_repair_issues": issues,
+                    })
+                    question.question_latex = cleaned_text
+                    question.reconstruction_metadata = metadata
+                    question.save(update_fields=["question_latex", "reconstruction_metadata"])
+                    safely_cleaned += 1
+                    self.stdout.write(
+                        f"Cleaned Q{question.number} id={question.id} course={code}; "
+                        "retained only after validation passed."
+                    )
+                else:
+                    metadata.setdefault("original_transcription", original_text)
+                    metadata.update({
+                        "review_status": "source_flagged",
+                        "reason": "The question has extraction defects that cannot be repaired without guessing.",
+                        "original_extraction_issues": issues,
+                    })
+                    question.verification_status = "flagged"
+                    question.verified_by = None
+                    question.reconstruction_metadata = metadata
+                    question.save(update_fields=[
+                        "verification_status",
+                        "verified_by",
+                        "reconstruction_metadata",
+                    ])
+                    hidden_invalid += 1
+                    self.stderr.write(
+                        f"Flagged Q{question.number} id={question.id} course={code}: "
+                        f"{'; '.join(issues)}"
+                    )
                 continue
 
             if question.verification_status != "flagged":
@@ -314,6 +379,7 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"{mode} {len(candidates)} candidate(s); repaired={repaired}, "
+                f"deterministically_cleaned={safely_cleaned}, hidden_invalid={hidden_invalid}, "
                 f"already_repaired={already_repaired}, failed={failed}, "
                 f"awaiting_review={awaiting_review}, "
                 f"covered_by_clean_duplicate={covered_by_clean_duplicate}, "

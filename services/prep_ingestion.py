@@ -962,6 +962,13 @@ _ASSESSMENT_EXAM_FOOTER_RE = re.compile(
     r"SHALL LEAD TO DISCONTINUATION[ \t]*$\r?\n?"
 )
 _ASSESSMENT_SCANNER_FOOTER_RE = re.compile(r"(?im)^[ \t]*Scanned with CamScanner[ \t]*$\r?\n?")
+_ASSESSMENT_ADVERTISEMENT_RE = re.compile(r"(?im)^[ \t]*VISIT US FOR\s*:")
+_ASSESSMENT_PAPER_HEADER_RE = re.compile(
+    r"(?is)\\begin\{center\}\s*"
+    r"\\textbf\{[^{}]*(?:UNIVERSITY|COLLEGE|INSTITUTE)[^{}]*\}"
+    r"[\s\S]{0,600}?\\textbf\{EXAMINATION\b[\s\S]{0,600}?"
+    r"\\end\{center\}\s*\\noindent\s*\\textbf\{INSTRUCTIONS:"
+)
 
 
 def _strip_assessment_document_footers(text: str) -> str:
@@ -970,6 +977,21 @@ def _strip_assessment_document_footers(text: str) -> str:
     cleaned = _ASSESSMENT_EXAM_FOOTER_RE.sub("", cleaned)
     cleaned = _ASSESSMENT_SCANNER_FOOTER_RE.sub("", cleaned)
     return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+
+
+def _strip_safe_question_extraction_artifacts(text: str) -> str:
+    """Remove only known extraction debris whose boundaries are unambiguous."""
+    cleaned = re.sub(r"^\s*\}+", "", str(text or ""), count=1).lstrip()
+    header = _ASSESSMENT_PAPER_HEADER_RE.search(cleaned)
+    if header:
+        cleaned = cleaned[:header.start()].rstrip()
+    advertisement = _ASSESSMENT_ADVERTISEMENT_RE.search(cleaned)
+    if advertisement and re.search(
+        r"(?i)\b(?:key cutting|past papers|setbooks|binding|handouts)\b",
+        cleaned[advertisement.end():],
+    ):
+        cleaned = cleaned[:advertisement.start()].rstrip()
+    return cleaned
 
 
 def _split_page_transcriptions(text: str) -> dict[int, str]:
@@ -1555,6 +1577,12 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
 
     source = str(question_text or "")
     issues = []
+    if re.match(r"^\s*\}+", source):
+        issues.append("question text begins with stray closing LaTeX braces")
+    if source.count("**") % 2:
+        issues.append("question text contains an unmatched Markdown bold marker")
+    if _ASSESSMENT_PAPER_HEADER_RE.search(source):
+        issues.append("question text contains the next examination paper header")
     if re.search(r"[\ue000-\uf8ff]", source):
         issues.append("unreadable private-use glyphs from source extraction")
     if "\ufffd" in source:
@@ -1591,6 +1619,17 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("question text may have a corrupted infimum operator before S")
     if source.rstrip().endswith(("\\", "=", ":", "|")):
         issues.append("question text appears truncated")
+    has_included_table_or_visual = (
+        re.search(r"(?i)\\begin\{(?:table|tabular|figure)\}|\\includegraphics\b", source)
+        or re.search(r"(?m)^\s*\|[^|\n]+\|", source)
+    )
+    if (
+        re.search(r"(?i)\b(?:following|below)\s+(?:table|figure|diagram)\b", source)
+        and not has_included_table_or_visual
+    ):
+        issues.append("question refers to a following table or visual that is missing")
+    if _ASSESSMENT_ADVERTISEMENT_RE.search(source):
+        issues.append("question text contains an advertisement footer")
     issues.extend(_display_math_issues(source))
     issues.extend(
         issue

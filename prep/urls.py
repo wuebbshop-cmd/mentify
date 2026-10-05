@@ -35,6 +35,7 @@ urlpatterns = [
     # AI Router & Zero-Cost Cache Endpoints
     path("api/solve-question/", views.prep_solve_question_api, name="api_solve_question"),
     path("api/topic-notes/", views.prep_topic_notes_api, name="api_topic_notes"),
+    path("api/topic/<int:topic_id>/tutor/", views.prep_topic_tutor_api, name="api_topic_tutor"),
     path("api/generate-practice/", views.prep_generate_practice_api, name="api_generate_practice"),
     path("api/adapt-question/", views.prep_adapt_question_api, name="api_adapt_question"),
     # Live Student Notification Endpoints
