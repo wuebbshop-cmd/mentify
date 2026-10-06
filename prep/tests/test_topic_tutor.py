@@ -311,6 +311,17 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "setTimeout(clearTopicTutorError, 10000)")
         self.assertContains(response, "position: fixed;\n      z-index: 1200;\n      inset: 0;", html=False)
         self.assertContains(response, "height: 100dvh;\n      min-height: 0;", html=False)
+        self.assertContains(
+            response,
+            "position: fixed;\n      z-index: 1202;\n      right: auto;\n      bottom: 0;",
+            html=False,
+        )
+        self.assertContains(response, "width: min(820px, 100vw)", html=False)
+        self.assertContains(
+            response,
+            "padding: 18px 12px max(12px, env(safe-area-inset-bottom, 0px));",
+            html=False,
+        )
         page_script = response.content.decode()
         self.assertLess(
             page_script.index("formData.set('message', text);"),
