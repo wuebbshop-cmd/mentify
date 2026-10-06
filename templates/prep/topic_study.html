@@ -1121,32 +1121,6 @@
       box-shadow: none;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer {
-      display: contents;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-file-list {
-      position: fixed;
-      z-index: 1202;
-      right: 0;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 70px);
-      left: 0;
-      justify-content: center;
-      width: min(820px, 100vw);
-      margin: 0 auto !important;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
-      position: fixed;
-      z-index: 1202;
-      right: 0;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-      left: 0;
-      width: calc(100% - 16px);
-      margin: 0 auto;
-      box-sizing: border-box;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 6px;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
       position: fixed;
       z-index: 1202;
       right: 0;
@@ -1155,16 +1129,43 @@
       width: min(820px, 100vw);
       box-sizing: border-box;
       margin: 0 auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-file-list {
+      display: none;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
+      width: calc(100% - 16px);
+      margin: 0 auto;
+      box-sizing: border-box;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border: 1px solid var(--danger);
+      border-radius: 22px;
+      background: rgba(10, 16, 18, 0.78);
+      box-shadow: 0 0 0 1px rgba(217, 48, 37, 0.15);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
+      position: static;
+      width: auto;
+      margin: 4px auto 0;
       padding: 0 8px;
       text-align: center;
+      font-size: .62rem;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-textarea {
       min-height: 38px;
       max-height: min(24vh, 120px);
       padding: 6px 2px;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
-      font-size: .62rem;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
       padding: 12px 14px;
@@ -1978,6 +1979,8 @@
       pendingUser.appendChild(attachmentList);
     }
     messages.appendChild(pendingUser);
+    input.value = '';
+    resizeTopicTutorInput(input);
     const loading = document.createElement('div');
     loading.className = 'topic-tutor-pending';
     loading.setAttribute('role', 'status');
@@ -1999,13 +2002,13 @@
       renderTopicTutorConversation(data.conversation);
       topicTutorConversations = data.conversations || [];
       renderTopicTutorHistory(topicTutorConversations);
-      input.value = '';
-      resizeTopicTutorInput(input);
       topicTutorSelectedFiles = [];
       renderTopicTutorSelectedFiles();
     } catch (error) {
       pendingUser.remove();
       loading.remove();
+      input.value = text;
+      resizeTopicTutorInput(input);
       showTopicTutorError(error.message);
     } finally {
       topicTutorSending = false;

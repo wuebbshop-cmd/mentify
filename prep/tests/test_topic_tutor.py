@@ -323,25 +323,19 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "setTimeout(clearTopicTutorError, 10000)")
         self.assertContains(response, "position: fixed;\n      z-index: 1200;\n      inset: 0;", html=False)
         self.assertContains(response, "height: 100dvh;\n      min-height: 0;", html=False)
-        self.assertContains(response, "display: contents;", html=False)
         self.assertContains(
             response,
-            "bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);",
+            "position: fixed;\n      z-index: 1202;\n      right: 0;\n      bottom: env(safe-area-inset-bottom, 0px);\n      left: 0;\n      width: min(820px, 100vw);\n      box-sizing: border-box;\n      margin: 0 auto;\n      padding: 0;\n      border: 0;\n      background: transparent;\n      box-shadow: none;\n      transform: none;",
             html=False,
         )
         self.assertContains(
             response,
-            "bottom: env(safe-area-inset-bottom, 0px);\n      left: 0;\n      width: min(820px, 100vw);",
+            "border: 1px solid var(--danger);\n      border-radius: 22px;\n      background: rgba(10, 16, 18, 0.78);",
             html=False,
         )
         self.assertContains(
             response,
-            "border: 1px solid var(--border);\n    border-radius: 24px;\n    background: var(--white);",
-            html=False,
-        )
-        self.assertContains(
-            response,
-            ".topic-tutor-composer-bar:focus-within {\n    border-color: var(--danger);",
+            ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within {\n      border-color: var(--danger);",
             html=False,
         )
         self.assertContains(response, "width: calc(100% - 16px);", html=False)
@@ -354,13 +348,17 @@ class TopicTutorApiTests(TestCase):
         )
         self.assertNotContains(response, "--topic-tutor-composer-clearance")
         self.assertContains(response, "width: min(820px, 100vw)", html=False)
-        self.assertContains(response, "border-radius: 24px;", html=False)
-        self.assertContains(response, ".topic-tutor-composer-bar:focus-within", html=False)
+        self.assertContains(response, ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within", html=False)
         page_script = response.content.decode()
         self.assertLess(
             page_script.index("formData.set('message', text);"),
             page_script.index("input.disabled = true;"),
         )
+        self.assertLess(
+            page_script.index("messages.appendChild(pendingUser);"),
+            page_script.index("input.value = '';", page_script.index("messages.appendChild(pendingUser);")),
+        )
+        self.assertIn("input.value = text;\n      resizeTopicTutorInput(input);", page_script)
         self.assertIn("files.forEach(file => formData.append('files', file, file.name));", page_script)
 
     def test_reservations_prevent_other_spending_from_using_held_credits(self):
