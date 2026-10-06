@@ -15,10 +15,18 @@ from prep.models import (
     PrepTopicChatMessage,
     PrepTopicChatSession,
     PrepTopicChatUpload,
+    PrepCreditReservation,
     PrepTransaction,
     PrepWallet,
 )
-from services.credit_service import grant_credits
+from services.credit_service import (
+    InsufficientCredits,
+    consume_credits,
+    get_available_credits,
+    grant_credits,
+    release_credit_reservation,
+    reserve_credits,
+)
 from services import prep_topic_tutor
 
 
@@ -210,14 +218,47 @@ class TopicTutorApiTests(TestCase):
         self.client.force_login(self.user)
         self.url = reverse("prep:api_topic_tutor", kwargs={"topic_id": self.topic.pk})
 
-    def test_topic_page_includes_assistant_tab_and_upload_billing_disclosure(self):
+    def test_topic_page_includes_compact_tutor_composer_and_disclosure(self):
         response = self.client.get(reverse("prep:topic_study", kwargs={"topic_id": self.topic.pk}))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Ask a Topic Tutor")
         self.assertContains(response, 'id="pillar-assistant"', html=False)
-        self.assertContains(response, "up to 3 PNG/JPEG images")
-        self.assertContains(response, "OCR is at least 5 credits")
+        self.assertContains(response, 'id="topic-tutor-attach"', html=False)
+        self.assertContains(response, 'aria-label="Attach a PDF or image"', html=False)
+        self.assertContains(response, 'id="topic-tutor-send"', html=False)
+        self.assertContains(response, "topic-tutor-spinner")
+        self.assertContains(response, 'class="topic-tutor-composer-disclosure"', html=False)
+        self.assertContains(response, "Up to 3 PNG/JPEG images")
+        self.assertContains(response, "scanned PDF pages and images cost 5 credits each")
+        self.assertContains(response, 'stroke="var(--danger)"', html=False)
+        self.assertContains(response, 'id="topic-tutor-expand"', html=False)
+        self.assertContains(response, "Expand tutor to full screen")
+        self.assertContains(response, ".topic-tutor-shell.topic-tutor-expanded")
+        self.assertContains(response, "event.key === 'Escape'")
+        page_script = response.content.decode()
+        self.assertLess(
+            page_script.index("formData.set('message', text);"),
+            page_script.index("input.disabled = true;"),
+        )
+
+    def test_reservations_prevent_other_spending_from_using_held_credits(self):
+        reservation = reserve_credits(
+            self.wallet,
+            20,
+            purpose="topic_tutor",
+        )
+
+        self.assertEqual(get_available_credits(self.wallet), 10)
+        with self.assertRaises(InsufficientCredits):
+            consume_credits(
+                self.wallet,
+                11,
+                action_type="test_spend",
+                description="Must not spend held tutor credits",
+            )
+        release_credit_reservation(reservation, reason="Test cleanup")
+        self.assertEqual(get_available_credits(self.wallet), 30)
 
     def test_another_users_session_cannot_be_loaded(self):
         session = PrepTopicChatSession.objects.create(
@@ -261,6 +302,31 @@ class TopicTutorApiTests(TestCase):
         )
         transaction = PrepTransaction.objects.get(wallet=self.wallet, action_type="topic_tutor")
         self.assertEqual(transaction.amount, -1)
+        self.assertEqual(transaction.metadata["provider"], "deepseek")
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "settled")
+        self.assertEqual(reservation.charged_credits, 1)
+        self.assertEqual(reservation.remaining_reserved_credits, 0)
+
+    @patch("services.prep_course_billing.ensure_note_access", return_value=(True, 30))
+    @patch.object(prep_topic_tutor, "_topic_context", return_value=("Approved notes", ""))
+    @patch.object(prep_topic_tutor, "_build_prompt", return_value=("system", "user"))
+    @patch(
+        "services.prep_ai_router.route_math_request",
+        return_value={"success": False, "content": "", "usage": {}},
+    )
+    def test_failed_chat_without_usage_releases_the_full_reservation(
+        self, route_math, build_prompt, topic_context, note_access
+    ):
+        response = self.client.post(self.url, {"message": "Explain unbiasedness simply"})
+
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.json()["credits_balance"], 30)
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "released")
+        self.assertEqual(reservation.charged_credits, 0)
+        self.assertEqual(reservation.remaining_reserved_credits, 0)
+        self.assertEqual(get_available_credits(self.wallet), 30)
 
     @patch("services.prep_course_billing.ensure_note_access", return_value=(True, 30))
     @patch.object(prep_topic_tutor, "_topic_context", return_value=("Approved notes", ""))
@@ -275,7 +341,7 @@ class TopicTutorApiTests(TestCase):
                 "source_type": "image_ocr",
             }],
             {"prompt_tokens": 1100, "completion_tokens": 100, "total_tokens": 1200},
-            "test-ocr",
+            "deepseek-ai/DeepSeek-V4.1-Flash",
         ),
     )
     @patch.object(prep_topic_tutor, "_build_prompt", return_value=("system", "user"))
@@ -305,10 +371,13 @@ class TopicTutorApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["credits_charged"], 6)
         self.assertEqual(response.json()["credits_balance"], 24)
-        self.assertEqual(
-            PrepTransaction.objects.filter(wallet=self.wallet, action_type="topic_tutor_ocr").count(),
-            1,
+        ocr_transaction = PrepTransaction.objects.get(
+            wallet=self.wallet,
+            action_type="topic_tutor_ocr",
         )
+        self.assertEqual(ocr_transaction.amount, -5)
+        self.assertEqual(ocr_transaction.metadata["flat_credits_per_image_or_page"], 5)
+        self.assertEqual(ocr_transaction.metadata["image_or_page_count"], 1)
         self.assertEqual(
             PrepTransaction.objects.filter(wallet=self.wallet, action_type="topic_tutor").count(),
             1,

@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Count, Q
+from django.utils import timezone
 from .models import (
     PrepCourse,
     PrepTopic,
@@ -19,6 +20,7 @@ from .models import (
     PrepContentCache,
     PrepWallet,
     PrepCourseEnrollment,
+    PrepTopicNotesJob,
     PrepTransaction,
     PrepHistory,
     PrepNotification,
@@ -719,6 +721,10 @@ def prep_topic_study(request, topic_id):
         "authentic_questions": authentic_qs,
         "generated_questions": generated_qs,
         "assistant_conversations": assistant_conversations,
+        "tutor_ocr_credits_per_image_page": max(
+            1,
+            int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", 5)),
+        ),
     }
     return render(request, "prep/topic_study.html", context)
 
@@ -1731,6 +1737,51 @@ def prep_topic_notes_api(request):
                 "credits_deducted": credits_deducted,
             }, status=402)
 
+    job_id = data.get("job_id")
+    if job_id:
+        if not topic_obj or not str(job_id).isdigit():
+            return JsonResponse(
+                {"success": False, "error": "Invalid notes generation job."},
+                status=400,
+            )
+        job = PrepTopicNotesJob.objects.filter(
+            pk=int(job_id),
+            topic=topic_obj,
+            level=level,
+        ).first()
+        if not job:
+            return JsonResponse(
+                {"success": False, "error": "Notes generation job was not found."},
+                status=404,
+            )
+        if job.status in {"pending", "running"}:
+            return JsonResponse(
+                {
+                    "success": True,
+                    "pending": True,
+                    "job_id": job.pk,
+                    "status": job.status,
+                    "level": level,
+                },
+                status=202,
+            )
+        if job.status == "failed":
+            logger.error(
+                "Topic notes job failed topic=%s level=%s job=%s: %s",
+                topic_obj.pk,
+                level,
+                job.pk,
+                job.last_error,
+            )
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Notes could not be prepared right now. Please retry in a moment.",
+                    "level": level,
+                },
+                status=502,
+            )
+
     # Use the same published-level source that rendered the notes on the page.
     # Shared notes are returned only after this learner's course share is settled.
     from services.prep_ai_router import get_published_topic_note_levels
@@ -1771,6 +1822,18 @@ def prep_topic_notes_api(request):
             "credits_balance": wallet.credits_balance,
         }, status=409)
 
+    if cached_res.get("validation_failed") and not (
+        cached_res.get("notes") or cached_res.get("content")
+    ):
+        return JsonResponse(
+            {
+                "success": False,
+                "error": cached_res.get("error")
+                or "These notes do not meet the approved topic requirements.",
+            },
+            status=422,
+        )
+
     if cached_res.get("notes") or cached_res.get("content"):
         res = cached_res
     else:
@@ -1793,6 +1856,49 @@ def prep_topic_notes_api(request):
                 ),
                 "credits_balance": wallet.credits_balance,
             }, status=402)
+
+        if topic_obj:
+            from services.prep_ai_router import _topic_notes_cache_signature
+
+            source_signature = _topic_notes_cache_signature(
+                topic_obj.course,
+                topic_obj,
+                topic_title,
+                subtopics,
+            )
+            job, created = PrepTopicNotesJob.objects.get_or_create(
+                topic=topic_obj,
+                level=level,
+                source_signature=source_signature,
+                defaults={"status": "pending"},
+            )
+            if not created and job.status in {"failed", "complete"}:
+                job.status = "pending"
+                job.attempts = 0
+                job.last_error = ""
+                job.started_at = None
+                job.completed_at = None
+                job.queued_at = timezone.now()
+                job.save(
+                    update_fields=[
+                        "status",
+                        "attempts",
+                        "last_error",
+                        "started_at",
+                        "completed_at",
+                        "queued_at",
+                    ]
+                )
+            return JsonResponse(
+                {
+                    "success": True,
+                    "pending": True,
+                    "job_id": job.pk,
+                    "status": job.status,
+                    "level": level,
+                },
+                status=202,
+            )
 
         res = get_or_generate_topic_notes(
             course_code=course_code or "Course",

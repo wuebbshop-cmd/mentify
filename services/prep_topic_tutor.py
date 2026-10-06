@@ -24,9 +24,16 @@ from prep.models import (
 )
 from services.credit_service import (
     InsufficientCredits,
-    consume_credits,
-    credits_for_usage,
     get_available_credits,
+    release_credit_reservation,
+    reserve_credits,
+    settle_credit_reservation,
+)
+from services.prep_tutor_billing import (
+    calculate_provider_cost,
+    estimate_chat_reservation,
+    provider_cost_credits,
+    quote_summary,
 )
 
 logger = logging.getLogger(__name__)
@@ -557,12 +564,6 @@ def _safe_answer(result: dict, topic) -> str:
     return answer
 
 
-def _estimate_chat_credits(system_prompt: str, user_prompt: str) -> int:
-    unit = max(1, int(getattr(settings, "PREP_CREDIT_TOKEN_UNIT", 1000)))
-    estimated_tokens = math.ceil((len(system_prompt) + len(user_prompt)) / 3.5) + CHAT_MAX_OUTPUT_TOKENS
-    return max(1, math.ceil(estimated_tokens / unit))
-
-
 def list_topic_conversations(user, topic) -> list[dict]:
     sessions = PrepTopicChatSession.objects.filter(user=user, topic=topic).order_by("-updated_at", "-id")[:30]
     return [
@@ -670,159 +671,203 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
         context_uploads,
     )
     wallet = PrepWallet.get_or_create_wallet(user)
-    ocr_estimate = 0
-    if vision_images:
-        ocr_unit = max(1, int(getattr(settings, "PREP_CREDIT_TOKEN_UNIT", 1000)))
-        ocr_estimate = max(MIN_OCR_CREDITS, math.ceil(len(vision_images) * 3000 / ocr_unit))
-    chat_estimate = _estimate_chat_credits(system_prompt, user_prompt)
-    available = get_available_credits(wallet)
-    if available < ocr_estimate + chat_estimate:
-        raise TopicTutorError(
-            f"This request may need up to {ocr_estimate + chat_estimate} credits "
-            f"({ocr_estimate} for OCR and {chat_estimate} for the reply). "
-            "Please top up and try again.",
-            402,
+    chat_model = str(getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-flash"))
+    chat_reserve, chat_reserve_quote = estimate_chat_reservation(
+        system_prompt,
+        user_prompt,
+        chat_model,
+        output_token_cap=CHAT_MAX_OUTPUT_TOKENS,
+    )
+    ocr_per_page = max(
+        1,
+        int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", MIN_OCR_CREDITS)),
+    )
+    ocr_reserve = ocr_per_page * len(vision_images)
+    try:
+        reservation = reserve_credits(
+            wallet,
+            ocr_reserve + chat_reserve,
+            purpose="topic_tutor",
+            metadata={
+                "topic_id": topic.pk,
+                "session_id": session.pk if session else None,
+                "ocr_image_or_page_count": len(vision_images),
+                "ocr_reserved_credits": ocr_reserve,
+                "chat_reserved_credits": chat_reserve,
+                "chat_reservation_pricing": quote_summary(chat_reserve_quote, chat_reserve),
+            },
         )
+    except InsufficientCredits as exc:
+        required = ocr_reserve + chat_reserve
+        available = get_available_credits(wallet)
+        raise TopicTutorError(
+            f"This request needs up to {required} credits reserved "
+            f"({ocr_reserve} for OCR and {chat_reserve} for the reply); "
+            f"your available balance is {available}. Please top up and retry.",
+            402,
+        ) from exc
 
     ocr_usage = {}
     ocr_model = ""
     ocr_credits = 0
+    chat_credits = 0
     uploads = []
-    if uploaded_files:
-        try:
-            uploads, ocr_usage, ocr_model = _finish_uploads(
-                prepared_uploads, vision_images, topic, notes
-            )
-        except TopicTutorError as exc:
-            if exc.usage:
-                charged = _charge_usage(
-                    wallet,
-                    exc.usage,
-                    MIN_OCR_CREDITS,
-                    "topic_tutor_ocr",
-                    f"Topic tutor upload OCR: {topic.title}",
-                    exc.model_name,
-                    {"topic_id": topic.pk, "session_id": session.pk if session else None},
+    try:
+        if uploaded_files:
+            try:
+                uploads, ocr_usage, ocr_model = _finish_uploads(
+                    prepared_uploads, vision_images, topic, notes
                 )
-                exc.credits_charged += charged
-            raise
-    if vision_images:
-        ocr_credits = _charge_usage(
-            wallet,
-            ocr_usage,
-            MIN_OCR_CREDITS,
-            "topic_tutor_ocr",
-            f"Topic tutor upload OCR: {topic.title}",
-            ocr_model,
-            {"topic_id": topic.pk, "session_id": session.pk if session else None},
-        )
-        existing_upload_context = [
-            {"name": item.original_name, "text": item.extracted_text[:MAX_EXTRACTED_CHARS_PER_UPLOAD]}
-            for item in reversed(session_uploads)
-        ]
-        context_uploads = existing_upload_context + uploads
-        total_chars = 0
-        bounded_uploads = []
-        for item in context_uploads:
-            remaining = MAX_UPLOAD_CONTEXT_CHARS - total_chars
-            if remaining <= 0:
-                break
-            clipped = str(item["text"] or "")[:remaining]
-            bounded_uploads.append({**item, "text": clipped})
-            total_chars += len(clipped)
-        context_uploads = bounded_uploads
-        system_prompt, user_prompt = _build_prompt(
-            topic, notes, course_material, history, user_message, context_uploads
-        )
-        available_after_ocr = get_available_credits(wallet)
-        chat_estimate = _estimate_chat_credits(system_prompt, user_prompt)
-        if available_after_ocr < chat_estimate:
-            raise TopicTutorError(
-                f"OCR used {ocr_credits} credits, and this reply may need {chat_estimate} more. "
-                "Please top up before sending the question.",
-                402,
-                credits_charged=ocr_credits,
+            except TopicTutorError as exc:
+                if vision_images and exc.usage:
+                    ocr_model = exc.model_name or str(
+                        getattr(settings, "TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+                    )
+                    ocr_quote = calculate_provider_cost("together", ocr_model, exc.usage)
+                    ocr_credits = settle_credit_reservation(
+                        reservation,
+                        ocr_per_page * len(vision_images),
+                        release_reserved=ocr_reserve,
+                        action_type="topic_tutor_ocr",
+                        description=f"Topic tutor OCR ({len(vision_images)} image/page): {topic.title}",
+                        usage=exc.usage,
+                        model_name=ocr_model,
+                        metadata={
+                            "provider": "together",
+                            "pricing": quote_summary(
+                                ocr_quote,
+                                ocr_per_page * len(vision_images),
+                            ),
+                            "flat_credits_per_image_or_page": ocr_per_page,
+                            "image_or_page_count": len(vision_images),
+                            "topic_id": topic.pk,
+                            "session_id": session.pk if session else None,
+                        },
+                    )
+                    exc.credits_charged += ocr_credits
+                raise
+
+        if vision_images:
+            ocr_quote = calculate_provider_cost("together", ocr_model, ocr_usage)
+            ocr_credits = settle_credit_reservation(
+                reservation,
+                ocr_per_page * len(vision_images),
+                release_reserved=ocr_reserve,
+                action_type="topic_tutor_ocr",
+                description=f"Topic tutor OCR ({len(vision_images)} image/page): {topic.title}",
+                usage=ocr_usage,
+                model_name=ocr_model,
+                metadata={
+                    "provider": "together",
+                    "pricing": quote_summary(ocr_quote, ocr_per_page * len(vision_images)),
+                    "flat_credits_per_image_or_page": ocr_per_page,
+                    "image_or_page_count": len(vision_images),
+                    "topic_id": topic.pk,
+                    "session_id": session.pk if session else None,
+                },
+            )
+            existing_upload_context = [
+                {"name": item.original_name, "text": item.extracted_text[:MAX_EXTRACTED_CHARS_PER_UPLOAD]}
+                for item in reversed(session_uploads)
+            ]
+            context_uploads = existing_upload_context + uploads
+            total_chars = 0
+            bounded_uploads = []
+            for item in context_uploads:
+                remaining = MAX_UPLOAD_CONTEXT_CHARS - total_chars
+                if remaining <= 0:
+                    break
+                clipped = str(item["text"] or "")[:remaining]
+                bounded_uploads.append({**item, "text": clipped})
+                total_chars += len(clipped)
+            context_uploads = bounded_uploads
+            system_prompt, user_prompt = _build_prompt(
+                topic, notes, course_material, history, user_message, context_uploads
             )
 
-    from services.prep_ai_router import robust_json_loads, route_math_request
+        from services.prep_ai_router import robust_json_loads, route_math_request
 
-    result = route_math_request(
-        user_prompt,
-        topic.course.code,
-        topic_label=topic.title,
-        is_complex_proof=False,
-        system_prompt=system_prompt,
-        max_tokens_override=CHAT_MAX_OUTPUT_TOKENS,
-        auto_continue=False,
-        thinking_enabled=False,
-    )
-    if not result.get("success"):
-        raise TopicTutorError(
-            "The topic tutor is temporarily unavailable. Please retry in a moment.",
-            502,
-            credits_charged=ocr_credits,
+        result = route_math_request(
+            user_prompt,
+            topic.course.code,
+            topic_label=topic.title,
+            is_complex_proof=False,
+            system_prompt=system_prompt,
+            max_tokens_override=CHAT_MAX_OUTPUT_TOKENS,
+            auto_continue=False,
+            thinking_enabled=False,
         )
+        chat_usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
+        chat_model_used = str(result.get("model_used") or chat_model)
+        chat_usage_for_billing = dict(chat_usage)
+        estimated_usage = False
+        if result.get("success") and not (
+            int(chat_usage.get("prompt_tokens") or chat_usage.get("input_tokens") or 0)
+            or int(chat_usage.get("completion_tokens") or chat_usage.get("output_tokens") or 0)
+            or int(chat_usage.get("total_tokens") or 0)
+        ):
+            chat_usage_for_billing.update({
+                "prompt_tokens": math.ceil((len(system_prompt) + len(user_prompt)) / 3.5),
+                "completion_tokens": math.ceil(
+                    len(str(result.get("content") or "")) / 3.5
+                ),
+            })
+            estimated_usage = True
 
-    chat_usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
-    try:
-        parsed = robust_json_loads(str(result.get("content") or "").strip())
-    except (ValueError, TypeError) as exc:
-        chat_credits = credits_for_usage(chat_usage, minimum=1)
-        _charge_usage(
-            wallet, chat_usage, 1, "topic_tutor",
-            f"Topic tutor reply validation: {topic.title}",
-            str(result.get("model_used") or ""),
-            {"topic_id": topic.pk, "session_id": session.pk if session else None},
-        )
-        raise TopicTutorError(
-            "The tutor returned an unreadable response. Please retry your question.",
-            502,
-            credits_charged=ocr_credits + chat_credits,
-        ) from exc
-    if not isinstance(parsed, dict):
-        chat_credits = _charge_usage(
-            wallet, chat_usage, 1, "topic_tutor",
-            f"Topic tutor reply validation: {topic.title}",
-            str(result.get("model_used") or ""),
-            {"topic_id": topic.pk, "session_id": session.pk if session else None},
-        )
-        raise TopicTutorError(
-            "The tutor returned an invalid response. Please retry your question.",
-            502,
-            credits_charged=ocr_credits + chat_credits,
-        )
-    try:
-        answer = _safe_answer(parsed, topic)
-    except TopicTutorError as exc:
-        chat_credits = _charge_usage(
-            wallet, chat_usage, 1, "topic_tutor",
-            f"Topic tutor reply validation: {topic.title}",
-            str(result.get("model_used") or ""),
-            {"topic_id": topic.pk, "session_id": session.pk if session else None},
-        )
-        exc.credits_charged += ocr_credits + chat_credits
-        raise
-    ocr_credits = credits_for_usage(ocr_usage, minimum=MIN_OCR_CREDITS) if ocr_usage else 0
-    chat_credits = credits_for_usage(chat_usage, minimum=1)
-    total_credits = ocr_credits + chat_credits
-
-    try:
-        with transaction.atomic():
-            if get_available_credits(wallet) < total_credits:
-                raise InsufficientCredits("Your balance changed while the response was being prepared.")
-            consume_credits(
-                wallet,
+        if chat_usage_for_billing:
+            chat_quote = calculate_provider_cost(
+                "deepseek",
+                chat_model_used,
+                chat_usage_for_billing,
+            )
+            chat_credits = provider_cost_credits(chat_quote)
+            chat_credits = settle_credit_reservation(
+                reservation,
                 chat_credits,
                 action_type="topic_tutor",
                 description=f"Topic tutor reply: {topic.course.code} - {topic.title}",
-                usage=chat_usage,
-                model_name=str(result.get("model_used") or ""),
+                usage=chat_usage_for_billing,
+                model_name=chat_model_used,
                 metadata={
+                    "provider": "deepseek",
+                    "pricing": quote_summary(chat_quote, chat_credits),
+                    "usage_estimated": estimated_usage,
                     "topic_id": topic.pk,
                     "session_id": session.pk if session else None,
                     "upload_count": len(uploads),
                 },
             )
+        else:
+            release_credit_reservation(
+                reservation,
+                reason="Chat provider returned no billable usage.",
+            )
+
+        if not result.get("success"):
+            raise TopicTutorError(
+                "The topic tutor is temporarily unavailable. Please retry in a moment.",
+                502,
+                credits_charged=ocr_credits + chat_credits,
+            )
+
+        try:
+            parsed = robust_json_loads(str(result.get("content") or "").strip())
+        except (ValueError, TypeError) as exc:
+            raise TopicTutorError(
+                "The tutor returned an unreadable response. Please retry your question.",
+                502,
+                credits_charged=ocr_credits + chat_credits,
+            ) from exc
+        if not isinstance(parsed, dict):
+            raise TopicTutorError(
+                "The tutor returned an invalid response. Please retry your question.",
+                502,
+                credits_charged=ocr_credits + chat_credits,
+            )
+        answer = _safe_answer(parsed, topic)
+
+        total_credits = ocr_credits + chat_credits
+        with transaction.atomic():
             if session is None:
                 session = PrepTopicChatSession.objects.create(
                     user=user,
@@ -843,8 +888,18 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                     page_count=upload["page_count"],
                     source_type=upload["source_type"],
                 )
-            prompt_tokens = int(chat_usage.get("prompt_tokens") or chat_usage.get("input_tokens") or 0)
-            completion_tokens = int(chat_usage.get("completion_tokens") or chat_usage.get("output_tokens") or 0)
+            prompt_tokens = int(
+                chat_usage.get("prompt_tokens")
+                or chat_usage.get("input_tokens")
+                or chat_usage_for_billing.get("prompt_tokens")
+                or 0
+            )
+            completion_tokens = int(
+                chat_usage.get("completion_tokens")
+                or chat_usage.get("output_tokens")
+                or chat_usage_for_billing.get("completion_tokens")
+                or 0
+            )
             PrepTopicChatMessage.objects.create(
                 session=session,
                 role="assistant",
@@ -854,49 +909,23 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 credits_charged=total_credits,
             )
             session.save(update_fields=["updated_at"])
-    except InsufficientCredits as exc:
-        raise TopicTutorError(
-            "Your available credits changed before this reply could be billed. Please top up and retry.",
-            402,
-            usage=chat_usage,
-            model_name=str(result.get("model_used") or ""),
-            credits_charged=ocr_credits,
-        ) from exc
 
-    wallet.refresh_from_db(fields=["credits_balance"])
-    return {
-        "answer": answer,
-        "session": session,
-        "credits_charged": total_credits,
-        "ocr_credits": ocr_credits,
-        "credits_balance": wallet.credits_balance,
-        "input_tokens": int(chat_usage.get("prompt_tokens") or chat_usage.get("input_tokens") or 0),
-        "output_tokens": int(chat_usage.get("completion_tokens") or chat_usage.get("output_tokens") or 0),
-        "uploads": [
-            {"name": item["name"], "source_type": item["source_type"], "page_count": item["page_count"]}
-            for item in uploads
-        ],
-    }
-
-
-def _charge_usage(wallet, usage, minimum, action_type, description, model_name, metadata):
-    amount = credits_for_usage(usage, minimum=minimum)
-    try:
-        consume_credits(
-            wallet,
-            amount,
-            action_type=action_type,
-            description=description,
-            usage=usage,
-            model_name=model_name,
-            metadata=metadata,
-        )
-        return amount
-    except InsufficientCredits:
-        logger.error("Topic tutor OCR was processed but the wallet could not be charged.")
-        raise TopicTutorError(
-            "This request used AI credits but your current balance could not cover them. Please top up.",
-            402,
-            usage=usage,
-            model_name=model_name,
+        wallet.refresh_from_db(fields=["credits_balance"])
+        return {
+            "answer": answer,
+            "session": session,
+            "credits_charged": total_credits,
+            "ocr_credits": ocr_credits,
+            "credits_balance": get_available_credits(wallet),
+            "input_tokens": prompt_tokens,
+            "output_tokens": completion_tokens,
+            "uploads": [
+                {"name": item["name"], "source_type": item["source_type"], "page_count": item["page_count"]}
+                for item in uploads
+            ],
+        }
+    finally:
+        release_credit_reservation(
+            reservation,
+            reason="Request finished; unused reserved credits released.",
         )

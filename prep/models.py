@@ -151,6 +151,40 @@ class PrepNotePrecomputeJob(models.Model):
         ordering = ["queued_at", "id"]
 
 
+class PrepTopicNotesJob(models.Model):
+    """Durable per-topic notes generation, processed outside web requests."""
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("running", "Running"),
+        ("complete", "Complete"),
+        ("failed", "Failed"),
+    ]
+
+    topic = models.ForeignKey(
+        "PrepTopic",
+        on_delete=models.CASCADE,
+        related_name="notes_generation_jobs",
+    )
+    level = models.CharField(max_length=20)
+    source_signature = models.CharField(max_length=64, db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    last_error = models.TextField(blank=True)
+    queued_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["topic", "level", "source_signature"],
+                name="unique_prep_topic_notes_job",
+            ),
+        ]
+        ordering = ["queued_at", "id"]
+
+
 class PrepTopic(models.Model):
     """Syllabus module/topic under a canonical course."""
     course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="topics")
@@ -652,6 +686,42 @@ class PrepCreditGrant(models.Model):
 
     def __str__(self):
         return f"{self.wallet.user} | {self.source} | {self.remaining_credits}/{self.granted_credits}"
+
+
+class PrepCreditReservation(models.Model):
+    """Credits held atomically while a provider request is in flight."""
+
+    STATUS_CHOICES = [
+        ("reserved", "Reserved"),
+        ("settled", "Settled"),
+        ("released", "Released"),
+    ]
+
+    wallet = models.ForeignKey(
+        PrepWallet,
+        on_delete=models.CASCADE,
+        related_name="credit_reservations",
+    )
+    purpose = models.CharField(max_length=50)
+    reserved_credits = models.PositiveIntegerField()
+    remaining_reserved_credits = models.PositiveIntegerField()
+    charged_credits = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="reserved", db_index=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["wallet", "status"], name="prep_res_wallet_status_idx"),
+        ]
+        ordering = ["created_at", "id"]
+
+    def __str__(self):
+        return (
+            f"{self.wallet.user} | {self.purpose} | "
+            f"{self.remaining_reserved_credits}/{self.reserved_credits} reserved"
+        )
 
 
 class PrepTransaction(models.Model):

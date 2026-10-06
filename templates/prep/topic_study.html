@@ -616,7 +616,7 @@
   }
   .topic-tutor-shell {
     display: grid;
-    grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
+    grid-template-columns: minmax(185px, 220px) minmax(0, 1fr);
     gap: 18px;
     align-items: stretch;
   }
@@ -630,15 +630,39 @@
   .topic-tutor-history {
     display: flex;
     flex-direction: column;
-    max-height: 720px;
+    height: min(78vh, 860px);
+    min-height: 620px;
   }
   .topic-tutor-history-head, .topic-tutor-head {
     padding: 17px 18px;
     border-bottom: 1px solid var(--border);
   }
   .topic-tutor-history-list {
+    min-height: 0;
+    flex: 1;
     overflow-y: auto;
     padding: 9px;
+    scrollbar-width: thin;
+    scrollbar-color: #a3a3a3 transparent;
+  }
+  body.dark-theme .topic-tutor-history-list,
+  html.dark-theme body .topic-tutor-history-list {
+    background: #171717;
+    scrollbar-color: #555 transparent;
+  }
+  .topic-tutor-history-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .topic-tutor-history-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .topic-tutor-history-list::-webkit-scrollbar-thumb {
+    background: #a3a3a3;
+    border-radius: 999px;
+  }
+  body.dark-theme .topic-tutor-history-list::-webkit-scrollbar-thumb,
+  html.dark-theme body .topic-tutor-history-list::-webkit-scrollbar-thumb {
+    background: #555;
   }
   .topic-tutor-history-item {
     display: block;
@@ -657,7 +681,9 @@
     border-color: var(--border);
   }
   .topic-tutor-main {
-    min-height: 670px;
+    position: relative;
+    height: min(78vh, 860px);
+    min-height: 620px;
     display: flex;
     flex-direction: column;
   }
@@ -669,13 +695,32 @@
   }
   .topic-tutor-messages {
     flex: 1;
-    min-height: 280px;
-    max-height: 470px;
+    min-height: 0;
     overflow-y: auto;
-    padding: 22px clamp(14px, 4vw, 34px);
+    padding: 22px clamp(14px, 4vw, 34px) 145px;
+    scrollbar-width: thin;
+    scrollbar-color: #a3a3a3 transparent;
     background:
       radial-gradient(ellipse at 15% 0%, rgba(16, 185, 129, 0.07), transparent 45%),
       var(--surface);
+  }
+  body.dark-theme .topic-tutor-messages,
+  html.dark-theme body .topic-tutor-messages {
+    scrollbar-color: #555 #171717;
+  }
+  .topic-tutor-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+  .topic-tutor-messages::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .topic-tutor-messages::-webkit-scrollbar-thumb {
+    background: #a3a3a3;
+    border-radius: 999px;
+  }
+  body.dark-theme .topic-tutor-messages::-webkit-scrollbar-thumb,
+  html.dark-theme body .topic-tutor-messages::-webkit-scrollbar-thumb {
+    background: #555;
   }
   .topic-tutor-message {
     max-width: 88%;
@@ -702,25 +747,107 @@
     font-size: .72rem;
   }
   .topic-tutor-composer {
-    padding: 14px 16px 16px;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 28px clamp(12px, 3vw, 28px) 12px;
+    background: linear-gradient(180deg, transparent 0%, var(--surface) 32%);
+  }
+  .topic-tutor-composer-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 9px;
+    padding: 8px 9px 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--white);
+    box-shadow: 0 5px 22px rgba(0, 0, 0, .12);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .topic-tutor-composer-bar:focus-within {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, .12), 0 5px 22px rgba(0, 0, 0, .12);
   }
   .topic-tutor-textarea {
-    resize: vertical;
-    min-height: 54px;
-    max-height: 160px;
+    resize: none;
+    min-height: 40px;
+    flex: 1;
+    min-width: 0;
     width: 100%;
-    padding: 13px 14px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--white, var(--surface));
+    padding: 9px 2px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     color: var(--text);
     font: inherit;
-    line-height: 1.5;
+    line-height: 1.4;
     outline: none;
+    overflow-y: hidden;
   }
-  .topic-tutor-textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(16, 185, 129, .12); }
+  .topic-tutor-textarea:focus { box-shadow: none; }
+  .topic-tutor-textarea::placeholder { color: var(--text-muted); }
+  .topic-tutor-icon-button {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .topic-tutor-icon-button:hover:not(:disabled) {
+    background: var(--hover);
+    color: var(--danger);
+  }
+  .topic-tutor-icon-button:disabled { cursor: not-allowed; opacity: .65; }
+  .topic-tutor-send {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    background: var(--danger);
+    color: #fff;
+  }
+  .topic-tutor-send:hover:not(:disabled) {
+    background: #b42318;
+    color: #fff;
+  }
+  .topic-tutor-send svg { width: 19px; height: 19px; }
+  .topic-tutor-spinner {
+    width: 19px;
+    height: 19px;
+    border: 2px solid rgba(255, 255, 255, .4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: topic-tutor-spin .7s linear infinite;
+  }
+  @keyframes topic-tutor-spin { to { transform: rotate(360deg); } }
+  .topic-tutor-composer-disclosure {
+    margin: 5px 8px 0;
+    color: var(--text-muted);
+    font-size: .68rem;
+    text-align: center;
+  }
+  .topic-tutor-composer-disclosure summary {
+    display: inline-block;
+    cursor: pointer;
+    color: var(--text-muted);
+  }
+  .topic-tutor-composer-disclosure p {
+    margin: 4px 0 0;
+    line-height: 1.4;
+  }
+  .topic-tutor-error {
+    position: absolute;
+    z-index: 3;
+    right: 18px;
+    bottom: 128px;
+    left: 18px;
+  }
   .topic-tutor-message .katex-display { overflow-x: auto; max-width: 100%; }
   .topic-tutor-upload-chip {
     display: inline-flex;
@@ -735,11 +862,90 @@
   }
   @media (max-width: 800px) {
     .topic-tutor-shell { grid-template-columns: 1fr; }
-    .topic-tutor-history { max-height: 190px; }
-    .topic-tutor-history-list { display: flex; gap: 6px; overflow-x: auto; }
+    .topic-tutor-history { height: 150px; min-height: 0; }
+    .topic-tutor-history-list { display: flex; flex: none; gap: 6px; overflow-x: auto; }
     .topic-tutor-history-item { min-width: 170px; margin: 0; }
-    .topic-tutor-main { min-height: 610px; }
+    .topic-tutor-main { height: min(76vh, 800px); min-height: 540px; }
     .topic-tutor-message { max-width: 96%; }
+    .topic-tutor-error { bottom: 126px; }
+  }
+  @media (max-width: 480px) {
+    .topic-tutor-shell { gap: 10px; }
+    .topic-tutor-history-head { padding: 12px 14px; }
+    .topic-tutor-composer { padding-right: 9px; padding-left: 9px; }
+    .topic-tutor-messages { padding-right: 12px; padding-left: 12px; }
+  }
+  .topic-tutor-shell.topic-tutor-expanded {
+    position: fixed;
+    z-index: 1200;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    padding: 14px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history,
+  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+    border-radius: 18px;
+  }
+  .topic-tutor-expand-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: .78rem;
+    cursor: pointer;
+  }
+  .topic-tutor-expand-button:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .topic-tutor-expand-button svg {
+    width: 16px;
+    height: 16px;
+  }
+  body.topic-tutor-expanded {
+    overflow: hidden;
+  }
+  @media (max-width: 800px) {
+    .topic-tutor-shell.topic-tutor-expanded {
+      grid-template-columns: 1fr;
+      grid-template-rows: 128px minmax(0, 1fr);
+      gap: 8px;
+      padding: 8px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history {
+      height: auto;
+      min-height: 0;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history-list {
+      display: flex;
+      flex: 1;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+      height: auto;
+      min-height: 0;
+    }
   }
 </style>
 {% endblock %}
@@ -814,7 +1020,7 @@
     Topic Notes &amp; Explanations
   </button>
   <button type="button" data-study-tab="assistant" class="study-tab-btn {% if active_subtab == 'assistant' %}active{% endif %}" onclick="switchPillarTab('assistant')">
-    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h8M8 14h5m-8 6 2.2-2.2A8 8 0 1 1 20 15"/></svg>
+    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color:var(--danger);" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h8M8 14h5m-8 6 2.2-2.2A8 8 0 1 1 20 15"/></svg>
     Ask a Topic Tutor
   </button>
   <button type="button" data-study-tab="past_questions" class="study-tab-btn {% if active_subtab == 'past_questions' %}active{% endif %}" onclick="switchPillarTab('past_questions')">
@@ -929,9 +1135,15 @@
           </div>
           <p style="margin:4px 0 0;color:var(--text-muted);font-size:.8rem;">Simple explanations for {{ topic.title }}</p>
         </div>
-        <div style="text-align:right;white-space:nowrap;">
-          <div style="font-size:.72rem;color:var(--text-muted);">Balance</div>
-          <strong style="font-size:.9rem;color:var(--green);"><span id="topic-tutor-balance">{{ user_credits }}</span> credits</strong>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button type="button" id="topic-tutor-expand" class="topic-tutor-expand-button" aria-label="Expand tutor to full screen" aria-pressed="false" title="Expand tutor">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
+            <span>Expand</span>
+          </button>
+          <div style="text-align:right;white-space:nowrap;">
+            <div style="font-size:.72rem;color:var(--text-muted);">Balance</div>
+            <strong style="font-size:.9rem;color:var(--green);"><span id="topic-tutor-balance">{{ user_credits }}</span> credits</strong>
+          </div>
         </div>
       </div>
 
@@ -948,22 +1160,24 @@
           <div class="topic-tutor-message-meta">Grounded in validated topic notes and approved course material</div>
         </div>
       </div>
-      <div id="topic-tutor-error" role="alert" style="display:none;margin:0 16px 12px;padding:10px 12px;border:1px solid rgba(220,38,38,.25);border-radius:10px;background:rgba(220,38,38,.06);color:var(--danger);font-size:.84rem;"></div>
+      <div id="topic-tutor-error" class="topic-tutor-error" role="alert" style="display:none;padding:10px 12px;border:1px solid rgba(220,38,38,.25);border-radius:10px;background:var(--surface);color:var(--danger);font-size:.84rem;box-shadow:0 3px 12px rgba(0,0,0,.08);"></div>
       <form id="topic-tutor-form" class="topic-tutor-composer">
         {% csrf_token %}
-        <div id="topic-tutor-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-        <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" maxlength="2000" placeholder="What part of {{ topic.title }} would you like to understand?" aria-label="Ask a question about this topic" required></textarea>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <input type="file" id="topic-tutor-files" name="files" accept="application/pdf,image/png,image/jpeg" multiple hidden>
-            <button type="button" id="topic-tutor-attach" class="btn btn-outline btn-sm">Attach notes</button>
-            <span style="font-size:.72rem;color:var(--text-muted);">PDF ≤8 MB / 4 pages; up to 3 PNG/JPEG images ≤4 MB each. Text only.</span>
-          </div>
-          <button type="submit" id="topic-tutor-send" class="btn btn-primary btn-sm" style="background:var(--green);border-color:var(--green);min-width:92px;">Send</button>
+        <div id="topic-tutor-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px;"></div>
+        <div class="topic-tutor-composer-bar">
+          <input type="file" id="topic-tutor-files" name="files" accept="application/pdf,image/png,image/jpeg" multiple hidden>
+          <button type="button" id="topic-tutor-attach" class="topic-tutor-icon-button" aria-label="Attach a PDF or image" title="Attach a PDF or image">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>
+          </button>
+          <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" rows="1" maxlength="2000" placeholder="Ask about {{ topic.title }}…" aria-label="Ask a question about this topic" required></textarea>
+          <button type="submit" id="topic-tutor-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Send message">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </button>
         </div>
-        <div style="font-size:.72rem;color:var(--text-muted);margin-top:8px;">
-          Replies use credits by token usage (minimum 1); OCR is at least 5 credits. <a href="{% url 'prep:billing' %}" style="color:var(--green);">Credit details</a>
-        </div>
+        <details class="topic-tutor-composer-disclosure">
+          <summary>Upload limits &amp; credit details</summary>
+          <p>PDFs: up to 8 MB and 4 pages. Up to 3 PNG/JPEG images, 4 MB each. Text PDFs are read locally; scanned PDF pages and images cost {{ tutor_ocr_credits_per_image_page }} credits each. Replies are billed by AI token usage (minimum 1 credit). <a href="{% url 'prep:billing' %}" style="color:var(--danger);">Credit details</a></p>
+        </details>
       </form>
       {% endif %}
     </section>
@@ -1190,6 +1404,8 @@
   let topicTutorInitialized = false;
   let topicTutorSending = false;
   let topicTutorConversations = [];
+  let topicTutorExpanded = false;
+  let topicTutorSavedScrollY = 0;
 
   // ─── 5-Page Syllabus Notes Navigation State ─────────────────────────────
   let notePages = [];
@@ -1218,6 +1434,51 @@
     const sharedBalance = document.getElementById('wallet-balance-indicator');
     if (balance !== undefined && balanceEl) balanceEl.textContent = String(balance);
     if (balance !== undefined && sharedBalance) sharedBalance.textContent = String(balance);
+  }
+
+  function resizeTopicTutorInput(input) {
+    if (!input) return;
+    input.style.height = 'auto';
+    input.style.height = `${input.scrollHeight}px`;
+    input.style.overflowY = 'hidden';
+  }
+
+  function setTopicTutorSendState(button, isSending) {
+    if (!button) return;
+    button.disabled = isSending;
+    button.setAttribute('aria-label', isSending ? 'Waiting for tutor response' : 'Send message');
+    button.title = isSending ? 'Waiting for tutor response' : 'Send message';
+    button.innerHTML = isSending
+      ? '<span class="topic-tutor-spinner" aria-hidden="true"></span>'
+      : '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>';
+  }
+
+  function setTopicTutorExpanded(expanded) {
+    const shell = document.querySelector('.topic-tutor-shell');
+    const button = document.getElementById('topic-tutor-expand');
+    if (!shell || !button || topicTutorExpanded === expanded) return;
+
+    topicTutorExpanded = expanded;
+    shell.classList.toggle('topic-tutor-expanded', expanded);
+    document.body.classList.toggle('topic-tutor-expanded', expanded);
+    button.setAttribute('aria-pressed', String(expanded));
+    button.setAttribute(
+      'aria-label',
+      expanded ? 'Exit full-screen tutor' : 'Expand tutor to full screen'
+    );
+    button.title = expanded ? 'Exit full-screen tutor' : 'Expand tutor';
+    button.innerHTML = expanded
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3m13-5v3a2 2 0 0 0 2 2h3M3 16h3a2 2 0 0 1 2 2v3m13-5h-3a2 2 0 0 0-2 2v3"/></svg><span>Collapse</span>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg><span>Expand</span>';
+
+    if (expanded) {
+      topicTutorSavedScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+      document.getElementById('topic-tutor-input')?.focus({ preventScroll: true });
+    } else {
+      window.scrollTo(0, topicTutorSavedScrollY);
+      button.focus({ preventScroll: true });
+    }
   }
 
   function renderTopicTutorMessage(message) {
@@ -1375,18 +1636,21 @@
       input.focus();
       return;
     }
+    const formData = new FormData(form);
+    formData.set('message', text);
+    if (topicTutorSessionId) formData.set('session_id', String(topicTutorSessionId));
+
     clearTopicTutorError();
     topicTutorSending = true;
-    send.disabled = true;
-    send.textContent = 'Thinking…';
+    setTopicTutorSendState(send, true);
+    input.disabled = true;
+    document.getElementById('topic-tutor-attach').disabled = true;
     const loading = document.createElement('div');
     loading.className = 'topic-tutor-message assistant';
     loading.textContent = 'Working through your question…';
     document.getElementById('topic-tutor-messages').appendChild(loading);
     document.getElementById('topic-tutor-messages').scrollTop =
       document.getElementById('topic-tutor-messages').scrollHeight;
-    const formData = new FormData(form);
-    if (topicTutorSessionId) formData.set('session_id', String(topicTutorSessionId));
     try {
       const response = await fetch(topicTutorApiUrl, {
         method: 'POST',
@@ -1403,6 +1667,7 @@
       topicTutorConversations = data.conversations || [];
       renderTopicTutorHistory(topicTutorConversations);
       input.value = '';
+      resizeTopicTutorInput(input);
       files.value = '';
       renderTopicTutorSelectedFiles();
     } catch (error) {
@@ -1410,8 +1675,9 @@
       showTopicTutorError(error.message);
     } finally {
       topicTutorSending = false;
-      send.disabled = false;
-      send.textContent = 'Send';
+      setTopicTutorSendState(send, false);
+      input.disabled = false;
+      document.getElementById('topic-tutor-attach').disabled = false;
       input.focus();
     }
   }
@@ -1423,7 +1689,10 @@
     renderTopicTutorConversation(null);
     const input = document.getElementById('topic-tutor-input');
     const files = document.getElementById('topic-tutor-files');
-    if (input) input.value = '';
+    if (input) {
+      input.value = '';
+      resizeTopicTutorInput(input);
+    }
     if (files) files.value = '';
     renderTopicTutorSelectedFiles();
     if (input) input.focus();
@@ -1605,6 +1874,39 @@
     }
   }
 
+  async function waitForNotesJob(jobId, level) {
+    const maxChecks = 300;
+    for (let check = 0; check < maxChecks; check += 1) {
+      await new Promise(resolve => window.setTimeout(resolve, 2000));
+      const response = await fetch("{% url 'prep:api_topic_notes' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({
+          topic_id: topicId,
+          level: level,
+          job_id: jobId,
+        }),
+      });
+      const raw = await response.text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseError) {
+        throw new Error(
+          `Notes request failed (${response.status}). The server returned a non-JSON response.`
+        );
+      }
+      if (!response.ok) {
+        throw new Error(data.error || `Notes request failed (${response.status}).`);
+      }
+      if (!data.pending) return data;
+    }
+    throw new Error('Notes are still being prepared. Please try again shortly.');
+  }
+
   function togglePdfLevelMenu(e) {
     if (e) e.stopPropagation();
     const dropdown = document.getElementById('pdf-level-dropdown');
@@ -1672,7 +1974,10 @@
       }
       return data;
     })
-    .then(data => {
+    .then(async data => {
+      if (data.pending && data.job_id) {
+        data = await waitForNotesJob(data.job_id, level);
+      }
       notesRequestInFlight = false;
       loadingEl.style.display = 'none';
       bodyEl.style.opacity = '1';
@@ -1939,6 +2244,8 @@
     if (tutorForm) tutorForm.addEventListener('submit', submitTopicTutorMessage);
     const tutorInput = document.getElementById('topic-tutor-input');
     if (tutorInput) {
+      resizeTopicTutorInput(tutorInput);
+      tutorInput.addEventListener('input', () => resizeTopicTutorInput(tutorInput));
       tutorInput.addEventListener('keydown', event => {
         if (event.key === 'Enter' && !event.shiftKey) {
           event.preventDefault();
@@ -1952,6 +2259,17 @@
     if (tutorFiles) tutorFiles.addEventListener('change', renderTopicTutorSelectedFiles);
     const tutorNewChat = document.getElementById('topic-tutor-new-chat');
     if (tutorNewChat) tutorNewChat.addEventListener('click', startNewTopicTutorChat);
+    const tutorExpand = document.getElementById('topic-tutor-expand');
+    if (tutorExpand) {
+      tutorExpand.addEventListener('click', () => {
+        setTopicTutorExpanded(!topicTutorExpanded);
+      });
+    }
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && topicTutorExpanded) {
+        setTopicTutorExpanded(false);
+      }
+    });
     const tutorHistory = document.getElementById('topic-tutor-history-list');
     if (tutorHistory) {
       tutorHistory.addEventListener('click', event => {

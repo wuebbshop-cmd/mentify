@@ -209,7 +209,15 @@ def expire_wallet_credits(wallet):
 def get_available_credits(wallet):
     ensure_wallet_credit_state(wallet)
     wallet.refresh_from_db(fields=["credits_balance", "current_plan", "plan_expires_at", "updated_at"])
-    return wallet.credits_balance
+    from prep.models import PrepCreditReservation
+
+    held = sum(
+        PrepCreditReservation.objects.filter(
+            wallet=wallet,
+            status="reserved",
+        ).values_list("remaining_reserved_credits", flat=True)
+    )
+    return max(0, wallet.credits_balance - held)
 
 
 def has_active_subscription(wallet, now=None):
@@ -342,7 +350,15 @@ def consume_credits(wallet, amount: int, action_type: str, description: str, usa
         )
         priority = {"trial": 0, "subscription": 1, "purchased": 2, "admin": 3, "legacy": 4}
         grants.sort(key=lambda grant: (priority.get(grant.source, 9), grant.expires_at or now + timedelta(days=36500), grant.created_at))
-        if sum(grant.remaining_credits for grant in grants) < amount:
+        from prep.models import PrepCreditReservation
+
+        reserved = sum(
+            PrepCreditReservation.objects.filter(
+                wallet=locked,
+                status="reserved",
+            ).values_list("remaining_reserved_credits", flat=True)
+        )
+        if sum(grant.remaining_credits for grant in grants) - reserved < amount:
             _sync_balance_locked(locked)
             raise InsufficientCredits(f"Insufficient credits. Required: {amount}.")
 
@@ -374,6 +390,133 @@ def consume_credits(wallet, amount: int, action_type: str, description: str, usa
 
         _sync_balance_locked(locked)
         return amount
+
+
+def reserve_credits(wallet, amount: int, *, purpose: str, metadata=None):
+    """Atomically hold spendable credits without debiting them during provider latency."""
+    from prep.models import PrepCreditReservation
+
+    amount = max(0, int(amount))
+    if amount <= 0:
+        raise ValueError("Credit reservation must be positive.")
+
+    ensure_wallet_credit_state(wallet)
+    with transaction.atomic():
+        locked = wallet.__class__.objects.select_for_update().get(pk=wallet.pk)
+        _ensure_grant_locked(locked)
+        _expire_locked(locked)
+        balance = _sync_balance_locked(locked)
+        held = sum(
+            PrepCreditReservation.objects.filter(
+                wallet=locked,
+                status="reserved",
+            ).values_list("remaining_reserved_credits", flat=True)
+        )
+        available = max(0, balance - held)
+        if available < amount:
+            raise InsufficientCredits(
+                f"Insufficient credits. Required reservation: {amount}; available: {available}."
+            )
+        return PrepCreditReservation.objects.create(
+            wallet=locked,
+            purpose=str(purpose)[:50],
+            reserved_credits=amount,
+            remaining_reserved_credits=amount,
+            metadata=metadata or {},
+        )
+
+
+def settle_credit_reservation(
+    reservation,
+    amount: int,
+    *,
+    release_reserved: int | None = None,
+    action_type: str,
+    description: str,
+    usage=None,
+    model_name: str = "",
+    metadata=None,
+):
+    """Settle one completed provider stage while retaining any later-stage hold."""
+    from prep.models import PrepCreditReservation
+
+    amount = max(0, int(amount))
+    with transaction.atomic():
+        locked = reservation.wallet.__class__.objects.select_for_update().get(
+            pk=reservation.wallet_id
+        )
+        held = PrepCreditReservation.objects.select_for_update().get(pk=reservation.pk)
+        if held.status != "reserved":
+            if amount == 0 and held.status in {"settled", "released"}:
+                return 0
+            raise ValueError("Credit reservation is no longer active.")
+
+        release_amount = (
+            held.remaining_reserved_credits
+            if release_reserved is None
+            else max(0, int(release_reserved))
+        )
+        if release_amount > held.remaining_reserved_credits:
+            raise ValueError("Cannot release more credits than the active reservation.")
+
+        held.remaining_reserved_credits -= release_amount
+        held.charged_credits += amount
+        if held.remaining_reserved_credits == 0:
+            held.status = "settled"
+        held.metadata = {
+            **(held.metadata if isinstance(held.metadata, dict) else {}),
+            **(metadata or {}),
+        }
+        held.save(update_fields=[
+            "remaining_reserved_credits",
+            "charged_credits",
+            "status",
+            "metadata",
+            "updated_at",
+        ])
+
+        charged = consume_credits(
+            locked,
+            amount,
+            action_type=action_type,
+            description=description,
+            usage=usage,
+            model_name=model_name,
+            metadata={
+                **(metadata or {}),
+                "credit_reservation_id": held.pk,
+                "reserved_credits": held.reserved_credits,
+            },
+        ) if amount else 0
+        return charged
+
+
+def release_credit_reservation(reservation, *, reason: str = "") -> int:
+    """Release unused held credits after a request finishes or fails."""
+    from prep.models import PrepCreditReservation
+
+    with transaction.atomic():
+        reservation.wallet.__class__.objects.select_for_update().get(
+            pk=reservation.wallet_id
+        )
+        held = PrepCreditReservation.objects.select_for_update().get(pk=reservation.pk)
+        if held.status != "reserved":
+            return 0
+        released = held.remaining_reserved_credits
+        held.remaining_reserved_credits = 0
+        held.status = "released" if held.charged_credits == 0 else "settled"
+        if reason:
+            held.metadata = {
+                **(held.metadata if isinstance(held.metadata, dict) else {}),
+                "release_reason": str(reason)[:500],
+            }
+        held.save(update_fields=[
+            "remaining_reserved_credits",
+            "status",
+            "metadata",
+            "updated_at",
+        ])
+        return released
 
 
 def credits_for_usage(usage, minimum: int = 1) -> int:

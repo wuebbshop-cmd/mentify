@@ -18,6 +18,7 @@ from prep.models import (
     PrepNoteRepair,
     PrepQuestion,
     PrepTopic,
+    PrepTopicNotesJob,
     PrepWallet,
 )
 from prep.content_rules import CONTENT_MODALITIES
@@ -1218,7 +1219,7 @@ $$
         self.assertEqual(wallet.credits_balance, before)
 
     @patch("prep.views.get_or_generate_topic_notes")
-    def test_active_trial_can_generate_level_two_with_no_remaining_trial_credits(self, generate_notes):
+    def test_active_trial_queues_missing_level_two_notes_without_blocking_web_request(self, generate_notes):
         PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
         wallet = PrepWallet.get_or_create_wallet(self.user)
         wallet.credit_grants.update(remaining_credits=0)
@@ -1243,10 +1244,106 @@ $$
         )
 
         wallet.refresh_from_db()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["credits_deducted"], 0)
+        self.assertEqual(response.status_code, 202)
+        self.assertTrue(response.json()["pending"])
+        self.assertTrue(
+            PrepTopicNotesJob.objects.filter(
+                topic=self.topic,
+                level="level_2",
+                status="pending",
+            ).exists()
+        )
         self.assertEqual(wallet.credits_balance, 0)
-        self.assertEqual(generate_notes.call_count, 2)
+        self.assertEqual(generate_notes.call_count, 1)
+
+    @patch("prep.views.get_or_generate_topic_notes")
+    def test_missing_topic_notes_are_queued_and_pending_jobs_are_pollable(self, note_service):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
+        note_service.return_value = {
+            "notes": "",
+            "generation_required": True,
+            "cached": False,
+        }
+        self.client.force_login(self.user)
+
+        request_data = {"topic_id": self.topic.pk, "level": "level_1"}
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps(request_data),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 202)
+        self.assertTrue(response.json()["pending"])
+        job_id = response.json()["job_id"]
+        poll_response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({**request_data, "job_id": job_id}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(poll_response.status_code, 202)
+        self.assertEqual(poll_response.json()["status"], "pending")
+        self.assertEqual(note_service.call_count, 1)
+
+    def test_failed_topic_notes_job_returns_safe_json_error(self):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
+        job = PrepTopicNotesJob.objects.create(
+            topic=self.topic,
+            level="level_1",
+            source_signature="a" * 64,
+            status="failed",
+            last_error="Provider returned a private internal error.",
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({
+                "topic_id": self.topic.pk,
+                "level": "level_1",
+                "job_id": job.pk,
+            }),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertEqual(
+            response.json()["error"],
+            "Notes could not be prepared right now. Please retry in a moment.",
+        )
+        self.assertNotIn("private internal error", response.content.decode("utf-8"))
+
+    @patch(
+        "services.prep_ai_router.get_published_topic_note_levels",
+        return_value={"level_1": valid_notes},
+    )
+    def test_completed_topic_notes_job_returns_published_notes_as_json(self, published_notes):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
+        job = PrepTopicNotesJob.objects.create(
+            topic=self.topic,
+            level="level_1",
+            source_signature="c" * 64,
+            status="complete",
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({
+                "topic_id": self.topic.pk,
+                "level": "level_1",
+                "job_id": job.pk,
+            }),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertTrue(response.json()["success"])
+        self.assertEqual(response.json()["notes"], self.valid_notes)
+        published_notes.assert_called_once()
 
     @patch("services.prep_ai_router.route_math_request")
     @patch("prep.views.get_available_credits", return_value=100)
