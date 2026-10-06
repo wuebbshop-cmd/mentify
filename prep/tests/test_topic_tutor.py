@@ -101,6 +101,32 @@ class TopicTutorSafetyTests(SimpleTestCase):
         self.assertEqual(response, "I can only answer questions about this topic.")
         self.assertNotIn("secret implementation", response)
 
+    def test_plain_text_model_response_is_validated_and_accepted(self):
+        answer = (
+            "Start with the definitions and key ideas in this topic. "
+            "Then practise applying each idea to a short exam question."
+        )
+
+        self.assertEqual(prep_topic_tutor._parse_tutor_response(answer, self.topic), answer)
+
+    def test_malformed_structured_model_response_is_not_treated_as_plain_text(self):
+        with self.assertRaisesRegex(
+            prep_topic_tutor.TopicTutorError,
+            "unreadable response",
+        ):
+            prep_topic_tutor._parse_tutor_response(
+                '{"decision":"answer","answer":"unfinished',
+                self.topic,
+            )
+
+    def test_plain_text_fallback_still_rejects_links_and_html(self):
+        for answer in (
+            "<script>alert(1)</script>",
+            "Read [this page](https://example.com) for more.",
+        ):
+            with self.subTest(answer=answer), self.assertRaises(prep_topic_tutor.TopicTutorError):
+                prep_topic_tutor._parse_tutor_response(answer, self.topic)
+
     def test_prompt_requests_direct_answers_without_unprompted_source_mentions(self):
         with patch.object(prep_topic_tutor, "_output_format_rules", return_value="Use standard notation"):
             system_prompt, user_prompt = prep_topic_tutor._build_prompt(
@@ -283,7 +309,8 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, 'id="topic-tutor-error-dismiss"', html=False)
         self.assertContains(response, 'aria-label="Dismiss error message"', html=False)
         self.assertContains(response, "setTimeout(clearTopicTutorError, 10000)")
-        self.assertContains(response, "height: 100%;\n      min-height: 0;", html=False)
+        self.assertContains(response, "position: fixed;\n      z-index: 1200;\n      inset: 0;", html=False)
+        self.assertContains(response, "height: 100dvh;\n      min-height: 0;", html=False)
         page_script = response.content.decode()
         self.assertLess(
             page_script.index("formData.set('message', text);"),

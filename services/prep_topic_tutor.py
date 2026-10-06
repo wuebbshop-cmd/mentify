@@ -566,6 +566,36 @@ def _safe_answer(result: dict, topic) -> str:
     return answer
 
 
+def _parse_tutor_response(raw_text: str, topic) -> str:
+    """Parse the structured tutor reply, accepting safe plain-text model output."""
+    from services.prep_ai_router import robust_json_loads
+
+    content = str(raw_text or "").strip()
+    try:
+        parsed = robust_json_loads(content)
+    except (ValueError, TypeError) as exc:
+        if not content or content.startswith(("{", "[")) or re.search(
+            r'"decision"\s*:', content, re.IGNORECASE
+        ):
+            raise TopicTutorError(
+                "The tutor returned an unreadable response. Please retry your question.",
+                502,
+            ) from exc
+        logger.warning(
+            "Topic tutor returned plain text instead of JSON for topic %s; "
+            "validating the text response directly.",
+            getattr(topic, "pk", topic.title),
+        )
+        return _safe_answer({"decision": "answer", "answer": content}, topic)
+
+    if not isinstance(parsed, dict):
+        raise TopicTutorError(
+            "The tutor returned an invalid response. Please retry your question.",
+            502,
+        )
+    return _safe_answer(parsed, topic)
+
+
 def list_topic_conversations(user, topic) -> list[dict]:
     sessions = PrepTopicChatSession.objects.filter(user=user, topic=topic).order_by("-updated_at", "-id")[:30]
     return [
@@ -781,7 +811,7 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 topic, notes, course_material, history, user_message, context_uploads
             )
 
-        from services.prep_ai_router import robust_json_loads, route_math_request
+        from services.prep_ai_router import route_math_request
 
         result = route_math_request(
             user_prompt,
@@ -847,20 +877,10 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
             )
 
         try:
-            parsed = robust_json_loads(str(result.get("content") or "").strip())
-        except (ValueError, TypeError) as exc:
-            raise TopicTutorError(
-                "The tutor returned an unreadable response. Please retry your question.",
-                502,
-                credits_charged=ocr_credits + chat_credits,
-            ) from exc
-        if not isinstance(parsed, dict):
-            raise TopicTutorError(
-                "The tutor returned an invalid response. Please retry your question.",
-                502,
-                credits_charged=ocr_credits + chat_credits,
-            )
-        answer = _safe_answer(parsed, topic)
+            answer = _parse_tutor_response(str(result.get("content") or ""), topic)
+        except TopicTutorError as exc:
+            exc.credits_charged = ocr_credits + chat_credits
+            raise
 
         total_credits = ocr_credits + chat_credits
         with transaction.atomic():

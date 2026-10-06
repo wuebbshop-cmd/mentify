@@ -352,14 +352,19 @@ small { font-size: .8rem; color: var(--text-light); }
 /* Mobile menu */
 .mobile-menu-btn {
   display: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  flex: 0 0 44px;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--text);
   font-size: 1.5rem;
-  padding: 8px;
+  padding: 0;
   border-radius: var(--radius);
   transition: background .2s;
+  touch-action: manipulation;
 }
 .mobile-menu-btn:active { background: var(--surface); }
 .mobile-drawer { display: none; }
@@ -381,16 +386,32 @@ small { font-size: .8rem; color: var(--text-light); }
 }
 .mobile-drawer-panel.active { transform: translateX(0); }
 .mobile-drawer-close {
-  align-self: flex-end; background: transparent; border: none;
-  color: var(--text); font-size: 1.5rem; padding: 12px; cursor: pointer;
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 4px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1.5rem;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 .mobile-drawer-content { padding: 16px; display: flex; flex-direction: column; gap: 2px; }
 .mobile-drawer-link {
-  padding: 12px 14px; border-radius: var(--radius);
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
   color: var(--text-muted); text-decoration: none;
   font-weight: 500; font-size: .95rem;
   transition: background .2s, color .2s;
   display: flex; align-items: center; gap: 10px;
+  touch-action: manipulation;
 }
 .mobile-drawer-link:hover  { background: #f3f3f3; color: var(--text); }
 .mobile-drawer-link.active { background: var(--green-light); color: var(--green); font-weight: 600; }
@@ -1611,8 +1632,9 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .sidebar-nav .nav-item a {
     white-space: nowrap;
     border-radius: 20px;
-    font-size: 0.82rem;
-    padding: 6px 14px;
+    min-height: 44px;
+    font-size: 0.84rem;
+    padding: 8px 14px;
     background: var(--white);
     border: 1px solid var(--border);
     display: inline-flex;
@@ -1730,6 +1752,36 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   }
   .form-row { grid-template-columns: 1fr; }
   .messages-container { bottom: 16px; right: 16px; left: 16px; max-width: 100%; }
+  .home-page > section:not(.hero) {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+  .home-page .hero > .container > div:first-child {
+    padding-top: 32px !important;
+    padding-bottom: 18px !important;
+  }
+  .home-page .hero h1 {
+    margin-bottom: 16px !important;
+  }
+  .home-page .hero p {
+    margin-bottom: 24px !important;
+    font-size: 1rem !important;
+  }
+  .home-page > section > .container > div[style*="text-align: center"] {
+    margin-bottom: 24px !important;
+  }
+  .home-page .card[style*="padding: 40px"] {
+    padding: 20px !important;
+  }
+  .home-page .cta-title {
+    margin-bottom: 12px !important;
+  }
+  .home-page .cta-title + p {
+    margin-bottom: 24px !important;
+  }
+  .home-page .btn {
+    min-height: 44px;
+  }
 }
 
 @media (max-width: 479px) {
@@ -1765,6 +1817,21 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .course-card .card-body { padding: 14px; }
   .course-card .card-footer { padding: 12px 14px; align-items: stretch; }
   .course-card .card-footer .btn { width: 100%; }
+  .navbar { padding-right: 8px; padding-left: 8px; gap: 4px; }
+  .navbar-brand { gap: 5px; font-size: 1rem; }
+  .navbar-end { gap: 4px; }
+}
+
+@media (max-width: 380px) {
+  .navbar-end > a[href*="/prep/billing/"] span {
+    display: none;
+  }
+  .navbar-end > a[href*="/prep/billing/"] {
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
+    padding: 6px !important;
+  }
 }
 
 @media (min-width: 861px) {
