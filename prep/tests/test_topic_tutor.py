@@ -325,14 +325,15 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "height: 100dvh;\n      min-height: 0;", html=False)
         self.assertContains(
             response,
-            "position: fixed;\n      z-index: 1202;\n      right: auto;\n      bottom: 0;",
+            "position: fixed;\n      z-index: 1202;\n      right: auto;\n      bottom: env(safe-area-inset-bottom, 0px);",
             html=False,
         )
         self.assertContains(
             response,
-            "padding: 0 8px env(safe-area-inset-bottom, 0px);",
+            "padding: 0;\n      transform: translateX(-50%);\n      border: 0;\n      background: transparent;\n      box-shadow: none;",
             html=False,
         )
+        self.assertContains(response, "border-radius: 0;\n      background: transparent;\n      box-shadow: none;", html=False)
         self.assertContains(response, ".topic-tutor-file-list:empty", html=False)
         self.assertContains(response, "margin-bottom: 0 !important;", html=False)
         self.assertContains(response, "max-height: min(24vh, 120px);", html=False)
@@ -347,7 +348,7 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "width: min(820px, 100vw)", html=False)
         self.assertContains(
             response,
-            "padding: 0 8px env(safe-area-inset-bottom, 0px);",
+            "margin: 0 auto;\n      align-items: center;",
             html=False,
         )
         page_script = response.content.decode()

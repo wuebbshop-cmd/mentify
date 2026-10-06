@@ -1124,20 +1124,34 @@
       position: fixed;
       z-index: 1202;
       right: auto;
-      bottom: 0;
+      bottom: env(safe-area-inset-bottom, 0px);
       left: 50%;
       width: min(820px, 100vw);
-      padding: 0 8px env(safe-area-inset-bottom, 0px);
+      box-sizing: border-box;
+      padding: 0;
       transform: translateX(-50%);
-      background: linear-gradient(180deg, transparent 0%, var(--surface) 26%);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-file-list:empty {
       margin-bottom: 0 !important;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
+      width: calc(100% - 16px);
+      margin: 0 auto;
       align-items: center;
       gap: 6px;
       padding: 4px 6px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      transition: none;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within {
+      border: 0;
+      box-shadow: none;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-textarea {
       min-height: 38px;
@@ -1146,6 +1160,8 @@
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
       margin-top: 0;
+      margin-right: 8px;
+      margin-left: 8px;
       font-size: .62rem;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
