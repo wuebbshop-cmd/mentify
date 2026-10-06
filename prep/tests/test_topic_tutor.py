@@ -349,11 +349,10 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "input.scrollHeight > height ? 'auto' : 'hidden'", html=False)
         self.assertContains(
             response,
-            "padding: 26px 14px var(--topic-tutor-composer-clearance, 88px);",
+            "padding: 26px 14px 0;",
             html=False,
         )
-        self.assertContains(response, "window.innerHeight - occupiedTop + 12", html=False)
-        self.assertContains(response, "new ResizeObserver(syncTopicTutorMessagePadding)", html=False)
+        self.assertNotContains(response, "--topic-tutor-composer-clearance")
         self.assertContains(response, "width: min(820px, 100vw)", html=False)
         self.assertContains(response, "border-radius: 24px;", html=False)
         self.assertContains(response, ".topic-tutor-composer-bar:focus-within", html=False)

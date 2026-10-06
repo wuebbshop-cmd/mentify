@@ -1170,7 +1170,7 @@
       padding: 12px 14px;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-messages {
-      padding: 26px 14px var(--topic-tutor-composer-clearance, 88px);
+      padding: 26px 14px 0;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.user {
       max-width: 86%;
@@ -1708,29 +1708,6 @@
       : input.scrollHeight;
     input.style.height = `${height}px`;
     input.style.overflowY = input.scrollHeight > height ? 'auto' : 'hidden';
-    syncTopicTutorMessagePadding();
-  }
-
-  function syncTopicTutorMessagePadding() {
-    const shell = document.querySelector('.topic-tutor-shell');
-    const messages = document.getElementById('topic-tutor-messages');
-    const composerBar = document.querySelector('.topic-tutor-composer-bar');
-    const disclosure = document.querySelector('.topic-tutor-composer-disclosure');
-    const fileList = document.getElementById('topic-tutor-file-list');
-    const mobileExpanded = shell?.classList.contains('topic-tutor-expanded')
-      && window.matchMedia('(max-width: 800px)').matches;
-    if (!messages || !composerBar || !disclosure) return;
-    if (!mobileExpanded) {
-      messages.style.removeProperty('--topic-tutor-composer-clearance');
-      return;
-    }
-    const occupiedTop = Math.min(
-      composerBar.getBoundingClientRect().top,
-      disclosure.getBoundingClientRect().top,
-      ...(fileList?.childElementCount ? [fileList.getBoundingClientRect().top] : [])
-    );
-    const clearance = Math.ceil(window.innerHeight - occupiedTop + 12);
-    messages.style.setProperty('--topic-tutor-composer-clearance', `${clearance}px`);
   }
 
   function setTopicTutorSendState(button, isSending) {
@@ -1769,7 +1746,6 @@
     topicTutorExpanded = expanded;
     shell.classList.toggle('topic-tutor-expanded', expanded);
     document.body.classList.toggle('topic-tutor-expanded', expanded);
-    syncTopicTutorMessagePadding();
     button.setAttribute('aria-pressed', String(expanded));
     button.setAttribute(
       'aria-label',
@@ -2602,13 +2578,6 @@
     const tutorForm = document.getElementById('topic-tutor-form');
     if (tutorForm) {
       tutorForm.addEventListener('submit', submitTopicTutorMessage);
-      if (window.ResizeObserver) {
-        const tutorComposerObserver = new ResizeObserver(syncTopicTutorMessagePadding);
-        tutorComposerObserver.observe(document.querySelector('.topic-tutor-composer-bar'));
-        tutorComposerObserver.observe(document.querySelector('.topic-tutor-composer-disclosure'));
-        tutorComposerObserver.observe(document.getElementById('topic-tutor-file-list'));
-      }
-      syncTopicTutorMessagePadding();
     }
     const tutorErrorDismiss = document.getElementById('topic-tutor-error-dismiss');
     if (tutorErrorDismiss) tutorErrorDismiss.addEventListener('click', clearTopicTutorError);
@@ -2707,7 +2676,6 @@
       }
     });
     window.addEventListener('resize', () => {
-      syncTopicTutorMessagePadding();
       if (window.innerWidth > 800) {
         if (topicTutorHistoryOpen) setTopicTutorHistoryOpen(false);
         else if (tutorHistoryPanel) tutorHistoryPanel.setAttribute('aria-hidden', 'false');
