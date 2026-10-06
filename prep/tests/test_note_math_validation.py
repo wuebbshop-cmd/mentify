@@ -75,6 +75,14 @@ class ReindexCourseTopicReportTests(SimpleTestCase):
 
 
 class NoteMathValidationTests(TestCase):
+    def test_normalization_separates_greek_command_from_following_identifier(self):
+        malformed = r"The characteristic equation is $|A-\lambdaI|=0$."
+
+        normalized = normalize_math_delimiters(malformed)
+
+        self.assertEqual(normalized, r"The characteristic equation is $|A-\lambda I|=0$.")
+        self.assertEqual(_latex_syntax_issues(normalized), [])
+
     def test_server_placement_replaces_a_model_figure_in_the_wrong_section(self):
         crop_url = "/media/approved-equilibrium.jpg"
         content = (
@@ -1624,6 +1632,30 @@ $$
 
         second_read = get_published_topic_note_levels(self.topic)
         self.assertEqual(second_read["level_2"], self.valid_notes.strip())
+
+    def test_published_cache_repairs_missing_space_after_greek_command(self):
+        malformed_notes = self.valid_notes.replace(
+            r"\left\lvert a_m-a_n\right\rvert",
+            r"\left\lvert A-\lambdaI\right\rvert",
+        )
+        cache = PrepContentCache.objects.create(
+            cache_key="notes:published:malformed-greek-command",
+            content_type="topic_notes",
+            prompt_hash="legacy-malformed-math",
+            payload={
+                "content": malformed_notes,
+                "level": "level_2",
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+
+        published = get_published_topic_note_levels(self.topic)
+
+        self.assertIn(r"\lambda I", published["level_2"])
+        self.assertNotIn(r"\lambdaI", published["level_2"])
+        cache.refresh_from_db()
+        self.assertIn(r"\lambda I", cache.payload["content"])
 
     def test_legacy_note_is_refreshed_with_required_visual_before_publication(self):
         with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):

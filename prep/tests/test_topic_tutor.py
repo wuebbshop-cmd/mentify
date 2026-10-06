@@ -244,9 +244,16 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "Ask a Topic Tutor")
         self.assertContains(response, 'id="pillar-assistant"', html=False)
         self.assertContains(response, 'id="topic-tutor-attach"', html=False)
-        self.assertContains(response, 'aria-label="Attach a PDF or image"', html=False)
+        self.assertContains(response, 'aria-label="Choose files to attach"', html=False)
+        self.assertContains(response, 'id="topic-tutor-upload-menu"', html=False)
+        self.assertContains(response, 'id="topic-tutor-choose-pdf"', html=False)
+        self.assertContains(response, 'id="topic-tutor-choose-image"', html=False)
+        self.assertContains(response, 'accept="application/pdf,.pdf"', html=False)
+        self.assertContains(response, 'accept="image/png,image/jpeg,.png,.jpg,.jpeg"', html=False)
+        self.assertContains(response, "topic-tutor-upload-remove")
         self.assertContains(response, 'id="topic-tutor-send"', html=False)
         self.assertContains(response, "topic-tutor-spinner")
+        self.assertContains(response, "topic-tutor-pending-dot")
         self.assertContains(response, 'class="topic-tutor-composer-disclosure"', html=False)
         self.assertContains(response, "Up to 3 PNG/JPEG images")
         self.assertContains(response, "scanned PDF pages and images cost 5 credits each")
@@ -254,6 +261,8 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, 'id="topic-tutor-expand"', html=False)
         self.assertContains(response, "Expand tutor to full screen")
         self.assertContains(response, ".topic-tutor-shell.topic-tutor-expanded")
+        self.assertContains(response, "body.topic-tutor-expanded .footer")
+        self.assertContains(response, "display: none !important;", html=False)
         self.assertContains(response, "event.key === 'Escape'")
         self.assertContains(response, 'id="topic-tutor-history-toggle"', html=False)
         self.assertContains(response, 'id="topic-tutor-history-close"', html=False)
@@ -268,6 +277,8 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "window.matchMedia('(max-width: 800px)').matches")
         self.assertContains(response, "width: min(680px, 100%)")
         self.assertContains(response, "transform: translateX(-50%)")
+        self.assertContains(response, "height: min(86vh, 960px)")
+        self.assertContains(response, "padding: 40px clamp(24px, 5vw, 64px) 180px")
         self.assertContains(response, "setTopicTutorHistoryOpen(false)")
         self.assertContains(response, 'id="topic-tutor-error-dismiss"', html=False)
         self.assertContains(response, 'aria-label="Dismiss error message"', html=False)
@@ -278,6 +289,7 @@ class TopicTutorApiTests(TestCase):
             page_script.index("formData.set('message', text);"),
             page_script.index("input.disabled = true;"),
         )
+        self.assertIn("files.forEach(file => formData.append('files', file, file.name));", page_script)
 
     def test_reservations_prevent_other_spending_from_using_held_credits(self):
         reservation = reserve_credits(

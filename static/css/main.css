@@ -1658,7 +1658,7 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
 @media (max-width: 860px) {
   :root { --nav-h: 56px; }
   .container { padding: 0 16px; }
-  .main-content { padding: 20px 0; }
+  .main-content { padding: 16px 0; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .navbar { padding: 0 16px; gap: 8px; }
   .navbar-nav { display: none; }
@@ -1666,13 +1666,13 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .mobile-drawer { display: block; }
   .mobile-drawer-panel { max-height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
   .mobile-drawer-content { padding-bottom: 24px; }
-  .dashboard-body { padding: 18px 14px; }
-  .card { padding: 18px 16px; }
+  .dashboard-body { padding: 16px 12px; }
+  .card { padding: 16px 14px; }
   .course-clean-row {
     flex-direction: column;
     align-items: flex-start;
-    padding: 14px 16px;
-    gap: 8px;
+    padding: 12px 14px;
+    gap: 7px;
   }
   .course-clean-row > div:last-child {
     flex-wrap: wrap;
@@ -1683,12 +1683,15 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .page-header[style*="display: flex"] {
     align-items: flex-start !important;
     flex-direction: column;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
   }
-  .hero { padding: 40px 0 30px; }
+  .page-header { padding-top: 8px; padding-bottom: 14px; }
+  .hero { padding: 32px 0 24px; }
   .hero h1 { font-size: 1.6rem; }
   .hero-actions { flex-direction: column; gap: 8px; }
   .hero-actions .btn { width: 100%; }
-  .auth-card { padding: 28px 20px; }
+  .auth-card { padding: 24px 18px; }
   .profile-photo-panel { align-items: flex-start; flex-direction: column; }
   .profile-settings-card,
   .cohort-detail-card { padding: 24px 20px; }
@@ -1698,7 +1701,7 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .price-panel { width: 100%; text-align: left; }
   .course-detail-layout {
     grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
+    gap: 18px;
   }
   .course-detail-sidebar {
     position: static;
@@ -1736,10 +1739,10 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   h2 { font-size: 1.1rem; }
   .btn { padding: 9px 14px; font-size: .84rem; }
   .btn-sm { padding: 7px 10px; font-size: .75rem; }
-  .dashboard-body { padding: 14px 10px; }
+  .dashboard-body { padding: 12px 10px; }
   .stats-grid, .grid-stat { grid-template-columns: 1fr; }
   .grid-auto { grid-template-columns: minmax(0, 1fr); }
-  .stat-card { padding: 14px; }
+  .stat-card { padding: 12px; }
   .stat-card .stat-value { font-size: 1.35rem; }
   .stat-strip-item { padding-right: 8px; }
   .filters-bar { flex-direction: column; gap: 8px; padding: 10px; align-items: stretch; }
@@ -1750,7 +1753,7 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   table { font-size: .75rem; }
   th, td { padding: 8px 10px; }
   .alert { padding: 8px 12px; font-size: .8rem; }
-  .card { padding: 14px; border-radius: 8px; }
+  .card { padding: 12px; border-radius: 8px; }
   .course-card .card-cover { height: 120px; }
   .course-detail-banner { aspect-ratio: 16 / 9; }
   .course-detail-page {

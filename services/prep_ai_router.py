@@ -2312,6 +2312,30 @@ def normalize_math_delimiters(text: str) -> str:
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
     text = re.sub(r"^\s*>\s*$", "", text, flags=re.MULTILINE)
     text = re.sub(r"^\s*#\s*$", "", text, flags=re.MULTILINE)
+
+    greek_commands = (
+        "varepsilon", "vartheta", "varpi", "varrho", "varsigma", "varphi",
+        "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+        "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi", "rho",
+        "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega",
+        "Gamma", "Delta", "Theta", "Lambda", "Xi", "Pi", "Sigma", "Upsilon",
+        "Phi", "Psi", "Omega",
+    )
+    command_boundary = re.compile(
+        r"(?<!\\)\\(" + "|".join(greek_commands) + r")(?=[A-Za-z])"
+    )
+    math_or_code = re.compile(
+        r"```[\s\S]*?```|`[^`\n]*`|\$\$[\s\S]*?\$\$|"
+        r"(?<!\\)\$(?!\$)[^\n$]*?(?<!\\)\$|\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]"
+    )
+
+    def separate_command_from_following_text(match: re.Match[str]) -> str:
+        segment = match.group(0)
+        if segment.startswith("`"):
+            return segment
+        return command_boundary.sub(r"\\\1 ", segment)
+
+    text = math_or_code.sub(separate_command_from_following_text, text)
     return text
 
 

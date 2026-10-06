@@ -630,8 +630,8 @@
   .topic-tutor-history {
     display: flex;
     flex-direction: column;
-    height: min(78vh, 860px);
-    min-height: 620px;
+    height: min(86vh, 960px);
+    min-height: 680px;
   }
   .topic-tutor-history-head, .topic-tutor-head {
     padding: 22px 26px;
@@ -682,8 +682,8 @@
   }
   .topic-tutor-main {
     position: relative;
-    height: min(78vh, 860px);
-    min-height: 620px;
+    height: min(86vh, 960px);
+    min-height: 680px;
     display: flex;
     flex-direction: column;
   }
@@ -697,7 +697,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 30px clamp(20px, 5vw, 54px) 160px;
+    padding: 40px clamp(24px, 5vw, 64px) 180px;
     scrollbar-width: thin;
     scrollbar-color: #a3a3a3 transparent;
     background:
@@ -724,8 +724,8 @@
   }
   .topic-tutor-message {
     max-width: 90%;
-    margin: 0 0 24px;
-    padding: 17px 21px;
+    margin: 0 0 32px;
+    padding: 22px 26px;
     border: 1px solid var(--border);
     border-radius: 15px 15px 15px 4px;
     background: var(--white, var(--surface));
@@ -877,6 +877,83 @@
     color: var(--text-secondary);
     font-size: .76rem;
   }
+  .topic-tutor-upload-chip svg { flex: 0 0 17px; width: 17px; height: 17px; }
+  .topic-tutor-upload-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topic-tutor-upload-remove {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .topic-tutor-upload-remove:hover { background: var(--hover); color: var(--danger); }
+  .topic-tutor-attach-wrap { position: relative; flex: 0 0 38px; }
+  .topic-tutor-upload-menu {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    bottom: calc(100% + 10px);
+    display: grid;
+    gap: 4px;
+    min-width: 172px;
+    padding: 7px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .18);
+  }
+  .topic-tutor-upload-menu[hidden] { display: none; }
+  .topic-tutor-upload-choice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .topic-tutor-upload-choice:hover { background: var(--hover); color: var(--danger); }
+  .topic-tutor-upload-choice svg { width: 19px; height: 19px; }
+  .topic-tutor-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    width: fit-content;
+    max-width: 90%;
+    margin: 0 0 32px;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    border-radius: 15px 15px 15px 4px;
+    background: var(--white, var(--surface));
+    color: var(--text-muted);
+    font-size: .86rem;
+  }
+  .topic-tutor-pending-dots { display: inline-flex; align-items: center; gap: 4px; }
+  .topic-tutor-pending-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: topicTutorDot 1.4s infinite ease-in-out both;
+  }
+  .topic-tutor-pending-dot:nth-child(1) { animation-delay: -.32s; }
+  .topic-tutor-pending-dot:nth-child(2) { animation-delay: -.16s; }
+  @keyframes topicTutorDot {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
   .topic-tutor-history-backdrop { display: none; }
   .topic-tutor-history-toggle,
   .topic-tutor-history-close { display: none !important; }
@@ -934,7 +1011,7 @@
       overflow-x: hidden;
       overflow-y: auto;
     }
-    .topic-tutor-main { height: min(76vh, 800px); min-height: 540px; }
+    .topic-tutor-main { height: min(82vh, 900px); min-height: 600px; }
     .topic-tutor-message { max-width: 96%; }
     .topic-tutor-error { bottom: 126px; }
     .topic-tutor-history-toggle { display: inline-grid !important; }
@@ -944,7 +1021,7 @@
     .topic-tutor-shell { gap: 10px; }
     .topic-tutor-history-head { padding: 12px 14px; }
     .topic-tutor-composer { width: 100%; padding-right: 9px; padding-left: 9px; }
-    .topic-tutor-messages { padding-right: 12px; padding-left: 12px; }
+    .topic-tutor-messages { padding: 30px 12px 170px; }
   }
   .topic-tutor-shell.topic-tutor-expanded {
     position: fixed;
@@ -1019,6 +1096,9 @@
   body.topic-tutor-expanded {
     overflow: hidden;
   }
+  body.topic-tutor-expanded .footer {
+    display: none !important;
+  }
   @media (max-width: 800px) {
     .topic-tutor-shell.topic-tutor-expanded {
       grid-template-columns: 1fr;
@@ -1035,7 +1115,7 @@
       padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-messages {
-      padding: 24px 18px 160px;
+      padding: 36px 22px 180px;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.user {
       max-width: 86%;
@@ -1272,10 +1352,23 @@
         {% csrf_token %}
         <div id="topic-tutor-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px;"></div>
         <div class="topic-tutor-composer-bar">
-          <input type="file" id="topic-tutor-files" name="files" accept="application/pdf,image/png,image/jpeg" multiple hidden>
-          <button type="button" id="topic-tutor-attach" class="topic-tutor-icon-button" aria-label="Attach a PDF or image" title="Attach a PDF or image">
+          <input type="file" id="topic-tutor-pdf-files" accept="application/pdf,.pdf" multiple hidden>
+          <input type="file" id="topic-tutor-image-files" accept="image/png,image/jpeg,.png,.jpg,.jpeg" multiple hidden>
+          <div class="topic-tutor-attach-wrap">
+          <button type="button" id="topic-tutor-attach" class="topic-tutor-icon-button" aria-label="Choose files to attach" title="Choose files to attach" aria-haspopup="true" aria-expanded="false">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>
           </button>
+          <div id="topic-tutor-upload-menu" class="topic-tutor-upload-menu" role="menu" hidden>
+            <button type="button" class="topic-tutor-upload-choice" id="topic-tutor-choose-pdf" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h8l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6M8 14h8M8 18h5"/></svg>
+              <span>Upload PDF</span>
+            </button>
+            <button type="button" class="topic-tutor-upload-choice" id="topic-tutor-choose-image" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              <span>Upload image</span>
+            </button>
+          </div>
+          </div>
           <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" rows="1" maxlength="2000" placeholder="Ask about {{ topic.title }}…" aria-label="Ask a question about this topic" required></textarea>
           <button type="submit" id="topic-tutor-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Send message">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -1515,6 +1608,7 @@
   let topicTutorSavedScrollY = 0;
   let topicTutorHistoryOpen = false;
   let topicTutorErrorTimeout;
+  let topicTutorSelectedFiles = [];
 
   // ─── 5-Page Syllabus Notes Navigation State ─────────────────────────────
   let notePages = [];
@@ -1743,14 +1837,41 @@
   }
 
   function renderTopicTutorSelectedFiles() {
-    const input = document.getElementById('topic-tutor-files');
     const list = document.getElementById('topic-tutor-file-list');
-    if (!input || !list) return;
+    if (!list) return;
     list.replaceChildren();
-    Array.from(input.files || []).forEach(file => {
+    topicTutorSelectedFiles.forEach((file, index) => {
       const chip = document.createElement('span');
       chip.className = 'topic-tutor-upload-chip';
-      chip.textContent = `${file.name} · ${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+      chip.title = file.name;
+      chip.setAttribute('aria-label', `${file.name}, ${(file.size / (1024 * 1024)).toFixed(1)} megabytes`);
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('viewBox', '0 0 24 24');
+      icon.setAttribute('fill', 'none');
+      icon.setAttribute('stroke', 'currentColor');
+      icon.setAttribute('stroke-width', '1.8');
+      icon.setAttribute('stroke-linecap', 'round');
+      icon.setAttribute('stroke-linejoin', 'round');
+      icon.setAttribute('aria-hidden', 'true');
+      const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+      icon.innerHTML = isPdf
+        ? '<path d="M6 2h8l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6M8 14h8M8 18h5"/>'
+        : '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>';
+      chip.appendChild(icon);
+      const name = document.createElement('span');
+      name.className = 'topic-tutor-upload-name';
+      name.textContent = `${file.name} · ${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+      chip.appendChild(name);
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'topic-tutor-upload-remove';
+      remove.setAttribute('aria-label', `Remove ${file.name}`);
+      remove.innerHTML = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>';
+      remove.addEventListener('click', () => {
+        topicTutorSelectedFiles.splice(index, 1);
+        renderTopicTutorSelectedFiles();
+      });
+      chip.appendChild(remove);
       list.appendChild(chip);
     });
   }
@@ -1761,7 +1882,7 @@
     const form = document.getElementById('topic-tutor-form');
     const input = document.getElementById('topic-tutor-input');
     const send = document.getElementById('topic-tutor-send');
-    const files = document.getElementById('topic-tutor-files');
+    const files = topicTutorSelectedFiles;
     const text = input.value.trim();
     if (!text) {
       showTopicTutorError('Enter a question about this topic.');
@@ -1771,18 +1892,39 @@
     const formData = new FormData(form);
     formData.set('message', text);
     if (topicTutorSessionId) formData.set('session_id', String(topicTutorSessionId));
+    files.forEach(file => formData.append('files', file, file.name));
 
     clearTopicTutorError();
     topicTutorSending = true;
     setTopicTutorSendState(send, true);
     input.disabled = true;
     document.getElementById('topic-tutor-attach').disabled = true;
+    document.getElementById('topic-tutor-upload-menu').hidden = true;
+    document.getElementById('topic-tutor-attach').setAttribute('aria-expanded', 'false');
+    document.getElementById('topic-tutor-choose-pdf').disabled = true;
+    document.getElementById('topic-tutor-choose-image').disabled = true;
+    const messages = document.getElementById('topic-tutor-messages');
+    const pendingUser = document.createElement('div');
+    pendingUser.className = 'topic-tutor-message user';
+    pendingUser.textContent = text;
+    if (files.length) {
+      const attachmentList = document.createElement('div');
+      attachmentList.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;';
+      files.forEach(file => {
+        const chip = document.createElement('span');
+        chip.className = 'topic-tutor-upload-chip';
+        chip.textContent = file.name;
+        attachmentList.appendChild(chip);
+      });
+      pendingUser.appendChild(attachmentList);
+    }
+    messages.appendChild(pendingUser);
     const loading = document.createElement('div');
-    loading.className = 'topic-tutor-message assistant';
-    loading.textContent = 'Working through your question…';
-    document.getElementById('topic-tutor-messages').appendChild(loading);
-    document.getElementById('topic-tutor-messages').scrollTop =
-      document.getElementById('topic-tutor-messages').scrollHeight;
+    loading.className = 'topic-tutor-pending';
+    loading.setAttribute('role', 'status');
+    loading.innerHTML = '<span>Working through your question</span><span class="topic-tutor-pending-dots" aria-hidden="true"><i class="topic-tutor-pending-dot"></i><i class="topic-tutor-pending-dot"></i><i class="topic-tutor-pending-dot"></i></span>';
+    messages.appendChild(loading);
+    messages.scrollTop = messages.scrollHeight;
     try {
       const response = await fetch(topicTutorApiUrl, {
         method: 'POST',
@@ -1800,9 +1942,10 @@
       renderTopicTutorHistory(topicTutorConversations);
       input.value = '';
       resizeTopicTutorInput(input);
-      files.value = '';
+      topicTutorSelectedFiles = [];
       renderTopicTutorSelectedFiles();
     } catch (error) {
+      pendingUser.remove();
       loading.remove();
       showTopicTutorError(error.message);
     } finally {
@@ -1810,6 +1953,8 @@
       setTopicTutorSendState(send, false);
       input.disabled = false;
       document.getElementById('topic-tutor-attach').disabled = false;
+      document.getElementById('topic-tutor-choose-pdf').disabled = false;
+      document.getElementById('topic-tutor-choose-image').disabled = false;
       input.focus();
     }
   }
@@ -1820,12 +1965,11 @@
     renderTopicTutorHistory(topicTutorConversations);
     renderTopicTutorConversation(null);
     const input = document.getElementById('topic-tutor-input');
-    const files = document.getElementById('topic-tutor-files');
     if (input) {
       input.value = '';
       resizeTopicTutorInput(input);
     }
-    if (files) files.value = '';
+    topicTutorSelectedFiles = [];
     renderTopicTutorSelectedFiles();
     if (input) input.focus();
   }
@@ -2388,9 +2532,52 @@
       });
     }
     const tutorAttach = document.getElementById('topic-tutor-attach');
-    const tutorFiles = document.getElementById('topic-tutor-files');
-    if (tutorAttach && tutorFiles) tutorAttach.addEventListener('click', () => tutorFiles.click());
-    if (tutorFiles) tutorFiles.addEventListener('change', renderTopicTutorSelectedFiles);
+    const tutorUploadMenu = document.getElementById('topic-tutor-upload-menu');
+    const pdfFiles = document.getElementById('topic-tutor-pdf-files');
+    const imageFiles = document.getElementById('topic-tutor-image-files');
+    const setUploadMenuOpen = open => {
+      if (!tutorAttach || !tutorUploadMenu) return;
+      tutorUploadMenu.hidden = !open;
+      tutorAttach.setAttribute('aria-expanded', String(open));
+    };
+    if (tutorAttach && tutorUploadMenu) {
+      tutorAttach.addEventListener('click', () => {
+        setUploadMenuOpen(tutorUploadMenu.hidden);
+      });
+      document.addEventListener('click', event => {
+        if (!event.target.closest('.topic-tutor-attach-wrap')) setUploadMenuOpen(false);
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !tutorUploadMenu.hidden) {
+          setUploadMenuOpen(false);
+          tutorAttach.focus();
+        }
+      });
+    }
+    const choosePdf = document.getElementById('topic-tutor-choose-pdf');
+    const chooseImage = document.getElementById('topic-tutor-choose-image');
+    if (choosePdf && pdfFiles) {
+      choosePdf.addEventListener('click', () => {
+        setUploadMenuOpen(false);
+        pdfFiles.click();
+      });
+      pdfFiles.addEventListener('change', () => {
+        topicTutorSelectedFiles.push(...Array.from(pdfFiles.files || []));
+        pdfFiles.value = '';
+        renderTopicTutorSelectedFiles();
+      });
+    }
+    if (chooseImage && imageFiles) {
+      chooseImage.addEventListener('click', () => {
+        setUploadMenuOpen(false);
+        imageFiles.click();
+      });
+      imageFiles.addEventListener('change', () => {
+        topicTutorSelectedFiles.push(...Array.from(imageFiles.files || []));
+        imageFiles.value = '';
+        renderTopicTutorSelectedFiles();
+      });
+    }
     const tutorNewChat = document.getElementById('topic-tutor-new-chat');
     if (tutorNewChat) {
       tutorNewChat.addEventListener('click', () => {
