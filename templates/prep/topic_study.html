@@ -774,6 +774,7 @@
   }
   .topic-tutor-textarea {
     resize: none;
+    box-sizing: border-box;
     min-height: 40px;
     flex: 1;
     min-width: 0;
@@ -1126,9 +1127,23 @@
       bottom: 0;
       left: 50%;
       width: min(820px, 100vw);
-      padding: 18px 12px max(12px, env(safe-area-inset-bottom, 0px));
+      padding: 4px 8px max(6px, env(safe-area-inset-bottom, 0px));
       transform: translateX(-50%);
       background: linear-gradient(180deg, transparent 0%, var(--surface) 26%);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-textarea {
+      min-height: 38px;
+      max-height: min(24vh, 120px);
+      padding: 6px 2px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
+      margin-top: 2px;
+      font-size: .62rem;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
       padding: 12px 14px;
@@ -1666,8 +1681,12 @@
   function resizeTopicTutorInput(input) {
     if (!input) return;
     input.style.height = 'auto';
-    input.style.height = `${input.scrollHeight}px`;
-    input.style.overflowY = 'hidden';
+    const maxHeight = Number.parseFloat(window.getComputedStyle(input).maxHeight);
+    const height = Number.isFinite(maxHeight)
+      ? Math.min(input.scrollHeight, maxHeight)
+      : input.scrollHeight;
+    input.style.height = `${height}px`;
+    input.style.overflowY = input.scrollHeight > height ? 'auto' : 'hidden';
   }
 
   function setTopicTutorSendState(button, isSending) {

@@ -263,6 +263,18 @@ class TopicTutorApiTests(TestCase):
         self.client.force_login(self.user)
         self.url = reverse("prep:api_topic_tutor", kwargs={"topic_id": self.topic.pk})
 
+    def _post_with_chat_result(self, result, *, files=None):
+        with (
+            patch("services.prep_course_billing.ensure_note_access", return_value=(True, 30)),
+            patch.object(prep_topic_tutor, "_topic_context", return_value=("Approved notes", "")),
+            patch.object(prep_topic_tutor, "_build_prompt", return_value=("system", "user")),
+            patch("services.prep_ai_router.route_math_request", return_value=result),
+        ):
+            payload = {"message": "Explain unbiasedness simply"}
+            if files:
+                payload["files"] = files
+            return self.client.post(self.url, payload)
+
     def test_topic_page_includes_compact_tutor_composer_and_disclosure(self):
         response = self.client.get(reverse("prep:topic_study", kwargs={"topic_id": self.topic.pk}))
 
@@ -316,10 +328,17 @@ class TopicTutorApiTests(TestCase):
             "position: fixed;\n      z-index: 1202;\n      right: auto;\n      bottom: 0;",
             html=False,
         )
+        self.assertContains(
+            response,
+            "padding: 4px 8px max(6px, env(safe-area-inset-bottom, 0px));",
+            html=False,
+        )
+        self.assertContains(response, "max-height: min(24vh, 120px);", html=False)
+        self.assertContains(response, "input.scrollHeight > height ? 'auto' : 'hidden'", html=False)
         self.assertContains(response, "width: min(820px, 100vw)", html=False)
         self.assertContains(
             response,
-            "padding: 18px 12px max(12px, env(safe-area-inset-bottom, 0px));",
+            "padding: 4px 8px max(6px, env(safe-area-inset-bottom, 0px));",
             html=False,
         )
         page_script = response.content.decode()
@@ -414,6 +433,169 @@ class TopicTutorApiTests(TestCase):
         self.assertEqual(reservation.charged_credits, 0)
         self.assertEqual(reservation.remaining_reserved_credits, 0)
         self.assertEqual(get_available_credits(self.wallet), 30)
+
+    def test_malformed_reply_with_provider_usage_releases_chat_credits(self):
+        response = self._post_with_chat_result({
+            "success": True,
+            "content": '{"decision":"answer","answer":"unfinished',
+            "usage": {"prompt_tokens": 100, "completion_tokens": 30, "total_tokens": 130},
+            "model_used": "test-model",
+        })
+
+        self.assertEqual(response.status_code, 502)
+        data = response.json()
+        self.assertEqual(data["credits_charged"], 0)
+        self.assertEqual(data["credits_balance"], 30)
+        self.assertFalse(PrepTransaction.objects.filter(
+            wallet=self.wallet,
+            action_type="topic_tutor",
+        ).exists())
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "released")
+        self.assertEqual(reservation.charged_credits, 0)
+        self.assertEqual(reservation.remaining_reserved_credits, 0)
+        self.assertEqual(reservation.metadata["chat_provider_cost_status"], "unbilled_failed_request")
+        self.assertEqual(
+            reservation.metadata["chat_provider_usage"]["total_tokens"],
+            130,
+        )
+        self.assertIn("estimated_cost_usd", reservation.metadata["chat_provider_cost"])
+
+    def test_unsafe_reply_with_provider_usage_releases_chat_credits(self):
+        response = self._post_with_chat_result({
+            "success": True,
+            "content": '{"decision":"answer","answer":"<script>bad</script>"}',
+            "usage": {"prompt_tokens": 100, "completion_tokens": 30, "total_tokens": 130},
+            "model_used": "test-model",
+        })
+
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.json()["credits_charged"], 0)
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "released")
+        self.assertEqual(reservation.charged_credits, 0)
+        self.assertEqual(get_available_credits(self.wallet), 30)
+        self.assertEqual(reservation.metadata["chat_provider_cost_status"], "unbilled_failed_request")
+
+    def test_persistence_failure_releases_chat_credits_and_records_provider_cost(self):
+        original_create = PrepTopicChatMessage.objects.create
+
+        def fail_assistant_message(**kwargs):
+            if kwargs.get("role") == "assistant":
+                raise RuntimeError("Simulated persistence failure")
+            return original_create(**kwargs)
+
+        with patch.object(
+            PrepTopicChatMessage.objects,
+            "create",
+            side_effect=fail_assistant_message,
+        ):
+            response = self._post_with_chat_result({
+                "success": True,
+                "content": '{"decision":"answer","answer":"A correct answer."}',
+                "usage": {"prompt_tokens": 100, "completion_tokens": 30, "total_tokens": 130},
+                "model_used": "test-model",
+            })
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(get_available_credits(self.wallet), 30)
+        self.assertEqual(PrepTopicChatMessage.objects.count(), 0)
+        self.assertFalse(PrepTransaction.objects.filter(
+            wallet=self.wallet,
+            action_type="topic_tutor",
+        ).exists())
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "released")
+        self.assertEqual(reservation.charged_credits, 0)
+        self.assertEqual(reservation.remaining_reserved_credits, 0)
+        self.assertEqual(reservation.metadata["chat_provider_cost_status"], "unbilled_failed_request")
+
+    def test_chat_credits_settle_only_after_assistant_message_is_saved(self):
+        real_settlement = prep_topic_tutor.settle_credit_reservation
+
+        def settle_after_assistant_save(*args, **kwargs):
+            self.assertTrue(
+                PrepTopicChatMessage.objects.filter(
+                    session__user=self.user,
+                    role="assistant",
+                ).exists()
+            )
+            return real_settlement(*args, **kwargs)
+
+        with patch.object(
+            prep_topic_tutor,
+            "settle_credit_reservation",
+            side_effect=settle_after_assistant_save,
+        ):
+            response = self._post_with_chat_result({
+                "success": True,
+                "content": '{"decision":"answer","answer":"A correct answer."}',
+                "usage": {"prompt_tokens": 100, "completion_tokens": 30, "total_tokens": 130},
+                "model_used": "test-model",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["credits_charged"], 1)
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "settled")
+        self.assertEqual(reservation.metadata["chat_provider_cost_status"], "student_billed")
+
+    def test_failed_reply_keeps_successful_ocr_charge_only(self):
+        image = SimpleUploadedFile(
+            "estimators.png",
+            b"\x89PNG\r\n\x1a\n" + b"small image",
+            content_type="image/png",
+        )
+        result = {
+            "success": True,
+            "content": '{"decision":"answer","answer":"unfinished',
+            "usage": {"prompt_tokens": 100, "completion_tokens": 30, "total_tokens": 130},
+            "model_used": "test-model",
+        }
+        with (
+            patch("services.prep_course_billing.ensure_note_access", return_value=(True, 30)),
+            patch.object(prep_topic_tutor, "_topic_context", return_value=("Approved notes", "")),
+            patch.object(
+                prep_topic_tutor,
+                "_finish_uploads",
+                return_value=(
+                    [{
+                        "name": "estimators.png",
+                        "text": "An unbiased estimator has expected value equal to the true parameter.",
+                        "page_count": 1,
+                        "source_type": "image_ocr",
+                    }],
+                    {"prompt_tokens": 1100, "completion_tokens": 100, "total_tokens": 1200},
+                    "deepseek-ai/DeepSeek-V4.1-Flash",
+                ),
+            ),
+            patch.object(prep_topic_tutor, "_build_prompt", return_value=("system", "user")),
+            patch("services.prep_ai_router.route_math_request", return_value=result),
+        ):
+            response = self.client.post(
+                self.url,
+                {"message": "Explain the text in this image", "files": [image]},
+            )
+
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.json()["credits_charged"], 5)
+        self.assertEqual(response.json()["credits_balance"], 25)
+        self.assertEqual(
+            PrepTransaction.objects.filter(
+                wallet=self.wallet,
+                action_type="topic_tutor_ocr",
+            ).count(),
+            1,
+        )
+        self.assertFalse(PrepTransaction.objects.filter(
+            wallet=self.wallet,
+            action_type="topic_tutor",
+        ).exists())
+        reservation = PrepCreditReservation.objects.get(wallet=self.wallet)
+        self.assertEqual(reservation.status, "settled")
+        self.assertEqual(reservation.charged_credits, 5)
+        self.assertEqual(reservation.remaining_reserved_credits, 0)
+        self.assertEqual(reservation.metadata["chat_provider_cost_status"], "unbilled_failed_request")
 
     @patch("services.prep_course_billing.ensure_note_access", return_value=(True, 30))
     @patch.object(prep_topic_tutor, "_topic_context", return_value=("Approved notes", ""))

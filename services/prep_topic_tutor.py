@@ -630,6 +630,18 @@ def serialize_topic_conversation(session) -> dict:
     return {"id": session.pk, "title": session.title, "messages": messages}
 
 
+def _update_reservation_metadata(reservation, metadata_updates: dict) -> None:
+    with transaction.atomic():
+        held = reservation.__class__.objects.select_for_update().get(pk=reservation.pk)
+        if held.status != "reserved":
+            return
+        held.metadata = {
+            **(held.metadata if isinstance(held.metadata, dict) else {}),
+            **metadata_updates,
+        }
+        held.save(update_fields=["metadata", "updated_at"])
+
+
 def send_topic_message(*, user, topic, session, user_message: str, uploaded_files: list) -> dict:
     user_message = str(user_message or "").strip()
     if not user_message:
@@ -847,39 +859,26 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 chat_usage_for_billing,
             )
             chat_credits = provider_cost_credits(chat_quote)
-            chat_credits = settle_credit_reservation(
+            _update_reservation_metadata(
                 reservation,
-                chat_credits,
-                action_type="topic_tutor",
-                description=f"Topic tutor reply: {topic.course.code} - {topic.title}",
-                usage=chat_usage_for_billing,
-                model_name=chat_model_used,
-                metadata={
-                    "provider": "deepseek",
-                    "pricing": quote_summary(chat_quote, chat_credits),
-                    "usage_estimated": estimated_usage,
-                    "topic_id": topic.pk,
-                    "session_id": session.pk if session else None,
-                    "upload_count": len(uploads),
+                {
+                    "chat_provider_usage": chat_usage_for_billing,
+                    "chat_provider_cost": chat_quote,
+                    "chat_provider_cost_status": "pending_validation",
                 },
-            )
-        else:
-            release_credit_reservation(
-                reservation,
-                reason="Chat provider returned no billable usage.",
             )
 
         if not result.get("success"):
             raise TopicTutorError(
                 "The topic tutor is temporarily unavailable. Please retry in a moment.",
                 502,
-                credits_charged=ocr_credits + chat_credits,
+                credits_charged=ocr_credits,
             )
 
         try:
             answer = _parse_tutor_response(str(result.get("content") or ""), topic)
         except TopicTutorError as exc:
-            exc.credits_charged = ocr_credits + chat_credits
+            exc.credits_charged = ocr_credits
             raise
 
         total_credits = ocr_credits + chat_credits
@@ -916,7 +915,7 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 or chat_usage_for_billing.get("completion_tokens")
                 or 0
             )
-            PrepTopicChatMessage.objects.create(
+            assistant_record = PrepTopicChatMessage.objects.create(
                 session=session,
                 role="assistant",
                 content=answer,
@@ -924,6 +923,31 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 output_tokens=completion_tokens,
                 credits_charged=total_credits,
             )
+            if chat_usage_for_billing:
+                chat_credits = settle_credit_reservation(
+                    reservation,
+                    chat_credits,
+                    action_type="topic_tutor",
+                    description=f"Topic tutor reply: {topic.course.code} - {topic.title}",
+                    usage=chat_usage_for_billing,
+                    model_name=chat_model_used,
+                    metadata={
+                        "provider": "deepseek",
+                        "pricing": quote_summary(chat_quote, chat_credits),
+                        "usage_estimated": estimated_usage,
+                        "topic_id": topic.pk,
+                        "session_id": session.pk,
+                        "upload_count": len(uploads),
+                        "chat_provider_cost_status": "student_billed",
+                    },
+                )
+                assistant_record.credits_charged = ocr_credits + chat_credits
+                assistant_record.save(update_fields=["credits_charged"])
+            elif ocr_credits:
+                release_credit_reservation(
+                    reservation,
+                    reason="Chat provider returned no billable usage.",
+                )
             session.save(update_fields=["updated_at"])
 
         wallet.refresh_from_db(fields=["credits_balance"])
@@ -941,6 +965,16 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
             ],
         }
     finally:
+        reservation.refresh_from_db(fields=["metadata", "status"])
+        if (
+            reservation.status == "reserved"
+            and isinstance(reservation.metadata, dict)
+            and reservation.metadata.get("chat_provider_cost_status") == "pending_validation"
+        ):
+            _update_reservation_metadata(
+                reservation,
+                {"chat_provider_cost_status": "unbilled_failed_request"},
+            )
         release_credit_reservation(
             reservation,
             reason="Request finished; unused reserved credits released.",
