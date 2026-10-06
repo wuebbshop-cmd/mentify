@@ -330,15 +330,24 @@ class TopicTutorApiTests(TestCase):
         )
         self.assertContains(
             response,
-            "padding: 4px 8px max(6px, env(safe-area-inset-bottom, 0px));",
+            "padding: 0 8px env(safe-area-inset-bottom, 0px);",
             html=False,
         )
+        self.assertContains(response, ".topic-tutor-file-list:empty", html=False)
+        self.assertContains(response, "margin-bottom: 0 !important;", html=False)
         self.assertContains(response, "max-height: min(24vh, 120px);", html=False)
         self.assertContains(response, "input.scrollHeight > height ? 'auto' : 'hidden'", html=False)
+        self.assertContains(
+            response,
+            "padding: 26px 14px var(--topic-tutor-composer-clearance, 88px);",
+            html=False,
+        )
+        self.assertContains(response, "composer.getBoundingClientRect().height + 12", html=False)
+        self.assertContains(response, "new ResizeObserver(syncTopicTutorMessagePadding)", html=False)
         self.assertContains(response, "width: min(820px, 100vw)", html=False)
         self.assertContains(
             response,
-            "padding: 4px 8px max(6px, env(safe-area-inset-bottom, 0px));",
+            "padding: 0 8px env(safe-area-inset-bottom, 0px);",
             html=False,
         )
         page_script = response.content.decode()

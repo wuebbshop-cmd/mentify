@@ -1127,9 +1127,12 @@
       bottom: 0;
       left: 50%;
       width: min(820px, 100vw);
-      padding: 4px 8px max(6px, env(safe-area-inset-bottom, 0px));
+      padding: 0 8px env(safe-area-inset-bottom, 0px);
       transform: translateX(-50%);
       background: linear-gradient(180deg, transparent 0%, var(--surface) 26%);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-file-list:empty {
+      margin-bottom: 0 !important;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
       align-items: center;
@@ -1142,14 +1145,14 @@
       padding: 6px 2px;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
-      margin-top: 2px;
+      margin-top: 0;
       font-size: .62rem;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
       padding: 12px 14px;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-messages {
-      padding: 26px 14px 170px;
+      padding: 26px 14px var(--topic-tutor-composer-clearance, 88px);
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.user {
       max-width: 86%;
@@ -1687,6 +1690,22 @@
       : input.scrollHeight;
     input.style.height = `${height}px`;
     input.style.overflowY = input.scrollHeight > height ? 'auto' : 'hidden';
+    syncTopicTutorMessagePadding();
+  }
+
+  function syncTopicTutorMessagePadding() {
+    const shell = document.querySelector('.topic-tutor-shell');
+    const messages = document.getElementById('topic-tutor-messages');
+    const composer = document.getElementById('topic-tutor-form');
+    const mobileExpanded = shell?.classList.contains('topic-tutor-expanded')
+      && window.matchMedia('(max-width: 800px)').matches;
+    if (!messages || !composer) return;
+    if (!mobileExpanded) {
+      messages.style.removeProperty('--topic-tutor-composer-clearance');
+      return;
+    }
+    const clearance = Math.ceil(composer.getBoundingClientRect().height + 12);
+    messages.style.setProperty('--topic-tutor-composer-clearance', `${clearance}px`);
   }
 
   function setTopicTutorSendState(button, isSending) {
@@ -1725,6 +1744,7 @@
     topicTutorExpanded = expanded;
     shell.classList.toggle('topic-tutor-expanded', expanded);
     document.body.classList.toggle('topic-tutor-expanded', expanded);
+    syncTopicTutorMessagePadding();
     button.setAttribute('aria-pressed', String(expanded));
     button.setAttribute(
       'aria-label',
@@ -2555,7 +2575,14 @@
       }
     }
     const tutorForm = document.getElementById('topic-tutor-form');
-    if (tutorForm) tutorForm.addEventListener('submit', submitTopicTutorMessage);
+    if (tutorForm) {
+      tutorForm.addEventListener('submit', submitTopicTutorMessage);
+      if (window.ResizeObserver) {
+        const tutorComposerObserver = new ResizeObserver(syncTopicTutorMessagePadding);
+        tutorComposerObserver.observe(tutorForm);
+      }
+      syncTopicTutorMessagePadding();
+    }
     const tutorErrorDismiss = document.getElementById('topic-tutor-error-dismiss');
     if (tutorErrorDismiss) tutorErrorDismiss.addEventListener('click', clearTopicTutorError);
     const tutorInput = document.getElementById('topic-tutor-input');
@@ -2653,6 +2680,7 @@
       }
     });
     window.addEventListener('resize', () => {
+      syncTopicTutorMessagePadding();
       if (window.innerWidth > 800) {
         if (topicTutorHistoryOpen) setTopicTutorHistoryOpen(false);
         else if (tutorHistoryPanel) tutorHistoryPanel.setAttribute('aria-hidden', 'false');
