@@ -323,14 +323,15 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "setTimeout(clearTopicTutorError, 10000)")
         self.assertContains(response, "position: fixed;\n      z-index: 1200;\n      inset: 0;", html=False)
         self.assertContains(response, "height: 100dvh;\n      min-height: 0;", html=False)
+        self.assertContains(response, "display: contents;", html=False)
         self.assertContains(
             response,
-            "position: fixed;\n      z-index: 1202;\n      right: auto;\n      bottom: env(safe-area-inset-bottom, 0px);",
+            "bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);",
             html=False,
         )
         self.assertContains(
             response,
-            "padding: 0;\n      transform: translateX(-50%);\n      border: 0;\n      background: transparent;\n      box-shadow: none;",
+            "bottom: env(safe-area-inset-bottom, 0px);\n      left: 0;\n      width: min(820px, 100vw);",
             html=False,
         )
         self.assertContains(
@@ -343,13 +344,7 @@ class TopicTutorApiTests(TestCase):
             ".topic-tutor-composer-bar:focus-within {\n    border-color: var(--danger);",
             html=False,
         )
-        self.assertContains(
-            response,
-            ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {\n      width: calc(100% - 16px);",
-            html=False,
-        )
-        self.assertContains(response, ".topic-tutor-file-list:empty", html=False)
-        self.assertContains(response, "margin-bottom: 0 !important;", html=False)
+        self.assertContains(response, "width: calc(100% - 16px);", html=False)
         self.assertContains(response, "max-height: min(24vh, 120px);", html=False)
         self.assertContains(response, "input.scrollHeight > height ? 'auto' : 'hidden'", html=False)
         self.assertContains(
@@ -357,14 +352,11 @@ class TopicTutorApiTests(TestCase):
             "padding: 26px 14px var(--topic-tutor-composer-clearance, 88px);",
             html=False,
         )
-        self.assertContains(response, "composer.getBoundingClientRect().height + 12", html=False)
+        self.assertContains(response, "window.innerHeight - occupiedTop + 12", html=False)
         self.assertContains(response, "new ResizeObserver(syncTopicTutorMessagePadding)", html=False)
         self.assertContains(response, "width: min(820px, 100vw)", html=False)
-        self.assertContains(
-            response,
-            "margin: 0 auto;\n      align-items: center;",
-            html=False,
-        )
+        self.assertContains(response, "border-radius: 24px;", html=False)
+        self.assertContains(response, ".topic-tutor-composer-bar:focus-within", html=False)
         page_script = response.content.decode()
         self.assertLess(
             page_script.index("formData.set('message', text);"),

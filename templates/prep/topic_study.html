@@ -1121,28 +1121,42 @@
       box-shadow: none;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer {
+      display: contents;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-file-list {
       position: fixed;
       z-index: 1202;
-      right: auto;
-      bottom: env(safe-area-inset-bottom, 0px);
-      left: 50%;
+      right: 0;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 70px);
+      left: 0;
+      justify-content: center;
       width: min(820px, 100vw);
-      box-sizing: border-box;
-      padding: 0;
-      transform: translateX(-50%);
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-file-list:empty {
-      margin-bottom: 0 !important;
+      margin: 0 auto !important;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
+      position: fixed;
+      z-index: 1202;
+      right: 0;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+      left: 0;
       width: calc(100% - 16px);
       margin: 0 auto;
+      box-sizing: border-box;
       align-items: center;
       gap: 6px;
       padding: 4px 6px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
+      position: fixed;
+      z-index: 1202;
+      right: 0;
+      bottom: env(safe-area-inset-bottom, 0px);
+      left: 0;
+      width: min(820px, 100vw);
+      box-sizing: border-box;
+      margin: 0 auto;
+      padding: 0 8px;
+      text-align: center;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-textarea {
       min-height: 38px;
@@ -1150,9 +1164,6 @@
       padding: 6px 2px;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
-      margin-top: 0;
-      margin-right: 8px;
-      margin-left: 8px;
       font-size: .62rem;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
@@ -1703,15 +1714,22 @@
   function syncTopicTutorMessagePadding() {
     const shell = document.querySelector('.topic-tutor-shell');
     const messages = document.getElementById('topic-tutor-messages');
-    const composer = document.getElementById('topic-tutor-form');
+    const composerBar = document.querySelector('.topic-tutor-composer-bar');
+    const disclosure = document.querySelector('.topic-tutor-composer-disclosure');
+    const fileList = document.getElementById('topic-tutor-file-list');
     const mobileExpanded = shell?.classList.contains('topic-tutor-expanded')
       && window.matchMedia('(max-width: 800px)').matches;
-    if (!messages || !composer) return;
+    if (!messages || !composerBar || !disclosure) return;
     if (!mobileExpanded) {
       messages.style.removeProperty('--topic-tutor-composer-clearance');
       return;
     }
-    const clearance = Math.ceil(composer.getBoundingClientRect().height + 12);
+    const occupiedTop = Math.min(
+      composerBar.getBoundingClientRect().top,
+      disclosure.getBoundingClientRect().top,
+      ...(fileList?.childElementCount ? [fileList.getBoundingClientRect().top] : [])
+    );
+    const clearance = Math.ceil(window.innerHeight - occupiedTop + 12);
     messages.style.setProperty('--topic-tutor-composer-clearance', `${clearance}px`);
   }
 
@@ -2586,7 +2604,9 @@
       tutorForm.addEventListener('submit', submitTopicTutorMessage);
       if (window.ResizeObserver) {
         const tutorComposerObserver = new ResizeObserver(syncTopicTutorMessagePadding);
-        tutorComposerObserver.observe(tutorForm);
+        tutorComposerObserver.observe(document.querySelector('.topic-tutor-composer-bar'));
+        tutorComposerObserver.observe(document.querySelector('.topic-tutor-composer-disclosure'));
+        tutorComposerObserver.observe(document.getElementById('topic-tutor-file-list'));
       }
       syncTopicTutorMessagePadding();
     }
