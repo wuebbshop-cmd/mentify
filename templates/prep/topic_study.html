@@ -749,10 +749,12 @@
   .topic-tutor-composer {
     position: absolute;
     z-index: 2;
-    right: 0;
+    left: 50%;
     bottom: 0;
-    left: 0;
+    width: min(680px, 100%);
+    box-sizing: border-box;
     padding: 28px clamp(12px, 3vw, 28px) 12px;
+    transform: translateX(-50%);
     background: linear-gradient(180deg, transparent 0%, var(--surface) 32%);
   }
   .topic-tutor-composer-bar {
@@ -860,19 +862,73 @@
     color: var(--text-secondary);
     font-size: .76rem;
   }
+  .topic-tutor-history-backdrop { display: none; }
+  .topic-tutor-history-toggle,
+  .topic-tutor-history-close { display: none !important; }
   @media (max-width: 800px) {
-    .topic-tutor-shell { grid-template-columns: 1fr; }
-    .topic-tutor-history { height: 150px; min-height: 0; }
-    .topic-tutor-history-list { display: flex; flex: none; gap: 6px; overflow-x: auto; }
-    .topic-tutor-history-item { min-width: 170px; margin: 0; }
+    .topic-tutor-shell {
+      position: relative;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .topic-tutor-history {
+      position: fixed;
+      z-index: 1202;
+      inset: 0 auto 0 0;
+      width: min(320px, 86vw);
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      max-height: none;
+      border-radius: 0 18px 18px 0;
+      box-shadow: 12px 0 36px rgba(0, 0, 0, .22);
+      transform: translateX(-105%);
+      transition: transform .22s ease, visibility .22s ease;
+      visibility: hidden;
+    }
+    .topic-tutor-shell.topic-tutor-history-open .topic-tutor-history {
+      transform: translateX(0);
+      visibility: visible;
+    }
+    .topic-tutor-history-list {
+      display: block;
+      flex: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .topic-tutor-history-item { min-width: 0; }
+    .topic-tutor-history-backdrop {
+      display: block;
+      position: fixed;
+      z-index: 1201;
+      inset: 0;
+      border: 0;
+      padding: 0;
+      background: rgba(0, 0, 0, .48);
+    }
+    .topic-tutor-shell.topic-tutor-history-open .topic-tutor-history-backdrop {
+      display: block;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history-list {
+      display: block;
+      flex: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
     .topic-tutor-main { height: min(76vh, 800px); min-height: 540px; }
     .topic-tutor-message { max-width: 96%; }
     .topic-tutor-error { bottom: 126px; }
+    .topic-tutor-history-toggle { display: inline-grid !important; }
+    .topic-tutor-history-close { display: inline-grid !important; }
   }
   @media (max-width: 480px) {
     .topic-tutor-shell { gap: 10px; }
     .topic-tutor-history-head { padding: 12px 14px; }
-    .topic-tutor-composer { padding-right: 9px; padding-left: 9px; }
+    .topic-tutor-composer { width: 100%; padding-right: 9px; padding-left: 9px; }
     .topic-tutor-messages { padding-right: 12px; padding-left: 12px; }
   }
   .topic-tutor-shell.topic-tutor-expanded {
@@ -928,25 +984,16 @@
   @media (max-width: 800px) {
     .topic-tutor-shell.topic-tutor-expanded {
       grid-template-columns: 1fr;
-      grid-template-rows: 128px minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr);
       gap: 8px;
       padding: 8px;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history {
-      height: auto;
-      min-height: 0;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history-list {
-      display: flex;
-      flex: 1;
-      gap: 6px;
-      overflow-x: auto;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
       height: auto;
       min-height: 0;
     }
   }
+  body.topic-tutor-history-open { overflow: hidden; }
 </style>
 {% endblock %}
 
@@ -1111,6 +1158,7 @@
 
 <div id="pillar-assistant" style="display: {% if active_subtab == 'assistant' %}block{% else %}none{% endif %};">
   <div class="topic-tutor-shell">
+    <button type="button" id="topic-tutor-history-backdrop" class="topic-tutor-history-backdrop" aria-label="Close conversation menu" tabindex="-1"></button>
     <aside class="topic-tutor-history" aria-label="Topic tutor conversation history">
       <div class="topic-tutor-history-head">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -1118,7 +1166,12 @@
             <h3 style="font-size:.94rem;margin:0 0 3px;">Your conversations</h3>
             <p style="font-size:.76rem;color:var(--text-muted);margin:0;">Private to you and this topic</p>
           </div>
-          <button type="button" class="btn btn-outline btn-sm" id="topic-tutor-new-chat" aria-label="Start a new conversation">New</button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button type="button" class="btn btn-outline btn-sm" id="topic-tutor-new-chat" aria-label="Start a new conversation">New</button>
+            <button type="button" class="topic-tutor-icon-button topic-tutor-history-close" id="topic-tutor-history-close" aria-label="Close conversation menu" title="Close menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
         </div>
       </div>
       <div id="topic-tutor-history-list" class="topic-tutor-history-list" aria-live="polite">
@@ -1130,6 +1183,9 @@
       <div class="topic-tutor-head">
         <div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="topic-tutor-history-toggle" class="topic-tutor-icon-button topic-tutor-history-toggle" aria-label="Open conversation menu" aria-expanded="false" title="Conversations" style="display:none;">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
             <h2 style="font-size:1.05rem;margin:0;">Topic study tutor</h2>
             <span class="badge badge-accent" style="font-size:.68rem;">{{ topic.course_code }}</span>
           </div>
@@ -1406,6 +1462,7 @@
   let topicTutorConversations = [];
   let topicTutorExpanded = false;
   let topicTutorSavedScrollY = 0;
+  let topicTutorHistoryOpen = false;
 
   // ─── 5-Page Syllabus Notes Navigation State ─────────────────────────────
   let notePages = [];
@@ -1451,6 +1508,24 @@
     button.innerHTML = isSending
       ? '<span class="topic-tutor-spinner" aria-hidden="true"></span>'
       : '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>';
+  }
+
+  function setTopicTutorHistoryOpen(open) {
+    const shell = document.querySelector('.topic-tutor-shell');
+    const toggle = document.getElementById('topic-tutor-history-toggle');
+    const history = document.querySelector('.topic-tutor-history');
+    if (!shell || !toggle || !history || topicTutorHistoryOpen === open) return;
+
+    topicTutorHistoryOpen = open;
+    shell.classList.toggle('topic-tutor-history-open', open);
+    document.body.classList.toggle('topic-tutor-history-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    history.setAttribute('aria-hidden', String(!open));
+    if (open) {
+      document.getElementById('topic-tutor-history-close')?.focus({ preventScroll: true });
+    } else {
+      toggle.focus({ preventScroll: true });
+    }
   }
 
   function setTopicTutorExpanded(expanded) {
@@ -2258,7 +2333,28 @@
     if (tutorAttach && tutorFiles) tutorAttach.addEventListener('click', () => tutorFiles.click());
     if (tutorFiles) tutorFiles.addEventListener('change', renderTopicTutorSelectedFiles);
     const tutorNewChat = document.getElementById('topic-tutor-new-chat');
-    if (tutorNewChat) tutorNewChat.addEventListener('click', startNewTopicTutorChat);
+    if (tutorNewChat) {
+      tutorNewChat.addEventListener('click', () => {
+        startNewTopicTutorChat();
+        setTopicTutorHistoryOpen(false);
+      });
+    }
+    const tutorHistoryToggle = document.getElementById('topic-tutor-history-toggle');
+    const tutorHistoryClose = document.getElementById('topic-tutor-history-close');
+    const tutorHistoryBackdrop = document.getElementById('topic-tutor-history-backdrop');
+    const tutorHistoryPanel = document.querySelector('.topic-tutor-history');
+    if (tutorHistoryPanel && window.matchMedia('(max-width: 800px)').matches) {
+      tutorHistoryPanel.setAttribute('aria-hidden', 'true');
+    }
+    if (tutorHistoryToggle) {
+      tutorHistoryToggle.addEventListener('click', () => setTopicTutorHistoryOpen(true));
+    }
+    if (tutorHistoryClose) {
+      tutorHistoryClose.addEventListener('click', () => setTopicTutorHistoryOpen(false));
+    }
+    if (tutorHistoryBackdrop) {
+      tutorHistoryBackdrop.addEventListener('click', () => setTopicTutorHistoryOpen(false));
+    }
     const tutorExpand = document.getElementById('topic-tutor-expand');
     if (tutorExpand) {
       tutorExpand.addEventListener('click', () => {
@@ -2266,15 +2362,28 @@
       });
     }
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && topicTutorExpanded) {
+      if (event.key === 'Escape' && topicTutorHistoryOpen) {
+        setTopicTutorHistoryOpen(false);
+      } else if (event.key === 'Escape' && topicTutorExpanded) {
         setTopicTutorExpanded(false);
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 800) {
+        if (topicTutorHistoryOpen) setTopicTutorHistoryOpen(false);
+        else if (tutorHistoryPanel) tutorHistoryPanel.setAttribute('aria-hidden', 'false');
+      } else if (!topicTutorHistoryOpen && tutorHistoryPanel) {
+        tutorHistoryPanel.setAttribute('aria-hidden', 'true');
       }
     });
     const tutorHistory = document.getElementById('topic-tutor-history-list');
     if (tutorHistory) {
       tutorHistory.addEventListener('click', event => {
         const button = event.target.closest('[data-session-id]');
-        if (button) loadTopicTutorConversation(button.dataset.sessionId);
+        if (button) {
+          loadTopicTutorConversation(button.dataset.sessionId);
+          setTopicTutorHistoryOpen(false);
+        }
       });
     }
     const tutorPanel = document.getElementById('pillar-assistant');

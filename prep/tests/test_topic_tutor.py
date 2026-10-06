@@ -236,6 +236,15 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "Expand tutor to full screen")
         self.assertContains(response, ".topic-tutor-shell.topic-tutor-expanded")
         self.assertContains(response, "event.key === 'Escape'")
+        self.assertContains(response, 'id="topic-tutor-history-toggle"', html=False)
+        self.assertContains(response, 'id="topic-tutor-history-close"', html=False)
+        self.assertContains(response, 'id="topic-tutor-history-backdrop"', html=False)
+        self.assertContains(response, "topic-tutor-shell.topic-tutor-history-open .topic-tutor-history")
+        self.assertContains(response, "transform: translateX(-105%)")
+        self.assertContains(response, "window.matchMedia('(max-width: 800px)').matches")
+        self.assertContains(response, "width: min(680px, 100%)")
+        self.assertContains(response, "transform: translateX(-50%)")
+        self.assertContains(response, "setTopicTutorHistoryOpen(false)")
         page_script = response.content.decode()
         self.assertLess(
             page_script.index("formData.set('message', text);"),
