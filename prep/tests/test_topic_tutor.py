@@ -79,6 +79,7 @@ class TopicTutorSafetyTests(SimpleTestCase):
             title="Properties of Estimators",
             subtopics=["unbiasedness", "estimator bias"],
             summary="Unbiasedness, bias, and estimator variance.",
+            course=SimpleNamespace(code="STA 210", title="Statistical Inference"),
         )
 
     def test_rejects_html_and_markdown_links_in_model_output(self):
@@ -97,8 +98,26 @@ class TopicTutorSafetyTests(SimpleTestCase):
             self.topic,
         )
 
-        self.assertIn("can’t discuss AI models", response)
+        self.assertEqual(response, "I can only answer questions about this topic.")
         self.assertNotIn("secret implementation", response)
+
+    def test_prompt_requests_direct_answers_without_unprompted_source_mentions(self):
+        with patch.object(prep_topic_tutor, "_output_format_rules", return_value="Use standard notation"):
+            system_prompt, user_prompt = prep_topic_tutor._build_prompt(
+                self.topic,
+                "Internal topic notes",
+                "Internal course source",
+                [],
+                "Explain estimator bias",
+                [],
+            )
+
+        self.assertIn(
+            "Give a direct answer without mentioning notes, uploaded materials, sources",
+            user_prompt,
+        )
+        self.assertIn("without mentioning notes, source documents", system_prompt)
+        self.assertNotIn("distinguish it from what the supplied notes say", user_prompt)
 
     @override_settings(TOGETHERAI_API="test-token", TOGETHER_VISION_MODEL="test-ocr")
     def test_ocr_parse_failure_keeps_provider_usage_for_billing(self):
@@ -239,12 +258,21 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, 'id="topic-tutor-history-toggle"', html=False)
         self.assertContains(response, 'id="topic-tutor-history-close"', html=False)
         self.assertContains(response, 'id="topic-tutor-history-backdrop"', html=False)
+        self.assertContains(response, "display: none;\n      position: fixed;\n      z-index: 1201;", html=False)
+        self.assertContains(
+            response,
+            ".topic-tutor-shell.topic-tutor-history-open .topic-tutor-history-backdrop",
+        )
         self.assertContains(response, "topic-tutor-shell.topic-tutor-history-open .topic-tutor-history")
         self.assertContains(response, "transform: translateX(-105%)")
         self.assertContains(response, "window.matchMedia('(max-width: 800px)').matches")
         self.assertContains(response, "width: min(680px, 100%)")
         self.assertContains(response, "transform: translateX(-50%)")
         self.assertContains(response, "setTopicTutorHistoryOpen(false)")
+        self.assertContains(response, 'id="topic-tutor-error-dismiss"', html=False)
+        self.assertContains(response, 'aria-label="Dismiss error message"', html=False)
+        self.assertContains(response, "setTimeout(clearTopicTutorError, 10000)")
+        self.assertContains(response, "height: 100%;\n      min-height: 0;", html=False)
         page_script = response.content.decode()
         self.assertLess(
             page_script.index("formData.set('message', text);"),
