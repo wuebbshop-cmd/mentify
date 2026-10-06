@@ -333,7 +333,21 @@ class TopicTutorApiTests(TestCase):
             "padding: 0;\n      transform: translateX(-50%);\n      border: 0;\n      background: transparent;\n      box-shadow: none;",
             html=False,
         )
-        self.assertContains(response, "border-radius: 0;\n      background: transparent;\n      box-shadow: none;", html=False)
+        self.assertContains(
+            response,
+            "border: 1px solid var(--border);\n    border-radius: 24px;\n    background: var(--white);",
+            html=False,
+        )
+        self.assertContains(
+            response,
+            ".topic-tutor-composer-bar:focus-within {\n    border-color: var(--danger);",
+            html=False,
+        )
+        self.assertContains(
+            response,
+            ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {\n      width: calc(100% - 16px);",
+            html=False,
+        )
         self.assertContains(response, ".topic-tutor-file-list:empty", html=False)
         self.assertContains(response, "margin-bottom: 0 !important;", html=False)
         self.assertContains(response, "max-height: min(24vh, 120px);", html=False)
