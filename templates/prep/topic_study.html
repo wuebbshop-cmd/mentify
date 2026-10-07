@@ -1710,6 +1710,7 @@
 {{ authentic_questions|json_script:"authentic-questions-data" }}
 {{ generated_questions|json_script:"generated-questions-data" }}
 {{ assistant_conversations|json_script:"topic-tutor-conversations-data" }}
+{{ initial_assistant_conversation|json_script:"topic-tutor-initial-conversation-data" }}
 {{ topic.title|json_script:"topic-tutor-topic-title-data" }}
 {{ topic.course_code|json_script:"topic-tutor-course-code-data" }}
 
@@ -1941,22 +1942,27 @@
     }
   }
 
-  async function initializeTopicTutor() {
-    if (topicTutorInitialized) return;
-    topicTutorInitialized = true;
+  async function initializeTopicTutor(forceRefresh = false) {
+    if (topicTutorInitialized && !forceRefresh) return;
     const listEl = document.getElementById('topic-tutor-history-list');
     if (!listEl) return;
     try {
-      const response = await fetch(topicTutorApiUrl, {
+      const targetSessionId = topicTutorSessionId;
+      const url = targetSessionId ? `${topicTutorApiUrl}?session_id=${encodeURIComponent(targetSessionId)}` : topicTutorApiUrl;
+      const response = await fetch(url, {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Could not load conversation history.');
+      topicTutorInitialized = true;
       topicTutorConversations = data.conversations || [];
       renderTopicTutorHistory(topicTutorConversations);
       updateTopicTutorBalance(data.credits_balance);
-      if (topicTutorConversations.length) {
+      if (data.conversation) {
+        topicTutorSessionId = data.conversation.id;
+        renderTopicTutorConversation(data.conversation);
+      } else if (topicTutorConversations.length) {
         await loadTopicTutorConversation(topicTutorConversations[0].id);
       } else {
         renderTopicTutorConversation(null);
@@ -2646,6 +2652,20 @@
         topicTutorConversations = JSON.parse(initialTutorHistory.textContent) || [];
       } catch (e) {
         console.error("Error parsing topic tutor history:", e);
+      }
+    }
+    const initialTutorConversationEl = document.getElementById('topic-tutor-initial-conversation-data');
+    if (initialTutorConversationEl && initialTutorConversationEl.textContent) {
+      try {
+        const initialConversation = JSON.parse(initialTutorConversationEl.textContent);
+        if (initialConversation && initialConversation.id) {
+          topicTutorSessionId = initialConversation.id;
+          renderTopicTutorConversation(initialConversation);
+          renderTopicTutorHistory(topicTutorConversations);
+          topicTutorInitialized = true;
+        }
+      } catch (e) {
+        console.error("Error parsing topic tutor initial conversation:", e);
       }
     }
     const tutorForm = document.getElementById('topic-tutor-form');

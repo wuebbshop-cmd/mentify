@@ -691,8 +691,10 @@ def prep_topic_study(request, topic_id):
     # repeat validation, or a synthesis screen for shared verified notes.
     from services.prep_ai_router import get_published_topic_note_levels
     published_notes_by_level = get_published_topic_note_levels(topic)
-    from services.prep_topic_tutor import list_topic_conversations
+    from services.prep_topic_tutor import list_topic_conversations, serialize_topic_conversation
     assistant_conversations = list_topic_conversations(request.user, topic)
+    latest_session = topic.chat_sessions.filter(user=request.user).order_by("-updated_at", "-id").first()
+    initial_assistant_conversation = serialize_topic_conversation(latest_session) if latest_session else None
     initial_notes = published_notes_by_level.get("level_2", "")
     initial_notes_error = ""
     if not initial_notes:
@@ -721,6 +723,7 @@ def prep_topic_study(request, topic_id):
         "authentic_questions": authentic_qs,
         "generated_questions": generated_qs,
         "assistant_conversations": assistant_conversations,
+        "initial_assistant_conversation": initial_assistant_conversation,
         "tutor_ocr_credits_per_image_page": max(
             1,
             int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", 5)),
@@ -764,6 +767,8 @@ def prep_topic_tutor_api(request, topic_id):
                     {"success": False, "error": "That conversation was not found for this topic."},
                     status=404,
                 )
+        elif conversations:
+            current = topic.chat_sessions.filter(pk=conversations[0]["id"], user=request.user).first()
         wallet = PrepWallet.get_or_create_wallet(request.user)
         return JsonResponse({
             "success": True,

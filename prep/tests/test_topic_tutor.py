@@ -325,29 +325,28 @@ class TopicTutorApiTests(TestCase):
         self.assertContains(response, "height: 100dvh;\n      min-height: 0;", html=False)
         self.assertContains(
             response,
-            "position: fixed;\n      z-index: 1202;\n      right: 0;\n      bottom: env(safe-area-inset-bottom, 0px);\n      left: 0;\n      width: min(820px, 100vw);\n      box-sizing: border-box;\n      margin: 0 auto;\n      padding: 0;\n      border: 0;\n      background: transparent;\n      box-shadow: none;\n      transform: none;",
+            "topic-tutor-initial-conversation-data",
             html=False,
         )
         self.assertContains(
             response,
-            "border: 1px solid var(--danger);\n      border-radius: 22px;\n      background: rgba(10, 16, 18, 0.78);",
+            ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer {\n    width: min(820px, 100%);\n    padding-bottom: 18px;\n  }",
             html=False,
         )
         self.assertContains(
             response,
-            ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within {\n      border-color: var(--danger);",
+            ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-subtitle,\n  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-course-tag,\n  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head-balance {\n    display: none !important;\n  }",
             html=False,
         )
-        self.assertContains(response, "width: calc(100% - 16px);", html=False)
         self.assertContains(response, "max-height: min(24vh, 120px);", html=False)
         self.assertContains(response, "input.scrollHeight > height ? 'auto' : 'hidden'", html=False)
         self.assertContains(
             response,
-            "padding: 26px 14px 0;",
+            "padding: 6px 12px calc(env(safe-area-inset-bottom, 0px) + 6px);",
             html=False,
         )
         self.assertNotContains(response, "--topic-tutor-composer-clearance")
-        self.assertContains(response, "width: min(820px, 100vw)", html=False)
+        self.assertContains(response, "width: 100vw;", html=False)
         self.assertContains(response, ".topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within", html=False)
         page_script = response.content.decode()
         self.assertLess(
