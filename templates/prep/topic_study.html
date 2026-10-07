@@ -1022,7 +1022,12 @@
     .topic-tutor-shell { gap: 10px; }
     .topic-tutor-history-head { padding: 12px 14px; }
     .topic-tutor-composer { width: 100%; padding-right: 9px; padding-left: 9px; }
-    .topic-tutor-messages { padding: 30px 12px 170px; }
+    .topic-tutor-messages { padding: 24px 12px 140px; }
+    .export-pdf-btn-group { max-width: 100%; width: 100%; }
+    .export-pdf-action-btn { flex: 1; min-width: 0; padding: 7px 10px; gap: 6px; }
+    .export-pdf-action-btn span:first-of-type { font-size: 0.8rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .export-pdf-badge { display: none; }
+    .level-selector-toolbar { padding: 10px 12px; gap: 8px; }
   }
   .topic-tutor-shell.topic-tutor-expanded {
     position: fixed;
@@ -1102,36 +1107,66 @@
   }
   @media (max-width: 800px) {
     .topic-tutor-shell.topic-tutor-expanded {
-      grid-template-columns: 1fr;
-      grid-template-rows: minmax(0, 1fr);
-      gap: 8px;
-      padding: 8px;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+      display: flex;
+      flex-direction: column;
       position: fixed;
       z-index: 1200;
       inset: 0;
-      width: 100%;
+      width: 100vw;
       height: 100vh;
       height: 100dvh;
       min-height: 0;
+      padding: 0;
+      margin: 0;
+      gap: 0;
+      background: var(--surface);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
       max-height: none;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
       border: 0;
       border-radius: 0;
       box-shadow: none;
+      background: var(--surface);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
+      flex: 0 0 auto;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-messages {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px 14px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.assistant {
+      max-width: 100%;
+      margin: 0 0 16px;
+      padding: 16px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.user {
+      max-width: 86%;
+      margin: 0 0 16px auto;
+      padding: 12px 16px;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer {
-      position: fixed;
-      z-index: 1202;
-      right: 0;
-      bottom: env(safe-area-inset-bottom, 0px);
-      left: 0;
-      width: min(820px, 100vw);
+      flex: 0 0 auto;
+      position: relative;
+      inset: auto;
+      width: 100%;
       box-sizing: border-box;
-      margin: 0 auto;
-      padding: 0;
-      border: 0;
-      background: transparent;
+      margin: 0;
+      padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 8px);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
       box-shadow: none;
       transform: none;
     }
@@ -1139,20 +1174,20 @@
       display: none;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar {
-      width: calc(100% - 16px);
-      margin: 0 auto;
+      width: 100%;
+      margin: 0;
       box-sizing: border-box;
       align-items: center;
       gap: 6px;
-      padding: 4px 6px;
-      border: 1px solid var(--danger);
-      border-radius: 22px;
-      background: rgba(10, 16, 18, 0.78);
-      box-shadow: 0 0 0 1px rgba(217, 48, 37, 0.15);
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--white);
+      box-shadow: none;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-bar:focus-within {
       border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
+      box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.12);
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer-disclosure {
       position: static;
@@ -1166,16 +1201,6 @@
       min-height: 38px;
       max-height: min(24vh, 120px);
       padding: 6px 2px;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
-      padding: 12px 14px;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-messages {
-      padding: 26px 14px 0;
-    }
-    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.user {
-      max-width: 86%;
-      margin-right: 0;
     }
   }
   body.topic-tutor-history-open { overflow: hidden; }
