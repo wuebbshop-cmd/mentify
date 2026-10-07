@@ -98,6 +98,19 @@
       width: 0;
       height: 0;
     }
+    /* Mobile-responsive notification dropdown fitting viewport */
+    @media (max-width: 600px) {
+      #prep-notif-panel {
+        position: fixed !important;
+        top: calc(var(--nav-h, 56px) + 6px) !important;
+        right: 12px !important;
+        left: 12px !important;
+        width: auto !important;
+        max-width: calc(100vw - 24px) !important;
+        box-sizing: border-box !important;
+        z-index: 1000 !important;
+      }
+    }
   </style>
 
   {% block extra_css %}{% endblock %}
