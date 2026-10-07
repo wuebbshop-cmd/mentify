@@ -54,7 +54,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Mentify Native Design System -->
-  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=20261006_mobile_touch_layout">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=20261008_credit_badge_pill">
 
   <!-- KaTeX for Mathematics & Formulas (Synchronous & Dedicated) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -111,6 +111,54 @@
         z-index: 1000 !important;
       }
     }
+    /* Credit badge layout guarantee: pill shape with visible balance */
+    #prep-navbar-credit-badge,
+    .navbar-end > a[href*="/prep/billing/"] {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      padding: 5px 11px !important;
+      font-size: 0.8rem !important;
+      white-space: nowrap !important;
+      min-width: fit-content !important;
+      width: auto !important;
+      height: auto !important;
+      border-radius: 999px !important;
+      flex-shrink: 0 !important;
+      text-decoration: none !important;
+    }
+    #prep-navbar-credit-badge span,
+    .navbar-end > a[href*="/prep/billing/"] span {
+      display: inline !important;
+      visibility: visible !important;
+      white-space: nowrap !important;
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+    }
+    @media (max-width: 480px) {
+      .navbar {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        gap: 4px !important;
+      }
+      .navbar-brand {
+        font-size: 0.95rem !important;
+        gap: 5px !important;
+      }
+      .navbar-end {
+        gap: 5px !important;
+      }
+      #prep-navbar-credit-badge,
+      .navbar-end > a[href*="/prep/billing/"] {
+        padding: 4px 8px !important;
+        font-size: 0.74rem !important;
+        gap: 4px !important;
+      }
+      #prep-navbar-credit-badge span,
+      .navbar-end > a[href*="/prep/billing/"] span {
+        font-size: 0.74rem !important;
+      }
+    }
   </style>
 
   {% block extra_css %}{% endblock %}
@@ -125,10 +173,10 @@
     Mentify <span style="color: var(--green);">Prep</span>
   </a>
 
-  <div class="navbar-end" style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
-    <!-- Credit Badge -->
-    <a href="{% url 'prep:billing' %}" class="badge badge-accent" style="padding: 6px 12px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;" title="Your Credit Balance">
-      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+  <div class="navbar-end" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+    <!-- Credit Badge (Always pill, number visible) -->
+    <a href="{% url 'prep:billing' %}" id="prep-navbar-credit-badge" class="badge badge-accent" title="Your Credit Balance">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
       <span>{{ user_credits|default:30 }} Credits</span>
     </a>
 
