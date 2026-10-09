@@ -3,13 +3,14 @@ from datetime import timedelta
 
 from django.core.management.base import BaseCommand
 from django.db import OperationalError, transaction
+from django.db.models import Case, Exists, OuterRef, Q, Value, When
 from django.utils import timezone
 
 from prep.models import PrepNotePrecomputeJob, PrepTopic, PrepTopicNotesJob
 
 
 class Command(BaseCommand):
-    help = "Prepare shared Level 2 course notes from the durable publication queue."
+    help = "Prepare all shared note levels from the durable publication queue."
 
     def add_arguments(self, parser):
         parser.add_argument("--once", action="store_true", help="Process available jobs, then exit.")
@@ -61,11 +62,27 @@ class Command(BaseCommand):
         ).update(status="pending", started_at=None)
 
     def _claim_topic_notes_job(self):
+        completed_level_two = PrepTopicNotesJob.objects.filter(
+            topic_id=OuterRef("topic_id"),
+            level="level_2",
+            source_signature=OuterRef("source_signature"),
+            status="complete",
+        )
         with transaction.atomic():
             job = (
                 PrepTopicNotesJob.objects.select_for_update(skip_locked=True)
                 .filter(status="pending")
-                .order_by("queued_at", "id")
+                .annotate(level_two_complete=Exists(completed_level_two))
+                .exclude(Q(level__in=["level_1", "level_3"]) & Q(level_two_complete=False))
+                .order_by(
+                    Case(
+                        When(level="level_2", then=Value(0)),
+                        When(level="level_1", then=Value(1)),
+                        default=Value(2),
+                    ),
+                    "queued_at",
+                    "id",
+                )
                 .first()
             )
             if not job:
@@ -95,65 +112,30 @@ class Command(BaseCommand):
             return job
 
     def _process_job(self, job):
-        from services.prep_ai_router import (
-            _topic_notes_cache_signature,
-            get_or_generate_topic_notes,
-        )
-        from services.credit_service import credits_for_usage
-        from services.prep_course_billing import create_shared_course_cost, settle_course_cost_share
-
         try:
-            course = job.course
-            topics = PrepTopic.objects.filter(course=course, is_active=True).order_by("order", "id")
-            for topic in topics.iterator():
-                job.started_at = timezone.now()
-                job.save(update_fields=["started_at"])
-                result = get_or_generate_topic_notes(
-                    course.code,
-                    topic.title,
-                    subtopics=topic.subtopics if isinstance(topic.subtopics, list) else [],
-                    level="level_2",
-                    course_obj=course,
-                    topic_obj=topic,
-                )
-                notes = str(result.get("notes") or result.get("content") or "").strip()
-                if not notes:
-                    raise RuntimeError(result.get("error") or f"No validated Level 2 notes for {topic.title}.")
+            from services.prep_note_precompute import enqueue_course_topic_note_jobs
 
-                if not result.get("cached"):
-                    usage = result.get("usage") or {}
-                    cost_credits = credits_for_usage(usage, minimum=1)
-                    signature = _topic_notes_cache_signature(
-                        course,
-                        topic,
-                        topic.title,
-                        topic.subtopics,
-                    )
-                    cost = create_shared_course_cost(
-                        course=course,
-                        cost_type="topic_notes",
-                        total_credits=cost_credits,
-                        source_key=f"topic-notes:{topic.pk}:level_2:{signature}",
-                        topic=topic,
-                        level="level_2",
-                        usage=usage,
-                        model_name=result.get("model") or "deepseek-chat",
-                    )
-                    for share in cost.shares.select_related("user", "cost").all():
-                        settle_course_cost_share(share)
-
+            queued = enqueue_course_topic_note_jobs(job.course)
             job.status = "complete"
             job.completed_at = timezone.now()
+            job.last_error = ""
             job.save(update_fields=["status", "completed_at", "last_error"])
-            self.stdout.write(self.style.SUCCESS(f"Prepared Level 2 notes for {course.code}."))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Queued all-level note preparation for {job.course.code} "
+                    f"({queued} topic-level jobs)."
+                )
+            )
         except Exception as exc:
             job.last_error = str(exc)[:4000]
             job.status = "pending" if job.attempts < 3 else "failed"
             job.save(update_fields=["status", "last_error"])
-            self.stderr.write(self.style.ERROR(f"Level 2 precompute failed for {job.course.code}: {exc}"))
+            self.stderr.write(self.style.ERROR(f"Course notes precompute failed for {job.course.code}: {exc}"))
 
     def _process_topic_notes_job(self, job):
         from services.prep_ai_router import (
+            _note_completion_issues,
+            _note_validation_options,
             _topic_notes_cache_signature,
             get_or_generate_topic_notes,
         )
@@ -171,23 +153,44 @@ class Command(BaseCommand):
                 topic_obj=topic,
             )
             notes = str(result.get("notes") or result.get("content") or "").strip()
+            usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
+            model_name = str(result.get("model") or result.get("model_used") or "")
             if not notes:
-                job.status = "failed"
-                job.last_error = str(
+                raise RuntimeError(
                     result.get("error") or "The notes provider did not return validated notes."
-                )[:4000]
-                job.completed_at = timezone.now()
-                job.save(update_fields=["status", "last_error", "completed_at"])
-                self.stderr.write(
-                    self.style.ERROR(
-                        f"Topic notes generation failed for topic {topic.pk} ({job.level}): "
-                        f"{job.last_error}"
-                    )
                 )
-                return
+            if result.get("stale"):
+                raise RuntimeError("A stale note cannot complete a job for the current source version.")
+            review_status = result.get("review_status")
+            if review_status and review_status != "passed":
+                raise RuntimeError(
+                    "The notes worker rejected notes without a successful independent review: "
+                    + str(review_status)
+                )
+            if not result.get("cached") and review_status != "passed":
+                raise RuntimeError(
+                    "Fresh notes cannot complete a job without a successful independent review."
+                )
 
-            if not result.get("cached"):
-                usage = result.get("usage") or {}
+            validation_options = _note_validation_options(
+                topic.course,
+                topic.title,
+                topic.summary,
+                topic.subtopics,
+                topic_obj=topic,
+            )
+            validation_issues = _note_completion_issues(
+                notes,
+                topic.title,
+                **validation_options,
+            )
+            if validation_issues:
+                raise RuntimeError(
+                    "The notes worker rejected unvalidated content: "
+                    + "; ".join(validation_issues)
+                )
+
+            if not result.get("cached") and job.level == "level_2":
                 signature = _topic_notes_cache_signature(
                     topic.course,
                     topic,
@@ -202,7 +205,7 @@ class Command(BaseCommand):
                     topic=topic,
                     level=job.level,
                     usage=usage,
-                    model_name=result.get("model") or "deepseek-chat",
+                    model_name=model_name or "deepseek-chat",
                 )
                 for share in cost.shares.select_related("user", "cost").all():
                     settle_course_cost_share(share)
@@ -210,14 +213,24 @@ class Command(BaseCommand):
             job.status = "complete"
             job.completed_at = timezone.now()
             job.last_error = ""
-            job.save(update_fields=["status", "completed_at", "last_error"])
+            job.provider_usage = usage
+            job.model_name = model_name
+            job.save(
+                update_fields=[
+                    "status",
+                    "completed_at",
+                    "last_error",
+                    "provider_usage",
+                    "model_name",
+                ]
+            )
             self.stdout.write(
                 self.style.SUCCESS(f"Prepared {job.level} notes for topic {topic.pk}.")
             )
         except Exception as exc:
-            job.status = "failed"
+            job.status = "pending" if job.attempts < 3 else "failed"
             job.last_error = str(exc)[:4000]
-            job.completed_at = timezone.now()
+            job.completed_at = timezone.now() if job.status == "failed" else None
             job.save(update_fields=["status", "last_error", "completed_at"])
             self.stderr.write(
                 self.style.ERROR(

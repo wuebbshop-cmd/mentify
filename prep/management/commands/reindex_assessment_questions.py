@@ -1,25 +1,24 @@
 from collections import Counter
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
 
 from prep.models import PrepDocument
 from services.prep_ingestion import (
     assessment_question_rendering_issues,
     extract_assessment_questions,
-    index_assessment_questions,
 )
+from services.prep_assessment_index import enqueue_assessment_index
 
 
 class Command(BaseCommand):
-    help = "Audit or reindex published CAT and final-paper questions without AI calls."
+    help = "Audit published assessment papers or queue them for background reindexing."
 
     def add_arguments(self, parser):
         parser.add_argument("--course-code", action="append", dest="course_codes")
         parser.add_argument(
             "--apply",
             action="store_true",
-            help="Reindex linked stage_3 CAT/final papers. No AI reconstruction is performed.",
+            help="Queue linked stage_3 papers for the dedicated background assessment worker.",
         )
 
     def handle(self, *args, **options):
@@ -71,7 +70,7 @@ class Command(BaseCommand):
         if not options["apply"]:
             self.stdout.write("DRY RUN: no questions changed and no AI calls made.")
         total_parsed = 0
-        total_created = 0
+        queued_jobs = 0
         for document, paper, parsed_count, flagged_count in candidates:
             total_parsed += parsed_count
             self.stdout.write(
@@ -82,18 +81,19 @@ class Command(BaseCommand):
                 f"| parsed_questions={parsed_count} | extraction_flags={flagged_count}"
             )
             if options["apply"]:
-                with transaction.atomic():
-                    created = index_assessment_questions(
-                        document,
-                        paper,
-                        reconstruct_invalid=False,
-                    )
-                total_created += created
-                self.stdout.write(f"  newly indexed questions: {created}")
+                _, created = enqueue_assessment_index(
+                    paper,
+                    reconstruct_invalid=False,
+                    force=True,
+                )
+                queued_jobs += int(created)
+                self.stdout.write(
+                    f"  {'queued new job' if created else 'job already exists'}"
+                )
 
         self.stdout.write(
             f"Assessment documents: {len(candidates)}; parsed question instances: {total_parsed}; "
-            f"newly indexed questions: {total_created}; "
+            f"new indexing jobs queued: {queued_jobs}; "
             f"unlinked source documents: {unlinked_count}."
         )
         if flag_reasons:

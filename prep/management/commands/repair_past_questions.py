@@ -263,7 +263,8 @@ class Command(BaseCommand):
                 )
                 confidence = metadata.get("model_confidence")
                 if (
-                    isinstance(confidence, (int, float))
+                    metadata.get("source_review_status") == "pass"
+                    and isinstance(confidence, (int, float))
                     and not isinstance(confidence, bool)
                     and _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD <= confidence <= 1
                     and not metadata.get("adapted_question_validation_issues")
@@ -271,8 +272,8 @@ class Command(BaseCommand):
                     existing.verification_status = "reconstructed"
                     metadata["review_status"] = "auto_validated"
                     metadata["reason"] = (
-                        "Previously generated adaptation passed deterministic validation "
-                        "and met the confidence threshold."
+                        "Previously generated adaptation passed deterministic validation, "
+                        "independent source review, and the confidence threshold."
                     )
                     existing.reconstruction_metadata = metadata
                     existing.save(update_fields=["verification_status", "reconstruction_metadata"])
@@ -282,7 +283,7 @@ class Command(BaseCommand):
                     awaiting_review += 1
                     self.stderr.write(
                         f"Q{question.number} id={question.id} already has a structurally valid "
-                        "adaptation without evidence meeting the auto-validation threshold; "
+                        "adaptation without a passing source review and confidence evidence; "
                         "not spending credits on an automatic retry."
                     )
                     continue
@@ -314,6 +315,7 @@ class Command(BaseCommand):
                 confidence = metadata.get("model_confidence")
                 auto_approved = (
                     not item_issues
+                    and metadata.get("source_review_status") == "pass"
                     and isinstance(confidence, (int, float))
                     and not isinstance(confidence, bool)
                     and _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD <= confidence <= 1
@@ -327,9 +329,9 @@ class Command(BaseCommand):
                 metadata.update({
                     "review_status": "auto_validated" if auto_approved else "pending",
                     "reason": (
-                        "AI reconstruction passed deterministic validation and the confidence threshold."
+                        "AI reconstruction passed deterministic validation, source review, and the confidence threshold."
                         if auto_approved
-                        else "AI reconstruction requires review because confidence was below threshold or unavailable."
+                        else "AI reconstruction requires review because source review failed or confidence was below threshold or unavailable."
                     ),
                     "auto_validation_threshold": _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD,
                     "source_question_id": str(question.pk),

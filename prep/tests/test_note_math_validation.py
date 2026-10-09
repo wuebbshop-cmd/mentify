@@ -33,6 +33,7 @@ from services.prep_ai_router import (
     _markdown_theorem_issues,
     _note_repair_scope,
     _parse_topic_note_repair_patch,
+    _review_topic_note_content,
     _note_allows_code,
     _note_completion_issues,
     call_deepseek,
@@ -46,6 +47,7 @@ from services.prep_ai_router import (
     _insert_required_visual_markers,
     _normalize_approved_visual_captions,
     _note_completion_issues,
+    _unavailable_visual_reference_issues,
     _topic_notes_cache_signature,
     _strip_course_administrative_front_matter,
     compute_cache_key,
@@ -56,6 +58,7 @@ from services.prep_ai_router import (
     normalize_math_delimiters,
     repair_json_escaped_latex_newlines,
     robust_json_loads,
+    route_math_request,
     store_cached_content,
 )
 from services.prep_blocks import parse_markdown_to_blocks
@@ -74,7 +77,185 @@ class ReindexCourseTopicReportTests(SimpleTestCase):
         )
 
 
-class NoteMathValidationTests(TestCase):
+class TopicNoteReviewTests(SimpleTestCase):
+    @patch("services.prep_ai_router.call_deepseek")
+    @override_settings(
+        DEEPSEEK_CHAT_MODEL="deepseek-flash",
+        DEEPSEEK_REASONER_MODEL="deepseek-v4-pro",
+    )
+    def test_repair_model_override_uses_the_configured_reasoner(self, provider_call):
+        provider_call.return_value = {"success": True, "content": "Repaired section."}
+
+        route_math_request(
+            "Repair this affected note section.",
+            "ECO 101",
+            is_complex_proof=False,
+            model_override="deepseek-v4-pro",
+        )
+
+        self.assertEqual(provider_call.call_args.kwargs["model"], "deepseek-v4-pro")
+
+    @patch("services.prep_ai_router.call_deepseek")
+    @patch("services.prep_ai_router._approved_course_source_context")
+    def test_source_grounded_review_returns_section_specific_findings(
+        self,
+        source_context,
+        review_request,
+    ):
+        from types import SimpleNamespace
+
+        topic = SimpleNamespace(
+            course=SimpleNamespace(code="ECO 101"),
+            title="Demand",
+        )
+        source_context.return_value = "Approved source says demand falls as price rises."
+        review_request.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "issues": [{
+                    "section": 2,
+                    "severity": "error",
+                    "description": "The notes reverse the demand relationship.",
+                    "source_evidence": "demand falls as price rises",
+                }],
+            }),
+            "usage": {"total_tokens": 40},
+            "model_used": "deepseek-v4-pro",
+        }
+
+        result = _review_topic_note_content(
+            topic,
+            "level_2",
+            "## 2. Demand\n\nDemand rises as price rises.",
+        )
+
+        self.assertTrue(result["success"])
+        self.assertEqual(len(result["issues"]), 1)
+        self.assertTrue(result["issues"][0].startswith("review section 2:"))
+        self.assertEqual(result["usage"]["total_tokens"], 40)
+        self.assertEqual(result["model_used"], "deepseek-v4-pro")
+
+    @patch("services.prep_ai_router.call_deepseek")
+    @patch("services.prep_ai_router._approved_course_source_context")
+    def test_review_rejects_a_section_number_not_present_in_the_notes(
+        self,
+        source_context,
+        review_request,
+    ):
+        from types import SimpleNamespace
+
+        topic = SimpleNamespace(
+            course=SimpleNamespace(code="ECO 101"),
+            title="Demand",
+        )
+        source_context.return_value = "Approved source."
+        review_request.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "issues": [{
+                    "section": 9,
+                    "severity": "error",
+                    "description": "Unsupported statement.",
+                    "source_evidence": "Approved source.",
+                }],
+            }),
+            "usage": {},
+        }
+
+        result = _review_topic_note_content(
+            topic,
+            "level_2",
+            "## 2. Demand\n\nStudy notes.",
+        )
+
+        self.assertFalse(result["success"])
+        self.assertIn("invalid section", result["error"])
+
+    @patch("services.prep_ai_router._approved_course_source_context")
+    def test_review_reports_when_no_approved_source_is_available(self, source_context):
+        from types import SimpleNamespace
+
+        topic = SimpleNamespace(
+            course=SimpleNamespace(code="ECO 101"),
+            title="Demand",
+        )
+        source_context.return_value = ""
+
+        result = _review_topic_note_content(topic, "level_2", "## 2. Demand")
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["skipped"], "No approved source excerpt is available for independent comparison.")
+
+
+class VisualReferencePlacementTests(SimpleTestCase):
+    def test_approved_crops_follow_matching_diagram_references(self):
+        content = (
+            "## 3. Opportunity Cost\n\n"
+            "A straight production possibility frontier has constant opportunity cost because its slope does not change.\n\n"
+            "With increasing opportunity cost, the production possibility frontier is concave to the origin, and its slope becomes steeper.\n\n"
+            "This prose explains the concept fully without depending on the images."
+        )
+        visuals = [
+            {
+                "id": "straight-ppf",
+                "marker": "[[VISUAL:straight-ppf]]",
+                "crop_url": "/media/straight-ppf.jpg",
+                "required": True,
+                "auto_match_terms": ["straight", "production possibility frontier", "constant opportunity cost"],
+                "caption": "Straight production possibility frontier",
+                "labels": [],
+                "context_before": "",
+                "context_after": "",
+            },
+            {
+                "id": "concave-ppf",
+                "marker": "[[VISUAL:concave-ppf]]",
+                "crop_url": "/media/concave-ppf.jpg",
+                "required": True,
+                "auto_match_terms": ["concave", "increasing opportunity cost", "frontier"],
+                "caption": "Concave production possibility frontier",
+                "labels": [],
+                "context_before": "",
+                "context_after": "",
+            },
+        ]
+
+        placed = _insert_required_visual_markers(content, visuals)
+        first_reference = placed.index("A straight production possibility frontier")
+        second_reference = placed.index("With increasing opportunity cost")
+        first_image = placed.index(visuals[0]["marker"])
+        second_image = placed.index(visuals[1]["marker"])
+        rendered = placed
+        for visual in visuals:
+            rendered = rendered.replace(
+                visual["marker"],
+                f"![{visual['caption']}]({visual['crop_url']})",
+            )
+
+        self.assertGreater(first_image, first_reference)
+        self.assertGreater(second_image, second_reference)
+        self.assertLess(first_image, second_image)
+        self.assertEqual(_unavailable_visual_reference_issues(rendered), [])
+
+
+class MockIndependentNoteReviewer:
+    def setUp(self):
+        super().setUp()
+        reviewer = patch(
+            "services.prep_ai_router._review_topic_note_content",
+            return_value={
+                "success": True,
+                "issues": [],
+                "usage": {},
+                "model_used": "test-note-reviewer",
+                "report": {"issues": []},
+            },
+        )
+        reviewer.start()
+        self.addCleanup(reviewer.stop)
+
+
+class NoteMathValidationTests(MockIndependentNoteReviewer, TestCase):
     def test_normalization_separates_greek_command_from_following_identifier(self):
         malformed = r"The characteristic equation is $|A-\lambdaI|=0$."
 
@@ -350,7 +531,41 @@ $$ not mathematical output
         for discipline, content in examples:
             with self.subTest(discipline=discipline):
                 issues = _note_completion_issues(content, "Visual Concepts")
-                self.assertIn("notes refer to a figure that is not included nearby", issues)
+                self.assertIn(
+                    "notes refer to a visual instead of explaining the concept independently",
+                    issues,
+                )
+
+    def test_visual_callouts_are_rejected_even_when_the_image_is_present(self):
+        examples = [
+            "In the diagram above, the demand curve slopes downwards.",
+            "For increasing opportunity cost, the following diagram is used.",
+            "The diagram shows how opportunity cost rises.",
+            "A reader who cannot see the diagram should still understand this explanation.",
+        ]
+        for content in examples:
+            with self.subTest(content=content):
+                issues = _note_completion_issues(
+                    f"{content}\n\n![Approved diagram](/media/approved-diagram.jpg)",
+                    "Visual Concepts",
+                )
+                self.assertIn(
+                    "notes refer to a visual instead of explaining the concept independently",
+                    issues,
+                )
+
+    def test_visual_concept_explanation_without_callouts_is_allowed(self):
+        content = (
+            "As price rises, buyers demand less of the good, so the demand curve slopes downward. "
+            "The horizontal axis measures quantity and the vertical axis measures price."
+        )
+
+        issues = _note_completion_issues(content, "Visual Concepts")
+
+        self.assertNotIn(
+            "notes refer to a visual instead of explaining the concept independently",
+            issues,
+        )
 
     def test_course_front_matter_is_removed_without_removing_subject_content(self):
         source = (
@@ -384,7 +599,10 @@ $$ not mathematical output
 
         issues = _note_completion_issues(content, "Visual Concepts")
 
-        self.assertNotIn("notes refer to a figure that is not included nearby", issues)
+        self.assertNotIn(
+            "notes refer to a visual instead of explaining the concept independently",
+            issues,
+        )
 
     def test_raw_html_image_is_rejected(self):
         sections = [
@@ -703,7 +921,7 @@ $$ not mathematical output
         mock_route.assert_called_once()
 
 
-class InvalidCachedNoteRecoveryTests(TestCase):
+class InvalidCachedNoteRecoveryTests(MockIndependentNoteReviewer, TestCase):
     valid_notes = """## 1. One
 
 Text.
@@ -731,6 +949,7 @@ $$
 """
 
     def setUp(self):
+        super().setUp()
         self.user = User.objects.create_user(
             username="note_validation_user",
             email="note-validation@example.test",
@@ -747,6 +966,65 @@ $$
             title="Sequences",
             slug="sequences",
         )
+
+    @patch("services.prep_ai_router._approved_course_source_context", return_value="Approved source evidence.")
+    @patch("services.prep_ai_router._review_topic_note_content")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_factual_review_repairs_only_flagged_section_then_rechecks(
+        self,
+        generation_request,
+        review_request,
+        source_context,
+    ):
+        replacement = self.valid_notes.split("## 2.", 1)[0].strip()
+        generation_request.side_effect = [
+            {
+                "success": True,
+                "content": self.valid_notes,
+                "model_used": "deepseek-flash",
+                "usage": {"prompt_tokens": 100, "completion_tokens": 100, "total_tokens": 200},
+            },
+            {
+                "success": True,
+                "content": replacement,
+                "model_used": "deepseek-v4-pro",
+                "usage": {"prompt_tokens": 80, "completion_tokens": 80, "total_tokens": 160},
+            },
+        ]
+        review_request.side_effect = [
+            {
+                "success": True,
+                "issues": ["review section 1: incorrect claim (source: Approved source evidence.)"],
+                "usage": {"prompt_tokens": 50, "completion_tokens": 20, "total_tokens": 70},
+                "model_used": "deepseek-v4-pro",
+            },
+            {
+                "success": True,
+                "issues": [],
+                "usage": {"prompt_tokens": 40, "completion_tokens": 10, "total_tokens": 50},
+                "model_used": "deepseek-v4-pro",
+                "report": {"issues": []},
+            },
+        ]
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        repair_request.assert_called_once()
+        self.assertTrue(result.get("repaired"), result)
+        self.assertEqual(review_request.call_count, 2)
+        self.assertEqual(generation_request.call_count, 2)
+        self.assertEqual(generation_request.call_args.kwargs["model_override"], "deepseek-v4-pro")
+        self.assertEqual(result["usage"]["total_tokens"], 480)
+        cache = PrepContentCache.objects.get(topic=self.topic, content_type="topic_notes")
+        self.assertEqual(cache.payload["review_status"], "passed")
+        self.assertEqual(cache.payload["review_model"], "deepseek-v4-pro")
+        self.assertIn("## 2. Two", result["notes"])
 
     @patch("services.prep_ai_router.route_math_request")
     def test_revalidated_legacy_cache_clears_stale_review_guard(self, generation_request):
@@ -991,15 +1269,70 @@ $$
             topic_obj=self.topic,
         )
 
+        repair_request.assert_called_once()
         self.assertTrue(result.get("repaired"), result)
         self.assertEqual(result["notes"].strip(), self.valid_notes.strip())
         self.assertEqual(result["usage"]["total_tokens"], 125)
-        repair_request.assert_called_once()
         prompt = route_request.call_args.args[0]
         self.assertIn("Teach as if explaining the idea to a child for the first time", prompt)
         self.assertIn("Use familiar everyday words, short sentences, and one new idea at a time", prompt)
         self.assertIn("give its meaning immediately in plain words", prompt)
         self.assertFalse(PrepContentCache.objects.get(topic=self.topic).payload.get("validation_state") is None)
+
+    @patch("services.prep_ai_router._repair_invalid_note_cache")
+    @patch("services.prep_ai_router.route_math_request")
+    def test_fresh_missing_figure_reference_regenerates_only_the_affected_section(
+        self,
+        route_request,
+        targeted_repair,
+    ):
+        long_notes = self.valid_notes.replace(
+            "## 1. One\n\nText.",
+            "## 1. One\n\n" + ("This prerequisite concept is explained in detail. " * 120),
+        )
+        broken_notes = long_notes.replace(
+            "## 3. Three\n\nText.",
+            "## 3. Three\n\nAs shown in the graph, the quantity increases.",
+        )
+        section_start = long_notes.index("## 3. Three")
+        section_end = long_notes.index("## 4. Four")
+        replacement = long_notes[section_start:section_end].rstrip()
+        route_request.side_effect = [
+            {
+                "success": True,
+                "content": broken_notes,
+                "model_used": "test-notes-model",
+                "usage": {"total_tokens": 100},
+            },
+            {
+                "success": True,
+                "content": replacement,
+                "model_used": "test-repair-model",
+                "usage": {"total_tokens": 25},
+            },
+        ]
+
+        result = get_or_generate_topic_notes(
+            self.course.code,
+            self.topic.title,
+            level="level_2",
+            course_obj=self.course,
+            topic_obj=self.topic,
+        )
+
+        self.assertTrue(result.get("repaired"), result)
+        self.assertNotIn("As shown in the graph", result["notes"])
+        self.assertIn("## 3. Three", result["notes"])
+        self.assertEqual(result["usage"]["total_tokens"], 125)
+        self.assertEqual(route_request.call_count, 2)
+        repair_prompt = route_request.call_args_list[1].args[0]
+        self.assertIn("Existing affected note sections:", repair_prompt)
+        self.assertIn("As shown in the graph", repair_prompt)
+        self.assertNotIn("This prerequisite concept", repair_prompt)
+        targeted_repair.assert_not_called()
+        repair = PrepNoteRepair.objects.get(topic=self.topic, level="level_2")
+        self.assertEqual(repair.status, "validated")
+        self.assertEqual(repair.attempts, 1)
 
     @patch("services.prep_ai_router.call_deepseek")
     @patch("services.prep_ai_router.route_math_request")
@@ -1115,23 +1448,35 @@ $$
         self.assertIsNone(cache.payload.get("validation_state"))
         send_failure_email.assert_called_once_with(guard)
 
-    @patch("services.prep_ai_router.call_together_repair", return_value={"success": False, "error": "repair unavailable"})
     @patch("services.prep_ai_router.route_math_request")
-    def test_unrepaired_missing_figure_wording_does_not_block_self_contained_notes(
-        self,
-        route_request,
-        repair_request,
-    ):
+    def test_unrepaired_missing_figure_wording_is_rejected(self, route_request):
         self_contained_notes = self.valid_notes.replace(
             "## 3. Three\n\nText.",
             "## 3. Three\n\nAs shown in the graph, the quantity rises. The relationship is explained here in text.",
         )
-        route_request.return_value = {
-            "success": True,
-            "content": self_contained_notes,
-            "model_used": "test-notes-model",
-            "usage": {},
-        }
+        section_start = self_contained_notes.index("## 3. Three")
+        section_end = self_contained_notes.index("## 4. Four")
+        invalid_section = self_contained_notes[section_start:section_end].rstrip()
+        route_request.side_effect = [
+            {
+                "success": True,
+                "content": self_contained_notes,
+                "model_used": "test-notes-model",
+                "usage": {},
+            },
+            {
+                "success": True,
+                "content": invalid_section,
+                "model_used": "test-repair-model",
+                "usage": {},
+            },
+            {
+                "success": True,
+                "content": invalid_section,
+                "model_used": "test-repair-model",
+                "usage": {},
+            },
+        ]
 
         result = get_or_generate_topic_notes(
             self.course.code,
@@ -1141,12 +1486,11 @@ $$
             topic_obj=self.topic,
         )
 
-        self.assertEqual(result["notes"].strip(), self_contained_notes.strip())
-        self.assertTrue(result.get("validation_failed") is not True)
-        self.assertEqual(repair_request.call_count, 3)
+        self.assertEqual(result["notes"], "")
+        self.assertTrue(result["validation_failed"])
+        self.assertEqual(route_request.call_count, 3)
         cache = PrepContentCache.objects.get(topic=self.topic, content_type="topic_notes")
-        self.assertEqual(cache.payload.get("validation_state"), NOTE_VALIDATION_STATE)
-        self.assertFalse(PrepNoteGenerationGuard.objects.filter(topic=self.topic, level="level_2").exists())
+        self.assertIsNone(cache.payload.get("validation_state"))
 
     @patch("services.prep_ai_router.route_math_request")
     def test_missing_level_one_and_three_use_the_same_validated_generation_path(self, route_request):
@@ -2662,8 +3006,9 @@ $$
         self.assertTrue(PrepContentCache.objects.filter(pk=other_cache.pk).exists())
 
 
-class SharedPracticeQuestionTests(TestCase):
+class SharedPracticeQuestionTests(MockIndependentNoteReviewer, TestCase):
     def setUp(self):
+        super().setUp()
         self.course = PrepCourse.objects.create(
             code="PRA 101",
             title="Practice Sharing",
@@ -2891,8 +3236,9 @@ class SharedPracticeQuestionTests(TestCase):
         continue_request.assert_called_once()
 
 
-class TopicStudyQuestionRenderingTests(TestCase):
+class TopicStudyQuestionRenderingTests(MockIndependentNoteReviewer, TestCase):
     def setUp(self):
+        super().setUp()
         self.user = User.objects.create_user(
             username="topic_render_user",
             email="topic-render@example.test",

@@ -9,7 +9,14 @@ from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 
 from accounts.models import User
-from prep.models import PrepCourse, PrepDocument, PrepPaper, PrepQuestion, PrepTopic
+from prep.models import (
+    PrepAssessmentIndexJob,
+    PrepCourse,
+    PrepDocument,
+    PrepPaper,
+    PrepQuestion,
+    PrepTopic,
+)
 from prep.admin import PrepQuestionAdmin
 from services.prep_ai_router import _practice_question_issues
 from services.prep_ingestion import (
@@ -127,6 +134,64 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
         )
 
         self.assertTrue(any("unmatched braces" in issue for issue in issues), issues)
+
+    @patch("services.prep_ai_router.call_deepseek")
+    def test_source_review_pass_requires_an_exact_quote_from_the_paper_page(self, call_review):
+        from types import SimpleNamespace
+
+        from services.prep_ai_router import _review_adapted_question_against_source
+
+        page_text = "Question 1: Explain how atomic vectors store values in R. (5 marks)"
+        call_review.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "decision": "pass",
+                "reason": "The replacement asks about the same source-supported topic.",
+                "source_evidence": "Explain how atomic vectors store values in R.",
+            }),
+            "usage": {"total_tokens": 10},
+            "model_used": "review-model",
+        }
+
+        result = _review_adapted_question_against_source(
+            SimpleNamespace(number=1, marks=5, question_latex="BAD OCR"),
+            {
+                "question_latex": "Explain how atomic vectors store values in R.",
+                "solution_latex": "The vector stores values of one type.",
+            },
+            page_text,
+        )
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["source_evidence"], "Explain how atomic vectors store values in R.")
+        self.assertIn(page_text, call_review.call_args.args[0][1]["content"])
+
+    @patch("services.prep_ai_router.call_deepseek")
+    def test_source_review_rejects_approval_without_evidence_from_the_page(self, call_review):
+        from types import SimpleNamespace
+
+        from services.prep_ai_router import _review_adapted_question_against_source
+
+        call_review.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "decision": "pass",
+                "reason": "Looks right.",
+                "source_evidence": "This quote is not in the source.",
+            }),
+            "usage": {},
+            "model_used": "review-model",
+        }
+
+        result = _review_adapted_question_against_source(
+            SimpleNamespace(number=1, marks=5, question_latex="BAD OCR"),
+            {"question_latex": "Replacement", "solution_latex": "Solution"},
+            "The source page has different text.",
+        )
+
+        self.assertFalse(result["success"])
+        self.assertEqual(result["status"], "hold")
 
     def test_flags_stray_leading_closing_braces(self):
         for content in (
@@ -403,7 +468,11 @@ class ExistingPastQuestionRepairTests(TestCase):
 
 
     @patch("services.prep_ai_router.route_math_request")
-    def test_apply_reconstructs_malformed_question_with_topic_context(self, route_request):
+    @patch(
+        "services.prep_ai_router._review_adapted_question_against_source",
+        return_value={"success": True, "status": "pass", "source_evidence": "R notes explain atomic vectors"},
+    )
+    def test_apply_reconstructs_malformed_question_with_topic_context(self, _review_source, route_request):
         source = PrepQuestion.objects.create(
             paper=self.paper,
             topic=self.topic,
@@ -479,7 +548,11 @@ class ExistingPastQuestionRepairTests(TestCase):
         self.assertIn("R notes explain atomic vectors", prompt)
 
     @patch("services.prep_ai_router.route_math_request")
-    def test_high_confidence_reconstruction_is_auto_published_after_validation(self, route_request):
+    @patch(
+        "services.prep_ai_router._review_adapted_question_against_source",
+        return_value={"success": True, "status": "pass", "source_evidence": "R notes explain atomic vectors"},
+    )
+    def test_high_confidence_reconstruction_is_auto_published_after_validation(self, _review_source, route_request):
         source = PrepQuestion.objects.create(
             paper=self.paper,
             topic=self.topic,
@@ -811,8 +884,7 @@ class QuestionIndexProvenanceTests(TestCase):
         )
         route_request.assert_not_called()
 
-    @patch("prep.management.commands.reindex_assessment_questions.index_assessment_questions")
-    def test_reindex_command_dry_run_does_not_write_or_call_ai(self, index_questions):
+    def test_reindex_command_dry_run_does_not_queue_or_call_ai(self):
         course = PrepCourse.objects.create(
             code="QPX 106",
             title="Assessment Command Testing",
@@ -852,7 +924,7 @@ class QuestionIndexProvenanceTests(TestCase):
 
         self.assertIn("DRY RUN", output.getvalue())
         self.assertIn("parsed_questions=1", output.getvalue())
-        index_questions.assert_not_called()
+        self.assertFalse(PrepAssessmentIndexJob.objects.exists())
 
     @patch("services.prep_ai_router.route_math_request")
     def test_damaged_question_is_flagged_with_page_and_never_auto_reconstructed(self, route_request):
@@ -891,7 +963,15 @@ class QuestionIndexProvenanceTests(TestCase):
         route_request.assert_not_called()
 
     @patch("services.prep_ai_router.route_math_request")
-    def test_indexing_automatically_reconstructs_damaged_question_with_topic_evidence(self, route_request):
+    @patch(
+        "services.prep_ai_router._review_adapted_question_against_source",
+        return_value={
+            "success": True,
+            "status": "pass",
+            "source_evidence": "Explain how atomic vectors store values in R.",
+        },
+    )
+    def test_indexing_automatically_reconstructs_damaged_question_with_topic_evidence(self, _review_source, route_request):
         course = PrepCourse.objects.create(
             code="QPX 104",
             title="Automatic Reconstruction Testing",
@@ -963,7 +1043,84 @@ class QuestionIndexProvenanceTests(TestCase):
         self.assertEqual(PrepQuestion.objects.filter(reconstructed_from=source).count(), 1)
 
     @patch("services.prep_ai_router.route_math_request")
-    def test_low_confidence_automatic_reconstruction_stays_pending(self, route_request):
+    @patch(
+        "services.prep_ai_router._review_adapted_question_against_source",
+        return_value={
+            "success": True,
+            "status": "hold",
+            "reason": "The source page does not support the changed condition.",
+        },
+    )
+    def test_high_confidence_reconstruction_is_held_when_source_review_fails(
+        self,
+        _review_source,
+        route_request,
+    ):
+        course = PrepCourse.objects.create(
+            code="QPX 108",
+            title="Source Review Gate Testing",
+            slug="source-review-gate-testing",
+        )
+        topic = PrepTopic.objects.create(
+            course=course,
+            order=1,
+            title="Atomic Vectors",
+            slug="source-review-atomic-vectors",
+            summary="Atomic vectors store values of one data type in R.",
+        )
+        document = PrepDocument.objects.create(
+            course=course,
+            doc_type="Final Examination Paper",
+            file=SimpleUploadedFile("source-review.pdf", b"source PDF"),
+            extracted_text=(
+                "--- Page 4 ---\n"
+                "1. BAD_SOURCE_MARKER \ue000: Explain how atomic vectors store values in R. (5 marks)"
+            ),
+            stage="stage_3",
+        )
+        paper = PrepPaper.objects.create(
+            id="source-review-gate-paper",
+            course=course,
+            title="Final Examination",
+            year="2026",
+            total_marks=5,
+            source_document=document,
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": json.dumps({
+                "marks": 5,
+                "topic_label": topic.title,
+                "question_latex": "Explain how an atomic vector stores values of one data type in R.",
+                "solution_latex": "It stores values of a single type.",
+                "hint": "Consider its storage mode.",
+                "confidence": 0.99,
+            }),
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        index_assessment_questions(document, paper)
+
+        source = PrepQuestion.objects.get(paper=paper, question_type="authentic")
+        adapted = PrepQuestion.objects.get(reconstructed_from=source)
+        self.assertEqual(adapted.verification_status, "pending")
+        self.assertEqual(adapted.reconstruction_metadata["source_review_status"], "hold")
+        self.assertEqual(
+            adapted.reconstruction_metadata["review_status"],
+            "pending",
+        )
+
+    @patch("services.prep_ai_router.route_math_request")
+    @patch(
+        "services.prep_ai_router._review_adapted_question_against_source",
+        return_value={
+            "success": True,
+            "status": "pass",
+            "source_evidence": "Explain how atomic vectors store values in R.",
+        },
+    )
+    def test_low_confidence_automatic_reconstruction_stays_pending(self, _review_source, route_request):
         course = PrepCourse.objects.create(
             code="QPX 105",
             title="Low Confidence Reconstruction Testing",

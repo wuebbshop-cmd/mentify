@@ -1653,7 +1653,8 @@ def prep_adapt_question_api(request):
     reconstruction_metadata = reconstruction_metadata if isinstance(reconstruction_metadata, dict) else {}
     model_confidence = reconstruction_metadata.get("model_confidence")
     auto_validated = (
-        isinstance(model_confidence, (int, float))
+        reconstruction_metadata.get("source_review_status") == "pass"
+        and isinstance(model_confidence, (int, float))
         and not isinstance(model_confidence, bool)
         and 0.8 <= model_confidence <= 1
     )
@@ -1871,6 +1872,32 @@ def prep_topic_notes_api(request):
                 topic_title,
                 subtopics,
             )
+            if level in {"level_1", "level_3"}:
+                level_two_job, level_two_created = PrepTopicNotesJob.objects.get_or_create(
+                    topic=topic_obj,
+                    level="level_2",
+                    source_signature=source_signature,
+                    defaults={"status": "pending"},
+                )
+                if not level_two_created and level_two_job.status == "failed":
+                    level_two_job.status = "pending"
+                    level_two_job.attempts = 0
+                    level_two_job.last_error = ""
+                    level_two_job.provider_usage = {}
+                    level_two_job.model_name = ""
+                    level_two_job.queued_at = timezone.now()
+                    level_two_job.started_at = None
+                    level_two_job.completed_at = None
+                    level_two_job.save(update_fields=[
+                        "status",
+                        "attempts",
+                        "last_error",
+                        "provider_usage",
+                        "model_name",
+                        "queued_at",
+                        "started_at",
+                        "completed_at",
+                    ])
             job, created = PrepTopicNotesJob.objects.get_or_create(
                 topic=topic_obj,
                 level=level,
@@ -1881,6 +1908,8 @@ def prep_topic_notes_api(request):
                 job.status = "pending"
                 job.attempts = 0
                 job.last_error = ""
+                job.provider_usage = {}
+                job.model_name = ""
                 job.started_at = None
                 job.completed_at = None
                 job.queued_at = timezone.now()
@@ -1889,6 +1918,8 @@ def prep_topic_notes_api(request):
                         "status",
                         "attempts",
                         "last_error",
+                        "provider_usage",
+                        "model_name",
                         "started_at",
                         "completed_at",
                         "queued_at",

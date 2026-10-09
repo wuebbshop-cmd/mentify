@@ -1786,6 +1786,7 @@ def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: boo
             confidence = metadata.get("model_confidence")
             accepted = (
                 not adapted_issues
+                and metadata.get("source_review_status") == "pass"
                 and isinstance(confidence, (int, float))
                 and not isinstance(confidence, bool)
                 and _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD <= confidence <= 1
@@ -1794,6 +1795,7 @@ def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: boo
                 "review_status": "auto_validated" if accepted else "pending",
                 "auto_validation_threshold": _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD,
                 "adapted_question_validation_issues": adapted_issues,
+                "source_review_status": metadata.get("source_review_status", "hold"),
             })
             PrepQuestion.objects.create(
                 paper=paper,
@@ -1979,8 +1981,25 @@ def process_prep_document(prep_document) -> dict:
     if not prep_document.file:
         return {"success": False, "error": "No file attached to document."}
 
-    with prep_document.file.open("rb") as uploaded_file:
-        file_content = uploaded_file.read()
+    try:
+        with prep_document.file.open("rb") as uploaded_file:
+            file_content = uploaded_file.read()
+    except (FileNotFoundError, OSError) as exc:
+        if prep_document.extracted_text and prep_document.extracted_text.strip():
+            logger.info(
+                f"[Prep Ingestion] Local file missing for doc {prep_document.id}, "
+                "retaining existing extracted text."
+            )
+            prep_document.stage = "stage_2"
+            prep_document.save(update_fields=["stage", "updated_at"])
+            return {
+                "success": True,
+                "stage": prep_document.stage,
+                "credits_deducted": 0,
+                "topics_indexed": 0,
+                "updates_proposed": 0,
+            }
+        return {"success": False, "error": f"Document file could not be read: {exc}"}
 
     # Stop exact duplicates before storage, OCR, AI extraction, or credit use.
     prep_document.file_sha256 = hashlib.sha256(file_content).hexdigest()

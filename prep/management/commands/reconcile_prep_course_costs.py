@@ -39,9 +39,9 @@ class Command(BaseCommand):
                 stage="stage_3",
                 doc_type__in=["Lecture Notes", "Revision Sheet"],
             ).exists():
-                from services.prep_note_precompute import enqueue_course_level_two_precompute
+                from services.prep_note_precompute import enqueue_course_note_precompute
 
-                _, was_queued = enqueue_course_level_two_precompute(course)
+                _, was_queued = enqueue_course_note_precompute(course)
                 queued += int(was_queued)
         self.stdout.write(self.style.SUCCESS(
             f"Reconciled {total} historical shared costs and queued {queued} published course(s)."

@@ -207,7 +207,7 @@ def ensure_note_access(user, topic, level: str) -> tuple[bool, int]:
         user=user,
         cost__topic=topic,
         cost__cost_type="topic_notes",
-        cost__level=level,
+        cost__level="level_2",
     ).select_related("cost").order_by("cost__created_at", "cost_id")
     for share in shares:
         if not settle_course_cost_share(share):

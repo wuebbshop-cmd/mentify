@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -171,6 +172,8 @@ class PrepTopicNotesJob(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
     attempts = models.PositiveSmallIntegerField(default=0)
     last_error = models.TextField(blank=True)
+    provider_usage = models.JSONField(default=dict, blank=True)
+    model_name = models.CharField(max_length=100, blank=True)
     queued_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
@@ -180,6 +183,58 @@ class PrepTopicNotesJob(models.Model):
             models.UniqueConstraint(
                 fields=["topic", "level", "source_signature"],
                 name="unique_prep_topic_notes_job",
+            ),
+        ]
+        ordering = ["queued_at", "id"]
+
+
+class PrepAssessmentIndexJob(models.Model):
+    """Durable, versioned queue item for indexing one approved assessment paper."""
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("running", "Running"),
+        ("complete", "Complete"),
+        ("failed", "Failed"),
+        ("superseded", "Superseded"),
+    ]
+
+    STAGE_CHOICES = [
+        ("queued", "Queued"),
+        ("indexing", "Indexing"),
+        ("retry_wait", "Waiting to Retry"),
+        ("complete", "Complete"),
+        ("failed", "Failed"),
+        ("superseded", "Superseded"),
+    ]
+
+    paper = models.ForeignKey(
+        "PrepPaper",
+        on_delete=models.CASCADE,
+        related_name="assessment_index_jobs",
+    )
+    source_document = models.ForeignKey(
+        "PrepDocument",
+        on_delete=models.CASCADE,
+        related_name="assessment_index_jobs",
+    )
+    source_signature = models.CharField(max_length=64)
+    reconstruct_invalid = models.BooleanField(default=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
+    stage = models.CharField(max_length=20, choices=STAGE_CHOICES, default="queued")
+    attempts = models.PositiveSmallIntegerField(default=0)
+    indexed_questions = models.PositiveIntegerField(default=0)
+    last_error = models.TextField(blank=True)
+    queued_at = models.DateTimeField(auto_now_add=True)
+    next_attempt_at = models.DateTimeField(default=timezone.now, db_index=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["paper", "source_signature", "reconstruct_invalid"],
+                name="unique_prep_assessment_index_version",
             ),
         ]
         ordering = ["queued_at", "id"]
@@ -595,6 +650,7 @@ class PrepNoteRepair(models.Model):
     original_content = models.TextField()
     current_content = models.TextField()
     validation_issues = models.JSONField(default=list)
+    repair_log = models.JSONField(default=list, blank=True)
     attempts = models.PositiveSmallIntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open", db_index=True)
     last_error = models.TextField(blank=True)

@@ -208,8 +208,13 @@ class CourseSharedBillingTests(TestCase):
         grant_credits(wallet, 2, source="purchased", description="Unlock next topic")
         self.assertTrue(ensure_note_access(self.first_user, topics[1], "level_2")[0])
 
+    @patch("services.prep_ai_router._note_completion_issues", return_value=[])
     @patch("services.prep_ai_router.get_or_generate_topic_notes")
-    def test_worker_precomputes_level_two_and_records_actual_cost(self, generate_notes):
+    def test_worker_fans_out_all_levels_and_records_level_two_bundle_cost(
+        self,
+        generate_notes,
+        validate_notes,
+    ):
         PrepCourseEnrollment.objects.create(user=self.first_user, course=self.course)
         topic = PrepTopic.objects.create(
             course=self.course,
@@ -221,6 +226,7 @@ class CourseSharedBillingTests(TestCase):
         generate_notes.return_value = {
             "notes": "Validated, self-contained Level 2 notes.",
             "cached": False,
+            "review_status": "passed",
             "usage": {"prompt_tokens": 1400, "completion_tokens": 1100, "total_tokens": 2500},
             "model": "test-notes-model",
         }
@@ -230,18 +236,39 @@ class CourseSharedBillingTests(TestCase):
         job.refresh_from_db()
         cost = PrepCourseSharedCost.objects.get(topic=topic, level="level_2")
         self.assertEqual(job.status, "complete")
-        self.assertEqual(generate_notes.call_args.kwargs["level"], "level_2")
+        self.assertEqual(
+            [call.kwargs["level"] for call in generate_notes.call_args_list],
+            ["level_2", "level_1", "level_3"],
+        )
         self.assertEqual(cost.total_credits, 3)
         self.assertEqual(cost.shares.get(user=self.first_user).required_credits, 3)
+        self.assertEqual(
+            set(topic.notes_generation_jobs.values_list("level", flat=True)),
+            {"level_1", "level_2", "level_3"},
+        )
+        level_two_job = topic.notes_generation_jobs.get(level="level_2")
+        self.assertEqual(level_two_job.provider_usage["total_tokens"], 2500)
+        self.assertEqual(level_two_job.model_name, "test-notes-model")
 
+    @patch("services.prep_ai_router._note_completion_issues", return_value=[])
     @patch("services.prep_ai_router.get_or_generate_topic_notes")
-    def test_worker_generates_requested_topic_level_without_web_request(self, generate_notes):
+    def test_worker_generates_level_one_only_after_level_two_is_complete(
+        self,
+        generate_notes,
+        validate_notes,
+    ):
         PrepCourseEnrollment.objects.create(user=self.first_user, course=self.course)
         topic = PrepTopic.objects.create(
             course=self.course,
             order=1,
             title="Elasticity",
             slug="elasticity-async-notes",
+        )
+        level_two_job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="b" * 64,
+            status="complete",
         )
         job = PrepTopicNotesJob.objects.create(
             topic=topic,
@@ -251,6 +278,7 @@ class CourseSharedBillingTests(TestCase):
         generate_notes.return_value = {
             "notes": "Validated, simple Level 1 notes.",
             "cached": False,
+            "review_status": "passed",
             "usage": {"prompt_tokens": 900, "completion_tokens": 600, "total_tokens": 1500},
             "model": "test-notes-model",
         }
@@ -258,11 +286,38 @@ class CourseSharedBillingTests(TestCase):
         call_command("run_prep_note_worker", "--once")
 
         job.refresh_from_db()
-        cost = PrepCourseSharedCost.objects.get(topic=topic, level="level_1")
         self.assertEqual(job.status, "complete")
         self.assertEqual(generate_notes.call_args.kwargs["level"], "level_1")
-        self.assertEqual(cost.total_credits, 2)
-        self.assertEqual(cost.shares.get(user=self.first_user).required_credits, 2)
+        self.assertFalse(PrepCourseSharedCost.objects.filter(topic=topic, level="level_1").exists())
+
+    @patch("services.prep_ai_router._note_completion_issues", return_value=[])
+    @patch("services.prep_ai_router.get_or_generate_topic_notes")
+    def test_worker_does_not_mark_unreviewed_notes_complete(self, generate_notes, validate_notes):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Supply",
+            slug="supply-review-gate",
+        )
+        job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="c" * 64,
+        )
+        generate_notes.return_value = {
+            "notes": "Structurally valid but not source-reviewed notes.",
+            "cached": False,
+            "review_status": "skipped_no_source",
+            "usage": {"total_tokens": 100},
+            "model": "test-notes-model",
+        }
+
+        call_command("run_prep_note_worker", "--once")
+
+        job.refresh_from_db()
+        self.assertEqual(job.status, "failed")
+        self.assertIn("without a successful independent review", job.last_error)
+        self.assertFalse(PrepCourseSharedCost.objects.filter(topic=topic).exists())
 
     def test_completed_course_job_is_requeued_once_for_new_publication(self):
         job = PrepNotePrecomputeJob.objects.create(

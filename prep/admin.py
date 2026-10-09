@@ -26,8 +26,11 @@ from .models import (
     PrepPaper,
     PrepQuestion,
     PrepContentCache,
+    PrepNotePrecomputeJob,
     PrepNoteGenerationGuard,
     PrepNoteRepair,
+    PrepTopicNotesJob,
+    PrepAssessmentIndexJob,
     PrepWallet,
     PrepCreditGrant,
     PrepTransaction,
@@ -427,6 +430,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         published_documents_count = 0
         ingestion_failures = 0
         validation_failures = 0
+        queued_assessment_jobs = 0
         courses_to_precompute = set()
         now = timezone.now()
 
@@ -435,9 +439,8 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                 continue
 
             # Admin publication is the final ingestion gate. Older uploads or
-            # failed requests may still be at Stage 1 with no extracted text;
-            # never publish those rows until ingestion succeeds.
-            if doc.stage == "stage_1" or not doc.extracted_text.strip():
+            # failed requests may have no extracted text; never publish those rows until ingestion succeeds.
+            if not doc.extracted_text.strip():
                 from services.prep_ingestion import process_prep_document
 
                 try:
@@ -504,8 +507,12 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                 if not created and not paper.is_published:
                     paper.is_published = True
                     paper.save()
-                from services.prep_ingestion import index_assessment_questions
-                index_assessment_questions(doc, paper)
+                if paper.source_document_id != doc.pk:
+                    paper.source_document = doc
+                    paper.save(update_fields=["source_document"])
+                from services.prep_assessment_index import enqueue_assessment_index
+                _, queued = enqueue_assessment_index(paper)
+                queued_assessment_jobs += int(queued)
                 published_papers_count += 1
 
             # Log to student's history
@@ -535,17 +542,18 @@ class PrepDocumentAdmin(admin.ModelAdmin):
 
         queued_precomputations = 0
         for course_id in courses_to_precompute:
-            from services.prep_note_precompute import enqueue_course_level_two_precompute
+            from services.prep_note_precompute import enqueue_course_note_precompute
 
             course = PrepCourse.objects.get(pk=course_id)
-            _, queued = enqueue_course_level_two_precompute(course)
+            _, queued = enqueue_course_note_precompute(course)
             queued_precomputations += int(queued)
 
         self.message_user(
             request,
             f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
             f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
-            f"Queued Level 2 note preparation for {queued_precomputations} course(s). "
+            f"Queued all-level note preparation for {queued_precomputations} course(s). "
+            f"Queued {queued_assessment_jobs} assessment indexing job(s). "
             f"Blocked {ingestion_failures} document(s) whose ingestion did not complete and "
             f"{validation_failures} document(s) with validation errors."
         )
@@ -612,17 +620,22 @@ class PrepDocumentAdmin(admin.ModelAdmin):
 
     @admin.action(description="Index approved assessment questions from extracted text")
     def index_assessment_questions(self, request, queryset):
-        from services.prep_ingestion import index_assessment_questions
+        from services.prep_assessment_index import enqueue_assessment_index
 
-        indexed = 0
+        queued = 0
         skipped = 0
         for doc in queryset.filter(doc_type__in=["Continuous Assessment Test (CAT)", "Final Examination Paper"]):
             paper = PrepPaper.objects.filter(source_document=doc).first()
             if not paper:
                 skipped += 1
                 continue
-            indexed += index_assessment_questions(doc, paper)
-        self.message_user(request, f"Indexed {indexed} question(s). Skipped {skipped} document(s) without a linked paper.")
+            _, created = enqueue_assessment_index(paper)
+            queued += int(created)
+        self.message_user(
+            request,
+            f"Queued {queued} assessment indexing job(s). "
+            f"Skipped {skipped} document(s) without a linked paper.",
+        )
 
     @admin.action(description="✕ Reject Selected Documents")
     def reject_document(self, request, queryset):
@@ -1214,8 +1227,134 @@ class PrepNoteRepairAdmin(admin.ModelAdmin):
     search_fields = ("topic__title", "topic__course__code", "source_signature", "last_error")
     readonly_fields = (
         "topic", "level", "source_signature", "cache_key", "original_content",
-        "current_content", "validation_issues", "attempts", "created_at", "updated_at",
+        "current_content", "validation_issues", "repair_log", "attempts",
+        "created_at", "updated_at",
     )
+
+
+@admin.register(PrepNotePrecomputeJob)
+class PrepNotePrecomputeJobAdmin(admin.ModelAdmin):
+    list_display = ("course", "status", "attempts", "queued_at", "completed_at")
+    list_filter = ("status",)
+    search_fields = ("course__code", "course__title", "last_error")
+    readonly_fields = (
+        "course", "status", "attempts", "last_error", "queued_at",
+        "started_at", "completed_at",
+    )
+    actions = ("retry_failed_precomputations",)
+
+    @admin.action(description="Retry failed course note precomputations")
+    def retry_failed_precomputations(self, request, queryset):
+        from services.prep_note_precompute import enqueue_course_note_precompute
+
+        queued = 0
+        course_ids = queryset.filter(status="failed").values_list(
+            "course_id", flat=True
+        ).distinct()
+        for course in PrepCourse.objects.filter(pk__in=course_ids):
+            queued += int(enqueue_course_note_precompute(course)[1])
+        self.message_user(request, f"Requeued {queued} failed course precomputation(s).")
+
+
+@admin.register(PrepTopicNotesJob)
+class PrepTopicNotesJobAdmin(admin.ModelAdmin):
+    list_display = ("topic", "level", "status", "attempts", "model_name", "queued_at", "completed_at")
+    list_filter = ("status", "level", "topic__course")
+    search_fields = ("topic__title", "topic__course__code", "source_signature", "last_error", "model_name")
+    readonly_fields = (
+        "topic", "level", "source_signature", "status", "attempts", "last_error",
+        "provider_usage", "model_name", "queued_at", "started_at", "completed_at",
+    )
+    actions = ("retry_failed_topic_preparations",)
+
+    @admin.action(description="Retry failed note levels for selected courses")
+    def retry_failed_topic_preparations(self, request, queryset):
+        from services.prep_note_precompute import enqueue_course_topic_note_jobs
+
+        course_ids = queryset.filter(status="failed").values_list(
+            "topic__course_id", flat=True
+        ).distinct()
+        queued = 0
+        for course in PrepCourse.objects.filter(pk__in=course_ids):
+            queued += enqueue_course_topic_note_jobs(course)
+        self.message_user(request, f"Requeued {queued} failed topic/level preparation(s).")
+
+
+@admin.register(PrepAssessmentIndexJob)
+class PrepAssessmentIndexJobAdmin(admin.ModelAdmin):
+    list_display = (
+        "paper",
+        "reconstruct_invalid",
+        "status",
+        "stage",
+        "attempts",
+        "indexed_questions",
+        "queued_at",
+        "completed_at",
+    )
+    list_filter = ("status", "stage", "paper__course")
+    search_fields = (
+        "paper__title",
+        "paper__course__code",
+        "source_signature",
+        "last_error",
+    )
+    readonly_fields = (
+        "paper",
+        "source_document",
+        "source_signature",
+        "reconstruct_invalid",
+        "status",
+        "stage",
+        "attempts",
+        "indexed_questions",
+        "last_error",
+        "queued_at",
+        "next_attempt_at",
+        "started_at",
+        "completed_at",
+    )
+    actions = ("retry_failed_assessment_index_jobs",)
+
+    @admin.action(description="Retry failed assessment indexing jobs")
+    def retry_failed_assessment_index_jobs(self, request, queryset):
+        from services.prep_assessment_index import enqueue_assessment_index
+
+        queued = 0
+        superseded = 0
+        for failed_job in queryset.filter(status="failed").select_related("paper"):
+            current_job, created = enqueue_assessment_index(
+                failed_job.paper,
+                reconstruct_invalid=failed_job.reconstruct_invalid,
+            )
+            if created:
+                queued += 1
+            if current_job.pk != failed_job.pk:
+                failed_job.status = "superseded"
+                failed_job.stage = "superseded"
+                failed_job.completed_at = timezone.now()
+                failed_job.last_error = "A newer source version was queued for indexing."
+                failed_job.save(update_fields=[
+                    "status", "stage", "completed_at", "last_error",
+                ])
+                superseded += 1
+                continue
+            failed_job.status = "pending"
+            failed_job.stage = "queued"
+            failed_job.attempts = 0
+            failed_job.next_attempt_at = timezone.now()
+            failed_job.started_at = None
+            failed_job.completed_at = None
+            failed_job.last_error = ""
+            failed_job.save(update_fields=[
+                "status", "stage", "attempts", "next_attempt_at",
+                "started_at", "completed_at", "last_error",
+            ])
+            queued += 1
+        self.message_user(
+            request,
+            f"Requeued {queued} assessment job(s); marked {superseded} outdated job(s) superseded.",
+        )
 
 
 @admin.register(PrepWallet)

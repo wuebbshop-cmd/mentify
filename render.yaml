@@ -99,6 +99,61 @@ services:
         value: mentify@mlaudit.info
       - key: ADMIN_EMAILS_NOTIFICATIONS
         sync: false
+
+  - type: worker
+    name: eduai-assessment-worker
+    runtime: python
+    pythonVersion: 3.11
+    numInstances: 1
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py run_prep_assessment_worker --poll-seconds 5
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_SSL
+        sync: false
+      - key: DB_TABLE_PREFIX
+        sync: false
+      - key: DB_TABLE_SUFFIX
+        sync: false
+      - key: ALLOWED_HOSTS
+        value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
+      - key: DEEPSEEK_API
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: TOGETHERAI_API
+        sync: false
+      - key: TOGETHERAI_ID
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO
+        sync: false
+      - key: GITHUB_BRANCH
+        value: main
+      - key: GITHUB_UPLOAD_DIR
+        value: mentify-uploads
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        value: mentify@mlaudit.info
+      - key: SUPPORT_EMAIL
+        value: mentify@mlaudit.info
+      - key: ADMIN_EMAILS_NOTIFICATIONS
+        sync: false
     
     # ─── Health Check ────────────────────────────────────────────────
     # Optional: Render pings /health/ to check if service is alive

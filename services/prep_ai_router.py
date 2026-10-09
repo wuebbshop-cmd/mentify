@@ -666,6 +666,16 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
         match for match in re.finditer(r"(?ms)(?:^|\n\s*\n)([^\n][\s\S]*?)(?=\n\s*\n|$)", content)
         if match.group(1).strip() and not match.group(1).lstrip().startswith("!")
     ]
+    required_visuals = [
+        visual for visual in manifest
+        if visual.get("required") and visual.get("marker")
+    ]
+    directional_references = [
+        paragraph for paragraph in paragraphs
+        if _DIRECTIONAL_VISUAL_REFERENCE_PATTERN.search(paragraph.group(1))
+    ]
+    use_distinct_reference_targets = len(directional_references) >= len(required_visuals)
+    used_reference_targets = set()
     insertions = []
     generic = {"figure", "graph", "diagram", "curve", "source", "page", "shows", "shown", "this", "that"}
     for visual in manifest:
@@ -691,14 +701,27 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
         }
         best = None
         best_score = 0
+        paragraph_scores = []
         for paragraph in paragraphs:
             paragraph_terms = {
                 token.casefold() for token in re.findall(r"[A-Za-z0-9]+", paragraph.group(1))
             }
             score = len(context_terms & paragraph_terms)
+            paragraph_scores.append((paragraph, score))
             if score > best_score:
                 best = paragraph
                 best_score = score
+        if use_distinct_reference_targets:
+            reference_matches = [
+                (paragraph, score)
+                for paragraph, score in paragraph_scores
+                if paragraph in directional_references
+                and paragraph.start() not in used_reference_targets
+                and score > 0
+            ]
+            if reference_matches:
+                best, _ = max(reference_matches, key=lambda item: item[1])
+                used_reference_targets.add(best.start())
         if best and best_score:
             insertions.append((best.end(), f"\n\n{marker}"))
     for position, insertion in sorted(insertions, reverse=True):
@@ -864,32 +887,37 @@ def _figure_reference_issues(content: str) -> list[str]:
     return issues
 
 
-_MISSING_VISUAL_REFERENCE_ISSUE = "notes refer to a figure that is not included nearby"
+_MISSING_VISUAL_REFERENCE_ISSUE = (
+    "notes refer to a visual instead of explaining the concept independently"
+)
+_VISUAL_REFERENCE_PATTERN = re.compile(
+    r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:(?:in|by)\s+)?(?:the\s+)?"
+    r"(?:figure|diagram|graph|plot|chart|table)"
+    r"|(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table|fig\.?\s*\d+)"
+    r"|(?:in|from|using)\s+(?:the\s+|this\s+|that\s+|following\s+|above\s+|below\s+)?"
+    r"(?:figure|diagram|graph|plot|chart|table)"
+    r"|(?:figure|diagram|graph|plot|chart|table)(?:\s+\d+)?\s+"
+    r"(?:above|below|on\s+the\s+(?:left|right)|shows|illustrates|depicts|indicates)"
+    r"|(?:following|next)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table)"
+    r"|(?:cannot|can't|unable\s+to|not\s+able\s+to)\s+see\s+"
+    r"(?:the\s+)?(?:figure|diagram|graph|plot|chart|table))",
+    re.IGNORECASE,
+)
+_DIRECTIONAL_VISUAL_REFERENCE_PATTERN = re.compile(
+    r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:in\s+)?(?:the\s+)?"
+    r"(?:figure|diagram|graph|plot|chart|table)"
+    r"|(?:figure|diagram|graph|plot|chart|table)\s+(?:above|below|on\s+the\s+(?:left|right))"
+    r"|(?:following|next)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table))",
+    re.IGNORECASE,
+)
 
 
 def _unavailable_visual_reference_issues(content: str) -> list[str]:
-    """Reject wording that points students to a figure not shown nearby."""
+    """Reject figure callouts so lesson prose remains complete without images."""
     source = re.sub(r"```[\s\S]*?```", "", str(content or ""))
-    blocks = re.split(r"\n\s*\n", source)
-    reference_pattern = re.compile(
-        r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:in\s+)?(?:the\s+)?"
-        r"(?:figure|diagram|graph|plot|chart|table)"
-        r"|(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table|fig\.?\s*\d+)"
-        r"|(?:figure|diagram|graph|plot|chart|table)\s+(?:above|below|on\s+the\s+(?:left|right)))\b",
-        re.IGNORECASE,
-    )
-    image_pattern = re.compile(r"!\[[^\]]*\]\([^)]+\)")
-    for index, block in enumerate(blocks):
-        if not reference_pattern.search(block):
-            continue
-        nearby_blocks = blocks[max(0, index - 1):min(len(blocks), index + 2)]
-        if not any(image_pattern.search(nearby) for nearby in nearby_blocks):
-            return [_MISSING_VISUAL_REFERENCE_ISSUE]
+    if _VISUAL_REFERENCE_PATTERN.search(source):
+        return [_MISSING_VISUAL_REFERENCE_ISSUE]
     return []
-
-
-def _only_missing_visual_reference_issue(issues: list[str]) -> bool:
-    return bool(issues) and all(issue == _MISSING_VISUAL_REFERENCE_ISSUE for issue in issues)
 
 
 def _course_administrative_metadata_issues(content: str) -> list[str]:
@@ -994,17 +1022,155 @@ def _note_needs_section_regeneration(issues: list[str]) -> bool:
     """Identify failures that cannot be fixed with an old_block/new_block patch."""
     return any(
         issue.startswith("missing section")
+        or issue.startswith("review section ")
         or issue.startswith("figure marker table row has no figure")
+        or issue == _MISSING_VISUAL_REFERENCE_ISSUE
         or issue == "figure summary contains empty reference placeholders"
         or issue in {
-            "unclosed display-math block",
-            "unclosed fenced code block",
-            "content ends at an escape delimiter",
             "final section has insufficient content",
             "code block is not allowed for this topic",
         }
         for issue in issues
     )
+
+
+def _review_topic_note_content(topic_obj, level: str, content: str) -> dict:
+    """Use an independent source-grounded model to flag likely factual errors."""
+    source_excerpt = _approved_course_source_context(topic_obj.course, topic_obj.title)
+    if not source_excerpt:
+        return {
+            "success": True,
+            "issues": [],
+            "usage": {},
+            "model_used": getattr(settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"),
+            "skipped": "No approved source excerpt is available for independent comparison.",
+        }
+
+    model = getattr(settings, "DEEPSEEK_NOTE_REVIEW_MODEL", None) or getattr(
+        settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"
+    )
+    result = call_deepseek(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You are an independent fact-checker for university study notes. Compare only "
+                    "the supplied notes with the approved course source. Report clear factual "
+                    "contradictions, unsupported material claims, or materially incorrect formulas. "
+                    "Do not report style preferences, omissions that are not required, or claims "
+                    "that are merely worded differently. Return exactly one JSON object: "
+                    '{"issues":[{"section":1,"severity":"error","description":"...","source_evidence":"..."}]}. '
+                    "Use an empty issues array when the notes are supported. Report at most eight findings. "
+                    "Each issue must identify one numbered section and quote exact concise source evidence. "
+                    "Do not rewrite the notes."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Course: {topic_obj.course.code}\nTopic: {topic_obj.title}\nLevel: {level}\n"
+                    "APPROVED COURSE MATERIAL:\n"
+                    f"{source_excerpt}\n\n"
+                    "NOTES TO REVIEW:\n"
+                    f"{content[:40000]}"
+                ),
+            },
+        ],
+        model=model,
+        max_tokens=2500,
+        auto_continue=False,
+        thinking_enabled=False,
+    )
+    if not result.get("success") or not result.get("content"):
+        return {
+            "success": False,
+            "issues": [],
+            "usage": result.get("usage", {}),
+            "model_used": result.get("model_used") or model,
+            "error": result.get("error") or "The independent note review returned no result.",
+            "raw_response": str(result.get("content") or "")[:4000],
+        }
+
+    try:
+        report = robust_json_loads(result["content"])
+    except ValueError as exc:
+        return {
+            "success": False,
+            "issues": [],
+            "usage": result.get("usage", {}),
+            "model_used": result.get("model_used") or model,
+            "error": f"The independent review response was not valid JSON: {exc}",
+            "raw_response": str(result.get("content") or "")[:4000],
+        }
+    raw_issues = report.get("issues") if isinstance(report, dict) else None
+    if not isinstance(raw_issues, list):
+        return {
+            "success": False,
+            "issues": [],
+            "usage": result.get("usage", {}),
+            "model_used": result.get("model_used") or model,
+            "error": "The independent review response did not contain an issues list.",
+            "raw_response": str(result.get("content") or "")[:4000],
+        }
+    if len(raw_issues) > 8:
+        return {
+            "success": False,
+            "issues": [],
+            "usage": result.get("usage", {}),
+            "model_used": result.get("model_used") or model,
+            "error": "The independent review returned more than eight findings.",
+            "raw_response": str(result.get("content") or "")[:4000],
+        }
+
+    issues = []
+    note_sections = {
+        int(match.group(1))
+        for match in re.finditer(r"(?m)^\s*##\s+(\d+)\.", content)
+    }
+    normalized_source = re.sub(r"\s+", " ", source_excerpt).casefold()
+    for item in raw_issues[:8]:
+        if not isinstance(item, dict):
+            return {
+                "success": False,
+                "issues": [],
+                "usage": result.get("usage", {}),
+                "model_used": result.get("model_used") or model,
+                "error": "The independent review returned a malformed issue entry.",
+                "raw_response": str(result.get("content") or "")[:4000],
+            }
+        section = item.get("section")
+        description = str(item.get("description") or "").strip()
+        evidence = str(item.get("source_evidence") or "").strip()
+        severity = str(item.get("severity") or "").strip().lower()
+        normalized_evidence = re.sub(r"\s+", " ", evidence).casefold()
+        if (
+            type(section) is not int
+            or section not in note_sections
+            or severity not in {"error", "critical"}
+            or not description
+            or not evidence
+            or normalized_evidence not in normalized_source
+        ):
+            return {
+                "success": False,
+                "issues": [],
+                "usage": result.get("usage", {}),
+                "model_used": result.get("model_used") or model,
+                "error": "The independent review issue had an invalid section, severity, description, or source evidence.",
+                "raw_response": str(result.get("content") or "")[:4000],
+            }
+        issues.append(
+            f"review section {section}: {description[:500]} "
+            f"(source: {evidence[:500]})"
+        )
+    return {
+        "success": True,
+        "issues": issues,
+        "usage": result.get("usage", {}),
+        "model_used": result.get("model_used") or model,
+        "report": report,
+        "raw_response": str(result.get("content") or "")[:4000],
+    }
 
 
 def _regenerate_invalid_note_sections(
@@ -1031,6 +1197,10 @@ def _regenerate_invalid_note_sections(
             local_issues = [issue for issue in local_issues if issue != "final section has insufficient content"]
         if local_issues:
             section_issues[number] = local_issues
+    for issue in issues:
+        review_section = re.match(r"review section (\d+):", issue)
+        if review_section:
+            section_issues.setdefault(int(review_section.group(1)), []).append(issue)
 
     affected_numbers = set(section_issues) | missing_numbers
     if not affected_numbers:
@@ -1071,10 +1241,26 @@ def _regenerate_invalid_note_sections(
         return None
 
     working_content = repair.current_content or content
-    for _ in range(repair.attempts, 2):
+    repair_usage = {}
+    for _ in range(2):
         repair.attempts += 1
         repair.validation_issues = issues
         repair.save(update_fields=["attempts", "validation_issues", "updated_at"])
+        working_headings = list(re.finditer(r"(?m)^\s*##\s+(\d+)\.[^\n]*", working_content))
+        working_first = next(
+            (heading for heading in working_headings if int(heading.group(1)) == first_number),
+            None,
+        )
+        working_next = next(
+            (heading for heading in working_headings if int(heading.group(1)) > last_number),
+            None,
+        )
+        if working_first:
+            affected_content = working_content[
+                working_first.start():working_next.start() if working_next else len(working_content)
+            ]
+        else:
+            affected_content = working_content
         code_instruction = (
             "Code is permitted only when directly required by the topic.\n"
             if allows_code
@@ -1085,10 +1271,15 @@ def _regenerate_invalid_note_sections(
             f"Topic: {topic_obj.title}\nLevel: {level}\n"
             "Preserve the existing valid sections exactly. Return only the replacement sections, "
             "including their Markdown headings. Use the required Markdown and KaTeX rules.\n"
+            "Explain every concept fully in plain prose so it remains understandable without images. "
+            "Never refer to a figure, diagram, graph, chart, table, or image in the prose, including "
+            "phrases such as 'as shown above', 'in the diagram', or 'see Figure 1', even when an image "
+            "is included. Approved source images may remain beside the explanation but must not be "
+            "required to understand it. Never invent image URLs or figure IDs.\n"
             + code_instruction
             + "Validation errors:\n" + json.dumps(issues) + "\n"
             + "Approved coursework source:\n" + source_excerpt + "\n"
-            "Existing note context:\n" + working_content[:4000]
+            "Existing affected note sections:\n" + affected_content[:12000]
         )
         result = route_math_request(
             prompt,
@@ -1096,18 +1287,62 @@ def _regenerate_invalid_note_sections(
             topic_label=topic_obj.title,
             is_complex_proof=False,
             thinking_enabled=False,
+            model_override=getattr(settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"),
         )
+        repair_log = repair.repair_log if isinstance(repair.repair_log, list) else []
+        repair_log.append({
+            "stage": "section_regeneration",
+            "attempt": repair.attempts,
+            "model": result.get("model_used") or getattr(settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"),
+            "issues": issues[:20],
+            "response": str(result.get("content") or "")[:2000],
+            "error": str(result.get("error") or "")[:1000],
+        })
+        repair.repair_log = repair_log[-10:]
+        repair.save(update_fields=["repair_log", "updated_at"])
         if not result.get("success") or not result.get("content"):
             continue
+        repair_usage = _merge_usage(repair_usage, result.get("usage", {}))
         replacement = normalize_math_delimiters(result["content"]).strip()
         candidate = prefix.rstrip() + "\n\n" + replacement
         if suffix:
             candidate += "\n\n" + suffix.lstrip()
+        visual_manifest = _approved_visual_manifest(validation_options["source_references"])
+        candidate = _insert_required_visual_markers(candidate, visual_manifest)
+        candidate = _resolve_approved_visual_markers(candidate, validation_options["source_references"])
+        candidate = _dedupe_approved_visual_images(candidate, validation_options["source_references"])
+        candidate = _normalize_approved_visual_captions(candidate, validation_options["source_references"])
         candidate_issues = _note_completion_issues(
             candidate,
             topic_obj.title,
             **validation_options,
         )
+        review = None
+        if not candidate_issues:
+            review = _review_topic_note_content(topic_obj, level, candidate)
+            repair_usage = _merge_usage(repair_usage, review.get("usage", {}))
+            repair_log = repair.repair_log if isinstance(repair.repair_log, list) else []
+            repair_log.append({
+                "stage": "independent_review",
+                "attempt": repair.attempts,
+                "model": review.get("model_used", ""),
+                "issues": review.get("issues", [])[:8],
+                "response": str(review.get("raw_response") or "")[:4000],
+                "error": str(review.get("error") or "")[:1000],
+            })
+            repair.repair_log = repair_log[-10:]
+            repair.save(update_fields=["repair_log", "updated_at"])
+            if not review.get("success") or review.get("skipped"):
+                candidate_issues = [
+                    "independent review failed: "
+                    + str(
+                        review.get("error")
+                        or review.get("skipped")
+                        or "review provider returned an unsuccessful response"
+                    )
+                ]
+            else:
+                candidate_issues.extend(review.get("issues", []))
         if candidate_issues:
             working_content = candidate
             issues = candidate_issues
@@ -1129,6 +1364,16 @@ def _regenerate_invalid_note_sections(
             "topic_content_rules_version": _topic_content_rules_version(topic_obj),
             "source_references": validation_options["source_references"],
             "source_signature": source_signature,
+            "review_status": (
+                "skipped_no_source"
+                if review and review.get("skipped")
+                else "passed"
+            ),
+            "review_model": (review or {}).get("model_used", ""),
+            "reviewed_at": timezone.now().isoformat(),
+            "review_report": (review or {}).get("report") or {
+                "skipped": (review or {}).get("skipped", "")
+            },
         })
         entry.payload = payload
         entry.save(update_fields=["payload", "updated_at"])
@@ -1140,8 +1385,13 @@ def _regenerate_invalid_note_sections(
             "notes": candidate,
             "cached": False,
             "repaired": True,
-            "usage": result.get("usage", {}),
+            "usage": repair_usage,
             "model": result.get("model_used", "deepseek-chat"),
+            "review_status": (
+                "skipped_no_source"
+                if review and review.get("skipped")
+                else "passed"
+            ),
             "source_references": validation_options["source_references"],
         }
 
@@ -1320,7 +1570,6 @@ def _note_completion_issues(
         issues.append("unclosed display-math block")
 
     issues.extend(_note_format_issues(content))
-    issues.extend(_unavailable_visual_reference_issues(content))
     issues.extend(_course_administrative_metadata_issues(content))
     issues.extend(_note_code_language_issues(content))
     if allow_code is False and re.search(r"```(?!mermaid\b)[A-Za-z0-9_+-]*\s*\n", content, re.IGNORECASE):
@@ -1642,6 +1891,8 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         payload = _cache_payload_as_dict(entry.payload)
         if not payload:
             continue
+        if payload.get("review_status") == "skipped_no_source":
+            continue
         level = payload.get("level") or "level_2"
         if level not in {"level_1", "level_2", "level_3"} or level in levels:
             continue
@@ -1790,6 +2041,62 @@ def _record_note_generation_failure(
         _notify_note_generation_failure(guard.pk)
 
 
+def _record_note_review_failure(
+    topic_obj,
+    level: str,
+    source_signature: str,
+    cache_key: str,
+    content: str,
+    review: dict,
+) -> None:
+    if not topic_obj:
+        return
+    from prep.models import PrepNoteRepair
+
+    error = str(
+        review.get("error")
+        or review.get("skipped")
+        or "independent review did not complete"
+    )
+    repair, _ = PrepNoteRepair.objects.get_or_create(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+        defaults={
+            "cache_key": cache_key,
+            "original_content": content,
+            "current_content": content,
+            "validation_issues": [error],
+        },
+    )
+    repair.repair_log = (repair.repair_log if isinstance(repair.repair_log, list) else [])[-9:]
+    repair.repair_log.append({
+        "stage": "independent_review",
+        "model": review.get("model_used", ""),
+        "response": str(review.get("raw_response") or "")[:4000],
+        "error": error[:1000],
+    })
+    repair.current_content = content
+    repair.validation_issues = [error]
+    repair.status = "needs_review"
+    repair.last_error = error[:4000]
+    repair.save(update_fields=[
+        "repair_log",
+        "current_content",
+        "validation_issues",
+        "status",
+        "last_error",
+        "updated_at",
+    ])
+    _record_note_generation_failure(
+        topic_obj,
+        level,
+        source_signature,
+        error,
+        force_review=True,
+    )
+
+
 def _clear_note_generation_guard(topic_obj, level: str, source_signature: str) -> None:
     if not topic_obj:
         return
@@ -1845,6 +2152,8 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
     for entry in entries:
         payload = _cache_payload_as_dict(entry.payload)
         if not payload or payload.get("level") != level:
+            continue
+        if payload.get("review_status") == "skipped_no_source":
             continue
         if int(payload.get("study_profile_version", 0) or 0) != _course_study_profile_version(topic_obj.course):
             continue
@@ -1934,6 +2243,19 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             max_tokens=2000,
         )
         repair_usage = _merge_usage(repair_usage, result.get("usage", {}))
+        repair_log = repair.repair_log if isinstance(repair.repair_log, list) else []
+        repair_log.append({
+            "stage": "targeted_block_repair",
+            "attempt": repair.attempts,
+            "model": result.get("model_used") or getattr(
+                settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash"
+            ),
+            "issues": issues[:20],
+            "response": str(result.get("content") or "")[:2000],
+            "error": str(result.get("error") or "")[:1000],
+        })
+        repair.repair_log = repair_log[-10:]
+        repair.save(update_fields=["repair_log", "updated_at"])
         if not result.get("success"):
             last_repair_error = str(result.get("error") or "repair provider returned an unsuccessful response")
             continue
@@ -1950,6 +2272,29 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 topic_obj.title,
                 **validation_options,
             )
+            review = None
+            if not candidate_issues:
+                review = _review_topic_note_content(topic_obj, level, candidate)
+                repair_usage = _merge_usage(repair_usage, review.get("usage", {}))
+                repair_log = repair.repair_log if isinstance(repair.repair_log, list) else []
+                repair_log.append({
+                    "stage": "independent_review",
+                    "attempt": repair.attempts,
+                    "model": review.get("model_used", ""),
+                    "issues": review.get("issues", [])[:8],
+                    "response": str(review.get("raw_response") or "")[:4000],
+                    "error": str(review.get("error") or "")[:1000],
+                })
+                repair.repair_log = repair_log[-10:]
+                repair.save(update_fields=["repair_log", "updated_at"])
+                if not review.get("success") or review.get("skipped"):
+                    last_repair_error = str(
+                        review.get("error")
+                        or review.get("skipped")
+                        or "independent review failed"
+                    )
+                    continue
+                candidate_issues.extend(review.get("issues", []))
             if candidate_issues:
                 working_content = candidate
                 issues = candidate_issues
@@ -1969,6 +2314,12 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 "topic_content_rules_version": _topic_content_rules_version(topic_obj),
                 "source_references": validation_options["source_references"],
                 "source_signature": source_signature,
+                "review_status": "passed",
+                "review_model": (review or {}).get("model_used", ""),
+                "reviewed_at": timezone.now().isoformat(),
+                "review_report": (review or {}).get("report") or {
+                    "skipped": (review or {}).get("skipped", "")
+                },
             })
             entry.payload = payload
             entry.save(update_fields=["payload", "updated_at"])
@@ -1981,6 +2332,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 "cached": False,
                 "repaired": True,
                 "usage": repair_usage,
+                "review_status": "passed",
                 "source_references": validation_options["source_references"],
             }
         except ValueError as exc:
@@ -1992,8 +2344,25 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             )
             continue
 
+    fallback_issues = issues or [last_repair_error or "targeted block repair did not produce validated notes"]
+    fallback_repair = _regenerate_invalid_note_sections(
+        topic_obj,
+        level,
+        source_signature,
+        cache_key,
+        working_content,
+        fallback_issues,
+    )
+    if fallback_repair:
+        fallback_repair["usage"] = _merge_usage(
+            repair_usage,
+            fallback_repair.get("usage", {}),
+        )
+        fallback_repair["repair_fallback"] = "section_regeneration"
+        return fallback_repair
+
     repair.status = "needs_review"
-    repair.last_error = "; ".join(issues)
+    repair.last_error = "; ".join(fallback_issues)
     if last_repair_error:
         repair.last_error += f"; targeted repair failed: {last_repair_error}"
     repair.save(update_fields=["status", "last_error", "updated_at"])
@@ -2236,6 +2605,7 @@ def route_math_request(
     is_complex_proof: bool | None = None,
     system_prompt: str | None = None,
     max_tokens_override: int | None = None,
+    model_override: str | None = None,
     auto_continue: bool = True,
     thinking_enabled: bool | None = None,
 ) -> dict:
@@ -2255,6 +2625,8 @@ def route_math_request(
     else:
         model = getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat")
         max_tokens = int(getattr(settings, "MAX_TOKENS_EXPLANATION", 6000) or 6000)
+    if model_override:
+        model = str(model_override)
     if max_tokens_override is not None:
         max_tokens = min(max_tokens, max(1, int(max_tokens_override)))
 
@@ -2454,6 +2826,20 @@ def get_or_generate_topic_notes(
         )
         cached_issues = _note_completion_issues(cached_content, topic_title, **validation_options)
         if cached.get("validation_state") == NOTE_VALIDATION_STATE and not cached_issues:
+            if cached.get("review_status") == "skipped_no_source":
+                return {
+                    "notes": "",
+                    "blocks": [],
+                    "schema_version": cached.get("schema_version", 1),
+                    "cached": False,
+                    "level": level,
+                    "validation_failed": True,
+                    "needs_review": True,
+                    "error": (
+                        "These notes cannot be published until approved course material is "
+                        "available for independent review."
+                    ),
+                }
             # Strict read-only: never mutate or overwrite a valid cache on read.
             _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
             return {
@@ -2538,22 +2924,6 @@ def get_or_generate_topic_notes(
         if fallback:
             fallback["regenerated_from_invalid_cache"] = True
             return fallback
-        if _only_missing_visual_reference_issue(cached_issues):
-            from prep.models import PrepContentCache
-
-            cached["validation_state"] = NOTE_VALIDATION_STATE
-            cached["validated_at"] = timezone.now().isoformat()
-            PrepContentCache.objects.filter(cache_key=cache_key).update(payload=cached)
-            _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
-            return {
-                "notes": cached_content,
-                "blocks": cached.get("blocks"),
-                "schema_version": cached.get("schema_version", 1),
-                "cached": True,
-                "level": level,
-                "model": cached.get("model", "Cache"),
-                "source_references": cached.get("source_references", validation_options["source_references"]),
-            }
         return {
             "notes": "",
             "blocks": [],
@@ -2649,8 +3019,10 @@ def get_or_generate_topic_notes(
         "Do not write Markdown image URLs, invent a figure, generate Mermaid/TikZ/plot code, or request an unlisted figure. "
         "Do not create a Figure Recall Map, marker table, or memory-device sentence with empty figure placeholders. "
         "Place each required marker directly beside the explanation it illustrates. "
-        "In the surrounding prose, define every symbol and variable at first use, explain visual labels and units, and state what each axis, node, or arrow means. "
-        "The explanation must still make sense if the image does not load. "
+        "Explain every concept fully in plain prose, including any supported axes, labels, units, directions, or relationships. "
+        "Never refer to a figure, diagram, graph, chart, table, or image in the prose, including phrases such as "
+        "'as shown above', 'in the diagram', or 'see Figure 1', even when an approved image is included. "
+        "A student must understand the explanation without looking at the image. "
         "Figures marked required were mapped to this topic from source-page evidence and must be included beside the matching explanation. "
         "If a listed optional figure is not relevant, omit it.\n\n"
         if approved_visual_manifest
@@ -2658,18 +3030,20 @@ def get_or_generate_topic_notes(
             "NO APPROVED SOURCE FIGURE IS AVAILABLE. Do not add an image, diagram, graph, Mermaid/TikZ, or plot code.\n"
             "Explain any relevant visual relationship naturally in the surrounding lesson, without labeling it as a walkthrough, "
             "announcing that an image is unavailable, or repeating caveats about missing figures. "
+            "Never refer to a figure, diagram, graph, chart, table, or image in the prose, including phrases such as "
+            "'as shown above', 'in the diagram', or 'see Figure 1'. "
             "Use only source-supported facts and never tell the student to look at an absent image.\n\n"
         )
     )
     visual_independence_block = (
         "UNIVERSAL VISUAL AND NOTATION REQUIREMENTS (all disciplines):\n"
-        "Define every variable, symbol, abbreviation, and unit when it first appears. Explain what each visual label represents. "
-        "When discussing a graph, state the axes, units, direction or comparison, and conclusion in words when supported by the source. "
-        "When discussing an arrowed or structural diagram, name the relevant parts and explain each supported relationship or direction. "
+        "Define every variable, symbol, abbreviation, and unit when it first appears. "
+        "Explain visual relationships in ordinary prose, including supported axes, units, directions, comparisons, and conclusions. "
+        "Never refer to an image, figure, diagram, graph, chart, or table in the prose, even when an approved image is included. "
         "Never make the student infer the explanation solely from an image. "
         "When no source image is available, explain a relevant visual concept in ordinary prose only when that adds useful understanding; do not announce the absence of an image or repeat a disclaimer. "
         "Use only source-supported facts; omit details that are unavailable instead of guessing. "
-        "Do not refer to a missing image as if it were shown.\n\n"
+        "The explanation must make complete sense without viewing any image.\n\n"
     )
 
     # Build strict curriculum boundary block
@@ -2943,6 +3317,59 @@ def get_or_generate_topic_notes(
         content = _normalize_approved_visual_captions(content, validation_options["source_references"])
         content = str(content).strip()
         completion_issues = _note_completion_issues(content, topic_title, **validation_options)
+        review = None
+        if not completion_issues:
+            review = _review_topic_note_content(topic_obj, level, content)
+            result["usage"] = _merge_usage(result.get("usage", {}), review.get("usage", {}))
+            if not review.get("success"):
+                error = "Independent content review failed: " + str(
+                    review.get("error") or "review provider returned an unsuccessful response"
+                )
+                _record_note_review_failure(
+                    topic_obj,
+                    level,
+                    cache_signature,
+                    cache_key,
+                    content,
+                    review,
+                )
+                logger.error(
+                    "[Topic Notes] %s course=%s topic=%s level=%s",
+                    error,
+                    course_code,
+                    topic_title,
+                    level,
+                )
+                fallback = _latest_valid_shared_notes(
+                    topic_obj,
+                    level,
+                    topic_title,
+                    exclude_cache_key=cache_key,
+                )
+                if fallback:
+                    fallback["regenerated_from_invalid_cache"] = regenerated_from_invalid_cache
+                    return fallback
+                return {
+                    "notes": "",
+                    "blocks": [],
+                    "schema_version": 2,
+                    "cached": False,
+                    "level": level,
+                    "model": result.get("model_used"),
+                    "usage": result.get("usage", {}),
+                    "validation_failed": True,
+                    "error": error,
+                }
+            if review.get("skipped"):
+                _record_note_review_failure(
+                    topic_obj,
+                    level,
+                    cache_signature,
+                    cache_key,
+                    content,
+                    review,
+                )
+            completion_issues.extend(review.get("issues", []))
         if completion_issues:
             logger.error(
                 "[Topic Notes] Refusing to cache incomplete notes for %s %s: %s",
@@ -2970,14 +3397,24 @@ def get_or_generate_topic_notes(
                     "topic": topic_obj,
                 },
             )
-            repaired = _repair_invalid_note_cache(
-                topic_obj,
-                level,
-                cache_signature,
-                cache_key,
-                content,
-                completion_issues,
-            )
+            if _note_needs_section_regeneration(completion_issues):
+                repaired = _regenerate_invalid_note_sections(
+                    topic_obj,
+                    level,
+                    cache_signature,
+                    cache_key,
+                    content,
+                    completion_issues,
+                )
+            else:
+                repaired = _repair_invalid_note_cache(
+                    topic_obj,
+                    level,
+                    cache_signature,
+                    cache_key,
+                    content,
+                    completion_issues,
+                )
             if repaired:
                 repaired["level"] = level
                 repaired["usage"] = _merge_usage(result.get("usage", {}), repaired.get("usage", {}))
@@ -2993,27 +3430,18 @@ def get_or_generate_topic_notes(
             if fallback:
                 fallback["regenerated_from_invalid_cache"] = regenerated_from_invalid_cache
                 return fallback
-            if _only_missing_visual_reference_issue(completion_issues):
-                logger.warning(
-                    "[Topic Notes] Publishing %s %s after visual-reference repair attempts; "
-                    "the notes remain text-first and this wording issue is non-blocking.",
-                    course_code,
-                    topic_title,
-                )
-                completion_issues = []
-            else:
-                return {
-                    "notes": "",
-                    "blocks": [],
-                    "schema_version": 2,
-                    "cached": False,
-                    "level": level,
-                    "model": result.get("model_used"),
-                    "usage": result.get("usage", {}),
-                    "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
-                    "validation_failed": True,
-                    "error": "The notes generation was incomplete. Please retry.",
-                }
+            return {
+                "notes": "",
+                "blocks": [],
+                "schema_version": 2,
+                "cached": False,
+                "level": level,
+                "model": result.get("model_used"),
+                "usage": result.get("usage", {}),
+                "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
+                "validation_failed": True,
+                "error": "The notes generation was incomplete. Please retry.",
+            }
         blocks = parse_markdown_to_blocks(content)
         is_valid, validation_err = validate_structured_blocks(blocks)
         if not is_valid:
@@ -3033,6 +3461,16 @@ def get_or_generate_topic_notes(
             "topic_content_rules_version": _topic_content_rules_version(topic_obj),
             "source_references": validation_options["source_references"],
             "source_signature": cache_signature,
+            "review_status": (
+                "skipped_no_source"
+                if review and review.get("skipped")
+                else "passed"
+            ),
+            "review_model": (review or {}).get("model_used", ""),
+            "reviewed_at": timezone.now().isoformat(),
+            "review_report": (review or {}).get("report") or {
+                "skipped": (review or {}).get("skipped", "")
+            },
             "generated_at": timezone.now().isoformat(),
         }
         store_cached_content(cache_key, "topic_notes", p_hash, payload, course=course_obj, topic=topic_obj)
@@ -3045,6 +3483,11 @@ def get_or_generate_topic_notes(
             "level": level,
             "model": result.get("model_used"),
             "usage": result.get("usage", {}),
+            "review_status": (
+                "skipped_no_source"
+                if review and review.get("skipped")
+                else "passed"
+            ),
             "source_references": validation_options["source_references"],
             "regenerated_from_invalid_cache": regenerated_from_invalid_cache,
         }
@@ -3895,6 +4338,128 @@ def _strip_question_number_heading(question_text: str) -> str:
     ).strip()
 
 
+def _review_adapted_question_against_source(
+    question_obj,
+    adapted_item: dict,
+    source_page_context: str,
+) -> dict:
+    """Independently check an adapted question against its extracted source page."""
+    if not source_page_context.strip():
+        return {
+            "success": False,
+            "status": "hold",
+            "error": "No extracted source-page text is available for comparison.",
+            "usage": {},
+        }
+
+    model = getattr(settings, "DEEPSEEK_ASSESSMENT_REVIEW_MODEL", None) or getattr(
+        settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"
+    )
+    try:
+        result = call_deepseek(
+            [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an independent reviewer. Compare an AI-adapted exam question "
+                        "with the supplied source-page text and damaged transcription. Decide whether "
+                        "it is a reasonable equivalent: same clearly supported skill/topic, same explicit "
+                        "values and conditions where readable, and marks consistent with the source. "
+                        "Do not approve details that are guessed or contradicted by the source. If OCR "
+                        "damage makes equivalence uncertain, hold it for a person. Also check that the "
+                        "provided solution answers the adapted question. Return exactly one JSON object: "
+                        '{"decision":"pass"|"hold","reason":"short explanation",'
+                        '"source_evidence":"exact short quote from source page, or empty if none"}. '
+                        "Do not rewrite the question."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Paper question number: {question_obj.number}\n"
+                        f"Source marks: {question_obj.marks}\n"
+                        "SOURCE PAGE TEXT (extracted from the uploaded paper):\n"
+                        f"{source_page_context[:6000]}\n\n"
+                        "DAMAGED SOURCE TRANSCRIPTION:\n"
+                        f"{str(question_obj.question_latex or '')[:4000]}\n\n"
+                        "ADAPTED QUESTION:\n"
+                        f"{str(adapted_item.get('question_latex') or '')[:4000]}\n\n"
+                        "PROPOSED SOLUTION:\n"
+                        f"{str(adapted_item.get('solution_latex') or '')[:6000]}"
+                    ),
+                },
+            ],
+            model=model,
+            max_tokens=1000,
+            auto_continue=False,
+            thinking_enabled=False,
+        )
+    except Exception as exc:
+        logger.exception("[Question Source Review] Independent review request failed.")
+        return {
+            "success": False,
+            "status": "hold",
+            "error": str(exc)[:1000],
+            "usage": {},
+            "model": model,
+        }
+    base = {
+        "usage": result.get("usage", {}),
+        "model": result.get("model_used") or model,
+        "raw_response": str(result.get("content") or "")[:2000],
+    }
+    if not result.get("success") or not result.get("content"):
+        return {
+            **base,
+            "success": False,
+            "status": "hold",
+            "error": result.get("error") or "The independent source check returned no result.",
+        }
+    try:
+        report = robust_json_loads(result["content"])
+    except ValueError as exc:
+        return {
+            **base,
+            "success": False,
+            "status": "hold",
+            "error": f"The independent source check was not valid JSON: {exc}",
+        }
+    if not isinstance(report, dict):
+        return {
+            **base,
+            "success": False,
+            "status": "hold",
+            "error": "The independent source check did not return a JSON object.",
+        }
+    decision = str(report.get("decision") or "").strip().lower()
+    reason = str(report.get("reason") or "").strip()
+    evidence = str(report.get("source_evidence") or "").strip()
+    normalized_source = re.sub(r"\s+", " ", source_page_context).casefold()
+    normalized_evidence = re.sub(r"\s+", " ", evidence).casefold()
+    if (
+        decision not in {"pass", "hold"}
+        or not reason
+        or (decision == "pass" and (
+            not normalized_evidence or normalized_evidence not in normalized_source
+        ))
+    ):
+        return {
+            **base,
+            "success": False,
+            "status": "hold",
+            "error": "The independent source check returned an invalid decision or source quote.",
+            "report": report,
+        }
+    return {
+        **base,
+        "success": True,
+        "status": decision,
+        "reason": reason[:1000],
+        "source_evidence": evidence[:1000],
+        "report": report,
+    }
+
+
 def generate_adapted_past_question(question_obj) -> dict:
     """Reconstruct one unreadable past-paper question from its context.
 
@@ -4015,6 +4580,12 @@ def generate_adapted_past_question(question_obj) -> dict:
                 and 0 <= raw_confidence <= 1
                 else None
             )
+            source_review = _review_adapted_question_against_source(
+                question_obj,
+                item,
+                source_page_context,
+            )
+            usage = _merge_usage(usage, source_review.get("usage", {}))
             source_document_id = str(source_document.pk) if source_document else None
             source_page_number = question_obj.source_page_number
             metadata = {
@@ -4032,6 +4603,11 @@ def generate_adapted_past_question(question_obj) -> dict:
                 "model_confidence": reconstruction_confidence,
                 "model": model,
                 "usage": usage,
+                "source_review_status": source_review.get("status", "hold"),
+                "source_review_model": source_review.get("model", ""),
+                "source_review_reason": source_review.get("reason") or source_review.get("error", ""),
+                "source_review_evidence": source_review.get("source_evidence", ""),
+                "source_review_report": source_review.get("report", {}),
             }
             return {
                 "success": True,
@@ -4039,6 +4615,7 @@ def generate_adapted_past_question(question_obj) -> dict:
                 "reconstruction_metadata": metadata,
                 "usage": usage,
                 "model": model,
+                "source_review": source_review,
             }
         except Exception as exc:
             last_error = str(exc)
