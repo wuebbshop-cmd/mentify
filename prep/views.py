@@ -1721,6 +1721,11 @@ def prep_solve_question_api(request):
                         "error": "This question is pending tutor review and cannot be answered yet.",
                         "verification_status": q_obj.verification_status,
                     }, status=409)
+                from services.prep_ai_router import repair_question_and_solution_text
+                repaired_q = repair_question_and_solution_text(q_obj.question_latex)
+                if repaired_q != q_obj.question_latex:
+                    q_obj.question_latex = repaired_q
+                    q_obj.save(update_fields=["question_latex"])
                 from services.prep_ingestion import assessment_question_rendering_issues
 
                 question_issues = assessment_question_rendering_issues(q_obj.question_latex)
@@ -1863,6 +1868,11 @@ def prep_adapt_question_api(request):
     ).first()
     wallet = PrepWallet.get_or_create_wallet(request.user)
     if existing:
+        from services.prep_ai_router import repair_question_and_solution_text
+        repaired_q = repair_question_and_solution_text(existing.question_latex)
+        if repaired_q != existing.question_latex:
+            existing.question_latex = repaired_q
+            existing.save(update_fields=["question_latex"])
         from services.prep_ingestion import assessment_question_rendering_issues
 
         existing_issues = assessment_question_rendering_issues(existing.question_latex)

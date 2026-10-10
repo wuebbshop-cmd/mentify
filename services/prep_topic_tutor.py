@@ -44,13 +44,13 @@ MAX_PDF_PAGES = 4
 MAX_IMAGE_COUNT = 3
 MAX_IMAGE_BYTES = 4 * 1024 * 1024
 MAX_UPLOAD_TOTAL_BYTES = MAX_PDF_BYTES + MAX_IMAGE_COUNT * MAX_IMAGE_BYTES
-MAX_EXTRACTED_CHARS_PER_UPLOAD = 7000
-MAX_UPLOAD_CONTEXT_CHARS = 10000
-MAX_NOTES_CONTEXT_CHARS = 7000
-MAX_APPROVED_PDF_CONTEXT_CHARS = 5000
-MAX_PAST_QUESTIONS_CONTEXT_CHARS = 8000
-MAX_HISTORY_MESSAGES = 20
-CHAT_MAX_OUTPUT_TOKENS = 2500
+MAX_EXTRACTED_CHARS_PER_UPLOAD = 3500
+MAX_UPLOAD_CONTEXT_CHARS = 5000
+MAX_NOTES_CONTEXT_CHARS = 3500
+MAX_APPROVED_PDF_CONTEXT_CHARS = 2500
+MAX_PAST_QUESTIONS_CONTEXT_CHARS = 2500
+MAX_HISTORY_MESSAGES = 8
+CHAT_MAX_OUTPUT_TOKENS = 1000
 MIN_OCR_CREDITS = 5
 
 _TOPIC_STOP_WORDS = {
@@ -466,7 +466,7 @@ def _topic_context(topic) -> tuple[str, str]:
     return notes, course_material
 
 
-def _topic_past_questions(topic, limit: int = 8) -> str:
+def _topic_past_questions(topic, limit: int = 4) -> str:
     """Retrieve verified authentic and adapted past examination questions with solutions for this topic."""
     from prep.models import PrepQuestion
     from services.prep_ingestion import assessment_question_rendering_issues
@@ -543,7 +543,7 @@ def _build_prompt(
         for upload in uploads
     )[:MAX_UPLOAD_CONTEXT_CHARS]
     history_text = "\n".join(
-        f"{'Learner' if item.role == 'user' else 'Tutor'}: {item.content[:4000]}"
+        f"{'Learner' if item.role == 'user' else 'Tutor'}: {item.content[:1500]}"
         for item in history[-MAX_HISTORY_MESSAGES:]
     )
     context_fields = {

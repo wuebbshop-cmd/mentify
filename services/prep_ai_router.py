@@ -2457,7 +2457,7 @@ def call_deepseek(
         payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
 
     try:
-        resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=90)
+        resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=35)
         if resp.status_code == 200:
             data = resp.json()
             choice = data["choices"][0]
@@ -2580,10 +2580,26 @@ def call_deepseek(
                 "usage": usage,
             }
         else:
-            logger.error(f"[DeepSeek API Error] HTTP {resp.status_code}: {resp.text}")
+            logger.warning(f"[DeepSeek API Error] HTTP {resp.status_code}: {resp.text[:300]}. Attempting Together AI fallback...")
+            together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+            if getattr(settings, "TOGETHERAI_API", "") and together_model:
+                try:
+                    fallback_res = call_together_repair(messages, together_model, max_tokens=max_tokens)
+                    if fallback_res.get("success") and fallback_res.get("content"):
+                        return fallback_res
+                except Exception as fb_err:
+                    logger.warning("[DeepSeek] Together fallback also failed: %s", fb_err)
             return {"success": False, "error": "The AI service encountered an issue while processing your request. Please try again shortly."}
     except Exception as e:
-        logger.error(f"[DeepSeek API Exception] {e}")
+        logger.warning(f"[DeepSeek API Exception] {e}. Attempting Together AI fallback...")
+        together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+        if getattr(settings, "TOGETHERAI_API", "") and together_model:
+            try:
+                fallback_res = call_together_repair(messages, together_model, max_tokens=max_tokens)
+                if fallback_res.get("success") and fallback_res.get("content"):
+                    return fallback_res
+            except Exception as fb_err:
+                logger.warning("[DeepSeek] Together fallback also failed: %s", fb_err)
         return {"success": False, "error": "The AI service is temporarily unreachable. Please try again shortly."}
 
 
@@ -4061,12 +4077,14 @@ def generate_similar_practice_questions(
     )
 
     sys_prompt = "You are an expert exam creator and mathematician. Output strictly a valid JSON array of question objects without any conversational text. Ensure all backslashes in JSON strings are escaped as \\\\."
+    max_tokens_calc = min(3500, max(1400, needed * 850))
     result = route_math_request(
         prompt,
         course_code,
         topic_label=topic_title,
         is_complex_proof=False,
         system_prompt=sys_prompt,
+        max_tokens_override=max_tokens_calc,
         thinking_enabled=False,
     )
 
@@ -4081,7 +4099,7 @@ def generate_similar_practice_questions(
                 {"role": "user", "content": prompt},
             ],
             model="deepseek-chat",
-            max_tokens=6000,
+            max_tokens=max_tokens_calc,
             thinking_enabled=False,
         )
         if fallback_res.get("success") and str(fallback_res.get("content") or "").strip():
@@ -4100,52 +4118,32 @@ def generate_similar_practice_questions(
 
     raw_text = str(result.get("content") or "").strip()
     parsed_questions = None
-    question_issues = []
-    for correction_attempt in range(3):
-        try:
-            parsed_questions = robust_json_loads(raw_text)
-            question_issues = _practice_question_issues(parsed_questions, needed)
-        except Exception as exc:
-            logger.warning("[PracticeGen] JSON parse error for %s: %s", topic_title, exc)
-            parsed_questions = None
-            question_issues = ["response is not a complete valid JSON question array"]
+    try:
+        parsed_questions = robust_json_loads(raw_text)
+    except Exception as exc:
+        logger.warning("[PracticeGen] Initial JSON parse failed for %s: %s", topic_title, exc)
 
-        if not question_issues:
-            break
-        if correction_attempt == 2:
-            break
-
-        logger.info(
-            "[PracticeGen] Correcting invalid practice set for %s (attempt %d): %s",
-            topic_title,
-            correction_attempt + 1,
-            "; ".join(question_issues),
-        )
-        correction = call_deepseek(
+    # Fast JSON recovery pass only if raw_text failed initial parsing
+    if not isinstance(parsed_questions, list) or len(parsed_questions) == 0:
+        logger.info("[PracticeGen] Attempting fast single-pass JSON recovery for %s", topic_title)
+        recovery = call_deepseek(
             [
-                {"role": "system", "content": sys_prompt},
-                {"role": "user", "content": prompt},
-                {"role": "assistant", "content": raw_text},
-                {
-                    "role": "user",
-                    "content": (
-                        "Return a complete replacement JSON array for the entire practice set, not a partial "
-                        "continuation. Correct every issue below while keeping exactly "
-                        f"{needed} questions and complete worked answers. Issues: {'; '.join(question_issues)}"
-                    ),
-                },
+                {"role": "system", "content": "You are an expert JSON extractor. Return only the valid JSON array of question objects without markdown code fences or commentary."},
+                {"role": "user", "content": f"Extract and format this into a strictly valid JSON array of {needed} question objects:\n\n{raw_text[:4000]}"},
             ],
             model=result.get("model_used", "deepseek-chat"),
-            max_tokens=6000,
+            max_tokens=max_tokens_calc,
             thinking_enabled=False,
         )
-        if not correction.get("success") or not correction.get("content"):
-            break
-        raw_text = str(correction["content"]).strip()
-        result["usage"] = _merge_usage(result.get("usage", {}), correction.get("usage", {}))
+        if recovery.get("success") and str(recovery.get("content") or "").strip():
+            try:
+                parsed_questions = robust_json_loads(recovery["content"])
+                result["usage"] = _merge_usage(result.get("usage", {}), recovery.get("usage", {}))
+            except Exception as e_rec:
+                logger.warning("[PracticeGen] Fast recovery parse failed: %s", e_rec)
 
-    if question_issues or parsed_questions is None:
-        logger.error("[PracticeGen] Refusing invalid practice set for %s: %s", topic_title, "; ".join(question_issues))
+    if not isinstance(parsed_questions, list) or len(parsed_questions) == 0:
+        logger.error("[PracticeGen] Refusing unparseable practice set for %s", topic_title)
         return {
             "success": False,
             "questions": [],
@@ -4153,105 +4151,37 @@ def generate_similar_practice_questions(
             "cached": False,
             "model": result.get("model_used", "deepseek-chat"),
             "usage": result.get("usage", {}),
-            "error": "The generated practice set did not pass validation and was not saved. Please try again.",
+            "error": "The generated practice set did not pass validation. Please try again.",
         }
 
-    variant_issues = []
+    # Deterministic high-speed in-memory repair: cleans math delimiters, unclosed fences, tags, and formatting in milliseconds
+    valid_items = []
     for index, item in enumerate(parsed_questions, start=1):
-        question_text = repair_question_and_solution_text(str(item.get("question_latex") or ""))
-        solution_text = repair_question_and_solution_text(str(item.get("solution_latex") or ""))
-        item["question_latex"] = question_text
-        item["solution_latex"] = solution_text
-        normalized_question = re.sub(r"\s+", " ", question_text).casefold()
-        if normalized_question in source_question_texts:
-            variant_issues.append(f"question {index} is an exact duplicate of a verified source question")
-        question_issues_for_variant = _question_solution_issues(
-            question_text,
-            is_nontechnical=_question_solution_uses_nontechnical_format(
-                course_obj=course_obj,
-                study_profile=validation_options["study_profile"],
-            ),
-            allow_code=validation_options["allow_code"],
-            allow_math=validation_options["allow_math"],
-            allow_chemical_equations=validation_options["allow_chemical_equations"],
-            content_rules=validation_options["content_rules"],
-            content_rule_issues=validation_options["content_rule_issues"],
-            source_references=validation_options["source_references"],
-        )
-        solution_issues_for_variant = _question_solution_issues(
-            solution_text,
-            is_nontechnical=_question_solution_uses_nontechnical_format(
-                course_obj=course_obj,
-                study_profile=validation_options["study_profile"],
-            ),
-            allow_code=validation_options["allow_code"],
-            allow_math=validation_options["allow_math"],
-            allow_chemical_equations=validation_options["allow_chemical_equations"],
-            content_rules=validation_options["content_rules"],
-            content_rule_issues=validation_options["content_rule_issues"],
-            source_references=validation_options["source_references"],
-        )
-        variant_issues.extend(f"question {index} problem: {issue}" for issue in question_issues_for_variant)
-        variant_issues.extend(f"question {index} solution: {issue}" for issue in solution_issues_for_variant)
+        if not isinstance(item, dict):
+            continue
+        q_text = str(item.get("question_latex") or "").strip()
+        sol_text = str(item.get("solution_latex") or "").strip()
+        if len(q_text) < 10 or len(sol_text) < 10:
+            continue
+        # Ensure subparts e.g. (a), (b), (i), (ii) have clean linebreaks
+        q_text = re.sub(r"([^\n])\s*(\([a-d]\)|\([i-v]+\))\s*", r"\1\n\n\2 ", q_text)
+        item["question_latex"] = repair_question_and_solution_text(q_text)
+        item["solution_latex"] = repair_question_and_solution_text(sol_text)
+        item["marks"] = int(item.get("marks") or 5)
+        valid_items.append(item)
 
-    if variant_issues:
-        logger.info(
-            "[PracticeGen] Attempting live AI repair for %s (%d issues): %s",
-            topic_title,
-            len(variant_issues),
-            "; ".join(variant_issues[:5]),
-        )
-        repair_prompt = (
-            f"You are an expert academic examiner and mathematician for {course_code}: {topic_title}.\n"
-            f"Please fix and reformat the following practice questions and step-by-step solutions.\n"
-            f"Validation issues found:\n"
-            + "\n".join(f"- {iss}" for iss in variant_issues[:10])
-            + f"\n\nOriginal JSON array:\n{json.dumps(parsed_questions)}\n\n"
-            "REQUIREMENTS:\n"
-            "- Return a corrected, valid JSON array containing the exact same number of questions.\n"
-            "- Ensure valid standard KaTeX math ($...$ inline, $$...$$ standalone).\n"
-            "- Wrap all LaTeX environments (\\begin{aligned}, \\begin{cases}) in standalone $$...$$.\n"
-            "- Format question parts (a), (b), (i), (ii) onto separate lines with blank lines between them.\n"
-            "- Solutions must provide step-by-step vertical derivations line-by-line (never horizontal equality chains).\n"
-            "- Output STRICTLY valid JSON without conversational text or code fences.\n"
-            "- Escape all LaTeX backslashes as \\\\."
-        )
-        repair_resp = call_deepseek(
-            [
-                {"role": "system", "content": "You are an expert exam editor. Output only a valid JSON array."},
-                {"role": "user", "content": repair_prompt},
-            ],
-            model=result.get("model_used", "deepseek-chat"),
-            max_tokens=6000,
-            thinking_enabled=False,
-        )
-        if repair_resp.get("success") and repair_resp.get("content"):
-            try:
-                repaired = robust_json_loads(repair_resp["content"])
-                if isinstance(repaired, list) and len(repaired) == len(parsed_questions):
-                    parsed_questions = repaired
-                    result["usage"] = _merge_usage(result.get("usage", {}), repair_resp.get("usage", {}))
-                    logger.info("[PracticeGen] Live AI repair succeeded for %s.", topic_title)
-                    variant_issues = []
-            except Exception as e_rep:
-                logger.warning("[PracticeGen] Could not parse repaired JSON: %s", e_rep)
+    if not valid_items:
+        return {
+            "success": False,
+            "questions": [],
+            "fresh_generated_count": 0,
+            "cached": False,
+            "model": result.get("model_used", "deepseek-chat"),
+            "usage": result.get("usage", {}),
+            "error": "The generated practice set did not contain valid questions.",
+        }
 
-    if variant_issues:
-        # Re-verify whether remaining issues are hard blocking or purely advisory
-        fatal_issues = [iss for iss in variant_issues if "empty or incomplete" in iss or "duplicate" in iss]
-        if fatal_issues:
-            logger.error("[PracticeGen] Refusing variant set for %s: %s", topic_title, "; ".join(fatal_issues))
-            return {
-                "success": False,
-                "questions": [],
-                "fresh_generated_count": 0,
-                "cached": False,
-                "model": result.get("model_used", "deepseek-chat"),
-                "usage": result.get("usage", {}),
-                "error": "The generated practice set failed verification and was not saved.",
-            }
-        else:
-            logger.warning("[PracticeGen] Proceeding with live normalized variant set for %s despite advisory issues: %s", topic_title, "; ".join(variant_issues))
+    parsed_questions = valid_items
 
     from django.db import transaction
 
@@ -4294,8 +4224,8 @@ def generate_similar_practice_questions(
     return_qs = newly_created if (force_fresh and newly_created) else all_combined
     results = []
     for q in return_qs:
-        clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
-        clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+        clean_q = repair_question_and_solution_text(q.question_latex) if q.question_latex else ""
+        clean_sol = repair_question_and_solution_text(q.solution_latex) if q.solution_latex else ""
         results.append({
             "id": q.id,
             "number": q.number,
@@ -4309,8 +4239,8 @@ def generate_similar_practice_questions(
 
     all_results = []
     for q in all_combined:
-        clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
-        clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+        clean_q = repair_question_and_solution_text(q.question_latex) if q.question_latex else ""
+        clean_sol = repair_question_and_solution_text(q.solution_latex) if q.solution_latex else ""
         all_results.append({
             "id": q.id,
             "number": q.number,
