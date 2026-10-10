@@ -80,10 +80,18 @@ def compute_cache_key(content_type: str, *parts) -> str:
 
 def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtopics: list | None) -> str:
     """Fingerprint the approved syllabus inputs that determine generated notes."""
+    topic_pk = getattr(topic_obj, "pk", None)
+    if topic_pk:
+        from django.core.cache import cache
+        sig_cache_key = f"prep_topic_sig_{topic_pk}"
+        cached_sig = cache.get(sig_cache_key)
+        if cached_sig:
+            return cached_sig
+
     topic_summary = getattr(topic_obj, "summary", "") if topic_obj else ""
     topic_rules = getattr(topic_obj, "content_rules", {}) if topic_obj else {}
     source_context = _approved_course_source_context(course_obj, topic_title)
-    return compute_prompt_hash(
+    sig = compute_prompt_hash(
         topic_title,
         topic_summary,
         json.dumps(topic_rules or {}, ensure_ascii=True, sort_keys=True),
@@ -98,6 +106,10 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
             sort_keys=True,
         ),
     )[:16]
+    if topic_pk:
+        from django.core.cache import cache
+        cache.set(f"prep_topic_sig_{topic_pk}", sig, 900)
+    return sig
 
 
 NOTES_CACHE_VERSION = "markdown-katex-v16-numbered-figure-context"
@@ -1874,6 +1886,12 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
     if not topic_obj:
         return {}
 
+    from django.core.cache import cache
+    levels_cache_key = f"prep_pub_levels_{topic_obj.pk}_{validated_only}"
+    cached_levels = cache.get(levels_cache_key)
+    if cached_levels is not None:
+        return cached_levels
+
     from prep.models import PrepContentCache
 
     levels: dict[str, str] = {}
@@ -1951,6 +1969,8 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             entry.save(update_fields=["payload", "updated_at"])
         if content:
             levels[level] = content
+    from django.core.cache import cache
+    cache.set(levels_cache_key, levels, 900)
     return levels
 
 

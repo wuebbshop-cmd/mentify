@@ -77,10 +77,59 @@
     text-decoration: none;
     font-weight: 500;
     transition: color 0.15s;
+    white-space: nowrap;
   }
   .topic-secondary-link:hover {
     color: var(--text);
     text-decoration: underline;
+  }
+
+  .topic-ready-group {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .topic-level-badge {
+    background: rgba(15, 118, 110, 0.08);
+    color: var(--green);
+    border: 1px solid rgba(15, 118, 110, 0.25);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.3;
+  }
+  body.dark-theme .topic-level-badge {
+    background: rgba(45, 212, 191, 0.12);
+    color: #2dd4bf;
+    border-color: rgba(45, 212, 191, 0.3);
+  }
+
+  @media (max-width: 600px) {
+    .page-header h1 {
+      font-size: clamp(1.25rem, 4vw, 1.6rem) !important;
+    }
+    .topic-card {
+      padding: 16px 16px;
+    }
+    .topic-headline {
+      font-size: 1.1rem;
+    }
+    .topic-action-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .topic-action-row .btn {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
   }
 </style>
 {% endblock %}
@@ -207,10 +256,10 @@
         </a>
         {% if t.ready_levels %}
         <span style="color: var(--border);">&bull;</span>
-        <div style="display: inline-flex; align-items: center; gap: 6px;">
-          <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Notes Ready:</span>
+        <div class="topic-ready-group">
+          <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;">Notes Ready:</span>
           {% for r in t.ready_levels %}
-          <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes&level={{ r.key }}" class="badge" style="background: rgba(15, 118, 110, 0.08); color: var(--green); border: 1px solid rgba(15, 118, 110, 0.25); font-size: 0.72rem; font-weight: 600; text-decoration: none; padding: 2px 7px; border-radius: 4px;" title="{{ r.label }} notes ready">
+          <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes&level={{ r.key }}" class="topic-level-badge" title="{{ r.label }} notes ready">
             L{{ r.num }}: {{ r.label }}
           </a>
           {% endfor %}
@@ -218,7 +267,7 @@
         {% endif %}
       </div>
 
-      <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes{% if t.preferred_level %}&level={{ t.preferred_level }}{% endif %}" class="btn btn-primary btn-sm" style="padding: 7px 18px; font-weight: 500;">
+      <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes{% if t.preferred_level %}&level={{ t.preferred_level }}{% endif %}" class="btn btn-primary btn-sm" style="padding: 7px 18px; font-weight: 500; white-space: nowrap;">
         Study Notes &rarr;
       </a>
     </div>

@@ -280,6 +280,12 @@ class PrepTopic(models.Model):
         if self.pk:
             cache.delete(f"prep_pub_topic_notes_{self.pk}")
             cache.delete(f"prep_pub_topic_questions_{self.pk}")
+            cache.delete(f"prep_pub_levels_{self.pk}_True")
+            cache.delete(f"prep_pub_levels_{self.pk}_False")
+            cache.delete(f"prep_topic_sig_{self.pk}")
+        if self.course_id:
+            cache.delete(f"prep_pub_course_page_{self.course_id}")
+            cache.delete(f"prep_course_detail_topics_{self.course_id}")
 
 
 class PrepTopicChatSession(models.Model):
@@ -610,9 +616,15 @@ class PrepContentCache(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        from django.core.cache import cache
         if self.topic_id:
-            from django.core.cache import cache
             cache.delete(f"prep_pub_topic_notes_{self.topic_id}")
+            cache.delete(f"prep_pub_levels_{self.topic_id}_True")
+            cache.delete(f"prep_pub_levels_{self.topic_id}_False")
+            cache.delete(f"prep_topic_sig_{self.topic_id}")
+        if self.course_id:
+            cache.delete(f"prep_pub_course_page_{self.course_id}")
+            cache.delete(f"prep_course_detail_topics_{self.course_id}")
 
 
 class PrepNoteGenerationGuard(models.Model):

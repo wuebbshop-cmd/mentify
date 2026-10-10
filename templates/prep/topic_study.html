@@ -2371,6 +2371,10 @@
     const activeBtn = document.getElementById('btn-lvl-' + level.replace('level_', ''));
     if (activeBtn) activeBtn.classList.add('active');
 
+    const loadingEl = document.getElementById('notes-loading');
+    const bodyEl = document.getElementById('notes-body');
+    const statusBadge = document.getElementById('notes-status-badge');
+
     const notesStorageKey = `prep_notes_${topicId}_${level}`;
     if (!publishedNotesByLevel[level]) {
       try {
@@ -2390,8 +2394,8 @@
       return;
     }
 
-    loadingEl.style.display = 'block';
-    bodyEl.style.opacity = '0.3';
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (bodyEl) bodyEl.style.opacity = '0.3';
     notesRequestInFlight = true;
 
     fetch("{% url 'prep:api_topic_notes' %}", {
@@ -2427,8 +2431,8 @@
         data = await waitForNotesJob(data.job_id, level);
       }
       notesRequestInFlight = false;
-      loadingEl.style.display = 'none';
-      bodyEl.style.opacity = '1';
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (bodyEl) bodyEl.style.opacity = '1';
 
       if (data.success && data.notes) {
         if (statusBadge) { statusBadge.textContent = ''; }
@@ -2443,8 +2447,8 @@
     })
     .catch(err => {
       notesRequestInFlight = false;
-      loadingEl.style.display = 'none';
-      bodyEl.style.opacity = '1';
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (bodyEl) bodyEl.style.opacity = '1';
       console.error(err);
       alert(err.message || 'Unable to load notes. Please try again.');
     });
@@ -2594,6 +2598,8 @@
         }
         return;
       }
+    } catch (storageErr) {}
+
     contentBox.innerHTML = `
       <div style="display: flex; align-items: center; gap: 12px; padding: 14px 12px; color: var(--text-muted); font-size: 0.9rem; background: var(--surface, #f8fafc); border-radius: 8px; border: 1px solid var(--border, #e2e8f0); margin: 8px 0;">
         <span style="display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(2, 132, 199, 0.2); border-top-color: #0284c7; border-radius: 50%; animation: prep-spin 0.8s linear infinite; flex-shrink: 0;"></span>
