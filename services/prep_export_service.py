@@ -508,7 +508,7 @@ def _build_topic_notes_html(
         for q in authentic_questions:
             num = q.get("number", 1)
             marks = q.get("marks", 10)
-            paper = q.get("paper_title", "University Examination")
+            paper = q.get("paper_title", "Standard Examination")
             year = q.get("year", "")
             q_latex = q.get("question_latex", "")
             sol_latex = q.get("solution_latex", "")
@@ -890,7 +890,7 @@ def _export_topic_notes_reportlab(
         for q in authentic_questions:
             num = q.get("number", 1)
             marks = q.get("marks", 10)
-            paper = q.get("paper_title", "University Examination")
+            paper = q.get("paper_title", "Standard Examination")
             year = q.get("year", "")
             q_latex = q.get("question_latex", "")
             sol_latex = q.get("solution_latex", "")
@@ -1427,7 +1427,7 @@ def export_topic_notes_docx(
         for q in authentic_questions:
             num = q.get("number", 1)
             marks = q.get("marks", 10)
-            paper = q.get("paper_title", "University Examination")
+            paper = q.get("paper_title", "Standard Examination")
             year = q.get("year", "")
             q_latex = q.get("question_latex", "")
             sol_latex = q.get("solution_latex", "")

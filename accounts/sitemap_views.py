@@ -90,7 +90,7 @@ def sitemap(request):
             if content and not _note_completion_issues(content, topic_title):
                 notes_dates[topic_id] = updated_at
 
-        for topic in PrepTopic.objects.filter(course__is_active=True).select_related("course").only(
+        for topic in PrepTopic.objects.filter(course__is_active=True, is_active=True).select_related("course").only(
             "id", "slug", "created_at", "course__slug"
         ):
             has_verified_questions = bool(

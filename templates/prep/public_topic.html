@@ -1,13 +1,13 @@
 {% extends "prep/base_prep.html" %}
 {% load prep_seo %}
 
-{% block title %}{{ topic.title }} — {{ course.code }} Study Notes & Questions | Mentify Prep{% endblock %}
-{% block meta_description %}Study {{ topic.title }} for {{ course.code }} {{ course.title }} with structured Mentify notes and verified revision questions for {{ course.level|lower }} learners.{% endblock %}
+{% block title %}{{ topic.title }} — {{ course.code }} Study Notes, Questions & PDF Material | Mentify Prep{% endblock %}
+{% block meta_description %}Study {{ topic.title }} for {{ course.code }} {{ course.title }} with structured notes, verified past exam questions, worked step-by-step solutions, and printable PDF revision material for students and exam candidates.{% endblock %}
 {% block og_title %}{{ topic.title }} | {{ course.code }} | Mentify Prep{% endblock %}
-{% block og_description %}Study notes and verified revision questions for {{ topic.title }} in {{ course.code }} on Mentify Prep.{% endblock %}
+{% block og_description %}Study notes, verified past exam questions, and printable revision guides for {{ topic.title }} in {{ course.code }} on Mentify Prep.{% endblock %}
 {% block robots %}{% if is_indexable %}index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1{% else %}noindex, follow{% endif %}{% endblock %}
 {% block extra_head %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"{{ topic.title|escapejs }}","description":"Study notes and verified revision questions for {{ topic.title|escapejs }} in {{ course.code|escapejs }} {{ course.title|escapejs }}.","educationalLevel":"{{ course.level|escapejs }}","learningResourceType":"Study guide","isPartOf":{"@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}"},"provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"{{ topic.title|escapejs }}","description":"Study notes and verified revision questions for {{ topic.title|escapejs }} in {{ course.code|escapejs }} {{ course.title|escapejs }}.","learningResourceType":"Study guide","isPartOf":{"@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}"},"provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en","isAccessibleForFree":false,"hasPart":{"@type":"WebPageElement","isAccessibleForFree":false,"cssSelector":".prep-locked-preview"}}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -53,37 +53,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
   <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
     <div>
-      <p style="margin: 0 0 6px; color: var(--green); font-weight: 700; font-size: 0.82rem;">{{ course.code }} &bull; UNIT {{ topic.order }} &bull; {{ course.level }}</p>
+      <p style="margin: 0 0 6px; color: var(--green); font-weight: 700; font-size: 0.82rem;">{{ course.code }} &bull; UNIT {{ topic.order }} &bull; {{ course.category }}</p>
       <h1 style="font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.02em; color: var(--text);">{{ topic.title }}</h1>
       {% if topic.subtopics %}<p style="color: var(--text-muted); line-height: 1.6; margin: 0; font-size: 0.9rem;">Topics covered: {{ topic.subtopics|join:", " }}</p>{% endif %}
     </div>
     <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Open in Prep Studio &rarr;</a>
   </header>
 
-  {% if notes %}
+  <div style="background: linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(13,148,136,0.12) 100%); border: 1px solid rgba(15,118,110,0.2); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Looking for {{ course.code }} {{ topic.title }} PDF material?</div>
+      <div style="font-size: 0.82rem; color: var(--text-muted);">Generate printable PDF revision notes, past examination papers with marking rubrics, and formula cheat sheets.</div>
+    </div>
+    <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-outline btn-sm" style="font-weight: 600;">Download Study Pack (PDF)</a>
+  </div>
+
+  {% if preview_notes %}
   <section class="prep-public-content" aria-labelledby="notes-heading">
-    <h2 id="notes-heading" style="font-size: 1.25rem; font-weight: 600;">Syllabus Study Notes</h2>
-    {{ notes|render_prep_markdown }}
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+      <h2 id="notes-heading" style="font-size: 1.25rem; font-weight: 600; margin: 0;">Syllabus Study Notes (Core Overview)</h2>
+      {% if has_locked_notes %}
+      <span style="font-size: 0.78rem; font-weight: 600; color: var(--green); background: rgba(15, 118, 110, 0.08); padding: 2px 8px; border-radius: 4px;">Free Overview Preview</span>
+      {% endif %}
+    </div>
+    {{ preview_notes|render_prep_markdown }}
+
+    {% if has_locked_notes %}
+    <div class="prep-locked-preview" style="position: relative; margin-top: -80px; padding-top: 100px; background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--bg, #fafafa) 65%); text-align: center;">
+      <div style="max-width: 640px; margin: 0 auto; padding: 28px 24px; background: var(--surface, #ffffff); border: 1px solid var(--border); border-radius: var(--radius-lg, 12px); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(15,118,110,0.1); color: var(--green); margin-bottom: 12px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 8px; color: var(--text);">Unlock Complete Study Notes &amp; Exam Traps</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; margin: 0 0 18px;">
+          The full guide includes formal proofs, worked exemplar calculations, high-yield exam traps, and examiner marking schemes. Continue studying this topic in Mentify Prep Studio.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+          <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary" style="font-weight: 600; padding: 8px 20px;">Open in Prep Studio &rarr;</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </section>
   {% endif %}
 
-  {% if questions %}
+  {% if sample_questions %}
   <section class="prep-public-content" aria-labelledby="questions-heading" style="margin-top: 42px;">
-    <h2 id="questions-heading" style="font-size: 1.25rem; font-weight: 600;">Verified Examination Problems &amp; Solutions</h2>
-    {% for question in questions %}
-    <article class="prep-public-question">
-      <h3 style="font-size: 1.05rem; font-weight: 600;">Question {{ question.number }}{% if question.marks %} ({{ question.marks }} marks){% endif %}</h3>
-      <div>{{ question.question_latex|render_prep_markdown }}</div>
-      {% if question.solution_latex %}
-      <h4 style="font-size: 0.95rem; font-weight: 600; color: #dc2626; margin-top: 14px;">Worked Solution &amp; Marking Rubric</h4>
-      <div>{{ question.solution_latex|render_prep_markdown }}</div>
-      {% endif %}
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+      <h2 id="questions-heading" style="font-size: 1.25rem; font-weight: 600; margin: 0;">Verified Examination Problems</h2>
+      <span style="font-size: 0.82rem; color: var(--text-muted);">{{ total_question_count }} verified question{{ total_question_count|pluralize }} in catalog</span>
+    </div>
+
+    {% for question in sample_questions %}
+    <article class="prep-public-question" style="margin-bottom: 24px; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface);">
+      <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0 0 10px;">Question {{ question.number }}{% if question.marks %} ({{ question.marks }} marks){% endif %}</h3>
+      <div style="line-height: 1.6;">{{ question.question_latex|render_prep_markdown }}</div>
+
+      <div style="margin-top: 16px; padding: 14px 16px; background: rgba(15,118,110,0.04); border: 1px dashed rgba(15,118,110,0.25); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--green);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span style="font-weight: 600;">Full Step-by-Step Solution &amp; Marking Rubric Locked</span>
+        </div>
+        <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary btn-sm" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600;">View Solution in Studio &rarr;</a>
+      </div>
     </article>
     {% endfor %}
+
+    {% if locked_questions_count > 0 %}
+    <div style="padding: 18px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center; margin-top: 16px;">
+      <div style="font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px;">+ {{ locked_questions_count }} More Verified Exam Questions Available</div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 12px;">Access all authentic past questions, interactive AI hint generation, and full marking rubrics in the course studio.</p>
+      <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-outline btn-sm" style="font-weight: 600;">Unlock All Questions in Studio &rarr;</a>
+    </div>
+    {% endif %}
   </section>
   {% endif %}
 
-  {% if not notes and not questions %}
+  {% if not preview_notes and not sample_questions %}
   <p style="color: var(--text-muted);">This topic is currently being prepared. The course syllabus remains available above.</p>
   {% endif %}
 

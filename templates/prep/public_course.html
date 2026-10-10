@@ -1,11 +1,11 @@
 {% extends "prep/base_prep.html" %}
 
-{% block title %}{{ course.code }} {{ course.title }} Syllabus and Study Resources | Mentify Prep{% endblock %}
-{% block meta_description %}Study {{ course.code }} {{ course.title }} with the Mentify Prep syllabus, topic notes, and verified revision questions for {{ course.level|lower }} learners.{% endblock %}
+{% block title %}{{ course.code }} {{ course.title }} Syllabus, Notes & PDF Study Pack | Mentify Prep{% endblock %}
+{% block meta_description %}Study {{ course.code }} {{ course.title }} with the Mentify Prep syllabus, printable PDF study packs, revision notes, and verified past examination questions for students and learners.{% endblock %}
 {% block og_title %}{{ course.code }} {{ course.title }} | Mentify Prep{% endblock %}
-{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, and revision questions on Mentify Prep.{% endblock %}
+{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, past papers, and printable PDF packs on Mentify Prep.{% endblock %}
 {% block extra_head %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|default:'Structured syllabus, study notes, and revision resources from Mentify Prep.'|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"educationalLevel":"{{ course.level|escapejs }}","inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|default:'Structured syllabus, study notes, and revision resources from Mentify Prep.'|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en"}</script>
 {% endblock %}
 
 {% block content %}
@@ -14,14 +14,26 @@
     <a href="{% url 'prep:dashboard' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">Mentify Prep</a> &bull; <a href="{% url 'prep:public_library' %}" style="color: var(--text-muted); text-decoration: none;">Study Library</a> &bull; {{ course.code }}
   </nav>
 
-  <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px;">
+  <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 24px;">
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
       <span style="color: var(--green); font-weight: 700; font-size: 0.82rem; background: rgba(15, 118, 110, 0.08); padding: 3px 8px; border-radius: 4px;">{{ course.code }}</span>
-      <span style="font-size: 0.82rem; color: var(--text-muted);">{{ course.level }}</span>
+      <span style="font-size: 0.82rem; color: var(--text-muted);">{{ course.category }}</span>
     </div>
     <h1 style="font-size: 1.6rem; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text);">{{ course.title }}</h1>
     <p style="max-width: 760px; color: var(--text-muted); line-height: 1.6; margin: 0; font-size: 0.92rem;">{{ course.description|default:"A structured Mentify Prep course with syllabus-guided study resources and revision questions." }}</p>
   </header>
+
+  <div style="background: linear-gradient(135deg, rgba(15, 118, 110, 0.06) 0%, rgba(13, 148, 136, 0.12) 100%); border: 1px solid rgba(15, 118, 110, 0.2); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+    <div>
+      <div style="font-weight: 600; font-size: 0.95rem; color: var(--text);">Looking for {{ course.code }} {{ course.title }} PDF material?</div>
+      <div style="font-size: 0.83rem; color: var(--text-muted); line-height: 1.5;">Access complete syllabus revision notes, step-by-step past examination solutions, and printable PDF study guides.</div>
+    </div>
+    {% if topics.0 %}
+    <a href="{% url 'prep:topic_study' topics.0.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Get PDF &amp; Study Pack</a>
+    {% else %}
+    <a href="{% url 'prep:dashboard' %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Get PDF &amp; Study Pack</a>
+    {% endif %}
+  </div>
 
   <section aria-labelledby="topics-heading">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">

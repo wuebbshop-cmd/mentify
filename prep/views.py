@@ -289,6 +289,52 @@ def prep_public_course(request, course_slug):
     )
 
 
+def _prepare_public_topic_preview(notes: str, questions: list) -> dict:
+    """
+    Split topic notes and examination questions into an SEO-optimized preview.
+    Provides enough high-quality introductory content and question statements
+    for search engines to index core syllabus concepts, while protecting
+    deep mathematical proofs, worked exemplars, examiner pitfalls, and full
+    marking rubrics behind the interactive study conversion barrier.
+    """
+    preview_notes = ""
+    has_locked_notes = False
+    locked_sections_count = 0
+
+    if notes:
+        headings = list(re.finditer(r"^##\s+", notes, flags=re.MULTILINE))
+        if len(headings) >= 3:
+            split_idx = headings[2].start()
+            preview_notes = notes[:split_idx].strip()
+            has_locked_notes = True
+            locked_sections_count = len(headings) - 2
+        elif len(headings) == 2 and len(notes) > 1800:
+            split_idx = headings[1].start()
+            preview_notes = notes[:split_idx].strip()
+            has_locked_notes = True
+            locked_sections_count = 1
+        elif len(notes) > 2200:
+            cut = notes[:2000].rfind("\n\n")
+            preview_notes = notes[:cut].strip() if cut > 800 else notes[:1800].strip()
+            has_locked_notes = True
+            locked_sections_count = 1
+        else:
+            preview_notes = notes
+            has_locked_notes = False
+
+    sample_questions = questions[:2] if questions else []
+    locked_questions_count = max(0, len(questions) - len(sample_questions))
+
+    return {
+        "preview_notes": preview_notes,
+        "has_locked_notes": has_locked_notes,
+        "locked_sections_count": locked_sections_count,
+        "sample_questions": sample_questions,
+        "locked_questions_count": locked_questions_count,
+        "total_question_count": len(questions),
+    }
+
+
 def prep_public_topic(request, course_slug, topic_id, topic_slug):
     """Public topic resource containing only validated notes and verified shared Q&A."""
     course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
@@ -304,6 +350,7 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
 
     notes, notes_updated_at = _public_topic_notes(topic)
     questions = _public_topic_questions(topic)
+    preview = _prepare_public_topic_preview(notes, questions)
     resp = render(
         request,
         "prep/public_topic.html",
@@ -311,6 +358,12 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
             "course": course,
             "topic": topic,
             "notes": notes,
+            "preview_notes": preview["preview_notes"],
+            "has_locked_notes": preview["has_locked_notes"],
+            "locked_sections_count": preview["locked_sections_count"],
+            "sample_questions": preview["sample_questions"],
+            "locked_questions_count": preview["locked_questions_count"],
+            "total_question_count": preview["total_question_count"],
             "notes_updated_at": notes_updated_at,
             "questions": questions,
             "is_indexable": bool(notes or questions),
@@ -1143,7 +1196,7 @@ def prep_upload(request):
                 course = PrepCourse.objects.create(
                     code=course_code,
                     title=course_title,
-                    level="Undergraduate",
+                    level="Standard",
                     category="Other",
                 )
 

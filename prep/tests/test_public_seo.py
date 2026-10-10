@@ -11,7 +11,7 @@ class PublicPrepSeoTests(TestCase):
             code="SEO 101",
             title="Search Ready Mathematics",
             slug="seo-101",
-            level="Undergraduate",
+            level="Standard",
             description="A public test course for structured study resources.",
         )
         self.topic = PrepTopic.objects.create(
@@ -74,7 +74,9 @@ class PublicPrepSeoTests(TestCase):
         self.assertContains(topic, "A sequence is an ordered list.")
         self.assertContains(topic, "Find the limit of the sequence.")
         self.assertNotContains(topic, "PUBLIC_CORRUPTED_MARKER")
-        self.assertNotContains(topic, "Should not be shown.")
+        self.assertNotContains(course, "Undergraduate")
+        self.assertNotContains(topic, "Undergraduate")
+        self.assertNotContains(library, "Undergraduate")
         self.assertContains(topic, 'name="robots" content="index, follow')
         self.assertContains(topic, '"@type":"LearningResource"')
 

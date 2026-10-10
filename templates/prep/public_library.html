@@ -1,7 +1,7 @@
 {% extends "prep/base_prep.html" %}
 
-{% block title %}Study Library — Courses, Syllabi & Study Notes | Mentify Prep{% endblock %}
-{% block meta_description %}Explore Mentify Prep courses, structured syllabi, verified study notes, revision questions, and past-paper resources for students and learners worldwide.{% endblock %}
+{% block title %}Study Library — Courses, Syllabi, Notes & PDF Material | Mentify Prep{% endblock %}
+{% block meta_description %}Explore Mentify Prep courses, structured syllabi, verified study notes, printable PDF study packs, revision questions, and past-paper resources for students and learners.{% endblock %}
 {% block og_title %}Study Library — Mentify Prep{% endblock %}
 {% block og_description %}Find structured courses, syllabus topics, revision notes, and verified practice resources from Mentify Prep.{% endblock %}
 
@@ -34,7 +34,7 @@
       <h2 style="margin: 0; font-size: 1.15rem; font-weight: 600;">
         <a href="{% url 'prep:public_course' course.slug %}" style="color: inherit; text-decoration: none;">{{ course.title }}</a>
       </h2>
-      <p style="margin: 0; color: var(--text-muted); font-size: .85rem;">{{ course.level }}</p>
+      <p style="margin: 0; color: var(--text-muted); font-size: .85rem;">{{ course.category }} Study Track</p>
       {% if course.description %}
       <p style="margin: 0; line-height: 1.55; font-size: 0.88rem; color: var(--text-muted);">{{ course.description|truncatewords:24 }}</p>
       {% endif %}

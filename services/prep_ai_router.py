@@ -1054,7 +1054,7 @@ def _review_topic_note_content(topic_obj, level: str, content: str) -> dict:
             {
                 "role": "system",
                 "content": (
-                    "You are an independent fact-checker for university study notes. Compare only "
+                    "You are an independent fact-checker for academic study notes. Compare only "
                     "the supplied notes with the approved course source. Report clear factual "
                     "contradictions, unsupported material claims, or materially incorrect formulas. "
                     "Do not report style preferences, omissions that are not required, or claims "
@@ -2701,7 +2701,7 @@ def route_math_request(
 
     if not system_prompt:
         system_prompt = (
-            f"You are an expert university mathematics and statistics tutor specialized in {course_code}. "
+            f"You are an expert academic mathematics and statistics tutor specialized in {course_code}. "
             "Provide rigorous, mathematically sound responses.\n\n"
             "STRICT MATHEMATICAL AUTHORING FORMAT — follow these rules exactly, no exceptions:\n"
             "1. Inline math: use $...$ with NO inner spaces (e.g. $x \\in \\mathbb{R}$, NEVER $ x $). Close all inline math before punctuation or paragraph breaks.\n"
@@ -3283,7 +3283,7 @@ def get_or_generate_topic_notes(
                 if q_lines:
                     past_questions_context_block = (
                         "AUTHENTIC PAST EXAMINATION QUESTIONS & ASSESSMENT SCOPE:\n"
-                        "The following examination problems have appeared in actual university CATs and final papers for this topic. "
+                        "The following examination problems have appeared in actual CATs and final papers for this topic. "
                         "The generated revision notes must explicitly prepare students for these types of questions: cover all underlying definitions, "
                         "theorems, formulas, calculation techniques, and proof strategies tested in these genuine past exam questions:\n"
                         + "\n".join(q_lines)
@@ -3358,15 +3358,15 @@ def get_or_generate_topic_notes(
     elif level == "level_3":
         level_instruction = (
             "Tone: Exam Mode & High-Yield Mastery (Level 3).\n"
-            "- Focus directly on how this topic is tested in university examinations (CATs and finals).\n"
+            "- Focus directly on how this topic is tested in course examinations (CATs and finals).\n"
             "- Highlight high-frequency exam question patterns and common pitfalls/traps where students lose marks.\n"
             "- Provide discipline-appropriate answer structures and worked applications.\n"
             "- Include examination marking rubric tips and time-management strategies."
         )
     else:  # level_2
         level_instruction = (
-            "Tone: University Undergraduate Standard (Level 2).\n"
-            "- Deliver standard university notes with precise definitions and academic rigor.\n"
+            "Tone: Rigorous Academic Standard (Level 2).\n"
+            "- Deliver thorough academic notes with precise definitions and academic rigor.\n"
             "- Include a representative worked example or application grounded in the approved notes.\n"
             "- Use formal notation only where supported by the approved source and relevant to this topic."
         )
@@ -3485,7 +3485,7 @@ def get_or_generate_topic_notes(
     note_system_prompt = None
     if study_profile:
         note_system_prompt = (
-            f"You are an expert university tutor for the approved subject family {study_profile.get('subject_family')}. "
+            f"You are an expert academic tutor for the approved subject family {study_profile.get('subject_family')}. "
             "Treat uploaded notes and quoted evidence as the sole factual scope. Do not infer content from course codes, exams, or generic conventions. "
             + ("Do not use equations, mathematical symbols, LaTeX, or code because the approved notes contain none. " if not allows_math and not allows_code else "")
             + ("Include code only where the approved topic notes support it. " if allows_code else "Do not include code or pseudocode. ")
@@ -4509,7 +4509,7 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             "Use definitions, theories, case examples, and clear academic reasoning. Do not convert it into a proof, derivation, or theorem exercise."
         )
         system_prompt = (
-            "You are an expert university tutor in the social sciences and humanities. "
+            "You are an expert academic tutor in the social sciences and humanities. "
             "Answer with clear academic explanation, definitions, theories, case evidence, and examples. "
             "Do not rewrite the question as a mathematical proof or theorem derivation."
         )
@@ -4807,7 +4807,7 @@ def generate_adapted_past_question(question_obj) -> dict:
         "delimiters exactly as requested, with no HTML and no code fences around the JSON."
     )
     system_prompt = (
-        "You are a careful university mathematics examiner. Return only valid JSON. "
+        "You are a careful academic mathematics examiner. Return only valid JSON. "
         "All LaTeX backslashes inside JSON strings must be escaped. Keep the adapted question at the same "
         "academic level and topic as the source."
     )

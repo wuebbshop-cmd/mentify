@@ -27,7 +27,7 @@ class PrepCourse(models.Model):
         ],
         default="Mathematics",
     )
-    level = models.CharField(max_length=100, default="Undergraduate")
+    level = models.CharField(max_length=100, default="Standard")
     description = models.TextField(blank=True, help_text="Canonical course objectives, syllabus scope, and references.")
     study_profile = models.JSONField(default=dict, blank=True, help_text="Tutor-approved, source-grounded subject rules for notes and topics.")
     study_profile_version = models.PositiveIntegerField(default=0)
@@ -47,6 +47,8 @@ class PrepCourse(models.Model):
         if not self.slug:
             self.slug = slugify(self.code)
         super().save(*args, **kwargs)
+        from django.core.cache import cache
+        cache.delete("prep_pub_lib_courses")
 
 
 class PrepCourseEnrollment(models.Model):
@@ -273,6 +275,11 @@ class PrepTopic(models.Model):
                 if update_fields is not None:
                     kwargs["update_fields"] = set(update_fields) | {"content_rules_version"}
         super().save(*args, **kwargs)
+        from django.core.cache import cache
+        cache.delete("prep_pub_lib_courses")
+        if self.pk:
+            cache.delete(f"prep_pub_topic_notes_{self.pk}")
+            cache.delete(f"prep_pub_topic_questions_{self.pk}")
 
 
 class PrepTopicChatSession(models.Model):
@@ -600,6 +607,12 @@ class PrepContentCache(models.Model):
 
     def __str__(self):
         return f"Cache [{self.content_type}] {self.cache_key} (Hits: {self.hit_count})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.topic_id:
+            from django.core.cache import cache
+            cache.delete(f"prep_pub_topic_notes_{self.topic_id}")
 
 
 class PrepNoteGenerationGuard(models.Model):
