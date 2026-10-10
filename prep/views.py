@@ -7,6 +7,9 @@ from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
+from django.core.cache import cache
+from django.views.decorators.cache import never_cache
+from django.utils.cache import patch_vary_headers
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
@@ -41,6 +44,21 @@ from services.credit_service import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def set_prep_cache_headers(response, *, max_age: int = 600, is_public: bool = False, is_authenticated: bool = False):
+    """
+    Apply appropriate HTTP Cache-Control headers to Mentify Prep responses.
+    - Public/anonymous: Cache-Control: public, max-age={max_age}, stale-while-revalidate={max_age * 2}
+    - Authenticated: Cache-Control: private, max-age={max(60, max_age // 2)}, stale-while-revalidate={max_age} + Vary: Cookie
+    """
+    if is_authenticated:
+        response["Cache-Control"] = f"private, max-age={max(60, max_age // 2)}, stale-while-revalidate={max_age}"
+        patch_vary_headers(response, ["Cookie"])
+    elif is_public:
+        response["Cache-Control"] = f"public, max-age={max_age}, stale-while-revalidate={max_age * 2}"
+        patch_vary_headers(response, ["Accept-Encoding"])
+    return response
 
 
 def _json_api_error_boundary(view_func):
@@ -116,12 +134,15 @@ def _find_catalog_courses(query: str, *, limit: int = 12, include_category: bool
     query_key = _catalog_search_key(query)
     if not query_key:
         return []
-    courses = list(
-        PrepCourse.objects.filter(is_active=True).annotate(
-            topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
-            papers_count=Count("papers", distinct=True),
+    courses = cache.get("prep_annotated_catalog_courses")
+    if courses is None:
+        courses = list(
+            PrepCourse.objects.filter(is_active=True).annotate(
+                topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
+                papers_count=Count("papers", distinct=True),
+            )
         )
-    )
+        cache.set("prep_annotated_catalog_courses", courses, 900)
 
     def matches(course):
         searchable = f"{course.code} {course.title}"
@@ -140,6 +161,11 @@ def _find_catalog_courses(query: str, *, limit: int = 12, include_category: bool
 
 def _public_topic_notes(topic):
     """Return the newest complete shared Level 2 notes without generating content."""
+    cache_key = f"prep_pub_topic_notes_{topic.pk}"
+    cached_val = cache.get(cache_key)
+    if cached_val is not None:
+        return cached_val
+
     from services.prep_ai_router import _cache_payload_as_dict, get_published_topic_note_levels
 
     published_levels = get_published_topic_note_levels(topic, validated_only=False)
@@ -152,13 +178,24 @@ def _public_topic_notes(topic):
         for entry in entries:
             payload = _cache_payload_as_dict(entry.payload)
             if payload and payload.get("level") == "level_2" and payload.get("content") == content:
-                return content, entry.updated_at
-        return content, None
-    return "", None
+                val = (content, entry.updated_at)
+                cache.set(cache_key, val, 900)
+                return val
+        val = (content, None)
+        cache.set(cache_key, val, 900)
+        return val
+    val = ("", None)
+    cache.set(cache_key, val, 900)
+    return val
 
 
 def _public_topic_questions(topic):
     """Return shared verified questions using the same course-safe matching as study pages."""
+    cache_key = f"prep_pub_topic_questions_{topic.pk}"
+    cached_val = cache.get(cache_key)
+    if cached_val is not None:
+        return cached_val
+
     from services.prep_ingestion import learner_visible_assessment_questions
 
     topic_match = (
@@ -178,37 +215,77 @@ def _public_topic_questions(topic):
         .select_related("paper")
         .order_by("question_type", "paper__created_at", "number", "id")
     )
-    return learner_visible_assessment_questions(records)
+    res = learner_visible_assessment_questions(records)
+    cache.set(cache_key, res, 900)
+    return res
 
 
 def prep_public_library(request):
     """Public catalogue for search visitors and crawlers, branded as Mentify."""
-    courses = (
-        PrepCourse.objects.filter(is_active=True)
-        .annotate(
-            topic_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
-            paper_count=Count("papers", filter=Q(papers__is_published=True), distinct=True),
+    courses = cache.get("prep_pub_lib_courses")
+    if courses is None:
+        courses = list(
+            PrepCourse.objects.filter(is_active=True)
+            .annotate(
+                topic_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
+                paper_count=Count("papers", filter=Q(papers__is_published=True), distinct=True),
+            )
+            .order_by("category", "code")
         )
-        .order_by("category", "code")
+        cache.set("prep_pub_lib_courses", courses, 900)
+
+    resp = render(request, "prep/public_library.html", {
+        "courses": courses,
+        "active_tab": "library",
+    })
+    return set_prep_cache_headers(
+        resp,
+        max_age=600,
+        is_public=not request.user.is_authenticated,
+        is_authenticated=request.user.is_authenticated,
     )
-    return render(request, "prep/public_library.html", {"courses": courses})
 
 
 def prep_public_course(request, course_slug):
     """Public, canonical course syllabus page with internal links to each topic."""
     course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
     topics = list(course.topics.filter(is_active=True).order_by("order", "id"))
+    from services.prep_ai_router import get_published_topic_note_levels
     for topic in topics:
         topic.question_count = len(_public_topic_questions(topic))
+        published_levels = get_published_topic_note_levels(topic)
+        ready_levels_list = []
+        if "level_1" in published_levels and published_levels["level_1"].strip():
+            ready_levels_list.append({"key": "level_1", "label": "Foundation", "num": 1})
+        if "level_2" in published_levels and published_levels["level_2"].strip():
+            ready_levels_list.append({"key": "level_2", "label": "Core Concepts", "num": 2})
+        if "level_3" in published_levels and published_levels["level_3"].strip():
+            ready_levels_list.append({"key": "level_3", "label": "Exam Focus", "num": 3})
 
-    return render(
+        preferred_level = "level_2"
+        if any(r["key"] == "level_2" for r in ready_levels_list):
+            preferred_level = "level_2"
+        elif ready_levels_list:
+            preferred_level = ready_levels_list[0]["key"]
+
+        topic.ready_levels = ready_levels_list
+        topic.preferred_level = preferred_level
+
+    resp = render(
         request,
         "prep/public_course.html",
         {
             "course": course,
             "topics": topics,
             "published_papers": course.papers.filter(is_published=True).order_by("-created_at"),
+            "active_tab": "library",
         },
+    )
+    return set_prep_cache_headers(
+        resp,
+        max_age=600,
+        is_public=not request.user.is_authenticated,
+        is_authenticated=request.user.is_authenticated,
     )
 
 
@@ -227,7 +304,7 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
 
     notes, notes_updated_at = _public_topic_notes(topic)
     questions = _public_topic_questions(topic)
-    return render(
+    resp = render(
         request,
         "prep/public_topic.html",
         {
@@ -237,10 +314,18 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
             "notes_updated_at": notes_updated_at,
             "questions": questions,
             "is_indexable": bool(notes or questions),
+            "active_tab": "library",
         },
+    )
+    return set_prep_cache_headers(
+        resp,
+        max_age=900,
+        is_public=not request.user.is_authenticated,
+        is_authenticated=request.user.is_authenticated,
     )
 
 
+@never_cache
 def prep_dashboard(request):
     """Mentify Prep Hub Main Landing Page with real database metrics."""
     courses_qs = PrepCourse.objects.filter(is_active=True).annotate(
@@ -504,6 +589,7 @@ def prep_course_detail(request, course_code):
     course_papers = []
     total_questions_count = 0
     from services.prep_ingestion import learner_visible_assessment_questions
+    from services.prep_ai_router import get_published_topic_note_levels
 
     topics_qs = course.topics.filter(is_active=True).order_by("order")
     for t in topics_qs:
@@ -515,12 +601,29 @@ def prep_course_detail(request, course_code):
         total_questions_count += auth_count
         raw_subtopics = t.subtopics if isinstance(t.subtopics, list) else []
         clean_subtopics = [clean_tag_label(str(st)) for st in raw_subtopics if clean_tag_label(str(st))]
+        published_levels = get_published_topic_note_levels(t)
+        ready_levels_list = []
+        if "level_1" in published_levels and published_levels["level_1"].strip():
+            ready_levels_list.append({"key": "level_1", "label": "Foundation", "num": 1})
+        if "level_2" in published_levels and published_levels["level_2"].strip():
+            ready_levels_list.append({"key": "level_2", "label": "Core Concepts", "num": 2})
+        if "level_3" in published_levels and published_levels["level_3"].strip():
+            ready_levels_list.append({"key": "level_3", "label": "Exam Focus", "num": 3})
+
+        preferred_level = "level_2"
+        if any(r["key"] == "level_2" for r in ready_levels_list):
+            preferred_level = "level_2"
+        elif ready_levels_list:
+            preferred_level = ready_levels_list[0]["key"]
+
         topics_data.append({
             "id": str(t.id),
             "num": t.order,
             "title": clean_tag_label(t.title),
             "subtopics": clean_subtopics,
             "authentic_count": auth_count,
+            "ready_levels": ready_levels_list,
+            "preferred_level": preferred_level,
         })
 
     for p in course.papers.filter(is_published=True).prefetch_related("questions"):
@@ -697,8 +800,12 @@ def prep_topic_study(request, topic_id):
     assistant_conversations = list_topic_conversations(request.user, topic)
     latest_session = topic.chat_sessions.filter(user=request.user).order_by("-updated_at", "-id").first()
     initial_assistant_conversation = serialize_topic_conversation(latest_session) if latest_session else None
-    initial_level = "level_2"
-    if "level_2" in published_notes_by_level and published_notes_by_level["level_2"].strip():
+    requested_level = request.GET.get("level", "").strip().lower()
+    if requested_level in ("level_1", "level_2", "level_3") and published_notes_by_level.get(requested_level, "").strip():
+        initial_level = requested_level
+        initial_notes = published_notes_by_level[requested_level]
+    elif "level_2" in published_notes_by_level and published_notes_by_level["level_2"].strip():
+        initial_level = "level_2"
         initial_notes = published_notes_by_level["level_2"]
     elif "level_1" in published_notes_by_level and published_notes_by_level["level_1"].strip():
         initial_level = "level_1"
@@ -707,6 +814,7 @@ def prep_topic_study(request, topic_id):
         initial_level = "level_3"
         initial_notes = published_notes_by_level["level_3"]
     else:
+        initial_level = requested_level if requested_level in ("level_1", "level_2", "level_3") else "level_2"
         initial_notes = ""
     initial_notes_error = ""
     if not initial_notes:
@@ -746,6 +854,7 @@ def prep_topic_study(request, topic_id):
 
 
 @login_required
+@never_cache
 @require_http_methods(["GET", "POST"])
 def prep_topic_tutor_api(request, topic_id):
     """Load or send a private topic conversation and optional bounded study uploads."""
@@ -968,6 +1077,7 @@ def prep_practice(request, topic_id):
     return redirect("prep:past_papers")
 
 
+@never_cache
 def prep_upload(request):
     """Upload one document group to an existing course or create a new course."""
     if request.method == "POST":
@@ -1125,12 +1235,14 @@ def prep_upload(request):
     return render(request, "prep/upload.html", context)
 
 
+@never_cache
 @login_required
 def prep_history(request):
     """Legacy revision history route; redirect to dashboard."""
     return redirect("prep:dashboard")
 
 
+@never_cache
 def prep_billing(request):
     """Credit Balance & M-Pesa Top-Up Page connected to PrepWallet."""
     if request.user.is_authenticated:
@@ -1246,6 +1358,7 @@ def prep_billing(request):
     return render(request, "prep/billing.html", context)
 
 
+@never_cache
 def prep_metrics(request):
     """
     Mentify Prep Metrics & Activity Page.
@@ -1386,7 +1499,7 @@ def prep_metrics(request):
         "chart_tutor_json": json.dumps(chart_tutor),
         "chart_ocr_json": json.dumps(chart_ocr),
         "daily_stats_json": json.dumps(daily_stats),
-        "transactions": table_transactions[:100],
+        "transactions": table_transactions[:10],
         "total_transactions_count": all_transactions.count(),
     }
     return render(request, "prep/metrics.html", context)
@@ -1431,6 +1544,7 @@ PREP_PACKAGES = {
 }
 
 
+@never_cache
 @login_required
 def prep_initiate_payment(request):
     """Initiate M-Pesa / Paystack payment for credits or monthly exam plan."""
@@ -1468,13 +1582,18 @@ def prep_initiate_payment(request):
         currency=getattr(settings, "PAYSTACK_CURRENCY", "KES"),
     )
 
-    status_code, body = paystack.initialize(
-        email=request.user.email,
-        amount_cents=amount_cents,
-        reference=reference,
-        callback_url=callback_url,
-        metadata=metadata,
-    )
+    try:
+        status_code, body = paystack.initialize(
+            email=request.user.email,
+            amount_cents=amount_cents,
+            reference=reference,
+            callback_url=callback_url,
+            metadata=metadata,
+        )
+    except Exception as exc:
+        logger.error("Paystack payment initialization error: %s", exc)
+        messages.error(request, "Unable to connect to the payment gateway. Please try again in a moment.")
+        return redirect("prep:billing")
 
     if status_code == 200 and body.get("status"):
         auth_url = body.get("data", {}).get("authorization_url")
@@ -1486,6 +1605,7 @@ def prep_initiate_payment(request):
     return redirect("prep:billing")
 
 
+@never_cache
 @login_required
 def prep_payment_callback(request):
     """Callback after Paystack M-Pesa / Card transaction."""
@@ -1499,7 +1619,12 @@ def prep_payment_callback(request):
         currency=getattr(settings, "PAYSTACK_CURRENCY", "KES"),
     )
 
-    status_code, body = paystack.verify(reference)
+    try:
+        status_code, body = paystack.verify(reference)
+    except Exception as exc:
+        logger.error("Paystack verification error for ref %s: %s", reference, exc)
+        messages.error(request, "Unable to verify payment with the gateway. If your payment was deducted, please contact support.")
+        return redirect("prep:billing")
     if status_code == 200 and body.get("status") and body.get("data", {}).get("status") == "success":
         data = body.get("data", {})
         metadata = data.get("metadata", {})
@@ -1562,6 +1687,7 @@ from services.prep_ai_router import (
 )
 
 
+@never_cache
 @login_required
 def prep_solve_question_api(request):
     """
@@ -1635,12 +1761,16 @@ def prep_solve_question_api(request):
         }, status=402)
 
     # Call AI router (with DB cache layer)
-    res = get_or_generate_question_solution(
-        question_latex=question_latex,
-        course_code=course_code or "Mathematics",
-        topic_label=topic_label,
-        question_obj=q_obj,
-    )
+    try:
+        res = get_or_generate_question_solution(
+            question_latex=question_latex,
+            course_code=course_code or "Mathematics",
+            topic_label=topic_label,
+            question_obj=q_obj,
+        )
+    except Exception as exc:
+        logger.error("Failed in get_or_generate_question_solution: %s", exc)
+        return JsonResponse({"success": False, "error": "Unable to generate verified solution right now. Please try again shortly."}, status=500)
 
     if not res.get("solution"):
         return JsonResponse({"success": False, "error": res.get("error", "Failed to generate solution.")}, status=500)
@@ -1686,6 +1816,7 @@ def prep_solve_question_api(request):
     })
 
 
+@never_cache
 @login_required
 def prep_adapt_question_api(request):
     """Create a credit-paid, validated equivalent for an unreadable source question."""
@@ -1767,7 +1898,11 @@ def prep_adapt_question_api(request):
             "credits_balance": wallet.credits_balance,
         }, status=402)
 
-    result = generate_adapted_past_question(question)
+    try:
+        result = generate_adapted_past_question(question)
+    except Exception as exc:
+        logger.error("Failed in generate_adapted_past_question: %s", exc)
+        return JsonResponse({"success": False, "error": "Unable to adapt question at this time. Please try again shortly."}, status=500)
     if not result.get("success"):
         return JsonResponse({"success": False, "error": result.get("error")}, status=422)
 
@@ -1851,6 +1986,7 @@ def prep_adapt_question_api(request):
     })
 
 
+@never_cache
 @login_required
 @_json_api_error_boundary
 def prep_topic_notes_api(request):
@@ -2192,6 +2328,7 @@ def prep_topic_notes_api(request):
     })
 
 
+@never_cache
 @login_required
 def prep_generate_practice_api(request):
     """
@@ -2300,15 +2437,19 @@ def prep_generate_practice_api(request):
             "credits_balance": wallet.credits_balance,
         }, status=402)
 
-    res = generate_similar_practice_questions(
-        course_code=course_code or "Course",
-        topic_title=topic_title,
-        question_count=count,
-        authentic_samples=authentic_samples,
-        topic_obj=topic_obj,
-        course_obj=topic_obj.course if topic_obj else None,
-        force_fresh=should_force_fresh,
-    )
+    try:
+        res = generate_similar_practice_questions(
+            course_code=course_code or "Course",
+            topic_title=topic_title,
+            question_count=count,
+            authentic_samples=authentic_samples,
+            topic_obj=topic_obj,
+            course_obj=topic_obj.course if topic_obj else None,
+            force_fresh=should_force_fresh,
+        )
+    except Exception as exc:
+        logger.error("Failed in generate_similar_practice_questions: %s", exc)
+        return JsonResponse({"success": False, "error": "Unable to generate practice questions at this time. Please try again shortly."}, status=500)
 
     if not res.get("success"):
         return JsonResponse({
@@ -2534,32 +2675,39 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
 
     clean_slug = topic_title.lower().replace(" ", "_")[:35]
 
-    if fmt.lower() == "docx":
-        docx_bytes = export_topic_notes_docx(
-            course_code,
-            topic_title,
-            notes_content,
-            authentic_questions=authentic_qs,
-            practice_questions=practice_qs,
-        )
-        resp = HttpResponse(
-            docx_bytes,
-            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        )
-        resp["Content-Disposition"] = f'attachment; filename="{course_code}_{clean_slug}_{level}_study_pack.docx"'
-        return resp
-    else:
-        pdf_bytes = export_topic_notes_pdf(
-            course_code,
-            topic_title,
-            notes_content,
-            authentic_questions=authentic_qs,
-            practice_questions=practice_qs,
-            level=level,
-        )
-        resp = HttpResponse(pdf_bytes, content_type="application/pdf")
-        resp["Content-Disposition"] = f'attachment; filename="{course_code}_{clean_slug}_{level}_study_pack.pdf"'
-        return resp
+    try:
+        if fmt.lower() == "docx":
+            docx_bytes = export_topic_notes_docx(
+                course_code,
+                topic_title,
+                notes_content,
+                authentic_questions=authentic_qs,
+                practice_questions=practice_qs,
+            )
+            resp = HttpResponse(
+                docx_bytes,
+                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+            resp["Content-Disposition"] = f'attachment; filename="{course_code}_{clean_slug}_{level}_study_pack.docx"'
+            return resp
+        else:
+            pdf_bytes = export_topic_notes_pdf(
+                course_code,
+                topic_title,
+                notes_content,
+                authentic_questions=authentic_qs,
+                practice_questions=practice_qs,
+                level=level,
+            )
+            resp = HttpResponse(pdf_bytes, content_type="application/pdf")
+            resp["Content-Disposition"] = f'attachment; filename="{course_code}_{clean_slug}_{level}_study_pack.pdf"'
+            return resp
+    except Exception as exc:
+        logger.error("Failed to generate topic export (%s): %s", fmt, exc)
+        messages.error(request, f"Unable to generate {fmt.upper()} export at this time. Please try again.")
+        if topic:
+            return redirect("prep:topic_study", topic_id=topic.id)
+        return redirect("prep:dashboard")
 
 
 @login_required
@@ -2610,29 +2758,35 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
     }
     include_questions, include_answers, filename_suffix = section_map.get(section, section_map["both"])
 
-    if fmt.lower() == "docx":
-        docx_bytes = export_paper_questions_docx(clean_course, paper_title, year, total_marks, questions_data)
-        resp = HttpResponse(
-            docx_bytes,
-            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        )
-        resp["Content-Disposition"] = f'attachment; filename="{clean_course}_{safe_id}.docx"'
-        return resp
-    else:
-        pdf_bytes = export_paper_questions_pdf(
-            clean_course,
-            paper_title,
-            year,
-            total_marks,
-            questions_data,
-            include_questions=include_questions,
-            include_answers=include_answers,
-        )
-        resp = HttpResponse(pdf_bytes, content_type="application/pdf")
-        resp["Content-Disposition"] = f'attachment; filename="{clean_course}_{safe_id}_{filename_suffix}.pdf"'
-        return resp
+    try:
+        if fmt.lower() == "docx":
+            docx_bytes = export_paper_questions_docx(clean_course, paper_title, year, total_marks, questions_data)
+            resp = HttpResponse(
+                docx_bytes,
+                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+            resp["Content-Disposition"] = f'attachment; filename="{clean_course}_{safe_id}.docx"'
+            return resp
+        else:
+            pdf_bytes = export_paper_questions_pdf(
+                clean_course,
+                paper_title,
+                year,
+                total_marks,
+                questions_data,
+                include_questions=include_questions,
+                include_answers=include_answers,
+            )
+            resp = HttpResponse(pdf_bytes, content_type="application/pdf")
+            resp["Content-Disposition"] = f'attachment; filename="{clean_course}_{safe_id}_{filename_suffix}.pdf"'
+            return resp
+    except Exception as exc:
+        logger.error("Failed to generate paper export (%s): %s", fmt, exc)
+        messages.error(request, f"Unable to generate {fmt.upper()} export for this past paper at this time. Please try again.")
+        return redirect("prep:paper_detail", course_code=course_code, paper_id=paper_id)
 
 
+@never_cache
 @login_required
 def prep_notifications_api(request):
     """Returns unread count and latest notifications for the current student."""
@@ -2660,6 +2814,7 @@ def prep_notifications_api(request):
     })
 
 
+@never_cache
 @login_required
 def prep_mark_notification_read_api(request):
     """Marks one or all notifications as read."""
@@ -2684,7 +2839,13 @@ def prep_terms(request):
         "active_tab": "terms",
         "user_credits": credits,
     }
-    return render(request, "prep/terms.html", context)
+    resp = render(request, "prep/terms.html", context)
+    return set_prep_cache_headers(
+        resp,
+        max_age=1800,
+        is_public=not request.user.is_authenticated,
+        is_authenticated=request.user.is_authenticated,
+    )
 
 
 def prep_privacy(request):
@@ -2697,9 +2858,16 @@ def prep_privacy(request):
         "active_tab": "privacy",
         "user_credits": credits,
     }
-    return render(request, "prep/privacy.html", context)
+    resp = render(request, "prep/privacy.html", context)
+    return set_prep_cache_headers(
+        resp,
+        max_age=1800,
+        is_public=not request.user.is_authenticated,
+        is_authenticated=request.user.is_authenticated,
+    )
 
 
+@never_cache
 @require_POST
 def prep_assistant_chat_api(request):
     """
@@ -2730,7 +2898,11 @@ def prep_assistant_chat_api(request):
 
     # Generate response using Prep grounding context & Gemini model
     user = request.user if request.user.is_authenticated else None
-    ai_response = generate_prep_chat_response(messages_history=history, user_message=user_message, user=user)
+    try:
+        ai_response = generate_prep_chat_response(messages_history=history, user_message=user_message, user=user)
+    except Exception as exc:
+        logger.error("Prep assistant chat error: %s", exc)
+        ai_response = "The Mentify Prep Assistant encountered a momentary issue. Please try again shortly or explore your [Courses & Syllabi](/prep/courses/) directly."
 
     # Save last 10 turns to session
     updated_history = history + [

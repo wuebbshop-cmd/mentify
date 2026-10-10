@@ -1,13 +1,13 @@
-{% extends "base.html" %}
+{% extends "prep/base_prep.html" %}
 {% load prep_seo %}
 
-{% block title %}{{ topic.title }} {{ course.code }} Study Notes and Questions{% endblock %}
+{% block title %}{{ topic.title }} — {{ course.code }} Study Notes & Questions | Mentify Prep{% endblock %}
 {% block meta_description %}Study {{ topic.title }} for {{ course.code }} {{ course.title }} with structured Mentify notes and verified revision questions for {{ course.level|lower }} learners.{% endblock %}
-{% block og_title %}{{ topic.title }} | {{ course.code }} | Mentify{% endblock %}
+{% block og_title %}{{ topic.title }} | {{ course.code }} | Mentify Prep{% endblock %}
 {% block og_description %}Study notes and verified revision questions for {{ topic.title }} in {{ course.code }} on Mentify Prep.{% endblock %}
 {% block robots %}{% if is_indexable %}index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1{% else %}noindex, follow{% endif %}{% endblock %}
 {% block extra_head %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"{{ topic.title|escapejs }}","description":"Study notes and verified revision questions for {{ topic.title|escapejs }} in {{ course.code|escapejs }} {{ course.title|escapejs }}.","educationalLevel":"{{ course.level|escapejs }}","learningResourceType":"Study guide","isPartOf":{"@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}"},"provider":{"@type":"EducationalOrganization","name":"Mentify"},"inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"{{ topic.title|escapejs }}","description":"Study notes and verified revision questions for {{ topic.title|escapejs }} in {{ course.code|escapejs }} {{ course.title|escapejs }}.","educationalLevel":"{{ course.level|escapejs }}","learningResourceType":"Study guide","isPartOf":{"@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}"},"provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -46,37 +46,53 @@ document.addEventListener('DOMContentLoaded', function () {
 {% endblock %}
 
 {% block content %}
-<article class="container" style="max-width: 980px; padding-top: 50px; padding-bottom: 64px;">
-  <nav aria-label="Breadcrumb" style="font-size: .9rem; margin-bottom: 18px;"><a href="/">Mentify</a> / <a href="{% url 'prep:public_library' %}">Prep library</a> / <a href="{% url 'prep:public_course' course.slug %}">{{ course.code }}</a> / {{ topic.title }}</nav>
-  <header style="border-bottom: 1px solid var(--border); padding-bottom: 26px; margin-bottom: 30px;">
-    <p style="margin: 0 0 8px; color: var(--green); font-weight: 700;">{{ course.code }} | UNIT {{ topic.order }} | {{ course.level }}</p>
-    <h1>{{ topic.title }}</h1>
-    {% if topic.subtopics %}<p style="color: var(--text-muted); line-height: 1.6;">Topics covered: {{ topic.subtopics|join:", " }}</p>{% endif %}
+<article style="max-width: 980px; margin: 0 auto; padding: 4px 0 40px;">
+  <nav aria-label="Breadcrumb" style="font-size: 0.85rem; margin-bottom: 20px; color: var(--text-muted);">
+    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">Mentify Prep</a> &bull; <a href="{% url 'prep:public_library' %}" style="color: var(--text-muted); text-decoration: none;">Study Library</a> &bull; <a href="{% url 'prep:public_course' course.slug %}" style="color: var(--text-muted); text-decoration: none;">{{ course.code }}</a> &bull; {{ topic.title }}
+  </nav>
+
+  <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <p style="margin: 0 0 6px; color: var(--green); font-weight: 700; font-size: 0.82rem;">{{ course.code }} &bull; UNIT {{ topic.order }} &bull; {{ course.level }}</p>
+      <h1 style="font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.02em; color: var(--text);">{{ topic.title }}</h1>
+      {% if topic.subtopics %}<p style="color: var(--text-muted); line-height: 1.6; margin: 0; font-size: 0.9rem;">Topics covered: {{ topic.subtopics|join:", " }}</p>{% endif %}
+    </div>
+    <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Open in Prep Studio &rarr;</a>
   </header>
+
   {% if notes %}
   <section class="prep-public-content" aria-labelledby="notes-heading">
-    <h2 id="notes-heading">Study notes</h2>
+    <h2 id="notes-heading" style="font-size: 1.25rem; font-weight: 600;">Syllabus Study Notes</h2>
     {{ notes|render_prep_markdown }}
   </section>
   {% endif %}
+
   {% if questions %}
   <section class="prep-public-content" aria-labelledby="questions-heading" style="margin-top: 42px;">
-    <h2 id="questions-heading">Verified revision questions and answers</h2>
+    <h2 id="questions-heading" style="font-size: 1.25rem; font-weight: 600;">Verified Examination Problems &amp; Solutions</h2>
     {% for question in questions %}
     <article class="prep-public-question">
-      <h3>Question {{ question.number }}{% if question.marks %} ({{ question.marks }} marks){% endif %}</h3>
+      <h3 style="font-size: 1.05rem; font-weight: 600;">Question {{ question.number }}{% if question.marks %} ({{ question.marks }} marks){% endif %}</h3>
       <div>{{ question.question_latex|render_prep_markdown }}</div>
       {% if question.solution_latex %}
-      <h4>Answer and explanation</h4>
+      <h4 style="font-size: 0.95rem; font-weight: 600; color: #dc2626; margin-top: 14px;">Worked Solution &amp; Marking Rubric</h4>
       <div>{{ question.solution_latex|render_prep_markdown }}</div>
       {% endif %}
     </article>
     {% endfor %}
   </section>
   {% endif %}
+
   {% if not notes and not questions %}
-  <p>This topic is currently being prepared. The course syllabus remains available above.</p>
+  <p style="color: var(--text-muted);">This topic is currently being prepared. The course syllabus remains available above.</p>
   {% endif %}
-  <p style="margin-top: 42px; color: var(--text-muted); font-size: .9rem;">Mentify Prep study resource for {{ course.code }}. <a href="{% url 'accounts:register' %}">Create a Mentify account</a> to access the full study workspace.</p>
+
+  <div style="margin-top: 42px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+    <div>
+      <div style="font-weight: 600; font-size: 0.95rem; color: var(--text);">Ready to practice this topic interactively?</div>
+      <div style="font-size: 0.82rem; color: var(--text-muted);">Generate custom exam variants, chat with the AI course tutor, and solve past papers.</div>
+    </div>
+    <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Launch Interactive Study</a>
+  </div>
 </article>
 {% endblock %}

@@ -314,6 +314,13 @@
         </li>
 
         <li class="nav-item">
+          <a href="{% url 'prep:public_library' %}" class="{% if active_tab == 'library' %}active{% endif %}">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Study Library
+          </a>
+        </li>
+
+        <li class="nav-item">
           <a href="{% url 'prep:upload' %}" class="{% if active_tab == 'upload' %}active{% endif %}">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             Upload
@@ -363,6 +370,7 @@
       <a href="{% url 'prep:billing' %}#credit-rules">Credit Rules</a>
       <a href="{% url 'prep:upload' %}#how-it-works">How Uploads Work</a>
       <a href="{% url 'prep:public_library' %}">Study Library</a>
+      <a href="javascript:void(0)" onclick="openPrepContactModal()">Contact Us</a>
       <a href="{% url 'accounts:dashboard' %}">Mentify</a>
       <a href="{% url 'prep:terms' %}">Terms</a>
       <a href="{% url 'prep:privacy' %}">Privacy</a>
@@ -568,6 +576,141 @@
 
 <!-- Mentify Prep AI Assistant Widget -->
 {% include "prep/includes/prep_chatbot.html" %}
+
+<!-- ─── Mentify Prep Contact Support Modal ───────────────────────── -->
+<div id="prep-contact-modal" style="display: none; position: fixed; inset: 0; z-index: 2100; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 16px;">
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); max-width: 480px; width: 100%; box-shadow: 0 16px 48px rgba(0,0,0,0.24); overflow: hidden;">
+    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(15, 118, 110, 0.12); color: var(--green); display: flex; align-items: center; justify-content: center;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text);">Contact Support</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Have questions about credits, notes, or your account?</p>
+        </div>
+      </div>
+      <button type="button" onclick="closePrepContactModal()" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+    </div>
+
+    <form id="prep-contact-form" onsubmit="handlePrepContactSubmit(event)" style="padding: 20px 22px;">
+      <div id="prep-contact-status" style="display: none; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-size: 0.85rem;"></div>
+
+      <div style="margin-bottom: 12px;">
+        <label for="prep-contact-name" style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 5px;">Your Name</label>
+        <input type="text" id="prep-contact-name" name="name" required value="{{ request.user.get_full_name|default:request.user.username }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.88rem; outline: none; box-sizing: border-box;">
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label for="prep-contact-email" style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 5px;">Email Address</label>
+        <input type="email" id="prep-contact-email" name="email" required value="{{ request.user.email }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.88rem; outline: none; box-sizing: border-box;">
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label for="prep-contact-message" style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 5px;">How can we help?</label>
+        <textarea id="prep-contact-message" name="message" rows="4" required placeholder="Describe your question or issue in detail..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.88rem; outline: none; resize: vertical; box-sizing: border-box;"></textarea>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 16px;">
+        <input type="checkbox" id="prep-contact-consent" name="consent" required checked style="margin-top: 3px; accent-color: var(--green);">
+        <label for="prep-contact-consent" style="font-size: 0.78rem; color: var(--text-muted); cursor: pointer; line-height: 1.4;">
+          I consent to being contacted by email regarding this request.
+        </label>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+        <button type="button" onclick="closePrepContactModal()" class="btn btn-outline btn-sm">Cancel</button>
+        <button type="submit" id="prep-contact-submit-btn" class="btn btn-primary btn-sm" style="font-weight: 600; min-width: 120px;">
+          Send Message
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openPrepContactModal() {
+    const modal = document.getElementById('prep-contact-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      const status = document.getElementById('prep-contact-status');
+      if (status) status.style.display = 'none';
+    }
+  }
+  function closePrepContactModal() {
+    const modal = document.getElementById('prep-contact-modal');
+    if (modal) modal.style.display = 'none';
+  }
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('prep-contact-modal');
+    if (e.target === modal) closePrepContactModal();
+  });
+  function handlePrepContactSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('prep-contact-submit-btn');
+    const status = document.getElementById('prep-contact-status');
+    const name = document.getElementById('prep-contact-name').value.trim();
+    const email = document.getElementById('prep-contact-email').value.trim();
+    const message = document.getElementById('prep-contact-message').value.trim();
+    const consent = document.getElementById('prep-contact-consent').checked;
+
+    if (!name || !email || !message || !consent) return;
+
+    btn.disabled = true;
+    btn.innerHTML = 'Sending...';
+    if (status) status.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('message', message);
+    if (consent) formData.append('consent', 'on');
+
+    const csrfToken = (function() {
+      const match = document.cookie.match(/csrftoken=([^;]+)/);
+      return match ? match[1] : '';
+    })();
+
+    fetch("{% url 'contact' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json',
+      },
+      body: formData,
+    })
+    .then(r => r.json().catch(() => ({ success: r.ok })))
+    .then(data => {
+      btn.disabled = false;
+      btn.innerHTML = 'Send Message';
+      if (data.success) {
+        status.style.display = 'block';
+        status.style.background = 'rgba(16, 185, 129, 0.12)';
+        status.style.color = 'var(--green)';
+        status.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+        status.textContent = 'Your message has been sent. We will follow up by email.';
+        document.getElementById('prep-contact-message').value = '';
+        setTimeout(closePrepContactModal, 2200);
+      } else {
+        status.style.display = 'block';
+        status.style.background = 'rgba(239, 68, 68, 0.12)';
+        status.style.color = '#dc2626';
+        status.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+        status.textContent = data.error || 'Could not send message. Please try again.';
+      }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = 'Send Message';
+      status.style.display = 'block';
+      status.style.background = 'rgba(239, 68, 68, 0.12)';
+      status.style.color = '#dc2626';
+      status.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      status.textContent = 'Network error communicating with contact service.';
+    });
+  }
+</script>
 
 {% block extra_js %}{% endblock %}
 </body>

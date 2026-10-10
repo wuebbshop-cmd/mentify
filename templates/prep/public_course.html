@@ -1,33 +1,64 @@
-{% extends "base.html" %}
+{% extends "prep/base_prep.html" %}
 
-{% block title %}{{ course.code }} {{ course.title }} Syllabus and Study Resources{% endblock %}
+{% block title %}{{ course.code }} {{ course.title }} Syllabus and Study Resources | Mentify Prep{% endblock %}
 {% block meta_description %}Study {{ course.code }} {{ course.title }} with the Mentify Prep syllabus, topic notes, and verified revision questions for {{ course.level|lower }} learners.{% endblock %}
 {% block og_title %}{{ course.code }} {{ course.title }} | Mentify Prep{% endblock %}
-{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, and revision questions on Mentify.{% endblock %}
+{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, and revision questions on Mentify Prep.{% endblock %}
 {% block extra_head %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|default:'Structured syllabus, study notes, and revision resources from Mentify.'|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify"},"educationalLevel":"{{ course.level|escapejs }}","inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|default:'Structured syllabus, study notes, and revision resources from Mentify Prep.'|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"educationalLevel":"{{ course.level|escapejs }}","inLanguage":"en"}</script>
 {% endblock %}
 
 {% block content %}
-<section class="container" style="max-width: 980px; padding-top: 50px; padding-bottom: 64px;">
-  <nav aria-label="Breadcrumb" style="font-size: .9rem; margin-bottom: 18px;"><a href="/">Mentify</a> / <a href="{% url 'prep:public_library' %}">Prep library</a> / {{ course.code }}</nav>
-  <header style="border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 30px;">
-    <p style="color: var(--green); font-weight: 700; margin-bottom: 8px;">{{ course.code }} | {{ course.level }}</p>
-    <h1>{{ course.title }}</h1>
-    <p style="max-width: 760px; color: var(--text-muted); line-height: 1.7;">{{ course.description|default:"A structured Mentify Prep course with syllabus-guided study resources and revision questions." }}</p>
+<div style="max-width: 980px; margin: 0 auto; padding: 4px 0 40px;">
+  <nav aria-label="Breadcrumb" style="font-size: 0.85rem; margin-bottom: 20px; color: var(--text-muted);">
+    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">Mentify Prep</a> &bull; <a href="{% url 'prep:public_library' %}" style="color: var(--text-muted); text-decoration: none;">Study Library</a> &bull; {{ course.code }}
+  </nav>
+
+  <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+      <span style="color: var(--green); font-weight: 700; font-size: 0.82rem; background: rgba(15, 118, 110, 0.08); padding: 3px 8px; border-radius: 4px;">{{ course.code }}</span>
+      <span style="font-size: 0.82rem; color: var(--text-muted);">{{ course.level }}</span>
+    </div>
+    <h1 style="font-size: 1.6rem; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text);">{{ course.title }}</h1>
+    <p style="max-width: 760px; color: var(--text-muted); line-height: 1.6; margin: 0; font-size: 0.92rem;">{{ course.description|default:"A structured Mentify Prep course with syllabus-guided study resources and revision questions." }}</p>
   </header>
+
   <section aria-labelledby="topics-heading">
-    <h2 id="topics-heading">Syllabus topics</h2>
-    <div style="display: grid; gap: 12px; margin-top: 16px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+      <h2 id="topics-heading" style="font-size: 1.2rem; margin: 0; font-weight: 600;">Syllabus Units &amp; Topics</h2>
+      <a href="{% url 'prep:topic_study' topics.0.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Enter Interactive Study &rarr;</a>
+    </div>
+
+    <div style="display: grid; gap: 12px;">
       {% for topic in topics %}
-      <article class="card" style="padding: 20px;">
-        <p style="color: var(--green); font-weight: 700; font-size: .82rem; margin: 0 0 6px;">UNIT {{ topic.order }}</p>
-        <h3 style="margin: 0 0 8px;"><a href="{% url 'prep:public_topic' course.slug topic.id topic.slug %}" style="color: inherit;">{{ topic.title }}</a></h3>
-        {% if topic.subtopics %}<p style="margin: 0 0 10px; color: var(--text-muted);">{{ topic.subtopics|join:", " }}</p>{% endif %}
-        <p style="margin: 0; font-size: .9rem; color: var(--text-muted);">{{ topic.question_count }} verified question{{ topic.question_count|pluralize }} available</p>
+      <article class="card" style="padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface);">
+        <p style="color: var(--green); font-weight: 700; font-size: .8rem; margin: 0 0 6px;">UNIT {{ topic.order }}</p>
+        <h3 style="margin: 0 0 8px; font-size: 1.1rem;">
+          <a href="{% url 'prep:public_topic' course.slug topic.id topic.slug %}" style="color: inherit; text-decoration: none;">{{ topic.title }}</a>
+        </h3>
+        {% if topic.subtopics %}<p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.88rem;">{{ topic.subtopics|join:", " }}</p>{% endif %}
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: .85rem; color: var(--text-muted);">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span>{{ topic.question_count }} verified question{{ topic.question_count|pluralize }} available</span>
+            {% if topic.ready_levels %}
+            <span style="color: var(--border);">&bull;</span>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Ready:</span>
+              {% for r in topic.ready_levels %}
+              <span class="badge" style="background: rgba(15, 118, 110, 0.08); color: var(--green); border: 1px solid rgba(15, 118, 110, 0.25); font-size: 0.72rem; font-weight: 600; padding: 2px 7px; border-radius: 4px;">
+                L{{ r.num }}: {{ r.label }}
+              </span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          <a href="{% url 'prep:topic_study' topic.id %}?tab=notes{% if topic.preferred_level %}&level={{ topic.preferred_level }}{% endif %}" class="btn btn-outline btn-sm" style="padding: 4px 12px; font-size: 0.78rem;">Study Topic &rarr;</a>
+        </div>
       </article>
-      {% empty %}<p>Syllabus topics are being prepared.</p>{% endfor %}
+      {% empty %}
+      <p style="color: var(--text-muted);">Syllabus topics are being prepared.</p>
+      {% endfor %}
     </div>
   </section>
-</section>
+</div>
 {% endblock %}

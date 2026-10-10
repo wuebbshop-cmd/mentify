@@ -10,7 +10,7 @@ from django.contrib.auth.views import (
 )
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.conf import settings
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -106,6 +106,10 @@ def role_select(request):
 
 def contact_page(request):
     """Public contact form for support and feedback."""
+    is_ajax = (
+        request.headers.get("x-requested-with") == "XMLHttpRequest"
+        or "application/json" in request.headers.get("Accept", "")
+    )
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -130,10 +134,16 @@ def contact_page(request):
                 sent = False
 
             if sent:
+                if is_ajax:
+                    return JsonResponse({"success": True, "message": "Your message has been sent. We will follow up by email."})
                 messages.success(request, "Your message has been sent. We will follow up by email.")
                 return redirect("accounts:contact")
+            if is_ajax:
+                return JsonResponse({"success": False, "error": "We could not send your message right now. Please try again later."}, status=500)
             messages.error(request, "We could not send your message right now. Please try again later.")
         else:
+            if is_ajax:
+                return JsonResponse({"success": False, "error": _form_error_message(form)}, status=400)
             messages.error(request, _form_error_message(form))
     else:
         form = ContactForm()
@@ -1238,21 +1248,91 @@ def google_callback(request):
 
 # ─── Custom HTTP Error Handlers ───────────────────────────────────────────────
 
+def _is_ajax_or_api(request) -> bool:
+    """Helper to detect AJAX or API requests expecting JSON responses."""
+    if not request:
+        return False
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return True
+    accept = request.headers.get("accept", "")
+    if "application/json" in accept and "text/html" not in accept:
+        return True
+    content_type = getattr(request, "content_type", "") or request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        return True
+    path = request.path or ""
+    if path.startswith("/api/") or "/api/" in path or path.endswith("/json/"):
+        return True
+    return False
+
+
 def custom_404(request, exception=None):
-    """Custom 404 Not Found error page."""
-    return render(request, "404.html", status=404)
+    """Custom 404 Not Found error page or JSON API response."""
+    if _is_ajax_or_api(request):
+        return JsonResponse(
+            {"success": False, "status": "error", "error": "The requested resource could not be found."},
+            status=404,
+        )
+    is_prep = bool(request and request.path and request.path.startswith("/prep/"))
+    return render(request, "404.html", {"is_prep": is_prep}, status=404)
 
 
 def custom_500(request):
-    """Custom 500 Internal Server Error page."""
-    return render(request, "500.html", status=500)
+    """Custom 500 Internal Server Error page or JSON API response."""
+    if _is_ajax_or_api(request):
+        return JsonResponse(
+            {"success": False, "status": "error", "error": "An unexpected server error occurred. Our team has been notified."},
+            status=500,
+        )
+    is_prep = bool(request and request.path and request.path.startswith("/prep/"))
+    try:
+        return render(request, "500.html", {"is_prep": is_prep}, status=500)
+    except Exception:
+        from config.middleware.security_error_middleware import _FAILSAFE_500_HTML
+        return HttpResponse(_FAILSAFE_500_HTML, status=500, content_type="text/html")
 
 
 def custom_403(request, exception=None):
-    """Custom 403 Permission Denied error page."""
-    return render(request, "403.html", status=403)
+    """Custom 403 Permission Denied error page or JSON API response."""
+    if _is_ajax_or_api(request):
+        return JsonResponse(
+            {"success": False, "status": "error", "error": "Access denied. You do not have permission to access this resource."},
+            status=403,
+        )
+    is_prep = bool(request and request.path and request.path.startswith("/prep/"))
+    return render(request, "403.html", {"is_prep": is_prep}, status=403)
 
 
 def custom_400(request, exception=None):
-    """Custom 400 Bad Request error page."""
-    return render(request, "400.html", status=400)
+    """Custom 400 Bad Request error page or JSON API response."""
+    if _is_ajax_or_api(request):
+        return JsonResponse(
+            {"success": False, "status": "error", "error": "Bad request. Please verify your input and try again."},
+            status=400,
+        )
+    is_prep = bool(request and request.path and request.path.startswith("/prep/"))
+    return render(request, "400.html", {"is_prep": is_prep}, status=400)
+
+
+def custom_csrf_failure(request, reason=""):
+    """Custom CSRF token failure handler that avoids technical tracebacks."""
+    if _is_ajax_or_api(request):
+        return JsonResponse(
+            {
+                "success": False,
+                "status": "error",
+                "error": "Your session or security token has expired. Please refresh the page and try again.",
+            },
+            status=403,
+        )
+    is_prep = bool(request and request.path and request.path.startswith("/prep/"))
+    return render(
+        request,
+        "403.html",
+        {
+            "is_prep": is_prep,
+            "csrf_failure": True,
+            "custom_message": "Your security token has expired or is invalid. Please refresh the page and try your submission again.",
+        },
+        status=403,
+    )

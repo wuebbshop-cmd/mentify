@@ -214,81 +214,119 @@
   </div>
 </div>
 
-<!-- 3. Recent Credit Activity Audit Table (Moved from Dashboard) -->
+<!-- 3. Recent Credit Activity Audit Table (Dropdown / Collapsible) -->
 <section style="margin-bottom: 40px;" id="credit-ledger">
-  <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface);">
-    <div style="padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid var(--border);">
+  <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow-sm);">
+    <!-- Dropdown Header (Clickable Toggle) -->
+    <div 
+      id="ledger-toggle-header" 
+      onclick="toggleLedgerDropdown()" 
+      onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleLedgerDropdown(); }"
+      style="padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; cursor: pointer; user-select: none; transition: background 0.15s ease;"
+      role="button"
+      tabindex="0"
+      aria-expanded="false"
+      aria-controls="ledger-dropdown-content"
+    >
       <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(15, 118, 110, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(15, 118, 110, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div>
-          <h2 style="margin: 0; font-size: 1.05rem; color: var(--text); font-weight: 600;">Recent Credit Activity Ledger</h2>
-          <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
-            Detailed audit ledger of all credit deductions, AI tutor queries, and purchases ({{ transactions|length }} of {{ total_transactions_count }} displayed)
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-size: 1.05rem; color: var(--text); font-weight: 600;">Recent Credit Activity Ledger</h2>
+            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: rgba(15, 118, 110, 0.12); color: var(--green); font-weight: 700;">
+              Last 10 Records
+            </span>
+          </div>
+          <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: var(--text-muted);">
+            Showing your 10 most recent credit transactions. Click to view or collapse.
           </p>
         </div>
       </div>
 
-      <!-- Search in ledger -->
-      <div>
-        <input type="search" id="ledger-search-input" placeholder="Search transactions..." class="table-filter-input" onkeyup="filterLedgerTable(this.value)">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="ledger-toggle-text" style="font-size: 0.82rem; font-weight: 600; color: var(--green);">View Ledger (10)</span>
+        <div id="ledger-chevron-icon" style="width: 28px; height: 28px; border-radius: 50%; background: var(--surface-hover, rgba(0,0,0,0.04)); display: flex; align-items: center; justify-content: center; transition: transform 0.25s ease;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text);">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <div style="overflow-x: auto;">
-      <table id="ledger-table" style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
-        <thead>
-          <tr style="border-bottom: 1px solid var(--border); background: var(--surface); text-align: left; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em;">
-            <th style="padding: 12px 20px;">Date &amp; Time</th>
-            <th style="padding: 12px 20px;">Category</th>
-            <th style="padding: 12px 20px;">Description</th>
-            <th style="padding: 12px 20px;">Reference</th>
-            <th style="padding: 12px 20px; text-align: right;">Credits</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for tx in transactions %}
-          <tr style="border-bottom: 1px solid var(--border);" class="ledger-row" data-search="{{ tx.description|lower }} {{ tx.action_type|lower }} {{ tx.reference_code|lower }}">
-            <td style="padding: 12px 20px; color: var(--text-muted); font-size: 0.82rem; white-space: nowrap;">
-              {{ tx.created_at|date:"M d, Y · H:i" }}
-            </td>
-            <td style="padding: 12px 20px; white-space: nowrap;">
-              {% if tx.action_type == 'topic_tutor' %}
-                <span class="badge-category cat-tutor">AI Tutor</span>
-              {% elif tx.action_type == 'ai_practice_gen' %}
-                <span class="badge-category cat-practice">Practice Gen</span>
-              {% elif tx.action_type == 'topic_notes' %}
-                <span class="badge-category cat-notes">Topic Notes</span>
-              {% elif tx.action_type == 'upload_ocr' or tx.action_type == 'topic_tutor_ocr' %}
-                <span class="badge-category cat-ocr">Vision OCR</span>
-              {% elif tx.action_type == 'upload_text' %}
-                <span class="badge-category cat-ocr">PDF Upload</span>
-              {% elif tx.action_type == 'topup_purchase' or tx.action_type == 'monthly_grant' or tx.action_type == 'trial_grant' %}
-                <span class="badge-category cat-grant">Top-Up / Grant</span>
-              {% else %}
-                <span class="badge-category cat-other">{{ tx.action_type|title }}</span>
-              {% endif %}
-            </td>
-            <td style="padding: 12px 20px; font-weight: 500; color: var(--text);">
-              {{ tx.description }}
-            </td>
-            <td style="padding: 12px 20px; font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">
-              {{ tx.reference_code|default:"—" }}
-            </td>
-            <td style="padding: 12px 20px; text-align: right; font-weight: 700; color: {% if tx.amount > 0 %}var(--green){% else %}var(--danger){% endif %}; white-space: nowrap;">
-              {{ tx.amount|stringformat:"+d" }}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="5" style="padding: 32px; text-align: center; color: var(--text-muted); font-size: 0.88rem;">
-              No credit transactions recorded yet for this selection.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Dropdown Content (Collapsible) -->
+    <div id="ledger-dropdown-content" style="display: none; border-top: 1px solid var(--border);">
+      <!-- Filter bar inside dropdown -->
+      <div style="padding: 12px 22px; background: var(--surface-hover, rgba(0,0,0,0.02)); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">
+          Latest transactions ({{ transactions|length }} of {{ total_transactions_count }} total recorded)
+        </span>
+        <input 
+          type="search" 
+          id="ledger-search-input" 
+          placeholder="Filter recent transactions..." 
+          class="table-filter-input" 
+          style="padding: 6px 12px; font-size: 0.82rem;"
+          onkeyup="filterLedgerTable(this.value)"
+          onclick="event.stopPropagation();"
+        >
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table id="ledger-table" style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border); background: var(--surface); text-align: left; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em;">
+              <th style="padding: 12px 20px;">Date &amp; Time</th>
+              <th style="padding: 12px 20px;">Category</th>
+              <th style="padding: 12px 20px;">Description</th>
+              <th style="padding: 12px 20px;">Reference</th>
+              <th style="padding: 12px 20px; text-align: right;">Credits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tx in transactions %}
+            <tr style="border-bottom: 1px solid var(--border);" class="ledger-row" data-search="{{ tx.description|lower }} {{ tx.action_type|lower }} {{ tx.reference_code|lower }}">
+              <td style="padding: 12px 20px; color: var(--text-muted); font-size: 0.82rem; white-space: nowrap;">
+                {{ tx.created_at|date:"M d, Y · H:i" }}
+              </td>
+              <td style="padding: 12px 20px; white-space: nowrap;">
+                {% if tx.action_type == 'topic_tutor' %}
+                  <span class="badge-category cat-tutor">AI Tutor</span>
+                {% elif tx.action_type == 'ai_practice_gen' %}
+                  <span class="badge-category cat-practice">Practice Gen</span>
+                {% elif tx.action_type == 'topic_notes' %}
+                  <span class="badge-category cat-notes">Topic Notes</span>
+                {% elif tx.action_type == 'upload_ocr' or tx.action_type == 'topic_tutor_ocr' %}
+                  <span class="badge-category cat-ocr">Vision OCR</span>
+                {% elif tx.action_type == 'upload_text' %}
+                  <span class="badge-category cat-ocr">PDF Upload</span>
+                {% elif tx.action_type == 'topup_purchase' or tx.action_type == 'monthly_grant' or tx.action_type == 'trial_grant' %}
+                  <span class="badge-category cat-grant">Top-Up / Grant</span>
+                {% else %}
+                  <span class="badge-category cat-other">{{ tx.action_type|title }}</span>
+                {% endif %}
+              </td>
+              <td style="padding: 12px 20px; font-weight: 500; color: var(--text);">
+                {{ tx.description }}
+              </td>
+              <td style="padding: 12px 20px; font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">
+                {{ tx.reference_code|default:"—" }}
+              </td>
+              <td style="padding: 12px 20px; text-align: right; font-weight: 700; color: {% if tx.amount > 0 %}var(--green){% else %}var(--danger){% endif %}; white-space: nowrap;">
+                {{ tx.amount|stringformat:"+d" }}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" style="padding: 32px; text-align: center; color: var(--text-muted); font-size: 0.88rem;">
+                No credit transactions recorded yet for this selection.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </section>
@@ -304,6 +342,38 @@
     const url = new URL(window.location.href);
     url.searchParams.set('date', dateVal);
     window.location.href = url.toString();
+  }
+
+  // Toggle Recent Credit Activity Ledger Dropdown
+  function toggleLedgerDropdown() {
+    const content = document.getElementById('ledger-dropdown-content');
+    const chevron = document.getElementById('ledger-chevron-icon');
+    const toggleText = document.getElementById('ledger-toggle-text');
+    const header = document.getElementById('ledger-toggle-header');
+    if (!content) return;
+
+    const isHidden = content.style.display === 'none' || !content.style.display;
+    if (isHidden) {
+      content.style.display = 'block';
+      if (chevron) chevron.style.transform = 'rotate(180deg)';
+      if (toggleText) toggleText.textContent = 'Hide Ledger';
+      if (header) header.setAttribute('aria-expanded', 'true');
+    } else {
+      content.style.display = 'none';
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+      if (toggleText) toggleText.textContent = 'View Ledger (10)';
+      if (header) header.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  // Auto-expand if anchor #credit-ledger is in URL
+  if (window.location.hash === '#credit-ledger') {
+    setTimeout(function() {
+      const content = document.getElementById('ledger-dropdown-content');
+      if (content && (content.style.display === 'none' || !content.style.display)) {
+        toggleLedgerDropdown();
+      }
+    }, 100);
   }
 
   // Client-side quick filter for the ledger table

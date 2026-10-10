@@ -239,10 +239,94 @@ def generate_prep_chat_response(messages_history: list, user_message: str, user=
         load_dotenv(BASE_DIR / ".env", override=True)
         api_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("GOOGLE_API_KEY", "").strip()
 
+def call_together_prep_fallback(messages_history: list, user_message: str, system_prompt: str) -> str | None:
+    """
+    Fallback chat completion using Together AI when Gemini token limits,
+    quotas, or rate limits are reached for Mentify Prep Assistant.
+    """
+    api_key = (
+        getattr(settings, "TOGETHERAI_API", "")
+        or os.environ.get("TOGETHERAI_API", "")
+    ).strip()
     if not api_key:
+        load_dotenv(BASE_DIR / ".env", override=True)
+        api_key = (
+            getattr(settings, "TOGETHERAI_API", "")
+            or os.environ.get("TOGETHERAI_API", "")
+        ).strip()
+    if not api_key:
+        logger.warning("[Together AI Prep Fallback] TOGETHERAI_API key is not configured.")
+        return None
+
+    model = (
+        getattr(settings, "TOGETHER_CHAT_MODEL", "")
+        or os.environ.get("TOGETHER_CHAT_MODEL", "")
+        or getattr(settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+    ).strip()
+
+    messages = [{"role": "system", "content": system_prompt}]
+    if isinstance(messages_history, list):
+        for msg in messages_history[-4:]:
+            role = "assistant" if msg.get("role") in ["model", "assistant", "bot"] else "user"
+            text = msg.get("text") or msg.get("content") or ""
+            if text:
+                messages.append({"role": role, "content": str(text)[:500]})
+
+    user_text = str(user_message).strip()[:500]
+    if not messages or messages[-1].get("content") != user_text:
+        messages.append({"role": "user", "content": user_text})
+
+    try:
+        url = "https://api.together.xyz/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": 800,
+            "temperature": 0.3,
+        }
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        if resp.status_code == 200:
+            data = resp.json()
+            choices = data.get("choices", [])
+            if choices:
+                content = choices[0].get("message", {}).get("content")
+                if content and isinstance(content, str) and content.strip():
+                    logger.info("[Together AI Prep Fallback] Prep Assistant answered inquiry via %s", model)
+                    return content.strip()
+        logger.warning("[Together AI Prep Fallback] HTTP %s: %s", resp.status_code, resp.text[:200])
+    except Exception as exc:
+        logger.warning("[Together AI Prep Fallback] Exception calling Together AI: %s", exc)
+
+    return None
+
+
+def generate_prep_chat_response(messages_history: list, user_message: str, user=None) -> str:
+    """
+    Calls the Gemini REST API with strict grounding context, credit consumption rules,
+    course/topic catalogs, and smart linking. Automatically falls back to Together AI
+    if Gemini token limits, quotas, or rate limits are reached.
+    """
+    user_text = str(user_message).strip()[:500]
+    system_prompt = get_prep_system_context(user=user, user_message=user_text)
+
+    # 1. Check API Key
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("GOOGLE_API_KEY", "").strip()
+    if not api_key:
+        load_dotenv(BASE_DIR / ".env", override=True)
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("GOOGLE_API_KEY", "").strip()
+
+    if not api_key:
+        logger.warning("Gemini API key is not configured for Mentify Prep Assistant; checking Together AI fallback...")
+        fallback = call_together_prep_fallback(messages_history, user_text, system_prompt)
+        if fallback:
+            return fallback
         return (
-            "The Gemini API key is missing. Please add `GEMINI_API_KEY=your_key_here` "
-            "to your `.env` file to activate the Mentify Prep Assistant."
+            "The Mentify Prep Assistant is momentarily unavailable while updating its study index. "
+            "Please try again in a few moments, or explore your [Courses & Syllabi](/prep/courses/) directly."
         )
 
     # 2. Prune and format chat history (Max last 4 messages to preserve tokens)
@@ -259,17 +343,13 @@ def generate_prep_chat_response(messages_history: list, user_message: str, user=
                 "parts": [{"text": str(text)[:500]}]
             })
 
-    user_text = str(user_message).strip()[:500]
     if not clean_history or clean_history[-1].get("parts", [{}])[0].get("text") != user_text:
         clean_history.append({
             "role": "user",
             "parts": [{"text": user_text}]
         })
 
-    # 3. System Prompt Context
-    system_prompt = get_prep_system_context(user=user, user_message=user_text)
-
-    # 4. Construct Gemini REST API Payload
+    # 3. Construct Gemini REST API Payload
     model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip() or "gemini-2.5-flash-lite"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
@@ -295,6 +375,12 @@ def generate_prep_chat_response(messages_history: list, user_message: str, user=
             error_code = response_data.get("error", {}).get("code", response.status_code)
             logger.error(f"Gemini API Error in Prep Assistant ({response.status_code} / {error_code}): {error_msg}")
 
+            # Fallback to Together AI when Gemini token limits, quota, or rate limits are reached
+            logger.info("Attempting Together AI fallback for Prep Assistant...")
+            fallback = call_together_prep_fallback(messages_history, user_text, system_prompt)
+            if fallback:
+                return fallback
+
             if response.status_code == 429 or "quota" in error_msg.lower() or "rate limit" in error_msg.lower() or "RESOURCE_EXHAUSTED" in error_msg:
                 return (
                     "I am currently receiving a high volume of student inquiries! "
@@ -316,19 +402,30 @@ def generate_prep_chat_response(messages_history: list, user_message: str, user=
             if parts and "text" in parts[0]:
                 return parts[0]["text"].strip()
 
+        # If candidates empty, try Together AI fallback
+        fallback = call_together_prep_fallback(messages_history, user_text, system_prompt)
+        if fallback:
+            return fallback
+
         return (
             "I couldn't process that query right now. Please try rephrasing your question or "
             "[Chat on WhatsApp (+254731900577)](https://wa.me/254731900577) for assistance."
         )
 
     except requests.exceptions.Timeout:
-        logger.error("Gemini API request timed out in Prep Assistant")
+        logger.error("Gemini API request timed out in Prep Assistant; triggering Together AI fallback...")
+        fallback = call_together_prep_fallback(messages_history, user_text, system_prompt)
+        if fallback:
+            return fallback
         return (
             "My connection took a bit too long to respond. Please try asking your question again in a moment, "
             "or [Chat on WhatsApp (+254731900577)](https://wa.me/254731900577)."
         )
     except Exception as e:
-        logger.error(f"Unexpected error calling Gemini API in Prep Assistant: {e}")
+        logger.error(f"Unexpected error calling Gemini API in Prep Assistant: {e}; triggering Together AI fallback...")
+        fallback = call_together_prep_fallback(messages_history, user_text, system_prompt)
+        if fallback:
+            return fallback
         return (
             "An unexpected connection issue occurred. Please try again shortly or "
             "[Chat on WhatsApp (+254731900577)](https://wa.me/254731900577)."

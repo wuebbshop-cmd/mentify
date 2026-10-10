@@ -46,8 +46,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "config.middleware.security_error_middleware.SecurityErrorMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.http.ConditionalGetMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -55,6 +57,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+
+# ─── Error Handling & Security Reporting ──────────────────────────────────────
+CSRF_FAILURE_VIEW = "accounts.views.custom_csrf_failure"
+DEFAULT_EXCEPTION_REPORTER_FILTER = "django.views.debug.SafeExceptionReporterFilter"
 
 
 # ─── Templates ────────────────────────────────────────────────────────────────
@@ -264,6 +270,7 @@ TOGETHERAI_API = os.environ.get("TOGETHERAI_API", "")
 TOGETHERAI_ID = os.environ.get("TOGETHERAI_ID", "")
 TOGETHER_VISION_MODEL = os.environ.get("TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
 TOGETHER_REPAIR_MODEL = os.environ.get("TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+TOGETHER_CHAT_MODEL = os.environ.get("TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
 TOGETHER_MAX_PAGES_PER_RUN = int(os.environ.get("TOGETHER_MAX_PAGES_PER_RUN", 15))
 
 # Automatically start worker threads in development when running runserver

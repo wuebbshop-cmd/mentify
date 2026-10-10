@@ -4,6 +4,10 @@
 
 {% block extra_css %}
 <style>
+  @keyframes prep-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
   .exam-question-card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -196,9 +200,39 @@
     const textEl = document.getElementById('solution-text-' + num);
     const badgeEl = document.getElementById('solution-badge-' + num);
 
+    const paperSolKey = `prep_paper_sol_${window.location.pathname}_${num}`;
+    try {
+      const cached = sessionStorage.getItem(paperSolKey);
+      if (cached) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "Toggle Solution";
+          btn.setAttribute("onclick", "toggleSolutionDisplay(" + num + ")");
+          btn.className = "btn btn-outline btn-sm";
+        }
+        if (container) container.style.display = 'block';
+        if (textEl) renderMarkdownWithKaTeX(cached, textEl);
+        if (badgeEl) {
+          badgeEl.innerText = "Verified Solution";
+          badgeEl.className = "badge badge-accent";
+        }
+        return;
+      }
+    } catch (storageErr) {}
+
     if (btn) {
       btn.disabled = true;
       btn.innerText = "Formulating step-by-step derivation...";
+    }
+
+    if (container) container.style.display = 'block';
+    if (textEl) {
+      textEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px; padding: 14px 12px; color: var(--text-muted); font-size: 0.9rem;">
+          <span style="display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(2, 132, 199, 0.2); border-top-color: #0284c7; border-radius: 50%; animation: prep-spin 0.8s linear infinite; flex-shrink: 0;"></span>
+          <span>Validating and deriving step-by-step proof in background...</span>
+        </div>
+      `;
     }
 
     fetch("{% url 'prep:api_solve_question' %}", {
@@ -224,6 +258,9 @@
 
       if (data.success) {
         container.style.display = 'block';
+        try {
+          sessionStorage.setItem(paperSolKey, data.solution);
+        } catch (storageErr) {}
         renderMarkdownWithKaTeX(data.solution, textEl);
         
         badgeEl.innerText = "Verified Solution";
@@ -234,6 +271,9 @@
           creditDisplay.innerText = data.credits_balance;
         }
       } else {
+        if (textEl) {
+          textEl.textContent = data.error || "Failed to generate solution. Please check your credit balance.";
+        }
         alert(data.error || "Failed to generate solution. Please check your credit balance.");
       }
     })
@@ -241,6 +281,9 @@
       if (btn) {
         btn.disabled = false;
         btn.innerText = "View Step-by-Step Proof & Solution";
+      }
+      if (textEl) {
+        textEl.textContent = "Error connecting to solution verification service.";
       }
       alert("Error contacting solution service: " + err);
     });

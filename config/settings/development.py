@@ -1,8 +1,9 @@
 """Development settings - DEBUG on, SQLite fallback not used (always MySQL)."""
 
+import os
 from .base import *  # noqa: F401, F403
 
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", os.environ.get("DEBUG", "True")).lower() in ("true", "1", "yes")
 
 # In dev, allow all hosts
 ALLOWED_HOSTS = ["*"]

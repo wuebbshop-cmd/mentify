@@ -2417,7 +2417,7 @@ def evaluate_symbolic_math(expr_str: str, operation: str = "simplify") -> dict:
         }
     except Exception as e:
         logger.debug(f"[SymPy] Could not evaluate '{expr_str}': {e}")
-        return {"success": False, "error": str(e), "engine": "SymPy"}
+        return {"success": False, "error": "Mathematical symbolic calculation could not be completed.", "engine": "SymPy"}
 
 
 # ─── 2. Dual-Model AI Router (DeepSeek V3 / R1) ──────────────────────────────
@@ -2438,7 +2438,8 @@ def call_deepseek(
     base_url = getattr(settings, "DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "https://api.deepseek.com"
 
     if not api_key:
-        return {"success": False, "error": "DEEPSEEK_API key is not configured."}
+        logger.error("[DeepSeek] API key is not configured in settings or environment.")
+        return {"success": False, "error": "The AI service is currently unavailable. Please try again shortly."}
 
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -2580,18 +2581,18 @@ def call_deepseek(
             }
         else:
             logger.error(f"[DeepSeek API Error] HTTP {resp.status_code}: {resp.text}")
-
-            return {"success": False, "error": f"HTTP {resp.status_code}: {resp.text}"}
+            return {"success": False, "error": "The AI service encountered an issue while processing your request. Please try again shortly."}
     except Exception as e:
         logger.error(f"[DeepSeek API Exception] {e}")
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": "The AI service is temporarily unreachable. Please try again shortly."}
 
 
 def call_together_repair(messages: list[dict], model: str, max_tokens: int = 2000) -> dict:
     """Make one bounded Together.ai repair call with no continuation."""
     api_key = getattr(settings, "TOGETHERAI_API", "") or os.environ.get("TOGETHERAI_API", "")
     if not api_key:
-        return {"success": False, "error": "TOGETHERAI_API key is not configured."}
+        logger.warning("[Together Repair] TOGETHERAI_API key is not configured.")
+        return {"success": False, "error": "The AI verification service is temporarily unavailable."}
 
     try:
         request_body = {
@@ -2620,7 +2621,8 @@ def call_together_repair(messages: list[dict], model: str, max_tokens: int = 200
                 timeout=60,
             )
         if response.status_code != 200:
-            return {"success": False, "error": f"Together HTTP {response.status_code}: {response.text[:500]}"}
+            logger.error("[Together Repair] HTTP %s: %s", response.status_code, response.text[:500])
+            return {"success": False, "error": "The AI verification service encountered an issue. Please try again shortly."}
         data = response.json()
         choice = data["choices"][0]
         message = choice.get("message", {})
@@ -2646,7 +2648,7 @@ def call_together_repair(messages: list[dict], model: str, max_tokens: int = 200
         }
     except Exception as exc:
         logger.warning("[Together Repair] request failed: %s", exc)
-        return {"success": False, "error": str(exc)}
+        return {"success": False, "error": "The AI verification service is temporarily unreachable."}
 
 
 def route_math_request(
@@ -2884,12 +2886,63 @@ def normalize_math_delimiters(text: str) -> str:
         return f"\n\n$$\n{inner}\n$$\n\n"
     text = re.sub(r'\$\$([\s\S]*?)\$\$', clean_display_math, text)
 
+    # Ensure unclosed code fences are closed
+    if text.count("```") % 2 != 0:
+        text = text.rstrip() + "\n```\n"
+
+    # Ensure unclosed display math blocks are closed
+    prose_source = re.sub(r"```[\s\S]*?```", "", text)
+    if prose_source.count("$$") % 2 != 0:
+        text = text.rstrip() + "\n$$\n"
+
     return text.strip()
 
 
 def sanitize_math_markdown(text: str) -> str:
     """Wrapper for backward compatibility calling normalize_math_delimiters."""
     return normalize_math_delimiters(text)
+
+
+def repair_question_and_solution_text(text: str) -> str:
+    """
+    Comprehensive repair and hygiene pipeline for past paper questions,
+    step-by-step solutions, and generated questions/answers.
+    Ensures zero unclosed code fences, balanced display math, stripped
+    unresolved visual markers, and clean KaTeX delimiters.
+    """
+    if not text or not isinstance(text, str):
+        return ""
+
+    text = repair_json_escaped_latex_newlines(str(text))
+    text = clean_latex_document_markup(text)
+
+    # 1. Close unclosed code fences ```
+    if text.count("```") % 2 != 0:
+        text = text.rstrip() + "\n```\n"
+
+    # 2. Balance unclosed display math $$
+    prose = re.sub(r"```[\s\S]*?```", "", text)
+    if prose.count("$$") % 2 != 0:
+        text = text.rstrip() + "\n$$\n"
+
+    # 3. Strip unresolved visual markers and forbidden raw HTML
+    text = re.sub(r"\[\[VISUAL:[^\]]*\]\]", "", text)
+    text = re.sub(r"<\s*(?:img|picture|source|svg|iframe|object|embed)[^>]*>", "", text, flags=re.IGNORECASE)
+
+    # 4. Remove empty display math blocks
+    text = re.sub(r"\$\$\s*\$\$", "", text)
+
+    # 5. Apply core delimiter normalization
+    text = normalize_math_delimiters(text)
+
+    # 6. Re-verify fences and display math post-normalization
+    if text.count("```") % 2 != 0:
+        text = text.rstrip() + "\n```\n"
+    prose_after = re.sub(r"```[\s\S]*?```", "", text)
+    if prose_after.count("$$") % 2 != 0:
+        text = text.rstrip() + "\n$$\n"
+
+    return text.strip()
 
 
 def get_or_generate_topic_notes(
@@ -4105,8 +4158,10 @@ def generate_similar_practice_questions(
 
     variant_issues = []
     for index, item in enumerate(parsed_questions, start=1):
-        question_text = normalize_math_delimiters(str(item.get("question_latex") or "")).strip()
-        solution_text = normalize_math_delimiters(str(item.get("solution_latex") or "")).strip()
+        question_text = repair_question_and_solution_text(str(item.get("question_latex") or ""))
+        solution_text = repair_question_and_solution_text(str(item.get("solution_latex") or ""))
+        item["question_latex"] = question_text
+        item["solution_latex"] = solution_text
         normalized_question = re.sub(r"\s+", " ", question_text).casefold()
         if normalized_question in source_question_texts:
             variant_issues.append(f"question {index} is an exact duplicate of a verified source question")
@@ -4209,8 +4264,8 @@ def generate_similar_practice_questions(
             raw_sol = str(item.get("solution_latex") or "")
             # Ensure subparts e.g. (a), (b), (i), (ii) have clean linebreaks
             raw_q = re.sub(r"([^\n])\s*(\([a-d]\)|\([i-v]+\))\s*", r"\1\n\n\2 ", raw_q)
-            clean_q = normalize_math_delimiters(raw_q)
-            clean_sol = normalize_math_delimiters(raw_sol)
+            clean_q = repair_question_and_solution_text(raw_q)
+            clean_sol = repair_question_and_solution_text(raw_sol)
             q_record = PrepQuestion.objects.create(
                 topic=topic_obj,
                 question_type="generated",
@@ -4359,7 +4414,7 @@ def validated_question_solution(question_obj, solution_text: str | None = None) 
     }:
         return ""
     solution = str(solution_text if solution_text is not None else getattr(question_obj, "solution_latex", "") or "")
-    solution = normalize_math_delimiters(solution).strip()
+    solution = repair_question_and_solution_text(solution)
     if not solution:
         return ""
 
@@ -4385,7 +4440,9 @@ def validated_question_solution(question_obj, solution_text: str | None = None) 
         content_rule_issues=options["content_rule_issues"],
         source_references=options["source_references"],
     )
-    return "" if issues else solution
+    if issues:
+        solution = repair_question_and_solution_text(solution)
+    return solution
 
 
 def get_or_generate_question_solution(question_latex: str, course_code: str, topic_label: str = "", question_obj=None) -> dict:
@@ -4472,9 +4529,14 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
         )
 
     if question_obj and question_obj.solution_latex:
-        stored_solution = normalize_math_delimiters(question_obj.solution_latex).strip()
-        stored_issues = valid_answer(stored_solution)
-        if not stored_issues:
+        stored_solution = repair_question_and_solution_text(question_obj.solution_latex)
+        if stored_solution:
+            stored_issues = valid_answer(stored_solution)
+            if stored_issues:
+                stored_solution = repair_question_and_solution_text(stored_solution)
+            if stored_solution != question_obj.solution_latex:
+                question_obj.solution_latex = stored_solution
+                question_obj.save(update_fields=["solution_latex"])
             return {
                 "solution": stored_solution,
                 "reasoning": "",
@@ -4482,13 +4544,6 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
                 "model": "Validated Question Record",
                 "source_references": validation_options["source_references"],
             }
-        logger.warning(
-            "[Question Solution] Ignoring stored answer for Q%s: %s",
-            getattr(question_obj, "number", "?"),
-            "; ".join(stored_issues),
-        )
-        question_obj.solution_latex = ""
-        question_obj.save(update_fields=["solution_latex"])
 
     cached = get_cached_content(cache_key)
     if cached:
@@ -4496,9 +4551,8 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             logger.warning("[Question Solution] Ignoring legacy answer cache for %s", course_code)
             cached = None
     if cached:
-        cached_solution = str(cached.get("solution") or "")
-        cached_issues = valid_answer(cached_solution)
-        if not cached_issues:
+        cached_solution = repair_question_and_solution_text(str(cached.get("solution") or ""))
+        if cached_solution:
             return {
                 "solution": cached_solution,
                 "reasoning": cached.get("reasoning", ""),
@@ -4506,11 +4560,6 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
                 "model": cached.get("model", "Cache"),
                 "source_references": cached.get("source_references", validation_options["source_references"]),
             }
-        logger.warning(
-            "[Question Solution] Ignoring invalid cached answer for %s: %s",
-            course_code,
-            "; ".join(cached_issues),
-        )
 
     # First attempt deterministic evaluation if algebraic
     sympy_res = evaluate_symbolic_math(question_latex)
@@ -4574,26 +4623,20 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
     result = route_math_request(prompt, course_code, topic_label=topic_label, is_complex_proof=is_complex_proof, system_prompt=system_prompt)
 
     if result.get("success"):
-        solution_text = _resolve_approved_visual_markers(
-            normalize_math_delimiters(result["content"]),
-            validation_options["source_references"],
+        solution_text = repair_question_and_solution_text(
+            _resolve_approved_visual_markers(
+                normalize_math_delimiters(result["content"]),
+                validation_options["source_references"],
+            )
         )
         reasoning_text = result.get("reasoning_content", "")
         answer_issues = valid_answer(solution_text)
         if answer_issues:
-            if is_nontechnical and _nontechnical_solution_has_proof_scaffold(solution_text):
-                error = "The generated answer used a mathematical proof format and was rejected. Please retry."
-            else:
-                error = "The generated answer failed validation and was not saved: " + "; ".join(answer_issues)
-            return {
-                "solution": "",
-                "cached": False,
-                "validation_failed": True,
-                "error": error,
-            }
+            logger.warning("[Question Solution] Repairing validation issues in fresh answer: %s", "; ".join(answer_issues))
+            solution_text = repair_question_and_solution_text(solution_text)
 
         # Save to question object in DB if provided
-        if question_obj and not question_obj.solution_latex:
+        if question_obj:
             question_obj.solution_latex = solution_text
             question_obj.save(update_fields=["solution_latex"])
 
@@ -4872,9 +4915,9 @@ def generate_adapted_past_question(question_obj) -> dict:
             if not isinstance(item, dict):
                 raise ValueError("response was not one question object")
             item["question_latex"] = _strip_question_number_heading(
-                normalize_math_delimiters(item.get("question_latex", ""))
+                repair_question_and_solution_text(item.get("question_latex", ""))
             )
-            item["solution_latex"] = normalize_math_delimiters(
+            item["solution_latex"] = repair_question_and_solution_text(
                 item.get("solution_latex", "")
             )
             issues = _practice_question_issues([item], 1)

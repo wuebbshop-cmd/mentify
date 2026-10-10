@@ -4,6 +4,10 @@
 
 {% block extra_css %}
 <style>
+  @keyframes prep-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
   .study-tab-btn {
     padding: 10px 20px;
     font-size: 0.9rem;
@@ -2367,9 +2371,15 @@
     const activeBtn = document.getElementById('btn-lvl-' + level.replace('level_', ''));
     if (activeBtn) activeBtn.classList.add('active');
 
-    const loadingEl = document.getElementById('notes-loading');
-    const bodyEl = document.getElementById('notes-body');
-    const statusBadge = document.getElementById('notes-status-badge');
+    const notesStorageKey = `prep_notes_${topicId}_${level}`;
+    if (!publishedNotesByLevel[level]) {
+      try {
+        const stored = sessionStorage.getItem(notesStorageKey);
+        if (stored) {
+          publishedNotesByLevel[level] = JSON.parse(stored);
+        }
+      } catch (storageErr) {}
+    }
 
     // If the published note is already cached, render it instantly with 0ms lag
     if (publishedNotesByLevel[level]) {
@@ -2423,6 +2433,9 @@
       if (data.success && data.notes) {
         if (statusBadge) { statusBadge.textContent = ''; }
         publishedNotesByLevel[level] = data.notes;
+        try {
+          sessionStorage.setItem(notesStorageKey, JSON.stringify(data.notes));
+        } catch (storageErr) {}
         setupNotesPagination(data.notes);
       } else {
         alert(data.error || 'Failed to load notes for this level.');
@@ -2569,7 +2582,24 @@
     if (!solBox || !contentBox) return;
 
     solBox.style.display = 'block';
-    contentBox.innerHTML = '<div style="font-style: italic; color: var(--text-muted); padding: 8px 0;">Preparing rigorous step-by-step mathematical proof and marking scheme...</div>';
+
+    const solStorageKey = `prep_sol_${questionId}`;
+    try {
+      const cachedSolution = sessionStorage.getItem(solStorageKey);
+      if (cachedSolution) {
+        renderMarkdownWithKaTeX(cachedSolution, contentBox);
+        contentBox.dataset.rendered = "true";
+        if (authQuestionsMap[questionId]) {
+          authQuestionsMap[questionId].solution_latex = cachedSolution;
+        }
+        return;
+      }
+    contentBox.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 12px; color: var(--text-muted); font-size: 0.9rem; background: var(--surface, #f8fafc); border-radius: 8px; border: 1px solid var(--border, #e2e8f0); margin: 8px 0;">
+        <span style="display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(2, 132, 199, 0.2); border-top-color: #0284c7; border-radius: 50%; animation: prep-spin 0.8s linear infinite; flex-shrink: 0;"></span>
+        <span>Validating and deriving step-by-step mathematical proof in background...</span>
+      </div>
+    `;
 
     fetch("{% url 'prep:api_solve_question' %}", {
       method: 'POST',
@@ -2586,6 +2616,9 @@
     .then(r => r.json())
     .then(data => {
       if (data.success && data.solution) {
+        try {
+          sessionStorage.setItem(solStorageKey, data.solution);
+        } catch (storageErr) {}
         renderMarkdownWithKaTeX(data.solution, contentBox);
         contentBox.dataset.rendered = "true";
         if (authQuestionsMap[questionId]) {
@@ -2862,6 +2895,9 @@
       }
     }
     updateExportPdfButton(initialSelectedLevel);
+    document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+    const initialActiveBtn = document.getElementById('btn-lvl-' + String(initialSelectedLevel).replace('level_', ''));
+    if (initialActiveBtn) initialActiveBtn.classList.add('active');
 
     const initialNotesErrorDataEl = document.getElementById('initial-notes-error-data');
     if (initialNotesErrorDataEl && initialNotesErrorDataEl.textContent) {
