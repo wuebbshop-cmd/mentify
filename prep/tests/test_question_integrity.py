@@ -596,7 +596,8 @@ class ExistingPastQuestionRepairTests(TestCase):
         self.assertEqual(adapted.reconstruction_metadata["review_status"], "auto_validated")
         self.assertEqual(adapted.reconstruction_metadata["model_confidence"], 0.94)
         self.assertNotIn("Question 4:", adapted.question_latex)
-        self.assertIn("\\begin{enumerate}", adapted.question_latex)
+        self.assertNotIn("\\begin{enumerate}", adapted.question_latex)
+        self.assertIn("1. State what typeof() reports.", adapted.question_latex)
         self.assertFalse(assessment_question_rendering_issues(adapted.question_latex))
         self.assertEqual(route_request.call_count, 1)
 

@@ -140,6 +140,17 @@
     text-align: center;
     page-break-inside: avoid;
   }
+  .katex-mathml {
+    display: none !important;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 14px auto;
+    border-radius: 4px;
+    page-break-inside: avoid;
+  }
   hr {
     border: none;
     border-top: 1px solid #e2e8f0;
@@ -152,7 +163,7 @@
 <div class="doc-header">
   <span class="badge-tag">Mentify Prep &bull; Verified Syllabus Study Pack &bull; {{LEVEL_DISPLAY}}</span>
   <h1>{{COURSE_UPPER}} &mdash; {{TOPIC_TITLE}}</h1>
-  <div class="subtitle">Canonical Academic Notes &bull; {{LEVEL_DISPLAY}} &bull; Full Derivations &amp; Code &bull; Generated {{DATE_STR}}</div>
+  <div class="subtitle">Canonical Academic Notes &bull; {{LEVEL_DISPLAY}} &bull; Generated {{DATE_STR}}</div>
 </div>
 
 <div id="content"></div>

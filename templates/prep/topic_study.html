@@ -581,6 +581,14 @@
     background: #1a1a1a;
     border-left-color: #2dd4bf;
   }
+  .markdown-rendered .katex-mathml,
+  .katex-mathml {
+    display: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+  }
   .markdown-rendered .katex-display {
     overflow-x: auto;
     overflow-y: hidden;
@@ -1324,13 +1332,13 @@
       <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
         Tone &amp; Depth:
       </span>
-      <button type="button" class="level-btn" id="btn-lvl-1" onclick="loadNotesLevel('level_1')">
+      <button type="button" class="level-btn {% if initial_level == 'level_1' %}active{% endif %}" id="btn-lvl-1" onclick="loadNotesLevel('level_1')">
         Foundation &amp; Intuition
       </button>
-      <button type="button" class="level-btn active" id="btn-lvl-2" onclick="loadNotesLevel('level_2')">
+      <button type="button" class="level-btn {% if not initial_level or initial_level == 'level_2' %}active{% endif %}" id="btn-lvl-2" onclick="loadNotesLevel('level_2')">
         Core Concepts
       </button>
-      <button type="button" class="level-btn" id="btn-lvl-3" onclick="loadNotesLevel('level_3')">
+      <button type="button" class="level-btn {% if initial_level == 'level_3' %}active{% endif %}" id="btn-lvl-3" onclick="loadNotesLevel('level_3')">
         Exam Focus
       </button>
     </div>
@@ -1705,6 +1713,7 @@
 
 <!-- Raw Safe Data Storage -->
 {{ initial_notes|json_script:"initial-notes-data" }}
+{{ initial_level|default:"level_2"|json_script:"initial-level-data" }}
 {{ published_notes_by_level|json_script:"published-notes-by-level-data" }}
 {{ initial_notes_error|json_script:"initial-notes-error-data" }}
 {{ authentic_questions|json_script:"authentic-questions-data" }}
@@ -2348,9 +2357,10 @@
     const bodyEl = document.getElementById('notes-body');
     const statusBadge = document.getElementById('notes-status-badge');
 
-    // Level 2 must pass through the API so course-cost shares are settled
-    // before shared notes are displayed. Levels 1 and 3 may use their cache directly.
-    if (publishedNotesByLevel[level] && level !== 'level_2') {
+    // If the published note is already cached, render it instantly with 0ms lag
+    if (publishedNotesByLevel[level]) {
+      if (loadingEl) { loadingEl.style.display = 'none'; }
+      if (bodyEl) { bodyEl.style.opacity = '1'; }
       if (statusBadge) { statusBadge.textContent = ''; }
       setupNotesPagination(publishedNotesByLevel[level]);
       return;
@@ -2798,6 +2808,17 @@
       }
     }
     // 1. Load initial notes
+    let initialSelectedLevel = 'level_2';
+    const initialLevelEl = document.getElementById('initial-level-data');
+    if (initialLevelEl && initialLevelEl.textContent) {
+      try {
+        initialSelectedLevel = JSON.parse(initialLevelEl.textContent) || 'level_2';
+      } catch (e) {
+        console.error("Error parsing initial level JSON:", e);
+      }
+    }
+    updateExportPdfButton(initialSelectedLevel);
+
     const initialNotesErrorDataEl = document.getElementById('initial-notes-error-data');
     if (initialNotesErrorDataEl && initialNotesErrorDataEl.textContent) {
       try {
@@ -2817,7 +2838,7 @@
           if (notesBody) {
             notesBody.replaceChildren();
           }
-          loadNotesLevel('level_2');
+          loadNotesLevel(initialSelectedLevel);
         }
       } catch (e) {
         console.error("Error parsing initial notes JSON:", e);

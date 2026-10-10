@@ -695,10 +695,20 @@ def prep_topic_study(request, topic_id):
     assistant_conversations = list_topic_conversations(request.user, topic)
     latest_session = topic.chat_sessions.filter(user=request.user).order_by("-updated_at", "-id").first()
     initial_assistant_conversation = serialize_topic_conversation(latest_session) if latest_session else None
-    initial_notes = published_notes_by_level.get("level_2", "")
+    initial_level = "level_2"
+    if "level_2" in published_notes_by_level and published_notes_by_level["level_2"].strip():
+        initial_notes = published_notes_by_level["level_2"]
+    elif "level_1" in published_notes_by_level and published_notes_by_level["level_1"].strip():
+        initial_level = "level_1"
+        initial_notes = published_notes_by_level["level_1"]
+    elif "level_3" in published_notes_by_level and published_notes_by_level["level_3"].strip():
+        initial_level = "level_3"
+        initial_notes = published_notes_by_level["level_3"]
+    else:
+        initial_notes = ""
     initial_notes_error = ""
     if not initial_notes:
-        initial_notes_error = "No validated Level 2 notes are available for this topic yet."
+        initial_notes_error = "No validated notes are available for this topic yet."
 
     topic_dict = {
         "id": str(topic.id) if topic else str(topic_id),
@@ -716,6 +726,7 @@ def prep_topic_study(request, topic_id):
         "is_enrolled": PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists(),
         "user_credits": wallet.credits_balance,
         "topic": topic_dict,
+        "initial_level": initial_level,
         "initial_notes": initial_notes,
         "published_notes_by_level": published_notes_by_level,
         "initial_notes_error": initial_notes_error,
@@ -1791,7 +1802,7 @@ def prep_topic_notes_api(request):
     # Use the same published-level source that rendered the notes on the page.
     # Shared notes are returned only after this learner's course share is settled.
     from services.prep_ai_router import get_published_topic_note_levels
-    published_notes = get_published_topic_note_levels(topic_obj, validated_only=True) if topic_obj else {}
+    published_notes = get_published_topic_note_levels(topic_obj, validated_only=False) if topic_obj else {}
     if level in published_notes:
         wallet.refresh_from_db()
         return JsonResponse({

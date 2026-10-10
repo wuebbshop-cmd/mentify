@@ -1533,16 +1533,73 @@ def extract_assessment_questions(text: str) -> list[dict]:
     return questions
 
 
-def learner_visible_assessment_questions(question_records):
-    """Return only published-status questions that pass current rendering checks."""
+def learner_visible_assessment_questions(question_records, deduplicate: bool = True):
+    """Return only published-status questions that pass current rendering checks and deduplicate per paper."""
     from prep.models import PrepQuestion
 
-    return [
+    valid = [
         question
         for question in question_records
         if question.verification_status in PrepQuestion.LEARNER_VISIBLE_STATUSES
         and not assessment_question_rendering_issues(question.question_latex)
     ]
+    if not deduplicate:
+        return valid
+
+    status_rank = {"verified": 3, "reconstructed": 2, "auto_validated": 1}
+
+    # If an authentic question has an active reconstruction present in this set,
+    # suppress the authentic version so students only see the clean reconstruction.
+    reconstructed_source_ids = {
+        q.reconstructed_from_id for q in valid if q.reconstructed_from_id
+    }
+
+    paper_best = {}
+    other_questions = []
+
+    for q in valid:
+        if q.pk in reconstructed_source_ids:
+            continue
+        if q.paper_id:
+            key = (q.paper_id, q.number)
+            score = (
+                status_rank.get(q.verification_status, 0),
+                1 if q.source_document_id else 0,
+                q.pk,
+            )
+            if key not in paper_best or score > paper_best[key][0]:
+                paper_best[key] = (score, q)
+        else:
+            other_questions.append(q)
+
+    candidates = [item[1] for item in paper_best.values()] + other_questions
+    candidates.sort(
+        key=lambda q: (
+            status_rank.get(q.verification_status, 0),
+            1 if q.source_document_id else 0,
+            q.pk,
+        ),
+        reverse=True,
+    )
+
+    seen_texts = set()
+    final_questions = []
+    for q in candidates:
+        norm = _normalise_document_text(q.question_latex or "")
+        if norm and len(norm) > 25:
+            if norm in seen_texts:
+                continue
+            seen_texts.add(norm)
+        final_questions.append(q)
+
+    final_questions.sort(
+        key=lambda q: (
+            str(q.paper_id or ""),
+            q.number or 0,
+            q.pk,
+        )
+    )
+    return final_questions
 
 
 def _topic_match_for_question(course, question_text: str):
@@ -1656,9 +1713,14 @@ def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: boo
     for item in parsed_questions:
         occurrences_by_number[item["number"]] = occurrences_by_number.get(item["number"], 0) + 1
 
+    from services.prep_ai_router import clean_latex_document_markup, normalize_math_delimiters
+
     used_question_ids = set()
     created = 0
     for item in parsed_questions:
+        cleaned_latex = clean_latex_document_markup(item.get("question_latex", ""))
+        if cleaned_latex:
+            item["question_latex"] = normalize_math_delimiters(cleaned_latex)
         topic = _topic_match_for_question(prep_document.course, item["question_latex"])
         issues = assessment_question_rendering_issues(item["question_latex"])
         status = "flagged" if issues else "auto_validated"
@@ -1780,6 +1842,12 @@ def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: boo
                 continue
 
             adapted_item = adapted_result["question"]
+            adapted_q_latex = clean_latex_document_markup(adapted_item.get("question_latex", ""))
+            adapted_sol_latex = clean_latex_document_markup(adapted_item.get("solution_latex", ""))
+            if adapted_q_latex:
+                adapted_item["question_latex"] = normalize_math_delimiters(adapted_q_latex)
+            if adapted_sol_latex:
+                adapted_item["solution_latex"] = normalize_math_delimiters(adapted_sol_latex)
             adapted_issues = assessment_question_rendering_issues(adapted_item.get("question_latex", ""))
             metadata = adapted_result.get("reconstruction_metadata")
             metadata = dict(metadata) if isinstance(metadata, dict) else {}

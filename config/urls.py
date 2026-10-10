@@ -45,6 +45,44 @@ def static_fallback_serve(request, path):
         raise
 
 
+def media_fallback_serve(request, path):
+    """
+    Serve media files from local disk if present; otherwise stream from GitHub storage proxy
+    and cache locally so subsequent loads are instant.
+    """
+    try:
+        return static_serve(
+            request,
+            path,
+            document_root=settings.MEDIA_ROOT,
+        )
+    except Http404:
+        pass
+
+    clean_path = str(path or "").lstrip("/")
+    candidates = [
+        clean_path,
+        f"mentify-uploads/{clean_path}".replace("mentify-uploads/mentify-uploads/", "mentify-uploads/"),
+    ]
+    for candidate in candidates:
+        try:
+            resp = assets_proxy(request, candidate)
+            if resp and resp.status_code == 200:
+                try:
+                    local_dest = settings.MEDIA_ROOT / candidate
+                    local_dest.parent.mkdir(parents=True, exist_ok=True)
+                    if not local_dest.exists() and hasattr(resp, "content"):
+                        with open(local_dest, "wb") as f:
+                            f.write(resp.content)
+                except Exception:
+                    pass
+                return resp
+        except Exception:
+            continue
+
+    raise Http404(f"Media file '{path}' not found locally or on GitHub.")
+
+
 def favicon(request):
     """Serve a real favicon.ico response for browsers that bypass page metadata."""
     return FileResponse(
@@ -141,7 +179,6 @@ urlpatterns += [
     ),
     re_path(
         r"^media/(?P<path>.*)$",
-        static_serve,
-        {"document_root": settings.MEDIA_ROOT},
+        media_fallback_serve,
     ),
 ]

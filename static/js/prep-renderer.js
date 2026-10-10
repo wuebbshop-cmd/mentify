@@ -37,6 +37,7 @@
       try {
         return window.katex.renderToString(cleanLatex, {
           displayMode: !!displayMode,
+          output: 'html',
           throwOnError: false,
           strict: false,
           trust: true
@@ -198,6 +199,132 @@
     }
   }
 
+  /**
+   * Convert raw LaTeX document commands and list environments into standard clean Markdown
+   * while strictly preserving LaTeX mathematical notation inside math mode ($...$, $$...$$, \(..\), \[..\]).
+   */
+  function cleanLatexDocumentMarkup(text) {
+    if (!text || typeof text !== 'string') return '';
+    var cleaned = text.trim();
+
+    // 1. Clean document-level whitespace and layout commands
+    cleaned = cleaned.replace(/\\noindent\s*/g, '');
+    cleaned = cleaned.replace(/\\vspace\{[^}]*\}/g, '');
+    cleaned = cleaned.replace(/\\hspace\{[^}]*\}/g, '');
+    cleaned = cleaned.replace(/\\hrule\b/g, '');
+
+    // 2. Convert mark tags e.g. \hfill (3 marks) -> **(3 marks)**
+    cleaned = cleaned.replace(/\\hfill\s*(\([0-9]+\s*(?:marks?|mks)\)|\[[0-9]+\s*(?:marks?|mks)\])/gi, function(_, m) {
+      return '**' + m + '**';
+    });
+    cleaned = cleaned.replace(/\\hfill\s*/g, ' ');
+
+    // 3. Protect math blocks while converting non-math LaTeX text styling
+    var mathPattern = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g;
+    var segments = [];
+    var lastIndex = 0;
+    var match;
+    while ((match = mathPattern.exec(cleaned)) !== null) {
+      var nonMath = cleaned.substring(lastIndex, match.index);
+      nonMath = nonMath.replace(/\\textbf\{([^}]*)\}/g, function(_, t) { return '**' + t + '**'; });
+      nonMath = nonMath.replace(/\\textit\{([^}]*)\}/g, function(_, t) { return '*' + t + '*'; });
+      nonMath = nonMath.replace(/\\underline\{([^}]*)\}/g, function(_, t) { return '<u>' + t + '</u>'; });
+      segments.push(nonMath);
+      segments.push(match[0]);
+      lastIndex = mathPattern.lastIndex;
+    }
+    var remaining = cleaned.substring(lastIndex);
+    remaining = remaining.replace(/\\textbf\{([^}]*)\}/g, function(_, t) { return '**' + t + '**'; });
+    remaining = remaining.replace(/\\textit\{([^}]*)\}/g, function(_, t) { return '*' + t + '*'; });
+    remaining = remaining.replace(/\\underline\{([^}]*)\}/g, function(_, t) { return '<u>' + t + '</u>'; });
+    segments.push(remaining);
+    cleaned = segments.join('');
+
+    // 4. Handle nested enumerate environments (innermost first)
+    function replaceInnerEnum(m, opt, body) {
+      opt = opt || '';
+      var isRoman = /\bi\b|\(i\)|i\)/i.test(opt);
+      var isAlpha = /\ba\b|\(a\)|a\)/i.test(opt);
+
+      var alphaSeq = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)'];
+      var romanSeq = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)', '(vii)', '(viii)', '(ix)', '(x)'];
+      var numSeq = [];
+      for (var n = 1; n <= 30; n++) numSeq.push(n + '.');
+
+      var defaultSeq = isRoman ? romanSeq : (isAlpha ? alphaSeq : numSeq);
+
+      var itemRegex = /\\item(?:\[([^\]]*)\])?\s*/g;
+      var parts = [];
+      var lastIdx = 0;
+      var labels = [];
+      var itemMatch;
+      while ((itemMatch = itemRegex.exec(body)) !== null) {
+        if (parts.length === 0) {
+          var prefix = body.substring(lastIdx, itemMatch.index).trim();
+          if (prefix) parts.push(prefix);
+        } else {
+          parts.push(body.substring(lastIdx, itemMatch.index).trim());
+        }
+        labels.push(itemMatch[1] || null);
+        lastIdx = itemRegex.lastIndex;
+      }
+      if (lastIdx > 0) {
+        parts.push(body.substring(lastIdx).trim());
+      }
+
+      if (labels.length === 0) return body;
+
+      var outLines = [];
+      var itemOffset = (parts.length > labels.length) ? 1 : 0;
+      if (itemOffset === 1 && parts[0]) {
+        outLines.push(parts[0]);
+      }
+
+      for (var i = 0; i < labels.length; i++) {
+        var lbl = labels[i];
+        var content = parts[i + itemOffset] || '';
+        if (!lbl) {
+          lbl = (i < defaultSeq.length) ? defaultSeq[i] : '(' + (i + 1) + ')';
+        }
+        var indent = isRoman ? '    ' : '';
+        var contentLines = content.split('\n');
+        if (contentLines.length > 0) {
+          outLines.push(indent + lbl + ' ' + contentLines[0]);
+          for (var c = 1; c < contentLines.length; c++) {
+            outLines.push(indent + '    ' + contentLines[c]);
+          }
+        } else {
+          outLines.push(indent + lbl);
+        }
+      }
+      return '\n\n' + outLines.join('\n') + '\n\n';
+    }
+
+    var innerEnumRe = /\\begin\{enumerate\}(?:\[([^\]]*)\])?((?:(?!\\begin\{enumerate\})[\s\S])*?)\\end\{enumerate\}/;
+    for (var round = 0; round < 6; round++) {
+      if (!innerEnumRe.test(cleaned)) break;
+      cleaned = cleaned.replace(innerEnumRe, replaceInnerEnum);
+    }
+
+    // 5. Handle itemize environments
+    cleaned = cleaned.replace(/\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g, function(_, body) {
+      var items = body.split(/\\item\s*/);
+      var out = [];
+      for (var j = 1; j < items.length; j++) {
+        var it = items[j].trim();
+        if (it) out.push('- ' + it);
+      }
+      return '\n\n' + out.join('\n') + '\n\n';
+    });
+
+    // 6. Strip text alignment environments
+    cleaned = cleaned.replace(/\\begin\{(?:center|flushleft|flushright)\}([\s\S]*?)\\end\{(?:center|flushleft|flushright)\}/g, '$1');
+
+    // 7. Clean consecutive newlines
+    cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+    return cleaned.trim();
+  }
+
   // Compatibility for older notes that put display math inside a Markdown
   // quote, or emitted a supported LaTeX environment without $$ fences.
   // This only moves unambiguous structural boundaries; it never edits the
@@ -313,6 +440,7 @@
 
     // Clean literal escaped newlines if any
     var cleanText = markdownSource.replace(/\\n(?![a-zA-Z])/g, '\n').trim();
+    cleanText = cleanLatexDocumentMarkup(cleanText);
     cleanText = normalizeLegacyMathBlocks(cleanText);
 
     var htmlOutput = '';
@@ -329,6 +457,7 @@
 
   /* ─── Global Exports ─────────────────────────────────────────────── */
   window.renderMarkdownWithKaTeX = renderMarkdownWithKaTeX;
+  window.cleanLatexDocumentMarkup = cleanLatexDocumentMarkup;
   window.tryRenderKaTeX = tryRenderKaTeX;
   window.createMathExtension = createMathExtension;
   ensureMarkedConfigured();

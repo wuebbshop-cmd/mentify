@@ -2469,10 +2469,17 @@ def call_deepseek(
             # Auto-continue if generation was truncated due to token length limit
             if auto_continue and finish_reason == "length" and model != "deepseek-reasoner":
                 logger.info(f"[DeepSeek] Model output reached token limit ({max_tokens}). Automatically requesting continuation...")
-                cont_messages = list(messages) + [
-                    {"role": "assistant", "content": content},
-                    {"role": "user", "content": "Continue directly from where you stopped. Do not repeat any preceding text, and complete all remaining sections thoroughly."},
-                ]
+                if content:
+                    cont_messages = list(messages) + [
+                        {"role": "assistant", "content": content},
+                        {"role": "user", "content": "Continue directly from where you stopped. Do not repeat any preceding text, and complete all remaining sections thoroughly."},
+                    ]
+                else:
+                    # Model exhausted tokens entirely in reasoning_content before outputting assistant content
+                    logger.warning("[DeepSeek] Reasoning exhausted token budget before assistant content. Requesting immediate final answer...")
+                    cont_messages = list(messages) + [
+                        {"role": "user", "content": "Please immediately provide the final answer content now without further hidden thought tokens."},
+                    ]
                 cont_payload = {
                     "model": model,
                     "messages": cont_messages,
@@ -2481,6 +2488,9 @@ def call_deepseek(
                 }
                 if thinking_enabled is not None:
                     cont_payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
+                elif not content:
+                    # Explicitly disable thinking on retry if reasoning swallowed the token budget
+                    cont_payload["thinking"] = {"type": "disabled"}
                 try:
                     cont_resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=cont_payload, timeout=90)
                     if cont_resp.status_code == 200:
@@ -2488,17 +2498,20 @@ def call_deepseek(
                         cont_choice = cont_data["choices"][0]
                         cont_content = cont_choice["message"].get("content", "").strip()
                         usage = _merge_usage(usage, cont_data.get("usage", {}))
-                        # Stitch continuation seamlessly:
-                        c_lines = content.split("\n")
-                        last_l = c_lines[-1].strip()
-                        first_cont_l = cont_content.split("\n")[0].strip() if cont_content else ""
-                        if len(last_l) >= 8 and first_cont_l.startswith(last_l[:min(len(last_l), 25)]):
-                            content = "\n".join(c_lines[:-1]).rstrip() + "\n\n" + cont_content
-                        elif not content.endswith(("\n", " ", ".", ":", "$", "`")):
-                            # Mid-token cutoff (e.g. 'a_{2' -> ',2}')
-                            content = content + cont_content
+                        if not content:
+                            content = cont_content
                         else:
-                            content = content + "\n\n" + cont_content
+                            # Stitch continuation seamlessly:
+                            c_lines = content.split("\n")
+                            last_l = c_lines[-1].strip()
+                            first_cont_l = cont_content.split("\n")[0].strip() if cont_content else ""
+                            if len(last_l) >= 8 and first_cont_l.startswith(last_l[:min(len(last_l), 25)]):
+                                content = "\n".join(c_lines[:-1]).rstrip() + "\n\n" + cont_content
+                            elif not content.endswith(("\n", " ", ".", ":", "$", "`")):
+                                # Mid-token cutoff (e.g. 'a_{2' -> ',2}')
+                                content = content + cont_content
+                            else:
+                                content = content + "\n\n" + cont_content
                 except Exception as cont_err:
                     logger.warning(f"[DeepSeek] Auto-continuation failed: {cont_err}")
 
@@ -2671,14 +2684,110 @@ from services.prep_blocks import (
 )
 
 
+def clean_latex_document_markup(text: str) -> str:
+    """
+    Convert raw LaTeX document commands and list environments into standard clean Markdown
+    while strictly preserving LaTeX mathematical notation inside math mode ($...$, $$...$$, \\(..\\), \\[..\\]).
+    """
+    if not text or not isinstance(text, str):
+        return ""
+    cleaned = text.strip()
+
+    # 1. Clean document-level whitespace and layout commands
+    cleaned = re.sub(r"\\noindent\s*", "", cleaned)
+    cleaned = re.sub(r"\\vspace\{[^}]*\}", "", cleaned)
+    cleaned = re.sub(r"\\hspace\{[^}]*\}", "", cleaned)
+    cleaned = re.sub(r"\\hrule\b", "", cleaned)
+
+    # 2. Convert mark tags e.g. \hfill (3 marks) -> **(3 marks)**
+    cleaned = re.sub(
+        r"\\hfill\s*(\([0-9]+\s*(?:marks?|mks)\)|\[[0-9]+\s*(?:marks?|mks)\])",
+        r"**\1**",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(r"\\hfill\s*", " ", cleaned)
+
+    # 3. Protect math blocks while converting non-math LaTeX text styling
+    math_pattern = r"(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))"
+    segments = re.split(math_pattern, cleaned)
+    for idx, seg in enumerate(segments):
+        if idx % 2 == 0:
+            seg = re.sub(r"\\textbf\{([^}]*)\}", r"**\1**", seg)
+            seg = re.sub(r"\\textit\{([^}]*)\}", r"*\1*", seg)
+            seg = re.sub(r"\\underline\{([^}]*)\}", r"**\1**", seg)
+            segments[idx] = seg
+    cleaned = "".join(segments)
+
+    # 4. Handle nested enumerate environments (innermost first)
+    def replace_inner_enum(match):
+        opt = match.group(1) or ""
+        body = match.group(2)
+        is_roman = bool(re.search(r"\bi\b|\(i\)|i\)", opt, re.IGNORECASE))
+        is_alpha = bool(re.search(r"\ba\b|\(a\)|a\)", opt, re.IGNORECASE))
+
+        alpha_seq = ["(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)"]
+        roman_seq = ["(i)", "(ii)", "(iii)", "(iv)", "(v)", "(vi)", "(vii)", "(viii)", "(ix)", "(x)"]
+        num_seq = [f"{i}." for i in range(1, 30)]
+
+        default_seq = roman_seq if is_roman else (alpha_seq if is_alpha else num_seq)
+
+        items = re.split(r"\\item(?:\[([^\]]*)\])?\s*", body)
+        out_lines = []
+        if items[0].strip():
+            out_lines.append(items[0].strip())
+
+        item_idx = 0
+        for i in range(1, len(items), 2):
+            label = items[i]
+            content = items[i + 1].strip() if i + 1 < len(items) else ""
+            if not label:
+                label = default_seq[item_idx] if item_idx < len(default_seq) else f"({item_idx + 1})"
+            item_idx += 1
+
+            indent = "    " if is_roman else ""
+            content_lines = content.splitlines()
+            if content_lines:
+                out_lines.append(f"{indent}{label} {content_lines[0]}")
+                for c_line in content_lines[1:]:
+                    out_lines.append(f"{indent}    {c_line}")
+            else:
+                out_lines.append(f"{indent}{label}")
+        return "\n\n" + "\n".join(out_lines) + "\n\n"
+
+    inner_enum_re = re.compile(
+        r"\\begin\{enumerate\}(?:\[([^\]]*)\])?((?:(?!\\begin\{enumerate\})[\s\S])*?)\\end\{enumerate\}"
+    )
+    for _ in range(6):
+        if not inner_enum_re.search(cleaned):
+            break
+        cleaned = inner_enum_re.sub(replace_inner_enum, cleaned)
+
+    def replace_itemize(match):
+        body = match.group(1)
+        items = re.split(r"\\item\s*", body)
+        out_lines = [f"- {it.strip()}" for it in items[1:] if it.strip()]
+        return "\n\n" + "\n".join(out_lines) + "\n\n"
+
+    cleaned = re.sub(r"\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}", replace_itemize, cleaned)
+    cleaned = re.sub(
+        r"\\begin\{(?:center|flushleft|flushright)\}([\s\S]*?)\\end\{(?:center|flushleft|flushright)\}",
+        r"\1",
+        cleaned,
+    )
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
 def normalize_math_delimiters(text: str) -> str:
     """
     Shared renderer hygiene for notes, authentic questions, generated questions,
-    and PDF exports. It performs only deterministic transport repairs and does
-    not guess at or auto-close mathematical expressions.
+    and PDF exports. It performs deterministic transport repairs and converts
+    raw LaTeX document markup to clean Markdown while preserving math notation.
     """
     if not text:
         return ""
+    text = clean_latex_document_markup(text)
     text = repair_json_escaped_latex_newlines(str(text))
     text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
@@ -3789,6 +3898,7 @@ def generate_similar_practice_questions(
         topic_label=topic_title,
         is_complex_proof=False,
         system_prompt=sys_prompt,
+        thinking_enabled=False,
     )
 
     if not result.get("success"):
@@ -3841,6 +3951,7 @@ def generate_similar_practice_questions(
             ],
             model=result.get("model_used", "deepseek-chat"),
             max_tokens=6000,
+            thinking_enabled=False,
         )
         if not correction.get("success") or not correction.get("content"):
             break

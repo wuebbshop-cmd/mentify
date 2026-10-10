@@ -265,3 +265,6 @@ TOGETHERAI_ID = os.environ.get("TOGETHERAI_ID", "")
 TOGETHER_VISION_MODEL = os.environ.get("TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
 TOGETHER_REPAIR_MODEL = os.environ.get("TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
 TOGETHER_MAX_PAGES_PER_RUN = int(os.environ.get("TOGETHER_MAX_PAGES_PER_RUN", 15))
+
+# Automatically start worker threads in development when running runserver
+ENABLE_LOCAL_PREP_WORKERS = os.environ.get("ENABLE_LOCAL_PREP_WORKERS", "true").lower() in ("1", "true")

@@ -2,7 +2,7 @@ import time
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand
-from django.db import OperationalError, transaction
+from django.db import OperationalError, close_old_connections, connection, transaction
 from django.db.models import Case, Exists, OuterRef, Q, Value, When
 from django.utils import timezone
 
@@ -21,6 +21,8 @@ class Command(BaseCommand):
         poll_seconds = max(1.0, options["poll_seconds"])
         last_expiry_sweep = 0.0
         while True:
+            if not connection.in_atomic_block:
+                close_old_connections()
             try:
                 if time.time() - last_expiry_sweep >= 3600:
                     self._expire_due_credits()
@@ -34,14 +36,24 @@ class Command(BaseCommand):
                 time.sleep(poll_seconds)
                 continue
             if notes_job:
-                self._process_topic_notes_job(notes_job)
+                try:
+                    self._process_topic_notes_job(notes_job)
+                except Exception as exc:
+                    self.stderr.write(
+                        self.style.ERROR(f"Unexpected worker error for notes job {notes_job.id}: {exc}")
+                    )
                 continue
             if not job:
                 if once:
                     return
                 time.sleep(poll_seconds)
                 continue
-            self._process_job(job)
+            try:
+                self._process_job(job)
+            except Exception as exc:
+                self.stderr.write(
+                    self.style.ERROR(f"Unexpected error processing course precompute job {job.id}: {exc}")
+                )
 
     def _expire_due_credits(self):
         from prep.models import PrepWallet
@@ -111,6 +123,17 @@ class Command(BaseCommand):
             job.save(update_fields=["status", "attempts", "started_at", "last_error"])
             return job
 
+    @staticmethod
+    def _save_job_resilient(job, update_fields):
+        if not connection.in_atomic_block:
+            close_old_connections()
+        try:
+            job.save(update_fields=update_fields)
+        except OperationalError:
+            if not connection.in_atomic_block:
+                close_old_connections()
+            job.save(update_fields=update_fields)
+
     def _process_job(self, job):
         try:
             from services.prep_note_precompute import enqueue_course_topic_note_jobs
@@ -119,7 +142,7 @@ class Command(BaseCommand):
             job.status = "complete"
             job.completed_at = timezone.now()
             job.last_error = ""
-            job.save(update_fields=["status", "completed_at", "last_error"])
+            self._save_job_resilient(job, update_fields=["status", "completed_at", "last_error"])
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Queued all-level note preparation for {job.course.code} "
@@ -129,7 +152,10 @@ class Command(BaseCommand):
         except Exception as exc:
             job.last_error = str(exc)[:4000]
             job.status = "pending" if job.attempts < 3 else "failed"
-            job.save(update_fields=["status", "last_error"])
+            try:
+                self._save_job_resilient(job, update_fields=["status", "last_error"])
+            except Exception as save_err:
+                self.stderr.write(self.style.ERROR(f"Failed to record error for {job.id}: {save_err}"))
             self.stderr.write(self.style.ERROR(f"Course notes precompute failed for {job.course.code}: {exc}"))
 
     def _process_topic_notes_job(self, job):
@@ -215,14 +241,15 @@ class Command(BaseCommand):
             job.last_error = ""
             job.provider_usage = usage
             job.model_name = model_name
-            job.save(
+            self._save_job_resilient(
+                job,
                 update_fields=[
                     "status",
                     "completed_at",
                     "last_error",
                     "provider_usage",
                     "model_name",
-                ]
+                ],
             )
             self.stdout.write(
                 self.style.SUCCESS(f"Prepared {job.level} notes for topic {topic.pk}.")
@@ -231,7 +258,14 @@ class Command(BaseCommand):
             job.status = "pending" if job.attempts < 3 else "failed"
             job.last_error = str(exc)[:4000]
             job.completed_at = timezone.now() if job.status == "failed" else None
-            job.save(update_fields=["status", "last_error", "completed_at"])
+            try:
+                self._save_job_resilient(job, update_fields=["status", "last_error", "completed_at"])
+            except Exception as save_err:
+                self.stderr.write(
+                    self.style.ERROR(
+                        f"Failed to record topic job error for {job.id}: {save_err}"
+                    )
+                )
             self.stderr.write(
                 self.style.ERROR(
                     f"Topic notes worker failed for topic {job.topic_id} ({job.level}): {exc}"

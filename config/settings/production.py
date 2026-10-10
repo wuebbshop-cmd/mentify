@@ -74,3 +74,6 @@ WHITENOISE_MAX_AGE = 31536000
 # SameSite cookie settings.
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+
+# Render uses dedicated worker services defined in render.yaml; disable in-process threads
+ENABLE_LOCAL_PREP_WORKERS = False

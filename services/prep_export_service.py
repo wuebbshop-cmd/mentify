@@ -10,9 +10,11 @@ Generates publication-ready PDF and DOCX documents with robust formatting for:
 """
 from __future__ import annotations
 
+import base64
 import io
 import json
 import logging
+import mimetypes
 import os
 import re
 import tempfile
@@ -403,6 +405,91 @@ def _render_html_with_playwright(
                 pass
 
 
+def _inline_media_images(markdown_text: str) -> str:
+    """
+    Finds /media/ or /cdn/assets/ image references in markdown and inlines them
+    as base64 data URIs so headless Chromium can render them without network/disk URL restrictions.
+    """
+    if not markdown_text:
+        return ""
+
+    from pathlib import Path
+    from services.cdn_views import _fetch_github_asset
+
+    # Match ![alt](url)
+    pattern = re.compile(r"!\[(.*?)\]\((\s*/(?:media|cdn/assets)/[^\s\)]+)\)")
+
+    def replace_image(match):
+        alt = match.group(1)
+        raw_url = match.group(2).strip()
+
+        # Determine file path relative to MEDIA_ROOT or repo
+        content_bytes = None
+        mime_type = "image/jpeg"
+
+        if raw_url.startswith("/media/"):
+            rel_path = raw_url[len("/media/"):].lstrip("/")
+        elif raw_url.startswith("/cdn/assets/"):
+            rel_path = raw_url[len("/cdn/assets/"):].lstrip("/")
+        else:
+            rel_path = raw_url.lstrip("/")
+
+        # 1. Try local disk cache under MEDIA_ROOT
+        candidates = [
+            Path(settings.MEDIA_ROOT) / rel_path,
+            Path(settings.MEDIA_ROOT) / rel_path.replace("mentify-uploads/", ""),
+            Path(settings.MEDIA_ROOT) / "mentify-uploads" / rel_path.replace("mentify-uploads/", ""),
+        ]
+        for candidate in candidates:
+            if candidate.exists() and candidate.is_file():
+                try:
+                    with open(candidate, "rb") as f:
+                        content_bytes = f.read()
+                    guessed, _ = mimetypes.guess_type(str(candidate))
+                    if guessed:
+                        mime_type = guessed
+                    break
+                except Exception:
+                    pass
+
+        # 2. If not on local disk, fetch directly from GitHub
+        if not content_bytes:
+            repo = getattr(settings, "GITHUB_REPO", "").strip()
+            branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
+            if repo and "/" in repo:
+                owner, repo_name = repo.split("/", 1)
+                gh_paths = [
+                    rel_path,
+                    f"mentify-uploads/{rel_path}".replace("mentify-uploads/mentify-uploads/", "mentify-uploads/"),
+                ]
+                for gh_path in gh_paths:
+                    try:
+                        content_bytes, mime = _fetch_github_asset(owner, repo_name, branch, gh_path)
+                        if content_bytes:
+                            mime_type = mime or mime_type
+                            # Also cache to local disk for future requests
+                            try:
+                                local_cache = Path(settings.MEDIA_ROOT) / gh_path
+                                local_cache.parent.mkdir(parents=True, exist_ok=True)
+                                if not local_cache.exists():
+                                    with open(local_cache, "wb") as f:
+                                        f.write(content_bytes)
+                            except Exception:
+                                pass
+                            break
+                    except Exception:
+                        continue
+
+        if content_bytes:
+            b64_data = base64.b64encode(content_bytes).decode("ascii")
+            data_uri = f"data:{mime_type};base64,{b64_data}"
+            return f"![{alt}]({data_uri})"
+
+        return match.group(0)
+
+    return pattern.sub(replace_image, markdown_text)
+
+
 def _build_topic_notes_html(
     course_code: str,
     topic_title: str,
@@ -453,6 +540,7 @@ def _build_topic_notes_html(
     course_upper = course_code.upper()
 
     full_markdown = normalize_math_delimiters(full_markdown)
+    full_markdown = _inline_media_images(full_markdown)
     escaped_json = json.dumps(full_markdown).replace("</", "<\/")
 
     level_labels = {

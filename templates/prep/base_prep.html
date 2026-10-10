@@ -88,6 +88,14 @@
       font-style: italic;
       color: inherit;
     }
+    /* KaTeX MathML suppression to prevent vertical character explosions on clipboard copy */
+    .katex-mathml {
+      display: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+    }
     /* Hide scrollbar completely on notification dropdown */
     #prep-notif-list {
       scrollbar-width: none;

@@ -42,7 +42,10 @@ class Command(BaseCommand):
                 time.sleep(poll_seconds)
                 continue
             if job:
-                self._process_job(job)
+                try:
+                    self._process_job(job)
+                except Exception as exc:
+                    logger.exception("Assessment worker error for job %s: %s", getattr(job, "pk", None), exc)
                 continue
             if once:
                 return
@@ -107,6 +110,17 @@ class Command(BaseCommand):
             ])
             return job
 
+    @staticmethod
+    def _save_job_resilient(job, update_fields):
+        if not connection.in_atomic_block:
+            close_old_connections()
+        try:
+            job.save(update_fields=update_fields)
+        except OperationalError:
+            if not connection.in_atomic_block:
+                close_old_connections()
+            job.save(update_fields=update_fields)
+
     def _process_job(self, job):
         try:
             paper = job.paper
@@ -126,18 +140,30 @@ class Command(BaseCommand):
                 job.stage = "superseded"
                 job.completed_at = timezone.now()
                 job.last_error = "The paper source changed after this job was queued."
-                job.save(update_fields=[
+                self._save_job_resilient(job, update_fields=[
                     "status", "stage", "completed_at", "last_error",
                 ])
                 return
 
             from services.prep_ingestion import index_assessment_questions
+            from services.prep_solution_precompute import precompute_solutions_for_paper
 
             indexed = index_assessment_questions(
                 document,
                 paper,
                 reconstruct_invalid=job.reconstruct_invalid,
             )
+
+            # Precompute and verify solutions in the background without blocking or locking
+            try:
+                precompute_solutions_for_paper(paper, sleep_seconds=1.0)
+            except Exception as sol_err:
+                logger.warning(
+                    "Background solution precomputation encountered error for paper %s: %s",
+                    paper.pk,
+                    sol_err,
+                )
+
             if assessment_source_signature(document) != job.source_signature:
                 enqueue_assessment_index(
                     paper,
@@ -147,7 +173,7 @@ class Command(BaseCommand):
                 job.stage = "superseded"
                 job.completed_at = timezone.now()
                 job.last_error = "The paper source changed while this job was processing."
-                job.save(update_fields=[
+                self._save_job_resilient(job, update_fields=[
                     "status", "stage", "completed_at", "last_error",
                 ])
                 return
@@ -158,7 +184,7 @@ class Command(BaseCommand):
             job.completed_at = timezone.now()
             job.started_at = None
             job.last_error = ""
-            job.save(update_fields=[
+            self._save_job_resilient(job, update_fields=[
                 "status", "stage", "indexed_questions", "completed_at",
                 "started_at", "last_error",
             ])
@@ -180,10 +206,13 @@ class Command(BaseCommand):
                 job.status = "failed"
                 job.stage = "failed"
                 job.completed_at = timezone.now()
-            job.save(update_fields=[
-                "status", "stage", "last_error", "started_at",
-                "next_attempt_at", "completed_at",
-            ])
+            try:
+                self._save_job_resilient(job, update_fields=[
+                    "status", "stage", "last_error", "started_at",
+                    "next_attempt_at", "completed_at",
+                ])
+            except Exception as save_err:
+                logger.error("Failed to persist assessment job state for %s: %s", job.pk, save_err)
             self.stderr.write(
                 self.style.ERROR(
                     f"Assessment indexing job {job.pk} failed "

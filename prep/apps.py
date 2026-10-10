@@ -8,3 +8,5 @@ class PrepConfig(AppConfig):
 
     def ready(self):
         import prep.signals  # noqa: F401
+        from services.local_prep_worker import start_local_prep_workers
+        start_local_prep_workers()
