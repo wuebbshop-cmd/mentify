@@ -170,7 +170,7 @@
   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
     <div>
       <h2 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 600; color: var(--text);">Daily Credit Usage Over Time</h2>
-      <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Interactive breakdown of daily consumption. Select timeframe or filter by a specific date.</p>
+      <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Hover or tap bars to view detailed credit consumption breakdown without reloading the page.</p>
     </div>
 
     <!-- Timeframe Selection and Date Filter -->
@@ -490,15 +490,6 @@
               color: textColor,
               font: { size: 11 },
               precision: 0,
-            }
-          }
-        },
-        onClick: function(event, elements) {
-          if (elements && elements.length > 0) {
-            const elementIndex = elements[0].index;
-            const clickedDate = chartDates[elementIndex];
-            if (clickedDate) {
-              filterByDate(clickedDate);
             }
           }
         }

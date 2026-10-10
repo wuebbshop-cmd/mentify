@@ -254,17 +254,6 @@
         <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=practice" class="topic-secondary-link">
           Practice Variants
         </a>
-        {% if t.ready_levels %}
-        <span style="color: var(--border);">&bull;</span>
-        <div class="topic-ready-group">
-          <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;">Notes Ready:</span>
-          {% for r in t.ready_levels %}
-          <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes&level={{ r.key }}" class="topic-level-badge" title="{{ r.label }} notes ready">
-            L{{ r.num }}: {{ r.label }}
-          </a>
-          {% endfor %}
-        </div>
-        {% endif %}
       </div>
 
       <a href="{% url 'prep:topic_study' topic_id=t.id %}?tab=notes{% if t.preferred_level %}&level={{ t.preferred_level }}{% endif %}" class="btn btn-primary btn-sm" style="padding: 7px 18px; font-weight: 500; white-space: nowrap;">

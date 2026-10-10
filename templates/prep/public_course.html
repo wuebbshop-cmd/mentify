@@ -136,17 +136,6 @@
         <div class="prep-topic-footer">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <span style="white-space: nowrap;">{{ topic.question_count }} verified question{{ topic.question_count|pluralize }}</span>
-            {% if topic.ready_levels %}
-            <span style="color: var(--border);">&bull;</span>
-            <div class="prep-ready-group">
-              <span class="prep-ready-label">Ready:</span>
-              {% for r in topic.ready_levels %}
-              <span class="prep-level-badge">
-                L{{ r.num }}: {{ r.label }}
-              </span>
-              {% endfor %}
-            </div>
-            {% endif %}
           </div>
           <a href="{% url 'prep:topic_study' topic.id %}?tab=notes{% if topic.preferred_level %}&level={{ topic.preferred_level }}{% endif %}" class="btn btn-outline btn-sm" style="padding: 5px 14px; font-size: 0.8rem; white-space: nowrap;">Study Topic &rarr;</a>
         </div>

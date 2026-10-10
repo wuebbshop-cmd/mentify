@@ -1716,6 +1716,8 @@ body.dark-theme .mobile-drawer-divider   { background: #333; }
   .mobile-drawer { display: block; }
   .mobile-drawer-panel { max-height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
   .mobile-drawer-content { padding-bottom: 24px; }
+  .sidebar { display: none !important; }
+  .dashboard-layout { grid-template-columns: minmax(0, 1fr) !important; }
   .dashboard-body { padding: 16px 12px; }
   .card { padding: 16px 14px; }
   .course-clean-row {
