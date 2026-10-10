@@ -1,5 +1,7 @@
 import os
 import re
+import json
+import datetime
 import logging
 from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
@@ -1244,6 +1246,152 @@ def prep_billing(request):
     return render(request, "prep/billing.html", context)
 
 
+def prep_metrics(request):
+    """
+    Mentify Prep Metrics & Activity Page.
+    Allows students to monitor their credit usage over time (daily) in an interactive graph,
+    select/filter by day or date range, and audit their complete credit transaction ledger.
+    """
+    if not request.user.is_authenticated:
+        return redirect(f"{reverse('accounts:login')}?next={reverse('prep:metrics')}")
+
+    wallet = PrepWallet.get_or_create_wallet(request.user)
+    available_credits = get_available_credits(wallet)
+
+    days_param = request.GET.get("days", "30").strip()
+    date_param = request.GET.get("date", "").strip()
+
+    now = timezone.now()
+    if days_param == "7":
+        num_days = 7
+    elif days_param == "14":
+        num_days = 14
+    elif days_param == "90":
+        num_days = 90
+    elif days_param == "all":
+        num_days = 365
+    else:
+        num_days = 30
+
+    start_date = now - datetime.timedelta(days=num_days)
+    all_transactions = wallet.transactions.all().order_by("-created_at")
+
+    selected_date_obj = None
+    if date_param:
+        try:
+            selected_date_obj = datetime.date.fromisoformat(date_param)
+            table_transactions = all_transactions.filter(
+                created_at__date=selected_date_obj
+            )
+        except ValueError:
+            table_transactions = all_transactions
+    else:
+        table_transactions = all_transactions
+
+    # Daily aggregation over the selected range
+    daily_stats = {}
+    for i in range(num_days - 1, -1, -1):
+        d = (now - datetime.timedelta(days=i)).date()
+        iso = d.isoformat()
+        daily_stats[iso] = {
+            "date": iso,
+            "label": d.strftime("%b %d"),
+            "used": 0,
+            "gained": 0,
+            "practice": 0,
+            "notes": 0,
+            "tutor": 0,
+            "ocr": 0,
+            "other": 0,
+        }
+
+    period_transactions = all_transactions.filter(created_at__gte=start_date)
+    total_period_used = 0
+    total_period_gained = 0
+
+    category_counts = {
+        "AI Practice": 0,
+        "Topic Notes": 0,
+        "AI Study Tutor": 0,
+        "Document OCR": 0,
+        "Top-ups & Grants": 0,
+    }
+
+    for tx in period_transactions:
+        tx_date = tx.created_at.date().isoformat()
+        amt = tx.amount
+        if tx_date in daily_stats:
+            if amt < 0:
+                spent = abs(amt)
+                daily_stats[tx_date]["used"] += spent
+                total_period_used += spent
+                if tx.action_type == "ai_practice_gen":
+                    daily_stats[tx_date]["practice"] += spent
+                    category_counts["AI Practice"] += spent
+                elif tx.action_type == "topic_notes":
+                    daily_stats[tx_date]["notes"] += spent
+                    category_counts["Topic Notes"] += spent
+                elif tx.action_type == "topic_tutor":
+                    daily_stats[tx_date]["tutor"] += spent
+                    category_counts["AI Study Tutor"] += spent
+                elif tx.action_type in ("upload_ocr", "topic_tutor_ocr", "upload_text"):
+                    daily_stats[tx_date]["ocr"] += spent
+                    category_counts["Document OCR"] += spent
+                else:
+                    daily_stats[tx_date]["other"] += spent
+            else:
+                daily_stats[tx_date]["gained"] += amt
+                total_period_gained += amt
+                category_counts["Top-ups & Grants"] += amt
+
+    chart_dates = []
+    chart_labels = []
+    chart_used = []
+    chart_gained = []
+    chart_practice = []
+    chart_notes = []
+    chart_tutor = []
+    chart_ocr = []
+
+    for d_iso, s in daily_stats.items():
+        chart_dates.append(d_iso)
+        chart_labels.append(s["label"])
+        chart_used.append(s["used"])
+        chart_gained.append(s["gained"])
+        chart_practice.append(s["practice"])
+        chart_notes.append(s["notes"])
+        chart_tutor.append(s["tutor"])
+        chart_ocr.append(s["ocr"])
+
+    avg_daily_used = round(total_period_used / max(num_days, 1), 1)
+    active_categories = {k: v for k, v in category_counts.items() if k != "Top-ups & Grants" and v > 0}
+    top_category = max(active_categories, key=active_categories.get) if active_categories else "None"
+
+    context = {
+        "active_tab": "metrics",
+        "wallet": wallet,
+        "user_credits": available_credits,
+        "total_period_used": total_period_used,
+        "total_period_gained": total_period_gained,
+        "avg_daily_used": avg_daily_used,
+        "top_category": top_category,
+        "days_selected": str(num_days),
+        "selected_date": date_param,
+        "chart_dates_json": json.dumps(chart_dates),
+        "chart_labels_json": json.dumps(chart_labels),
+        "chart_used_json": json.dumps(chart_used),
+        "chart_gained_json": json.dumps(chart_gained),
+        "chart_practice_json": json.dumps(chart_practice),
+        "chart_notes_json": json.dumps(chart_notes),
+        "chart_tutor_json": json.dumps(chart_tutor),
+        "chart_ocr_json": json.dumps(chart_ocr),
+        "daily_stats_json": json.dumps(daily_stats),
+        "transactions": table_transactions[:100],
+        "total_transactions_count": all_transactions.count(),
+    }
+    return render(request, "prep/metrics.html", context)
+
+
 # ─── Step 5: Paystack & M-Pesa Payments ──────────────────────────────────────
 
 import uuid
@@ -2108,22 +2256,34 @@ def prep_generate_practice_api(request):
             authentic_samples.append(f"Q{q.number} ({q.marks} marks): {q.question_latex}")
 
     # Check existing generated questions in DB
+    existing_generated = 0
     if topic_obj:
         from services.prep_ingestion import learner_visible_assessment_questions
-
-    existing_generated = (
-        len(learner_visible_assessment_questions(PrepQuestion.objects.filter(
+        existing_generated = len(learner_visible_assessment_questions(PrepQuestion.objects.filter(
             topic=topic_obj,
             question_type="generated",
             verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
         )))
-        if topic_obj
-        else 0
-    )
-    # A verified shared set is reused exactly as it stands. Do not reserve
-    # credits for a larger later selection, because that must not append paid
-    # variants to an existing set.
-    fresh_needed = 0 if existing_generated else count
+
+    force_fresh = bool(data.get("force_fresh", False))
+    existing_count = 0
+    try:
+        existing_count = int(data.get("existing_count", 0))
+    except (ValueError, TypeError):
+        existing_count = 0
+
+    # If user already has variants displayed (existing_count > 0) or requested force_fresh,
+    # generate a fresh batch of `count` questions.
+    # Otherwise, if variants exist in DB, fetch them at $0 cost.
+    if force_fresh or existing_count > 0:
+        fresh_needed = count
+        should_force_fresh = True
+    elif existing_generated >= count:
+        fresh_needed = 0
+        should_force_fresh = False
+    else:
+        fresh_needed = count
+        should_force_fresh = True
 
     if fresh_needed > 0:
         try:
@@ -2147,6 +2307,7 @@ def prep_generate_practice_api(request):
         authentic_samples=authentic_samples,
         topic_obj=topic_obj,
         course_obj=topic_obj.course if topic_obj else None,
+        force_fresh=should_force_fresh,
     )
 
     if not res.get("success"):

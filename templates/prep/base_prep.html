@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Mentify Prep{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Mentify Prep is an exam readiness and past-paper revision engine tailored for university and college students. Access syllabus-anchored past papers, CATs, and step-by-step verified proofs.{% endblock %}">
+  <meta name="description" content="{% block meta_description %}Mentify Prep is an exam readiness and past-paper revision engine tailored for students. Access syllabus-anchored past papers, CATs, and step-by-step verified proofs.{% endblock %}">
 
   <!-- Canonical & hreflang for Global SEO -->
   <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
@@ -22,14 +22,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
   <meta property="og:title" content="{% block og_title %}Mentify Prep — Exam Readiness & Past Paper Revision Engine{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}University syllabus-anchored past papers, Continuous Assessment Tests (CATs), practice variant generation, and step-by-step mathematical proofs.{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Syllabus-anchored past papers, Continuous Assessment Tests (CATs), practice variant generation, and step-by-step mathematical proofs.{% endblock %}">
   <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-image.png' %}">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
   <meta name="twitter:title" content="{% block twitter_title %}Mentify Prep — Exam Readiness & Past Paper Revision Engine{% endblock %}">
-  <meta name="twitter:description" content="{% block twitter_description %}University syllabus-anchored past papers, Continuous Assessment Tests (CATs), practice variant generation, and step-by-step mathematical proofs.{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Syllabus-anchored past papers, Continuous Assessment Tests (CATs), practice variant generation, and step-by-step mathematical proofs.{% endblock %}">
   <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-image.png' %}">
 
   <!-- Structured Data: Organization & EducationalPlatform -->
@@ -40,7 +40,7 @@
     "name": "Mentify Prep",
     "url": "{{ request.scheme }}://{{ request.get_host }}/prep/",
     "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
-    "description": "University exam readiness, CAT preparation, syllabus-anchored lecture notes, and verified past paper solutions.",
+    "description": "Exam readiness, CAT preparation, syllabus-anchored lecture notes, and verified past paper solutions.",
     "parentOrganization": {
       "@type": "Organization",
       "name": "Mentify",
@@ -258,6 +258,10 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
         Credits &amp; Plans
       </a>
+      <a href="{% url 'prep:metrics' %}" class="mobile-drawer-link {% if active_tab == 'metrics' %}active{% endif %}">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Metrics
+      </a>
 
       <div class="mobile-drawer-divider"></div>
       <a href="{% url 'home' %}" class="mobile-drawer-link">
@@ -287,9 +291,11 @@
             <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email|default:'Mentify Prep' }}</div>
           </div>
         </div>
-        <span class="badge badge-danger" style="font-size: 0.72rem; align-self: flex-start;">
-          Exam Prep Mode
+        {% if user_plan_badge %}
+        <span class="badge" style="font-size: 0.72rem; align-self: flex-start; font-weight: 700; color: {{ user_plan_badge.color }}; background: {{ user_plan_badge.bg }}; border: 1px solid {{ user_plan_badge.border }};">
+          {{ user_plan_badge.label }}
         </span>
+        {% endif %}
       </div>
 
       <ul class="sidebar-nav">
@@ -318,6 +324,13 @@
           <a href="{% url 'prep:billing' %}" class="{% if active_tab == 'billing' %}active{% endif %}">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
             Credits & Plans
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="{% url 'prep:metrics' %}" class="{% if active_tab == 'metrics' %}active{% endif %}">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Metrics
           </a>
         </li>
       </ul>

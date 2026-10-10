@@ -28,11 +28,15 @@
   }
 
   /**
-   * Pure KaTeX rendering without regex auto-repair.
+   * Robust KaTeX rendering with delimiter stripping and command normalization.
    */
   function tryRenderKaTeX(latex, displayMode) {
     if (!latex || !String(latex).trim()) return '';
     var cleanLatex = String(latex).trim();
+    // Strip accidental redundant outer delimiters if passed inside latex token
+    cleanLatex = cleanLatex.replace(/^(\$\$|\\\[|\$|\\\()/, '').replace(/(\$\$|\\\]|\$|\\\))$/, '').trim();
+    // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
+    cleanLatex = cleanLatex.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
     if (window.katex && typeof window.katex.renderToString === 'function') {
       try {
         return window.katex.renderToString(cleanLatex, {
@@ -286,15 +290,15 @@
         if (!lbl) {
           lbl = (i < defaultSeq.length) ? defaultSeq[i] : '(' + (i + 1) + ')';
         }
-        var indent = isRoman ? '    ' : '';
+        var indent = '';
         var contentLines = content.split('\n');
         if (contentLines.length > 0) {
-          outLines.push(indent + lbl + ' ' + contentLines[0]);
+          outLines.push(lbl + ' ' + contentLines[0]);
           for (var c = 1; c < contentLines.length; c++) {
-            outLines.push(indent + '    ' + contentLines[c]);
+            outLines.push(contentLines[c]);
           }
         } else {
-          outLines.push(indent + lbl);
+          outLines.push(lbl);
         }
       }
       return '\n\n' + outLines.join('\n') + '\n\n';
@@ -442,6 +446,38 @@
     var cleanText = markdownSource.replace(/\\n(?![a-zA-Z])/g, '\n').trim();
     cleanText = cleanLatexDocumentMarkup(cleanText);
     cleanText = normalizeLegacyMathBlocks(cleanText);
+
+    // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
+    cleanText = cleanText.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+
+    // Collapse adjacent display delimiters to prevent nested math parsing errors (using replacer func to avoid JS $$ replacement string bug)
+    cleanText = cleanText.replace(/(?:\\\[|\$\$)\s*(?:\\\[|\$\$)/g, function() { return '$$'; });
+    cleanText = cleanText.replace(/(?:\\\]|\$\$)\s*(?:\\\]|\$\$)/g, function() { return '$$'; });
+
+    // Ensure LaTeX environments occurring on the same line or outside $$ delimiters are isolated in $$...$$ without double-nesting
+    var envInlineRe = /(?:\\\[|\$\$)?\s*\\begin\{(aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}([\s\S]*?)\\end\{\1\}\s*(?:\\\]|\$\$)?/g;
+    cleanText = cleanText.replace(envInlineRe, function(full, env, body) {
+      return '\n\n$$\n\\begin{' + env + '}' + body + '\\end{' + env + '}\n$$\n\n';
+    });
+
+    // Clean any outer \[ ... \] that wrapped an inner $$...$$
+    cleanText = cleanText.replace(/\\\[\s*\$\$([\s\S]*?)\$\$\s*\\\]/g, function(full, inner) {
+      return '\n\n$$\n' + inner.trim() + '\n$$\n\n';
+    });
+
+    // Prevent accidental 4-space indents outside code fences from turning into <pre><code> code blocks
+    var lines = cleanText.split('\n');
+    var inCodeFence = false;
+    for (var li = 0; li < lines.length; li++) {
+      if (/^\s*```/.test(lines[li])) {
+        inCodeFence = !inCodeFence;
+        continue;
+      }
+      if (!inCodeFence && /^[ ]{4,}\S/.test(lines[li])) {
+        lines[li] = lines[li].replace(/^[ ]+/, '');
+      }
+    }
+    cleanText = lines.join('\n');
 
     var htmlOutput = '';
     if (window.marked && typeof window.marked.parse === 'function') {

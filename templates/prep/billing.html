@@ -1,9 +1,9 @@
 {% extends 'prep/base_prep.html' %}
 
 {% block title %}Credits & Plans | Mentify Prep{% endblock %}
-{% block meta_description %}Explore Mentify Prep pricing plans, M-Pesa STK push top-ups, and Credit Consumption Rules for university exam revision. Free 30-credit trial with plans starting from KES 399/mo.{% endblock %}
+{% block meta_description %}Explore Mentify Prep pricing plans, M-Pesa STK push top-ups, and Credit Consumption Rules for exam revision. Free 30-credit trial with plans starting from KES 399/mo.{% endblock %}
 {% block og_title %}Mentify Prep Pricing, Plans & Credit Consumption Rules{% endblock %}
-{% block og_description %}Get transparent pricing for university revision, authentic CAT solutions, and step-by-step proofs. Pay easily via M-Pesa with 30 free starter credits.{% endblock %}
+{% block og_description %}Get transparent pricing for syllabus revision, authentic CAT solutions, and step-by-step proofs. Pay easily via M-Pesa with 30 free starter credits.{% endblock %}
 
 {% block extra_head %}
 <script type="application/ld+json">
@@ -11,7 +11,7 @@
   "@context": "https://schema.org",
   "@type": "Product",
   "name": "Mentify Prep Subscriptions & Credits",
-  "description": "Exam revision platform for university undergraduate students with credit wallet, step-by-step mathematical proofs, and authentic past paper solutions.",
+  "description": "Exam revision platform for students with credit wallet, step-by-step mathematical proofs, and authentic past paper solutions.",
   "brand": {
     "@type": "Brand",
     "name": "Mentify Prep"
@@ -165,7 +165,7 @@
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
           <div>
-            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Cached Past Questions & Notes</div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Cached Past Questions &amp; Notes</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">Instant access from syllabus database, all 3 explanation levels, and marking rubrics</div>
           </div>
         </div>
@@ -174,7 +174,39 @@
         </span>
       </div>
 
-      <!-- Row 2: Digital PDF Upload -->
+      <!-- Row 2: AI Study Tutor Message -->
+      <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(2, 132, 199, 0.1); color: #0284c7; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">AI Study Tutor Conversation</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive topic tutoring, concept clarification, and step-by-step guidance</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          1 Credit / reply
+        </span>
+      </div>
+
+      <!-- Row 3: Tutor File & Image Upload (OCR) -->
+      <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(230, 126, 34, 0.12); color: #d97706; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Tutor Image &amp; Scanned PDF Upload (OCR)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Visual OCR extraction for photos and scanned pages; digital text PDFs are read free</div>
+          </div>
+        </div>
+        <span class="badge" style="background: rgba(230, 126, 34, 0.12); color: #d97706; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
+          5 Credits / image or page
+        </span>
+      </div>
+
+      <!-- Row 4: Digital PDF Upload -->
       <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(37, 99, 235, 0.1); color: #2563eb; display: flex; align-items: center; justify-content: center;">
@@ -190,7 +222,7 @@
         </span>
       </div>
 
-      <!-- Row 3: Handwritten Exam Scan -->
+      <!-- Row 5: Handwritten Exam Scan -->
       <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(230, 126, 34, 0.12); color: #d97706; display: flex; align-items: center; justify-content: center;">
@@ -206,7 +238,7 @@
         </span>
       </div>
 
-      <!-- Row 4: Step-by-Step Proof -->
+      <!-- Row 6: Step-by-Step Proof -->
       <div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(124, 58, 237, 0.1); color: #7c3aed; display: flex; align-items: center; justify-content: center;">
@@ -222,7 +254,7 @@
         </span>
       </div>
 
-      <!-- Row 5: Practice Question Variant -->
+      <!-- Row 7: Practice Question Variant -->
       <div style="padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--white);">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="width: 34px; height: 34px; border-radius: 6px; background: rgba(15, 118, 110, 0.1); color: var(--green); display: flex; align-items: center; justify-content: center;">

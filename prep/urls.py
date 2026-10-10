@@ -25,6 +25,7 @@ urlpatterns = [
     path("upload/", views.prep_upload, name="upload"),
     path("history/", views.prep_history, name="history"),
     path("billing/", views.prep_billing, name="billing"),
+    path("metrics/", views.prep_metrics, name="metrics"),
     path("billing/initiate/", views.prep_initiate_payment, name="initiate_payment"),
     path("billing/callback/", views.prep_payment_callback, name="payment_callback"),
     path("terms/", views.prep_terms, name="terms"),

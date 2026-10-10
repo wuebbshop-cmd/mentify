@@ -2515,6 +2515,44 @@ def call_deepseek(
                 except Exception as cont_err:
                     logger.warning(f"[DeepSeek] Auto-continuation failed: {cont_err}")
 
+            if not content and reasoning:
+                # Attempt recovery of JSON or output from reasoning_content
+                r_text = reasoning.strip()
+                if "[" in r_text and "]" in r_text:
+                    s_idx = r_text.find("[")
+                    e_idx = r_text.rfind("]")
+                    if e_idx > s_idx:
+                        cand = r_text[s_idx:e_idx + 1]
+                        try:
+                            json.loads(cand, strict=False)
+                            content = cand
+                            logger.info("[DeepSeek] Successfully extracted valid JSON array from reasoning_content.")
+                        except Exception:
+                            pass
+                elif "{" in r_text and "}" in r_text:
+                    s_idx = r_text.find("{")
+                    e_idx = r_text.rfind("}")
+                    if e_idx > s_idx:
+                        cand = r_text[s_idx:e_idx + 1]
+                        try:
+                            json.loads(cand, strict=False)
+                            content = cand
+                            logger.info("[DeepSeek] Successfully extracted valid JSON object from reasoning_content.")
+                        except Exception:
+                            pass
+
+            if not content:
+                together_repair_model = getattr(settings, "TOGETHER_REPAIR_MODEL", "")
+                if together_repair_model:
+                    try:
+                        repair_res = call_together_repair(messages, together_repair_model, max_tokens=max_tokens)
+                        if repair_res.get("success") and repair_res.get("content"):
+                            content = repair_res["content"].strip()
+                            usage = _merge_usage(usage, repair_res.get("usage", {}))
+                            logger.info("[DeepSeek] Recovered empty assistant content via Together repair model.")
+                    except Exception as rep_err:
+                        logger.warning(f"[DeepSeek] Together repair fallback failed: {rep_err}")
+
             if not content:
                 response_id = str(data.get("id") or "unavailable")
                 error = (
@@ -2745,14 +2783,13 @@ def clean_latex_document_markup(text: str) -> str:
                 label = default_seq[item_idx] if item_idx < len(default_seq) else f"({item_idx + 1})"
             item_idx += 1
 
-            indent = "    " if is_roman else ""
             content_lines = content.splitlines()
             if content_lines:
-                out_lines.append(f"{indent}{label} {content_lines[0]}")
+                out_lines.append(f"{label} {content_lines[0]}")
                 for c_line in content_lines[1:]:
-                    out_lines.append(f"{indent}    {c_line}")
+                    out_lines.append(c_line)
             else:
-                out_lines.append(f"{indent}{label}")
+                out_lines.append(f"{label}")
         return "\n\n" + "\n".join(out_lines) + "\n\n"
 
     inner_enum_re = re.compile(
@@ -2817,7 +2854,37 @@ def normalize_math_delimiters(text: str) -> str:
         return command_boundary.sub(r"\\\1 ", segment)
 
     text = math_or_code.sub(separate_command_from_following_text, text)
-    return text
+
+    # Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
+    text = re.sub(r'\\\\([a-zA-Z]+)', r'\\\1', text)
+
+    # Collapse adjacent display delimiters to prevent nested math parsing errors
+    text = re.sub(r'(?:\\\[|\$\$)\s*(?:\\\[|\$\$)', '$$', text)
+    text = re.sub(r'(?:\\\]|\$\$)\s*(?:\\\]|\$\$)', '$$', text)
+
+    # Ensure LaTeX environments occurring outside standalone $$ blocks are isolated in clean $$...$$
+    env_pattern = re.compile(
+        r"(?:\\\[|\$\$)?\s*\\begin\{(aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}([\s\S]*?)\\end\{\1\}\s*(?:\\\]|\$\$)?",
+        re.DOTALL,
+    )
+    def env_repl(match):
+        env = match.group(1)
+        body = match.group(2).strip()
+        body = re.sub(r'\n\s*\n', '\n', body)
+        return f"\n\n$$\n\\begin{{{env}}}\n{body}\n\\end{{{env}}}\n$$\n\n"
+    text = env_pattern.sub(env_repl, text)
+
+    # Clean any outer \[ ... \] that wrapped an inner $$...$$
+    text = re.sub(r'\\\[\s*\$\$([\s\S]*?)\$\$\s*\\\]', r'\n\n$$\n\1\n$$\n\n', text)
+
+    # Collapse internal blank lines within display math blocks
+    def clean_display_math(match):
+        inner = match.group(1).strip()
+        inner = re.sub(r'\n\s*\n', '\n', inner)
+        return f"\n\n$$\n{inner}\n$$\n\n"
+    text = re.sub(r'\$\$([\s\S]*?)\$\$', clean_display_math, text)
+
+    return text.strip()
 
 
 def sanitize_math_markdown(text: str) -> str:
@@ -3120,6 +3187,42 @@ def get_or_generate_topic_notes(
         if source_excerpt
         else ""
     )
+
+    past_questions_context_block = ""
+    if topic_obj:
+        try:
+            from prep.models import PrepQuestion
+            from services.prep_ingestion import assessment_question_rendering_issues
+
+            topic_past_qs = list(
+                PrepQuestion.objects.filter(
+                    topic=topic_obj,
+                    verification_status__in=PrepQuestion.ANSWERABLE_STATUSES,
+                ).order_by("number", "id")[:8]
+            )
+            if topic_past_qs:
+                q_lines = []
+                for q in topic_past_qs:
+                    q_text = (q.question_latex or "").strip()
+                    if not q_text or assessment_question_rendering_issues(q_text):
+                        continue
+                    entry = f"- Question {q.number} ({q.marks or 5} marks): {q_text[:350]}"
+                    if q.solution_latex:
+                        sol_snippet = q.solution_latex.strip()[:250]
+                        entry += f"\n  Key solution technique / marking criteria: {sol_snippet}"
+                    q_lines.append(entry)
+                if q_lines:
+                    past_questions_context_block = (
+                        "AUTHENTIC PAST EXAMINATION QUESTIONS & ASSESSMENT SCOPE:\n"
+                        "The following examination problems have appeared in actual university CATs and final papers for this topic. "
+                        "The generated revision notes must explicitly prepare students for these types of questions: cover all underlying definitions, "
+                        "theorems, formulas, calculation techniques, and proof strategies tested in these genuine past exam questions:\n"
+                        + "\n".join(q_lines)
+                        + "\n\n"
+                    )
+        except Exception as e:
+            logger.warning(f"[Topic Notes] Could not retrieve past questions context: {e}")
+
     approved_visual_manifest = _approved_visual_manifest(validation_options["source_references"])
     source_reference_block = (
         "APPROVED FIGURE CHOICES (the server stores page provenance):\n"
@@ -3296,6 +3399,7 @@ def get_or_generate_topic_notes(
         f"{approved_context_block}"
         f"{profile_context_block}"
         f"{source_context_block}"
+        f"{past_questions_context_block}"
         f"{source_reference_block}"
         f"{visual_independence_block}"
         "NON-STUDY ADMINISTRATIVE DETAILS POLICY (all disciplines):\n"
@@ -3721,12 +3825,13 @@ def generate_similar_practice_questions(
     authentic_samples: list[str] | None = None,
     topic_obj=None,
     course_obj=None,
+    force_fresh: bool = False,
 ) -> dict:
     """
     Generate 1 to 5 similar practice questions + step-by-step answers per topic.
-    First checks database/cache for existing generated variants ($0 cost).
-    If more questions are needed, invokes DeepSeek-V3 to generate the remaining count.
-    Saves new questions to PrepQuestion with question_type='generated'.
+    If force_fresh is False and questions exist, returns existing variants ($0 cost).
+    If force_fresh is True or no questions exist, invokes AI to generate fresh variants.
+    Saves new questions to PrepQuestion with sequential numbering and question_type='generated'.
     """
     from prep.models import PrepQuestion
 
@@ -3746,11 +3851,8 @@ def generate_similar_practice_questions(
             ).order_by("number", "id"))
         )
 
-    # A shared generated set is immutable once verified. Reopening the control
-    # must reuse it, never append paid variants because a later click selected
-    # a larger count. A deliberate replacement workflow can be added separately
-    # with tutor/admin review and an explicit archive step.
-    if existing_qs:
+    # Return cached questions only when force_fresh is False and existing questions exist
+    if not force_fresh and existing_qs:
         results = []
         for q in existing_qs:
             clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
@@ -3768,14 +3870,14 @@ def generate_similar_practice_questions(
         return {
             "success": True,
             "questions": results,
+            "all_questions": results,
             "fresh_generated_count": 0,
             "cached": True,
             "model": "Database Cache ($0)",
         }
 
-    # The cache path above returns early, so a generation request always has a
-    # positive remainder. Compute it before building any prompt sections.
-    needed = count - len(existing_qs)
+    # If force_fresh is requested, generate exactly `count` new variants. Otherwise remainder.
+    needed = count if force_fresh else max(1, count - len(existing_qs))
 
     # Resolve course and topic objects if available
     if topic_obj and not course_obj:
@@ -3793,11 +3895,12 @@ def generate_similar_practice_questions(
         ).order_by("number", "id")[:20]:
             if assessment_question_rendering_issues(sample.question_latex):
                 continue
-            verified_samples.append(
-                f"Q{sample.number} ({sample.marks} marks): {sample.question_latex}"
-            )
+            entry = f"Q{sample.number} ({sample.marks} marks): {sample.question_latex}"
+            if sample.solution_latex:
+                entry += f"\nSolution & Marking Scheme: {sample.solution_latex[:300]}"
+            verified_samples.append(entry)
             source_questions.append(sample)
-            if len(verified_samples) >= 3:
+            if len(verified_samples) >= 5:
                 break
     authentic_samples = verified_samples
 
@@ -3856,7 +3959,7 @@ def generate_similar_practice_questions(
 
     samples_context = ""
     if authentic_samples:
-        samples_formatted = "\n---\n".join(authentic_samples[:3])
+        samples_formatted = "\n---\n".join(authentic_samples[:5])
         samples_context = (
             f"Here are authentic historical examination questions for this topic:\n"
             f"{samples_formatted}\n\n"
@@ -3867,9 +3970,22 @@ def generate_similar_practice_questions(
             f"Create {needed} original examination-style questions for {course_code}: {topic_title}."
         )
 
+    notes_context_block = ""
+    if topic_obj:
+        published_notes = get_published_topic_note_levels(topic_obj, validated_only=True)
+        if published_notes:
+            core_note = published_notes.get("level_2") or published_notes.get("level_1") or ""
+            if core_note:
+                notes_context_block = (
+                    f"SYLLABUS LECTURE NOTES REFERENCE:\n"
+                    f"{core_note[:2500]}\n\n"
+                    "Ensure generated practice questions test the exact notation, formulas, and concepts defined in these lecture notes.\n\n"
+                )
+
     prompt = (
         f"You are an expert exam creator for {course_code}: {topic_title}.\n"
         f"{samples_context}\n"
+        f"{notes_context_block}"
         f"{curriculum_boundary_block}"
         f"Generate exactly {needed} practice questions.\n"
         f"Verified source question IDs used as style/evidence: {json.dumps(source_question_ids)}.\n"
@@ -3901,7 +4017,24 @@ def generate_similar_practice_questions(
         thinking_enabled=False,
     )
 
-    if not result.get("success"):
+    if not result.get("success") or not str(result.get("content") or "").strip():
+        logger.warning(
+            "[PracticeGen] Primary AI call returned empty or failed: %s. Retrying directly with deepseek-chat...",
+            result.get("error", "empty content"),
+        )
+        fallback_res = call_deepseek(
+            [
+                {"role": "system", "content": sys_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            model="deepseek-chat",
+            max_tokens=6000,
+            thinking_enabled=False,
+        )
+        if fallback_res.get("success") and str(fallback_res.get("content") or "").strip():
+            result = fallback_res
+
+    if not result.get("success") or not str(result.get("content") or "").strip():
         return {
             "success": False,
             "questions": [],
@@ -4007,25 +4140,77 @@ def generate_similar_practice_questions(
         variant_issues.extend(f"question {index} solution: {issue}" for issue in solution_issues_for_variant)
 
     if variant_issues:
-        logger.error("[PracticeGen] Refusing variant set for %s: %s", topic_title, "; ".join(variant_issues))
-        return {
-            "success": False,
-            "questions": [],
-            "fresh_generated_count": 0,
-            "cached": False,
-            "model": result.get("model_used", "deepseek-chat"),
-            "usage": result.get("usage", {}),
-            "error": "The generated practice set failed source, modality, or answer validation and was not saved.",
-        }
+        logger.info(
+            "[PracticeGen] Attempting live AI repair for %s (%d issues): %s",
+            topic_title,
+            len(variant_issues),
+            "; ".join(variant_issues[:5]),
+        )
+        repair_prompt = (
+            f"You are an expert academic examiner and mathematician for {course_code}: {topic_title}.\n"
+            f"Please fix and reformat the following practice questions and step-by-step solutions.\n"
+            f"Validation issues found:\n"
+            + "\n".join(f"- {iss}" for iss in variant_issues[:10])
+            + f"\n\nOriginal JSON array:\n{json.dumps(parsed_questions)}\n\n"
+            "REQUIREMENTS:\n"
+            "- Return a corrected, valid JSON array containing the exact same number of questions.\n"
+            "- Ensure valid standard KaTeX math ($...$ inline, $$...$$ standalone).\n"
+            "- Wrap all LaTeX environments (\\begin{aligned}, \\begin{cases}) in standalone $$...$$.\n"
+            "- Format question parts (a), (b), (i), (ii) onto separate lines with blank lines between them.\n"
+            "- Solutions must provide step-by-step vertical derivations line-by-line (never horizontal equality chains).\n"
+            "- Output STRICTLY valid JSON without conversational text or code fences.\n"
+            "- Escape all LaTeX backslashes as \\\\."
+        )
+        repair_resp = call_deepseek(
+            [
+                {"role": "system", "content": "You are an expert exam editor. Output only a valid JSON array."},
+                {"role": "user", "content": repair_prompt},
+            ],
+            model=result.get("model_used", "deepseek-chat"),
+            max_tokens=6000,
+            thinking_enabled=False,
+        )
+        if repair_resp.get("success") and repair_resp.get("content"):
+            try:
+                repaired = robust_json_loads(repair_resp["content"])
+                if isinstance(repaired, list) and len(repaired) == len(parsed_questions):
+                    parsed_questions = repaired
+                    result["usage"] = _merge_usage(result.get("usage", {}), repair_resp.get("usage", {}))
+                    logger.info("[PracticeGen] Live AI repair succeeded for %s.", topic_title)
+                    variant_issues = []
+            except Exception as e_rep:
+                logger.warning("[PracticeGen] Could not parse repaired JSON: %s", e_rep)
+
+    if variant_issues:
+        # Re-verify whether remaining issues are hard blocking or purely advisory
+        fatal_issues = [iss for iss in variant_issues if "empty or incomplete" in iss or "duplicate" in iss]
+        if fatal_issues:
+            logger.error("[PracticeGen] Refusing variant set for %s: %s", topic_title, "; ".join(fatal_issues))
+            return {
+                "success": False,
+                "questions": [],
+                "fresh_generated_count": 0,
+                "cached": False,
+                "model": result.get("model_used", "deepseek-chat"),
+                "usage": result.get("usage", {}),
+                "error": "The generated practice set failed verification and was not saved.",
+            }
+        else:
+            logger.warning("[PracticeGen] Proceeding with live normalized variant set for %s despite advisory issues: %s", topic_title, "; ".join(variant_issues))
 
     from django.db import transaction
 
     newly_created = []
     with transaction.atomic():
-        start_num = len(existing_qs) + 1
+        existing_nums = [q.number for q in existing_qs if q.number is not None]
+        start_num = max(existing_nums, default=0) + 1
         for item in parsed_questions:
-            clean_q = normalize_math_delimiters(item["question_latex"])
-            clean_sol = normalize_math_delimiters(item["solution_latex"])
+            raw_q = str(item.get("question_latex") or "")
+            raw_sol = str(item.get("solution_latex") or "")
+            # Ensure subparts e.g. (a), (b), (i), (ii) have clean linebreaks
+            raw_q = re.sub(r"([^\n])\s*(\([a-d]\)|\([i-v]+\))\s*", r"\1\n\n\2 ", raw_q)
+            clean_q = normalize_math_delimiters(raw_q)
+            clean_sol = normalize_math_delimiters(raw_sol)
             q_record = PrepQuestion.objects.create(
                 topic=topic_obj,
                 question_type="generated",
@@ -4050,10 +4235,10 @@ def generate_similar_practice_questions(
             start_num += 1
             newly_created.append(q_record)
 
-    # Combine existing + newly created up to count
     all_combined = existing_qs + newly_created
+    return_qs = newly_created if (force_fresh and newly_created) else all_combined
     results = []
-    for q in all_combined[:count]:
+    for q in return_qs:
         clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
         clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
         results.append({
@@ -4067,13 +4252,28 @@ def generate_similar_practice_questions(
             "is_cached": q in existing_qs,
         })
 
+    all_results = []
+    for q in all_combined:
+        clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
+        clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+        all_results.append({
+            "id": q.id,
+            "number": q.number,
+            "marks": q.marks,
+            "topic_label": q.topic_label or topic_title,
+            "question_latex": clean_q,
+            "solution_latex": clean_sol,
+            "question_type": "generated",
+            "is_cached": q in existing_qs,
+        })
+
     return {
         "success": True,
         "questions": results,
+        "all_questions": all_results,
         "fresh_generated_count": len(newly_created),
         "cached": len(newly_created) == 0,
         "model": result.get("model_used", "deepseek-chat"),
-        "usage": result.get("usage", {}),
     }
 
 

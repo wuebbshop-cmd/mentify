@@ -248,14 +248,14 @@ def llms_txt(request):
     
     llms_content = f"""# Mentify ({base_url})
 
-> Mentify is an interactive online tutoring, cohort learning, and tech education platform for students and adults. It offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, robotics, math, science, and career-focused technical articles. Mentify Prep is the specialized course-anchored exam readiness and past-paper revision engine for university students.
+> Mentify is an interactive online tutoring, cohort learning, and tech education platform for students and adults. It offers hands-on programming courses, machine learning & AI code auditing, live cohort mentorship, robotics, math, science, and career-focused technical articles. Mentify Prep is the specialized course-anchored exam readiness and past-paper revision engine.
 
 ## Core Offerings
 - Live Online Cohorts: Interactive coding courses with live instruction, code reviews, and personal guidance.
 - Course Catalog: Python, Machine Learning, Data Science, Web Development, and Computer Science.
 - Technical Blog: Practical tutorials, career advice, and deep dives authored by John Shivogo.
 - Code & Model Auditing: Machine learning code evaluation, model safety, and software quality assurance.
-- Mentify Prep Exam Engine: Course-anchored university past papers, CAT revision, syllabus modules, verified step-by-step mathematical proofs, and document ingestion.
+- Mentify Prep Exam Engine: Course-anchored past papers, CAT revision, syllabus modules, interactive AI Study Tutor with image/PDF document upload support, verified step-by-step mathematical proofs, and document ingestion.
 
 ## Key Resources & Links
 - Homepage: {base_url}/

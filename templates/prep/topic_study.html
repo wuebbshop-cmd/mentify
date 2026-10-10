@@ -274,7 +274,30 @@
     border-color: #2dd4bf;
   }
 
-  /* Structured Block University Callouts */
+  /* Structured Block Academic Callouts */
+  .prep-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(15, 118, 110, 0.2);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: prep-spin-animation 0.75s linear infinite;
+    display: inline-block;
+  }
+  .btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: prep-spin-animation 0.75s linear infinite;
+    vertical-align: -2px;
+    margin-right: 6px;
+  }
+  @keyframes prep-spin-animation {
+    to { transform: rotate(360deg); }
+  }
   .prep-callout {
     padding: 16px 20px;
     border-radius: var(--radius);
@@ -394,15 +417,15 @@
     font-size: 0.98rem;
     line-height: 1.8;
     color: var(--text);
-    margin-bottom: 18px;
-    padding: 16px 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    margin-bottom: 20px;
+    padding: 0;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0;
   }
   body.dark-theme .exam-problem-box {
-    background: #121212;
-    border-color: #2a2a2a;
+    background: transparent !important;
+    border: none !important;
   }
   .exam-actions-row {
     display: flex;
@@ -414,14 +437,14 @@
     margin-top: 18px;
     padding: 20px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--green);
+    border: 1.5px solid rgba(220, 38, 38, 0.45);
+    border-left: 4px solid #dc2626;
     border-radius: var(--radius);
   }
   body.dark-theme .exam-solution-box {
     background: #141414;
-    border-color: #2e2e2e;
-    border-left-color: #2dd4bf;
+    border-color: rgba(239, 68, 68, 0.5);
+    border-left-color: #ef4444;
   }
 
   /* Clean Markdown Rendering Styles with Multi-Line Spacing */
@@ -1516,14 +1539,6 @@
      PILLAR 2: AUTHENTIC PAST EXAMINATION QUESTIONS
      ══════════════════════════════════════════════════════════════════════════════ -->
 <div id="pillar-past_questions" style="display: {% if active_subtab == 'past_questions' %}block{% else %}none{% endif %};">
-  <div class="card mb-lg" style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-    <div>
-      <h3 style="font-size: 1rem; margin: 0 0 4px 0; color: var(--text);">Authentic Assessment Problems</h3>
-      <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Verified examination problems strictly mapped to this syllabus topic.</p>
-    </div>
-    <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">{{ authentic_questions|length }} QUESTIONS INDEXED</span>
-  </div>
-
   <div id="authentic-questions-container">
     {% if authentic_questions %}
       {% for q in authentic_questions %}
@@ -1540,10 +1555,6 @@
             <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">
               {{ q.marks }} MARKS
             </span>
-          </div>
-          <div class="exam-paper-meta">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>{{ q.paper_title }} &bull; {{ q.year }}</span>
           </div>
         </div>
 
@@ -1592,11 +1603,11 @@
         <!-- Solution Box -->
         <div id="auth-sol-{{ q.id }}" class="exam-solution-box" style="display: none;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-            <span style="font-size: 0.88rem; font-weight: 700; color: var(--green); display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.88rem; font-weight: 700; color: #dc2626; display: flex; align-items: center; gap: 6px;">
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               Step-by-Step Verified Solution &amp; Marking Scheme:
             </span>
-            <span class="badge badge-accent" style="font-size: 0.72rem;">Verified Answer</span>
+            <span class="badge" style="background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.3); font-size: 0.72rem; font-weight: 700;">Verified Answer</span>
           </div>
           <div id="auth-sol-content-{{ q.id }}" class="markdown-rendered">
             <!-- Rendered via JS -->
@@ -1650,13 +1661,16 @@
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div id="practice-loading" style="display: none; text-align: center; padding: 48px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px;">
-    <div style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">
-      Generating examination-style practice variants...
+  <!-- Loading State with Spinner -->
+  <div id="practice-loading" style="display: none; text-align: center; padding: 44px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 24px;">
+    <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 16px;">
+      <div class="prep-spinner"></div>
     </div>
-    <div style="font-size: 0.85rem; color: var(--text-muted);">
-      Analyzing syllabus patterns, formulating syllabus-standard problems, and preparing step-by-step LaTeX proofs.
+    <div id="practice-loading-status" style="font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">
+      Synthesizing examination practice variants...
+    </div>
+    <div id="practice-loading-subtext" style="font-size: 0.85rem; color: var(--text-muted); max-width: 520px; margin: 0 auto; line-height: 1.5;">
+      Analyzing syllabus patterns, formulating exam-standard problems, and preparing step-by-step LaTeX proofs.
     </div>
   </div>
 
@@ -1692,7 +1706,7 @@
           </div>
 
           <div id="gen-sol-{{ q.id }}" class="exam-solution-box" style="display: none;">
-            <div style="font-size: 0.88rem; font-weight: 700; color: var(--green); margin-bottom: 8px;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: #dc2626; margin-bottom: 8px;">
               Step-by-Step Solution &amp; Marking Scheme:
             </div>
             <div id="gen-sol-content-{{ q.id }}" class="markdown-rendered">
@@ -2424,16 +2438,39 @@
   }
 
   // ─── Practice Question Generator (1 to 5) ──────────────────────────────────
+  let practiceGenInterval = null;
   function runPracticeGeneration() {
     const btn = document.getElementById('btn-generate-practice');
     const loadingEl = document.getElementById('practice-loading');
+    const statusEl = document.getElementById('practice-loading-status');
+    const subtextEl = document.getElementById('practice-loading-subtext');
     const emptyState = document.getElementById('practice-empty-state');
     const listContainer = document.getElementById('practice-list');
 
     btn.disabled = true;
-    btn.textContent = 'Generating...';
+    btn.innerHTML = '<span class="btn-spinner"></span> Generating...';
     loadingEl.style.display = 'block';
     if (emptyState) emptyState.style.display = 'none';
+
+    // Dynamic step-by-step status rotation
+    const stages = [
+      { status: "Analyzing syllabus topic...", sub: "Examining lecture notes, subtopics, and authentic CAT questions." },
+      { status: "Formulating examination problems...", sub: "Synthesizing authentic question variants strictly anchored to syllabus scope." },
+      { status: "Deriving step-by-step proofs...", sub: "Structuring mathematical solutions with vertical alignments and marking rubric." },
+      { status: "Verifying formatting & notation...", sub: "Performing live quality validation and rendering final question cards." }
+    ];
+    let stageIdx = 0;
+    if (statusEl) statusEl.textContent = stages[0].status;
+    if (subtextEl) subtextEl.textContent = stages[0].sub;
+    clearInterval(practiceGenInterval);
+    practiceGenInterval = setInterval(() => {
+      stageIdx = (stageIdx + 1) % stages.length;
+      if (statusEl) statusEl.textContent = stages[stageIdx].status;
+      if (subtextEl) subtextEl.textContent = stages[stageIdx].sub;
+    }, 2800);
+
+    const existingCards = listContainer ? listContainer.querySelectorAll('.exam-question-card') : [];
+    const currentCardCount = existingCards.length;
 
     fetch("{% url 'prep:api_generate_practice' %}", {
       method: 'POST',
@@ -2446,18 +2483,27 @@
         course_code: courseCode,
         topic_title: topicTitle,
         count: selectedCount,
+        existing_count: currentCardCount,
       }),
     })
     .then(r => r.json())
     .then(data => {
+      clearInterval(practiceGenInterval);
       btn.disabled = false;
-      btn.textContent = 'Generate Similar Questions';
+      btn.innerHTML = 'Generate Similar Questions';
       loadingEl.style.display = 'none';
 
       if (data.success && data.questions && data.questions.length > 0) {
-        listContainer.innerHTML = '';
+        if (currentCardCount === 0) {
+          listContainer.innerHTML = '';
+        }
+        if (emptyState) emptyState.style.display = 'none';
+
         data.questions.forEach(q => {
           genQuestionsMap[q.id] = q;
+          // If already in list, do not duplicate
+          if (document.getElementById(`gen-card-${q.id}`)) return;
+
           const cardDiv = document.createElement('div');
           cardDiv.className = 'exam-question-card';
           cardDiv.id = `gen-card-${q.id}`;
@@ -2479,7 +2525,7 @@
               </button>
             </div>
             <div id="gen-sol-${q.id}" class="exam-solution-box" style="display: none;">
-              <div style="font-size: 0.88rem; font-weight: 700; color: var(--green); margin-bottom: 8px;">
+              <div style="font-size: 0.88rem; font-weight: 700; color: #dc2626; margin-bottom: 8px;">
                 Step-by-Step Solution &amp; Marking Scheme:
               </div>
               <div id="gen-sol-content-${q.id}" class="markdown-rendered"></div>
@@ -2507,8 +2553,9 @@
       }
     })
     .catch(err => {
+      clearInterval(practiceGenInterval);
       btn.disabled = false;
-      btn.textContent = 'Generate Similar Questions';
+      btn.innerHTML = 'Generate Similar Questions';
       loadingEl.style.display = 'none';
       console.error(err);
       alert('Error communicating with practice generation service.');
@@ -2590,9 +2637,6 @@
             <span class="exam-q-title">Question</span>
             <span class="badge badge-accent" style="font-size:0.75rem;font-weight:700;">${marksText} MARKS</span>
           </div>
-          <div class="exam-paper-meta">
-            <span>AI Reconstructed &bull; ${topicText}</span>
-          </div>
         </div>
         <div class="exam-problem-box markdown-rendered" id="auth-q-content-${newId}"></div>
         <div class="exam-actions-row">
@@ -2601,7 +2645,7 @@
           </button>
         </div>
         <div id="auth-sol-${newId}" class="exam-solution-box" style="display:none;">
-          <div style="font-size:0.88rem;font-weight:700;color:var(--green);margin-bottom:8px;">
+          <div style="font-size:0.88rem;font-weight:700;color:#dc2626;margin-bottom:8px;">
             Step-by-Step Verified Solution &amp; Marking Scheme:
           </div>
           <div id="auth-sol-content-${newId}" class="markdown-rendered"></div>

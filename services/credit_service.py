@@ -146,9 +146,10 @@ def ensure_wallet_credit_state(wallet, initialize_trial: bool = False):
                 url="/prep/billing/",
             )
         _expire_locked(locked, now)
-        if locked.current_plan == "trial" and locked.plan_expires_at and locked.plan_expires_at <= now:
-            locked.current_plan = "expired"
-            locked.save(update_fields=["current_plan", "updated_at"])
+        if locked.plan_expires_at and locked.plan_expires_at <= now:
+            if locked.current_plan in {"trial", "basic", "plus", "pro"}:
+                locked.current_plan = "expired"
+                locked.save(update_fields=["current_plan", "updated_at"])
         _sync_balance_locked(locked)
 
 
@@ -199,9 +200,10 @@ def expire_wallet_credits(wallet):
         locked = wallet.__class__.objects.select_for_update().get(pk=wallet.pk)
         now = timezone.now()
         count = _expire_locked(locked, now)
-        if locked.current_plan == "trial" and locked.plan_expires_at and locked.plan_expires_at <= now:
-            locked.current_plan = "expired"
-            locked.save(update_fields=["current_plan", "updated_at"])
+        if locked.plan_expires_at and locked.plan_expires_at <= now:
+            if locked.current_plan in {"trial", "basic", "plus", "pro"}:
+                locked.current_plan = "expired"
+                locked.save(update_fields=["current_plan", "updated_at"])
         _sync_balance_locked(locked)
         return count
 
@@ -281,28 +283,21 @@ def enforce_subscription_limit(wallet, limit_name: str, requested: int = 1) -> d
 
 
 def grant_subscription(wallet, plan_id: str, amount: int, reference_code: str = ""):
-    """Replace the current monthly allocation; unused subscription credits do not carry forward."""
-    from prep.models import PrepTransaction
-
+    """
+    Assign new subscription plan and credit allocation.
+    When a student upgrades (e.g. basic -> pro) or switches tiers, existing credit lots
+    from prior subscriptions remain intact and each expires at its originally scheduled date,
+    while the active plan tier and badge update immediately to the latest subscription.
+    """
     if plan_id not in {"basic", "plus", "pro"}:
         raise ValueError("Invalid subscription plan")
     with transaction.atomic():
         locked = wallet.__class__.objects.select_for_update().get(pk=wallet.pk)
         now = timezone.now()
         _expire_locked(locked, now)
-        old_grants = locked.credit_grants.select_for_update().filter(source="subscription", remaining_credits__gt=0)
-        for grant in old_grants:
-            unused = grant.remaining_credits
-            grant.remaining_credits = 0
-            grant.save(update_fields=["remaining_credits"])
-            PrepTransaction.objects.create(
-                wallet=locked,
-                credit_grant=grant,
-                amount=-unused,
-                action_type="credit_expiry",
-                description="Unused subscription credits expired at plan replacement",
-                reference_code=reference_code,
-            )
+        # Previous subscription credit grants are preserved with their original
+        # expiration dates so that the user does not lose unused credits upon upgrade.
+        # FIFO consumption will naturally draw from earlier-expiring lots first.
         locked.current_plan = plan_id
         locked.plan_expires_at = now + timedelta(days=30)
         locked.save(update_fields=["current_plan", "plan_expires_at", "updated_at"])
