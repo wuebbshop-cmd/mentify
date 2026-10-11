@@ -4241,6 +4241,36 @@ def generate_similar_practice_questions(
                     "Ensure generated practice questions test the exact notation, formulas, and concepts defined in these lecture notes.\n\n"
                 )
 
+    allow_code = bool(validation_options.get("allow_code"))
+    is_nontechnical = _question_solution_uses_nontechnical_format(course_obj=course_obj)
+    code_rule_line = (
+        "- For computational questions in R, use multi-line fenced code blocks with ```R ... ```.\n"
+        if allow_code
+        else "- Do NOT include R, Python, or any programming code blocks.\n"
+    )
+    if is_nontechnical:
+        solution_rule_line = (
+            "- In solution_latex: provide a complete, well-structured university marking-scheme solution addressing every sub-part `(a)`, `(b)`, `(i)`, `(ii)` with clear definitions, economic/theoretical reasoning, step-by-step calculations (using `\\begin{aligned}...\\end{aligned}` inside `$$...$$` when numerical calculations are required), and final interpretation. Do not convert the answer into a theorem-proof exercise.\n"
+        )
+        solution_key_desc = (
+            "- \"solution_latex\": string (complete step-by-step marking-scheme solution addressing all parts with clear definitions, calculations where applicable, and academic analysis)\n"
+        )
+        sys_prompt = (
+            f"You are an expert university examiner for {course_code} ({topic_title}). "
+            "Output strictly a valid JSON array of question objects without any conversational text. "
+            "Ensure all backslashes in JSON strings are escaped as \\\\."
+        )
+    else:
+        solution_rule_line = (
+            "- In solution_latex: complete step-by-step mathematical solution; NEVER chain equalities horizontally; format derivations vertically line-by-line using \\begin{aligned}...\\end{aligned} showing every intermediate transition step"
+            + (", R code if applicable," if allow_code else "")
+            + " and final answer.\n"
+        )
+        solution_key_desc = (
+            "- \"solution_latex\": string (complete step-by-step mathematical solution with vertical derivations in \\begin{aligned}...\\end{aligned}, intermediate justifications, and final answer)\n"
+        )
+        sys_prompt = "You are an expert exam creator and mathematician. Output strictly a valid JSON array of question objects without any conversational text. Ensure all backslashes in JSON strings are escaped as \\\\."
+
     prompt = (
         f"You are an expert exam creator for {course_code}: {topic_title}.\n"
         f"{samples_context}\n"
@@ -4251,10 +4281,10 @@ def generate_similar_practice_questions(
         "RULES:\n"
         "- Questions must test strictly the current topic, with absolutely zero leakage of future topics.\n"
         "- In question_latex and solution_latex, write clear multi-line formatting with `\\n\\n` between question parts (e.g. `(i)`, `(ii)`).\n"
-        "- For computational questions in R, use multi-line fenced code blocks with ```R ... ```.\n"
+        f"{code_rule_line}"
         "- Use standard LaTeX notation for mathematical equations ($...$ inline, $$...$$ standalone).\n"
         "- ALL LaTeX environments (such as \\begin{aligned}, \\begin{cases}, \\begin{pmatrix}) in question_latex or solution_latex MUST be enclosed in standalone $$...$$ display math delimiters. NEVER output naked \\begin{aligned} or \\begin{cases} outside $$...$$.\n"
-        "- In solution_latex: complete step-by-step mathematical solution; NEVER chain equalities horizontally; format derivations vertically line-by-line using \\begin{aligned}...\\end{aligned} showing every intermediate transition step, R code if applicable, and final answer.\n"
+        f"{solution_rule_line}"
         "- CRITICAL FOR VALID JSON: Inside string values, ALWAYS escape LaTeX backslashes with double backslashes (e.g., \\\\beta, \\\\times, \\\\sigma, \\\\frac). Never use raw single-backslash escapes.\n"
         "- Return ONLY a valid JSON array of objects, with no markdown code fences or conversational text.\n"
         "Each object must have these exact keys:\n"
@@ -4262,11 +4292,9 @@ def generate_similar_practice_questions(
         "- \"marks\": integer (e.g. 5, 8, 10)\n"
         "- \"topic_label\": string (specific concept tested)\n"
         "- \"question_latex\": string (clear problem statement, with question sub-parts on separate lines)\n"
-        "- \"solution_latex\": string (complete step-by-step mathematical solution with vertical derivations in \\begin{aligned}...\\end{aligned}, intermediate justifications, and final answer)\n"
+        f"{solution_key_desc}"
         "- \"hint\": string (a 1-sentence guidance tip)\n"
     )
-
-    sys_prompt = "You are an expert exam creator and mathematician. Output strictly a valid JSON array of question objects without any conversational text. Ensure all backslashes in JSON strings are escaped as \\\\."
     max_tokens_calc = min(3500, max(1400, needed * 850))
     result = route_math_request(
         prompt,
@@ -4313,8 +4341,8 @@ def generate_similar_practice_questions(
     except Exception as exc:
         logger.warning("[PracticeGen] Initial JSON parse failed for %s: %s", topic_title, exc)
 
-    # Fast JSON recovery pass only if raw_text failed initial parsing
-    if not isinstance(parsed_questions, list) or len(parsed_questions) == 0:
+    # Fast JSON recovery pass if raw_text failed initial parsing or returned fewer than needed questions
+    if not isinstance(parsed_questions, list) or len(parsed_questions) < needed:
         logger.info("[PracticeGen] Attempting fast single-pass JSON recovery for %s", topic_title)
         recovery = call_deepseek(
             [
@@ -4332,8 +4360,8 @@ def generate_similar_practice_questions(
             except Exception as e_rec:
                 logger.warning("[PracticeGen] Fast recovery parse failed: %s", e_rec)
 
-    if not isinstance(parsed_questions, list) or len(parsed_questions) == 0:
-        logger.error("[PracticeGen] Refusing unparseable practice set for %s", topic_title)
+    if not isinstance(parsed_questions, list) or len(parsed_questions) < needed:
+        logger.error("[PracticeGen] Refusing unparseable or incomplete practice set for %s", topic_title)
         return {
             "success": False,
             "questions": [],
@@ -4353,6 +4381,17 @@ def generate_similar_practice_questions(
         sol_text = str(item.get("solution_latex") or "").strip()
         if len(q_text) < 10 or len(sol_text) < 10:
             continue
+        normalized_question = re.sub(r"\s+", " ", normalize_math_delimiters(q_text).strip()).casefold()
+        if normalized_question in source_question_texts:
+            return {
+                "success": False,
+                "questions": [],
+                "fresh_generated_count": 0,
+                "cached": False,
+                "model": result.get("model_used", "deepseek-chat"),
+                "usage": result.get("usage", {}),
+                "error": "The generated practice set failed source, modality, or answer validation and was not saved.",
+            }
         # Ensure subparts e.g. (a), (b), (i), (ii) have clean linebreaks
         q_text = re.sub(r"([^\n])\s*(\([a-d]\)|\([i-v]+\))\s*", r"\1\n\n\2 ", q_text)
         item["question_latex"] = repair_question_and_solution_text(q_text)
@@ -4360,7 +4399,7 @@ def generate_similar_practice_questions(
         item["marks"] = int(item.get("marks") or 5)
         valid_items.append(item)
 
-    if not valid_items:
+    if len(valid_items) < needed:
         return {
             "success": False,
             "questions": [],
@@ -4368,7 +4407,7 @@ def generate_similar_practice_questions(
             "cached": False,
             "model": result.get("model_used", "deepseek-chat"),
             "usage": result.get("usage", {}),
-            "error": "The generated practice set did not contain valid questions.",
+            "error": "The generated practice set did not pass validation. Please try again.",
         }
 
     parsed_questions = valid_items
@@ -4456,7 +4495,33 @@ def _question_solution_uses_nontechnical_format(course_obj=None, study_profile: 
     """Return True when the course should be answered with explanatory analysis rather than proof-style math."""
     profile = study_profile if isinstance(study_profile, dict) else _course_study_profile(course_obj)
     family = str(profile.get("subject_family") or "").strip().lower()
-    return family in {"social_science", "humanities", "business_economics", "general_science"}
+    if family in {"social_science", "humanities", "business_economics", "general_science"}:
+        return True
+    if family in {"mathematics", "statistics", "computer_science", "computing", "engineering", "physics"}:
+        return False
+    if course_obj is not None:
+        category = str(getattr(course_obj, "category", "") or "").strip().lower()
+        if any(
+            token in category
+            for token in (
+                "economic", "business", "humanit", "social", "law", "history",
+                "art", "educat", "psychol", "sociol", "politic", "philosoph",
+                "literature", "commerce", "management",
+            )
+        ):
+            return True
+        meta = " ".join(
+            str(getattr(course_obj, attr, "") or "")
+            for attr in ("code", "title", "description")
+        ).lower()
+        if re.search(
+            r"\b(?:eet|econ|economics|microeconomic|microeconomics|macroeconomic|macroeconomics|"
+            r"business|commerce|accounting|marketing|management|sociology|psychology|history|"
+            r"philosophy|literature|political|law|anthropology|geography|humanities)\b",
+            meta,
+        ):
+            return True
+    return False
 
 
 def _nontechnical_solution_has_proof_scaffold(solution: str) -> bool:
@@ -4466,6 +4531,7 @@ def _nontechnical_solution_has_proof_scaffold(solution: str) -> bool:
         "problem statement & given conditions",
         "step-by-step rigorous proof / derivation",
         "final result / q.e.d.",
+        "\\blacksquare",
     )):
         return True
     return any(
@@ -4603,6 +4669,12 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             course_obj = getattr(topic_obj, "course", None)
         elif getattr(question_obj, "paper", None):
             course_obj = question_obj.paper.course
+    if course_obj is None and course_code:
+        try:
+            from prep.models import PrepCourse
+            course_obj = PrepCourse.objects.filter(code__iexact=str(course_code).strip()).first()
+        except Exception:
+            course_obj = None
     study_profile = _course_study_profile(course_obj)
     is_nontechnical = _question_solution_uses_nontechnical_format(course_obj=course_obj, study_profile=study_profile)
     topic_title = (getattr(topic_obj, "title", "") or topic_label or "Question Answer").strip()
@@ -4712,21 +4784,26 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
 
     if is_nontechnical:
         prompt = (
-            f"Provide a clear, academically rigorous explanatory answer for this question from course {course_code} "
+            f"Provide a clear, academically rigorous university marking-scheme answer for this examination question from course {course_code} "
             f"({topic_label}), question type {question_type}):\n\n"
             f"{question_type_guidance}\n{modality_guidance}\n\n"
             f"{question_latex}\n\n"
             f"Approved topic summary:\n{topic_summary or 'No approved topic summary is available.'}\n\n"
             "Structure your response:\n"
-            "1. **Key Concept / Definition**\n"
-            "2. **Explanation and Analysis**\n"
-            "3. **Examples / Evidence / Application**\n"
-            "4. **Conclusion / Main Point**\n\n"
-            "Use definitions, theories, case examples, and clear academic reasoning. Do not convert it into a proof, derivation, or theorem exercise."
+            "- If the question has multiple parts (such as `(a)`, `(b)`, `(i)`, `(ii)`), answer EVERY part in order under its own clear bold heading (with mark allocation if shown).\n"
+            "- For single-part conceptual questions, structure clearly with:\n"
+            "  1. **Key Concept / Definition**\n"
+            "  2. **Explanation and Economic / Academic Analysis**\n"
+            "  3. **Examples / Evidence / Application**\n"
+            "  4. **Conclusion / Summary**\n"
+            "- For quantitative, table, or graphical parts (e.g., opportunity cost tables, elasticity, market equilibrium), state the formula, show the step-by-step calculation clearly, and interpret the result.\n"
+            "- If you refer to tabular data, include the relevant Markdown table in your answer, and never use dangling visual callouts like 'as shown in the diagram/figure above' without explaining the coordinates and curve behavior directly in text.\n\n"
+            "Use exact definitions, theoretical principles, and clear academic reasoning. "
+            "Do not convert it into a proof, derivation, or theorem exercise."
         )
         system_prompt = (
-            "You are an expert academic tutor in the social sciences and humanities. "
-            "Answer with clear academic explanation, definitions, theories, case evidence, and examples. "
+            "You are an expert university examiner and tutor in economics, business, social sciences, and humanities. "
+            "Answer every sub-question thoroughly with clear definitions, theoretical analysis, step-by-step calculations where quantitative data are given, and concrete examples. "
             "Do not rewrite the question as a mathematical proof or theorem derivation."
         )
         is_complex_proof = False
@@ -4755,7 +4832,7 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
         + "\n\n"
         + "Approved source/page/figure references for internal grounding:\n"
         + json.dumps(validation_options["source_references"], ensure_ascii=True, sort_keys=True)
-        + "\nUse only question-relevant approved material. Any figure must use an exact approved [[VISUAL:id]] marker; never invent figure IDs, data, labels, or URLs."
+        + "\nUse only question-relevant approved material. Do NOT embed lecture-note [[VISUAL:id]] image crops into an examination solution unless the question explicitly asks about that exact source figure and its exact goods/variables; never invent figure IDs, data, labels, or URLs."
     )
 
     p_hash = compute_prompt_hash(
@@ -4775,11 +4852,27 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
                 validation_options["source_references"],
             )
         )
+        if is_nontechnical and solution_text:
+            solution_text = re.sub(r"\s*\$?\\blacksquare\$?\s*", "", solution_text).strip()
         reasoning_text = result.get("reasoning_content", "")
         answer_issues = valid_answer(solution_text)
         if answer_issues:
             logger.warning("[Question Solution] Repairing validation issues in fresh answer: %s", "; ".join(answer_issues))
             solution_text = repair_question_and_solution_text(solution_text)
+            if is_nontechnical and solution_text:
+                solution_text = re.sub(r"\s*\$?\\blacksquare\$?\s*", "", solution_text).strip()
+            answer_issues = valid_answer(solution_text)
+        if answer_issues:
+            logger.warning("[Question Solution] Rejecting fresh answer that failed validation: %s", "; ".join(answer_issues))
+            error_msg = "; ".join(answer_issues)
+            if "mathematical proof scaffold" in error_msg:
+                error_msg = f"Generated answer used an unsupported proof format: {error_msg}"
+            return {
+                "solution": "",
+                "cached": False,
+                "validation_failed": True,
+                "error": error_msg,
+            }
 
         # Save to question object in DB if provided
         if question_obj:

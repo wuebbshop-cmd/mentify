@@ -1509,9 +1509,28 @@ _ASSESSMENT_MARKS = re.compile(
 )
 _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD = 0.8
 _TOPIC_STOP_WORDS = {
-    "about", "after", "also", "answer", "assume", "below", "calculate", "course",
-    "define", "find", "following", "from", "given", "have", "into", "marks", "paper",
-    "prove", "question", "show", "that", "the", "then", "this", "using", "with", "write",
+    "about", "after", "also", "and", "answer", "any", "are", "assume", "basing",
+    "below", "between", "both", "briefly", "but", "calculate", "can", "clearly",
+    "comment", "compare", "compute", "concept", "concepts", "consider", "contrast",
+    "course", "critical", "critically", "define", "department", "describe",
+    "determine", "differentiate", "discuss", "distinction", "distinguish", "does",
+    "each", "economic", "economics", "economist", "effect", "effects", "evaluate",
+    "examine", "example", "examples", "explain", "find", "five", "following", "for",
+    "four", "from", "give", "given", "good", "goods", "has", "have", "how",
+    "identify", "illustrate", "illustrated", "impact", "importance", "into", "its",
+    "kenya", "kenyan", "kind", "list", "main", "major", "make", "marks", "meaning",
+    "more", "most", "name", "nature", "new", "not", "one", "only", "other",
+    "outline", "over", "paper", "part", "parts", "present", "problem", "problems",
+    "prove", "provide", "question", "questions", "rate", "reasons", "refer",
+    "reference", "relation", "relationship", "relevant", "required", "respect",
+    "role", "same", "section", "set", "seven", "short", "show", "six", "sketch",
+    "solve", "some", "state", "statement", "statements", "study", "such", "suggest",
+    "suppose", "table", "ten", "term", "terms", "that", "the", "their", "them",
+    "then", "theory", "there", "these", "they", "this", "three", "through", "time",
+    "two", "type", "types", "under", "use", "used", "using", "value", "values",
+    "various", "very", "what", "when", "where", "which", "while", "who", "why",
+    "will", "with", "within", "without", "work", "would", "write", "year", "years",
+    "you", "your",
 }
 
 
@@ -1560,7 +1579,19 @@ def extract_assessment_questions(text: str) -> list[dict]:
     page_headers = list(_PAGE_TEXT_HEADER_RE.finditer(text))
     matches = list(_ASSESSMENT_QUESTION_START.finditer(text))
     if any(m.group("explicit_number") for m in matches):
-        matches = [m for m in matches if m.group("explicit_number")]
+        first_explicit_pos = min(
+            m.start() for m in matches if m.group("explicit_number")
+        )
+        filtered_matches = []
+        for idx, m in enumerate(matches):
+            if m.group("explicit_number"):
+                filtered_matches.append(m)
+            elif m.start() < first_explicit_pos:
+                seg_end = matches[idx + 1].start() if idx + 1 < len(matches) else first_explicit_pos
+                segment = text[m.end():seg_end]
+                if _ASSESSMENT_MARKS.search(segment):
+                    filtered_matches.append(m)
+        matches = filtered_matches
     questions = []
     for index, match in enumerate(matches):
         raw_number = match.group("explicit_number") or match.group("bare_number")
@@ -1691,26 +1722,181 @@ def learner_visible_assessment_questions(question_records, deduplicate: bool = T
 
 
 def _topic_match_for_question(course, question_text: str):
-    """Map only evidence-backed keyword matches; leave uncertain questions unassigned."""
-    question_words = {
+    """Map only evidence-backed keyword and phrase matches; leave uncertain questions unassigned."""
+    if not course or not question_text:
+        return None
+    topics = list(course.topics.all().order_by("order", "id"))
+    if not topics:
+        return None
+
+    q_lower = re.sub(r"\s+", " ", question_text).casefold()
+    q_tokens = [
         word.casefold()
         for word in re.findall(r"[A-Za-z]{3,}", question_text)
         if word.casefold() not in _TOPIC_STOP_WORDS
-    }
-    best_topic = None
-    best_score = 0
-    for topic in course.topics.all():
-        labels = [topic.title] + list(topic.subtopics if isinstance(topic.subtopics, list) else [])
-        topic_words = {
-            word.casefold()
-            for label in labels
-            for word in re.findall(r"[A-Za-z]{3,}", str(label))
-            if word.casefold() not in _TOPIC_STOP_WORDS
+    ]
+    if not q_tokens:
+        return None
+    q_token_counts = {}
+    for tok in q_tokens:
+        q_token_counts[tok] = q_token_counts.get(tok, 0) + 1
+
+    topic_profiles = []
+    word_topic_freq = {}
+    for topic in topics:
+        title_words = {
+            w.casefold()
+            for w in re.findall(r"[A-Za-z]{3,}", str(topic.title or ""))
+            if w.casefold() not in _TOPIC_STOP_WORDS
         }
-        score = len(question_words & topic_words)
+        subtopic_list = topic.subtopics if isinstance(topic.subtopics, list) else []
+        labels = [str(topic.title or "")] + [str(s) for s in subtopic_list]
+        if getattr(topic, "summary", ""):
+            labels.append(str(topic.summary))
+        all_words = {
+            w.casefold()
+            for label in labels
+            for w in re.findall(r"[A-Za-z]{3,}", label)
+            if w.casefold() not in _TOPIC_STOP_WORDS
+        }
+        phrases = []
+        for raw_label in [str(topic.title or "")] + [str(s) for s in subtopic_list]:
+            cleaned_phrase = re.sub(r"[^A-Za-z0-9\s\-]", " ", raw_label).casefold()
+            phrase_words = [
+                w for w in cleaned_phrase.split()
+                if len(w) >= 3 and w not in _TOPIC_STOP_WORDS
+            ]
+            if len(phrase_words) >= 2:
+                phrases.append(" ".join(phrase_words))
+        for w in all_words:
+            word_topic_freq[w] = word_topic_freq.get(w, 0) + 1
+        topic_profiles.append((topic, title_words, all_words, phrases))
+
+    best_topic = None
+    best_score = 0.0
+    for topic, title_words, all_words, phrases in topic_profiles:
+        score = 0.0
+        for phrase in phrases:
+            if phrase in q_lower:
+                score += 4.0
+        for word in (set(q_token_counts.keys()) & all_words):
+            occurrences = min(q_token_counts[word], 3)
+            df = word_topic_freq.get(word, 1)
+            specificity = 2.5 if df == 1 else (1.25 if df == 2 else 0.5)
+            title_bonus = 1.5 if word in title_words else 0.0
+            score += occurrences * (specificity + title_bonus)
         if score > best_score:
             best_topic, best_score = topic, score
-    return best_topic if best_score else None
+
+    return best_topic if best_score >= 1.5 else None
+
+
+_TOP_LEVEL_SUBPART_SPLIT_RE = re.compile(
+    r"(?m)(?=^\s*(?:\\item\s*\[\s*)?(?:\([a-h]\)|[a-h]\)|\([ivx]{1,4}\))\s+)",
+    re.IGNORECASE,
+)
+
+
+def split_multi_topic_assessment_questions(course, parsed_questions: list[dict]) -> list[dict]:
+    """
+    When an omnibus exam question contains top-level sub-parts (e.g., (a), (b), (c) or (i), (ii), (iii))
+    that clearly map to different syllabus topics in the course, split or group the sub-parts by topic
+    so each syllabus topic only receives the sub-questions that belong to it.
+    """
+    if not course or not parsed_questions:
+        return parsed_questions
+    topics = list(course.topics.all().order_by("order", "id"))
+    if len(topics) < 2:
+        return parsed_questions
+
+    expanded = []
+    for item in parsed_questions:
+        q_text = str(item.get("question_latex") or "").strip()
+        if not q_text:
+            expanded.append(item)
+            continue
+
+        # First check if Question has top-level (a), (b), (c)... parts
+        alpha_re = re.compile(
+            r"(?m)(?=^\s*(?:\\item\s*\[\s*)?(?:\([a-h]\)|[a-h]\))\s+)",
+            re.IGNORECASE,
+        )
+        roman_re = re.compile(
+            r"(?m)(?=^\s*(?:\\item\s*\[\s*)?\([ivx]{1,4}\)\s+)",
+            re.IGNORECASE,
+        )
+        starts = [m.start() for m in alpha_re.finditer(q_text)]
+        if len(starts) < 2:
+            starts = [m.start() for m in roman_re.finditer(q_text)]
+        if len(starts) < 2:
+            expanded.append(item)
+            continue
+
+        preamble = q_text[:starts[0]].strip()
+        # If the preamble itself contains a shared table or data scenario that all parts depend on, keep intact
+        if preamble and (
+            re.search(r"(?i)\\begin\{(?:table|tabular)\}", preamble)
+            or re.search(r"(?m)^\s*\|[^|\n]+\|", preamble)
+            or re.search(r"(?i)\b(?:following\s+table|table\s+below|given\s+the\s+following\s+data)\b", preamble)
+        ):
+            expanded.append(item)
+            continue
+
+        parts = []
+        for idx, start in enumerate(starts):
+            end = starts[idx + 1] if idx + 1 < len(starts) else len(q_text)
+            part_text = q_text[start:end].strip()
+            part_topic = _topic_match_for_question(course, part_text)
+            parts.append((part_text, part_topic))
+
+        matched_topic_ids = {t.pk for _, t in parts if t is not None}
+        if len(matched_topic_ids) < 2:
+            expanded.append(item)
+            continue
+
+        # Assign any unmatched sub-part to the nearest matched neighbor's topic (or overall topic)
+        fallback_topic = _topic_match_for_question(course, q_text)
+        resolved_parts = []
+        last_known_topic = next((t for _, t in parts if t is not None), fallback_topic)
+        for part_text, part_topic in parts:
+            chosen = part_topic or last_known_topic
+            if chosen is not None:
+                last_known_topic = chosen
+            resolved_parts.append((part_text, chosen))
+
+        # Group sub-parts by topic while preserving original sub-part order within each topic
+        grouped_by_topic = {}
+        topic_order = []
+        for part_text, part_topic in resolved_parts:
+            t_key = part_topic.pk if part_topic else None
+            if t_key not in grouped_by_topic:
+                grouped_by_topic[t_key] = {"topic": part_topic, "parts": []}
+                topic_order.append(t_key)
+            grouped_by_topic[t_key]["parts"].append(part_text)
+
+        if len(topic_order) < 2:
+            expanded.append(item)
+            continue
+
+        for t_key in topic_order:
+            group = grouped_by_topic[t_key]
+            combined_text = "\n\n".join(group["parts"]).strip()
+            if preamble and len(preamble) < 180 and not _ASSESSMENT_MARKS.search(preamble):
+                combined_text = f"{preamble}\n\n{combined_text}".strip()
+            part_marks = [
+                int(m.group(1) or m.group(2) or m.group(3))
+                for m in _ASSESSMENT_MARKS.finditer(combined_text)
+                if (m.group(1) or m.group(2) or m.group(3))
+            ]
+            marks_val = sum(part_marks) if part_marks else max(1, int(item.get("marks") or 0) // len(topic_order))
+            expanded.append({
+                **item,
+                "marks": marks_val,
+                "question_latex": combined_text,
+                "_matched_topic": group["topic"],
+            })
+
+    return expanded
 
 
 def assessment_question_rendering_issues(question_text: str) -> list[str]:
@@ -1817,19 +2003,23 @@ def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: boo
     if not parsed_questions:
         return 0
 
-    occurrences_by_number = {}
-    for item in parsed_questions:
-        occurrences_by_number[item["number"]] = occurrences_by_number.get(item["number"], 0) + 1
-
     from services.prep_ai_router import clean_latex_document_markup, normalize_math_delimiters
 
-    used_question_ids = set()
-    created = 0
     for item in parsed_questions:
         cleaned_latex = clean_latex_document_markup(item.get("question_latex", ""))
         if cleaned_latex:
             item["question_latex"] = normalize_math_delimiters(cleaned_latex)
-        topic = _topic_match_for_question(prep_document.course, item["question_latex"])
+
+    parsed_questions = split_multi_topic_assessment_questions(prep_document.course, parsed_questions)
+
+    occurrences_by_number = {}
+    for item in parsed_questions:
+        occurrences_by_number[item["number"]] = occurrences_by_number.get(item["number"], 0) + 1
+
+    used_question_ids = set()
+    created = 0
+    for item in parsed_questions:
+        topic = item.get("_matched_topic") or _topic_match_for_question(prep_document.course, item["question_latex"])
         issues = assessment_question_rendering_issues(item["question_latex"])
         status = "flagged" if issues else "auto_validated"
         candidates = list(PrepQuestion.objects.filter(

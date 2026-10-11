@@ -1554,12 +1554,17 @@
               {% if q.is_flagged %}SOURCE NEEDS RECONSTRUCTION{% elif q.is_adapted %}ADAPTED PAST QUESTION{% else %}OFFICIAL PAST EXAM{% endif %}
             </span>
             <span class="exam-q-title">
-              Question {{ q.number }}
+              Question {{ forloop.counter }}
             </span>
             <span class="badge badge-accent" style="font-size: 0.75rem; font-weight: 700;">
               {{ q.marks }} MARKS
             </span>
           </div>
+          {% if q.paper_title and q.paper_title != "Course Exercise" %}
+          <span class="badge badge-outline" style="font-size: 0.72rem;">
+            {{ q.paper_title }}{% if q.year and q.year not in q.paper_title %} ({{ q.year }}){% endif %}
+          </span>
+          {% endif %}
         </div>
 
         <!-- Problem Statement Canvas -->
@@ -2259,25 +2264,43 @@
   const authQuestionsMap = {};
   const genQuestionsMap = {};
 
+  function isUsableSolutionText(solText) {
+    if (!solText || typeof solText !== 'string') return false;
+    const trimmed = solText.trim();
+    if (trimmed.length < 20) return false;
+    if (trimmed.startsWith('{') || trimmed.includes('"messages": [') || trimmed.includes('"role": "system"')) {
+      return false;
+    }
+    return true;
+  }
+
   function toggleSolution(elementId, qId) {
     const el = document.getElementById(elementId);
     if (!el) return;
     const isHidden = (el.style.display === 'none' || !el.style.display);
-    el.style.display = isHidden ? 'block' : 'none';
+    if (!isHidden) {
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'block';
 
-    if (isHidden && qId) {
+    if (qId) {
       const cleanId = String(qId).replace(/^gen-/, '');
       const contentEl = document.getElementById(elementId.replace('auth-sol-', 'auth-sol-content-').replace('gen-sol-', 'gen-sol-content-'));
-      if (contentEl && !contentEl.dataset.rendered) {
+      if (contentEl) {
         let sol = "";
-        if (authQuestionsMap[cleanId]) {
+        if (elementId.startsWith('auth-sol-') && authQuestionsMap[cleanId]) {
           sol = authQuestionsMap[cleanId].solution_latex;
         } else if (genQuestionsMap[cleanId]) {
           sol = genQuestionsMap[cleanId].solution_latex;
         }
-        if (sol) {
-          renderMarkdownWithKaTeX(sol, contentEl);
-          contentEl.dataset.rendered = "true";
+        if (isUsableSolutionText(sol)) {
+          if (!contentEl.dataset.rendered) {
+            renderMarkdownWithKaTeX(sol, contentEl);
+            contentEl.dataset.rendered = "true";
+          }
+        } else if (elementId.startsWith('auth-sol-')) {
+          deriveR1Proof(cleanId, courseCode, topicTitle);
         }
       }
     }
@@ -2588,22 +2611,44 @@
     solBox.style.display = 'block';
 
     const solStorageKey = `prep_sol_${questionId}`;
+    const serverSol = authQuestionsMap[questionId] ? authQuestionsMap[questionId].solution_latex : "";
+    if (isUsableSolutionText(serverSol)) {
+      renderMarkdownWithKaTeX(serverSol, contentBox);
+      contentBox.dataset.rendered = "true";
+      try {
+        sessionStorage.setItem(solStorageKey, serverSol);
+      } catch (storageErr) {}
+      return;
+    }
+
     try {
       const cachedSolution = sessionStorage.getItem(solStorageKey);
       if (cachedSolution) {
-        renderMarkdownWithKaTeX(cachedSolution, contentBox);
-        contentBox.dataset.rendered = "true";
-        if (authQuestionsMap[questionId]) {
-          authQuestionsMap[questionId].solution_latex = cachedSolution;
+        const lowerCached = cachedSolution.toLowerCase();
+        const isStaleScaffold = (
+          !serverSol && (
+            lowerCached.includes('problem statement & given conditions') ||
+            lowerCached.includes('step-by-step rigorous proof / derivation') ||
+            lowerCached.includes('final result / q.e.d.')
+          )
+        );
+        if (isUsableSolutionText(cachedSolution) && !isStaleScaffold) {
+          renderMarkdownWithKaTeX(cachedSolution, contentBox);
+          contentBox.dataset.rendered = "true";
+          if (authQuestionsMap[questionId]) {
+            authQuestionsMap[questionId].solution_latex = cachedSolution;
+          }
+          return;
+        } else {
+          sessionStorage.removeItem(solStorageKey);
         }
-        return;
       }
     } catch (storageErr) {}
 
     contentBox.innerHTML = `
       <div style="display: flex; align-items: center; gap: 12px; padding: 14px 12px; color: var(--text-muted); font-size: 0.9rem; background: var(--surface, #f8fafc); border-radius: 8px; border: 1px solid var(--border, #e2e8f0); margin: 8px 0;">
         <span style="display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(2, 132, 199, 0.2); border-top-color: #0284c7; border-radius: 50%; animation: prep-spin 0.8s linear infinite; flex-shrink: 0;"></span>
-        <span>Validating and deriving step-by-step mathematical proof in background...</span>
+        <span>Validating and deriving step-by-step verified solution...</span>
       </div>
     `;
 
@@ -2944,9 +2989,17 @@
               renderMarkdownWithKaTeX(q.question_latex, qBox);
             }
             const sBox = document.getElementById(`auth-sol-content-${q.id}`);
-            if (sBox && q.solution_latex) {
+            const solStorageKey = `prep_sol_${q.id}`;
+            if (sBox && isUsableSolutionText(q.solution_latex)) {
               renderMarkdownWithKaTeX(q.solution_latex, sBox);
               sBox.dataset.rendered = "true";
+              try {
+                sessionStorage.setItem(solStorageKey, q.solution_latex);
+              } catch (storageErr) {}
+            } else {
+              try {
+                sessionStorage.removeItem(solStorageKey);
+              } catch (storageErr) {}
             }
           });
         }

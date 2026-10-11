@@ -1277,3 +1277,133 @@ class QuestionIndexProvenanceTests(TestCase):
         self.assertEqual(adapted.reconstruction_metadata["review_status"], "approved")
         self.assertEqual(adapted.reconstruction_metadata["reviewed_by"], str(user.pk))
         self.assertEqual(adapted.reconstructed_from, original)
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_omnibus_multi_topic_exam_question_splits_subparts_to_matching_topics(self, route_request):
+        course = PrepCourse.objects.create(
+            code="EET 100",
+            title="Microeconomic Theory I",
+            slug="eet-100-multi-topic-test",
+            category="Economics",
+        )
+        intro_topic = PrepTopic.objects.create(
+            course=course,
+            order=1,
+            title="Introduction",
+            slug="eet-intro",
+            summary="Scarcity, choice, opportunity cost, production possibilities frontier, positive and normative statements.",
+            subtopics=[
+                "Production possibility frontier",
+                "Positive and normative economic analysis",
+            ],
+        )
+        market_topic = PrepTopic.objects.create(
+            course=course,
+            order=2,
+            title="Market structures",
+            slug="eet-markets",
+            summary="Perfect competition, monopoly, monopolistic competition, and oligopoly.",
+            subtopics=[
+                "Sources of monopoly power",
+                "Oligopoly and kinked demand curve",
+            ],
+        )
+        document = PrepDocument.objects.create(
+            course=course,
+            doc_type="Final Examination Paper",
+            file=SimpleUploadedFile("omnibus-exam.pdf", b"source PDF"),
+            extracted_text=(
+                "--- Page 2 ---\n"
+                "**QUESTION ONE (12 MARKS)**\n"
+                "(a) Using a well-labelled Production Possibilities Frontier, explain scarcity and opportunity cost. (6 Marks)\n"
+                "(b) Discuss three sources of monopoly power in an oligopoly and monopoly market structure. (6 Marks)"
+            ),
+            stage="stage_3",
+        )
+        paper = PrepPaper.objects.create(
+            id="eet-omnibus-paper",
+            course=course,
+            title="Final Examination",
+            year="2025",
+            total_marks=12,
+            source_document=document,
+        )
+
+        created = index_assessment_questions(document, paper, reconstruct_invalid=False)
+
+        self.assertEqual(created, 2)
+        intro_questions = list(PrepQuestion.objects.filter(paper=paper, topic=intro_topic))
+        market_questions = list(PrepQuestion.objects.filter(paper=paper, topic=market_topic))
+        self.assertEqual(len(intro_questions), 1)
+        self.assertEqual(len(market_questions), 1)
+        self.assertIn("Production Possibilities Frontier", intro_questions[0].question_latex)
+        self.assertNotIn("monopoly power", intro_questions[0].question_latex)
+        self.assertIn("monopoly power", market_questions[0].question_latex)
+        self.assertEqual(intro_questions[0].marks, 6)
+        self.assertEqual(market_questions[0].marks, 6)
+        route_request.assert_not_called()
+
+    @patch("services.prep_ai_router.route_math_request")
+    def test_nontechnical_course_rejects_proof_scaffold_solutions(self, route_request):
+        from services.prep_ai_router import get_or_generate_question_solution
+
+        course = PrepCourse.objects.create(
+            code="EET 100",
+            title="Microeconomic Theory I",
+            slug="eet-100-solution-test",
+            category="Social Sciences",
+        )
+        topic = PrepTopic.objects.create(
+            course=course,
+            order=1,
+            title="Introduction",
+            slug="eet-solution-intro",
+        )
+        paper = PrepPaper.objects.create(
+            id="eet-solution-paper",
+            course=course,
+            title="CAT 1",
+            year="2025",
+            total_marks=6,
+        )
+        question = PrepQuestion.objects.create(
+            paper=paper,
+            topic=topic,
+            question_type="authentic",
+            verification_status="verified",
+            number=1,
+            marks=6,
+            topic_label="Introduction",
+            question_latex="Distinguish between positive and normative economic statements with examples.",
+            solution_latex=(
+                "### Problem Statement & Given Conditions\n"
+                "Let $S$ be a statement.\n"
+                "### Step-by-Step Rigorous Proof\n"
+                "By definition $\\blacksquare$"
+            ),
+        )
+        route_request.return_value = {
+            "success": True,
+            "content": (
+                "### Definition of Positive Economic Statements\n"
+                "Positive economic statements are objective, value-free claims that can be tested using empirical evidence.\n\n"
+                "### Definition of Normative Economic Statements\n"
+                "Normative economic statements are subjective claims based on value judgments about what ought to be."
+            ),
+            "model_used": "test-model",
+            "usage": {},
+        }
+
+        result = get_or_generate_question_solution(
+            question.question_latex,
+            course.code,
+            topic_label=topic.title,
+            question_obj=question,
+        )
+
+        self.assertIn("Positive economic statements are objective", result["solution"])
+        self.assertNotIn("Step-by-Step Rigorous Proof", result["solution"])
+        question.refresh_from_db()
+        self.assertIn("Positive economic statements are objective", question.solution_latex)
+
+
