@@ -707,6 +707,7 @@ def prep_course_detail(request, course_code):
     course_papers = []
     topics_data, total_questions_count = _get_course_topics_summary(course)
 
+    from services.prep_ingestion import learner_visible_assessment_questions
     for p in course.papers.filter(is_published=True).prefetch_related("questions"):
         course_papers.append({
             "id": p.id,
