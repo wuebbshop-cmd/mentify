@@ -357,10 +357,10 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
         document_topic = " ".join(str(document.topic_name or "").casefold().split())
         requested_topic = " ".join(str(topic_title or "").casefold().split())
         has_assigned_visual = any(
-            " ".join(str((visual.extracted_content or {}).get("auto_topic") or "").casefold().split())
+            " ".join(str((content or {}).get("auto_topic") or "").casefold().split())
             == requested_topic
-            for visual in document.visual_candidates.filter(status="approved").only("extracted_content")
-            if isinstance(visual.extracted_content, dict)
+            for content in document.visual_candidates.filter(status="approved").values_list("extracted_content", flat=True)
+            if isinstance(content, dict)
         )
         is_topic_document = (
             document_topic == requested_topic

@@ -295,13 +295,6 @@ def _get_course_topics_summary(course):
         total_questions += auth_count
 
         found_levels = levels_by_topic.get(t.id, set())
-        # If no specific cache entries were found, fallback to fast router lookup
-        if not found_levels:
-            from services.prep_ai_router import get_published_topic_note_levels
-            published_levels = get_published_topic_note_levels(t)
-            for lvl in ("level_1", "level_2", "level_3"):
-                if lvl in published_levels and published_levels[lvl].strip():
-                    found_levels.add(lvl)
 
         ready_levels_list = []
         if "level_1" in found_levels:
