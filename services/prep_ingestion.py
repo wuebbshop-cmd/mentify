@@ -1484,7 +1484,10 @@ _ASSESSMENT_QUESTION_NUMBER_WORDS = {
     "nine": 9,
     "ten": 10,
 }
-_ASSESSMENT_MARKS = re.compile(r"\(?\s*(\d{1,3})\s*(?:marks?|mks?)\s*\)?", re.IGNORECASE)
+_ASSESSMENT_MARKS = re.compile(
+    r"(?:\(\s*(\d{1,3})\s*(?:marks?|mks?)\s*\)|\[\s*(\d{1,3})\s*(?:marks?|mks?)\s*\]|\b(\d{1,3})\s*(?:marks?|mks?)\b)",
+    re.IGNORECASE,
+)
 _AUTO_RECONSTRUCTION_CONFIDENCE_THRESHOLD = 0.8
 _TOPIC_STOP_WORDS = {
     "about", "after", "also", "answer", "assume", "below", "calculate", "course",
@@ -1512,13 +1515,40 @@ def extract_assessment_questions(text: str) -> list[dict]:
         prompt = _strip_assessment_document_footers(
             _PAGE_TEXT_HEADER_RE.sub("", text[match.end():end])
         )
+        prompt = re.sub(
+            r"^\s*(?:\(\s*compulsory\s*\)\s*)?(?:\}+|\*\*|__)?\s*(?:\(\s*compulsory\s*\)\s*)?(?:\}+|\*\*|__)?\s*",
+            "",
+            prompt,
+            flags=re.IGNORECASE,
+        )
         prompt = re.sub(r"\\hfill", " ", prompt)
         prompt = re.sub(r"[ \t]+", " ", prompt)
         prompt = re.sub(r"\n{3,}", "\n\n", prompt).strip()
-        marks_match = _ASSESSMENT_MARKS.search(prompt)
-        marks = int(marks_match.group(1)) if marks_match else 0
-        if marks_match:
-            prompt = (prompt[:marks_match.start()] + prompt[marks_match.end():]).strip()
+        all_marks = [
+            int(m.group(1) or m.group(2) or m.group(3))
+            for m in _ASSESSMENT_MARKS.finditer(prompt)
+            if (m.group(1) or m.group(2) or m.group(3))
+        ]
+        if len(all_marks) == 1:
+            marks_match = _ASSESSMENT_MARKS.search(prompt)
+            marks = all_marks[0]
+            if marks_match:
+                prompt = (prompt[:marks_match.start()] + prompt[marks_match.end():]).strip()
+        elif len(all_marks) > 1:
+            first_line_end = prompt.find("\n")
+            first_line = prompt[:first_line_end] if first_line_end != -1 else prompt
+            header_mark = _ASSESSMENT_MARKS.search(first_line)
+            if (
+                header_mark
+                and not re.search(r"^\s*(?:\(?[a-z]\)|[a-z]\)|\(?[ivx]+\))", first_line, re.IGNORECASE)
+                and int(header_mark.group(1) or header_mark.group(2) or header_mark.group(3)) >= sum(all_marks[1:])
+            ):
+                marks = int(header_mark.group(1) or header_mark.group(2) or header_mark.group(3))
+                prompt = (prompt[:header_mark.start()] + prompt[header_mark.end():]).strip()
+            else:
+                marks = sum(all_marks)
+        else:
+            marks = 0
         source_page = next(
             (int(header.group(1)) for header in reversed(page_headers) if header.start() < match.start()),
             None,
@@ -1642,6 +1672,18 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("question text begins with a stray Markdown bold marker")
     if _ASSESSMENT_PAPER_HEADER_RE.search(source):
         issues.append("question text contains the next examination paper header")
+    if re.search(
+        r"(?i)\b(?:course\s+delivery\s+plan|contact\s+hours|consultation\s+hours|"
+        r"course\s+objectives|course\s+description|reference\s+list|main\s+topics)\b",
+        source,
+    ):
+        issues.append("question text contains syllabus or course-outline metadata")
+    if re.match(
+        r"(?i)^\s*(?:demonstrate\s+understanding|understand\s+and\s+distinguish|"
+        r"acquire\s+analytical\s+skills|develop\s+abilities\s+to|use\s+and\s+apply\s+mathematical\s+skills)\b",
+        source,
+    ):
+        issues.append("question text is a syllabus learning objective rather than an assessment question")
     if re.search(r"[\ue000-\uf8ff]", source):
         issues.append("unreadable private-use glyphs from source extraction")
     if "\ufffd" in source:
@@ -1676,14 +1718,17 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("question text contains document page or scan footer")
     if re.search(r"\\infty\s+S\b", source):
         issues.append("question text may have a corrupted infimum operator before S")
-    if source.rstrip().endswith(("\\", "=", ":", "|")):
-        issues.append("question text appears truncated")
+    if source.rstrip().endswith(("\\", "=", ":", "|", ";")):
+        issues.append("question text appears truncated or is an incomplete list fragment")
     has_included_table_or_visual = (
         re.search(r"(?i)\\begin\{(?:table|tabular|figure)\}|\\includegraphics\b", source)
         or re.search(r"(?m)^\s*\|[^|\n]+\|", source)
     )
     if (
-        re.search(r"(?i)\b(?:following|below)\s+(?:table|figure|diagram)\b", source)
+        re.search(
+            r"(?i)\b(?:following|below)\s+(?:table|figure|diagram|cost\s+data|data\s+table|schedule)\b",
+            source,
+        )
         and not has_included_table_or_visual
     ):
         issues.append("question refers to a following table or visual that is missing")

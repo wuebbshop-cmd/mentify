@@ -78,6 +78,40 @@ def compute_cache_key(content_type: str, *parts) -> str:
     return f"{content_type}:{joined}"[:250]
 
 
+def _canonical_asset_path(url_or_path: str) -> str:
+    """Normalize storage URLs (/media/ vs /cdn/assets/) to a canonical relative asset path."""
+    if not url_or_path or not isinstance(url_or_path, str):
+        return ""
+    value = url_or_path.strip().replace("%20", " ").replace("%29", ")")
+    value = re.sub(r"^https?://[^/]+", "", value, flags=re.IGNORECASE)
+    for prefix in ("/cdn/assets/", "cdn/assets/", "/media/", "media/"):
+        if value.startswith(prefix):
+            return value[len(prefix):].lstrip("/")
+    return value.lstrip("/")
+
+
+def _normalize_source_references_for_signature(references: list[dict] | None) -> list[dict]:
+    """Strip storage-backend-specific URL prefixes before hashing source references."""
+    normalized = []
+    for ref in references or []:
+        if not isinstance(ref, dict):
+            continue
+        ref_copy = dict(ref)
+        visuals = []
+        for vis in ref.get("visuals", []) or []:
+            if not isinstance(vis, dict):
+                continue
+            vis_copy = dict(vis)
+            if "crop_url" in vis_copy:
+                vis_copy["crop_url"] = _canonical_asset_path(str(vis_copy.get("crop_url") or ""))
+            if "context_crop_url" in vis_copy:
+                vis_copy["context_crop_url"] = _canonical_asset_path(str(vis_copy.get("context_crop_url") or ""))
+            visuals.append(vis_copy)
+        ref_copy["visuals"] = visuals
+        normalized.append(ref_copy)
+    return normalized
+
+
 def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtopics: list | None) -> str:
     """Fingerprint the approved syllabus inputs that determine generated notes."""
     topic_pk = getattr(topic_obj, "pk", None)
@@ -91,6 +125,7 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
     topic_summary = getattr(topic_obj, "summary", "") if topic_obj else ""
     topic_rules = getattr(topic_obj, "content_rules", {}) if topic_obj else {}
     source_context = _approved_course_source_context(course_obj, topic_title)
+    raw_references = _approved_course_source_references(course_obj, topic_title)
     sig = compute_prompt_hash(
         topic_title,
         topic_summary,
@@ -101,7 +136,7 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
         _VISUAL_NOTE_ROUTING_VERSION,
         hashlib.sha256(source_context.encode("utf-8", errors="ignore")).hexdigest(),
         json.dumps(
-            _approved_course_source_references(course_obj, topic_title),
+            _normalize_source_references_for_signature(raw_references),
             ensure_ascii=True,
             sort_keys=True,
         ),
@@ -668,11 +703,18 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
             content = content.replace(marker, "")
         crop_url = str(visual.get("crop_url") or "")
         if crop_url:
+            canon_crop = _canonical_asset_path(crop_url)
             content = re.sub(
                 r"!\[[^\]]*\]\(" + re.escape(crop_url) + r"\)",
                 "",
                 content,
             )
+            if canon_crop:
+                content = re.sub(
+                    r"!\[[^\]]*\]\((?:/media/|/cdn/assets/|media/|cdn/assets/)" + re.escape(canon_crop) + r"\)",
+                    "",
+                    content,
+                )
     content = re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", content)
     paragraphs = [
         match for match in re.finditer(r"(?ms)(?:^|\n\s*\n)([^\n][\s\S]*?)(?=\n\s*\n|$)", content)
@@ -744,20 +786,21 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
 def _dedupe_approved_visual_images(content: str, source_references: list[dict] | None) -> str:
     """Keep each approved source crop at most once in a note level."""
     approved_urls = {
-        visual.get("crop_url")
+        _canonical_asset_path(str(visual.get("crop_url") or ""))
         for reference in source_references or []
         for visual in reference.get("visuals", [])
         if isinstance(visual, dict) and visual.get("crop_url")
-    }
+    } - {""}
     seen = set()
 
     def replace(match):
         image_url = match.group(2).strip()
-        if image_url not in approved_urls:
+        canon_url = _canonical_asset_path(image_url)
+        if canon_url not in approved_urls:
             return match.group(0)
-        if image_url in seen:
+        if canon_url in seen:
             return ""
-        seen.add(image_url)
+        seen.add(canon_url)
         return match.group(0)
 
     content = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, str(content or ""))
@@ -766,20 +809,28 @@ def _dedupe_approved_visual_images(content: str, source_references: list[dict] |
 
 def _normalize_approved_visual_captions(content: str, source_references: list[dict] | None) -> str:
     captions = {}
+    url_by_canon = {}
     for reference in source_references or []:
         for visual in reference.get("visuals", []):
             if not isinstance(visual, dict) or not visual.get("crop_url"):
                 continue
+            canon = _canonical_asset_path(str(visual["crop_url"]))
+            if not canon:
+                continue
+            url_by_canon[canon] = str(visual["crop_url"])
             caption = _source_figure_caption(visual)
             if caption:
-                captions[visual["crop_url"]] = caption
+                captions[canon] = caption
 
     def replace(match):
-        caption = captions.get(match.group(2).strip())
+        raw_url = match.group(2).strip()
+        canon = _canonical_asset_path(raw_url)
+        caption = captions.get(canon)
+        target_url = url_by_canon.get(canon, raw_url)
         if not caption:
             return match.group(0)
         safe_caption = re.sub(r"[\r\n]+", " ", caption).replace("]", "\\]")
-        return f"![{safe_caption}]({match.group(2)})"
+        return f"![{safe_caption}]({target_url})"
 
     return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, str(content or ""))
 
@@ -906,9 +957,11 @@ _VISUAL_REFERENCE_PATTERN = re.compile(
     r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:(?:in|by)\s+)?(?:the\s+)?"
     r"(?:figure|diagram|graph|plot|chart|table)"
     r"|(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table|fig\.?\s*\d+)"
-    r"|(?:in|from|using)\s+(?:the\s+|this\s+|that\s+|following\s+|above\s+|below\s+)?"
+    r"|(?:in|from|using)\s+(?:the\s+|this\s+|that\s+|following\s+|above\s+|below\s+)"
     r"(?:figure|diagram|graph|plot|chart|table)"
-    r"|(?:figure|diagram|graph|plot|chart|table)(?:\s+\d+)?\s+"
+    r"|(?:the\s+|this\s+|that\s+)(?:figure|diagram|graph|plot|chart|table)(?:\s+\d+)?\s+"
+    r"(?:above|below|on\s+the\s+(?:left|right)|shows|illustrates|depicts|indicates)"
+    r"|(?:figure|diagram|graph|plot|chart|table)\s+\d+\s+"
     r"(?:above|below|on\s+the\s+(?:left|right)|shows|illustrates|depicts|indicates)"
     r"|(?:following|next)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table)"
     r"|(?:cannot|can't|unable\s+to|not\s+able\s+to)\s+see\s+"
@@ -925,9 +978,18 @@ _DIRECTIONAL_VISUAL_REFERENCE_PATTERN = re.compile(
 
 
 def _unavailable_visual_reference_issues(content: str) -> list[str]:
-    """Reject figure callouts so lesson prose remains complete without images."""
+    """Reject figure callouts only when the referenced visual or table is actually absent from the note."""
     source = re.sub(r"```[\s\S]*?```", "", str(content or ""))
-    if _VISUAL_REFERENCE_PATTERN.search(source):
+    has_markdown_table = bool(re.search(r"(?m)^\s*\|[^|\n]+\|.*\n\s*\|[\s:\-|]+\|", source))
+    has_embedded_image = bool(re.search(r"!\[[^\]]*\]\([^)]+\)", source))
+    for match in _VISUAL_REFERENCE_PATTERN.finditer(source):
+        phrase = match.group(0).lower()
+        if re.search(r"\b(?:cannot|can't|unable\s+to|not\s+able\s+to)\s+see\b", phrase):
+            return [_MISSING_VISUAL_REFERENCE_ISSUE]
+        if "table" in phrase and has_markdown_table:
+            continue
+        if any(word in phrase for word in ("figure", "diagram", "graph", "plot", "chart", "fig")) and has_embedded_image:
+            continue
         return [_MISSING_VISUAL_REFERENCE_ISSUE]
     return []
 
@@ -1595,13 +1657,13 @@ def _note_completion_issues(
     if content_rules:
         detected_modalities = _note_modalities(content)
         source_visuals_by_url = {
-            visual.get("crop_url"): visual
+            _canonical_asset_path(str(visual.get("crop_url") or "")): visual
             for reference in (source_references or [])
             for visual in reference.get("visuals", [])
             if isinstance(visual, dict) and visual.get("crop_url")
         }
         for image in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", content):
-            visual = source_visuals_by_url.get(image.group(1).strip())
+            visual = source_visuals_by_url.get(_canonical_asset_path(image.group(1).strip()))
             if not visual:
                 continue
             visual_modality = {
@@ -1622,18 +1684,18 @@ def _note_completion_issues(
     detected_modalities = _note_modalities(content)
     if detected_modalities & {"graphs", "arrow_diagrams"} and not source_references:
         issues.append("visual modality has no approved source-page provenance")
+    approved_crops = {
+        _canonical_asset_path(str(visual.get("crop_url") or ""))
+        for reference in (source_references or [])
+        for visual in reference.get("visuals", [])
+        if isinstance(visual, dict) and visual.get("crop_url")
+    } - {""}
     for image in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", content):
-        image_path = image.group(1).strip()
-        approved_crops = {
-            visual.get("crop_url")
-            for reference in (source_references or [])
-            for visual in reference.get("visuals", [])
-            if isinstance(visual, dict) and visual.get("crop_url")
-        }
+        image_path = _canonical_asset_path(image.group(1).strip())
         if image_path not in approved_crops:
             issues.append("embedded figure does not reference an approved source crop")
     required_visuals = {
-        str(visual.get("visual_id")): str(visual.get("crop_url"))
+        str(visual.get("visual_id")): _canonical_asset_path(str(visual.get("crop_url") or ""))
         for reference in (source_references or [])
         for visual in reference.get("visuals", [])
         if isinstance(visual, dict)
@@ -1643,12 +1705,12 @@ def _note_completion_issues(
         and visual.get("auto_decision") in _APPROVED_VISUAL_DECISIONS
     }
     embedded_urls = {
-        match.group(1).strip()
+        _canonical_asset_path(match.group(1).strip())
         for match in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", content)
-    }
+    } - {""}
     missing_visual_ids = [
         visual_id for visual_id, crop_url in required_visuals.items()
-        if crop_url not in embedded_urls
+        if crop_url and crop_url not in embedded_urls
     ]
     if missing_visual_ids:
         issues.append(
@@ -1821,6 +1883,33 @@ def repair_json_escaped_latex_newlines(content: str) -> str:
     return repair_escaped_dollars_inside_math("".join(output))
 
 
+def _rewrite_embedded_visual_urls(content: str, source_references: list[dict] | None) -> str:
+    """Rewrite embedded image URLs to match the active storage backend's crop_url."""
+    if not content or not source_references:
+        return content
+    url_map = {}
+    for reference in source_references or []:
+        for visual in reference.get("visuals", []):
+            if not isinstance(visual, dict) or not visual.get("crop_url"):
+                continue
+            canon = _canonical_asset_path(str(visual["crop_url"]))
+            if canon:
+                url_map[canon] = str(visual["crop_url"]).replace(" ", "%20").replace(")", "%29")
+    if not url_map:
+        return content
+
+    def replace(match):
+        alt_text = match.group(1)
+        raw_url = match.group(2).strip()
+        canon = _canonical_asset_path(raw_url)
+        target_url = url_map.get(canon)
+        if not target_url:
+            return match.group(0)
+        return f"![{alt_text}]({target_url})"
+
+    return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, content)
+
+
 def _publish_legacy_note_cache(
     entry,
     payload: dict,
@@ -1946,6 +2035,7 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
+        content = _rewrite_embedded_visual_urls(content, validation_options["source_references"])
         content_issues = _note_completion_issues(content, topic_obj.title, **validation_options)
         if content_issues:
             # A new policy can invalidate an older published row without
@@ -2566,7 +2656,17 @@ def call_deepseek(
                 together_repair_model = getattr(settings, "TOGETHER_REPAIR_MODEL", "")
                 if together_repair_model:
                     try:
-                        repair_res = call_together_repair(messages, together_repair_model, max_tokens=max_tokens)
+                        expects_json = any(
+                            "json" in str(m.get("content") or "").lower()
+                            for m in messages
+                            if isinstance(m, dict)
+                        )
+                        repair_res = call_together_repair(
+                            messages,
+                            together_repair_model,
+                            max_tokens=max_tokens,
+                            json_mode=expects_json,
+                        )
                         if repair_res.get("success") and repair_res.get("content"):
                             content = repair_res["content"].strip()
                             usage = _merge_usage(usage, repair_res.get("usage", {}))
@@ -2604,7 +2704,17 @@ def call_deepseek(
             together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
             if getattr(settings, "TOGETHERAI_API", "") and together_model:
                 try:
-                    fallback_res = call_together_repair(messages, together_model, max_tokens=max_tokens)
+                    expects_json = any(
+                        "json" in str(m.get("content") or "").lower()
+                        for m in messages
+                        if isinstance(m, dict)
+                    )
+                    fallback_res = call_together_repair(
+                        messages,
+                        together_model,
+                        max_tokens=max_tokens,
+                        json_mode=expects_json,
+                    )
                     if fallback_res.get("success") and fallback_res.get("content"):
                         return fallback_res
                 except Exception as fb_err:
@@ -2615,7 +2725,17 @@ def call_deepseek(
         together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
         if getattr(settings, "TOGETHERAI_API", "") and together_model:
             try:
-                fallback_res = call_together_repair(messages, together_model, max_tokens=max_tokens)
+                expects_json = any(
+                    "json" in str(m.get("content") or "").lower()
+                    for m in messages
+                    if isinstance(m, dict)
+                )
+                fallback_res = call_together_repair(
+                    messages,
+                    together_model,
+                    max_tokens=max_tokens,
+                    json_mode=expects_json,
+                )
                 if fallback_res.get("success") and fallback_res.get("content"):
                     return fallback_res
             except Exception as fb_err:
@@ -2623,7 +2743,13 @@ def call_deepseek(
         return {"success": False, "error": "The AI service is temporarily unreachable. Please try again shortly."}
 
 
-def call_together_repair(messages: list[dict], model: str, max_tokens: int = 2000) -> dict:
+def call_together_repair(
+    messages: list[dict],
+    model: str,
+    max_tokens: int = 2000,
+    *,
+    json_mode: bool = True,
+) -> dict:
     """Make one bounded Together.ai repair call with no continuation."""
     api_key = getattr(settings, "TOGETHERAI_API", "") or os.environ.get("TOGETHERAI_API", "")
     if not api_key:
@@ -2636,8 +2762,9 @@ def call_together_repair(messages: list[dict], model: str, max_tokens: int = 200
             "messages": messages,
             "max_tokens": max_tokens,
             "temperature": 0.1,
-            "response_format": {"type": "json_object"},
         }
+        if json_mode:
+            request_body["response_format"] = {"type": "json_object"}
         response = requests.post(
             "https://api.together.xyz/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
@@ -2649,7 +2776,7 @@ def call_together_repair(messages: list[dict], model: str, max_tokens: int = 200
                 "[Together Repair] model %s rejected JSON mode; retrying once without it",
                 model,
             )
-            request_body.pop("response_format")
+            request_body.pop("response_format", None)
             response = requests.post(
                 "https://api.together.xyz/v1/chat/completions",
                 headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
@@ -2896,13 +3023,14 @@ def normalize_math_delimiters(text: str) -> str:
     # Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     text = re.sub(r'\\\\([a-zA-Z]+)', r'\\\1', text)
 
-    # Collapse adjacent display delimiters to prevent nested math parsing errors
-    text = re.sub(r'(?:\\\[|\$\$)\s*(?:\\\[|\$\$)', '$$', text)
-    text = re.sub(r'(?:\\\]|\$\$)\s*(?:\\\]|\$\$)', '$$', text)
+    # Collapse adjacent display delimiters on the same line (e.g. \[ $$ -> $$) without merging consecutive $$ blocks across lines
+    text = re.sub(r'\\\[[ \t]*\$\$|\$\$[ \t]*\\\[', '$$', text)
+    text = re.sub(r'\$\$[ \t]*\\\]|\\\][ \t]*\$\$', '$$', text)
 
     # Ensure LaTeX environments occurring outside standalone $$ blocks are isolated in clean $$...$$
+    # Only wrap environments in segments that are NOT already inside $$...$$ or \[...\] or fenced code
     env_pattern = re.compile(
-        r"(?:\\\[|\$\$)?\s*\\begin\{(aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}([\s\S]*?)\\end\{\1\}\s*(?:\\\]|\$\$)?",
+        r"\\begin\{(aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}([\s\S]*?)\\end\{\1\}",
         re.DOTALL,
     )
     def env_repl(match):
@@ -2910,15 +3038,23 @@ def normalize_math_delimiters(text: str) -> str:
         body = match.group(2).strip()
         body = re.sub(r'\n\s*\n', '\n', body)
         return f"\n\n$$\n\\begin{{{env}}}\n{body}\n\\end{{{env}}}\n$$\n\n"
-    text = env_pattern.sub(env_repl, text)
 
-    # Clean any outer \[ ... \] that wrapped an inner $$...$$
-    text = re.sub(r'\\\[\s*\$\$([\s\S]*?)\$\$\s*\\\]', r'\n\n$$\n\1\n$$\n\n', text)
+    display_or_code_split = re.compile(r"(```[\s\S]*?```|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])")
+    parts = display_or_code_split.split(text)
+    for idx, part in enumerate(parts):
+        if idx % 2 == 0:
+            parts[idx] = env_pattern.sub(env_repl, part)
+    text = "".join(parts)
+
+    # Clean any outer \[ ... \] into $$...$$
+    text = re.sub(r'\\\[\s*([\s\S]*?)\s*\\\]', r'\n\n$$\n\1\n$$\n\n', text)
 
     # Collapse internal blank lines within display math blocks
     def clean_display_math(match):
         inner = match.group(1).strip()
-        inner = re.sub(r'\n\s*\n', '\n', inner)
+        if not inner:
+            return ""
+        inner = re.sub(r'\r?\n(?:[ \t]*\r?\n)+', '\n', inner)
         return f"\n\n$$\n{inner}\n$$\n\n"
     text = re.sub(r'\$\$([\s\S]*?)\$\$', clean_display_math, text)
 
@@ -2948,6 +3084,44 @@ def repair_question_and_solution_text(text: str) -> str:
     """
     if not text or not isinstance(text, str):
         return ""
+
+    stripped = text.strip()
+    if stripped.startswith("{") or stripped.startswith("```json"):
+        candidate_json = re.sub(r"^```(?:json)?\s*|\s*```$", "", stripped, flags=re.IGNORECASE).strip()
+        if '"messages"' in candidate_json and '"role"' in candidate_json:
+            return ""
+        if candidate_json.startswith("{"):
+            try:
+                parsed = robust_json_loads(candidate_json)
+                if isinstance(parsed, dict):
+                    if "messages" in parsed or "role" in parsed:
+                        return ""
+                    extracted = (
+                        parsed.get("answer")
+                        or parsed.get("solution")
+                        or parsed.get("solution_latex")
+                        or parsed.get("content")
+                        or parsed.get("explanation")
+                    )
+                    if isinstance(extracted, str) and extracted.strip():
+                        text = extracted.strip()
+                    else:
+                        return ""
+            except Exception:
+                m = re.match(
+                    r'^\{\s*"(?:answer|solution|solution_latex|content|explanation)"\s*:\s*"([\s\S]+)',
+                    candidate_json,
+                )
+                if m:
+                    raw_val = m.group(1)
+                    raw_val = re.sub(r'"\s*\}\s*$', "", raw_val)
+                    raw_val = raw_val.replace('\\"', '"').replace("\\n", "\n").replace("\\\\", "\\")
+                    if len(raw_val.strip()) >= 40:
+                        text = raw_val.strip()
+                    else:
+                        return ""
+                else:
+                    return ""
 
     text = repair_json_escaped_latex_newlines(str(text))
     text = clean_latex_document_markup(text)
@@ -4319,6 +4493,9 @@ def _question_solution_issues(
     """Validate generated, cached, and stored answers against current policy."""
     if not isinstance(solution, str) or len(solution.strip()) < 20:
         return ["answer is empty or incomplete"]
+    stripped = solution.strip()
+    if stripped.startswith("{") or '"messages": [' in stripped or '"role": "system"' in stripped:
+        return ["answer contains raw JSON or prompt payload instead of formatted solution"]
     issues = list(content_rule_issues or [])
     if is_nontechnical and _nontechnical_solution_has_proof_scaffold(solution):
         issues.append("mathematical proof scaffold is not allowed for this subject family")
@@ -4344,13 +4521,13 @@ def _question_solution_issues(
         issues.append("visual answer has no approved source-page provenance")
 
     approved_crops = {
-        visual.get("crop_url")
+        _canonical_asset_path(str(visual.get("crop_url") or ""))
         for reference in source_references or []
         for visual in reference.get("visuals", [])
         if isinstance(visual, dict) and visual.get("crop_url")
-    }
+    } - {""}
     for image in re.finditer(r"!\[[^\]]*\]\(([^)]+)\)", solution):
-        if image.group(1).strip() not in approved_crops:
+        if _canonical_asset_path(image.group(1).strip()) not in approved_crops:
             issues.append("answer embeds a figure that is not an approved source crop")
     if re.search(r"<\s*(?:img|picture|source|svg|iframe|object|embed)\b", solution, re.IGNORECASE):
         issues.append("raw HTML visual markup is not allowed in answers")
@@ -4380,6 +4557,7 @@ def validated_question_solution(question_obj, solution_text: str | None = None) 
         getattr(topic, "subtopics", []) if topic else [],
         topic_obj=topic,
     )
+    solution = _rewrite_embedded_visual_urls(solution, options["source_references"])
     issues = _question_solution_issues(
         solution,
         is_nontechnical=_question_solution_uses_nontechnical_format(course_obj=course),
@@ -4392,6 +4570,19 @@ def validated_question_solution(question_obj, solution_text: str | None = None) 
     )
     if issues:
         solution = repair_question_and_solution_text(solution)
+        solution = _rewrite_embedded_visual_urls(solution, options["source_references"])
+        issues = _question_solution_issues(
+            solution,
+            is_nontechnical=_question_solution_uses_nontechnical_format(course_obj=course),
+            allow_code=options["allow_code"],
+            allow_math=options["allow_math"],
+            allow_chemical_equations=options["allow_chemical_equations"],
+            content_rules=options["content_rules"],
+            content_rule_issues=options["content_rule_issues"],
+            source_references=options["source_references"],
+        )
+        if issues:
+            return ""
     return solution
 
 
@@ -4480,20 +4671,28 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
 
     if question_obj and question_obj.solution_latex:
         stored_solution = repair_question_and_solution_text(question_obj.solution_latex)
+        stored_solution = _rewrite_embedded_visual_urls(stored_solution, validation_options["source_references"])
         if stored_solution:
             stored_issues = valid_answer(stored_solution)
-            if stored_issues:
-                stored_solution = repair_question_and_solution_text(stored_solution)
-            if stored_solution != question_obj.solution_latex:
-                question_obj.solution_latex = stored_solution
+            if not stored_issues:
+                if stored_solution != question_obj.solution_latex:
+                    question_obj.solution_latex = stored_solution
+                    question_obj.save(update_fields=["solution_latex"])
+                return {
+                    "solution": stored_solution,
+                    "reasoning": "",
+                    "cached": True,
+                    "model": "Validated Question Record",
+                    "source_references": validation_options["source_references"],
+                }
+            else:
+                logger.warning(
+                    "[Question Solution] Discarding invalid stored solution for Q%s: %s",
+                    getattr(question_obj, "pk", "?"),
+                    "; ".join(stored_issues),
+                )
+                question_obj.solution_latex = ""
                 question_obj.save(update_fields=["solution_latex"])
-            return {
-                "solution": stored_solution,
-                "reasoning": "",
-                "cached": True,
-                "model": "Validated Question Record",
-                "source_references": validation_options["source_references"],
-            }
 
     cached = get_cached_content(cache_key)
     if cached:
@@ -4502,7 +4701,8 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             cached = None
     if cached:
         cached_solution = repair_question_and_solution_text(str(cached.get("solution") or ""))
-        if cached_solution:
+        cached_solution = _rewrite_embedded_visual_urls(cached_solution, validation_options["source_references"])
+        if cached_solution and not valid_answer(cached_solution):
             return {
                 "solution": cached_solution,
                 "reasoning": cached.get("reasoning", ""),

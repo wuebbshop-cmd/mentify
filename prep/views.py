@@ -280,11 +280,12 @@ def _get_course_topics_summary(course):
 
     levels_by_topic = {tid: set() for tid in topic_ids}
     for tid, ckey in cache_entries:
-        if ":level_1:" in ckey:
+        ck = str(ckey or "")
+        if ":level_1:" in ck or "_level_1_" in ck or ck.endswith("_level_1"):
             levels_by_topic[tid].add("level_1")
-        elif ":level_2:" in ckey:
+        elif ":level_2:" in ck or "_level_2_" in ck or ck.endswith("_level_2"):
             levels_by_topic[tid].add("level_2")
-        elif ":level_3:" in ckey:
+        elif ":level_3:" in ck or "_level_3_" in ck or ck.endswith("_level_3"):
             levels_by_topic[tid].add("level_3")
 
     topics_data = []
