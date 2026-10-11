@@ -141,11 +141,30 @@ def extract_text_pdfplumber(pdf_source) -> tuple[str, bool, int]:
                 words = len(page_text.split())
                 total_words += words
 
-                # Also try to extract simple tables if text is sparse
-                if words < 15:
-                    tables = page.extract_tables()
-                    for table in tables:
-                        table_str = "\n".join([" | ".join([cell or "" for cell in row]) for row in table])
+                # Extract structured tables as Markdown when present on the page
+                try:
+                    tables = page.extract_tables() or []
+                except Exception:
+                    tables = []
+                for table in tables:
+                    cleaned_rows = [
+                        [re.sub(r"\s+", " ", (cell or "").strip()) for cell in row]
+                        for row in (table or [])
+                        if row and any((cell or "").strip() for cell in row)
+                    ]
+                    if len(cleaned_rows) >= 2 and len(cleaned_rows[0]) >= 2:
+                        col_count = len(cleaned_rows[0])
+                        header_line = "| " + " | ".join(cleaned_rows[0]) + " |"
+                        sep_line = "| " + " | ".join(["---"] * col_count) + " |"
+                        body_lines = [
+                            "| " + " | ".join((r + [""] * col_count)[:col_count]) + " |"
+                            for r in cleaned_rows[1:]
+                        ]
+                        md_table = "\n".join([header_line, sep_line, *body_lines])
+                        if header_line not in page_text:
+                            page_text = f"{page_text.rstrip()}\n\n{md_table}\n"
+                    elif words < 15 and cleaned_rows:
+                        table_str = "\n".join([" | ".join(row) for row in cleaned_rows])
                         page_text += f"\n{table_str}\n"
 
                 extracted_pages.append(f"--- Page {idx} ---\n{page_text.strip()}")
@@ -1496,13 +1515,52 @@ _TOPIC_STOP_WORDS = {
 }
 
 
+_SYLLABUS_OUTLINE_PAGE_RE = re.compile(
+    r"(?i)\b(?:course\s+outline|course\s+description|course\s+objectives|"
+    r"course\s+delivery\s+plan|expected\s+learning\s+outcomes|teaching\s+methodology|"
+    r"reference\s+list|recommended\s+textbooks|core\s+reading|main\s+topics)\b"
+)
+_EXPLICIT_QUESTION_HEADING_RE = re.compile(
+    r"(?im)^[ \t]*(?:(?:\\noindent\s*)|(?:\\(?:section\*?|subsection\*?|textbf|underline)\s*\{\s*)|(?:\*\*|__|#{1,6}\s*))*"
+    r"(?:question\s+|q\.?\s*)(?:" + _ASSESSMENT_QUESTION_NUMBER + r")\b(?!\s+and\s+any\s+other\b)"
+)
+
+
+def _strip_syllabus_outline_pages_from_assessment(text: str) -> str:
+    """Remove course-outline or syllabus pages that lack explicit exam questions."""
+    if not text:
+        return ""
+    page_headers = list(_PAGE_TEXT_HEADER_RE.finditer(text))
+    if not page_headers:
+        if _SYLLABUS_OUTLINE_PAGE_RE.search(text) and not _EXPLICIT_QUESTION_HEADING_RE.search(text):
+            return ""
+        return text
+
+    kept_chunks = []
+    if page_headers[0].start() > 0:
+        preamble = text[:page_headers[0].start()]
+        if not (_SYLLABUS_OUTLINE_PAGE_RE.search(preamble) and not _EXPLICIT_QUESTION_HEADING_RE.search(preamble)):
+            kept_chunks.append(preamble)
+    for idx, header in enumerate(page_headers):
+        end = page_headers[idx + 1].start() if idx + 1 < len(page_headers) else len(text)
+        page_block = text[header.start():end]
+        page_body = text[header.end():end]
+        if _SYLLABUS_OUTLINE_PAGE_RE.search(page_body) and not _EXPLICIT_QUESTION_HEADING_RE.search(page_body):
+            continue
+        kept_chunks.append(page_block)
+    return "".join(kept_chunks)
+
+
 def extract_assessment_questions(text: str) -> list[dict]:
     """Split numbered questions while retaining their original source page."""
+    text = _strip_syllabus_outline_pages_from_assessment(text)
     if not text:
         return []
 
     page_headers = list(_PAGE_TEXT_HEADER_RE.finditer(text))
     matches = list(_ASSESSMENT_QUESTION_START.finditer(text))
+    if any(m.group("explicit_number") for m in matches):
+        matches = [m for m in matches if m.group("explicit_number")]
     questions = []
     for index, match in enumerate(matches):
         raw_number = match.group("explicit_number") or match.group("bare_number")
@@ -1673,17 +1731,22 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
     if _ASSESSMENT_PAPER_HEADER_RE.search(source):
         issues.append("question text contains the next examination paper header")
     if re.search(
-        r"(?i)\b(?:course\s+delivery\s+plan|contact\s+hours|consultation\s+hours|"
-        r"course\s+objectives|course\s+description|reference\s+list|main\s+topics)\b",
+        r"(?i)\b(?:course\s+outline|course\s+delivery\s+plan|contact\s+hours|consultation\s+hours|"
+        r"course\s+objectives|course\s+description|expected\s+learning\s+outcomes|"
+        r"teaching\s+methodology|reference\s+list|recommended\s+textbooks|core\s+reading|main\s+topics)\b",
         source,
     ):
         issues.append("question text contains syllabus or course-outline metadata")
     if re.match(
-        r"(?i)^\s*(?:demonstrate\s+understanding|understand\s+and\s+distinguish|"
+        r"(?i)^\s*(?:at\s+the\s+end\s+of\s+this\s+course|by\s+the\s+end\s+of\s+the\s+course|"
+        r"learners?\s+should\s+be\s+able\s+to|students?\s+will\s+be\s+able\s+to|"
+        r"demonstrate\s+understanding|understand\s+and\s+distinguish|"
         r"acquire\s+analytical\s+skills|develop\s+abilities\s+to|use\s+and\s+apply\s+mathematical\s+skills)\b",
         source,
     ):
         issues.append("question text is a syllabus learning objective rather than an assessment question")
+    if re.match(r"^\s*[A-Z][A-Za-z'\-]+,\s*(?:[A-Z]\.\s*)+(?:\(\d{4}\)|\d{4}\b)", source):
+        issues.append("question text is a bibliography or textbook reference entry")
     if re.search(r"[\ue000-\uf8ff]", source):
         issues.append("unreadable private-use glyphs from source extraction")
     if "\ufffd" in source:

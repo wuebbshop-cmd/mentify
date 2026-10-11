@@ -135,6 +135,45 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
 
         self.assertTrue(any("unmatched braces" in issue for issue in issues), issues)
 
+    def test_question_splitter_skips_syllabus_outline_pages_and_preserves_numbered_subitems(self):
+        source = (
+            "--- Page 1 ---\n"
+            "COURSE OUTLINE\n"
+            "Course Objectives\n"
+            "1. Demonstrate understanding of the terminology and concepts of economics.\n"
+            "2. Use and apply mathematical skills as appropriate.\n"
+            "--- Page 2 ---\n"
+            "**QUESTION ONE**\n"
+            "State whether the following statements are true or false:\n"
+            "1. Price elasticity of demand for necessities is inelastic. (2 marks)\n"
+            "2. Cross-price elasticity of substitutes is negative. (2 marks)\n"
+            "**QUESTION TWO**\n"
+            "Explain the determinants of supply in a competitive market. (6 marks)"
+        )
+
+        questions = extract_assessment_questions(source)
+
+        self.assertEqual([q["number"] for q in questions], [1, 2])
+        self.assertEqual(questions[0]["source_page_number"], 2)
+        self.assertEqual(questions[0]["marks"], 4)
+        self.assertIn("1. Price elasticity of demand", questions[0]["question_latex"])
+        self.assertIn("2. Cross-price elasticity", questions[0]["question_latex"])
+        self.assertEqual(questions[1]["marks"], 6)
+
+    def test_flags_syllabus_objectives_and_bibliography_entries(self):
+        self.assertIn(
+            "question text is a syllabus learning objective rather than an assessment question",
+            assessment_question_rendering_issues(
+                "Use and apply mathematical skills as appropriate - data analysis, graphs, etc."
+            ),
+        )
+        self.assertIn(
+            "question text is a bibliography or textbook reference entry",
+            assessment_question_rendering_issues(
+                "Colander, D. (2017). Economics, 10th Ed. New York: McGraw-Hill Education."
+            ),
+        )
+
     @patch("services.prep_ai_router.call_deepseek")
     def test_source_review_pass_requires_an_exact_quote_from_the_paper_page(self, call_review):
         from types import SimpleNamespace

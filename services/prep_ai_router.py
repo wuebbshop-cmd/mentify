@@ -202,23 +202,19 @@ def _note_allows_code(course_obj, topic_title: str, summary: str = "", subtopics
         str(topic_title or ""),
         str(summary or ""),
         " ".join(str(item) for item in (subtopics or [])),
+        str(getattr(course_obj, "title", "") or ""),
+        str(getattr(course_obj, "description", "") or ""),
     ]
     profile = _course_study_profile(course_obj)
     if profile:
         capabilities = profile.get("capabilities") if isinstance(profile.get("capabilities"), dict) else {}
         if not capabilities.get("code"):
             return False
-    else:
-        scope_parts.extend([
-            str(getattr(course_obj, "title", "") or ""),
-            str(getattr(course_obj, "description", "") or ""),
-        ])
     scope = " ".join(scope_parts).lower()
     explicit_code_terms = (
         "programming", "software", "python", "r language", "r programming", "data frame",
         "source code", "computer algorithm", "coding", "syntax", "plotting",
     )
-    profile = _course_study_profile(course_obj)
     family = str(profile.get("subject_family") or "").lower()
     return any(term in scope for term in explicit_code_terms) or (
         family == "computing" and bool(re.search(r"\br\b", scope))
