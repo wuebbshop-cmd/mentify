@@ -639,9 +639,17 @@ _APPROVED_VISUAL_MARKER_RE = re.compile(r"\[\[VISUAL:([A-Za-z0-9-]+)\]\]")
 
 
 def _source_figure_caption(visual: dict) -> str:
+    explicit_caption = re.sub(r"\s+", " ", str(visual.get("caption") or "")).strip()
+    if (
+        explicit_caption
+        and len(explicit_caption.split()) >= 3
+        and not re.search(r"(?i)downloaded by|lOMoARcPSD|scan to|studocu|coursehero", explicit_caption)
+        and not re.search(r"\b(?:figures?|diagrams?|graphs?)\s*\(\s*(?:and\s*)?\)", explicit_caption, re.IGNORECASE)
+    ):
+        return explicit_caption[:220]
+
     candidates = [
         visual.get("figure_context"),
-        visual.get("caption"),
         visual.get("context_after"),
         visual.get("context_before"),
     ]
@@ -651,7 +659,7 @@ def _source_figure_caption(visual: dict) -> str:
             continue
         caption = re.split(r"(?<=[.!?])\s+", caption, maxsplit=1)[0]
         caption = re.sub(r"^\W*\d+\s+", "", caption).strip(" -|")
-        if len(caption.split()) >= 4 and not re.search(r"\(\s*(?:and\s*)?\)", caption, re.IGNORECASE):
+        if len(caption.split()) >= 4 and not re.search(r"\b(?:figures?|diagrams?|graphs?)\s*\(\s*(?:and\s*)?\)", caption, re.IGNORECASE):
             return caption[:220]
     return str(visual.get("visual_type") or "Source figure").replace("_", " ").title()
 
@@ -692,7 +700,7 @@ def _approved_visual_manifest(source_references: list[dict] | None, *, limit: in
 
 
 def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
-    """Place assigned source figures beside the generated paragraph matching their context."""
+    """Place assigned source figures beside the generated paragraph matching their concept and caption."""
     for visual in manifest:
         marker = visual.get("marker")
         if marker:
@@ -701,21 +709,52 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
         if crop_url:
             canon_crop = _canonical_asset_path(crop_url)
             content = re.sub(
-                r"!\[[^\]]*\]\(" + re.escape(crop_url) + r"\)",
+                r"!\[(?:\\.|[^\]])*\]\(" + re.escape(crop_url) + r"\)",
                 "",
                 content,
             )
             if canon_crop:
                 content = re.sub(
-                    r"!\[[^\]]*\]\((?:/media/|/cdn/assets/|media/|cdn/assets/)" + re.escape(canon_crop) + r"\)",
+                    r"!\[(?:\\.|[^\]])*\]\((?:/media/|/cdn/assets/|media/|cdn/assets/)" + re.escape(canon_crop) + r"\)",
                     "",
                     content,
                 )
+    content = re.sub(
+        r"\$\$\s*([\s\S]*?)\s*\$\$",
+        lambda m: "\n\n$$\n" + re.sub(r"\r?\n(?:[ \t]*\r?\n)+", "\n", m.group(1).strip()) + "\n$$\n\n",
+        content,
+    )
     content = re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", content)
     paragraphs = [
         match for match in re.finditer(r"(?ms)(?:^|\n\s*\n)([^\n][\s\S]*?)(?=\n\s*\n|$)", content)
-        if match.group(1).strip() and not match.group(1).lstrip().startswith("!")
+        if match.group(1).strip()
+        and not match.group(1).lstrip().startswith("!")
+        and not match.group(1).lstrip().startswith("#")
+        and not match.group(1).lstrip().startswith("---")
     ]
+    if not paragraphs:
+        paragraphs = [
+            match for match in re.finditer(r"(?ms)(?:^|\n\s*\n)([^\n][\s\S]*?)(?=\n\s*\n|$)", content)
+            if match.group(1).strip() and not match.group(1).lstrip().startswith("!")
+        ]
+
+    # Map each paragraph start offset to its active section/subsection headings
+    heading_matches = list(re.finditer(r"(?m)^(#{2,4}\s+[^\n]+)$", content))
+    para_headings = {}
+    for paragraph in paragraphs:
+        active_h2 = ""
+        active_h3 = ""
+        for hm in heading_matches:
+            if hm.start() > paragraph.start():
+                break
+            htext = hm.group(1).strip()
+            if htext.startswith("## "):
+                active_h2 = htext
+                active_h3 = ""
+            else:
+                active_h3 = htext
+        para_headings[paragraph.start()] = f"{active_h2} {active_h3}".strip()
+
     required_visuals = [
         visual for visual in manifest
         if visual.get("required") and visual.get("marker")
@@ -726,37 +765,58 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
     ]
     use_distinct_reference_targets = len(directional_references) >= len(required_visuals)
     used_reference_targets = set()
+    used_paragraph_counts: dict[int, int] = {}
     insertions = []
-    generic = {"figure", "graph", "diagram", "curve", "source", "page", "shows", "shown", "this", "that"}
+    generic = {
+        "figure", "graph", "diagram", "curve", "source", "page", "shows", "shown",
+        "this", "that", "with", "from", "under", "between", "where", "when", "into",
+        "over", "illustration", "illustrating", "plotting", "plot", "table", "model",
+    }
     for visual in manifest:
         marker = visual.get("marker")
         if not visual.get("required") or not marker:
             continue
-        if visual.get("placement_context"):
-            context_text = " ".join((
-                visual.get("placement_context", ""),
-                " ".join(visual.get("labels", [])),
-            ))
-        else:
-            context_text = " ".join((
-                " ".join(visual.get("auto_match_terms", [])),
-                visual.get("caption", ""),
-                " ".join(visual.get("labels", [])),
-                visual.get("context_before", ""),
-                visual.get("context_after", ""),
-            ))
-        context_terms = {
-            token.casefold() for token in re.findall(r"[A-Za-z0-9]+", context_text)
-            if len(token) > 3 and token.casefold() not in generic
+        primary_text = " ".join((
+            str(visual.get("caption") or ""),
+            " ".join(str(t) for t in (visual.get("auto_match_terms") or [])),
+            " ".join(str(l) for l in (visual.get("labels") or [])),
+        ))
+        secondary_text = " ".join((
+            str(visual.get("placement_context") or ""),
+            str(visual.get("context_before") or ""),
+            str(visual.get("context_after") or ""),
+        ))
+        primary_terms = {
+            token.casefold() for token in re.findall(r"[A-Za-z0-9]+", primary_text)
+            if len(token) > 2 and token.casefold() not in generic
         }
+        secondary_terms = {
+            token.casefold() for token in re.findall(r"[A-Za-z0-9]+", secondary_text)
+            if len(token) > 3 and token.casefold() not in generic
+        } - primary_terms
+
         best = None
-        best_score = 0
+        best_score = -1e9
         paragraph_scores = []
         for paragraph in paragraphs:
+            ptext = paragraph.group(1)
+            htext = para_headings.get(paragraph.start(), "")
             paragraph_terms = {
-                token.casefold() for token in re.findall(r"[A-Za-z0-9]+", paragraph.group(1))
+                token.casefold() for token in re.findall(r"[A-Za-z0-9]+", ptext)
             }
-            score = len(context_terms & paragraph_terms)
+            heading_terms = {
+                token.casefold() for token in re.findall(r"[A-Za-z0-9]+", htext)
+            }
+            score = (
+                3.0 * len(primary_terms & paragraph_terms)
+                + 2.0 * len(primary_terms & heading_terms)
+                + 1.0 * len(secondary_terms & paragraph_terms)
+            )
+            # Prefer body sections (2, 3, 4) over overview/summary sections (1, 5) unless no body match exists
+            if re.match(r"^##\s+[15]\.", htext):
+                score -= 2.5
+            # Penalize piling multiple figures onto the exact same paragraph
+            score -= used_paragraph_counts.get(paragraph.start(), 0) * 4.0
             paragraph_scores.append((paragraph, score))
             if score > best_score:
                 best = paragraph
@@ -772,7 +832,8 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
             if reference_matches:
                 best, _ = max(reference_matches, key=lambda item: item[1])
                 used_reference_targets.add(best.start())
-        if best and best_score:
+        if best is not None:
+            used_paragraph_counts[best.start()] = used_paragraph_counts.get(best.start(), 0) + 1
             insertions.append((best.end(), f"\n\n{marker}"))
     for position, insertion in sorted(insertions, reverse=True):
         content = content[:position] + insertion + content[position:]
@@ -799,7 +860,7 @@ def _dedupe_approved_visual_images(content: str, source_references: list[dict] |
         seen.add(canon_url)
         return match.group(0)
 
-    content = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, str(content or ""))
+    content = re.sub(r"!\[((?:\\.|[^\]])*)\]\(([^)]+)\)", replace, str(content or ""))
     return re.sub(r"\n{3,}", "\n\n", content)
 
 
@@ -828,7 +889,7 @@ def _normalize_approved_visual_captions(content: str, source_references: list[di
         safe_caption = re.sub(r"[\r\n]+", " ", caption).replace("]", "\\]")
         return f"![{safe_caption}]({target_url})"
 
-    return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, str(content or ""))
+    return re.sub(r"!\[((?:\\.|[^\]])*)\]\(([^)]+)\)", replace, str(content or ""))
 
 
 def _resolve_approved_visual_markers(content: str, source_references: list[dict] | None) -> str:
@@ -1028,6 +1089,12 @@ def _note_format_issues(content: str) -> list[str]:
     structural_source = re.sub(r"```[\s\S]*?```", "", content)
     if structural_source.count("$$") % 2:
         issues.append("unclosed display-math block")
+    if "\ufffd" in structural_source:
+        issues.append("corrupted encoding replacement character present")
+    if re.search(r"\\begin\{(?:verbatim|lstlisting|tabular|table|enumerate|itemize)\}", structural_source):
+        issues.append("unconverted LaTeX document environment in markdown source")
+    if re.search(r"\\(?:texttt|textbf|textit|emph|section\*?|subsection\*?)\s*\{", structural_source):
+        issues.append("unconverted LaTeX text styling command in markdown source")
     issues.extend(_display_math_issues(content))
     issues.extend(_latex_syntax_issues(content))
     environments = re.findall(r"\\begin\{([^{}]+)\}", structural_source)
@@ -2883,6 +2950,102 @@ from services.prep_blocks import (
 )
 
 
+_VALID_LATEX_N_COMMANDS = {
+    "neq", "ne", "notin", "nu", "nabla", "natural", "newline", "nmid",
+    "nparallel", "ncong", "nsim", "nleq", "ngeq", "nprec", "nsucc",
+    "nsubseteq", "nsupseteq", "nvdash", "nmodels", "ni", "not",
+    "noindent", "nocite", "notag", "normalsize", "normalfont",
+    "newcommand", "newenvironment", "newtheorem", "newpage",
+    "nless", "ngtr", "nleqslant", "ngeqslant", "nrightarrow", "nleftarrow",
+    "nRightarrow", "nLeftarrow", "nleftrightarrow", "nLeftrightarrow",
+    "neg", "nexists", "nshortmid", "nshortparallel", "nsubseteqq",
+    "nsupseteqq", "ntriangleleft", "ntrianglelefteq", "ntriangleright",
+    "ntrianglerighteq", "nVDash", "nvDash", "nVdash",
+}
+
+
+def _replace_literal_escaped_newlines(text: str) -> str:
+    """Replace literal ``\\n`` sequences that are line breaks rather than LaTeX ``\\n...`` commands."""
+    if not text or "\\n" not in text:
+        return text or ""
+
+    # 1. Inside verbatim, lstlisting, or fenced code blocks, every \n is a literal newline
+    def _clean_code_block_newlines(match: re.Match[str]) -> str:
+        return re.sub(r"\\n", "\n", match.group(0))
+
+    text = re.sub(
+        r"\\begin\{(?:verbatim|lstlisting)\}[\s\S]*?\\end\{(?:verbatim|lstlisting)\}|```[\s\S]*?```",
+        _clean_code_block_newlines,
+        text,
+    )
+
+    # 2. Outside code blocks, replace \n whenever the suffix is not a valid LaTeX \n... command
+    def _replace_n(match: re.Match[str]) -> str:
+        suffix = match.group(1) or ""
+        trailing = match.group(2) or ""
+        if not suffix:
+            return "\n" + trailing
+        cmd = "n" + suffix
+        if cmd not in _VALID_LATEX_N_COMMANDS:
+            return "\n" + suffix + trailing
+        if cmd == "ni" and re.match(r"^\s*(?:<-|=)\b", trailing):
+            return "\n" + suffix + trailing
+        return match.group(0)
+
+    return re.sub(r"\\n([A-Za-z]*)(\s*(?:<-|=)?)", _replace_n, text)
+
+
+def _convert_latex_tabular_to_markdown(text: str) -> str:
+    """Convert well-formed ``\\begin{tabular}...\\end{tabular}`` blocks into GFM pipe tables."""
+    if "\\begin{tabular}" not in text:
+        return text
+
+    # Unwrap outer \begin{table}...\end{table} floats first
+    def _unwrap_table_env(match: re.Match[str]) -> str:
+        body = match.group(1)
+        body = re.sub(r"\\caption\{([^}]*)\}", r"**\1**\n\n", body)
+        body = re.sub(r"\\(?:centering|label\{[^}]*\})\s*", "", body)
+        return "\n\n" + body.strip() + "\n\n"
+
+    text = re.sub(
+        r"\\begin\{table\*?\}(?:\[[^\]]*\])?([\s\S]*?)\\end\{table\*?\}",
+        _unwrap_table_env,
+        text,
+    )
+
+    def _replace_tabular(match: re.Match[str]) -> str:
+        body = _replace_literal_escaped_newlines(match.group(1))
+        body = re.sub(r"\\(?:hline|toprule|midrule|bottomrule|cline\{[^}]*\})\s*", "\n", body)
+        raw_rows = re.split(r"\\\\(?:\s*\[[^\]]*\])?|\r?\n", body)
+        parsed_rows: list[list[str]] = []
+        for raw_row in raw_rows:
+            cleaned_row = raw_row.strip()
+            if not cleaned_row or "&" not in cleaned_row:
+                continue
+            cleaned_row = re.sub(r"\\(?:hline|toprule|midrule|bottomrule|cline\{[^}]*\})\s*", "", cleaned_row).strip()
+            if not cleaned_row or "&" not in cleaned_row:
+                continue
+            cells = [cell.strip() for cell in re.split(r"(?<!\\)&", cleaned_row)]
+            if len(cells) >= 2:
+                parsed_rows.append(cells)
+
+        if not parsed_rows:
+            return match.group(0)
+
+        col_count = max(len(r) for r in parsed_rows)
+        norm_rows = [r + [""] * (col_count - len(r)) for r in parsed_rows]
+        header = "| " + " | ".join(norm_rows[0]) + " |"
+        separator = "| " + " | ".join(["---"] * col_count) + " |"
+        data_lines = ["| " + " | ".join(r) + " |" for r in norm_rows[1:]]
+        return "\n\n" + "\n".join([header, separator] + data_lines) + "\n\n"
+
+    return re.sub(
+        r"\\begin\{tabular\}(?:\[[^\]]*\])?\{[^}]*\}([\s\S]*?)\\end\{tabular\}",
+        _replace_tabular,
+        text,
+    )
+
+
 def clean_latex_document_markup(text: str) -> str:
     """
     Convert raw LaTeX document commands and list environments into standard clean Markdown
@@ -2890,13 +3053,42 @@ def clean_latex_document_markup(text: str) -> str:
     """
     if not text or not isinstance(text, str):
         return ""
-    cleaned = text.strip()
+    cleaned = _replace_literal_escaped_newlines(text.strip())
 
-    # 1. Clean document-level whitespace and layout commands
-    cleaned = re.sub(r"\\noindent\s*", "", cleaned)
-    cleaned = re.sub(r"\\vspace\{[^}]*\}", "", cleaned)
-    cleaned = re.sub(r"\\hspace\{[^}]*\}", "", cleaned)
+    # 1. Clean document-level whitespace, section headings, and layout commands
+    cleaned = re.sub(r"\\(?:noindent|centering|newpage|clearpage)\b\s*", "", cleaned)
+    cleaned = re.sub(r"\\vspace\*?\{[^}]*\}", "", cleaned)
+    cleaned = re.sub(r"\\hspace\*?\{[^}]*\}", "", cleaned)
     cleaned = re.sub(r"\\hrule\b", "", cleaned)
+    cleaned = re.sub(r"\\section\*?\{([^}]*)\}", r"\n\n## \1\n\n", cleaned)
+    cleaned = re.sub(r"\\subsection\*?\{([^}]*)\}", r"\n\n### \1\n\n", cleaned)
+    cleaned = re.sub(r"\\subsubsection\*?\{([^}]*)\}", r"\n\n#### \1\n\n", cleaned)
+
+    # 1b. Convert \begin{verbatim}...\end{verbatim} and \begin{lstlisting}...\end{lstlisting} to fenced code blocks
+    def _replace_verbatim(match: re.Match[str]) -> str:
+        body = _replace_literal_escaped_newlines(match.group(1)).strip("\r\n")
+        lines = body.splitlines()
+        non_empty = [line for line in lines if line.strip()]
+        if non_empty:
+            min_indent = min(len(line) - len(line.lstrip(" ")) for line in non_empty)
+            if min_indent > 0:
+                lines = [line[min_indent:] if len(line) >= min_indent else line for line in lines]
+        clean_body = "\n".join(lines).strip()
+        return f"\n\n```r\n{clean_body}\n```\n\n"
+
+    cleaned = re.sub(
+        r"\\begin\{verbatim\}([\s\S]*?)\\end\{verbatim\}",
+        _replace_verbatim,
+        cleaned,
+    )
+    cleaned = re.sub(
+        r"\\begin\{lstlisting\}(?:\[[^\]]*\])?([\s\S]*?)\\end\{lstlisting\}",
+        _replace_verbatim,
+        cleaned,
+    )
+
+    # 1c. Convert \begin{tabular}...\end{tabular} into Markdown pipe tables
+    cleaned = _convert_latex_tabular_to_markdown(cleaned)
 
     # 2. Convert mark tags e.g. \hfill (3 marks) -> **(3 marks)**
     cleaned = re.sub(
@@ -2907,14 +3099,45 @@ def clean_latex_document_markup(text: str) -> str:
     )
     cleaned = re.sub(r"\\hfill\s*", " ", cleaned)
 
-    # 3. Protect math blocks while converting non-math LaTeX text styling
-    math_pattern = r"(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))"
-    segments = re.split(math_pattern, cleaned)
+    # 2b. Repair previously mangled **...\texttt{...**...} where \textbf was split at inner \texttt brace
+    cleaned = re.sub(
+        r"\*\*([^*\n]*?)\\texttt\{([^{}*]+?)\*\*([^{}\n]*?)\}",
+        r"**\1`\2`\3**",
+        cleaned,
+    )
+
+    # 3. Protect fenced code and display math blocks while converting LaTeX text styling
+    block_pattern = r"(```[\s\S]*?```|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])"
+    segments = re.split(block_pattern, cleaned)
+    inline_math_re = re.compile(r"(\$[^\$\n]+?\$|\\\([\s\S]*?\\\))")
     for idx, seg in enumerate(segments):
         if idx % 2 == 0:
-            seg = re.sub(r"\\textbf\{([^}]*)\}", r"**\1**", seg)
-            seg = re.sub(r"\\textit\{([^}]*)\}", r"*\1*", seg)
-            seg = re.sub(r"\\underline\{([^}]*)\}", r"**\1**", seg)
+            # First convert \texttt{...} before protecting inline math
+            for _ in range(3):
+                seg = re.sub(r"\\texttt\{([^{}]*)\}", r"`\1`", seg)
+            # Temporarily replace inline math with placeholders so braces inside $...$ never break \textbf{...}
+            imath_store: list[str] = []
+
+            def _stash_imath(m: re.Match[str]) -> str:
+                imath_store.append(m.group(0))
+                return f"\x00IMATH{len(imath_store) - 1}\x00"
+
+            seg_protected = inline_math_re.sub(_stash_imath, seg)
+            for _ in range(3):
+                seg_protected = re.sub(r"\\textbf\{([^{}]*)\}", r"**\1**", seg_protected)
+                seg_protected = re.sub(r"\\textit\{([^{}]*)\}", r"*\1*", seg_protected)
+                seg_protected = re.sub(r"\\emph\{([^{}]*)\}", r"*\1*", seg_protected)
+                seg_protected = re.sub(r"\\underline\{([^{}]*)\}", r"**\1**", seg_protected)
+            # Restore inline math
+            seg = re.sub(
+                r"\x00IMATH(\d+)\x00",
+                lambda m: imath_store[int(m.group(1))],
+                seg_protected,
+            )
+            seg = seg.replace("Cram\\'er--Rao", "Cramér–Rao").replace("Cram\\'er", "Cramér")
+            seg = seg.replace("Cram\ufffdr\ufffdRao", "Cramér–Rao").replace("Cram\ufffdr", "Cramér")
+            seg = seg.replace("L\\'evy", "Lévy").replace("Poincar\\'e", "Poincaré")
+            seg = seg.replace("Fr\\'echet", "Fréchet").replace("H\\\"older", "Hölder")
             segments[idx] = seg
     cleaned = "".join(segments)
 
@@ -2987,8 +3210,9 @@ def normalize_math_delimiters(text: str) -> str:
         return ""
     text = clean_latex_document_markup(text)
     text = repair_json_escaped_latex_newlines(str(text))
-    text = re.sub(r"\\n(?![a-zA-Z])", "\n", text)
+    text = _replace_literal_escaped_newlines(text)
     text = text.replace("Lindeberg\ufffdL\ufffdy", "Lindeberg–Lévy")
+    text = text.replace("Cram\ufffdr\ufffdRao", "Cramér–Rao").replace("Cram\ufffdr", "Cramér")
     text = re.sub(r"^\s*>\s*$", "", text, flags=re.MULTILINE)
     text = re.sub(r"^\s*#\s*$", "", text, flags=re.MULTILINE)
 
@@ -3018,6 +3242,13 @@ def normalize_math_delimiters(text: str) -> str:
 
     # Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     text = re.sub(r'\\\\([a-zA-Z]+)', r'\\\1', text)
+
+    # Merge detached '\[ lhs =' followed by '$$ \begin{cases|...} ... $$' into a single $$ block
+    text = re.sub(
+        r"\\\[\s*([^\n$]+?=\s*)\n+\$\$\s*\n(\\begin\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\}[\s\S]*?\\end\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\})\s*\n\$\$(?:\s*\\\])?",
+        r"\n\n$$\n\1\2\n$$\n\n",
+        text,
+    )
 
     # Collapse adjacent display delimiters on the same line (e.g. \[ $$ -> $$) without merging consecutive $$ blocks across lines
     text = re.sub(r'\\\[[ \t]*\$\$|\$\$[ \t]*\\\[', '$$', text)

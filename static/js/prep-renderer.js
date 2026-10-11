@@ -203,19 +203,95 @@
     }
   }
 
+  var VALID_LATEX_N_COMMANDS = {
+    nabla: 1, natural: 1, naturalnums: 1, ncong: 1, ne: 1, nearrow: 1, neg: 1,
+    neq: 1, nexists: 1, ngeq: 1, ngeqq: 1, ngeqslant: 1, ngtr: 1, ni: 1,
+    nleftarrow: 1, nLeftarrow: 1, nleftrightarrow: 1, nLeftrightarrow: 1,
+    nleq: 1, nleqq: 1, nleqslant: 1, nless: 1, nmid: 1, noindent: 1,
+    nolimits: 1, nonumber: 1, normalfont: 1, normalsize: 1, not: 1, notin: 1,
+    nparallel: 1, nprec: 1, npreceq: 1, nrightarrow: 1, nRightarrow: 1,
+    nshortmid: 1, nshortparallel: 1, nsim: 1, nsubseteq: 1, nsubseteqq: 1,
+    nsucc: 1, nsucceq: 1, nsupseteq: 1, nsupseteqq: 1, ntriangleleft: 1,
+    ntrianglelefteq: 1, ntriangleright: 1, ntrianglerighteq: 1, nu: 1,
+    nvdash: 1, nvDash: 1, nVdash: 1, nVDash: 1, nwarrow: 1, newline: 1,
+    newpage: 1
+  };
+
+  function replaceLiteralEscapedNewlines(text) {
+    if (!text || text.indexOf('\\n') === -1) return text;
+    var out = text.replace(/\\n(?![a-zA-Z])/g, '\n');
+    out = out.replace(/\\(n[a-zA-Z]*)/g, function(full, cmd) {
+      if (VALID_LATEX_N_COMMANDS[cmd]) return full;
+      return '\n' + cmd.substring(1);
+    });
+    return out;
+  }
+
+  function convertLatexTabularToMarkdown(body) {
+    var cleanedBody = body.replace(/\\(?:hline|toprule|midrule|bottomrule|cline\{[^}]*\})/g, '');
+    var rawRows = cleanedBody.split(/\\\\/);
+    var parsedRows = [];
+    for (var r = 0; r < rawRows.length; r++) {
+      var row = rawRows[r].trim();
+      if (!row || row.indexOf('&') === -1) continue;
+      var cells = row.split('&').map(function(c) {
+        return c.trim().replace(/\s+/g, ' ');
+      });
+      parsedRows.push(cells);
+    }
+    if (!parsedRows.length) return body;
+    var numCols = 0;
+    for (var i = 0; i < parsedRows.length; i++) {
+      if (parsedRows[i].length > numCols) numCols = parsedRows[i].length;
+    }
+    var mdLines = [];
+    for (var idx = 0; idx < parsedRows.length; idx++) {
+      var rowCells = parsedRows[idx].slice();
+      while (rowCells.length < numCols) rowCells.push('');
+      mdLines.push('| ' + rowCells.join(' | ') + ' |');
+      if (idx === 0) {
+        var sep = [];
+        for (var c = 0; c < numCols; c++) sep.push('---');
+        mdLines.push('| ' + sep.join(' | ') + ' |');
+      }
+    }
+    return '\n\n' + mdLines.join('\n') + '\n\n';
+  }
+
   /**
    * Convert raw LaTeX document commands and list environments into standard clean Markdown
    * while strictly preserving LaTeX mathematical notation inside math mode ($...$, $$...$$, \(..\), \[..\]).
    */
   function cleanLatexDocumentMarkup(text) {
     if (!text || typeof text !== 'string') return '';
-    var cleaned = text.trim();
+    var cleaned = replaceLiteralEscapedNewlines(text).trim();
+
+    // Fix corrupted encoding artifacts
+    cleaned = cleaned.replace(/Cram\ufffdr\ufffdRao/g, 'Cram\u00e9r\u2013Rao');
+    cleaned = cleaned.replace(/\ufffd/g, '\u2013');
+
+    // 0. Convert verbatim and lstlisting environments into fenced R code blocks
+    cleaned = cleaned.replace(/\\begin\{(?:verbatim|lstlisting)\}(?:\[[^\]]*\])?([\s\S]*?)\\end\{(?:verbatim|lstlisting)\}/g, function(_, body) {
+      var codeBody = replaceLiteralEscapedNewlines(body).replace(/^\n+|\n+$/g, '');
+      return '\n\n```r\n' + codeBody + '\n```\n\n';
+    });
+
+    // 0b. Strip outer table wrappers and convert tabular environments to Markdown tables
+    cleaned = cleaned.replace(/\\begin\{table\}(?:\[[^\]]*\])?([\s\S]*?)\\end\{table\}/g, '$1');
+    cleaned = cleaned.replace(/\\centering\b\s*/g, '');
+    cleaned = cleaned.replace(/\\caption\{([^}]*)\}/g, '\n**$1**\n');
+    cleaned = cleaned.replace(/\\label\{[^}]*\}/g, '');
+    cleaned = cleaned.replace(/\\begin\{tabular\}\{[^}]*\}([\s\S]*?)\\end\{tabular\}/g, function(_, body) {
+      return convertLatexTabularToMarkdown(body);
+    });
 
     // 1. Clean document-level whitespace and layout commands
     cleaned = cleaned.replace(/\\noindent\s*/g, '');
-    cleaned = cleaned.replace(/\\vspace\{[^}]*\}/g, '');
-    cleaned = cleaned.replace(/\\hspace\{[^}]*\}/g, '');
-    cleaned = cleaned.replace(/\\hrule\b/g, '');
+    cleaned = cleaned.replace(/\\(?:vspace|hspace)\*?\{[^}]*\}/g, '');
+    cleaned = cleaned.replace(/\\(?:bigskip|medskip|smallskip|newpage|clearpage|pagebreak|hrule)\b\s*/g, '');
+    cleaned = cleaned.replace(/\\section\*?\{([^}]*)\}/g, '\n\n## $1\n\n');
+    cleaned = cleaned.replace(/\\subsection\*?\{([^}]*)\}/g, '\n\n### $1\n\n');
+    cleaned = cleaned.replace(/\\subsubsection\*?\{([^}]*)\}/g, '\n\n#### $1\n\n');
 
     // 2. Convert mark tags e.g. \hfill (3 marks) -> **(3 marks)**
     cleaned = cleaned.replace(/\\hfill\s*(\([0-9]+\s*(?:marks?|mks)\)|\[[0-9]+\s*(?:marks?|mks)\])/gi, function(_, m) {
@@ -223,25 +299,45 @@
     });
     cleaned = cleaned.replace(/\\hfill\s*/g, ' ');
 
-    // 3. Protect math blocks while converting non-math LaTeX text styling
-    var mathPattern = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g;
+    // 3. Protect fenced code blocks and display math while converting text styling commands
+    var protectedPattern = /(```[\s\S]*?```|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])/g;
     var segments = [];
     var lastIndex = 0;
     var match;
-    while ((match = mathPattern.exec(cleaned)) !== null) {
-      var nonMath = cleaned.substring(lastIndex, match.index);
-      nonMath = nonMath.replace(/\\textbf\{([^}]*)\}/g, function(_, t) { return '**' + t + '**'; });
-      nonMath = nonMath.replace(/\\textit\{([^}]*)\}/g, function(_, t) { return '*' + t + '*'; });
-      nonMath = nonMath.replace(/\\underline\{([^}]*)\}/g, function(_, t) { return '<u>' + t + '</u>'; });
-      segments.push(nonMath);
-      segments.push(match[0]);
-      lastIndex = mathPattern.lastIndex;
+
+    function cleanTextStylingInSegment(seg) {
+      var s = seg.replace(/\*\*([^*\n]*?\\texttt\{[^}\n]*?)\*\*([^}\n]*)\}/g, function(_, p1, p2) {
+        var inner = p1 + p2;
+        inner = inner.replace(/\\texttt\{([^{}]*)\}/g, '`$1`');
+        return '**' + inner + '**';
+      });
+      for (var pass = 0; pass < 3; pass++) {
+        s = s.replace(/\\texttt\{([^{}]*)\}/g, function(_, inner) {
+          return '`' + inner.replace(/\\%/g, '%').replace(/\\_/g, '_') + '`';
+        });
+      }
+      var imathStore = [];
+      s = s.replace(/(\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g, function(m) {
+        imathStore.push(m);
+        return '\x00IMATH' + (imathStore.length - 1) + '\x00';
+      });
+      for (var p2 = 0; p2 < 3; p2++) {
+        s = s.replace(/\\textbf\{([^{}]*)\}/g, '**$1**');
+        s = s.replace(/\\(?:textit|emph)\{([^{}]*)\}/g, '*$1*');
+        s = s.replace(/\\underline\{([^{}]*)\}/g, '<u>$1</u>');
+      }
+      s = s.replace(/\x00IMATH(\d+)\x00/g, function(_, idx) {
+        return imathStore[parseInt(idx, 10)];
+      });
+      return s;
     }
-    var remaining = cleaned.substring(lastIndex);
-    remaining = remaining.replace(/\\textbf\{([^}]*)\}/g, function(_, t) { return '**' + t + '**'; });
-    remaining = remaining.replace(/\\textit\{([^}]*)\}/g, function(_, t) { return '*' + t + '*'; });
-    remaining = remaining.replace(/\\underline\{([^}]*)\}/g, function(_, t) { return '<u>' + t + '</u>'; });
-    segments.push(remaining);
+
+    while ((match = protectedPattern.exec(cleaned)) !== null) {
+      segments.push(cleanTextStylingInSegment(cleaned.substring(lastIndex, match.index)));
+      segments.push(match[0]);
+      lastIndex = protectedPattern.lastIndex;
+    }
+    segments.push(cleanTextStylingInSegment(cleaned.substring(lastIndex)));
     cleaned = segments.join('');
 
     // 4. Handle nested enumerate environments (innermost first)
@@ -290,7 +386,6 @@
         if (!lbl) {
           lbl = (i < defaultSeq.length) ? defaultSeq[i] : '(' + (i + 1) + ')';
         }
-        var indent = '';
         var contentLines = content.split('\n');
         if (contentLines.length > 0) {
           outLines.push(lbl + ' ' + contentLines[0]);
@@ -311,7 +406,7 @@
     }
 
     // 5. Handle itemize environments
-    cleaned = cleaned.replace(/\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g, function(_, body) {
+    cleaned = cleaned.replace(/\\begin\{itemize\}(?:\[[^\]]*\])?([\s\S]*?)\\end\{itemize\}/g, function(_, body) {
       var items = body.split(/\\item\s*/);
       var out = [];
       for (var j = 1; j < items.length; j++) {
@@ -358,7 +453,7 @@
     }
 
     lines.forEach(function (line) {
-      var quoteMatch = line.match(/^\\s*>\\s?(.*)$/);
+      var quoteMatch = line.match(/^\s*>\s?(.*)$/);
       var content = quoteMatch ? quoteMatch[1] : line;
       var trimmed = content.trim();
 
@@ -442,13 +537,21 @@
       markdownSource = String(rawInput);
     }
 
-    // Clean literal escaped newlines if any
-    var cleanText = markdownSource.replace(/\\n(?![a-zA-Z])/g, '\n').trim();
+    // Clean literal escaped newlines and LaTeX document markup
+    var cleanText = replaceLiteralEscapedNewlines(markdownSource).trim();
     cleanText = cleanLatexDocumentMarkup(cleanText);
     cleanText = normalizeLegacyMathBlocks(cleanText);
 
     // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     cleanText = cleanText.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+
+    // Merge detached \[ lhs = \n\n$$\n\begin{cases}...\end{cases}\n$$
+    cleanText = cleanText.replace(
+      /(?:\\\[|\$\$)\s*([^\n$\\]+?=\s*)\s*\$\$\s*(\\begin\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\}[\s\S]*?\\end\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\})\s*\$\$\s*(?:\\\]|\$\$)?/g,
+      function(full, lhs, envBlock) {
+        return '\n\n$$\n' + lhs.trim() + ' ' + envBlock.trim() + '\n$$\n\n';
+      }
+    );
 
     // Collapse adjacent display delimiters to prevent nested math parsing errors (using replacer func to avoid JS $$ replacement string bug)
     cleanText = cleanText.replace(/(?:\\\[|\$\$)\s*(?:\\\[|\$\$)/g, function() { return '$$'; });
