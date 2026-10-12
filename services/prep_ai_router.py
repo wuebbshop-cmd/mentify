@@ -3046,6 +3046,37 @@ def _convert_latex_tabular_to_markdown(text: str) -> str:
     )
 
 
+
+def _clean_prose_latex_breaks(text: str) -> str:
+    """
+    Remove LaTeX prose-mode double-backslash line-break sequences (\\) that appear
+    outside math blocks and code fences. In prose these render as visible garbage in
+    the browser; replace them with paragraph breaks instead.
+    Math blocks ($...$, $$...$$, \\[...\\], \\(...\\)) and code fences (```...```) are
+    left completely untouched.
+    """
+    if not text or not isinstance(text, str):
+        return text
+    # Pattern to match protected blocks — even-indexed segments are prose
+    block_pattern = (
+        r"(```[\s\S]*?```"
+        r"|\$\$[\s\S]*?\$\$"
+        r"|\\\[[\s\S]*?\\\]"
+        r"|\$[^\$\n]+?\$"
+        r"|\\\(.*?\\\))"
+    )
+    segments = re.split(block_pattern, text)
+    for i in range(0, len(segments), 2):
+        seg = segments[i]
+        # Replace \\ (optionally followed by whitespace and another \\) with a paragraph break
+        seg = re.sub(r"(?:\\\\)[ \t]*(?:\\\\)?", "\n\n", seg)
+        # Remove any remaining lone trailing backslash at end of line
+        seg = re.sub(r"\\(?=[ \t]*\n|[ \t]*$)", "", seg)
+        segments[i] = seg
+    result = "".join(segments)
+    return re.sub(r"\n{3,}", "\n\n", result)
+
+
 def clean_latex_document_markup(text: str) -> str:
     """
     Convert raw LaTeX document commands and list environments into standard clean Markdown
@@ -3197,6 +3228,7 @@ def clean_latex_document_markup(text: str) -> str:
         cleaned,
     )
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    cleaned = _clean_prose_latex_breaks(cleaned)
     return cleaned.strip()
 
 
@@ -3352,6 +3384,7 @@ def repair_question_and_solution_text(text: str) -> str:
 
     text = repair_json_escaped_latex_newlines(str(text))
     text = clean_latex_document_markup(text)
+    text = _clean_prose_latex_breaks(text)
 
     # 1. Close unclosed code fences ```
     if text.count("```") % 2 != 0:

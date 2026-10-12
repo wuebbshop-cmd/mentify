@@ -351,7 +351,7 @@
     <!-- Credit Badge (Always pill, number visible) -->
     <a href="{% url 'prep:billing' %}" id="prep-navbar-credit-badge" class="badge badge-accent" title="Your Credit Balance">
       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-      <span>{{ user_credits|default:30 }} Credits</span>
+      <span>{{ user_credits|default:0 }} Credits</span>
     </a>
 
     <!-- Live Notification Bell & Dropdown (Plain SVG like theme toggle) -->

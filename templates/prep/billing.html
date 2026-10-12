@@ -55,7 +55,7 @@
 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 32px;">
   <div>
     <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Active Balance</div>
-    <div style="font-size: 2rem; font-weight: 700; color: var(--green);">{{ user_credits|default:30 }} Credits</div>
+    <div style="font-size: 2rem; font-weight: 700; color: var(--green);">{{ user_credits|default:0 }} Credits</div>
     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
       Current Plan: <strong>{{ current_plan }}</strong> &bull;
       <a href="{% url 'prep:dashboard' %}#credit-activity" style="color: var(--green); text-decoration: none; font-weight: 500;">View Activity on Dashboard &rarr;</a>

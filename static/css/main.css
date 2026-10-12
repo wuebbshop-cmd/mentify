@@ -188,6 +188,25 @@ small { font-size: .8rem; color: var(--text-light); }
   padding: 12px 0 20px;
   margin-bottom: 24px;
 }
+
+/* ─── Global Section Divider Spacing ──────────────────────────────────────────
+   Ensure elements that immediately follow a bordered section header always
+   have a minimum breathing gap. Applies across all Mentify Prep pages on both
+   mobile and desktop so no form, search bar, or container ever touches a
+   border-bottom divider line.
+   ─────────────────────────────────────────────────────────────────────────── */
+[class*="-header"] + [class*="-toolbar"],
+[class*="-header"] + [class*="-section"],
+[class*="-header"] + [class*="-body"],
+[class*="-header"] + [class*="-grid"],
+[class*="-header"] + [class*="-content"] {
+  padding-top: max(var(--section-gap, 24px), 24px);
+}
+/* Fallback: any direct next-sibling of a bordered page-header gets clearance */
+.page-header + *,
+[class$="-header"][style*="border-bottom"] + * {
+  margin-top: max(var(--section-gap, 0px), 0px);
+}
 .auth-page {
   padding: 56px 0 48px;
   display: flex;
