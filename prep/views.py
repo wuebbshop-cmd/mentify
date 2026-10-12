@@ -779,6 +779,20 @@ def prep_dashboard(request):
             "type": "Syllabus Notes",
         }
 
+    user_pending_review_docs = []
+    if request.user.is_authenticated:
+        user_pending_review_docs = [
+            {
+                "id": str(d.id),
+                "filename": d.file.name.split("/")[-1] if d.file else "Document",
+                "course_code": d.course.code,
+                "course_title": d.course.title,
+                "doc_type": d.doc_type,
+                "created_at": d.created_at.strftime("%b %d, %Y"),
+            }
+            for d in PrepDocument.objects.filter(user=request.user, stage="stage_2").select_related("course").order_by("-created_at")[:5]
+        ]
+
     context = {
         "active_tab": "dashboard",
         "user_credits": user_credits,
@@ -793,6 +807,7 @@ def prep_dashboard(request):
         "total_questions": total_questions,
         "featured_topics": featured_topics,
         "latest_study_item": latest_study_item,
+        "user_pending_review_docs": user_pending_review_docs,
     }
     return render(request, "prep/dashboard.html", context)
 
@@ -958,7 +973,12 @@ def prep_course_detail(request, course_code):
         })
 
     pending_documents = []
-    for d in course.documents.filter(stage__in=["stage_1", "stage_2"]).order_by("-created_at"):
+    # Documents under review should ONLY be visible to the user who uploaded them (or staff/admin)
+    pending_docs_qs = course.documents.filter(stage__in=["stage_1", "stage_2"]).order_by("-created_at")
+    if not request.user.is_staff:
+        pending_docs_qs = pending_docs_qs.filter(user=request.user)
+
+    for d in pending_docs_qs:
         document_data = {
             "id": str(d.id),
             "filename": d.file.name.split("/")[-1] if d.file else "Document",

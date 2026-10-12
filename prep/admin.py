@@ -235,6 +235,9 @@ class PrepDocumentAdmin(admin.ModelAdmin):
     inlines = [PrepPaperInline]
     date_hierarchy = "created_at"
 
+    def has_delete_permission(self, request, obj=None):
+        return True
+
     fieldsets = (
         ("Document Identification", {
             "fields": (
@@ -756,7 +759,7 @@ class PrepDocumentVisualAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
     @admin.display(description="Source document")
     def document_link(self, obj):

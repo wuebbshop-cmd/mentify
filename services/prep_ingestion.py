@@ -1107,53 +1107,171 @@ def upload_to_github_storage(file_obj, course_code: str) -> str:
     return ""
 
 
+_WORD_TO_NUM = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
+    "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+    "nineteen": 19, "twenty": 20,
+    "i": 1, "ii": 2, "iii": 3, "iv": 4, "v": 5,
+    "vi": 6, "vii": 7, "viii": 8, "ix": 9, "x": 10,
+    "xi": 11, "xii": 12, "xiii": 13, "xiv": 14, "xv": 15,
+}
+
+_EXCLUDED_TOPIC_NAMES = {
+    "table of content", "table of contents", "content", "contents",
+    "introduction", "purpose of the module", "module learning outcomes",
+    "course requirements", "references", "assessment questions",
+    "examination", "overview of the course", "forward", "foreword",
+    "course outline", "syllabus", "course description", "preface",
+    "acknowledgements", "grading policy", "instructor information"
+}
+
+
+def _parse_order_number(val) -> int | None:
+    if not val:
+        return None
+    cleaned = str(val).strip().lower()
+    if cleaned.isdigit():
+        return int(cleaned)
+    first_num = re.match(r"^(\d+)", cleaned)
+    if first_num:
+        return int(first_num.group(1))
+    return _WORD_TO_NUM.get(cleaned)
+
+
 def extract_topic_candidates(text: str) -> list[dict]:
     """
-    Extract candidate syllabus units/topics without changing the course graph.
+    Extract candidate syllabus units/topics by analyzing the full text across all pages.
+    Supports Table of Contents, course outlines, lessons, weeks, units, modules, and chapters.
     """
     if not text or len(text.strip()) < 50:
         return []
 
+    # 1. Search across the entire document for Table of Contents, Flowchart, or Syllabus Outline
+    toc_topics = {}
+    toc_match = re.search(
+        r"(?i)\b(?:TABLE\s+OF\s+CONTENTS?|TABLE\s+OF\s+CONTENT|COURSE\s+OUTLINE|SYLLABUS\s+OUTLINE|FLOW\s*CHART|COURSE\s+SCHEDULE|MODULE\s+OUTLINE)\b",
+        text,
+    )
+    if toc_match:
+        # Scan up to 25,000 characters from the outline start (covers multi-page TOCs)
+        toc_window = text[toc_match.start():toc_match.start() + 25000]
+        # Match LESSON/WEEK/UNIT/MODULE/CHAPTER/TOPIC <NUMBER/WORD> \n <TITLE>
+        toc_pattern = re.compile(
+            r"(?i)(?:LESSON|WEEK|UNIT|MODULE|CHAPTER|TOPIC|LECTURE|PART|SECTION)\s+([A-Za-z0-9]+(?:\s*(?:&|-|to|and)\s*[A-Za-z0-9]+)?)\s*[\.\s\d]*\n+([^\n\r]+)",
+            re.MULTILINE,
+        )
+        for m in toc_pattern.finditer(toc_window):
+            num = _parse_order_number(m.group(1))
+            raw_title = m.group(2).strip()
+            clean_title = re.sub(r"[\.·\s\d]+$", "", raw_title).strip()
+            clean_title = re.sub(r"^[#*\s\-\–—:]+|[#*\s\-\–—:]+$", "", clean_title).strip()
+            clean_title = re.sub(r"[^\w\s,&/\-()]+", "", clean_title).strip()
+            clean_title = re.sub(r"(?i)\b(?:assessment\s+questions|learning\s+outcomes|references)\b.*", "", clean_title).strip()
+            if not num or len(clean_title) < 4:
+                continue
+            if any(ex in clean_title.lower() for ex in _EXCLUDED_TOPIC_NAMES):
+                continue
+            if num not in toc_topics:
+                toc_topics[num] = clean_title.title()
+
     topics = []
+    # If TOC yielded at least 2 structured topics, populate them with subtopics from the body
+    if len(toc_topics) >= 2:
+        for num in sorted(toc_topics.keys()):
+            title = toc_topics[num]
+            subtopics = []
+            heading_pattern = re.compile(
+                rf"(?i)(?:LESSON|WEEK|UNIT|MODULE|CHAPTER|TOPIC)\s+(?:{num}|[A-Za-z]+)\b.*?\n+{re.escape(title[:12])}",
+                re.MULTILINE,
+            )
+            m = heading_pattern.search(text)
+            start_pos = m.start() if m else 0
+            next_num = num + 1
+            next_pos = len(text)
+            if next_num in toc_topics:
+                next_title = toc_topics[next_num]
+                next_m = re.compile(
+                    rf"(?i)(?:LESSON|WEEK|UNIT|MODULE|CHAPTER|TOPIC)\s+(?:{next_num}|[A-Za-z]+)\b.*?\n+{re.escape(next_title[:12])}",
+                    re.MULTILINE,
+                ).search(text[start_pos + 50:])
+                if next_m:
+                    next_pos = start_pos + 50 + next_m.start()
 
-    # 1. First, check if text has Markdown table structure (e.g. Unit / Module tables)
-    rows = text.splitlines()
-    current_topic = None
-    for line in rows:
-        line = line.strip()
-        if not line.startswith("|") or "---" in line or "Module / Main Unit" in line:
-            continue
-        parts = [p.strip() for p in line.split("|")[1:-1]]
-        if len(parts) >= 2:
-            unit_col = parts[0]
-            topic_col = parts[1]
-            desc_col = parts[2] if len(parts) >= 3 else ""
+            section = text[start_pos:next_pos]
+            for line in section.splitlines():
+                line_s = line.strip()
+                sub_m = re.match(r"^\s*\d+\.\d+(?:\.\d+)?\s+([A-Za-z][^\n\r\.\:]{3,60})", line_s)
+                if sub_m:
+                    sub_title = sub_m.group(1).strip()
+                    if not any(ex in sub_title.lower() for ex in _EXCLUDED_TOPIC_NAMES) and sub_title not in subtopics:
+                        subtopics.append(sub_title)
+                bullet_m = re.match(r"^(?:[\*\-•])\s+(?:\*\*)?([A-Za-z][^*:\n]{3,60}?)(?:\*\*)?\s*$", line_s)
+                if bullet_m:
+                    b_title = bullet_m.group(1).strip()
+                    if not any(ex in b_title.lower() for ex in _EXCLUDED_TOPIC_NAMES) and b_title not in subtopics:
+                        subtopics.append(b_title)
 
-            # Match patterns like: **1. Matrices in R** or Unit 1: Matrices in R or 1. Matrices
-            unit_match = re.search(r'(?:\*\*|#+)?(?:\bUnit\b|\bModule\b|\bChapter\b)?\s*(\d+)[\.:\)]\s*([^*#|]+)(?:\*\*)?', unit_col, re.IGNORECASE)
-            if unit_match:
-                num = int(unit_match.group(1))
-                title = unit_match.group(2).strip()
-                current_topic = {
-                    "order": num,
-                    "title": title,
-                    "subtopics": [topic_col] if topic_col else [],
-                    "summary": desc_col,
-                }
-                topics.append(current_topic)
-            elif current_topic and topic_col:
-                if topic_col not in current_topic["subtopics"]:
-                    current_topic["subtopics"].append(topic_col)
-                if desc_col:
-                    current_topic["summary"] = (current_topic["summary"] + " " + desc_col).strip()
+            summary = ""
+            for p in section.split("\n\n"):
+                clean_p = " ".join(p.split()).strip()
+                if (
+                    len(clean_p) >= 30
+                    and not any(k in clean_p.lower() for k in ["studocu", "lomoar", "downloaded by", "assessment questions", "table of content", "all rights reserved", "university", "college", "lecturer"])
+                ):
+                    summary = clean_p[:300]
+                    break
+            summary = summary or f"Foundational concepts, theoretical principles, and worked analytical examples for {title}."
 
-    # 2. Heading-based extraction (e.g. ### Module 1: ..., ## Unit 1: ..., # Chapter 1: ...)
-    # Prefer explicit syllabus headings over cover-page table rows. Some PDFs
-    # put course metadata in a table-shaped cover block that looks like units.
-    if text:
+            topics.append({
+                "order": num,
+                "title": title,
+                "subtopics": subtopics[:8],
+                "summary": summary,
+            })
+
+    # 2. If no multi-topic TOC was found, check Markdown table structure across lines
+    if len(topics) < 2:
+        rows = text.splitlines()
+        current_topic = None
+        for line in rows:
+            line = line.strip()
+            if not line.startswith("|") or "---" in line or "Module / Main Unit" in line:
+                continue
+            parts = [p.strip() for p in line.split("|")[1:-1]]
+            if len(parts) >= 2:
+                unit_col = parts[0]
+                topic_col = parts[1]
+                desc_col = parts[2] if len(parts) >= 3 else ""
+
+                unit_match = re.search(
+                    r'(?:\*\*|#+)?(?:\bUnit\b|\bModule\b|\bChapter\b|\bLesson\b|\bWeek\b)?\s*([A-Za-z0-9]+)[\.:\)]\s*([^*#|]+)(?:\*\*)?',
+                    unit_col,
+                    re.IGNORECASE,
+                )
+                if unit_match:
+                    num = _parse_order_number(unit_match.group(1))
+                    title = unit_match.group(2).strip()
+                    if num and len(title) > 2 and not any(ex in title.lower() for ex in _EXCLUDED_TOPIC_NAMES):
+                        current_topic = {
+                            "order": num,
+                            "title": title.title(),
+                            "subtopics": [topic_col] if topic_col else [],
+                            "summary": desc_col,
+                        }
+                        topics.append(current_topic)
+                elif current_topic and topic_col:
+                    if topic_col not in current_topic["subtopics"]:
+                        current_topic["subtopics"].append(topic_col)
+                    if desc_col:
+                        current_topic["summary"] = (current_topic["summary"] + " " + desc_col).strip()
+
+    # 3. Heading-based extraction across ALL pages (scanning entire text)
+    if len(topics) < 2:
         heading_pattern = re.compile(
-            r'^(?:#{1,6}\s*(?:(?:\bUnit\b|\bModule\b|\bChapter\b|\bTopic\b)\s*)?|(?:\bUnit\b|\bModule\b|\bChapter\b|\bTopic\b)\s+)(\d+)[\.:\-\)]\s*([^\n\r]+)',
-            re.MULTILINE | re.IGNORECASE
+            r'^(?:#{1,6}\s*(?:(?:\bUnit\b|\bModule\b|\bChapter\b|\bTopic\b|\bLesson\b|\bWeek\b|\bLecture\b|\bPart\b|\bSection\b)\s*)?|(?:\bUnit\b|\bModule\b|\bChapter\b|\bTopic\b|\bLesson\b|\bWeek\b|\bLecture\b|\bPart\b|\bSection\b)\s+)([A-Za-z0-9]+(?:\s*(?:&|-|to|and)\s*[A-Za-z0-9]+)?)[\.:\-\)]\s*([^\n\r]+)',
+            re.MULTILINE | re.IGNORECASE,
         )
         matches = list(heading_pattern.finditer(text))
         bare_topic_pattern = re.compile(r'^\s*(\d+)\:\s*([^\n\r]+)', re.MULTILINE)
@@ -1165,18 +1283,27 @@ def extract_topic_candidates(text: str) -> list[dict]:
         matches.sort(key=lambda match: match.start())
         heading_topics = {}
         for i, m in enumerate(matches):
-            num = int(m.group(1))
+            num = _parse_order_number(m.group(1))
+            if not num:
+                continue
             title = m.group(2).strip().strip("#* ").strip()
+            title = re.sub(r'^[#*\s\-\–—:]+|[#*\s\-\–—:]+$', '', title).strip()
+            if any(ex in title.lower() for ex in _EXCLUDED_TOPIC_NAMES):
+                continue
             if len(title) > 2 and num not in heading_topics:
                 start_pos = m.end()
                 end_pos = matches[i + 1].start() if i + 1 < len(matches) else len(text)
                 section_text = text[start_pos:end_pos]
 
-                # Extract subtopics from bullet points like * **Subtopic**:
                 subtopics = []
                 started_bullets = False
                 for line in section_text.splitlines():
                     clean_line = line.strip()
+                    sub_m = re.match(r"^\s*\d+\.\d+(?:\.\d+)?\s+([A-Za-z][^\n\r\.\:]{3,60})", clean_line)
+                    if sub_m:
+                        sub_t = sub_m.group(1).strip()
+                        if not any(ex in sub_t.lower() for ex in _EXCLUDED_TOPIC_NAMES) and sub_t not in subtopics:
+                            subtopics.append(sub_t)
                     bullet_match = re.match(
                         r'^(?:[\*\-•])\s+(?:\*\*)?([^*:\n]+?)(?:\*\*)?\s*$',
                         clean_line,
@@ -1189,7 +1316,6 @@ def extract_topic_candidates(text: str) -> list[dict]:
                     elif started_bullets and clean_line:
                         break
 
-                # Extract summary from first meaningful paragraph
                 summary = ""
                 summary_source = section_text.split("•", 1)[0]
                 for line in summary_source.splitlines():
@@ -1197,24 +1323,22 @@ def extract_topic_candidates(text: str) -> list[dict]:
                     if (
                         len(clean_line) >= 20
                         and re.match(r"[A-Za-z]", clean_line)
-                        and not re.match(r"(?i)(downloaded by|lomoar|scan to|studocu)", clean_line)
+                        and not re.match(r"(?i)(downloaded by|lomoar|scan to|studocu|university|college|lecturer)", clean_line)
                     ):
                         summary = clean_line
                         break
-                summary = summary or f"Syllabus coverage and foundational theorems for {title}."
+                summary = summary or f"Syllabus coverage and foundational theorems for {title.title()}."
 
                 heading_topics[num] = {
                     "order": num,
-                    "title": title,
+                    "title": title.title(),
                     "subtopics": subtopics,
                     "summary": summary,
                 }
         if heading_topics:
-            topics = [topic for topic in topics if topic["order"] not in heading_topics]
-            topics.extend(heading_topics.values())
-            topics.sort(key=lambda topic: topic["order"])
+            topics = sorted(heading_topics.values(), key=lambda t: t["order"])
 
-    # 3. If still fewer than 2 topics and text is rich, call DeepSeek to extract structured syllabus topics
+    # 4. If still fewer than 2 topics and text is rich, call DeepSeek with a full-document outline skeleton
     if len(topics) < 2 and len(text) > 300:
         try:
             api_key = getattr(settings, "DEEPSEEK_API", "") or getattr(settings, "DEEPSEEK_API_KEY", "") or os.environ.get("DEEPSEEK_API", "") or os.environ.get("DEEPSEEK_API_KEY", "")
@@ -1226,7 +1350,13 @@ def extract_topic_candidates(text: str) -> list[dict]:
                     "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
                 }
-                sample_text = text[:4000]
+                outline_lines = []
+                for line in text.splitlines():
+                    ls = line.strip()
+                    if re.match(r'(?i)^(?:#{1,6}\s*)?(?:lesson|week|unit|module|chapter|topic|lecture|part|section|\d+[\.:\)])\b', ls) or re.match(r'(?i)^(?:table\s+of\s+content|course\s+outline|flow\s*chart)\b', ls):
+                        outline_lines.append(ls[:120])
+                sample_text = "\n".join(outline_lines[:150]) if len(outline_lines) >= 4 else text[:12000]
+
                 payload = {
                     "model": model_name,
                     "messages": [
@@ -1251,35 +1381,42 @@ def extract_topic_candidates(text: str) -> list[dict]:
                         }
                     ],
                     "temperature": 0.1,
-                    "max_tokens": 1500,
+                    "max_tokens": 1800,
                 }
                 resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=25)
                 if resp.status_code == 200:
                     raw_json = resp.json()["choices"][0]["message"]["content"].strip()
-                    if raw_json.startswith("```"):
-                        raw_json = re.sub(r"^```(?:json)?\s*", "", raw_json)
-                        raw_json = re.sub(r"\s*```$", "", raw_json)
-                    parsed = json.loads(raw_json)
+                    raw_json = re.sub(r"^```(?:json)?\s*", "", raw_json, flags=re.IGNORECASE)
+                    raw_json = re.sub(r"\s*```$", "", raw_json)
+                    try:
+                        parsed = json.loads(raw_json)
+                    except Exception:
+                        match_arr = re.search(r"\[\s*\{.*\}\s*\]", raw_json, re.DOTALL)
+                        parsed = json.loads(match_arr.group(0)) if match_arr else []
                     if isinstance(parsed, list) and len(parsed) >= 2:
                         topics = parsed
         except Exception as ex:
             logger.warning(f"[Topic Extraction] LLM fallback exception: {ex}")
 
-    # Sanitize any institutional / school / lecturer references from extracted summaries
+    # Sanitize any institutional / school / lecturer references from extracted summaries and titles
     _inst_re = re.compile(
         r"(?i)\b(?:offered\s+at|taught\s+at|at\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School|Polytechnic)|"
-        r"using\s+[A-Z][A-Za-z\s]+(?:University|College|Institute)\s+as\s+an?\s+(?:illustrative\s+)?example)\b[^.;]*"
+        r"using\s+[A-Z][A-Za-z\s]+(?:University|College|Institute)\s+as\s+an?\s+(?:illustrative\s+)?example|"
+        r"university|college|polytechnic|lecturer|professor|dr\.|prof\.)\b[^.;]*"
     )
     cleaned_topics = []
     for t in topics:
         if not isinstance(t, dict):
             continue
+        raw_title = str(t.get("title") or "").strip()
+        raw_title = re.sub(r"(?i)\b(?:university|college|polytechnic|school\s+of|department\s+of)\b.*", "", raw_title).strip(" ,.;:-")
         raw_summary = str(t.get("summary") or "").strip()
         if _inst_re.search(raw_summary):
             raw_summary = _inst_re.sub("", raw_summary).strip(" ,.;:-")
             if len(raw_summary) < 20 or re.match(r"(?i)^an?\s+(?:introductory\s+)?course\b", raw_summary):
                 raw_summary = ""
-        t["summary"] = raw_summary
+        t["title"] = raw_title.title()
+        t["summary"] = raw_summary or f"Foundational concepts, theoretical principles, and core analytical methods for {t['title']}."
         cleaned_topics.append(t)
 
     return cleaned_topics
