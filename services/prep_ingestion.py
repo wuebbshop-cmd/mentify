@@ -109,7 +109,8 @@ def extract_text_markdown(md_source) -> tuple[str, bool, int]:
 
 def extract_text_pdfplumber(pdf_source) -> tuple[str, bool, int]:
     """
-    Extract text from a digital PDF using local pdfplumber at zero API token cost.
+    Extract text from a digital PDF locally at zero API token cost.
+    Uses PyMuPDF (fitz) C-engine first for fast extraction, falling back to pdfplumber.
     
     Args:
         pdf_source: file path (str), binary stream, or bytes.
@@ -121,19 +122,40 @@ def extract_text_pdfplumber(pdf_source) -> tuple[str, bool, int]:
     total_words = 0
 
     try:
-        # Handle bytes vs file-like vs path
+        raw_bytes: bytes | None = None
         if isinstance(pdf_source, bytes):
-            pdf_file = io.BytesIO(pdf_source)
+            raw_bytes = pdf_source
         elif hasattr(pdf_source, "read"):
             try:
                 pdf_source.seek(0)
             except Exception:
                 pass
             content = pdf_source.read()
-            pdf_file = io.BytesIO(content)
-        else:
-            pdf_file = pdf_source
+            raw_bytes = content if isinstance(content, bytes) else bytes(content)
 
+        if fitz is not None:
+            doc = (
+                fitz.open(stream=raw_bytes, filetype="pdf")
+                if raw_bytes is not None
+                else fitz.open(pdf_source)
+            )
+            try:
+                page_count = len(doc)
+                for idx, page in enumerate(doc, start=1):
+                    page_text = page.get_text("text", sort=True, clip=fitz.INFINITE_RECT()) or ""
+                    words = len(page_text.split())
+                    total_words += words
+                    extracted_pages.append(f"--- Page {idx} ---\n{page_text.strip()}")
+
+            finally:
+                doc.close()
+
+            full_text = "\n\n".join(extracted_pages).strip()
+            avg_words_per_page = total_words / max(page_count, 1)
+            is_digital = avg_words_per_page >= 25 and len(full_text) > 100
+            return full_text, is_digital, page_count
+
+        pdf_file = io.BytesIO(raw_bytes) if raw_bytes is not None else pdf_source
         with pdfplumber.open(pdf_file) as pdf:
             page_count = len(pdf.pages)
             for idx, page in enumerate(pdf.pages, start=1):
@@ -141,11 +163,14 @@ def extract_text_pdfplumber(pdf_source) -> tuple[str, bool, int]:
                 words = len(page_text.split())
                 total_words += words
 
-                # Extract structured tables as Markdown when present on the page
-                try:
-                    tables = page.extract_tables() or []
-                except Exception:
-                    tables = []
+                # Only run expensive table extraction on pages that actually contain grid lines/rects
+                has_table_geometry = (len(getattr(page, "lines", ()) or ()) + len(getattr(page, "rects", ()) or ())) >= 4
+                tables = []
+                if has_table_geometry:
+                    try:
+                        tables = page.extract_tables() or []
+                    except Exception:
+                        tables = []
                 for table in tables:
                     cleaned_rows = [
                         [re.sub(r"\s+", " ", (cell or "").strip()) for cell in row]
@@ -180,6 +205,7 @@ def extract_text_pdfplumber(pdf_source) -> tuple[str, bool, int]:
     except Exception as e:
         logger.error(f"[pdfplumber] Extraction failed: {e}")
         return "", False, 0
+
 
 
 _VISUAL_REFERENCE_RE = re.compile(
@@ -2508,14 +2534,21 @@ def process_prep_document(prep_document) -> dict:
     visual_topic_assignments = {"approved": 0, "review": 0, "rejected": 0}
     if prep_document.doc_type in {"Lecture Notes", "Revision Sheet"}:
         try:
-            topic_candidates = extract_topic_candidates(text)
+            from concurrent.futures import ThreadPoolExecutor
+
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                topics_future = pool.submit(extract_topic_candidates, text)
+                profile_future = pool.submit(
+                    extract_course_study_profile,
+                    prep_document.course,
+                    text,
+                    source_document=prep_document,
+                )
+                topic_candidates = topics_future.result()
+                course_profile = profile_future.result()
+
             if visual_candidate_count and topic_candidates:
                 visual_topic_assignments = assign_visuals_to_topics(prep_document, topic_candidates)
-            course_profile = extract_course_study_profile(
-                prep_document.course,
-                text,
-                source_document=prep_document,
-            )
             content_updates = create_content_update_proposals(
                 prep_document.course,
                 prep_document,
@@ -2589,3 +2622,51 @@ def process_prep_document(prep_document) -> dict:
         "updates_proposed": len(content_updates),
         "github_url": prep_document.github_raw_url,
     }
+
+
+from concurrent.futures import ThreadPoolExecutor as _IngestionThreadPoolExecutor
+
+_DOCUMENT_INGESTION_EXECUTOR = _IngestionThreadPoolExecutor(
+    max_workers=2,
+    thread_name_prefix="PrepDocumentIngest",
+)
+
+
+def _run_queued_document_ingestion(document_id) -> dict:
+    """Execute document ingestion in a background worker thread with safe DB connection lifecycle."""
+    from django.db import close_old_connections
+    from prep.models import PrepDocument
+
+    close_old_connections()
+    try:
+        prep_doc = (
+            PrepDocument.objects.select_related("course", "user")
+            .filter(pk=document_id)
+            .first()
+        )
+        if not prep_doc:
+            return {"success": False, "error": "Document not found."}
+        result = process_prep_document(prep_doc)
+        if not result.get("success"):
+            failure = result.get("error", "The document could not be processed.")
+            prep_doc.tutor_review_notes = f"Ingestion failed before review. {failure[:900]}"
+            prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
+        return result
+    except Exception as exc:
+        logger.exception("[Prep Ingestion] Background ingestion failed for document %s", document_id)
+        try:
+            prep_doc = PrepDocument.objects.filter(pk=document_id).first()
+            if prep_doc:
+                prep_doc.tutor_review_notes = f"Ingestion failed before review: {str(exc)[:1000]}"
+                prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
+        except Exception:
+            pass
+        return {"success": False, "error": str(exc)}
+    finally:
+        close_old_connections()
+
+
+def enqueue_prep_document_ingestion(document_id):
+    """Submit a saved Stage 1 PrepDocument for non-blocking background ingestion."""
+    return _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(document_id))
+

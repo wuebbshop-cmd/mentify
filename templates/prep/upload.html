@@ -1,9 +1,9 @@
 {% extends 'prep/base_prep.html' %}
 
-{% block title %}Upload Documents | Mentify Prep{% endblock %}
-{% block meta_description %}Upload past papers, CATs, lecture notes, and tutorial sheets to Mentify Prep. Learn how our 3-stage extraction, Vision OCR, and tutor review gate index your syllabus.{% endblock %}
-{% block og_title %}Upload Study Material & Document Review Process — Mentify Prep{% endblock %}
-{% block og_description %}Submit your syllabus documents and past papers for automated parsing and tutor review. Expand your course catalog on Mentify Prep.{% endblock %}
+{% block title %}Upload Study Materials | Mentify Prep{% endblock %}
+{% block meta_description %}Upload past papers, CATs, lecture notes, and tutorial sheets to Mentify Prep. We process them into organized study notes and practice questions for your course.{% endblock %}
+{% block og_title %}Upload Study Materials — Mentify Prep{% endblock %}
+{% block og_description %}Submit your syllabus documents and past papers for automated parsing and tutor review on Mentify Prep.{% endblock %}
 
 {% block extra_head %}
 <script type="application/ld+json">
@@ -15,195 +15,952 @@
   "step": [
     {
       "@type": "HowToStep",
-      "name": "Upload Document",
-      "text": "Select your course code and upload digital PDFs, Word documents, or scanned handwritten papers up to 15 MB."
+      "name": "Choose Course",
+      "text": "Select your course code or create a new course and specify the document type and academic year."
     },
     {
       "@type": "HowToStep",
-      "name": "Parsing & OCR Extraction",
-      "text": "High-precision text extractors and Vision OCR parse mathematical formulas and match them to syllabus topics."
+      "name": "Add Files",
+      "text": "Drag and drop digital PDFs, Word documents, or scanned papers up to 15 MB per file."
     },
     {
       "@type": "HowToStep",
-      "name": "Tutor Review & Global Indexing",
-      "text": "Academic tutors review the extracted questions and solutions before indexing them into the course catalogue."
+      "name": "Review & Process",
+      "text": "Documents process in the background through Vision OCR and Tutor Review before indexing into your course."
     }
   ]
 }
 </script>
+<style>
+  .upload-page-shell {
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: 40px;
+  }
+
+  .upload-hero {
+    margin-bottom: 22px;
+  }
+
+  .upload-hero h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin: 0 0 6px;
+  }
+
+  .upload-hero p {
+    margin: 0;
+    font-size: 0.93rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* 3-Step Horizontal Stepper */
+  .upload-stepper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+
+  .upload-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.18s ease;
+  }
+
+  .upload-step-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+  }
+
+  .upload-step.is-active {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .upload-step.is-active .upload-step-circle {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--white);
+  }
+
+  .upload-step.is-done {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .upload-step.is-done .upload-step-circle {
+    background: rgba(15, 118, 110, 0.14);
+    border-color: rgba(15, 118, 110, 0.35);
+    color: var(--green);
+  }
+
+  .upload-step-line {
+    width: 40px;
+    height: 1px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* Full-Width Cards */
+  .upload-card {
+    width: 100%;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    box-sizing: border-box;
+  }
+
+  .upload-card-section-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+    display: block;
+  }
+
+  /* Full-Width Icon Field Boxes */
+  .upload-meta-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1.15fr 0.95fr 1.15fr;
+    gap: 14px;
+    width: 100%;
+  }
+
+  @media (max-width: 960px) {
+    .upload-meta-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .upload-meta-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .upload-field-box {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    min-height: 54px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .upload-field-box:focus-within {
+    border-color: var(--green);
+    background: var(--white);
+  }
+
+  .upload-field-icon {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .upload-field-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .upload-field-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .upload-field-control {
+    width: 100%;
+    border: none !important;
+    background: transparent !important;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0 !important;
+    margin: 0;
+    outline: none !important;
+    box-shadow: none !important;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+  }
+
+  .upload-field-control::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .upload-field-control option {
+    background: var(--white);
+    color: var(--text);
+  }
+
+  .new-course-collapse {
+    margin-top: 12px;
+    display: none;
+  }
+
+  .new-course-collapse.is-visible {
+    display: block;
+  }
+
+  /* Dashed Dropzone */
+  .upload-dropzone {
+    position: relative;
+    width: 100%;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease;
+    box-sizing: border-box;
+  }
+
+  .upload-dropzone:hover,
+  .upload-dropzone.is-dragover {
+    border-color: var(--green);
+    background: rgba(15, 118, 110, 0.04);
+  }
+
+  .upload-dropzone-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .upload-dropzone-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+
+  .upload-dropzone-title .browse-link {
+    color: var(--green);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .upload-dropzone-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* Visually hidden file input so native browser validation and tests still work */
+  .upload-file-input-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Selected Files Staged List */
+  .selected-files-wrap {
+    margin-top: 18px;
+    display: none;
+  }
+
+  .selected-files-wrap.is-visible {
+    display: block;
+  }
+
+  .selected-files-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .selected-files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .selected-file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .selected-file-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .file-doc-svg-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .dark-theme .pdf-svg-sheet {
+    fill: rgba(220, 38, 38, 0.12);
+    stroke: rgba(248, 113, 113, 0.45);
+  }
+
+  .dark-theme .pdf-svg-corner {
+    fill: rgba(220, 38, 38, 0.24);
+    stroke: rgba(248, 113, 113, 0.45);
+  }
+
+  .selected-file-meta {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .selected-file-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .selected-file-size {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+
+  .selected-file-remove {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.15rem;
+    line-height: 1;
+    flex-shrink: 0;
+    touch-action: manipulation;
+  }
+
+  .selected-file-remove:hover {
+    background: rgba(217, 48, 37, 0.1);
+    color: var(--danger);
+  }
+
+  /* Action Bar */
+  .upload-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  .btn-process-materials {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--green);
+    color: #ffffff;
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .btn-process-materials:hover:not(:disabled) {
+    opacity: 0.93;
+  }
+
+  .btn-process-materials:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-clear-selection {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.86rem;
+    font-weight: 500;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .btn-clear-selection.is-visible {
+    display: inline-flex;
+  }
+
+  .btn-clear-selection:hover {
+    background: var(--border);
+  }
+
+  /* Mobile Adaptation */
+  @media (max-width: 640px) {
+    .upload-page-shell {
+      padding-bottom: 24px;
+    }
+
+    .upload-hero {
+      margin-bottom: 16px;
+    }
+
+    .upload-hero h1 {
+      font-size: 1.35rem;
+    }
+
+    .upload-hero p {
+      font-size: 0.85rem;
+    }
+
+    .upload-stepper {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      gap: 6px;
+      margin-bottom: 16px;
+      padding-bottom: 2px;
+    }
+
+    .upload-stepper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .upload-step {
+      font-size: 0.78rem;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .upload-step-circle {
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+    }
+
+    .upload-step-line {
+      width: 14px;
+    }
+
+    .upload-card {
+      padding: 16px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+
+    .upload-meta-grid {
+      gap: 10px;
+    }
+
+    .upload-field-box {
+      padding: 8px 12px;
+      min-height: 52px;
+    }
+
+    /* 16px prevents iOS/mobile browser auto-zoom on focus */
+    .upload-field-control {
+      font-size: 16px;
+    }
+
+    .upload-dropzone {
+      padding: 24px 14px;
+    }
+
+    .upload-dropzone-title {
+      font-size: 0.9rem;
+    }
+
+    .upload-dropzone-sub {
+      font-size: 0.75rem;
+      line-height: 1.4;
+    }
+
+    .selected-file-row {
+      padding: 9px 10px;
+      gap: 8px;
+    }
+
+    .selected-file-left {
+      gap: 10px;
+    }
+
+    .selected-file-name {
+      font-size: 0.83rem;
+    }
+
+    .upload-actions-bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .btn-process-materials,
+    .btn-clear-selection {
+      width: 100%;
+      min-height: 44px;
+      box-sizing: border-box;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>Upload Course Materials</h1>
-  <p style="margin: 0; color: var(--text-muted);">Choose an existing course or create a new one, then upload a group of related documents together.</p>
-</div>
-
-<div class="card mb-xl">
-  <div style="padding: 18px 20px 0;">
-    <h2 style="font-size: 1.15rem; margin: 0 0 4px;">Document group</h2>
-    <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem;">All selected files share the document type, academic period, and topic metadata below. Upload up to 10 files per group.</p>
+<div class="upload-page-shell">
+  <!-- Header -->
+  <div class="upload-hero">
+    <h1>Upload study materials</h1>
+    <p>Add your lecture notes, CAT papers or past exams. We'll process them into organized study notes for your course.</p>
   </div>
+
+  <!-- 3-Step Horizontal Stepper -->
+  <div class="upload-stepper" aria-label="Upload progress steps">
+    <div class="upload-step is-done" id="stepper-step-1">
+      <span class="upload-step-circle" id="stepper-circle-1">&#10003;</span>
+      <span>Choose course</span>
+    </div>
+    <div class="upload-step-line"></div>
+    <div class="upload-step is-active" id="stepper-step-2">
+      <span class="upload-step-circle" id="stepper-circle-2">2</span>
+      <span>Add files</span>
+    </div>
+    <div class="upload-step-line"></div>
+    <div class="upload-step" id="stepper-step-3">
+      <span class="upload-step-circle" id="stepper-circle-3">3</span>
+      <span>Review &amp; process</span>
+    </div>
+  </div>
+
   <form method="post" enctype="multipart/form-data" id="upload-doc-form" onsubmit="return validateForm()">
     {% csrf_token %}
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px;">
-      <div>
-        <label for="course-select" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Course *</label>
-        <select name="course_id" id="course-select" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
-          <option value="">Create a new course</option>
-          {% for course in upload_courses %}
-            <option value="{{ course.id }}" {% if selected_course_id == course.id|stringformat:'s' %}selected{% endif %}>{{ course.code }} — {{ course.title }}</option>
-          {% endfor %}
-        </select>
-      </div>
+    <!-- Step 1: Course & Document Metadata Card -->
+    <div class="upload-card">
+      <span class="upload-card-section-label">Course</span>
 
-      <div>
-        <label for="course_name" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">New Course Code &amp; Title</label>
-        <input type="text" name="course_name" id="course_name" placeholder="e.g. SMA 300 - Real Analysis I" {% if selected_course_id %}disabled{% else %}required{% endif %}
-               style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
-      </div>
-
-      <!-- Document Type Selection -->
-      <div>
-        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Document Type *</label>
-        <select name="doc_type" id="doc_type" required 
-                style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
-          <option value="Lecture Notes">Lecture Notes / Module</option>
-          <option value="Continuous Assessment Test (CAT)">Continuous Assessment Test (CAT)</option>
-          <option value="Final Examination Paper">Final Examination Past Paper</option>
-          <option value="Revision Sheet">Revision Exercises / Tutorial</option>
-        </select>
-      </div>
-
-      <!-- Academic Year / Period -->
-      <div>
-        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Academic Year / Period *</label>
-        <input type="text" name="academic_year" id="academic_year" required placeholder="e.g. 2024/2025 Semester 1" 
-               style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
-      </div>
-
-      <!-- Topic / Unit Covered (Optional) -->
-      <div>
-        <label style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Topic / Unit Covered <span style="font-weight: 400; color: var(--text-muted);">(optional)</span></label>
-        <input type="text" name="topic_name" id="topic_name" placeholder="e.g. Metric Spaces, or Full Syllabus" 
-               style="width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--text); font-size: 0.9rem;">
-      </div>
-    </div>
-
-    <!-- Document File Input -->
-    <div style="margin-bottom: 20px; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-        <div>
-          <label for="prep-files" style="font-weight: 600; font-size: 0.9rem; color: var(--text); display: block; margin-bottom: 2px;">Attach Documents *</label>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">PDF, Word, Markdown, or text; up to 15 MB each, 10 files per group.</span>
+      <div class="upload-meta-grid">
+        <!-- Course Selector -->
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="course-select" class="upload-field-label">Course</label>
+            <select name="course_id" id="course-select" class="upload-field-control">
+              <option value="">+ Create a new course</option>
+              {% for course in upload_courses %}
+                <option value="{{ course.id }}" {% if selected_course_id == course.id|stringformat:'s' %}selected{% endif %}>{{ course.code }} — {{ course.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-        <input type="file" name="files" id="prep-files" accept=".pdf,.docx,.doc,.md,.txt" multiple required onchange="checkFileSize(this)">
+
+        <!-- Document Type -->
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="doc_type" class="upload-field-label">Document type</label>
+            <select name="doc_type" id="doc_type" required class="upload-field-control">
+              <option value="Lecture Notes">Lecture notes</option>
+              <option value="Continuous Assessment Test (CAT)">CAT paper</option>
+              <option value="Final Examination Paper">Past exam paper</option>
+              <option value="Revision Sheet">Revision sheet</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Academic Year -->
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="academic_year" class="upload-field-label">Academic year</label>
+            <input type="text" name="academic_year" id="academic_year" required value="2025/2026" placeholder="2025/2026" class="upload-field-control">
+          </div>
+        </div>
+
+        <!-- Topic / Unit (Optional) -->
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="topic_name" class="upload-field-label">Topic / Unit (optional)</label>
+            <input type="text" name="topic_name" id="topic_name" placeholder="Full syllabus" class="upload-field-control">
+          </div>
+        </div>
+      </div>
+
+      <!-- Conditional New Course Input (only visible when '+ Create a new course' is selected) -->
+      <div id="new-course-wrap" class="new-course-collapse {% if not selected_course_id %}is-visible{% endif %}">
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v16m8-8H4"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="course_name" class="upload-field-label">New course code &amp; title</label>
+            <input type="text" name="course_name" id="course_name" placeholder="e.g. SMA 102 - Basic Mathematics" {% if selected_course_id %}disabled{% else %}required{% endif %} class="upload-field-control">
+          </div>
+        </div>
       </div>
     </div>
 
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <span class="badge badge-danger" style="font-size: 0.78rem;">
-        15 MB Maximum File Size
-      </span>
-      <button type="submit" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger); padding: 9px 24px;">
-        Upload
-      </button>
+    <!-- Step 2 & 3: Dropzone, Selected Files List, Progress & Submit Card -->
+    <div class="upload-card">
+      <div class="upload-dropzone" id="upload-dropzone" role="button" tabindex="0" aria-label="Drop your PDFs here or browse files">
+        <div class="upload-dropzone-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        </div>
+        <div class="upload-dropzone-title">
+          Drop your PDFs here or <span class="browse-link">browse files</span>
+        </div>
+        <p class="upload-dropzone-sub">PDF, Word, Markdown, or text &middot; Up to 10 files &middot; 15 MB per file</p>
+        <input type="file" name="files" id="prep-files" class="upload-file-input-hidden" accept=".pdf,.docx,.doc,.md,.txt" multiple required onchange="handleFileInputChange(this)">
+      </div>
+
+      <!-- Selected Files Staged List -->
+      <div id="selected-files-panel" class="selected-files-wrap">
+        <div class="selected-files-header">
+          <span>Selected files (<span id="selected-files-count">0</span>)</span>
+          <span id="selected-files-badge">0 files selected</span>
+        </div>
+        <div id="selected-files-list" class="selected-files-list"></div>
+      </div>
+
+      <!-- Live Upload Progress & Instant Status Panel -->
+      <div id="upload-progress-panel" style="display: none; margin-top: 16px; padding: 14px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+          <div id="upload-progress-title" style="font-weight: 600; font-size: 0.86rem; color: var(--text);">Uploading documents...</div>
+          <span id="upload-progress-pct" style="font-size: 0.8rem; font-weight: 700; color: var(--green);">0%</span>
+        </div>
+        <div id="upload-progress-bar-wrap" style="width: 100%; height: 6px; background: var(--border); border-radius: 999px; overflow: hidden;">
+          <div id="upload-progress-bar" style="width: 0%; height: 100%; background: var(--green); transition: width 0.18s ease;"></div>
+        </div>
+        <div id="upload-progress-detail" style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <span id="upload-progress-subtext">Transferring files to Mentify Prep...</span>
+          <a id="upload-course-link" href="#" style="display: none; font-weight: 600; color: var(--green); text-decoration: none;">Open Course &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="upload-actions-bar">
+        <button type="submit" id="upload-submit-btn" class="btn-process-materials">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <span id="upload-submit-label">Process materials</span>
+        </button>
+        <button type="button" id="clear-selection-btn" class="btn-clear-selection" onclick="clearSelectedFiles()">
+          Clear selection
+        </button>
+      </div>
     </div>
   </form>
 </div>
 
-<!-- Verification & Processing Steps Flow -->
-<section id="how-it-works" style="margin-top: 32px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 22px; box-shadow: var(--shadow);">
-  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
-    <div>
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-        <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px;">
-          PROCESS
-        </span>
-        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text);">What Happens After You Upload?</h3>
-      </div>
-      <p style="margin: 0; color: var(--text-muted); font-size: 0.84rem;">Your document moves through 3 simple steps before it is ready for your revision.</p>
-    </div>
-    <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-muted); background: var(--surface); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border);">
-      3 Steps to Revision
-    </span>
-  </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-    <!-- Step 1 -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(15, 118, 110, 0.12); color: var(--green); display: flex; align-items: center; justify-content: center;">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        </div>
-        <span style="font-size: 0.72rem; font-weight: 700; color: var(--green); letter-spacing: 0.5px;">STEP 01</span>
-      </div>
-      <div>
-        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 4px;">Document Processing</div>
-        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">We scan your file to organize questions, lecture notes, and syllabus topics.</p>
-      </div>
-    </div>
-
-    <!-- Step 2 -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(217, 48, 37, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center;">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        </div>
-        <span style="font-size: 0.72rem; font-weight: 700; color: var(--danger); letter-spacing: 0.5px;">STEP 02</span>
-      </div>
-      <div>
-        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 4px;">Tutor Review</div>
-        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">A tutor checks questions and formulas for accuracy and matches them to your syllabus.</p>
-      </div>
-    </div>
-
-    <!-- Step 3 -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(28, 133, 232, 0.1); color: var(--blue); display: flex; align-items: center; justify-content: center;">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        </div>
-        <span style="font-size: 0.72rem; font-weight: 700; color: var(--blue); letter-spacing: 0.5px;">STEP 03</span>
-      </div>
-      <div>
-        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text); margin-bottom: 4px;">Ready to Study</div>
-        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">Materials are added directly to your course topics, with an alert on your dashboard.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <script>
   const courseSelect = document.getElementById('course-select');
   const courseNameInput = document.getElementById('course_name');
+  const newCourseWrap = document.getElementById('new-course-wrap');
+  const uploadForm = document.getElementById('upload-doc-form');
+  const fileInput = document.getElementById('prep-files');
+  const dropzone = document.getElementById('upload-dropzone');
+  const selectedFilesPanel = document.getElementById('selected-files-panel');
+  const selectedFilesList = document.getElementById('selected-files-list');
+  const selectedFilesCount = document.getElementById('selected-files-count');
+  const selectedFilesBadge = document.getElementById('selected-files-badge');
+  const clearSelectionBtn = document.getElementById('clear-selection-btn');
+  const submitBtn = document.getElementById('upload-submit-btn');
+  const submitLabel = document.getElementById('upload-submit-label');
+  const progressPanel = document.getElementById('upload-progress-panel');
+  const progressTitle = document.getElementById('upload-progress-title');
+  const progressPct = document.getElementById('upload-progress-pct');
+  const progressBar = document.getElementById('upload-progress-bar');
+  const progressSubtext = document.getElementById('upload-progress-subtext');
+  const courseLink = document.getElementById('upload-course-link');
+  const statusEndpoint = "{% url 'prep:api_document_upload_status' %}";
+
+  let stagedFiles = [];
+  let activeUploadDocIds = [];
+  let statusPollTimer = null;
+
+  function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = value == null ? '' : String(value);
+    return div.innerHTML;
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes <= 0) return '< 0.1 MB';
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 0.1) return `${mb.toFixed(1)} MB`;
+    const kb = Math.max(1, Math.round(bytes / 1024));
+    return `${kb} KB`;
+  }
+
+  function renderPdfDocumentSvg(filename) {
+    const ext = String(filename || '').split('.').pop().toUpperCase();
+    const label = (ext === 'DOCX' || ext === 'DOC') ? 'DOC' : ((ext === 'MD' || ext === 'TXT') ? 'TXT' : 'PDF');
+    return `
+      <span class="file-doc-svg-wrap" aria-hidden="true">
+        <svg width="34" height="38" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="pdf-svg-sheet" d="M6 1.5H21.5L30.5 10.5V33.5C30.5 35.1569 29.1569 36.5 27.5 36.5H6C4.34315 36.5 3 35.1569 3 33.5V4.5C3 2.84315 4.34315 1.5 6 1.5Z" fill="#FFF5F5" stroke="#FCA5A5" stroke-width="1.3"/>
+          <path class="pdf-svg-corner" d="M21.5 1.5V8.5C21.5 9.60457 22.3954 10.5 23.5 10.5H30.5" fill="#FEE2E2" stroke="#FCA5A5" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="5" y="18.5" width="23.5" height="11.5" rx="2.5" fill="#DC2626"/>
+          <text x="16.75" y="26.5" text-anchor="middle" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="7.5" font-weight="800" letter-spacing="0.4">${label}</text>
+        </svg>
+      </span>
+    `;
+  }
+
+  function updateStepperState(isProcessing = false) {
+    const step1 = document.getElementById('stepper-step-1');
+    const circle1 = document.getElementById('stepper-circle-1');
+    const step2 = document.getElementById('stepper-step-2');
+    const circle2 = document.getElementById('stepper-circle-2');
+    const step3 = document.getElementById('stepper-step-3');
+    const circle3 = document.getElementById('stepper-circle-3');
+
+    const hasCourse = Boolean(courseSelect.value || (courseNameInput && courseNameInput.value.trim()));
+    const hasFiles = stagedFiles.length > 0;
+
+    if (hasCourse) {
+      step1.className = 'upload-step is-done';
+      circle1.innerHTML = '&#10003;';
+    } else {
+      step1.className = 'upload-step is-active';
+      circle1.textContent = '1';
+    }
+
+    if (hasFiles || isProcessing) {
+      step2.className = 'upload-step is-done';
+      circle2.innerHTML = '&#10003;';
+      step3.className = isProcessing ? 'upload-step is-done' : 'upload-step is-active';
+      circle3.innerHTML = isProcessing ? '&#10003;' : '3';
+    } else {
+      step2.className = hasCourse ? 'upload-step is-active' : 'upload-step';
+      circle2.textContent = '2';
+      step3.className = 'upload-step';
+      circle3.textContent = '3';
+    }
+  }
 
   function updateCourseInput() {
     const useExistingCourse = Boolean(courseSelect.value);
     courseNameInput.disabled = useExistingCourse;
     courseNameInput.required = !useExistingCourse;
+    if (newCourseWrap) {
+      newCourseWrap.classList.toggle('is-visible', !useExistingCourse);
+    }
+    updateStepperState();
   }
 
   courseSelect.addEventListener('change', updateCourseInput);
+  if (courseNameInput) {
+    courseNameInput.addEventListener('input', () => updateStepperState());
+  }
 
-  function checkFileSize(input) {
+  updateCourseInput();
+
+  function syncStagedFilesToInput() {
+    if (typeof DataTransfer !== 'undefined' && fileInput) {
+      const dt = new DataTransfer();
+      stagedFiles.forEach(f => dt.items.add(f));
+      fileInput.files = dt.files;
+    }
+  }
+
+  function renderSelectedFiles() {
+    if (!selectedFilesPanel || !selectedFilesList) return;
+    const count = stagedFiles.length;
+    selectedFilesCount.textContent = String(count);
+    selectedFilesBadge.textContent = `${count} ${count === 1 ? 'file' : 'files'} selected`;
+
+    if (count === 0) {
+      selectedFilesPanel.classList.remove('is-visible');
+      clearSelectionBtn.classList.remove('is-visible');
+      selectedFilesList.innerHTML = '';
+      updateStepperState();
+      return;
+    }
+
+    selectedFilesPanel.classList.add('is-visible');
+    clearSelectionBtn.classList.add('is-visible');
+    selectedFilesList.innerHTML = stagedFiles.map((file, idx) => `
+      <div class="selected-file-row">
+        <div class="selected-file-left">
+          ${renderPdfDocumentSvg(file.name)}
+          <div class="selected-file-meta">
+            <div class="selected-file-name">${escapeHtml(file.name)}</div>
+            <div class="selected-file-size">${escapeHtml(formatBytes(file.size))}</div>
+          </div>
+        </div>
+        <button type="button" class="selected-file-remove" title="Remove file" onclick="removeStagedFile(${idx})">&times;</button>
+      </div>
+    `).join('');
+    updateStepperState();
+  }
+
+  function addFilesToSelection(incomingFiles) {
+    const incoming = Array.from(incomingFiles || []);
+    if (!incoming.length) return;
+
+    const combined = stagedFiles.slice();
+    for (const file of incoming) {
+      if (file.size > 15 * 1024 * 1024) {
+        alert(`${file.name} exceeds the 15 MB per-file limit.`);
+        continue;
+      }
+      const duplicateInStage = combined.some(existing => existing.name === file.name && existing.size === file.size);
+      if (!duplicateInStage) {
+        combined.push(file);
+      }
+    }
+
+    if (combined.length > 10) {
+      alert("Select no more than 10 documents in one group.");
+      stagedFiles = combined.slice(0, 10);
+    } else {
+      stagedFiles = combined;
+    }
+
+    syncStagedFilesToInput();
+    renderSelectedFiles();
+  }
+
+  function handleFileInputChange(input) {
     const files = Array.from(input.files || []);
     if (files.length > 10) {
       alert("Select no more than 10 documents in one group.");
       input.value = "";
+      stagedFiles = [];
+      renderSelectedFiles();
       return;
     }
     const oversized = files.find(file => file.size > 15 * 1024 * 1024);
     if (oversized) {
       alert(`${oversized.name} exceeds the 15 MB per-file limit.`);
       input.value = "";
+      stagedFiles = [];
+      renderSelectedFiles();
+      return;
     }
+    stagedFiles = files;
+    renderSelectedFiles();
+  }
+
+  function removeStagedFile(index) {
+    stagedFiles.splice(index, 1);
+    syncStagedFilesToInput();
+    if (stagedFiles.length === 0 && fileInput) {
+      fileInput.value = '';
+    }
+    renderSelectedFiles();
+  }
+
+  function clearSelectedFiles() {
+    stagedFiles = [];
+    if (fileInput) fileInput.value = '';
+    renderSelectedFiles();
+  }
+
+  if (dropzone && fileInput) {
+    dropzone.addEventListener('click', function (e) {
+      if (e.target === fileInput) return;
+      fileInput.click();
+    });
+    dropzone.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+    dropzone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      dropzone.classList.add('is-dragover');
+    });
+    dropzone.addEventListener('dragleave', function () {
+      dropzone.classList.remove('is-dragover');
+    });
+    dropzone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      dropzone.classList.remove('is-dragover');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        addFilesToSelection(e.dataTransfer.files);
+      }
+    });
   }
 
   function validateForm() {
-    const fileInput = document.getElementById('prep-files');
-    if (!fileInput.files || !fileInput.files.length) {
+    if ((!fileInput.files || !fileInput.files.length) && stagedFiles.length === 0) {
       alert("Please select at least one document.");
       return false;
     }
@@ -212,6 +969,146 @@
       return false;
     }
     return true;
+  }
+
+  function pollCurrentBatchStatus() {
+    if (!activeUploadDocIds.length) {
+      if (statusPollTimer) {
+        clearTimeout(statusPollTimer);
+        statusPollTimer = null;
+      }
+      return;
+    }
+
+    fetch(`${statusEndpoint}?ids=${encodeURIComponent(activeUploadDocIds.join(','))}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (!data || !Array.isArray(data.documents)) return;
+        if (data.has_processing) {
+          statusPollTimer = setTimeout(pollCurrentBatchStatus, 2500);
+        } else {
+          activeUploadDocIds = [];
+          if (progressPanel && progressPanel.style.display !== 'none') {
+            progressTitle.textContent = 'Processing complete';
+            progressSubtext.textContent = 'Your study materials have been extracted and queued for course indexing.';
+          }
+        }
+      })
+      .catch(() => {
+        statusPollTimer = setTimeout(pollCurrentBatchStatus, 4000);
+      });
+  }
+
+  if (uploadForm && window.XMLHttpRequest) {
+    uploadForm.addEventListener('submit', function (event) {
+      if (!validateForm()) {
+        event.preventDefault();
+        return;
+      }
+      event.preventDefault();
+
+      syncStagedFilesToInput();
+      const formData = new FormData(uploadForm);
+      formData.append('async', '1');
+
+      submitBtn.disabled = true;
+      if (submitLabel) submitLabel.textContent = 'Uploading...';
+      progressPanel.style.display = 'block';
+      progressTitle.textContent = 'Uploading documents...';
+      progressPct.textContent = '0%';
+      progressBar.style.width = '0%';
+      progressBar.style.background = 'var(--green)';
+      progressSubtext.textContent = 'Transferring files to Mentify Prep...';
+      courseLink.style.display = 'none';
+      updateStepperState(true);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', uploadForm.action || window.location.pathname, true);
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+      xhr.upload.addEventListener('progress', function (e) {
+        if (e.lengthComputable && e.total > 0) {
+          const pct = Math.min(100, Math.round((e.loaded / e.total) * 100));
+          progressPct.textContent = `${pct}%`;
+          progressBar.style.width = `${pct}%`;
+          if (pct >= 100) {
+            progressTitle.textContent = 'Saving & queuing background extraction...';
+          }
+        }
+      });
+
+      xhr.onload = function () {
+        submitBtn.disabled = false;
+        if (submitLabel) submitLabel.textContent = 'Process materials';
+        let payload = null;
+        try {
+          payload = JSON.parse(xhr.responseText);
+        } catch (err) {
+          uploadForm.submit();
+          return;
+        }
+
+        if (payload && payload.login_url) {
+          window.location.href = payload.login_url;
+          return;
+        }
+
+        if (xhr.status >= 200 && xhr.status < 300 && payload && payload.success) {
+          progressPct.textContent = 'Done';
+          progressBar.style.width = '100%';
+          progressTitle.textContent = payload.queued_count > 0
+            ? 'Upload complete — processing in background'
+            : 'Upload processed';
+          progressSubtext.textContent = payload.message || 'Your files are being processed in the background.';
+
+          if (payload.course_url) {
+            courseLink.href = payload.course_url;
+            courseLink.style.display = 'inline-block';
+          }
+
+          if (payload.course_id && !courseSelect.value) {
+            let opt = courseSelect.querySelector(`option[value="${payload.course_id}"]`);
+            if (!opt) {
+              opt = document.createElement('option');
+              opt.value = String(payload.course_id);
+              opt.textContent = payload.course_title || payload.course_code;
+              courseSelect.appendChild(opt);
+            }
+            courseSelect.value = String(payload.course_id);
+            updateCourseInput();
+          }
+
+          clearSelectedFiles();
+          updateStepperState(true);
+
+          if (Array.isArray(payload.documents)) {
+            activeUploadDocIds = payload.documents
+              .filter(d => d.stage_code === 'stage_1')
+              .map(d => d.id);
+            pollCurrentBatchStatus();
+          }
+        } else {
+          progressBar.style.width = '100%';
+          progressBar.style.background = 'var(--danger)';
+          progressPct.textContent = 'Error';
+          progressTitle.textContent = 'Upload needs attention';
+          progressSubtext.textContent = (payload && (payload.error || payload.message)) || 'Unable to process upload.';
+        }
+      };
+
+      xhr.onerror = function () {
+        submitBtn.disabled = false;
+        if (submitLabel) submitLabel.textContent = 'Process materials';
+        progressBar.style.background = 'var(--danger)';
+        progressTitle.textContent = 'Network error during upload';
+        progressSubtext.textContent = 'Please check your connection and try again.';
+      };
+
+      xhr.send(formData);
+    });
   }
 </script>
 {% endblock %}

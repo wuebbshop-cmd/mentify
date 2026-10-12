@@ -127,6 +127,85 @@ class PrepUploadWorkflowTests(TestCase):
         course = PrepCourse.objects.get(code="SST 210")
         self.assertTrue(PrepDocument.objects.filter(course=course, user=self.user).exists())
 
+    @patch("services.prep_ingestion.enqueue_prep_document_ingestion")
+    def test_async_xhr_upload_returns_202_immediately_and_polls_status(self, enqueue_ingestion):
+        response = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "topic_name": "Metric Spaces",
+                "files": [
+                    SimpleUploadedFile("lecture-1.pdf", b"%PDF-1.4 unique-a", content_type="application/pdf"),
+                    SimpleUploadedFile("lecture-2.pdf", b"%PDF-1.4 unique-b", content_type="application/pdf"),
+                ],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 202)
+        payload = response.json()
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["queued_count"], 2)
+        self.assertEqual(payload["duplicate_count"], 0)
+        self.assertEqual(len(payload["documents"]), 2)
+        self.assertEqual(enqueue_ingestion.call_count, 2)
+
+        doc_ids = [doc["id"] for doc in payload["documents"]]
+        status_res = self.client.get(
+            reverse("prep:api_document_upload_status"),
+            {"ids": ",".join(doc_ids)},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(status_res.status_code, 200)
+        status_payload = status_res.json()
+        self.assertTrue(status_payload["has_processing"])
+        self.assertEqual(len(status_payload["documents"]), 2)
+
+        # Simulate background worker completing one document
+        PrepDocument.objects.filter(pk=doc_ids[0]).update(stage="stage_2")
+        PrepDocument.objects.filter(pk=doc_ids[1]).update(stage="stage_2")
+        status_res_done = self.client.get(
+            reverse("prep:api_document_upload_status"),
+            {"ids": ",".join(doc_ids)},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertFalse(status_res_done.json()["has_processing"])
+
+    @patch("services.prep_ingestion.enqueue_prep_document_ingestion")
+    def test_async_xhr_upload_detects_exact_duplicate_instantly_without_queuing(self, enqueue_ingestion):
+        first_res = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "files": [SimpleUploadedFile("notes-v1.pdf", b"%PDF-1.4 identical-bytes", content_type="application/pdf")],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(first_res.status_code, 202)
+        self.assertEqual(enqueue_ingestion.call_count, 1)
+
+        dup_res = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "files": [SimpleUploadedFile("notes-copy.pdf", b"%PDF-1.4 identical-bytes", content_type="application/pdf")],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(dup_res.status_code, 200)
+        dup_payload = dup_res.json()
+        self.assertTrue(dup_payload["success"])
+        self.assertEqual(dup_payload["queued_count"], 0)
+        self.assertEqual(dup_payload["duplicate_count"], 1)
+        # Background worker must not be called again for an exact duplicate
+        self.assertEqual(enqueue_ingestion.call_count, 1)
+
 
 class PrepFailureNotificationRecipientTests(TestCase):
     @override_settings(

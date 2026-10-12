@@ -39,9 +39,11 @@ urlpatterns = [
     path("api/topic/<int:topic_id>/tutor/", views.prep_topic_tutor_api, name="api_topic_tutor"),
     path("api/generate-practice/", views.prep_generate_practice_api, name="api_generate_practice"),
     path("api/adapt-question/", views.prep_adapt_question_api, name="api_adapt_question"),
-    # Live Student Notification Endpoints
+    # Live Student Notification & Document Upload Status Endpoints
+    path("api/documents/status/", views.prep_document_upload_status_api, name="api_document_upload_status"),
     path("api/notifications/", views.prep_notifications_api, name="api_notifications"),
     path("api/notifications/read/", views.prep_mark_notification_read_api, name="api_notifications_read"),
     # Mentify Prep AI Assistant
     path("api/assistant/chat/", views.prep_assistant_chat_api, name="api_assistant_chat"),
 ]
+

@@ -445,6 +445,95 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
     )
 
 
+def _resolve_course_category_meta(course: PrepCourse) -> dict:
+    """Resolve a course's discipline key and clean display tag from its study_profile, category, and title."""
+    code_upper = str(course.code or "").strip().upper()
+    title_lower = str(course.title or "").strip().lower()
+    profile = course.study_profile if isinstance(course.study_profile, dict) else {}
+    family = str(profile.get("subject_family") or "").strip().lower()
+    caps = profile.get("capabilities") if isinstance(profile.get("capabilities"), dict) else {}
+
+    # 1. Explicit programming / computing courses (e.g. SST 301 Programming Language for Statistics I)
+    if (
+        family == "computing"
+        or any(kw in title_lower for kw in ("programming", "software", "algorithm", "data structure", "database", "computer"))
+        or (caps.get("code") and "programming" in title_lower)
+    ):
+        return {"subject_key": "computing", "category": "Computing"}
+
+    # 2. Study profile family mapping
+    family_map = {
+        "statistics": ("statistics", "Statistics"),
+        "business_economics": ("economics", "Economics"),
+        "social_science": ("social_science", "Social Sciences"),
+        "humanities": ("humanities", "Humanities"),
+        "chemistry": ("chemistry", "Chemistry"),
+        "physics": ("physics", "Physics"),
+        "engineering": ("engineering", "Engineering"),
+        "general_science": ("health_science", "Health & Sciences"),
+        "mathematics": ("mathematics", "Mathematics"),
+    }
+    if family in family_map:
+        sk, label = family_map[family]
+        return {"subject_key": sk, "category": label}
+
+    # 3. Non-default model category field
+    raw_cat = str(course.category or "").strip()
+    cat_map = {
+        "Statistics": ("statistics", "Statistics"),
+        "Computing": ("computing", "Computing"),
+        "Business & Economics": ("economics", "Economics"),
+        "Social Sciences": ("social_science", "Social Sciences"),
+        "Humanities": ("humanities", "Humanities"),
+        "Chemistry": ("chemistry", "Chemistry"),
+        "Physics": ("physics", "Physics"),
+        "Engineering": ("engineering", "Engineering"),
+        "General Sciences": ("health_science", "Health & Sciences"),
+    }
+    if raw_cat in cat_map:
+        sk, label = cat_map[raw_cat]
+        return {"subject_key": sk, "category": label}
+
+    # 4. Fallback inference when category is still the default "Mathematics"
+    prefix = re.split(r"[\s\-_0-9]+", code_upper)[0] if code_upper else ""
+    if prefix in {"EET", "ECO", "BBA", "BCOM", "FIN", "ACC"} or any(
+        kw in title_lower for kw in ("economic", "microeconomic", "macroeconomic", "finance", "accounting", "business", "commerce")
+    ):
+        return {"subject_key": "economics", "category": "Economics"}
+    if prefix in {"ASC", "SOC", "PSY", "ANT", "POL", "DEV"} or any(
+        kw in title_lower for kw in ("sociology", "psychology", "anthropology", "political", "social", "society")
+    ):
+        return {"subject_key": "social_science", "category": "Social Sciences"}
+    if prefix in {"CIT", "CCS", "CSC", "ICS", "BIT", "SIT", "COM"}:
+        return {"subject_key": "computing", "category": "Computing"}
+    if prefix in {"SST", "STA", "ACT"} or any(
+        kw in title_lower for kw in ("statistic", "estimation", "probability", "stochastic", "regression", "time series", "sampling", "actuarial")
+    ):
+        return {"subject_key": "statistics", "category": "Statistics"}
+    if prefix in {"SCH", "CHE", "BCH"} or any(
+        kw in title_lower for kw in ("chemistry", "chemical", "organic", "inorganic", "biochemistry")
+    ):
+        return {"subject_key": "chemistry", "category": "Chemistry"}
+    if prefix in {"SPH", "PHY"} or any(
+        kw in title_lower for kw in ("physics", "mechanics", "electromagnetism", "quantum", "optics")
+    ):
+        return {"subject_key": "physics", "category": "Physics"}
+    if prefix in {"ENG", "ECE", "MCE", "CVE", "EEE"} or any(
+        kw in title_lower for kw in ("engineering", "circuit", "structural")
+    ):
+        return {"subject_key": "engineering", "category": "Engineering"}
+    if prefix in {"SBT", "SZL", "MED", "NUR", "PHA", "HNS", "BIO"} or any(
+        kw in title_lower for kw in ("health", "medical", "nursing", "clinical", "anatomy", "physiology", "pathology", "pharmacology", "biology", "genetics")
+    ):
+        return {"subject_key": "health_science", "category": "Health & Sciences"}
+    if prefix in {"AEN", "ALT", "AHI", "ARE", "APS"} or any(
+        kw in title_lower for kw in ("literature", "history", "philosophy", "linguistics", "ethics")
+    ):
+        return {"subject_key": "humanities", "category": "Humanities"}
+
+    return {"subject_key": "mathematics", "category": "Mathematics"}
+
+
 @never_cache
 def prep_dashboard(request):
     """Mentify Prep Hub Main Landing Page with real database metrics."""
@@ -453,10 +542,20 @@ def prep_dashboard(request):
         papers_count=Count("papers", distinct=True),
     )
 
+    today_credits_used = 0
+    week_credits_used = 0
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
         user_credits = get_available_credits(wallet)
         recent_credit_transactions = wallet.transactions.all()[:10]
+        now_ts = timezone.now()
+        today_date = now_ts.date()
+        week_start = now_ts - datetime.timedelta(days=7)
+        for tx in wallet.transactions.filter(created_at__gte=week_start, amount__lt=0):
+            spent = abs(tx.amount)
+            week_credits_used += spent
+            if tx.created_at.date() == today_date:
+                today_credits_used += spent
         enrolled_courses = PrepCourse.objects.filter(
             enrollments__user=request.user,
         ).annotate(
@@ -481,12 +580,15 @@ def prep_dashboard(request):
             clean_title = re.sub(r"^" + re.escape(c.code) + r"[\s:\-\–—]*", "", clean_title, flags=re.IGNORECASE).strip()
             if not clean_title:
                 clean_title = c.title
+        cat_meta = _resolve_course_category_meta(c)
         recent_courses.append({
             "id": c.id,
             "code": c.code,
             "slug": c.slug or c.code.replace(" ", "-"),
             "title": clean_title,
             "level": c.level,
+            "category": cat_meta["category"],
+            "subject_key": cat_meta["subject_key"],
             "topics_count": c.topics_count,
             "papers_count": c.papers_count,
         })
@@ -551,6 +653,8 @@ def prep_dashboard(request):
     context = {
         "active_tab": "dashboard",
         "user_credits": user_credits,
+        "today_credits_used": today_credits_used,
+        "week_credits_used": week_credits_used,
         "recent_courses": recent_courses,
         "recent_activity": recent_activity,
         "recent_credit_transactions": recent_credit_transactions,
@@ -589,13 +693,15 @@ def prep_courses(request):
             clean_title = re.sub(r"^" + re.escape(c.code) + r"[\s:\-\–—]*", "", clean_title, flags=re.IGNORECASE).strip()
             if not clean_title:
                 clean_title = c.title
+        cat_meta = _resolve_course_category_meta(c)
         courses_data.append({
             "id": c.id,
             "code": c.code,
             "slug": c.slug or c.code.replace(" ", "-"),
             "title": clean_title,
             "level": c.level,
-            "category": c.category,
+            "category": cat_meta["category"],
+            "subject_key": cat_meta["subject_key"],
             "topics": c.topics_count,
             "papers": c.papers_count,
         })
@@ -611,12 +717,14 @@ def prep_courses(request):
                 course.title,
                 flags=re.IGNORECASE,
             ).strip() or course.title
+            cat_meta = _resolve_course_category_meta(course)
             result = {
                 "id": course.id,
                 "code": course.code,
                 "title": title,
                 "level": course.level,
-                "category": course.category,
+                "category": cat_meta["category"],
+                "subject_key": cat_meta["subject_key"],
                 "topics": course.topics_count,
                 "papers": course.papers_count,
             }
@@ -1160,11 +1268,64 @@ def prep_practice(request, topic_id):
     return redirect("prep:past_papers")
 
 
+def _serialize_upload_document(d: PrepDocument) -> dict:
+    size_mb = round(d.file_size_bytes / (1024 * 1024), 1) if d.file_size_bytes else 0
+    notes_text = str(d.tutor_review_notes or "").strip()
+    failed = bool(d.stage == "stage_1" and notes_text.startswith("Ingestion failed"))
+    course_slug = d.course.slug or d.course.code.replace(" ", "-")
+    course_title = getattr(d.course, "clean_title", "") or d.course.title
+    if failed:
+        stage_label = "Needs attention"
+    elif d.is_duplicate:
+        stage_label = "Duplicate"
+    elif d.stage == "stage_1":
+        stage_label = "Processing"
+    elif d.stage == "stage_3":
+        stage_label = "Ready to study"
+    else:
+        stage_label = "In tutor review"
+    return {
+        "id": str(d.id),
+        "filename": d.file.name.split("/")[-1] if d.file else "Document.pdf",
+        "course": d.course.code,
+        "course_title": course_title,
+        "course_url": reverse("prep:course_detail", kwargs={"course_code": course_slug}),
+        "type": d.doc_type,
+        "size": f"{size_mb} MB" if size_mb > 0 else "< 1 MB",
+        "date": d.created_at.strftime("%b %d, %Y"),
+        "stage_code": "failed" if failed else d.stage,
+        "stage": stage_label,
+        "is_duplicate": bool(d.is_duplicate),
+        "failed": failed,
+        "error": notes_text if failed else "",
+    }
+
+
 @never_cache
 def prep_upload(request):
     """Upload one document group to an existing course or create a new course."""
     if request.method == "POST":
+        is_async = (
+            request.headers.get("X-Requested-With") == "XMLHttpRequest"
+            or request.POST.get("async") == "1"
+        )
+
+        def _reject(msg: str, status_code: int = 400):
+            if is_async:
+                return JsonResponse({"success": False, "error": msg}, status=status_code)
+            messages.error(request, msg)
+            return redirect("prep:upload")
+
         if not request.user.is_authenticated:
+            if is_async:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "error": "Please sign in or create a free account to upload study materials.",
+                        "login_url": f"/accounts/login/?next={request.path}",
+                    },
+                    status=401,
+                )
             messages.info(request, "Please sign in or create a free account to upload study materials.")
             return redirect(f"/accounts/login/?next={request.path}")
 
@@ -1176,12 +1337,10 @@ def prep_upload(request):
         uploaded_files = request.FILES.getlist("files") or request.FILES.getlist("file")
 
         if not uploaded_files:
-            messages.error(request, "Please attach at least one document file to upload.")
-            return redirect("prep:upload")
+            return _reject("Please attach at least one document file to upload.")
 
         if len(uploaded_files) > 10:
-            messages.error(request, "Upload up to 10 documents in one batch.")
-            return redirect("prep:upload")
+            return _reject("Upload up to 10 documents in one batch.")
 
         valid_extensions = (".pdf", ".docx", ".doc", ".md", ".txt")
         max_bytes = 15 * 1024 * 1024
@@ -1197,29 +1356,23 @@ def prep_upload(request):
         if invalid_file:
             file_ext = os.path.splitext(invalid_file.name.lower())[1]
             if file_ext not in valid_extensions:
-                messages.error(
-                    request,
-                    f"'{invalid_file.name}' has an unsupported format. Use PDF, Word, Markdown, or text files.",
+                return _reject(
+                    f"'{invalid_file.name}' has an unsupported format. Use PDF, Word, Markdown, or text files."
                 )
-            else:
-                messages.error(request, f"'{invalid_file.name}' exceeds the 15 MB per-file limit.")
-            return redirect("prep:upload")
+            return _reject(f"'{invalid_file.name}' exceeds the 15 MB per-file limit.")
 
         valid_doc_types = dict(PrepDocument.DOC_TYPES)
         if doc_type not in valid_doc_types:
-            messages.error(request, "Choose a valid document type.")
-            return redirect("prep:upload")
+            return _reject("Choose a valid document type.")
 
         if course_id:
             try:
                 course = PrepCourse.objects.get(pk=int(course_id), is_active=True)
             except (ValueError, PrepCourse.DoesNotExist):
-                messages.error(request, "Choose an active course from the list or select a new course.")
-                return redirect("prep:upload")
+                return _reject("Choose an active course from the list or select a new course.")
         else:
             if not course_name:
-                messages.error(request, "Choose an existing course or enter a course code and title.")
-                return redirect("prep:upload")
+                return _reject("Choose an existing course or enter a course code and title.")
             course_code, course_title = parse_course_code_and_title(course_name)
             course = PrepCourse.objects.filter(code__iexact=course_code).first()
             if not course:
@@ -1235,6 +1388,109 @@ def prep_upload(request):
             course=course,
             defaults={"source": "upload"},
         )
+
+        if is_async:
+            import hashlib
+            from services.prep_ingestion import enqueue_prep_document_ingestion
+
+            wallet = PrepWallet.get_or_create_wallet(request.user)
+            course_slug = course.slug or course.code.replace(" ", "-")
+            course_url = reverse("prep:course_detail", kwargs={"course_code": course_slug})
+
+            queued = 0
+            duplicates = 0
+            failures = []
+            created_docs = []
+
+            for uploaded_file in uploaded_files:
+                try:
+                    raw_bytes = uploaded_file.read()
+                    uploaded_file.seek(0)
+                except Exception as exc:
+                    failures.append(f"{uploaded_file.name}: could not read file ({exc})")
+                    continue
+
+                file_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+                duplicate = (
+                    PrepDocument.objects.filter(course=course, file_sha256=file_sha256)
+                    .order_by("created_at")
+                    .first()
+                )
+                if duplicate:
+                    prep_doc = PrepDocument.objects.create(
+                        user=request.user,
+                        course=course,
+                        doc_type=doc_type,
+                        academic_year=academic_year,
+                        topic_name=topic_name,
+                        file=uploaded_file,
+                        file_size_bytes=uploaded_file.size,
+                        file_sha256=file_sha256,
+                        is_duplicate=True,
+                        duplicate_of=duplicate,
+                        stage="stage_2",
+                    )
+                    duplicates += 1
+                    created_docs.append(_serialize_upload_document(prep_doc))
+                    continue
+
+                try:
+                    enforce_subscription_limit(wallet, "document_uploads")
+                except PlanLimitExceeded as exc:
+                    failures.append(f"{uploaded_file.name}: {exc}")
+                    continue
+
+                prep_doc = PrepDocument.objects.create(
+                    user=request.user,
+                    course=course,
+                    doc_type=doc_type,
+                    academic_year=academic_year,
+                    topic_name=topic_name,
+                    file=uploaded_file,
+                    file_size_bytes=uploaded_file.size,
+                    file_sha256=file_sha256,
+                    stage="stage_1",
+                )
+                PrepHistory.objects.create(
+                    user=request.user,
+                    title=f"Uploaded {uploaded_file.name}",
+                    course_code=course.code,
+                    item_type=doc_type,
+                    url=course_url,
+                )
+                enqueue_prep_document_ingestion(prep_doc.pk)
+                queued += 1
+                created_docs.append(_serialize_upload_document(prep_doc))
+
+            status_parts = []
+            if queued:
+                status_parts.append(
+                    f"Uploaded {queued} document(s) for {course.code}. Background extraction & syllabus indexing has started."
+                )
+            if duplicates:
+                status_parts.append(
+                    f"{duplicates} duplicate document(s) were recognized instantly and saved for audit without re-indexing."
+                )
+            if failures:
+                status_parts.append(f"{len(failures)} document(s) need attention: " + "; ".join(failures)[:500])
+
+            return JsonResponse(
+                {
+                    "success": bool(queued or duplicates or not failures),
+                    "queued_count": queued,
+                    "duplicate_count": duplicates,
+                    "failed_count": len(failures),
+                    "failures": failures,
+                    "message": " ".join(status_parts) or "Upload processed.",
+                    "course_id": course.pk,
+                    "course_code": course.code,
+                    "course_title": f"{course.code} — {course.title}",
+                    "course_url": course_url,
+                    "status_url": reverse("prep:api_document_upload_status"),
+                    "documents": created_docs,
+                },
+                status=202 if queued else (200 if duplicates else 400),
+            )
 
         from services.prep_ingestion import process_prep_document
         succeeded = 0
@@ -1287,23 +1543,10 @@ def prep_upload(request):
 
         return redirect(f"{reverse('prep:upload')}?course_id={course.pk}")
 
-    # Recent uploads for this user (if authenticated)
-    recent_uploads = []
     user_credits = 30
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
         user_credits = wallet.credits_balance
-        user_docs = PrepDocument.objects.filter(user=request.user).order_by("-created_at")[:5]
-        for d in user_docs:
-            size_mb = round(d.file_size_bytes / (1024 * 1024), 1) if d.file_size_bytes else 0
-            recent_uploads.append({
-                "filename": d.file.name.split("/")[-1] if d.file else "Document.pdf",
-                "course": d.course.code,
-                "type": d.doc_type,
-                "size": f"{size_mb} MB" if size_mb > 0 else "< 1 MB",
-                "date": d.created_at.strftime("%Y-%m-%d"),
-                "stage": d.get_stage_display(),
-            })
     selected_course_id = request.GET.get("course_id", "").strip()
     courses = PrepCourse.objects.filter(is_active=True).order_by("code")
     if not selected_course_id.isdigit() or not courses.filter(pk=selected_course_id).exists():
@@ -1311,11 +1554,45 @@ def prep_upload(request):
     context = {
         "active_tab": "upload",
         "user_credits": user_credits,
-        "recent_uploads": recent_uploads,
         "upload_courses": courses,
         "selected_course_id": selected_course_id,
     }
     return render(request, "prep/upload.html", context)
+
+
+@never_cache
+@login_required
+@require_http_methods(["GET"])
+def prep_document_upload_status_api(request):
+    """Lightweight status polling endpoint for student background document uploads (max 10)."""
+    ids_param = request.GET.get("ids", "").strip()
+    qs = PrepDocument.objects.filter(user=request.user).select_related("course")
+    if ids_param:
+        raw_ids = [part.strip() for part in ids_param.split(",") if part.strip()]
+        valid_ids = []
+        for raw_id in raw_ids[:10]:
+            try:
+                valid_ids.append(uuid.UUID(raw_id))
+            except (ValueError, TypeError):
+                continue
+        if valid_ids:
+            docs = list(qs.filter(pk__in=valid_ids).order_by("-created_at")[:10])
+        else:
+            return JsonResponse({"success": True, "documents": [], "has_processing": False})
+    else:
+        docs = list(qs.order_by("-created_at")[:10])
+
+    serialized = [_serialize_upload_document(d) for d in docs]
+    has_processing = any(item["stage_code"] == "stage_1" for item in serialized)
+    return JsonResponse(
+        {
+            "success": True,
+            "documents": serialized,
+            "has_processing": has_processing,
+        }
+    )
+
+
 
 
 @never_cache
