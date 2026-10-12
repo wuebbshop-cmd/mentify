@@ -188,6 +188,36 @@ class TopicNoteReviewTests(SimpleTestCase):
 
 
 class VisualReferencePlacementTests(SimpleTestCase):
+    def test_optional_visual_never_interrupts_problem_and_calculation_flow(self):
+        content = (
+            "## 2. Market Equilibrium\n\n"
+            "Problem. The demand and supply functions for a commodity are given as follows.\n\n"
+            "$$\\nQ_d = 20 - P, \\qquad Q_s = 2 + P\\n$$\n\n"
+            "Solving the two equations gives the equilibrium price and quantity.\n\n"
+            "## 3. Labour Supply\n\n"
+            "A target worker can reduce hours after reaching a daily wage target, which creates a backward-bending labour-supply relationship.\n\n"
+            "[[VISUAL:wage-curve]]"
+        )
+        manifest = [{
+            "id": "wage-curve",
+            "marker": "[[VISUAL:wage-curve]]",
+            "crop_url": "/media/wage-curve.jpg",
+            "required": False,
+            "caption": "Backward-bending labour supply curve for target workers showing wages and hours worked",
+            "labels": ["Wages", "Hours worked"],
+            "auto_match_terms": ["labour supply", "target workers", "wages", "hours worked"],
+            "context_before": "Target workers reduce their hours after reaching the wage target.",
+            "context_after": "The labour supply curve bends backward.",
+        }]
+
+        placed = _insert_required_visual_markers(content, manifest)
+
+        self.assertNotIn("[[VISUAL:wage-curve]]", placed[:placed.index("## 3. Labour Supply")])
+        self.assertGreater(
+            placed.index("[[VISUAL:wage-curve]]"),
+            placed.index("backward-bending labour-supply relationship"),
+        )
+
     def test_approved_crops_follow_matching_diagram_references(self):
         content = (
             "## 3. Opportunity Cost\n\n"

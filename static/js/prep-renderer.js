@@ -488,11 +488,6 @@
       var content = quoteMatch ? quoteMatch[1] : line;
       var contentTrimmed = content.trim();
 
-      if (quoteMatch && (contentTrimmed === '$$' || contentTrimmed === '\\[')) {
-        quoted = true;
-        quotedMath = [];
-        return;
-      }
       if (quoted) {
         if (quoteMatch && (contentTrimmed === '$$' || contentTrimmed === '\\]')) {
           output.push('$$', quotedMath.join('\n'), '$$');
@@ -506,6 +501,12 @@
           quoted = false;
           output.push(line);
         }
+        return;
+      }
+
+      if (quoteMatch && (contentTrimmed === '$$' || contentTrimmed === '\\[')) {
+        quoted = true;
+        quotedMath = [];
         return;
       }
 
@@ -586,6 +587,12 @@
 
     // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     cleanText = cleanText.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+
+    // In math blocks, replace literal '*' with '\ast' so Markdown's bold/italic parser
+    // never confuses math superscripts (e.g. p^* or Q_1^*) with Markdown asterisks.
+    cleanText = cleanText.replace(/(\$\$[\s\S]*?\$\$|\$[^\$\n]+?\$)/g, function(m) {
+      return m.replace(/\*/g, '\\ast');
+    });
 
     // Merge detached \[ lhs = \n\n$$\n\begin{cases}...\end{cases}\n$$
     cleanText = cleanText.replace(

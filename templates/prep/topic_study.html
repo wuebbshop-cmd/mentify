@@ -2329,9 +2329,6 @@
     if (trimmed.startsWith('{') || trimmed.includes('"messages": [') || trimmed.includes('"role": "system"')) {
       return false;
     }
-    if (/\\begin\{(?:verbatim|lstlisting|tabular|table|enumerate|itemize)\}|\\(?:texttt|textbf|textit|emph)\{/.test(trimmed)) {
-      return false;
-    }
     return true;
   }
 

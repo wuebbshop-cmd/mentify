@@ -17,6 +17,7 @@ import logging
 import os
 import re
 import requests
+from collections import Counter
 try:
     import sympy as sp
 except ImportError:
@@ -688,10 +689,10 @@ def _approved_visual_manifest(source_references: list[dict] | None, *, limit: in
                 "context_after": visual.get("context_after", ""),
                 "placement_context": visual.get("figure_context", ""),
                 "context_crop_url": visual.get("context_crop_url", ""),
-                "required": (
-                    bool(visual.get("auto_topic"))
-                    and visual.get("auto_decision") in _APPROVED_VISUAL_DECISIONS
-                ),
+                # A source crop is eligible for a note, not automatically mandatory.
+                # Broad topics can have many source figures; forcing every crop into
+                # every learner level makes the lesson incoherent.
+                "required": False,
                 "marker": f"[[VISUAL:{visual['visual_id']}]]",
             })
             if limit is not None and len(manifest) >= limit:
@@ -699,15 +700,78 @@ def _approved_visual_manifest(source_references: list[dict] | None, *, limit: in
     return manifest
 
 
+def _is_safe_visual_anchor(paragraph: str) -> bool:
+    """Return whether a paragraph is a completed explanation, not active solution work."""
+    text = str(paragraph or "").strip()
+    if not text or text.startswith(("#", "|", "```", "$$", "!")):
+        return False
+    text = re.sub(r"(?m)^\s*>\s?", "", text)
+    if re.match(r"(?:[-*+] |\d+[.)] )", text):
+        return False
+    if "$$" in text or "```" in text or "|" in text:
+        return False
+    words = re.findall(r"[A-Za-z][A-Za-z'-]*", text)
+    if len(words) < 14:
+        return False
+    # An image must not interrupt a problem, calculation, proof, or solution.
+    if re.match(
+        r"(?i)^(?:problem|exercise|question|example|worked example|solution|answer|"
+        r"step\s*\d+|calculation|proof|derive|solve|suppose|given|let|consider)\b",
+        text,
+    ):
+        return False
+    if text.rstrip().endswith((":", "=")):
+        return False
+    if re.search(
+        r"(?i)\b(?:following equations?|equilibrium condition|takes? the form|"
+        r"is written as|is given by|we obtain)\b",
+        text,
+    ):
+        return False
+    if re.search(r"(?i)\b(?:therefore|hence|substitut(?:e|ing)|rearrang(?:e|ing)|calculate|compute)\b", text):
+        return False
+    return True
+
+
+def _visual_placement_token(token: str) -> str:
+    """Normalize common terminology variants when matching source figures to prose."""
+    token = str(token or "").casefold()
+    return {
+        "labour": "labor",
+        "labours": "labors",
+        "convergent": "stable",
+        "convergence": "stable",
+        "divergent": "unstable",
+        "divergence": "unstable",
+        "oscillations": "fluctuations",
+        "oscillation": "fluctuation",
+    }.get(token, token)
+
+
 def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
-    """Place assigned source figures beside the generated paragraph matching their concept and caption."""
+    """Place selected source figures only after a semantically matching completed explanation.
+
+    The name is retained for compatibility with existing callers and tests. In
+    production, figures are available rather than mandatory: a broad syllabus
+    topic can legitimately contain many source crops, but only a crop explicitly
+    selected by the note and strongly matched to safe explanatory prose belongs
+    in that note level.
+    """
+    requested_visual_ids = set(_APPROVED_VISUAL_MARKER_RE.findall(str(content or "")))
     for visual in manifest:
         marker = visual.get("marker")
         if marker:
             content = content.replace(marker, "")
         crop_url = str(visual.get("crop_url") or "")
+        canon_crop = _canonical_asset_path(crop_url)
+        if canon_crop and re.search(
+            r"!\[(?:\\.|[^\]])*\]\(([^)]+)\)", str(content or ""),
+        ):
+            for image in re.finditer(r"!\[(?:\\.|[^\]])*\]\(([^)]+)\)", str(content or "")):
+                if _canonical_asset_path(image.group(1).strip()) == canon_crop:
+                    requested_visual_ids.add(str(visual.get("id") or visual.get("visual_id") or ""))
+                    break
         if crop_url:
-            canon_crop = _canonical_asset_path(crop_url)
             content = re.sub(
                 r"!\[(?:\\.|[^\]])*\]\(" + re.escape(crop_url) + r"\)",
                 "",
@@ -738,22 +802,53 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
             if match.group(1).strip() and not match.group(1).lstrip().startswith("!")
         ]
 
-    # Map each paragraph start offset to its active section/subsection headings
+    # Map each paragraph to its active heading and the end of that coherent
+    # section so a figure does not split a paragraph-to-paragraph explanation.
     heading_matches = list(re.finditer(r"(?m)^(#{2,4}\s+[^\n]+)$", content))
     para_headings = {}
+    para_section_ends = {}
     for paragraph in paragraphs:
         active_h2 = ""
+        active_h2_heading = None
         active_h3 = ""
+        active_heading = None
         for hm in heading_matches:
             if hm.start() > paragraph.start():
                 break
+            active_heading = hm
             htext = hm.group(1).strip()
             if htext.startswith("## "):
                 active_h2 = htext
+                active_h2_heading = hm
                 active_h3 = ""
             else:
                 active_h3 = htext
-        para_headings[paragraph.start()] = f"{active_h2} {active_h3}".strip()
+        if active_heading:
+            para_headings[paragraph.start()] = f"{active_h2} {active_h3}".strip()
+            anchor_heading = active_heading
+            if (
+                active_h2_heading
+                and active_heading != active_h2_heading
+                and re.search(
+                    r"\b(?:problem|solution|worked\s+example|calculation|proof|derivation)\b",
+                    active_heading.group(1),
+                    re.IGNORECASE,
+                )
+            ):
+                anchor_heading = active_h2_heading
+            heading_level = len(anchor_heading.group(1)) - len(anchor_heading.group(1).lstrip("#"))
+            para_section_ends[paragraph.start()] = next(
+                (
+                    hm.start()
+                    for hm in heading_matches
+                    if hm.start() > anchor_heading.start()
+                    and len(hm.group(1)) - len(hm.group(1).lstrip("#")) <= heading_level
+                ),
+                len(content),
+            )
+        else:
+            para_headings[paragraph.start()] = ""
+            para_section_ends[paragraph.start()] = len(content)
 
     required_visuals = [
         visual for visual in manifest
@@ -766,50 +861,98 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
     use_distinct_reference_targets = len(directional_references) >= len(required_visuals)
     used_reference_targets = set()
     used_paragraph_counts: dict[int, int] = {}
+    used_section_counts: dict[str, int] = {}
     insertions = []
     generic = {
         "figure", "graph", "diagram", "curve", "source", "page", "shows", "shown",
         "this", "that", "with", "from", "under", "between", "where", "when", "into",
         "over", "illustration", "illustrating", "plotting", "plot", "table", "model",
+        "demand", "supply", "price", "quantity", "market", "equilibrium", "goods",
+        "good", "relationship", "change", "changes", "increase", "decrease",
+        "theory",
     }
+    term_frequency = Counter()
+    for candidate in manifest:
+        candidate_text = " ".join((
+            str(candidate.get("caption") or ""),
+            " ".join(str(term) for term in (candidate.get("labels") or [])),
+        ))
+        term_frequency.update({
+            _visual_placement_token(term) for term in re.findall(r"[A-Za-z0-9]+", candidate_text)
+            if len(term) > 2 and term.casefold() not in generic
+        })
     for visual in manifest:
         marker = visual.get("marker")
-        if not visual.get("required") or not marker:
+        visual_id = str(visual.get("id") or visual.get("visual_id") or "")
+        if not marker or not (visual.get("required") or visual_id in requested_visual_ids):
             continue
         primary_text = " ".join((
             str(visual.get("caption") or ""),
-            " ".join(str(t) for t in (visual.get("auto_match_terms") or [])),
             " ".join(str(l) for l in (visual.get("labels") or [])),
         ))
         secondary_text = " ".join((
+            " ".join(str(t) for t in (visual.get("auto_match_terms") or [])),
             str(visual.get("placement_context") or ""),
             str(visual.get("context_before") or ""),
             str(visual.get("context_after") or ""),
         ))
         primary_terms = {
-            token.casefold() for token in re.findall(r"[A-Za-z0-9]+", primary_text)
+            _visual_placement_token(token) for token in re.findall(r"[A-Za-z0-9]+", primary_text)
             if len(token) > 2 and token.casefold() not in generic
         }
         secondary_terms = {
-            token.casefold() for token in re.findall(r"[A-Za-z0-9]+", secondary_text)
+            _visual_placement_token(token) for token in re.findall(r"[A-Za-z0-9]+", secondary_text)
             if len(token) > 3 and token.casefold() not in generic
         } - primary_terms
+        distinctive_terms = {
+            term for term in primary_terms if term_frequency.get(term, 0) <= 2
+        }
 
         best = None
         best_score = -1e9
         paragraph_scores = []
         for paragraph in paragraphs:
             ptext = paragraph.group(1)
+            if not visual.get("required") and not _is_safe_visual_anchor(ptext):
+                continue
             htext = para_headings.get(paragraph.start(), "")
             paragraph_terms = {
-                token.casefold() for token in re.findall(r"[A-Za-z0-9]+", ptext)
+                _visual_placement_token(token) for token in re.findall(r"[A-Za-z0-9]+", ptext)
             }
             heading_terms = {
-                token.casefold() for token in re.findall(r"[A-Za-z0-9]+", htext)
+                _visual_placement_token(token) for token in re.findall(r"[A-Za-z0-9]+", htext)
             }
+            matched_primary = primary_terms & paragraph_terms
+            matched_heading = primary_terms & heading_terms
+            matched_distinctive = distinctive_terms & (paragraph_terms | heading_terms)
+            caption_terms = [
+                _visual_placement_token(term) for term in re.findall(r"[A-Za-z0-9]+", str(visual.get("caption") or ""))
+                if len(term) > 2 and term.casefold() not in generic
+            ]
+            caption_phrases = {
+                " ".join(caption_terms[index:index + 2])
+                for index in range(len(caption_terms) - 1)
+            }
+            searchable_text = " ".join(
+                _visual_placement_token(token)
+                for token in re.findall(r"[A-Za-z0-9]+", f"{htext} {ptext}")
+            )
+            has_caption_phrase = any(
+                phrase in searchable_text for phrase in caption_phrases
+            )
+            # A single generic overlap such as "supply" or "price" cannot
+            # establish that a graph belongs beside this explanation. A
+            # distinctive source term or a caption phrase is required unless
+            # this is an explicitly forced test/admin visual.
+            if not visual.get("required") and not (
+                matched_distinctive
+                or has_caption_phrase
+                or len(matched_primary) >= 5
+            ):
+                continue
             score = (
-                3.0 * len(primary_terms & paragraph_terms)
-                + 2.0 * len(primary_terms & heading_terms)
+                3.0 * len(matched_primary)
+                + 2.0 * len(matched_heading)
                 + 1.0 * len(secondary_terms & paragraph_terms)
             )
             # Prefer body sections (2, 3, 4) over overview/summary sections (1, 5) unless no body match exists
@@ -833,11 +976,40 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
                 best, _ = max(reference_matches, key=lambda item: item[1])
                 used_reference_targets.add(best.start())
         if best is not None:
+            section_key = para_headings.get(best.start(), "") or "__unsectioned__"
+            # A figure should illustrate a completed idea, not form an image
+            # gallery inside one paragraph or dominate a single note section.
+            if (
+                not visual.get("required")
+                and (
+                    used_paragraph_counts.get(best.start(), 0) >= 1
+                    or used_section_counts.get(section_key, 0) >= 3
+                )
+            ):
+                continue
             used_paragraph_counts[best.start()] = used_paragraph_counts.get(best.start(), 0) + 1
-            insertions.append((best.end(), f"\n\n{marker}"))
-    for position, insertion in sorted(insertions, reverse=True):
-        content = content[:position] + insertion + content[position:]
+            used_section_counts[section_key] = used_section_counts.get(section_key, 0) + 1
+            insertions.append((para_section_ends.get(best.start(), best.end()), marker))
+    insertions_by_position = {}
+    for position, marker in insertions:
+        insertions_by_position.setdefault(position, []).append(marker)
+    for position, markers in sorted(insertions_by_position.items(), reverse=True):
+        before = content[:position].rstrip()
+        after = content[position:].lstrip()
+        visual_block = "\n\n".join(markers)
+        content = f"{before}\n\n{visual_block}"
+        if after:
+            content += f"\n\n{after}"
     return content
+
+
+def normalize_approved_visual_placement(content: str, source_references: list[dict] | None) -> str:
+    """Deterministically re-anchor existing approved figures without AI generation."""
+    manifest = _approved_visual_manifest(source_references)
+    content = _insert_required_visual_markers(str(content or ""), manifest)
+    content = _resolve_approved_visual_markers(content, source_references)
+    content = _dedupe_approved_visual_images(content, source_references)
+    return _normalize_approved_visual_captions(content, source_references).strip()
 
 
 def _dedupe_approved_visual_images(content: str, source_references: list[dict] | None) -> str:
@@ -1764,8 +1936,9 @@ def _note_completion_issues(
         if isinstance(visual, dict)
         and visual.get("visual_id")
         and visual.get("crop_url")
-        and visual.get("auto_topic")
-        and visual.get("auto_decision") in _APPROVED_VISUAL_DECISIONS
+        # Only an explicitly forced source visual is mandatory. Normal
+        # topic-matched crops are optional and must pass semantic placement.
+        and visual.get("required") is True
     }
     embedded_urls = {
         _canonical_asset_path(match.group(1).strip())
@@ -3759,13 +3932,13 @@ def get_or_generate_topic_notes(
         + "\nUse a figure only by inserting its exact [[VISUAL:id]] marker at the relevant position. "
         "Do not write Markdown image URLs, invent a figure, generate Mermaid/TikZ/plot code, or request an unlisted figure. "
         "Do not create a Figure Recall Map, marker table, or memory-device sentence with empty figure placeholders. "
-        "Place each required marker directly beside the explanation it illustrates. "
+        "Use a marker only when the source crop directly supports a completed explanatory paragraph. "
+        "Never place a marker in a problem statement, worked example, solution, calculation, proof, list, table, code block, or display equation. "
         "Explain every concept fully in plain prose, including any supported axes, labels, units, directions, or relationships. "
         "Never refer to a figure, diagram, graph, chart, table, or image in the prose, including phrases such as "
         "'as shown above', 'in the diagram', or 'see Figure 1', even when an approved image is included. "
         "A student must understand the explanation without looking at the image. "
-        "Figures marked required were mapped to this topic from source-page evidence and must be included beside the matching explanation. "
-        "If a listed optional figure is not relevant, omit it.\n\n"
+        "The listed source crops are available only when they add direct instructional value; omit a crop that is not relevant to the surrounding explanation.\n\n"
         if approved_visual_manifest
         else (
             "NO APPROVED SOURCE FIGURE IS AVAILABLE. Do not add an image, diagram, graph, Mermaid/TikZ, or plot code.\n"

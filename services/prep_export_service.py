@@ -371,7 +371,8 @@ def _render_html_with_playwright(
             page = browser.new_page()
             page.goto(file_url, wait_until="networkidle", timeout=timeout_ms)
             try:
-                page.wait_for_selector(".render-complete", state="attached", timeout=8000)
+                page.wait_for_selector(".render-complete", state="attached", timeout=timeout_ms)
+                page.evaluate("() => document.fonts ? document.fonts.ready : Promise.resolve()")
             except Exception:
                 pass
 
@@ -521,9 +522,8 @@ def _build_topic_notes_html(
             full_markdown += f"### Question {num} [{marks} Marks] &bull; {paper} ({year})\n\n"
             full_markdown += f"{q_latex}\n\n"
             if sol_latex:
-                full_markdown += "> **✓ Step-by-Step Verified Solution & Marking Rubric:**\n>\n"
-                sol_lines = sol_latex.strip().split("\n")
-                full_markdown += "\n".join(f"> {line}" for line in sol_lines) + "\n\n"
+                full_markdown += "#### ✓ Step-by-Step Verified Solution & Marking Rubric:\n\n"
+                full_markdown += f"{sol_latex.strip()}\n\n"
 
     if practice_questions:
         full_markdown += "\n\n---\n\n## Curated Practice Examination Variants & Solutions\n\n"
@@ -536,9 +536,8 @@ def _build_topic_notes_html(
             full_markdown += f"### Practice Question {num} [{marks} Marks] &bull; {topic}\n\n"
             full_markdown += f"{q_latex}\n\n"
             if sol_latex:
-                full_markdown += "> **✓ Step-by-Step Solution & Marking Scheme:**\n>\n"
-                sol_lines = sol_latex.strip().split("\n")
-                full_markdown += "\n".join(f"> {line}" for line in sol_lines) + "\n\n"
+                full_markdown += "#### ✓ Step-by-Step Solution & Marking Scheme:\n\n"
+                full_markdown += f"{sol_latex.strip()}\n\n"
 
     date_str = datetime.now().strftime("%B %d, %Y")
     course_upper = course_code.upper()
@@ -591,9 +590,6 @@ def _build_paper_questions_html(
     include_questions: bool = True,
     include_answers: bool = True,
 ) -> str:
-    """Build a question paper, answer key, or combined paper from one source."""
-    from services.prep_ai_router import normalize_math_delimiters
-
     course_upper = course_code.upper()
     if include_questions and include_answers:
         document_label = paper_title
@@ -606,8 +602,8 @@ def _build_paper_questions_html(
         num = q.get("number", 1)
         marks = q.get("marks", 10)
         topic = q.get("topic", "Mathematical Assessment")
-        q_latex = normalize_math_delimiters(q.get("question_latex", ""))
-        sol_latex = normalize_math_delimiters(q.get("solution_latex", ""))
+        q_latex = q.get("question_latex", "")
+        sol_latex = q.get("solution_latex", "")
 
         heading = f"## Question {num} [{marks} Marks] - {topic}"
         if include_answers and not include_questions:

@@ -175,10 +175,13 @@
 {{RENDERER_JS}}
 </script>
 <script>
-function renderPDFContent() {
+async function renderPDFContent() {
   try {
     var rawData = JSON.parse(document.getElementById('raw-notes').textContent);
     renderMarkdownWithKaTeX(rawData, document.getElementById('content'));
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
   } catch(e) {
     console.error('PDF render error:', e);
   } finally {
