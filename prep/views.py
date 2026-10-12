@@ -1018,7 +1018,7 @@ def prep_course_detail(request, course_code):
 
     context = {
         "active_tab": "courses",
-        "user_credits": wallet.credits_balance,
+        "user_credits": get_available_credits(wallet),
         "course": course_obj,
         "topics": topics_data,
         "total_questions_count": total_questions_count,
@@ -1182,7 +1182,7 @@ def prep_topic_study(request, topic_id):
         "active_subtab": active_subtab,
         "from_history": from_tab == "history",
         "is_enrolled": PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists(),
-        "user_credits": wallet.credits_balance,
+        "user_credits": get_available_credits(wallet),
         "topic": topic_dict,
         "initial_level": initial_level,
         "initial_notes": initial_notes,
@@ -1405,7 +1405,7 @@ def prep_paper_detail(request, course_code, paper_id):
     context = {
         "active_tab": "history" if from_tab == "history" else "practice",
         "from_history": from_tab == "history",
-        "user_credits": wallet.credits_balance,
+        "user_credits": get_available_credits(wallet),
         "course_code": course_name,
         "paper_title": paper_title,
         "paper_id": paper_id,
@@ -1700,10 +1700,10 @@ def prep_upload(request):
 
         return redirect(f"{reverse('prep:upload')}?course_id={course.pk}")
 
-    user_credits = 30
+    user_credits = 0
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
-        user_credits = wallet.credits_balance
+        user_credits = get_available_credits(wallet)
     selected_course_id = request.GET.get("course_id", "").strip()
     courses = PrepCourse.objects.filter(is_active=True).order_by("code")
     if not selected_course_id.isdigit() or not courses.filter(pk=selected_course_id).exists():
@@ -1764,7 +1764,7 @@ def prep_billing(request):
     """Credit Balance & M-Pesa Top-Up Page connected to PrepWallet."""
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
-        user_credits = wallet.credits_balance
+        user_credits = get_available_credits(wallet)
         if wallet.current_plan == "pro":
             plan_display = "Pro (Exam Master)"
         elif wallet.current_plan == "plus":
@@ -1782,7 +1782,7 @@ def prep_billing(request):
         current_plan_code = wallet.current_plan
     else:
         wallet = None
-        user_credits = 30
+        user_credits = 0
         plan_display = "Free 30-Credit Trial (Sign Up Free)"
         is_trial = False
         can_top_up = False
@@ -2264,7 +2264,7 @@ def prep_solve_question_api(request):
                         "cached": True,
                         "credits_deducted": 0,
                         "model": "Database Validated Cache ($0)",
-                        "credits_balance": wallet.credits_balance,
+                        "credits_balance": get_available_credits(wallet),
                     })
         except Exception:
             pass
@@ -2279,7 +2279,7 @@ def prep_solve_question_api(request):
         return JsonResponse({
             "success": False,
             "error": f"Insufficient credits. You need at least {required_balance} credits available before generating a step-by-step verified solution. Please subscribe or top up.",
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
         }, status=402)
 
     # Call AI router (with DB cache layer)
@@ -2333,7 +2333,7 @@ def prep_solve_question_api(request):
         "reasoning": res.get("reasoning", ""),
         "cached": res.get("cached", False),
         "credits_deducted": credits_deducted,
-        "credits_balance": wallet.credits_balance,
+        "credits_balance": get_available_credits(wallet),
         "model": res.get("model", "deepseek-reasoner"),
     })
 
@@ -2408,7 +2408,7 @@ def prep_adapt_question_api(request):
             "marks": existing.marks,
             "topic_label": existing.topic_label or "",
             "credits_deducted": 0,
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
         })
 
     try:
@@ -2422,7 +2422,7 @@ def prep_adapt_question_api(request):
         return JsonResponse({
             "success": False,
             "error": f"Insufficient credits. At least {required_balance} credits are required to reconstruct this question.",
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
         }, status=402)
 
     try:
@@ -2509,7 +2509,7 @@ def prep_adapt_question_api(request):
         "marks": adapted.marks,
         "topic_label": adapted.topic_label or "",
         "credits_deducted": credits_deducted,
-        "credits_balance": wallet.credits_balance,
+        "credits_balance": get_available_credits(wallet),
     })
 
 
@@ -2622,7 +2622,7 @@ def prep_topic_notes_api(request):
             "level": level,
             "cached": True,
             "credits_deducted": credits_deducted,
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
             "model": "Published Shared Notes",
         })
 
@@ -2647,7 +2647,7 @@ def prep_topic_notes_api(request):
             "error": cached_res.get("error") or "These notes are awaiting tutor review.",
             "level": level,
             "credits_deducted": 0,
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
         }, status=409)
 
     if cached_res.get("validation_failed") and not (
@@ -2682,7 +2682,7 @@ def prep_topic_notes_api(request):
                     f"Insufficient credits. At least {required_balance} credits are required "
                     "before generating a new notes level."
                 ),
-                "credits_balance": wallet.credits_balance,
+                "credits_balance": get_available_credits(wallet),
             }, status=402)
 
         if topic_obj:
@@ -2775,7 +2775,7 @@ def prep_topic_notes_api(request):
             "error": res.get("error") or "These notes are awaiting tutor review.",
             "level": level,
             "credits_deducted": 0,
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
         }, status=409)
 
     if res.get("error") and not res.get("notes"):
@@ -2850,7 +2850,7 @@ def prep_topic_notes_api(request):
         "level": res.get("level", level),
         "cached": res.get("cached", False),
         "credits_deducted": credits_deducted,
-        "credits_balance": wallet.credits_balance,
+        "credits_balance": get_available_credits(wallet),
         "model": res.get("model", "deepseek-chat"),
     })
 
@@ -2961,7 +2961,7 @@ def prep_generate_practice_api(request):
         return JsonResponse({
             "success": False,
             "error": f"Insufficient credits. At least {required_balance} credits are required to generate fresh practice questions. Please subscribe or top up.",
-            "credits_balance": wallet.credits_balance,
+            "credits_balance": get_available_credits(wallet),
         }, status=402)
 
     try:
@@ -3021,7 +3021,7 @@ def prep_generate_practice_api(request):
         "fresh_count": fresh_count,
         "cached": res.get("cached", False),
         "credits_deducted": credits_deducted,
-        "credits_balance": wallet.credits_balance,
+        "credits_balance": get_available_credits(wallet),
         "model": res.get("model", "deepseek-chat"),
     })
 
@@ -3358,10 +3358,10 @@ def prep_mark_notification_read_api(request):
 
 def prep_terms(request):
     """Mentify Prep Terms of Service."""
-    credits = 30
+    credits = 0
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
-        credits = wallet.credits_balance
+        credits = get_available_credits(wallet)
     context = {
         "active_tab": "terms",
         "user_credits": credits,
@@ -3377,10 +3377,10 @@ def prep_terms(request):
 
 def prep_privacy(request):
     """Mentify Prep Privacy Policy."""
-    credits = 30
+    credits = 0
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
-        credits = wallet.credits_balance
+        credits = get_available_credits(wallet)
     context = {
         "active_tab": "privacy",
         "user_credits": credits,

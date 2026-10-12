@@ -419,9 +419,25 @@
     // 6. Strip text alignment environments
     cleaned = cleaned.replace(/\\begin\{(?:center|flushleft|flushright)\}([\s\S]*?)\\end\{(?:center|flushleft|flushright)\}/g, '$1');
 
-    // 7. Clean consecutive newlines
+    // 7. Clean prose-mode LaTeX line breaks (\\) outside math/code blocks
+    cleaned = cleanProseLatexBreaks(cleaned);
+
+    // 8. Clean consecutive newlines
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
     return cleaned.trim();
+  }
+
+  function cleanProseLatexBreaks(text) {
+    if (!text || typeof text !== 'string') return text;
+    var blockPattern = /(```[\s\S]*?```|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\(.*?\\\))/g;
+    var segments = text.split(blockPattern);
+    for (var i = 0; i < segments.length; i += 2) {
+      if (segments[i]) {
+        segments[i] = segments[i].replace(/(?:\\\\)[ \t]*(?:\\\\)?/g, '\n\n');
+        segments[i] = segments[i].replace(/\\(?=[ \t]*\n|[ \t]*$)/g, '');
+      }
+    }
+    return segments.join('').replace(/\n{3,}/g, '\n\n');
   }
 
   // Compatibility for older notes that put display math inside a Markdown
@@ -431,6 +447,8 @@
   function normalizeLegacyMathBlocks(text) {
     var lines = String(text || '').split('\n');
     var output = [];
+    var inDisplayMath = false;
+    var inCodeFence = false;
     var quoted = false;
     var quotedMath = [];
     var envNames = 'aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\\*?';
@@ -453,17 +471,30 @@
     }
 
     lines.forEach(function (line) {
+      var trimmed = line.trim();
+
+      // Protect code fences
+      if (/^```/.test(trimmed)) {
+        inCodeFence = !inCodeFence;
+        output.push(line);
+        return;
+      }
+      if (inCodeFence) {
+        output.push(line);
+        return;
+      }
+
       var quoteMatch = line.match(/^\s*>\s?(.*)$/);
       var content = quoteMatch ? quoteMatch[1] : line;
-      var trimmed = content.trim();
+      var contentTrimmed = content.trim();
 
-      if (quoteMatch && (trimmed === '$$' || trimmed === '\\[')) {
+      if (quoteMatch && (contentTrimmed === '$$' || contentTrimmed === '\\[')) {
         quoted = true;
         quotedMath = [];
         return;
       }
       if (quoted) {
-        if (quoteMatch && (trimmed === '$$' || trimmed === '\\]')) {
+        if (quoteMatch && (contentTrimmed === '$$' || contentTrimmed === '\\]')) {
           output.push('$$', quotedMath.join('\n'), '$$');
           quoted = false;
         } else if (quoteMatch) {
@@ -478,7 +509,18 @@
         return;
       }
 
-      if (!environment && envStart.test(line) && !line.includes('$$')) {
+      // Track unquoted display math ($$ ... $$)
+      if (!quoted) {
+        var dCount = (line.match(/\$\$/g) || []).length;
+        if (dCount % 2 === 1) {
+          inDisplayMath = !inDisplayMath;
+        } else if (trimmed === '\\[' || trimmed === '\\]') {
+          inDisplayMath = (trimmed === '\\[');
+        }
+      }
+
+      // Only wrap environments if we are NOT already inside display math!
+      if (!inDisplayMath && !environment && envStart.test(line) && !line.includes('$$')) {
         environment = true;
         environmentStack = [];
         environmentLines = [line.trim()];
@@ -553,20 +595,45 @@
       }
     );
 
-    // Collapse adjacent display delimiters to prevent nested math parsing errors (using replacer func to avoid JS $$ replacement string bug)
-    cleanText = cleanText.replace(/(?:\\\[|\$\$)\s*(?:\\\[|\$\$)/g, function() { return '$$'; });
-    cleanText = cleanText.replace(/(?:\\\]|\$\$)\s*(?:\\\]|\$\$)/g, function() { return '$$'; });
+    // Collapse adjacent display delimiters on the same line only (never across newlines)
+    cleanText = cleanText.replace(/(?:\\\[|\$\$)[ \t]*(?:\\\[|\$\$)/g, function() { return '$$'; });
+    cleanText = cleanText.replace(/(?:\\\]|\$\$)[ \t]*(?:\\\]|\$\$)/g, function() { return '$$'; });
 
-    // Ensure LaTeX environments occurring on the same line or outside $$ delimiters are isolated in $$...$$ without double-nesting
-    var envInlineRe = /(?:\\\[|\$\$)?\s*\\begin\{(aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}([\s\S]*?)\\end\{\1\}\s*(?:\\\]|\$\$)?/g;
-    cleanText = cleanText.replace(envInlineRe, function(full, env, body) {
-      return '\n\n$$\n\\begin{' + env + '}' + body + '\\end{' + env + '}\n$$\n\n';
-    });
+    // Ensure LaTeX environments occurring outside display math are isolated in $$...$$ without double-nesting
+    var envBlocks = /(```[\s\S]*?```|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])/g;
+    var envSegs = cleanText.split(envBlocks);
+    var envRe = /\\begin\{(aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}([\s\S]*?)\\end\{\1\}/g;
+    for (var esi = 0; esi < envSegs.length; esi += 2) {
+      if (envSegs[esi]) {
+        envSegs[esi] = envSegs[esi].replace(envRe, function(full, env, body) {
+          return '\n\n$$\n\\begin{' + env + '}' + body + '\\end{' + env + '}\n$$\n\n';
+        });
+      }
+    }
+    cleanText = envSegs.join('');
 
     // Clean any outer \[ ... \] that wrapped an inner $$...$$
     cleanText = cleanText.replace(/\\\[\s*\$\$([\s\S]*?)\$\$\s*\\\]/g, function(full, inner) {
       return '\n\n$$\n' + inner.trim() + '\n$$\n\n';
     });
+
+    // Guard against unclosed display math delimiters ($$) leaking across the document
+    var checkLines = cleanText.split('\n');
+    var inFence = false;
+    var dBlockCount = 0;
+    for (var cli = 0; cli < checkLines.length; cli++) {
+      if (/^\s*```/.test(checkLines[cli])) {
+        inFence = !inFence;
+        continue;
+      }
+      if (!inFence) {
+        var dm = checkLines[cli].match(/\$\$/g);
+        if (dm) dBlockCount += dm.length;
+      }
+    }
+    if (dBlockCount % 2 === 1) {
+      cleanText += '\n\n$$\n';
+    }
 
     // Prevent accidental 4-space indents outside code fences from turning into <pre><code> code blocks
     var lines = cleanText.split('\n');

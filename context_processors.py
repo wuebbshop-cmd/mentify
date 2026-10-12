@@ -69,6 +69,24 @@ def get_user_plan_badge(user) -> dict | None:
         return None
 
 
+def get_user_credits(user) -> int:
+    """
+    Returns the real-time available credits balance for an authenticated user,
+    accounting for lot expiry, plan state, and active reservations.
+    """
+    if not user or not getattr(user, "is_authenticated", False):
+        return 0
+
+    try:
+        from prep.models import PrepWallet
+        from services.credit_service import get_available_credits
+
+        wallet = PrepWallet.get_or_create_wallet(user)
+        return int(get_available_credits(wallet))
+    except Exception:
+        return 0
+
+
 def site_context(request):
     user = getattr(request, "user", None)
     return {
@@ -76,4 +94,5 @@ def site_context(request):
         "PAYSTACK_PUBLIC_KEY": getattr(settings, "PAYSTACK_PUBLIC_KEY", ""),
         "SUPPORT_EMAIL": getattr(settings, "SUPPORT_EMAIL", "mentify@mlaudit.info"),
         "user_plan_badge": get_user_plan_badge(user),
+        "user_credits": get_user_credits(user),
     }

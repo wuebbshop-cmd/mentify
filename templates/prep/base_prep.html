@@ -64,7 +64,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 
   <!-- Unified Prep Markdown & KaTeX Engine -->
-  <script src="{% static 'js/prep-renderer.js' %}?v=20261011_v7_clean_latex"></script>
+  <script src="{% static 'js/prep-renderer.js' %}?v=20261012_v8_global_math_fix"></script>
 
   <!-- Prism.js for R Code Syntax Highlighting -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
@@ -351,7 +351,7 @@
     <!-- Credit Badge (Always pill, number visible) -->
     <a href="{% url 'prep:billing' %}" id="prep-navbar-credit-badge" class="badge badge-accent" title="Your Credit Balance">
       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-      <span>{{ user_credits|default:0 }} Credits</span>
+      <span id="prep-navbar-credit-count">{{ user_credits|default:0 }} Credits</span>
     </a>
 
     <!-- Live Notification Bell & Dropdown (Plain SVG like theme toggle) -->
@@ -915,6 +915,43 @@
         }
       }
     });
+  })();
+
+  // Real-time Credit Synchronization across the entire Mentify Prep app
+  (function initCreditSync() {
+    function updateBadge(balance) {
+      if (balance === undefined || balance === null) return;
+      const balanceNum = parseInt(balance, 10);
+      const displayVal = isNaN(balanceNum) ? String(balance) : String(Math.max(0, balanceNum));
+      const badgeSpan = document.getElementById('prep-navbar-credit-count') || document.querySelector('#prep-navbar-credit-badge span');
+      if (badgeSpan) {
+        badgeSpan.textContent = displayVal + ' Credits';
+      }
+      document.querySelectorAll('#wallet-balance-indicator, .credit-counter-value, .topic-tutor-balance-val').forEach(function (el) {
+        el.textContent = displayVal;
+      });
+    }
+
+    window.updatePrepNavbarCredits = updateBadge;
+
+    if (window.fetch) {
+      const originalFetch = window.fetch;
+      window.fetch = async function (...args) {
+        const response = await originalFetch.apply(this, args);
+        try {
+          const clone = response.clone();
+          const contentType = clone.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            clone.json().then(function (data) {
+              if (data && typeof data === 'object' && data.credits_balance !== undefined) {
+                updateBadge(data.credits_balance);
+              }
+            }).catch(function () {});
+          }
+        } catch (e) {}
+        return response;
+      };
+    }
   })();
 </script>
 

@@ -1666,7 +1666,7 @@
     </div>
 
     <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;">
-      Synthesized variants adhere strictly to curriculum standards &bull; Balance: <strong id="wallet-balance-indicator">{{ user_credits|default:30 }}</strong> Credits
+      Synthesized variants adhere strictly to curriculum standards &bull; Balance: <strong id="wallet-balance-indicator">{{ user_credits|default:0 }}</strong> Credits
     </div>
   </div>
 
@@ -1801,6 +1801,7 @@
     document.querySelectorAll('.topic-tutor-balance-val').forEach(el => {
       el.textContent = balanceStr;
     });
+    if (window.updatePrepNavbarCredits) window.updatePrepNavbarCredits(balance);
   }
 
   function resizeTopicTutorInput(input) {
