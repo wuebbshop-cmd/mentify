@@ -170,7 +170,7 @@
   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
     <div>
       <h2 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 600; color: var(--text);">Daily Credit Usage Over Time</h2>
-      <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Hover or tap bars to view detailed credit consumption breakdown without reloading the page.</p>
+      <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Hover or tap along the curve to view detailed credit consumption breakdown without reloading the page.</p>
     </div>
 
     <!-- Timeframe Selection and Date Filter -->
@@ -204,12 +204,12 @@
     <canvas id="creditUsageChart"></canvas>
   </div>
 
-  <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 18px; font-size: 0.78rem; color: var(--text-muted);">
-    <span style="display: inline-flex; align-items: center; gap: 6px;">
-      <span style="width: 10px; height: 10px; background: #dc2626; border-radius: 2px;"></span> Credits Consumed (Deductions)
+  <div style="display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 18px; font-size: 0.8rem; color: var(--text-muted);">
+    <span style="display: inline-flex; align-items: center; gap: 8px;">
+      <span style="width: 22px; height: 3.5px; background: #0f766e; border-radius: 999px; box-shadow: 0 0 6px rgba(15,118,110,0.35);"></span> Credits Consumed (Deductions)
     </span>
-    <span style="display: inline-flex; align-items: center; gap: 6px;">
-      <span style="width: 10px; height: 10px; background: #059669; border-radius: 2px;"></span> Credits Added (Top-Ups / Grants)
+    <span style="display: inline-flex; align-items: center; gap: 8px;">
+      <span style="width: 22px; height: 3.5px; background: #8b5cf6; border-radius: 999px; box-shadow: 0 0 6px rgba(139,92,246,0.3);"></span> Credits Added (Top-Ups / Grants)
     </span>
   </div>
 </div>
@@ -390,7 +390,7 @@
     });
   }
 
-  // Render Daily Usage Chart
+  // Render Daily Usage Chart (Smooth shaded line plot)
   (function initMetricsChart() {
     const canvas = document.getElementById('creditUsageChart');
     if (!canvas) return;
@@ -405,28 +405,72 @@
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
     const textColor = isDark ? '#9ca3af' : '#6b7280';
 
+    const ctx = canvas.getContext('2d');
+
+    // Create vertical linear gradients for shaded underbelly
+    const consumedGrad = ctx.createLinearGradient(0, 0, 0, 260);
+    if (isDark) {
+      consumedGrad.addColorStop(0, 'rgba(45, 212, 191, 0.38)');
+      consumedGrad.addColorStop(0.75, 'rgba(45, 212, 191, 0.06)');
+      consumedGrad.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
+    } else {
+      consumedGrad.addColorStop(0, 'rgba(15, 118, 110, 0.32)');
+      consumedGrad.addColorStop(0.75, 'rgba(15, 118, 110, 0.05)');
+      consumedGrad.addColorStop(1, 'rgba(15, 118, 110, 0.0)');
+    }
+
+    const gainedGrad = ctx.createLinearGradient(0, 0, 0, 260);
+    if (isDark) {
+      gainedGrad.addColorStop(0, 'rgba(167, 139, 250, 0.30)');
+      gainedGrad.addColorStop(0.75, 'rgba(167, 139, 250, 0.05)');
+      gainedGrad.addColorStop(1, 'rgba(167, 139, 250, 0.0)');
+    } else {
+      gainedGrad.addColorStop(0, 'rgba(139, 92, 246, 0.22)');
+      gainedGrad.addColorStop(0.75, 'rgba(139, 92, 246, 0.03)');
+      gainedGrad.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+    }
+
+    const consumedLineColor = isDark ? '#2dd4bf' : '#0f766e';
+    const gainedLineColor = isDark ? '#a78bfa' : '#8b5cf6';
+
     new Chart(canvas, {
-      type: 'bar',
+      type: 'line',
       data: {
         labels: chartLabels,
         datasets: [
           {
             label: 'Credits Consumed',
             data: chartUsed,
-            backgroundColor: 'rgba(220, 38, 38, 0.75)',
-            borderColor: '#dc2626',
-            borderWidth: 1,
-            borderRadius: 4,
-            maxBarThickness: 28,
+            borderColor: consumedLineColor,
+            backgroundColor: consumedGrad,
+            borderWidth: 2.75,
+            fill: true,
+            tension: 0.42,
+            pointRadius: 3,
+            pointHoverRadius: 6.5,
+            pointBackgroundColor: consumedLineColor,
+            pointBorderColor: isDark ? '#1e1e1e' : '#ffffff',
+            pointBorderWidth: 2,
+            pointHoverBackgroundColor: '#ffffff',
+            pointHoverBorderColor: consumedLineColor,
+            pointHoverBorderWidth: 3,
           },
           {
             label: 'Credits Added',
             data: chartGained,
-            backgroundColor: 'rgba(5, 150, 105, 0.75)',
-            borderColor: '#059669',
-            borderWidth: 1,
-            borderRadius: 4,
-            maxBarThickness: 28,
+            borderColor: gainedLineColor,
+            backgroundColor: gainedGrad,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.42,
+            pointRadius: 2.5,
+            pointHoverRadius: 5.5,
+            pointBackgroundColor: gainedLineColor,
+            pointBorderColor: isDark ? '#1e1e1e' : '#ffffff',
+            pointBorderWidth: 1.5,
+            pointHoverBackgroundColor: '#ffffff',
+            pointHoverBorderColor: gainedLineColor,
+            pointHoverBorderWidth: 2.5,
           }
         ]
       },

@@ -75,6 +75,9 @@
     if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark-theme');
     }
+    if (localStorage.getItem('prep_sidebar_collapsed') === 'true') {
+      document.documentElement.classList.add('sidebar-collapsed');
+    }
   </script>
 
   <style>
@@ -337,10 +340,18 @@
 
 <!-- ─── Standalone Mentify Prep Navbar ───────────────────────────── -->
 <nav class="navbar" role="navigation" aria-label="Prep navigation">
-  <a href="{% url 'prep:dashboard' %}" class="navbar-brand">
-    <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 28px; width: 28px; object-fit: contain; border-radius: 4px;">
-    Mentify <span style="color: var(--green);">Prep</span>
-  </a>
+  <div style="display: flex; align-items: center; gap: 6px;">
+    <button id="navbar-sidebar-toggle" type="button" class="sidebar-desktop-nav-toggle" title="Toggle sidebar (Ctrl+B)" aria-label="Toggle sidebar">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="9" y1="3" x2="9" y2="21"></line>
+      </svg>
+    </button>
+    <a href="{% url 'prep:dashboard' %}" class="navbar-brand" style="margin-right: 0;">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 28px; width: 28px; object-fit: contain; border-radius: 4px;">
+      Mentify <span style="color: var(--green);">Prep</span>
+    </a>
+  </div>
 
   <div class="navbar-end" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
     <!-- Credit Badge (Always pill, number visible) -->
@@ -441,67 +452,93 @@
 <main id="main-content" style="padding-top: var(--nav-h);">
   <div class="dashboard-layout">
     <!-- Dedicated Prep Sidebar -->
-    <aside class="sidebar" role="navigation" aria-label="Prep sidebar navigation">
-      <div class="sidebar-profile">
-        <div class="sidebar-profile-row">
-          <div class="sidebar-profile-avatar" style="background: var(--danger);">
-            {{ request.user.first_name|default:'P'|first|upper }}P
+    <aside class="sidebar" id="prep-sidebar" role="navigation" aria-label="Prep sidebar navigation">
+      <div class="sidebar-top-container">
+        <div class="sidebar-header-row">
+          <div class="sidebar-profile">
+            <div class="sidebar-profile-row">
+              <div class="sidebar-profile-avatar" style="background: var(--danger);">
+                {{ request.user.first_name|default:'P'|first|upper }}P
+              </div>
+              <div class="sidebar-profile-info">
+                <div class="sidebar-profile-name">{{ request.user.first_name|default:'Student' }} {{ request.user.last_name|default:'' }}</div>
+                <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email|default:'Mentify Prep' }}</div>
+              </div>
+            </div>
+            {% if user_plan_badge %}
+            <span class="badge" style="font-size: 0.72rem; align-self: flex-start; font-weight: 700; color: {{ user_plan_badge.color }}; background: {{ user_plan_badge.bg }}; border: 1px solid {{ user_plan_badge.border }};">
+              {{ user_plan_badge.label }}
+            </span>
+            {% endif %}
           </div>
-          <div class="sidebar-profile-info">
-            <div class="sidebar-profile-name">{{ request.user.first_name|default:'Student' }} {{ request.user.last_name|default:'' }}</div>
-            <div class="sidebar-profile-email" title="{{ request.user.email }}">{{ request.user.email|default:'Mentify Prep' }}</div>
-          </div>
+
+          <button id="sidebar-collapse-btn" type="button" class="sidebar-collapse-btn" title="Toggle sidebar (Ctrl+B)" aria-label="Toggle sidebar">
+            <svg class="sidebar-icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="m14 9-3 3 3 3"></path>
+            </svg>
+          </button>
         </div>
-        {% if user_plan_badge %}
-        <span class="badge" style="font-size: 0.72rem; align-self: flex-start; font-weight: 700; color: {{ user_plan_badge.color }}; background: {{ user_plan_badge.bg }}; border: 1px solid {{ user_plan_badge.border }};">
-          {{ user_plan_badge.label }}
-        </span>
-        {% endif %}
+
+        <ul class="sidebar-nav">
+          <li class="nav-item">
+            <a href="{% url 'prep:dashboard' %}" class="{% if active_tab == 'dashboard' %}active{% endif %}" title="Dashboard">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span class="nav-label">Dashboard</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{% url 'prep:courses' %}" class="{% if active_tab == 'courses' %}active{% endif %}" title="Courses &amp; Syllabi">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span class="nav-label">Courses &amp; Syllabi</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{% url 'prep:public_library' %}" class="{% if active_tab == 'library' %}active{% endif %}" title="Study Library">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span class="nav-label">Study Library</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{% url 'prep:upload' %}" class="{% if active_tab == 'upload' %}active{% endif %}" title="Upload Material">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span class="nav-label">Upload</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{% url 'prep:billing' %}" class="{% if active_tab == 'billing' %}active{% endif %}" title="Credits &amp; Plans">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              <span class="nav-label">Credits &amp; Plans</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{% url 'prep:metrics' %}" class="{% if active_tab == 'metrics' %}active{% endif %}" title="Metrics">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span class="nav-label">Metrics</span>
+            </a>
+          </li>
+        </ul>
       </div>
 
-      <ul class="sidebar-nav">
-        <li class="nav-item">
-          <a href="{% url 'prep:dashboard' %}" class="{% if active_tab == 'dashboard' %}active{% endif %}">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Dashboard
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{% url 'prep:courses' %}" class="{% if active_tab == 'courses' %}active{% endif %}">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-            Courses &amp; Syllabi
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{% url 'prep:public_library' %}" class="{% if active_tab == 'library' %}active{% endif %}">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-            Study Library
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{% url 'prep:upload' %}" class="{% if active_tab == 'upload' %}active{% endif %}">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Upload
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{% url 'prep:billing' %}" class="{% if active_tab == 'billing' %}active{% endif %}">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            Credits & Plans
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{% url 'prep:metrics' %}" class="{% if active_tab == 'metrics' %}active{% endif %}">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            Metrics
-          </a>
-        </li>
-      </ul>
+      <!-- Bottom Brand Footnote (Always attached at the bottom) -->
+      <div class="sidebar-footer-brand">
+        <div class="sidebar-brand-quote">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          <div class="sidebar-brand-quote-text">
+            <span>Better notes. Higher scores.</span>
+            <span>Your goals. Our support.</span>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- Main Body Container -->
@@ -871,6 +908,32 @@
       status.textContent = 'Network error communicating with contact service.';
     });
   }
+
+  // Sidebar Retract / Expand logic with Ctrl+B shortcut & localStorage persistence
+  (function initSidebarToggle() {
+    function toggleSidebar() {
+      const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+      document.documentElement.classList.toggle('sidebar-collapsed', isCollapsed);
+      try {
+        localStorage.setItem('prep_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+      } catch (e) {}
+    }
+
+    const collapseBtn = document.getElementById('sidebar-collapse-btn');
+    const navToggleBtn = document.getElementById('navbar-sidebar-toggle');
+    if (collapseBtn) collapseBtn.addEventListener('click', toggleSidebar);
+    if (navToggleBtn) navToggleBtn.addEventListener('click', toggleSidebar);
+
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        const activeTag = (document.activeElement && document.activeElement.tagName) || '';
+        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+          e.preventDefault();
+          toggleSidebar();
+        }
+      }
+    });
+  })();
 </script>
 
 {% block extra_js %}{% endblock %}

@@ -264,9 +264,10 @@ def _public_topic_questions(topic):
 
 def prep_public_library(request):
     """Public catalogue for search visitors and crawlers, branded as Mentify."""
-    courses = cache.get("prep_pub_lib_courses")
-    if courses is None:
-        courses = list(
+    cache_key = "prep_pub_lib_courses_v3"
+    bundle = cache.get(cache_key)
+    if bundle is None:
+        raw_courses = list(
             PrepCourse.objects.filter(is_active=True)
             .annotate(
                 topic_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
@@ -274,12 +275,65 @@ def prep_public_library(request):
             )
             .order_by("category", "code")
         )
-        cache.set("prep_pub_lib_courses", courses, 900)
 
-    resp = render(request, "prep/public_library.html", {
-        "courses": courses,
+        courses_data = []
+        categories_set = set()
+        total_units = 0
+        total_papers = 0
+
+        for c in raw_courses:
+            cat_meta = _resolve_course_category_meta(c)
+            cat_name = cat_meta["category"]
+            categories_set.add(cat_name)
+            total_units += c.topic_count
+            total_papers += c.paper_count
+
+            # Clean display title to avoid duplication
+            display_title = c.title
+            if c.code and c.code in display_title:
+                display_title = re.sub(
+                    r"^" + re.escape(c.code) + r"[\s:\-\–—]*", "", display_title, flags=re.IGNORECASE
+                ).strip()
+                if not display_title:
+                    display_title = c.title
+
+            desc = (c.description or "").strip()
+            if desc:
+                desc = re.sub(
+                    r"(?i)\b(?:offered\s+at|taught\s+at|at\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School))\b[^.;]*",
+                    "",
+                    desc,
+                ).strip(" ,.;:-")
+            if not desc or len(desc) < 15:
+                desc = f"Structured syllabus units, lecture notes, and verified past examination problems."
+
+            courses_data.append({
+                "id": c.id,
+                "code": c.code,
+                "slug": c.slug,
+                "title": display_title,
+                "category": cat_name,
+                "subject_key": cat_meta["subject_key"],
+                "description": desc,
+                "topic_count": c.topic_count,
+                "paper_count": c.paper_count,
+            })
+
+        bundle = {
+            "courses": courses_data,
+            "categories": sorted(list(categories_set)),
+            "total_courses": len(courses_data),
+            "total_units": total_units,
+            "total_papers": total_papers,
+            "total_disciplines": len(categories_set),
+        }
+        cache.set(cache_key, bundle, 900)
+
+    context = {
+        **bundle,
         "active_tab": "library",
-    })
+    }
+    resp = render(request, "prep/public_library.html", context)
     return set_prep_cache_headers(
         resp,
         max_age=600,
@@ -381,14 +435,44 @@ def _get_course_topics_summary(course):
 def prep_public_course(request, course_slug):
     """Public, canonical course syllabus page with internal links to each topic."""
     course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
-    topics_data, _ = _get_course_topics_summary(course)
+    topics_data, total_questions_count = _get_course_topics_summary(course)
+    cat_meta = _resolve_course_category_meta(course)
+
+    display_title = course.title
+    if course.code and course.code in display_title:
+        display_title = re.sub(
+            r"^" + re.escape(course.code) + r"[\s:\-\–—]*", "", display_title, flags=re.IGNORECASE
+        ).strip()
+        if not display_title:
+            display_title = course.title
+
+    desc = (course.description or "").strip()
+    if desc:
+        desc = re.sub(
+            r"(?i)\b(?:offered\s+at|taught\s+at|at\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School))\b[^.;]*",
+            "",
+            desc,
+        ).strip(" ,.;:-")
+    if not desc or len(desc) < 15:
+        desc = "Canonical syllabus units, structured theorems, lecture notes, and past examination problems."
+
+    course_obj = {
+        "id": course.id,
+        "code": course.code,
+        "slug": course.slug,
+        "title": display_title,
+        "category": cat_meta["category"],
+        "subject_key": cat_meta["subject_key"],
+        "description": desc,
+    }
 
     resp = render(
         request,
         "prep/public_course.html",
         {
-            "course": course,
+            "course": course_obj,
             "topics": topics_data,
+            "total_questions_count": total_questions_count,
             "published_papers": course.papers.filter(is_published=True).order_by("-created_at"),
             "active_tab": "library",
         },

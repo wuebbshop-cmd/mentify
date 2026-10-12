@@ -1,149 +1,379 @@
 {% extends "prep/base_prep.html" %}
 
-{% block title %}{{ course.code }} {{ course.title }} Syllabus, Notes & PDF Study Pack | Mentify Prep{% endblock %}
-{% block meta_description %}Study {{ course.code }} {{ course.title }} with the Mentify Prep syllabus, printable PDF study packs, revision notes, and verified past examination questions for students and learners.{% endblock %}
+{% block title %}{{ course.code }} {{ course.title }} Syllabus, Notes &amp; Exam Papers | Mentify Prep{% endblock %}
+{% block meta_description %}Study {{ course.code }} {{ course.title }} with the Mentify Prep syllabus, structured study notes, and verified past examination problems.{% endblock %}
 {% block og_title %}{{ course.code }} {{ course.title }} | Mentify Prep{% endblock %}
-{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, past papers, and printable PDF packs on Mentify Prep.{% endblock %}
+{% block og_description %}Explore the {{ course.code }} syllabus, study topics, notes, and past examination problems on Mentify Prep.{% endblock %}
+
 {% block extra_head %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|default:'Structured syllabus, study notes, and revision resources from Mentify Prep.'|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}","description":"{{ course.description|escapejs }}","provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en"}</script>
 <style>
-  .prep-course-title {
-    font-size: clamp(1.2rem, 3.5vw, 1.6rem);
-    letter-spacing: -0.02em;
-    margin: 0 0 8px;
-    color: var(--text);
-    line-height: 1.3;
+  .pc-shell {
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: 48px;
   }
-  .prep-section-header {
+
+  .pc-breadcrumb {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .prep-topic-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-    font-size: 0.85rem;
+    gap: 8px;
+    font-size: 0.82rem;
     color: var(--text-muted);
+    margin-bottom: 14px;
+    flex-wrap: wrap;
   }
-  .prep-ready-group {
+  .pc-breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .pc-breadcrumb a:hover {
+    color: var(--green);
+  }
+  .pc-breadcrumb-sep {
+    color: var(--border);
+    user-select: none;
+  }
+  .pc-breadcrumb-current {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* Header */
+  .pc-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pc-header-identity {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 280px;
+    flex: 1;
+  }
+  .pc-header-identity .course-type-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin-top: 2px;
+  }
+  .pc-header-identity .course-type-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  .pc-title-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+  .pc-code-kicker {
     display: inline-flex;
     align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .pc-code-badge {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-light);
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+  body.dark-theme .pc-code-badge {
+    background: rgba(45, 212, 191, 0.12);
+    color: #2dd4bf;
+  }
+  .pc-category-tag {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .pc-title {
+    margin: 0 0 6px;
+    font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .pc-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 780px;
+  }
+  .pc-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  /* Units List */
+  .pc-units-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .pc-unit-card {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr) 210px;
+    gap: 20px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+  .pc-unit-card:hover {
+    border-color: rgba(15, 118, 110, 0.45);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  }
+  body.dark-theme .pc-unit-card {
+    background: #161616;
+    border-color: #2a2a2a;
+  }
+  body.dark-theme .pc-unit-card:hover {
+    border-color: rgba(45, 212, 191, 0.45);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+  }
+
+  .pc-unit-tile {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  body.dark-theme .pc-unit-tile {
+    background: #1f1f1f;
+    border-color: #303030;
+  }
+  .pc-unit-kicker {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .pc-unit-num {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  body.dark-theme .pc-unit-num {
+    color: #2dd4bf;
+  }
+
+  .pc-unit-body {
+    min-width: 0;
+  }
+  .pc-unit-title {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.015em;
+    line-height: 1.32;
+  }
+  .pc-unit-summary {
+    margin: 0 0 10px;
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.48;
+  }
+  .pc-subtopics-list {
+    display: flex;
     flex-wrap: wrap;
     gap: 6px;
   }
-  .prep-ready-label {
-    font-size: 0.74rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    white-space: nowrap;
-    letter-spacing: 0.04em;
-  }
-  .prep-level-badge {
-    background: rgba(15, 118, 110, 0.08);
-    color: var(--green);
-    border: 1px solid rgba(15, 118, 110, 0.25);
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    line-height: 1.3;
+  .pc-subtopic-chip {
+    font-size: 0.76rem;
+    font-weight: 500;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 6px;
+    color: var(--text-secondary);
     display: inline-block;
   }
-  body.dark-theme .prep-level-badge {
-    background: rgba(45, 212, 191, 0.12);
-    color: #2dd4bf;
-    border-color: rgba(45, 212, 191, 0.3);
+  body.dark-theme .pc-subtopic-chip {
+    background: #202020;
+    border-color: #303030;
+    color: #d4d4d4;
   }
+
+  .pc-unit-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    padding-left: 20px;
+    border-left: 1px solid var(--border);
+  }
+  .pc-unit-count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .pc-unit-cta {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .pc-unit-card {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 18px;
+    }
+    .pc-unit-tile {
+      display: none;
+    }
+    .pc-unit-actions {
+      padding-left: 0;
+      padding-top: 14px;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pc-unit-cta {
+      width: auto;
+    }
+  }
+
   @media (max-width: 600px) {
-    .prep-section-header {
+    .pc-header {
       flex-direction: column;
       align-items: stretch;
-      gap: 10px;
     }
-    .prep-section-header .btn {
-      width: 100%;
-      text-align: center;
-      justify-content: center;
-    }
-    .prep-topic-footer {
+    .pc-unit-actions {
       flex-direction: column;
       align-items: stretch;
-      gap: 12px;
     }
-    .prep-topic-footer .btn {
+    .pc-unit-cta {
       width: 100%;
-      text-align: center;
-      justify-content: center;
     }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 980px; margin: 0 auto; padding: 4px 0 40px;">
-  <nav aria-label="Breadcrumb" style="font-size: 0.85rem; margin-bottom: 20px; color: var(--text-muted);">
-    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">Mentify Prep</a> &bull; <a href="{% url 'prep:public_library' %}" style="color: var(--text-muted); text-decoration: none;">Study Library</a> &bull; {{ course.code }}
+<div class="pc-shell">
+  <!-- Breadcrumb -->
+  <nav class="pc-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'prep:dashboard' %}">Dashboard</a>
+    <span class="pc-breadcrumb-sep">/</span>
+    <a href="{% url 'prep:public_library' %}">Study Library</a>
+    <span class="pc-breadcrumb-sep">/</span>
+    <span class="pc-breadcrumb-current">{{ course.code }}</span>
   </nav>
 
-  <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 24px;">
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-      <span style="color: var(--green); font-weight: 700; font-size: 0.82rem; background: rgba(15, 118, 110, 0.08); padding: 3px 8px; border-radius: 4px;">{{ course.code }}</span>
-      <span style="font-size: 0.82rem; color: var(--text-muted);">{{ course.category }}</span>
+  <!-- Header -->
+  <div class="pc-header">
+    <div class="pc-header-identity">
+      {% include 'prep/includes/course_type_icon.html' with subject_key=course.subject_key category=course.category %}
+      <div class="pc-title-wrap">
+        <div class="pc-code-kicker">
+          <span class="pc-code-badge">{{ course.code }}</span>
+          <span class="pc-category-tag">{{ course.category }}</span>
+        </div>
+        <h1 class="pc-title">{{ course.code }} &bull; {{ course.title }}</h1>
+        <p class="pc-desc">{{ course.description }}</p>
+      </div>
     </div>
-    <h1 class="prep-course-title">{{ course.title }}</h1>
-    <p style="max-width: 760px; color: var(--text-muted); line-height: 1.6; margin: 0; font-size: 0.92rem;">{{ course.description|default:"A structured Mentify Prep course with syllabus-guided study resources and revision questions." }}</p>
-  </header>
 
-  <div style="background: linear-gradient(135deg, rgba(15, 118, 110, 0.06) 0%, rgba(13, 148, 136, 0.12) 100%); border: 1px solid rgba(15, 118, 110, 0.2); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-    <div style="flex: 1 1 260px;">
-      <div style="font-weight: 600; font-size: 0.95rem; color: var(--text);">Looking for {{ course.code }} {{ course.title }} PDF material?</div>
-      <div style="font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin-top: 2px;">Access complete syllabus revision notes, step-by-step past examination solutions, and printable PDF study guides.</div>
-    </div>
-    {% if topics.0 %}
-    <a href="{% url 'prep:topic_study' topics.0.id %}" class="btn btn-primary btn-sm" style="font-weight: 600; white-space: nowrap;">Get PDF &amp; Study Pack</a>
-    {% else %}
-    <a href="{% url 'prep:dashboard' %}" class="btn btn-primary btn-sm" style="font-weight: 600; white-space: nowrap;">Get PDF &amp; Study Pack</a>
-    {% endif %}
-  </div>
-
-  <section aria-labelledby="topics-heading">
-    <div class="prep-section-header">
-      <h2 id="topics-heading" style="font-size: 1.2rem; margin: 0; font-weight: 600;">Syllabus Units &amp; Topics</h2>
-      {% if topics.0 %}
-      <a href="{% url 'prep:topic_study' topics.0.id %}" class="btn btn-primary btn-sm" style="font-weight: 600; white-space: nowrap;">Enter Interactive Study &rarr;</a>
+    <div class="pc-header-actions">
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'prep:course_detail' course_code=course.code %}" class="btn btn-primary btn-sm">
+        Go to Course Workspace &rarr;
+      </a>
+      {% else %}
+      <a href="{% url 'account_login' %}?next={% url 'prep:public_course' course.slug %}" class="btn btn-primary btn-sm">
+        Sign In to Study
+      </a>
       {% endif %}
     </div>
+  </div>
 
-    <div style="display: grid; gap: 12px;">
-      {% for topic in topics %}
-      <article class="card" style="padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface);">
-        <p style="color: var(--green); font-weight: 700; font-size: .8rem; margin: 0 0 6px;">UNIT {{ topic.order|default:forloop.counter }}</p>
-        <h3 style="margin: 0 0 8px; font-size: 1.1rem; line-height: 1.35;">
-          <a href="{% url 'prep:public_topic' course.slug topic.id topic.slug %}" style="color: inherit; text-decoration: none;">{{ topic.title }}</a>
-        </h3>
-        {% if topic.subtopics %}<p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.88rem; line-height: 1.45;">{{ topic.subtopics|join:", " }}</p>{% endif %}
-        <div class="prep-topic-footer">
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span style="white-space: nowrap;">{{ topic.question_count }} verified question{{ topic.question_count|pluralize }}</span>
-          </div>
-          <a href="{% url 'prep:topic_study' topic.id %}?tab=notes{% if topic.preferred_level %}&level={{ topic.preferred_level }}{% endif %}" class="btn btn-outline btn-sm" style="padding: 5px 14px; font-size: 0.8rem; white-space: nowrap;">Study Topic &rarr;</a>
-        </div>
-      </article>
-      {% empty %}
-      <p style="color: var(--text-muted);">Syllabus topics are being prepared.</p>
-      {% endfor %}
+  <!-- Units List -->
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 2px; color: var(--text);">Syllabus Units</h2>
+      <span style="font-size: 0.84rem; color: var(--text-muted);">Curriculum outline, core theorems, and revision problems.</span>
     </div>
-  </section>
+    <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">{{ topics|length }} Topics</span>
+  </div>
+
+  <div class="pc-units-list">
+    {% for topic in topics %}
+    <article class="pc-unit-card">
+      <div class="pc-unit-tile">
+        <span class="pc-unit-kicker">Unit</span>
+        <span class="pc-unit-num">{{ forloop.counter|stringformat:"02d" }}</span>
+      </div>
+
+      <div class="pc-unit-body">
+        <h3 class="pc-unit-title">
+          <a href="{% url 'prep:public_topic' course.slug topic.id topic.slug %}" style="color: inherit; text-decoration: none;">
+            {{ topic.title }}
+          </a>
+        </h3>
+
+        {% if topic.summary %}
+        <p class="pc-unit-summary">{{ topic.summary }}</p>
+        {% endif %}
+
+        {% if topic.subtopics %}
+        <div class="pc-subtopics-list">
+          {% for st in topic.subtopics %}
+          <span class="pc-subtopic-chip">{{ st }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="pc-unit-actions">
+        <span class="pc-unit-count">{{ topic.question_count }} Verified Question{{ topic.question_count|pluralize }}</span>
+        <a href="{% url 'prep:topic_study' topic.id %}?tab=notes{% if topic.preferred_level %}&level={{ topic.preferred_level }}{% endif %}" class="btn btn-primary btn-sm pc-unit-cta">
+          Study Topic &rarr;
+        </a>
+      </div>
+    </article>
+    {% empty %}
+    <div style="padding: 36px 20px; text-align: center; border: 1px dashed var(--border); border-radius: 12px; background: var(--surface);">
+      <p style="color: var(--text-muted); margin: 0; font-size: 0.88rem;">No syllabus units are currently published for this course.</p>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

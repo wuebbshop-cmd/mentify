@@ -117,45 +117,6 @@
     flex-shrink: 0;
   }
 
-  /* Borderless Typographic Summary Strip */
-  .cd-summary-strip {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-    padding: 18px 0;
-    margin-bottom: 28px;
-    border-bottom: 1px solid var(--border);
-  }
-  .cd-metric-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding-right: 16px;
-    border-right: 1px solid var(--border);
-  }
-  .cd-metric-item:last-child {
-    border-right: none;
-    padding-right: 0;
-  }
-  .cd-metric-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-  }
-  .cd-metric-value {
-    font-size: 1.45rem;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-  }
-  .cd-metric-sub {
-    font-size: 0.76rem;
-    color: var(--text-muted);
-  }
-
   /* Section Toolbar (Heading + Search Filter) */
   .cd-toolbar {
     display: flex;
@@ -517,14 +478,6 @@
 
   /* Responsive Breakpoints */
   @media (max-width: 900px) {
-    .cd-summary-strip {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-    .cd-metric-item:nth-child(2) {
-      border-right: none;
-      padding-right: 0;
-    }
     .unit-row-card {
       grid-template-columns: 1fr;
       gap: 14px;
@@ -573,18 +526,6 @@
     .cd-header-actions form .btn {
       width: 100%;
       justify-content: center;
-    }
-    .cd-summary-strip {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      padding: 14px 0;
-    }
-    .cd-metric-item {
-      border-right: none;
-      padding-right: 0;
-    }
-    .cd-metric-value {
-      font-size: 1.25rem;
     }
     .cd-toolbar {
       flex-direction: column;
@@ -668,30 +609,6 @@
         </form>
         {% endif %}
       {% endif %}
-    </div>
-  </div>
-
-  <!-- Borderless Typographic Metrics Strip -->
-  <div class="cd-summary-strip">
-    <div class="cd-metric-item">
-      <span class="cd-metric-label">Syllabus Scope</span>
-      <span class="cd-metric-value">{{ topics|length }} Units</span>
-      <span class="cd-metric-sub">{{ total_subtopics_count|default:0 }} indexed sub-topics</span>
-    </div>
-    <div class="cd-metric-item">
-      <span class="cd-metric-label">Banked Past Questions</span>
-      <span class="cd-metric-value">{{ total_questions_count|default:0 }} Questions</span>
-      <span class="cd-metric-sub">Verified from exam papers</span>
-    </div>
-    <div class="cd-metric-item">
-      <span class="cd-metric-label">Explanation Levels</span>
-      <span class="cd-metric-value" style="color: var(--green);">Levels 1 &ndash; 3</span>
-      <span class="cd-metric-sub">Foundation, Core &amp; Exam Focus</span>
-    </div>
-    <div class="cd-metric-item">
-      <span class="cd-metric-label">Exam Papers</span>
-      <span class="cd-metric-value">{{ course_papers|length }} Paper{{ course_papers|length|pluralize }}</span>
-      <span class="cd-metric-sub">{% if ready_topics_count %}{{ ready_topics_count }}/{{ topics|length }} units pre-cached{% else %}On-demand synthesis{% endif %}</span>
     </div>
   </div>
 
