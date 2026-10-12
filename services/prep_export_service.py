@@ -498,8 +498,14 @@ def _build_topic_notes_html(
     practice_questions: list | None = None,
     level: str = "level_2",
 ) -> str:
-    """Builds complete standalone HTML with KaTeX, marked, Prism.js, and print styling for topic notes."""
-    from services.prep_ai_router import normalize_math_delimiters
+    """Builds complete standalone HTML with KaTeX, marked, Prism.js, and print styling for topic notes.
+
+    NOTE: Do NOT run normalize_math_delimiters() on the assembled markdown here.
+    The Python implementation can corrupt inline math (e.g. $Q_d = 12$ → ' = 12$') when the
+    text contains LaTeX layout commands. The injected prep-renderer.js already calls
+    cleanLatexDocumentMarkup() + normalizeLegacyMathBlocks() client-side, so all
+    normalisation is deferred to the JS renderer which handles it correctly.
+    """
 
     full_markdown = notes_content.strip()
 
@@ -515,9 +521,8 @@ def _build_topic_notes_html(
             full_markdown += f"### Question {num} [{marks} Marks] &bull; {paper} ({year})\n\n"
             full_markdown += f"{q_latex}\n\n"
             if sol_latex:
-                clean_sol = normalize_math_delimiters(sol_latex.strip())
                 full_markdown += "> **✓ Step-by-Step Verified Solution & Marking Rubric:**\n>\n"
-                sol_lines = clean_sol.split("\n")
+                sol_lines = sol_latex.strip().split("\n")
                 full_markdown += "\n".join(f"> {line}" for line in sol_lines) + "\n\n"
 
     if practice_questions:
@@ -531,15 +536,14 @@ def _build_topic_notes_html(
             full_markdown += f"### Practice Question {num} [{marks} Marks] &bull; {topic}\n\n"
             full_markdown += f"{q_latex}\n\n"
             if sol_latex:
-                clean_sol = normalize_math_delimiters(sol_latex.strip())
                 full_markdown += "> **✓ Step-by-Step Solution & Marking Scheme:**\n>\n"
-                sol_lines = clean_sol.split("\n")
+                sol_lines = sol_latex.strip().split("\n")
                 full_markdown += "\n".join(f"> {line}" for line in sol_lines) + "\n\n"
 
     date_str = datetime.now().strftime("%B %d, %Y")
     course_upper = course_code.upper()
 
-    full_markdown = normalize_math_delimiters(full_markdown)
+    # Only inline images (base64-embed); math normalisation is handled by the JS renderer.
     full_markdown = _inline_media_images(full_markdown)
     escaped_json = json.dumps(full_markdown).replace("</", "<\/")
 
