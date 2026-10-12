@@ -3087,10 +3087,15 @@ def clean_latex_document_markup(text: str) -> str:
     cleaned = _replace_literal_escaped_newlines(text.strip())
 
     # 1. Clean document-level whitespace, section headings, and layout commands
-    cleaned = re.sub(r"\\(?:noindent|centering|newpage|clearpage)\b\s*", "", cleaned)
+    cleaned = re.sub(r"\\(?:noindent|centering|newpage|clearpage|raggedright|raggedleft)\b\s*", "", cleaned)
     cleaned = re.sub(r"\\vspace\*?\{[^}]*\}", "", cleaned)
     cleaned = re.sub(r"\\hspace\*?\{[^}]*\}", "", cleaned)
     cleaned = re.sub(r"\\hrule\b", "", cleaned)
+    cleaned = re.sub(r"\\rule(?:\[[^\]]*\])?\{[^}]*\}\{[^}]*\}", "", cleaned)
+    cleaned = re.sub(r"\\includegraphics(?:\[[^\]]*\])?\{[^}]*\}", "", cleaned)
+    cleaned = re.sub(r"\\(?:tiny|scriptsize|footnotesize|small|normalsize|large|Large|LARGE|huge|Huge)\b\s*", "", cleaned)
+    cleaned = re.sub(r"\\\[\s*([0-9.]+\s*(?:em|ex|pt|cm|mm|in))\s*\\\]", "", cleaned)
+    cleaned = re.sub(r"\\\\\[[^\]]*\]", "\n\n", cleaned)
     cleaned = re.sub(r"\\section\*?\{([^}]*)\}", r"\n\n## \1\n\n", cleaned)
     cleaned = re.sub(r"\\subsection\*?\{([^}]*)\}", r"\n\n### \1\n\n", cleaned)
     cleaned = re.sub(r"\\subsubsection\*?\{([^}]*)\}", r"\n\n#### \1\n\n", cleaned)
@@ -3223,10 +3228,11 @@ def clean_latex_document_markup(text: str) -> str:
 
     cleaned = re.sub(r"\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}", replace_itemize, cleaned)
     cleaned = re.sub(
-        r"\\begin\{(?:center|flushleft|flushright)\}([\s\S]*?)\\end\{(?:center|flushleft|flushright)\}",
+        r"\\begin\{(?:center|flushleft|flushright|figure|table|minipage|quote)\}([\s\S]*?)\\end\{(?:center|flushleft|flushright|figure|table|minipage|quote)\}",
         r"\1",
         cleaned,
     )
+    cleaned = re.sub(r"\\caption\*?\{([^}]*)\}", r"*\1*", cleaned)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
     cleaned = _clean_prose_latex_breaks(cleaned)
     return cleaned.strip()

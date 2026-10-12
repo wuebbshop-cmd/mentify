@@ -698,17 +698,27 @@ class PrepNoteRepair(models.Model):
 class PrepWallet(models.Model):
     """User credit balance and monthly exam readiness plan."""
     PLAN_CHOICES = [
-        ("trial", "Free Trial (3 Days)"),
-        ("basic", "Basic (Starter Prep)"),
-        ("plus", "Plus (Semester Pass)"),
-        ("pro", "Pro (Exam Master)"),
-        ("expired", "Trial Expired"),
+        ("trial",    "Free Trial (7 Days)"),
+        ("freemium", "Freemium (Free Forever)"),
+        ("basic",    "Basic (Starter Prep)"),
+        ("plus",     "Plus (Semester Pass)"),
+        ("pro",      "Pro (Exam Master)"),
+        ("expired",  "Expired"),
     ]
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="prep_wallet")
-    credits_balance = models.PositiveIntegerField(default=30)
+    credits_balance = models.PositiveIntegerField(default=0)
     current_plan = models.CharField(max_length=50, choices=PLAN_CHOICES, default="trial")
     plan_expires_at = models.DateTimeField(null=True, blank=True)
+    # PDF / image upload quota tracking (reset every 30 days by plan cycle)
+    pdf_uploads_this_month = models.PositiveIntegerField(
+        default=0,
+        help_text="Count of PDF/image uploads consumed in the current 30-day window.",
+    )
+    pdf_uploads_reset_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="When pdf_uploads_this_month resets to 0 next.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -721,7 +731,7 @@ class PrepWallet(models.Model):
 
     @classmethod
     def get_or_create_wallet(cls, user):
-        """Helper to safely retrieve or create a wallet for a user with default starter balance and 3-day trial."""
+        """Safely retrieve or create a wallet. New wallets start on a 7-day, 100-credit free trial."""
         wallet = cls.objects.filter(user=user).first()
         created = False
         if not wallet:
@@ -732,7 +742,7 @@ class PrepWallet(models.Model):
                 user=user,
                 credits_balance=0,
                 current_plan="trial",
-                plan_expires_at=timezone.now() + timedelta(days=3),
+                plan_expires_at=timezone.now() + timedelta(days=7),
             )
         from services.credit_service import ensure_wallet_credit_state
         ensure_wallet_credit_state(wallet, initialize_trial=created)

@@ -2633,8 +2633,10 @@ def process_prep_document(prep_document) -> dict:
             }
         text = merge_local_and_ocr_pages(text, ocr_text)
 
-    prep_document.extracted_text = text
-    prep_document.text_sha256 = hashlib.sha256(_normalise_document_text(text).encode("utf-8")).hexdigest() if text.strip() else ""
+    from services.prep_ai_router import clean_latex_document_markup, normalize_math_delimiters
+    cleaned_doc_text = normalize_math_delimiters(clean_latex_document_markup(text)) if text.strip() else text
+    prep_document.extracted_text = cleaned_doc_text
+    prep_document.text_sha256 = hashlib.sha256(_normalise_document_text(cleaned_doc_text).encode("utf-8")).hexdigest() if cleaned_doc_text.strip() else ""
 
     # Different files sometimes contain the same notes. Keep the source file for
     # review, but do not propose duplicate syllabus changes or charge a user for it.
@@ -2721,6 +2723,11 @@ def process_prep_document(prep_document) -> dict:
             )
         except Exception as e:
             logger.error(f"[Topic Extraction] Error extracting topics: {e}")
+    elif visual_candidate_count:
+        # For past papers, CATs, and assignments, map visual crops to existing active course topics
+        existing_topics = list(prep_document.course.topics.filter(is_active=True))
+        if existing_topics:
+            assign_visuals_to_topics(prep_document, existing_topics, allow_auto_approval=True)
 
     from prep.document_validation import validate_prep_document
 

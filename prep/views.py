@@ -1549,8 +1549,16 @@ def prep_upload(request):
         if is_async:
             import hashlib
             from services.prep_ingestion import enqueue_prep_document_ingestion
+            from services.credit_service import enforce_upload_limit, record_upload, UploadLimitExceeded
 
             wallet = PrepWallet.get_or_create_wallet(request.user)
+
+            # ── Plan upload gate — check BEFORE touching any files ─────────────
+            try:
+                enforce_upload_limit(wallet)
+            except UploadLimitExceeded as exc:
+                return JsonResponse({"success": False, "error": str(exc), "upgrade_required": True}, status=403)
+
             course_slug = course.slug or course.code.replace(" ", "-")
             course_url = reverse("prep:course_detail", kwargs={"course_code": course_slug})
 
@@ -1616,6 +1624,7 @@ def prep_upload(request):
                     url=course_url,
                 )
                 enqueue_prep_document_ingestion(prep_doc.pk)
+                record_upload(wallet)   # increment monthly upload counter
                 queued += 1
                 created_docs.append(_serialize_upload_document(prep_doc))
 
@@ -1762,6 +1771,7 @@ def prep_history(request):
 @never_cache
 def prep_billing(request):
     """Credit Balance & M-Pesa Top-Up Page connected to PrepWallet."""
+    from services.credit_service import get_plan_upload_limit
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
         user_credits = get_available_credits(wallet)
@@ -1771,24 +1781,34 @@ def prep_billing(request):
             plan_display = "Plus (Semester Pass)"
         elif wallet.current_plan == "basic":
             plan_display = "Basic (Starter Prep)"
+        elif wallet.current_plan == "freemium":
+            plan_display = "Freemium (Free Forever)"
         elif wallet.current_plan == "expired":
-            plan_display = "Free Trial Expired"
+            plan_display = "Expired — Upgrade to Continue"
         else:
-            plan_display = "Free Trial (3 Days)"
+            plan_display = "Free Trial (7 Days)"
         is_trial = wallet.current_plan == "trial"
-        can_top_up = has_active_subscription(wallet)
+        is_freemium = wallet.current_plan == "freemium"
+        can_top_up = True   # Open to all authenticated users on any plan
         plan_expires_at = wallet.plan_expires_at
         recent_transactions = wallet.transactions.all()[:10]
         current_plan_code = wallet.current_plan
+        upload_limit = get_plan_upload_limit(wallet)
+        uploads_used = wallet.pdf_uploads_this_month
+        uploads_remaining = None if upload_limit is None else max(0, upload_limit - uploads_used)
     else:
         wallet = None
         user_credits = 0
-        plan_display = "Free 30-Credit Trial (Sign Up Free)"
+        plan_display = "Free 100-Credit Trial (Sign Up Free)"
         is_trial = False
+        is_freemium = False
         can_top_up = False
         plan_expires_at = None
         recent_transactions = []
         current_plan_code = None
+        upload_limit = 0
+        uploads_used = 0
+        uploads_remaining = 0
 
     context = {
         "active_tab": "billing",
@@ -1796,11 +1816,37 @@ def prep_billing(request):
         "user_credits": user_credits,
         "current_plan": plan_display,
         "is_trial": is_trial,
+        "is_freemium": is_freemium,
         "can_top_up": can_top_up,
         "plan_expires_at": plan_expires_at,
         "recent_transactions": recent_transactions,
-        "topup_price_kes": 150,
+        "topup_rate_per_credit": 1.5,   # KES 1.5 per credit — used by template JS
+        "topup_min_credits": 10,
+        "upload_limit": upload_limit,
+        "uploads_used": uploads_used,
+        "uploads_remaining": uploads_remaining,
         "plans": [
+            {
+                "id": "freemium_plan",
+                "name": "Freemium",
+                "price": "KES 0 / mo",
+                "price_num": 0,
+                "credits": "20 Credits/mo",
+                "tagline": "Permanent free access — cached notes and past Q&A always available",
+                "is_popular": False,
+                "theme_color": "#64748b",
+                "theme_bg": "rgba(100, 116, 139, 0.08)",
+                "badge_label": "FREE",
+                "features": [
+                    "20 Free Credits Every Month (auto-refresh)",
+                    "Cached Lecture Notes (Read Only)",
+                    "Past Exam Questions & Answers",
+                    "AI Tutor & Generated Questions (uses credits)",
+                    "No PDF / Image Uploads",
+                    "Buy credit top-ups anytime",
+                ],
+                "active": current_plan_code == "freemium",
+            },
             {
                 "id": "basic_plan",
                 "name": "Basic (Starter Prep)",
@@ -1814,7 +1860,7 @@ def prep_billing(request):
                 "badge_label": "STARTER",
                 "features": [
                     "250 Monthly Credits",
-                    "10 Document / PDF Uploads",
+                    "20 PDF / Image Uploads per month",
                     "100 Practice Exam Questions",
                     "5 Handwritten & Scanned Exam Uploads",
                     "Full PDF & DOCX Study Pack Downloads",
@@ -1837,7 +1883,7 @@ def prep_billing(request):
                 "badge_label": "RECOMMENDED",
                 "features": [
                     "450 Monthly Credits",
-                    "20 Document / PDF Uploads",
+                    "40 PDF / Image Uploads per month",
                     "200 Practice Exam Questions",
                     "15 Handwritten & Scanned Exam Uploads",
                     "Full PDF & DOCX Study Pack Downloads",
@@ -1860,7 +1906,7 @@ def prep_billing(request):
                 "badge_label": "FULL ACCESS",
                 "features": [
                     "750 Monthly Credits",
-                    "40 Document / PDF Uploads",
+                    "Unlimited PDF / Image Uploads",
                     "350 Practice Exam Questions",
                     "30 Handwritten & Scanned Exam Uploads",
                     "Full PDF & DOCX Study Pack Downloads",
@@ -1873,6 +1919,7 @@ def prep_billing(request):
         ],
     }
     return render(request, "prep/billing.html", context)
+
 
 
 @never_cache
@@ -2031,10 +2078,11 @@ from django.conf import settings
 from services.paystack_service import PaystackService
 
 PREP_PACKAGES = {
-    "topup_100": {
-        "name": "100 Credits Top-Up",
-        "price_kes": 150,
-        "credits": 100,
+    "topup_custom": {
+        # Dynamic — amount and credits are computed in prep_initiate_payment from POST data
+        "name": "Custom Credit Top-Up",
+        "price_kes": None,   # set dynamically
+        "credits": None,     # set dynamically
         "type": "topup",
     },
     "basic_plan": {
@@ -2060,6 +2108,10 @@ PREP_PACKAGES = {
     },
 }
 
+# KES per credit for custom top-up
+TOPUP_RATE_KES_PER_CREDIT = 1.5
+TOPUP_MIN_CREDITS = 10
+
 
 @never_cache
 @login_required
@@ -2068,15 +2120,30 @@ def prep_initiate_payment(request):
     if request.method != "POST":
         return redirect("prep:billing")
 
-    package_key = request.POST.get("package", "topup_100")
-    package = PREP_PACKAGES.get(package_key)
-    if not package:
-        messages.error(request, "Invalid payment package selected.")
-        return redirect("prep:billing")
+    package_key = request.POST.get("package", "topup_custom")
 
-    if package["type"] == "topup" and not has_active_subscription(PrepWallet.get_or_create_wallet(request.user)):
-        messages.error(request, "Credit top-ups are available only while you have an active subscription.")
-        return redirect("prep:billing")
+    # ── Dynamic custom top-up (open to all plans) ──────────────────────────────
+    if package_key == "topup_custom":
+        try:
+            credit_amount = int(request.POST.get("credit_amount", 0))
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid credit amount entered.")
+            return redirect("prep:billing")
+        if credit_amount < TOPUP_MIN_CREDITS:
+            messages.error(request, f"Minimum top-up is {TOPUP_MIN_CREDITS} credits (KES {round(TOPUP_MIN_CREDITS * TOPUP_RATE_KES_PER_CREDIT)}).")
+            return redirect("prep:billing")
+        price_kes = round(credit_amount * TOPUP_RATE_KES_PER_CREDIT)
+        package = {
+            "name": f"{credit_amount} Credits Top-Up",
+            "price_kes": price_kes,
+            "credits": credit_amount,
+            "type": "topup",
+        }
+    else:
+        package = PREP_PACKAGES.get(package_key)
+        if not package:
+            messages.error(request, "Invalid payment package selected.")
+            return redirect("prep:billing")
 
     reference = f"PREP-{uuid.uuid4().hex[:12].upper()}"
     amount_cents = package["price_kes"] * 100
@@ -2153,18 +2220,13 @@ def prep_payment_callback(request):
 
         with transaction.atomic():
             wallet = PrepWallet.get_or_create_wallet(request.user)
-            # Check if this reference was already credited to prevent duplicate credit grants
+            # Prevent duplicate credit grants for the same Paystack reference
             existing_tx = PrepTransaction.objects.filter(reference_code=reference).first()
             if not existing_tx:
                 if package_type == "plan" and plan_id:
                     grant_subscription(wallet, plan_id, int(credits_to_add), reference_code=reference)
                 else:
-                    if not has_active_subscription(wallet):
-                        messages.error(
-                            request,
-                            "The payment was received, but top-up credits require an active subscription. Please contact support with your payment reference.",
-                        )
-                        return redirect("prep:billing")
+                    # Top-ups are open to all plans — no subscription gate
                     grant_purchased_topup(
                         wallet,
                         int(credits_to_add),
@@ -2187,8 +2249,6 @@ def prep_payment_callback(request):
     err = paystack.friendly_error(body, fallback="Transaction was not successful or was cancelled.")
     messages.error(request, f"Payment verification: {err}")
     return redirect("prep:billing")
-
-
 
 # ─── Step 4: AI Model Router & Zero-Cost Cache JSON Endpoints ────────────────
 
@@ -2317,6 +2377,10 @@ def prep_solve_question_api(request):
                 "error": "The generated solution requires more credits than are currently available. Please subscribe or top up, then try again.",
                 "credits_balance": get_available_credits(wallet),
             }, status=402)
+
+        # Downgrade trial → freemium immediately if credits are now zero
+        from services.credit_service import check_and_downgrade_trial
+        check_and_downgrade_trial(wallet)
 
         # Trigger low credit alert if balance is running low
         wallet.refresh_from_db()
@@ -2469,6 +2533,10 @@ def prep_adapt_question_api(request):
             "error": "The adapted question requires more credits than are currently available.",
             "credits_balance": get_available_credits(wallet),
         }, status=402)
+
+    # Downgrade trial → freemium immediately if credits are now zero
+    from services.credit_service import check_and_downgrade_trial
+    check_and_downgrade_trial(wallet)
 
     reconstruction_metadata = result.get("reconstruction_metadata")
     reconstruction_metadata = reconstruction_metadata if isinstance(reconstruction_metadata, dict) else {}
@@ -2828,6 +2896,10 @@ def prep_topic_notes_api(request):
                 "credits_balance": get_available_credits(wallet),
             }, status=402)
 
+        # Downgrade trial → freemium immediately if credits are now zero
+        from services.credit_service import check_and_downgrade_trial
+        check_and_downgrade_trial(wallet)
+
     if topic_obj:
         balance_before_final_settlement = get_available_credits(wallet)
         allowed, available_credits = ensure_note_access(request.user, topic_obj, level)
@@ -3005,6 +3077,10 @@ def prep_generate_practice_api(request):
                 "error": "The generated practice set requires more credits than are currently available. Please subscribe or top up, then try again.",
                 "credits_balance": get_available_credits(wallet),
             }, status=402)
+
+        # Downgrade trial → freemium immediately if credits are now zero
+        from services.credit_service import check_and_downgrade_trial
+        check_and_downgrade_trial(wallet)
 
         # Low credits advisory
         wallet.refresh_from_db()

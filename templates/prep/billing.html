@@ -39,16 +39,32 @@
   <div>
     <div style="font-weight: 600; color: #2563eb; display: flex; align-items: center; gap: 8px;">
       <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2563eb;"></span>
-      Free Trial Active (30 Starter Credits)
+      Free Trial Active (100 Starter Credits)
     </div>
     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-      Explore all features: view complete lecture notes, generate practice questions, derive step-by-step proofs, and download study pack PDFs.
+      Explore all features: view complete lecture notes, generate practice questions, derive step-by-step proofs, and try up to 10 PDF/image uploads.
       {% if plan_expires_at %}
         &bull; <strong>Trial Ends:</strong> {{ plan_expires_at|date:"M d, Y H:i" }}
       {% endif %}
     </div>
   </div>
-  <span class="badge" style="background: #2563eb; color: #fff; font-size: 0.78rem; padding: 4px 10px;">Free 30-Credit Trial</span>
+  <span class="badge" style="background: #2563eb; color: #fff; font-size: 0.78rem; padding: 4px 10px;">Free 100-Credit Trial</span>
+</div>
+{% elif is_freemium %}
+<div style="background: rgba(100, 116, 139, 0.08); border: 1px solid rgba(100, 116, 139, 0.25); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+  <div>
+    <div style="font-weight: 600; color: #475569; display: flex; align-items: center; gap: 8px;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #64748b;"></span>
+      Freemium Active (20 Free Monthly Credits)
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+      Unlimited access to cached lecture notes and authentic past examination questions.
+      {% if plan_expires_at %}
+        &bull; <strong>Next 20-Credit Refresh:</strong> {{ plan_expires_at|date:"M d, Y" }}
+      {% endif %}
+    </div>
+  </div>
+  <span class="badge" style="background: #64748b; color: #fff; font-size: 0.78rem; padding: 4px 10px;">Free Forever</span>
 </div>
 {% endif %}
 
@@ -60,20 +76,56 @@
       Current Plan: <strong>{{ current_plan }}</strong> &bull;
       <a href="{% url 'prep:dashboard' %}#credit-activity" style="color: var(--green); text-decoration: none; font-weight: 500;">View Activity on Dashboard &rarr;</a>
     </div>
+    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+      📎 Monthly Upload Quota:
+      <strong style="color: var(--text);">
+        {{ uploads_used }} / {% if upload_limit is None %}Unlimited{% else %}{{ upload_limit }}{% endif %}
+      </strong>
+    </div>
   </div>
 
-  <div style="text-align: right;">
+  <div style="text-align: right; min-width: 280px;">
     {% if can_top_up %}
-      <form method="post" action="{% url 'prep:initiate_payment' %}" style="margin: 0;">
+      <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text);">Purchase Credit Top-Up</div>
+      <form method="post" action="{% url 'prep:initiate_payment' %}" id="custom-topup-form" style="margin: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
         {% csrf_token %}
-        <input type="hidden" name="package" value="topup_100">
-        <button type="submit" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger);">
-          Top Up KES 150 (100 Credits)
+        <input type="hidden" name="package" value="topup_custom">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input
+            type="number"
+            id="credit-amount-input"
+            name="credit_amount"
+            value="100"
+            min="10"
+            step="1"
+            style="width: 100px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.92rem; text-align: center; font-weight: 600;"
+            oninput="handleCreditChange(this.value)"
+          >
+          <span style="font-size: 0.85rem; color: var(--text-muted);">credits</span>
+        </div>
+        <button type="submit" id="topup-submit-btn" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger); font-size: 0.9rem; padding: 8px 16px;">
+          Pay KES 150 via M-Pesa
         </button>
       </form>
-      <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 5px;">Purchased top-ups expire 30 days after purchase.</div>
+      <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 5px;">
+        Rate: KES 1.50 / credit &bull; Valid for 30 days &bull; Available to all users
+      </div>
+      <script>
+        function handleCreditChange(val) {
+          const credits = parseInt(val, 10) || 0;
+          const cost = Math.round(credits * 1.5);
+          const btn = document.getElementById('topup-submit-btn');
+          if (credits < 10) {
+            btn.disabled = true;
+            btn.innerText = 'Min. 10 Credits';
+          } else {
+            btn.disabled = false;
+            btn.innerText = `Pay KES ${cost.toLocaleString()} via M-Pesa`;
+          }
+        }
+      </script>
     {% else %}
-      <div style="font-size: 0.85rem; color: var(--text-muted); max-width: 260px;">Subscribe to any monthly plan to unlock 30-day credit top-ups.</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); max-width: 260px;">Sign in to access 30-day custom credit top-ups.</div>
     {% endif %}
   </div>
 </div>
@@ -81,11 +133,11 @@
 <!-- Monthly Subscription Plans with Color Distinctions -->
 <section style="margin-bottom: 40px;">
   <div style="margin-bottom: 22px;">
-    <h3 style="margin-bottom: 4px; font-size: 1.15rem;">Monthly Subscription Plans</h3>
+    <h3 style="margin-bottom: 4px; font-size: 1.15rem;">Subscription & Access Plans</h3>
     <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 0.9rem;">Fair, student-friendly pricing tailored for Continuous Assessment Tests and final exam revision.</p>
     <div style="display: flex; align-items: center; gap: 6px; font-size: 0.84rem; color: var(--green); font-weight: 600;">
       <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-      All plans include full PDF & Word study pack downloads, step-by-step proofs, and all explanation levels.
+      All paid plans include full PDF & Word study pack downloads, step-by-step proofs, and all explanation levels.
     </div>
   </div>
 
@@ -127,6 +179,8 @@
       <div>
         {% if p.active %}
           <button class="btn btn-outline btn-block" disabled style="opacity: 0.7; cursor: default;">Current Plan</button>
+        {% elif p.price_num == 0 %}
+          <button class="btn btn-outline btn-block" disabled style="opacity: 0.7; cursor: default;">Default Tier</button>
         {% else %}
           <form method="post" action="{% url 'prep:initiate_payment' %}">
             {% csrf_token %}
@@ -149,11 +203,17 @@
     <div style="padding: 16px 22px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
       <div>
         <h3 style="margin: 0 0 3px 0; font-size: 1.05rem; color: var(--text); font-weight: 600;">Credit Consumption Rules</h3>
-        <p style="margin: 0; color: var(--text-muted); font-size: 0.84rem;">Transparent credit deductions per action; cached syllabus questions and lecture notes are always 100% free.</p>
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.84rem;">Clear, transparent credit rules so you always know what to expect before studying.</p>
       </div>
       <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-weight: 700; font-size: 0.75rem; padding: 4px 10px;">
         PAY-PER-USE
       </span>
+    </div>
+
+    <!-- Transparent Notice on Course Sharing & Tutor Estimation -->
+    <div style="padding: 12px 22px; background: rgba(245, 158, 11, 0.08); border-bottom: 1px solid rgba(245, 158, 11, 0.2); font-size: 0.82rem; color: #92400e; line-height: 1.5;">
+      💡 <strong>Course Cost Share &amp; Tutor Usage Note:</strong>
+      Cached lecture notes and past papers are free to read. When unlocking an uncached, freshly synthesized course unit or custom course pack for the first time, an initial one-time course-share credit deduction may apply. AI Tutor replies start at 1 credit for standard questions, and scale proportionally (2–5 credits) for long inquiries, heavy proofs, or attached documents based on model tokens.
     </div>
 
     <!-- Structured Rules List -->
@@ -166,11 +226,11 @@
           </div>
           <div>
             <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Cached Past Questions &amp; Notes</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Instant access from syllabus database, all 3 explanation levels, and marking rubrics</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Instant access from syllabus database, all 3 explanation levels, and marking rubrics (one-time course-share applies only when unlocking new unindexed modules)</div>
           </div>
         </div>
         <span class="badge" style="background: rgba(15, 118, 110, 0.12); color: var(--green); font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
-          0 Credits (Free)
+          0 Credits (Free Once Unlocked)
         </span>
       </div>
 
@@ -182,11 +242,11 @@
           </div>
           <div>
             <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">AI Study Tutor Conversation</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive topic tutoring, concept clarification, and step-by-step guidance</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive topic tutoring, step-by-step guidance &bull; 1 credit for standard questions; multi-step mathematical derivations or long outputs dynamically scale by token length</div>
           </div>
         </div>
         <span class="badge" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
-          1 Credit / reply
+          From 1 Credit / reply (Token-Based)
         </span>
       </div>
 
@@ -198,7 +258,7 @@
           </div>
           <div>
             <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Tutor Image &amp; Scanned PDF Upload (OCR)</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Visual OCR extraction for photos and scanned pages; digital text PDFs are read free</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Visual OCR extraction for photos and scanned pages (subject to plan monthly upload limits)</div>
           </div>
         </div>
         <span class="badge" style="background: rgba(230, 126, 34, 0.12); color: #d97706; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
@@ -214,7 +274,7 @@
           </div>
           <div>
             <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Document / PDF Upload</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Digital lecture notes, course outlines, and typed syllabus materials</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Digital lecture notes, course outlines, and typed syllabus materials (subject to plan monthly upload limits)</div>
           </div>
         </div>
         <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">

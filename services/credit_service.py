@@ -11,18 +11,37 @@ from django.db import transaction
 from django.utils import timezone
 
 
-TRIAL_CREDITS = 30
-TRIAL_DURATION = timedelta(hours=72)
+# ─── Plan Constants ────────────────────────────────────────────────────────────
+
+TRIAL_CREDITS = 100
+TRIAL_DURATION = timedelta(days=7)
+
+FREEMIUM_CREDITS = 20
+FREEMIUM_CYCLE_DAYS = 30
+
 PURCHASED_CREDIT_DURATION = timedelta(days=30)
+
+# Per-plan PDF/image upload limits (uploads per 30-day cycle).
+# None = unlimited. 0 = blocked entirely.
+PLAN_UPLOAD_LIMITS = {
+    "trial":    10,
+    "freemium": 0,
+    "basic":    20,
+    "plus":     40,
+    "pro":      None,    # unlimited
+    "expired":  0,
+}
 
 # These are the server-side counterparts of the limits shown on the billing
 # page. Credits pay for model use; these caps bound plan volume independently.
 SUBSCRIPTION_USAGE_LIMITS = {
-    "basic": {"document_uploads": 10, "scanned_uploads": 5, "practice_questions": 100},
-    "plus": {"document_uploads": 20, "scanned_uploads": 15, "practice_questions": 200},
-    "pro": {"document_uploads": 40, "scanned_uploads": 30, "practice_questions": 350},
+    "basic": {"document_uploads": 10, "scanned_uploads": 5,  "practice_questions": 100},
+    "plus":  {"document_uploads": 20, "scanned_uploads": 15, "practice_questions": 200},
+    "pro":   {"document_uploads": 40, "scanned_uploads": 30, "practice_questions": 350},
 }
 
+
+# ─── Exceptions ────────────────────────────────────────────────────────────────
 
 class CreditError(Exception):
     """Base error for credit operations."""
@@ -35,6 +54,12 @@ class InsufficientCredits(CreditError):
 class PlanLimitExceeded(CreditError):
     """Raised when an active subscription has reached an advertised usage cap."""
 
+
+class UploadLimitExceeded(CreditError):
+    """Raised when a wallet has reached its monthly PDF/image upload limit."""
+
+
+# ─── Internal helpers ──────────────────────────────────────────────────────────
 
 def _sync_balance_locked(wallet):
     from prep.models import PrepCreditGrant
@@ -106,13 +131,176 @@ def _ensure_grant_locked(wallet, now=None):
             credit_grant=grant,
             amount=legacy_balance,
             action_type="trial_grant",
-            description="Welcome Grant: 3-Day Free Trial (30 Credits)",
+            description=f"Welcome Grant: 7-Day Free Trial ({legacy_balance} Credits)",
         )
 
+
+# ─── Plan status helpers ───────────────────────────────────────────────────────
+
+def has_active_subscription(wallet, now=None):
+    """True only for paid plans (Basic / Plus / Pro) that have not expired."""
+    now = now or timezone.now()
+    return wallet.current_plan in {"basic", "plus", "pro"} and bool(
+        wallet.plan_expires_at and wallet.plan_expires_at > now
+    )
+
+
+def has_active_plan(wallet, now=None):
+    """True for any non-expired plan including Freemium and active Trial."""
+    now = now or timezone.now()
+    if wallet.current_plan == "freemium":
+        return True  # Freemium is permanent; plan_expires_at = next monthly refresh date
+    return wallet.current_plan in {"trial", "basic", "plus", "pro"} and bool(
+        wallet.plan_expires_at and wallet.plan_expires_at > now
+    )
+
+
+# ─── Upload quota helpers ──────────────────────────────────────────────────────
+
+def get_plan_upload_limit(wallet):
+    """Monthly PDF/image upload limit for the wallet's current plan. None = unlimited, 0 = blocked."""
+    return PLAN_UPLOAD_LIMITS.get(wallet.current_plan, 0)
+
+
+def can_upload(wallet):
+    """Check whether the wallet may perform a PDF/image upload right now."""
+    limit = get_plan_upload_limit(wallet)
+    if limit is None:
+        return True   # Pro: unlimited
+    if limit == 0:
+        return False  # Freemium / expired: fully blocked
+    now = timezone.now()
+    # Reset counter if the window has lapsed (defensive guard; command also does this)
+    if wallet.pdf_uploads_reset_at and wallet.pdf_uploads_reset_at <= now:
+        return True   # Counter will be reset on record_upload()
+    return wallet.pdf_uploads_this_month < limit
+
+
+def record_upload(wallet):
+    """Atomically increment the monthly upload counter, resetting if the window has passed."""
+    from prep.models import PrepWallet
+    with transaction.atomic():
+        locked = PrepWallet.objects.select_for_update().get(pk=wallet.pk)
+        now = timezone.now()
+        # Reset counter if the 30-day window has passed
+        if locked.pdf_uploads_reset_at and locked.pdf_uploads_reset_at <= now:
+            locked.pdf_uploads_this_month = 0
+            locked.pdf_uploads_reset_at = now + timedelta(days=30)
+        elif not locked.pdf_uploads_reset_at:
+            locked.pdf_uploads_reset_at = now + timedelta(days=30)
+        locked.pdf_uploads_this_month += 1
+        locked.save(update_fields=["pdf_uploads_this_month", "pdf_uploads_reset_at", "updated_at"])
+    wallet.refresh_from_db(fields=["pdf_uploads_this_month", "pdf_uploads_reset_at"])
+
+
+def enforce_upload_limit(wallet):
+    """
+    Raise UploadLimitExceeded if the wallet cannot perform a PDF/image upload.
+    Call this before processing any uploaded file. On success, call record_upload().
+    """
+    limit = get_plan_upload_limit(wallet)
+    if limit is None:
+        return  # Pro: unlimited, always allowed
+    if limit == 0:
+        if wallet.current_plan == "freemium":
+            raise UploadLimitExceeded(
+                "PDF and image uploads are not available on the Free Plan. "
+                "Upgrade to Basic or higher to unlock uploads."
+            )
+        raise UploadLimitExceeded(
+            "Your current plan does not include PDF or image uploads. "
+            "Please upgrade to continue."
+        )
+    now = timezone.now()
+    # If the reset window has passed, the counter will be reset on record_upload — allow it
+    if wallet.pdf_uploads_reset_at and wallet.pdf_uploads_reset_at <= now:
+        return
+    if wallet.pdf_uploads_this_month >= limit:
+        raise UploadLimitExceeded(
+            f"You've used all {limit} PDF/image uploads for this month on your "
+            f"{wallet.current_plan.title()} plan. Upgrade to Pro for unlimited uploads, "
+            "or wait for your plan to renew."
+        )
+
+
+# ─── Freemium transition ───────────────────────────────────────────────────────
+
+def grant_freemium_monthly(wallet):
+    """
+    Transition the wallet to Freemium and grant 20 credits for the next 30 days.
+    Safe to call when trial credits are exhausted OR when the 7-day timer fires.
+    Also called by the management command to refresh an already-freemium wallet each cycle.
+    """
+    from prep.models import PrepNotification, PrepWallet
+    now = timezone.now()
+    next_reset = now + timedelta(days=FREEMIUM_CYCLE_DAYS)
+
+    with transaction.atomic():
+        locked = PrepWallet.objects.select_for_update().get(pk=wallet.pk)
+        already_freemium = locked.current_plan == "freemium"
+        locked.current_plan = "freemium"
+        locked.plan_expires_at = next_reset
+        # Reset upload counter on plan change / cycle refresh
+        locked.pdf_uploads_this_month = 0
+        locked.pdf_uploads_reset_at = next_reset
+        locked.save(update_fields=[
+            "current_plan", "plan_expires_at",
+            "pdf_uploads_this_month", "pdf_uploads_reset_at",
+            "updated_at",
+        ])
+
+    grant = grant_credits(
+        wallet,
+        amount=FREEMIUM_CREDITS,
+        source="subscription",
+        action_type="monthly_grant",
+        description="Freemium Monthly Grant (20 Credits — valid 30 days)",
+        expires_at=next_reset,
+    )
+
+    if not already_freemium:
+        try:
+            PrepNotification.objects.create(
+                user=wallet.user,
+                title="You're now on the Free Plan",
+                message=(
+                    "Your trial has ended. You've been moved to the permanent Free Plan "
+                    "and received 20 credits for this month. Upgrade any time for full access."
+                ),
+                category="general",
+                url="/prep/billing/",
+            )
+        except Exception:
+            pass
+
+    wallet.refresh_from_db()
+    return grant
+
+
+def check_and_downgrade_trial(wallet):
+    """
+    If the wallet is on 'trial' and has zero available credits, immediately
+    transition to Freemium without waiting for the 7-day timer.
+    Call this after every successful credit consumption on a trial wallet.
+    """
+    if wallet.current_plan != "trial":
+        return
+    wallet.refresh_from_db(fields=["credits_balance", "current_plan"])
+    if wallet.current_plan != "trial":
+        return
+    available = get_available_credits(wallet)
+    if available == 0:
+        grant_freemium_monthly(wallet)
+        wallet.refresh_from_db()
+
+
+# ─── Core wallet state ─────────────────────────────────────────────────────────
 
 def ensure_wallet_credit_state(wallet, initialize_trial: bool = False):
     """Initialize new wallets and backfill old aggregate-only wallets safely."""
     from prep.models import PrepCreditGrant, PrepNotification, PrepTransaction
+
+    _transition_to_freemium = False
 
     with transaction.atomic():
         locked = wallet.__class__.objects.select_for_update().get(pk=wallet.pk)
@@ -133,24 +321,32 @@ def ensure_wallet_credit_state(wallet, initialize_trial: bool = False):
                 credit_grant=grant,
                 amount=TRIAL_CREDITS,
                 action_type="trial_grant",
-                description="Welcome Grant: 3-Day Free Trial (30 Credits)",
+                description=f"Welcome Grant: 7-Day Free Trial ({TRIAL_CREDITS} Credits)",
             )
-            PrepNotification.objects.create(
-                user=locked.user,
-                title="Your 3-day free trial has started",
-                message=(
-                    "You received 30 free credits. They expire exactly 72 hours after account creation. "
-                    "Subscribe before the expiry time to continue using Mentify Prep."
-                ),
-                category="general",
-                url="/prep/billing/",
-            )
+            try:
+                PrepNotification.objects.create(
+                    user=locked.user,
+                    title="Your 7-day free trial has started",
+                    message=(
+                        f"You received {TRIAL_CREDITS} free credits. They expire exactly 7 days after "
+                        "account creation. Subscribe before the expiry time to continue using Mentify Prep."
+                    ),
+                    category="general",
+                    url="/prep/billing/",
+                )
+            except Exception:
+                pass
         _expire_locked(locked, now)
         if locked.plan_expires_at and locked.plan_expires_at <= now:
-            if locked.current_plan in {"trial", "basic", "plus", "pro"}:
+            if locked.current_plan == "trial":
+                _transition_to_freemium = True
+            elif locked.current_plan in {"basic", "plus", "pro"}:
                 locked.current_plan = "expired"
                 locked.save(update_fields=["current_plan", "updated_at"])
         _sync_balance_locked(locked)
+
+    if _transition_to_freemium:
+        grant_freemium_monthly(wallet)
 
 
 def grant_credits(
@@ -196,16 +392,25 @@ def grant_credits(
 
 
 def expire_wallet_credits(wallet):
+    """Expire all due credit grants and transition plan if needed."""
+    _transition_to_freemium = False
+
     with transaction.atomic():
         locked = wallet.__class__.objects.select_for_update().get(pk=wallet.pk)
         now = timezone.now()
         count = _expire_locked(locked, now)
         if locked.plan_expires_at and locked.plan_expires_at <= now:
-            if locked.current_plan in {"trial", "basic", "plus", "pro"}:
+            if locked.current_plan == "trial":
+                _transition_to_freemium = True
+            elif locked.current_plan in {"basic", "plus", "pro"}:
                 locked.current_plan = "expired"
                 locked.save(update_fields=["current_plan", "updated_at"])
         _sync_balance_locked(locked)
-        return count
+
+    if _transition_to_freemium:
+        grant_freemium_monthly(wallet)
+
+    return count
 
 
 def get_available_credits(wallet):
@@ -222,10 +427,7 @@ def get_available_credits(wallet):
     return max(0, wallet.credits_balance - held)
 
 
-def has_active_subscription(wallet, now=None):
-    now = now or timezone.now()
-    return wallet.current_plan in {"basic", "plus", "pro"} and bool(wallet.plan_expires_at and wallet.plan_expires_at > now)
-
+# ─── Subscription & top-up grants ─────────────────────────────────────────────
 
 def subscription_usage(wallet) -> dict:
     """Return current-plan usage derived from the immutable credit ledger."""
@@ -264,8 +466,7 @@ def enforce_subscription_limit(wallet, limit_name: str, requested: int = 1) -> d
     requested = max(0, int(requested))
     limits = SUBSCRIPTION_USAGE_LIMITS.get(wallet.current_plan)
     if not limits or not has_active_subscription(wallet):
-        # Trial access is governed by its dated 30-credit grant. Expired plans
-        # have no active tier whose monthly quota can be applied.
+        # Trial / Freemium access is governed solely by dated credit grants.
         return {}
     if limit_name not in limits:
         raise ValueError(f"Unknown subscription limit: {limit_name}")
@@ -284,10 +485,10 @@ def enforce_subscription_limit(wallet, limit_name: str, requested: int = 1) -> d
 
 def grant_subscription(wallet, plan_id: str, amount: int, reference_code: str = ""):
     """
-    Assign new subscription plan and credit allocation.
-    When a student upgrades (e.g. basic -> pro) or switches tiers, existing credit lots
-    from prior subscriptions remain intact and each expires at its originally scheduled date,
-    while the active plan tier and badge update immediately to the latest subscription.
+    Assign a new paid subscription plan and credit allocation.
+    When a student upgrades (e.g. basic → pro), existing credit lots from prior
+    subscriptions remain intact and expire at their originally scheduled date,
+    while the active plan tier updates immediately.
     """
     if plan_id not in {"basic", "plus", "pro"}:
         raise ValueError("Invalid subscription plan")
@@ -295,12 +496,16 @@ def grant_subscription(wallet, plan_id: str, amount: int, reference_code: str = 
         locked = wallet.__class__.objects.select_for_update().get(pk=wallet.pk)
         now = timezone.now()
         _expire_locked(locked, now)
-        # Previous subscription credit grants are preserved with their original
-        # expiration dates so that the user does not lose unused credits upon upgrade.
-        # FIFO consumption will naturally draw from earlier-expiring lots first.
         locked.current_plan = plan_id
         locked.plan_expires_at = now + timedelta(days=30)
-        locked.save(update_fields=["current_plan", "plan_expires_at", "updated_at"])
+        # Reset upload counter on new plan cycle
+        locked.pdf_uploads_this_month = 0
+        locked.pdf_uploads_reset_at = locked.plan_expires_at
+        locked.save(update_fields=[
+            "current_plan", "plan_expires_at",
+            "pdf_uploads_this_month", "pdf_uploads_reset_at",
+            "updated_at",
+        ])
         return grant_credits(
             locked,
             amount,
@@ -313,9 +518,12 @@ def grant_subscription(wallet, plan_id: str, amount: int, reference_code: str = 
 
 
 def grant_purchased_topup(wallet, amount: int, reference_code: str, description: str):
+    """
+    Grant purchased top-up credits. Available to ALL plan holders including Freemium.
+    Credits expire after 30 days.
+    """
     wallet.refresh_from_db(fields=["current_plan", "plan_expires_at", "updated_at"])
-    if not has_active_subscription(wallet):
-        raise CreditError("An active subscription is required to purchase credit top-ups.")
+    # Top-ups are open to everyone — no subscription gate
     return grant_credits(
         wallet,
         amount,
@@ -326,6 +534,8 @@ def grant_purchased_topup(wallet, amount: int, reference_code: str, description:
         reference_code=reference_code,
     )
 
+
+# ─── Credit consumption ────────────────────────────────────────────────────────
 
 def consume_credits(wallet, amount: int, action_type: str, description: str, usage=None, model_name="", metadata=None):
     """Consume credits atomically, preferring expiring trial/subscription lots before top-ups."""
@@ -513,6 +723,8 @@ def release_credit_reservation(reservation, *, reason: str = "") -> int:
         ])
         return released
 
+
+# ─── Credit estimation ─────────────────────────────────────────────────────────
 
 def credits_for_usage(usage, minimum: int = 1) -> int:
     """Convert provider usage into internal credits with a predictable minimum."""

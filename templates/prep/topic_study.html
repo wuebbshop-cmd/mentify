@@ -108,6 +108,7 @@
     display: none;
     position: absolute;
     right: 0;
+    left: auto;
     top: 100%;
     margin-top: 6px;
     background: var(--surface);
@@ -115,13 +116,24 @@
     border-radius: var(--radius-md);
     box-shadow: 0 10px 30px rgba(0,0,0,0.18);
     z-index: 100;
-    min-width: 270px;
+    min-width: 250px;
+    max-width: calc(100vw - 24px);
+    width: max-content;
     padding: 4px 0;
+    box-sizing: border-box;
   }
   body.dark-theme .export-pdf-menu {
     background: #1e1e1e;
     border-color: #383838;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  @media (max-width: 600px) {
+    .export-pdf-menu {
+      right: 0;
+      left: auto;
+      min-width: 220px;
+      max-width: calc(100vw - 32px);
+    }
   }
 
   /* High-Contrast Level Selector Buttons & Toolbar */

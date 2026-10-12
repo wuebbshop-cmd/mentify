@@ -35,10 +35,18 @@ def get_user_plan_badge(user) -> dict | None:
         if wallet.current_plan == "trial":
             return {
                 "plan": "trial",
-                "label": "Free",
+                "label": "Trial",
                 "color": "#0284c7",
                 "bg": "rgba(2, 132, 199, 0.12)",
                 "border": "rgba(2, 132, 199, 0.3)",
+            }
+        elif wallet.current_plan == "freemium":
+            return {
+                "plan": "freemium",
+                "label": "Free",
+                "color": "#64748b",
+                "bg": "rgba(100, 116, 139, 0.12)",
+                "border": "rgba(100, 116, 139, 0.3)",
             }
         elif wallet.current_plan == "basic":
             return {
