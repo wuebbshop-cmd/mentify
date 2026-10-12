@@ -124,6 +124,48 @@ def clean_tag_label(label: str) -> str:
     return text
 
 
+def clean_topic_summary(summary: str, title: str = "", subtopics: list[str] | None = None) -> str:
+    """
+    Ensure topic descriptions strictly describe academic course content and subject matter,
+    stripping institutional names, universities, schools, lecturers, degrees, or cover-page metadata.
+    """
+    text = (summary or "").strip()
+    if text:
+        # Strip institutional / school / university references
+        text = re.sub(
+            r"(?i)\b(?:offered\s+at|taught\s+at|examined\s+at|taken\s+at)\s+[^,.;]+(?:University|College|Institute|School|Campus|Faculty|Polytechnic)[^,.;]*",
+            "",
+            text,
+        )
+        text = re.sub(
+            r"(?i)\b(?:at|in)\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School|Campus|Faculty|Polytechnic)\b[^,.;]*",
+            "",
+            text,
+        )
+        text = re.sub(
+            r"(?i)\busing\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School)\s+as\s+an?\s+(?:illustrative\s+)?example\b[^,.;]*",
+            "",
+            text,
+        )
+        text = re.sub(r"(?i)\b(?:lecturer|instructor|professor|prof\.|dr\.)\s*:[^,.;]+", "", text)
+        text = re.sub(r"(?i)\b(?:academic\s+year|semester|term|undergraduate|postgraduate|degree|diploma)\b[^,.;]*", "", text)
+        # Strip leading "An introductory course in ...", "A course covering ..." if it was purely a course blurb
+        text = re.sub(r"(?i)^an?\s+(?:introductory\s+)?course\s+(?:in|covering)\s+[^,.;]+[.,;]?\s*", "", text)
+        text = re.sub(r"\s+", " ", text).strip(" ,.;:-")
+
+    # If empty or too trivial, synthesize a crisp subject-matter summary based on title & subtopics
+    if not text or len(text) < 15:
+        clean_title = (title or "").strip()
+        if subtopics and len(subtopics) > 0:
+            joined_st = ", ".join(subtopics[:3])
+            text = f"Covers core theoretical principles and analytical methods for {clean_title}, focusing on {joined_st}."
+        elif clean_title:
+            text = f"Foundational concepts, theoretical frameworks, and core analytical principles for {clean_title}."
+        else:
+            text = "Canonical syllabus topics, foundational definitions, and worked analytical examples."
+    return text
+
+
 def _catalog_search_key(value: str) -> str:
     """Make course-code search insensitive to spaces, hyphens, and casing."""
     return re.sub(r"[^a-z0-9]+", "", (value or "").casefold())
@@ -252,7 +294,7 @@ def _get_course_topics_summary(course):
     Uses indexed queries instead of scanning and parsing hundreds of pages of raw text per topic,
     reducing course page latency from ~35s down to <0.5s.
     """
-    cache_key = f"prep_course_topics_summary_{course.pk}"
+    cache_key = f"prep_course_topics_summary_v4_{course.pk}"
     cached_bundle = cache.get(cache_key)
     if cached_bundle is not None:
         return cached_bundle
@@ -320,10 +362,13 @@ def _get_course_topics_summary(course):
             "order": t.order,
             "title": clean_tag_label(t.title) if clean_tag_label(t.title) else t.title,
             "slug": t.slug,
+            "summary": clean_topic_summary(t.summary, t.title, clean_subtopics),
             "subtopics": clean_subtopics,
+            "subtopics_count": len(clean_subtopics),
             "question_count": auth_count,
             "authentic_count": auth_count,
             "ready_levels": ready_levels_list,
+            "ready_levels_count": len(ready_levels_list),
             "preferred_level": preferred_level,
         }
         topics_data.append(t_data)
@@ -852,14 +897,20 @@ def prep_course_detail(request, course_code):
             display_title = course.title
 
     is_enrolled = PrepCourseEnrollment.objects.filter(user=request.user, course=course).exists()
+    cat_meta = _resolve_course_category_meta(course)
     course_obj = {
         "id": course.id,
         "code": course.code,
         "title": display_title,
         "level": course.level,
+        "category": cat_meta["category"],
+        "subject_key": cat_meta["subject_key"],
         "is_enrolled": is_enrolled,
         "description": course.description or "Canonical syllabus units, structured theorems, lecture notes, and past examination problems.",
     }
+
+    total_subtopics_count = sum(len(t.get("subtopics") or []) for t in topics_data)
+    ready_topics_count = sum(1 for t in topics_data if t.get("ready_levels"))
 
     context = {
         "active_tab": "courses",
@@ -867,6 +918,8 @@ def prep_course_detail(request, course_code):
         "course": course_obj,
         "topics": topics_data,
         "total_questions_count": total_questions_count,
+        "total_subtopics_count": total_subtopics_count,
+        "ready_topics_count": ready_topics_count,
         "course_papers": course_papers,
         "course_documents": pending_documents,
         "pending_documents": pending_documents,

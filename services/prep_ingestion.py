@@ -1233,9 +1233,13 @@ def extract_topic_candidates(text: str) -> list[dict]:
                         {
                             "role": "system",
                             "content": (
-                                "You are an academic course-content parser. Extract only distinct modules, units, "
-                                "or topics explicitly evidenced in the provided university notes or assessment. "
-                                "Do not infer unnamed topics or invent syllabus coverage. "
+                                "You are an academic course-content parser. Extract only distinct subject-matter modules, units, "
+                                "or topics explicitly evidenced in the provided course notes or assessment. "
+                                "STRICT RULES: "
+                                "1. NEVER include university, school, college, institution, department, faculty, lecturer, instructor, "
+                                "degree program, or education level names anywhere in titles, subtopics, or summaries. "
+                                "2. Ignore cover-page headers (such as department names, school names, or course title banners). "
+                                "3. Do not infer unnamed topics or invent syllabus coverage. "
                                 "Return ONLY a valid JSON list of objects with keys: "
                                 "\"order\" (int), \"title\" (str), \"subtopics\" (list of str), \"summary\" (str). "
                                 "Do not include markdown code fence formatting or explanations."
@@ -1261,7 +1265,24 @@ def extract_topic_candidates(text: str) -> list[dict]:
         except Exception as ex:
             logger.warning(f"[Topic Extraction] LLM fallback exception: {ex}")
 
-    return topics
+    # Sanitize any institutional / school / lecturer references from extracted summaries
+    _inst_re = re.compile(
+        r"(?i)\b(?:offered\s+at|taught\s+at|at\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School|Polytechnic)|"
+        r"using\s+[A-Z][A-Za-z\s]+(?:University|College|Institute)\s+as\s+an?\s+(?:illustrative\s+)?example)\b[^.;]*"
+    )
+    cleaned_topics = []
+    for t in topics:
+        if not isinstance(t, dict):
+            continue
+        raw_summary = str(t.get("summary") or "").strip()
+        if _inst_re.search(raw_summary):
+            raw_summary = _inst_re.sub("", raw_summary).strip(" ,.;:-")
+            if len(raw_summary) < 20 or re.match(r"(?i)^an?\s+(?:introductory\s+)?course\b", raw_summary):
+                raw_summary = ""
+        t["summary"] = raw_summary
+        cleaned_topics.append(t)
+
+    return cleaned_topics
 
 
 COURSE_STUDY_FAMILIES = {
