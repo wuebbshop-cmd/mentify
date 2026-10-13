@@ -1,8 +1,60 @@
-from django.test import TestCase
+from types import SimpleNamespace
+
+from django.template.loader import render_to_string
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
 from prep.models import PrepContentCache, PrepCourse, PrepPaper, PrepQuestion, PrepTopic
-from prep.views import _public_topic_notes
+from prep.views import _public_topic_notes, _resolve_course_category_meta
+
+
+class CourseCategoryIconTests(SimpleTestCase):
+    def test_general_sciences_and_other_resolve_to_distinct_icons(self):
+        general_science = _resolve_course_category_meta(SimpleNamespace(
+            code="SCI 101",
+            title="General Science",
+            category="General Sciences",
+            study_profile={},
+        ))
+        other = _resolve_course_category_meta(SimpleNamespace(
+            code="GEN 101",
+            title="Interdisciplinary Studies",
+            category="Other",
+            study_profile={},
+        ))
+
+        self.assertEqual(general_science["subject_key"], "general_science")
+        self.assertEqual(other["subject_key"], "other")
+        self.assertNotEqual(general_science["subject_key"], other["subject_key"])
+
+    def test_other_category_still_allows_known_course_inference(self):
+        course = SimpleNamespace(
+            code="ECO 101",
+            title="Introduction to Economics",
+            category="Other",
+            study_profile={},
+        )
+
+        self.assertEqual(
+            _resolve_course_category_meta(course),
+            {"subject_key": "economics", "category": "Economics"},
+        )
+
+    def test_general_sciences_and_other_have_dedicated_svg_tiles(self):
+        general_science = render_to_string(
+            "prep/includes/course_type_icon.html",
+            {"subject_key": "general_science", "category": "General Sciences"},
+        )
+        other = render_to_string(
+            "prep/includes/course_type_icon.html",
+            {"subject_key": "other", "category": "Other"},
+        )
+
+        self.assertIn("is-general-science", general_science)
+        self.assertIn("<svg", general_science)
+        self.assertIn("is-other", other)
+        self.assertIn("<svg", other)
+        self.assertNotIn("is-mathematics", other)
 
 
 class PublicPrepSeoTests(TestCase):

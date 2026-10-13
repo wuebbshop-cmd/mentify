@@ -599,7 +599,7 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
         "chemistry": ("chemistry", "Chemistry"),
         "physics": ("physics", "Physics"),
         "engineering": ("engineering", "Engineering"),
-        "general_science": ("health_science", "Health & Sciences"),
+        "general_science": ("general_science", "General Sciences"),
         "mathematics": ("mathematics", "Mathematics"),
     }
     if family in family_map:
@@ -617,7 +617,7 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
         "Chemistry": ("chemistry", "Chemistry"),
         "Physics": ("physics", "Physics"),
         "Engineering": ("engineering", "Engineering"),
-        "General Sciences": ("health_science", "Health & Sciences"),
+        "General Sciences": ("general_science", "General Sciences"),
     }
     if raw_cat in cat_map:
         sk, label = cat_map[raw_cat]
@@ -654,13 +654,15 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
     if prefix in {"SBT", "SZL", "MED", "NUR", "PHA", "HNS", "BIO"} or any(
         kw in title_lower for kw in ("health", "medical", "nursing", "clinical", "anatomy", "physiology", "pathology", "pharmacology", "biology", "genetics")
     ):
-        return {"subject_key": "health_science", "category": "Health & Sciences"}
+        return {"subject_key": "general_science", "category": "Health & Sciences"}
     if prefix in {"AEN", "ALT", "AHI", "ARE", "APS"} or any(
         kw in title_lower for kw in ("literature", "history", "philosophy", "linguistics", "ethics")
     ):
         return {"subject_key": "humanities", "category": "Humanities"}
 
-    return {"subject_key": "mathematics", "category": "Mathematics"}
+    if raw_cat == "Mathematics":
+        return {"subject_key": "mathematics", "category": "Mathematics"}
+    return {"subject_key": "other", "category": raw_cat or "Other"}
 
 
 @never_cache
