@@ -864,12 +864,17 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
     used_section_counts: dict[str, int] = {}
     insertions = []
     generic = {
+        "and", "the", "for", "are", "was", "were", "has", "have", "had",
+        "not", "but", "also", "their", "they", "these", "those", "which",
+        "each", "both", "many", "most", "some", "other", "another", "than",
         "figure", "graph", "diagram", "curve", "source", "page", "shows", "shown",
         "this", "that", "with", "from", "under", "between", "where", "when", "into",
         "over", "illustration", "illustrating", "plotting", "plot", "table", "model",
         "demand", "supply", "price", "quantity", "market", "equilibrium", "goods",
         "good", "relationship", "change", "changes", "increase", "decrease",
-        "theory",
+        "theory", "downward", "upward", "sloping", "slope", "linear", "straight",
+        "number", "against", "plotting", "worked", "demanded", "supplied",
+        "consumer", "consumers", "producer", "producers",
     }
     term_frequency = Counter()
     for candidate in manifest:
@@ -926,13 +931,18 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
             matched_heading = primary_terms & heading_terms
             matched_distinctive = distinctive_terms & (paragraph_terms | heading_terms)
             caption_terms = [
-                _visual_placement_token(term) for term in re.findall(r"[A-Za-z0-9]+", str(visual.get("caption") or ""))
-                if len(term) > 2 and term.casefold() not in generic
+                _visual_placement_token(term)
+                for term in re.findall(r"[A-Za-z0-9]+", str(visual.get("caption") or ""))
+                if len(term) > 2
             ]
-            caption_phrases = {
-                " ".join(caption_terms[index:index + 2])
-                for index in range(len(caption_terms) - 1)
-            }
+            caption_phrases = set()
+            for index in range(len(caption_terms) - 1):
+                phrase_terms = caption_terms[index:index + 2]
+                if (
+                    any(term in distinctive_terms for term in phrase_terms)
+                    and any(term not in generic for term in phrase_terms)
+                ):
+                    caption_phrases.add(" ".join(phrase_terms))
             searchable_text = " ".join(
                 _visual_placement_token(token)
                 for token in re.findall(r"[A-Za-z0-9]+", f"{htext} {ptext}")
@@ -951,9 +961,10 @@ def _insert_required_visual_markers(content: str, manifest: list[dict]) -> str:
             ):
                 continue
             score = (
-                3.0 * len(matched_primary)
-                + 2.0 * len(matched_heading)
-                + 1.0 * len(secondary_terms & paragraph_terms)
+                8.0 * len(distinctive_terms & heading_terms)
+                + 6.0 * len(distinctive_terms & paragraph_terms)
+                + 1.0 * len(matched_primary)
+                + 0.5 * len(secondary_terms & paragraph_terms)
             )
             # Prefer body sections (2, 3, 4) over overview/summary sections (1, 5) unless no body match exists
             if re.match(r"^##\s+[15]\.", htext):
@@ -1250,6 +1261,11 @@ def _markdown_theorem_issues(content: str) -> list[str]:
 def _note_format_issues(content: str) -> list[str]:
     """Return local Markdown/LaTeX issues without requiring note sections."""
     issues = []
+    issues.extend(
+        str(issue["message"])
+        for issue in _math_content_review_issues(content)
+        if issue["message"]
+    )
     if content.count("```") % 2:
         issues.append("unclosed fenced code block")
     if re.search(r"\[\[VISUAL:[^\]]*\]\]", content):
@@ -3513,6 +3529,121 @@ def sanitize_math_markdown(text: str) -> str:
     return normalize_math_delimiters(text)
 
 
+def _math_content_review_issues(text: str) -> list[dict[str, str | None]]:
+    """Return reviewable math/text defects with stable codes and safe suggestions."""
+    protected = re.compile(
+        r"```[\s\S]*?```|`[^`\n]*`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]"
+    )
+    segments = protected.split(str(text or ""))
+    issues: list[dict[str, str | None]] = []
+
+    def add(code: str, message: str, suggestion: str | None = None) -> None:
+        if not any(issue["code"] == code for issue in issues):
+            issues.append({
+                "code": code,
+                "message": message,
+                "fix_suggestion": suggestion,
+            })
+
+    for prose in segments[::2]:
+        inline_math = re.compile(
+            r"(?<!\\)\$(?!\$)([^$\n]+?)(?<!\\)\$(?!\$)|\\\(([\s\S]*?)\\\)"
+        )
+        for match in inline_math.finditer(prose):
+            body = (match.group(1) if match.group(1) is not None else match.group(2)).strip()
+            if re.fullmatch(r"[A-Za-z0-9_]+", body):
+                continue
+            before = prose[match.start() - 1] if match.start() else ""
+            after = prose[match.end()] if match.end() < len(prose) else ""
+            if (before and (before.isalnum() or before == "_")) or (
+                after and (after.isalnum() or after == "_")
+            ):
+                add(
+                    "math.inline_boundary.missing_space",
+                    "compound inline math is joined directly to surrounding prose",
+                    "Insert a space between the prose and the inline-math expression.",
+                )
+
+        single_dollars = list(re.finditer(r"(?<!\\)\$(?!\$)", prose))
+        if len(single_dollars) % 2:
+            unmatched = single_dollars[-1]
+            before = prose[unmatched.start() - 1] if unmatched.start() else ""
+            after = prose[unmatched.end()] if unmatched.end() < len(prose) else ""
+            if (before and (before.isalnum() or before == "_")) or (
+                after and (after.isalnum() or after == "_")
+            ):
+                add(
+                    "math.inline_delimiter.unmatched",
+                    "an inline-math delimiter is adjacent to prose but has no matching delimiter",
+                    "Review the intended inline-math delimiters; no automatic correction is safe.",
+                )
+
+        if re.search(r"(?i)\btheseries\b", prose):
+            add(
+                "text.ocr.merged_words",
+                "text contains the likely OCR merge 'theseries'",
+                "Change 'theseries' to 'the series'.",
+            )
+
+    source_without_code = re.sub(r"```[\s\S]*?```|`[^`\n]*`", "", str(text or ""))
+    if re.search(r"(?<!\\)\\Re\b", source_without_code):
+        add(
+            "math.notation.real_operator_ambiguous",
+            r"the LaTeX command \Re may be ambiguous",
+            r"If the set of real numbers is intended, use \mathbb{R}; retain \Re for the real-part operator.",
+        )
+    if re.search(r"(?i)\bi\s+e\s+j\b", source_without_code) and re.search(
+        r"(?i)\b(?:cov(?:ariance)?|var(?:iance)?|correlation|matrix|independent)\b",
+        source_without_code,
+    ):
+        add(
+            "math.ocr.not_equal",
+            "statistical text may contain the OCR artifact 'i e j'",
+            r"Review whether 'i e j' should be \(i \ne j\).",
+        )
+
+    return issues
+
+
+def _repair_safe_math_text_issues(text: str) -> str:
+    """Fix only unambiguous prose joins and the common merged phrase 'theseries'."""
+    protected = re.compile(
+        r"(```[\s\S]*?```|`[^`\n]*`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])"
+    )
+    segments = protected.split(text)
+    for index in range(0, len(segments), 2):
+        prose = segments[index]
+        inline_math = re.compile(
+            r"(?<!\\)\$(?!\$)([^$\n]+?)(?<!\\)\$(?!\$)|\\\(([\s\S]*?)\\\)"
+        )
+
+        def add_boundary_spaces(match: re.Match[str]) -> str:
+            body = (match.group(1) if match.group(1) is not None else match.group(2)).strip()
+            if re.fullmatch(r"[A-Za-z0-9_]+", body):
+                return match.group(0)
+            token = match.group(0)
+            start, end = match.span()
+            before = prose[start - 1] if start else ""
+            after = prose[end] if end < len(prose) else ""
+            return (
+                (" " if before and (before.isalnum() or before == "_") else "")
+                + token
+                + (" " if after and (after.isalnum() or after == "_") else "")
+            )
+
+        prose = inline_math.sub(add_boundary_spaces, prose)
+        inline_math_tokens = re.compile(
+            r"(\$(?!\$)[^$\n]+?\$(?!\$)|\\\([\s\S]*?\\\))"
+        )
+        text_segments = inline_math_tokens.split(prose)
+        for text_index in range(0, len(text_segments), 2):
+            text_segments[text_index] = re.sub(
+                r"(?i)\btheseries\b", "the series", text_segments[text_index]
+            )
+        segments[index] = "".join(text_segments)
+    return "".join(segments)
+
+
 def repair_question_and_solution_text(text: str) -> str:
     """
     Comprehensive repair and hygiene pipeline for past paper questions,
@@ -3583,6 +3714,7 @@ def repair_question_and_solution_text(text: str) -> str:
 
     # 5. Apply core delimiter normalization
     text = normalize_math_delimiters(text)
+    text = _repair_safe_math_text_issues(text)
 
     # 6. Re-verify fences and display math post-normalization
     if text.count("```") % 2 != 0:

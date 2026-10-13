@@ -79,6 +79,15 @@ class GitHubService:
                 last_error = exc
         raise RuntimeError(f"GitHub upload failed after retries: {last_error}")
 
+    def upload_bytes(self, repo_path: str, content: bytes, message: str) -> str:
+        """Upload bytes to a deterministic repository path and return that path."""
+        path_parts = [part for part in repo_path.strip("/").split("/") if part]
+        if not path_parts or any(part in {".", ".."} for part in path_parts) or not content:
+            raise ValueError("A repository path and non-empty file content are required.")
+        safe_path = "/".join(path_parts)
+        self._commit_file(safe_path, content, message)
+        return safe_path
+
     def upload_file(self, file_obj, subdir: str | None = None) -> GitHubUploadResult | None:
         """
         Upload a file-like object to GitHub.
@@ -121,9 +130,15 @@ class GitHubService:
         if not repo_path:
             raise RuntimeError(f"Invalid stored_path: {stored_path}")
 
+        raw_url = f"https://raw.githubusercontent.com/{self.repo_name}/{self.branch}/{quote(repo_path, safe='/')}"
+        raw_response = self.session.get(raw_url, timeout=30)
+        if raw_response.status_code == 200:
+            return raw_response.content
+
         resp = self.session.get(
             f"{self.base_url}/repos/{self.repo_name}/contents/{repo_path}",
             params={"ref": self.branch},
+            timeout=30,
         )
         if resp.status_code >= 300:
             raise RuntimeError(f"GitHub download failed: {resp.status_code}")

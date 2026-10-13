@@ -242,6 +242,54 @@ class PrepAssessmentIndexJob(models.Model):
         ordering = ["queued_at", "id"]
 
 
+class PrepTopicPdfArtifact(models.Model):
+    """Current PDF artifact and durable queue state for one topic output."""
+
+    ARTIFACT_TYPES = [
+        ("notes", "Validated Topic Notes"),
+        ("questions", "Authentic Past Questions and Answers"),
+    ]
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("running", "Running"),
+        ("ready", "Ready"),
+        ("empty", "No Eligible Source Content"),
+        ("failed", "Failed"),
+    ]
+
+    topic = models.ForeignKey(
+        "PrepTopic",
+        on_delete=models.CASCADE,
+        related_name="pdf_artifacts",
+    )
+    artifact_type = models.CharField(max_length=20, choices=ARTIFACT_TYPES)
+    level = models.CharField(max_length=20, blank=True)
+    source_signature = models.CharField(max_length=64, blank=True, db_index=True)
+    published_signature = models.CharField(max_length=64, blank=True)
+    github_path = models.CharField(max_length=500, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
+    request_version = models.PositiveIntegerField(default=1)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    last_error = models.TextField(blank=True)
+    queued_at = models.DateTimeField(default=timezone.now, db_index=True)
+    next_attempt_at = models.DateTimeField(default=timezone.now, db_index=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["topic", "artifact_type", "level"],
+                name="unique_prep_topic_pdf_artifact",
+            ),
+        ]
+        ordering = ["queued_at", "id"]
+
+    def __str__(self):
+        label = self.level or "questions"
+        return f"{self.topic}: {self.artifact_type} {label} ({self.status})"
+
+
 class PrepTopic(models.Model):
     """Syllabus module/topic under a canonical course."""
     course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="topics")

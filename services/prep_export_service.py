@@ -336,6 +336,7 @@ def _render_html_with_playwright(
     html_content: str,
     header_text: str = "Mentify Academic Prep",
     timeout_ms: int = 15000,
+    require_browser: bool = False,
 ) -> bytes:
     """
     Renders an HTML string to a publication-ready vector PDF using headless Chrome/Edge and Playwright.
@@ -349,7 +350,7 @@ def _render_html_with_playwright(
         r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
     ]
     chrome_path = next((p for p in chrome_candidates if p and os.path.exists(p)), None)
-    if not chrome_path:
+    if not chrome_path and not require_browser:
         return b""
 
     tmp_path = None
@@ -365,16 +366,22 @@ def _render_html_with_playwright(
 
         with sync_playwright() as p:
             browser = p.chromium.launch(
-                executable_path=chrome_path,
+                executable_path=chrome_path if chrome_path else None,
                 args=["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
             )
             page = browser.new_page()
             page.goto(file_url, wait_until="networkidle", timeout=timeout_ms)
             try:
-                page.wait_for_selector(".render-complete", state="attached", timeout=timeout_ms)
+                page.wait_for_selector(
+                    ".render-complete[data-done='true']",
+                    state="attached",
+                    timeout=timeout_ms,
+                )
                 page.evaluate("() => document.fonts ? document.fonts.ready : Promise.resolve()")
-            except Exception:
-                pass
+            except Exception as exc:
+                if require_browser:
+                    raise RuntimeError("HTML-to-PDF content did not finish rendering.") from exc
+                logger.warning("PDF page did not signal render completion: %s", exc)
 
             safe_header = header_text.replace("<", "&lt;").replace(">", "&gt;")
             pdf_bytes = page.pdf(
@@ -396,7 +403,9 @@ def _render_html_with_playwright(
             browser.close()
             return pdf_bytes
     except Exception as exc:
-        logger.warning("Playwright PDF generation failed, falling back to ReportLab: %s", exc)
+        logger.warning("Playwright PDF generation failed: %s", exc)
+        if require_browser:
+            raise RuntimeError("The required Chromium PDF renderer failed.") from exc
         return b""
     finally:
         if tmp_path and os.path.exists(tmp_path):
@@ -1137,6 +1146,8 @@ def export_topic_notes_pdf(
     authentic_questions: list | None = None,
     practice_questions: list | None = None,
     level: str = "level_2",
+    require_playwright: bool = False,
+    timeout_ms: int = 15000,
 ) -> bytes:
     """
     Generate publication-ready PDF for topic notes.
@@ -1162,10 +1173,16 @@ def export_topic_notes_pdf(
         pdf_bytes = _render_html_with_playwright(
             html_content=html,
             header_text=f"{course_code.upper()} • {topic_title} • {level_display}",
+            require_browser=require_playwright,
+            timeout_ms=timeout_ms,
         )
         if pdf_bytes and len(pdf_bytes) > 1000:
             return pdf_bytes
+        if require_playwright:
+            raise RuntimeError("The required Chromium renderer returned an empty or invalid PDF.")
     except Exception as exc:
+        if require_playwright:
+            raise
         logger.warning("Playwright topic PDF export failed, falling back to ReportLab: %s", exc)
 
     return _export_topic_notes_reportlab(
@@ -1185,6 +1202,8 @@ def export_paper_questions_pdf(
     questions: list[dict],
     include_questions: bool = True,
     include_answers: bool = True,
+    require_playwright: bool = False,
+    timeout_ms: int = 15000,
 ) -> bytes:
     """
     Generate publication-ready PDF for past paper questions and step-by-step proofs.
@@ -1206,10 +1225,16 @@ def export_paper_questions_pdf(
         pdf_bytes = _render_html_with_playwright(
             html_content=html,
             header_text=f"{course_code.upper()} • {paper_title}",
+            require_browser=require_playwright,
+            timeout_ms=timeout_ms,
         )
         if pdf_bytes and len(pdf_bytes) > 1000:
             return pdf_bytes
+        if require_playwright:
+            raise RuntimeError("The required Chromium renderer returned an empty or invalid PDF.")
     except Exception as exc:
+        if require_playwright:
+            raise
         logger.warning("Playwright paper PDF export failed, falling back to ReportLab: %s", exc)
 
     return _export_paper_questions_reportlab(

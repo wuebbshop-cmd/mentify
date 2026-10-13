@@ -32,6 +32,9 @@ def invalidate_notes_after_topic_source_change(sender, instance, created, **kwar
     if not created and getattr(instance, "_invalidate_topic_notes", False):
         PrepContentCache.objects.filter(topic=instance, content_type="topic_notes").delete()
         PrepNoteGenerationGuard.objects.filter(topic=instance).delete()
+        from services.prep_pdf_artifacts import invalidate_topic_note_pdfs
+
+        invalidate_topic_note_pdfs(instance)
 
 
 @receiver(post_save, sender=PrepCourseEnrollment)

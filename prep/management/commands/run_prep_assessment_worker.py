@@ -193,6 +193,16 @@ class Command(BaseCommand):
                     f"Indexed assessment paper {paper.pk}; {indexed} new question(s)."
                 )
             )
+            try:
+                from services.prep_pdf_artifacts import enqueue_paper_topic_question_pdfs
+
+                enqueue_paper_topic_question_pdfs(paper)
+            except Exception:
+                logger.exception(
+                    "Could not queue topic PDF updates for assessment paper %s; "
+                    "the PDF worker startup scan can retry.",
+                    paper.pk,
+                )
         except Exception as exc:
             logger.exception("Assessment indexing job %s failed.", job.pk)
             retry_delay = min(2 ** job.attempts, MAX_RETRY_DELAY_MINUTES)

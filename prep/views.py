@@ -3106,11 +3106,82 @@ def prep_generate_practice_api(request):
 
 from django.http import HttpResponse
 from services.prep_export_service import (
-    export_topic_notes_pdf,
     export_topic_notes_docx,
     export_paper_questions_pdf,
     export_paper_questions_docx,
 )
+
+
+def _download_topic_pdf_artifact(request, topic, artifact_type, level, filename, tab_query):
+    from services.prep_pdf_artifacts import enqueue_topic_pdf_artifact, github_pdf_bytes
+
+    try:
+        artifact, _ = enqueue_topic_pdf_artifact(topic, artifact_type, level)
+    except Exception:
+        logger.exception(
+            "Unable to queue/check %s PDF for topic %s.",
+            artifact_type,
+            topic.pk,
+        )
+        messages.error(request, "The PDF could not be checked right now. Please try again shortly.")
+        return redirect(
+            reverse("prep:topic_study", kwargs={"topic_id": topic.pk})
+            + f"?tab={tab_query}"
+        )
+
+    has_good_version = bool(artifact.github_path and artifact.published_signature)
+    can_serve = artifact.status == "ready" or (
+        artifact.status in {"pending", "running", "failed"} and has_good_version
+    )
+    if can_serve and has_good_version:
+        try:
+            pdf_bytes = github_pdf_bytes(artifact.github_path)
+            if not pdf_bytes.startswith(b"%PDF"):
+                raise RuntimeError("GitHub returned an invalid PDF artifact.")
+        except Exception:
+            logger.exception(
+                "Unable to download ready PDF artifact %s for topic %s.",
+                artifact.pk,
+                topic.pk,
+            )
+            try:
+                enqueue_topic_pdf_artifact(topic, artifact_type, level, force=True)
+            except Exception:
+                logger.exception(
+                    "Unable to requeue missing GitHub PDF artifact %s.",
+                    artifact.pk,
+                )
+            return HttpResponse(
+                "The saved PDF is temporarily unavailable. Please try again shortly.",
+                status=503,
+                content_type="text/plain; charset=utf-8",
+            )
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Cache-Control"] = "private, no-store"
+        if artifact.published_signature != artifact.source_signature:
+            response["X-Prep-PDF-Stale"] = "true"
+        return response
+
+    if artifact.status == "empty":
+        messages.info(
+            request,
+            "No validated content is available for this PDF yet. It will be prepared after the source content is ready.",
+        )
+    elif artifact.status == "failed":
+        messages.error(
+            request,
+            "PDF preparation failed. The preparation worker will retry; please try again later.",
+        )
+    else:
+        messages.info(
+            request,
+            "Your PDF is being prepared in the background. Please try downloading it again shortly.",
+        )
+    return redirect(
+        reverse("prep:topic_study", kwargs={"topic_id": topic.pk})
+        + f"?tab={tab_query}"
+    )
 
 
 @login_required
@@ -3131,6 +3202,15 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     if section == "questions_answers":
         if not topic:
             return HttpResponse("The requested syllabus topic was not found.", status=404)
+        if fmt.lower() == "pdf":
+            return _download_topic_pdf_artifact(
+                request,
+                topic,
+                "questions",
+                "",
+                f"{topic.course.code}_{topic.slug}_past_questions_answers.pdf",
+                "questions_answers",
+            )
         from services.prep_ai_router import validated_question_solution
 
         topic_filter = (
@@ -3204,6 +3284,18 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     # 1. Export the same published shared source shown on the study page.
     # This direct lookup avoids a second cache-key path producing a false
     # "No validated notes" response on a mobile download request.
+    if fmt.lower() == "pdf":
+        if not topic:
+            return HttpResponse("The requested syllabus topic was not found.", status=404)
+        return _download_topic_pdf_artifact(
+            request,
+            topic,
+            "notes",
+            level,
+            f"{topic.course.code}_{topic.slug}_{level}_notes.pdf",
+            f"notes&level={level}",
+        )
+
     from services.prep_ai_router import (
         get_or_generate_topic_notes,
         get_published_topic_note_levels,
@@ -3327,12 +3419,14 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
 
     questions_data = []
     if paper and paper.questions.filter(
+        question_type__in=("authentic", "adapted"),
         verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
     ).exists():
         from services.prep_ingestion import learner_visible_assessment_questions
 
         for q in learner_visible_assessment_questions(
             paper.questions.filter(
+                question_type__in=("authentic", "adapted"),
                 verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES
             ).order_by("number", "id")
         ):

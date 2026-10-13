@@ -104,6 +104,18 @@ $$
                 include_answers=False,
             )
 
+    @patch("services.prep_export_service._export_topic_notes_reportlab")
+    @patch("services.prep_export_service._render_html_with_playwright", return_value=b"")
+    def test_required_chromium_export_does_not_fall_back_to_reportlab(self, _render_pdf, fallback):
+        with self.assertRaisesRegex(RuntimeError, "required Chromium renderer"):
+            export_topic_notes_pdf(
+                "TST 101",
+                "Export Topic",
+                self.notes_source,
+                require_playwright=True,
+            )
+        fallback.assert_not_called()
+
 
 class PrepPdfExportEndpointTests(TestCase):
     def setUp(self):
@@ -154,8 +166,10 @@ class PrepPdfExportEndpointTests(TestCase):
         self.assertFalse(exporter.call_args.kwargs["include_questions"])
         self.assertTrue(exporter.call_args.kwargs["include_answers"])
 
-    @patch("prep.views.export_paper_questions_pdf", return_value=b"%PDF-test")
-    def test_topic_questions_and_answers_export_combines_authentic_and_generated(self, exporter):
+    @patch("services.prep_pdf_artifacts.github_pdf_bytes", return_value=b"%PDF-test")
+    def test_topic_questions_and_answers_export_uses_ready_authentic_only_artifact(self, download_pdf):
+        from services.prep_pdf_artifacts import _load_artifact_source, enqueue_topic_pdf_artifact
+
         topic = PrepTopic.objects.create(
             course=self.course,
             order=1,
@@ -181,6 +195,11 @@ class PrepPdfExportEndpointTests(TestCase):
             question_latex="Generated question source",
             solution_latex="Generated answer source",
         )
+        artifact, _ = enqueue_topic_pdf_artifact(topic, "questions")
+        artifact.status = "ready"
+        artifact.published_signature = artifact.source_signature
+        artifact.github_path = "mentify-uploads/prep-pdfs/topic-questions.pdf"
+        artifact.save(update_fields=["status", "published_signature", "github_path"])
 
         url = reverse(
             "prep:export_topic",
@@ -191,9 +210,8 @@ class PrepPdfExportEndpointTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn("_questions_answers.pdf", response["Content-Disposition"])
-        self.assertEqual(exporter.call_args.args[3], 14)
-        self.assertEqual(len(exporter.call_args.args[4]), 2)
-        self.assertEqual(exporter.call_args.args[4][0]["question_latex"], "Authentic question source")
-        self.assertEqual(exporter.call_args.args[4][1]["question_latex"], "Generated question source")
-        self.assertTrue(exporter.call_args.kwargs["include_questions"])
-        self.assertTrue(exporter.call_args.kwargs["include_answers"])
+        download_pdf.assert_called_once_with(artifact.github_path)
+        _, payload = _load_artifact_source(artifact)
+        self.assertEqual(len(payload["questions"]), 1)
+        self.assertEqual(payload["questions"][0]["question_latex"], "Authentic question source")
+        self.assertNotIn("Generated question source", str(payload))

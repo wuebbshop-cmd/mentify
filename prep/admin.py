@@ -31,6 +31,7 @@ from .models import (
     PrepNoteRepair,
     PrepTopicNotesJob,
     PrepAssessmentIndexJob,
+    PrepTopicPdfArtifact,
     PrepWallet,
     PrepCreditGrant,
     PrepTransaction,
@@ -981,6 +982,37 @@ class PrepQuestionAdmin(admin.ModelAdmin):
     )
     actions = ["verify_questions", "flag_questions", "mark_pending"]
 
+    @staticmethod
+    def _queue_question_pdf_refresh(question):
+        from services.prep_pdf_artifacts import enqueue_question_pdf_artifacts_for_record
+
+        enqueue_question_pdf_artifacts_for_record(question)
+
+    def save_model(self, request, obj, form, change):
+        previous = None
+        if change:
+            previous = PrepQuestion.objects.filter(pk=obj.pk).select_related(
+                "topic", "paper__course"
+            ).first()
+        super().save_model(request, obj, form, change)
+        self._queue_question_pdf_refresh(obj)
+        if previous:
+            self._queue_question_pdf_refresh(previous)
+
+    def delete_model(self, request, obj):
+        previous = PrepQuestion.objects.filter(pk=obj.pk).select_related(
+            "topic", "paper__course"
+        ).first()
+        super().delete_model(request, obj)
+        if previous:
+            self._queue_question_pdf_refresh(previous)
+
+    def delete_queryset(self, request, queryset):
+        previous = list(queryset.select_related("topic", "paper__course"))
+        super().delete_queryset(request, queryset)
+        for question in previous:
+            self._queue_question_pdf_refresh(question)
+
     fieldsets = (
         ("Assessment Attachment", {
             "fields": (
@@ -1051,6 +1083,7 @@ class PrepQuestionAdmin(admin.ModelAdmin):
     @admin.action(description="✓ Mark Selected Questions as Verified (Tutor / SymPy Approved)")
     def verify_questions(self, request, queryset):
         count = 0
+        affected = []
         for question in queryset:
             question.verification_status = "verified"
             question.verified_by = request.user
@@ -1063,31 +1096,42 @@ class PrepQuestionAdmin(admin.ModelAdmin):
                     "reviewed_at": timezone.now().isoformat(),
                 }
             question.save(update_fields=["verification_status", "verified_by", "reconstruction_metadata"])
+            affected.append(question)
             count += 1
+        for question in affected:
+            self._queue_question_pdf_refresh(question)
         self.message_user(request, f"Marked {count} question(s) as officially verified.")
 
     @admin.action(description="⚠ Flag Selected Questions for Mathematical Correction")
     def flag_questions(self, request, queryset):
         count = 0
+        affected = []
         for question in queryset:
             question.verification_status = "flagged"
             if question.question_type == "adapted":
                 metadata = question.reconstruction_metadata if isinstance(question.reconstruction_metadata, dict) else {}
                 question.reconstruction_metadata = {**metadata, "review_status": "needs_correction"}
             question.save(update_fields=["verification_status", "reconstruction_metadata"])
+            affected.append(question)
             count += 1
+        for question in affected:
+            self._queue_question_pdf_refresh(question)
         self.message_user(request, f"Flagged {count} question(s) for correction.")
 
     @admin.action(description="⏳ Move to Pending Verification")
     def mark_pending(self, request, queryset):
         count = 0
+        affected = []
         for question in queryset:
             question.verification_status = "pending"
             if question.question_type == "adapted":
                 metadata = question.reconstruction_metadata if isinstance(question.reconstruction_metadata, dict) else {}
                 question.reconstruction_metadata = {**metadata, "review_status": "pending"}
             question.save(update_fields=["verification_status", "reconstruction_metadata"])
+            affected.append(question)
             count += 1
+        for question in affected:
+            self._queue_question_pdf_refresh(question)
         self.message_user(request, f"Moved {count} question(s) to pending review.")
 
 
@@ -1358,6 +1402,53 @@ class PrepAssessmentIndexJobAdmin(admin.ModelAdmin):
             request,
             f"Requeued {queued} assessment job(s); marked {superseded} outdated job(s) superseded.",
         )
+
+
+@admin.register(PrepTopicPdfArtifact)
+class PrepTopicPdfArtifactAdmin(admin.ModelAdmin):
+    list_display = (
+        "topic",
+        "artifact_type",
+        "level",
+        "status",
+        "attempts",
+        "queued_at",
+        "completed_at",
+    )
+    list_filter = ("status", "artifact_type", "level", "topic__course")
+    search_fields = ("topic__title", "topic__course__code", "source_signature", "last_error")
+    readonly_fields = (
+        "topic",
+        "artifact_type",
+        "level",
+        "source_signature",
+        "published_signature",
+        "github_path",
+        "status",
+        "request_version",
+        "attempts",
+        "last_error",
+        "queued_at",
+        "next_attempt_at",
+        "started_at",
+        "completed_at",
+    )
+    actions = ("retry_failed_pdf_artifacts",)
+
+    @admin.action(description="Retry selected failed PDF artifacts")
+    def retry_failed_pdf_artifacts(self, request, queryset):
+        from services.prep_pdf_artifacts import request_topic_pdf_artifact
+
+        queued = 0
+        for artifact in queryset.filter(status="failed").select_related("topic"):
+            _, changed = request_topic_pdf_artifact(
+                artifact.topic,
+                artifact.artifact_type,
+                artifact.level,
+                force=True,
+            )
+            queued += int(changed)
+        self.message_user(request, f"Requeued {queued} PDF artifact(s).")
 
 
 @admin.register(PrepWallet)

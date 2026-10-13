@@ -254,6 +254,17 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(f"Prepared {job.level} notes for topic {topic.pk}.")
             )
+            try:
+                from services.prep_pdf_artifacts import enqueue_topic_pdf_artifact
+
+                enqueue_topic_pdf_artifact(topic, "notes", job.level)
+            except Exception:
+                self.stderr.write(
+                    self.style.ERROR(
+                        f"Could not queue the {job.level} PDF for topic {topic.pk}; "
+                        "the notes remain complete and the PDF worker startup scan can retry."
+                    )
+                )
         except Exception as exc:
             job.status = "pending" if job.attempts < 3 else "failed"
             job.last_error = str(exc)[:4000]

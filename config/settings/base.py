@@ -182,6 +182,7 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO = os.environ.get("GITHUB_REPO", "")        # e.g. "username/MENTIFY-uploads"
 GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 GITHUB_UPLOAD_DIR = os.environ.get("GITHUB_UPLOAD_DIR", "uploads")
+PREP_PDF_STORAGE_DIR = os.environ.get("PREP_PDF_STORAGE_DIR", "prep-pdfs")
 
 
 # ─── Bunny Stream ─────────────────────────────────────────────────────────────

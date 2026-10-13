@@ -58,7 +58,7 @@ Substituting the supply function and solving gives the equilibrium.
 
 ### 1.1 Price Theory
 
-Price theory explains how demand and supply interact to determine market prices.
+A supply curve relates the price of a good to the quantity producers are willing to offer at many possible prices.
 
 ### 1.2 Market Stability
 
@@ -81,8 +81,8 @@ Problem. Given the demand and supply functions, calculate the equilibrium.
             "required": False,
         }]
         content = content.replace(
-            "Price theory explains",
-            "Price theory [[VISUAL:labor-supply]] explains",
+            "A supply curve relates",
+            "A supply curve [[VISUAL:labor-supply]] relates",
         )
 
         updated = _insert_required_visual_markers(content, manifest)
@@ -92,6 +92,36 @@ Problem. Given the demand and supply functions, calculate the equilibrium.
         worked_example_position = updated.index("### 1.3 Worked Example")
         self.assertGreater(image_position, stability_position)
         self.assertLess(image_position, worked_example_position)
+
+    def test_figure_is_not_matched_by_generic_demanded_overlap(self):
+        content = """## 1. Core Concept Overview
+
+Price theory explains why quantity demanded falls when prices rise and how markets reach equilibrium.
+
+## 2. Mathematical Formalization
+
+The demand function represents the relationship between price and quantity demanded.
+"""
+        manifest = [{
+            "id": "engel-curve",
+            "marker": "[[VISUAL:engel-curve]]",
+            "crop_url": "/cdn/assets/engel-curve.jpg",
+            "caption": "Engel curve illustrating the relationship between consumer income and quantity demanded",
+            "labels": ["Income", "Quantity demanded"],
+            "auto_match_terms": ["consumer income", "Engel curve"],
+            "placement_context": "An Engel curve relates consumer income to quantity demanded.",
+            "context_before": "",
+            "context_after": "",
+            "required": False,
+        }]
+        content = content.replace(
+            "Price theory explains",
+            "Price theory [[VISUAL:engel-curve]] explains",
+        )
+
+        updated = _insert_required_visual_markers(content, manifest)
+
+        self.assertNotIn("[[VISUAL:engel-curve]]", updated)
 
     def test_figure_in_problem_waits_until_the_whole_solution_finishes(self):
         content = """## 4. Worked Example

@@ -154,6 +154,45 @@ services:
         value: mentify@mlaudit.info
       - key: ADMIN_EMAILS_NOTIFICATIONS
         sync: false
+
+  - type: worker
+    name: eduai-pdf-worker
+    runtime: python
+    pythonVersion: 3.11
+    numInstances: 1
+    buildCommand: pip install -r requirements.txt && playwright install --with-deps chromium
+    startCommand: python manage.py run_prep_pdf_worker --poll-seconds 5
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_SSL
+        sync: false
+      - key: DB_TABLE_PREFIX
+        sync: false
+      - key: DB_TABLE_SUFFIX
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO
+        sync: false
+      - key: GITHUB_BRANCH
+        value: main
+      - key: GITHUB_UPLOAD_DIR
+        value: mentify-uploads
+      - key: PREP_PDF_STORAGE_DIR
+        value: prep-pdfs
     
     # ─── Health Check ────────────────────────────────────────────────
     # Optional: Render pings /health/ to check if service is alive

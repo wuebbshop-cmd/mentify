@@ -18,9 +18,10 @@ from prep.models import (
     PrepTopic,
 )
 from prep.admin import PrepQuestionAdmin
-from services.prep_ai_router import _practice_question_issues
+from services.prep_ai_router import _note_format_issues, _practice_question_issues
 from services.prep_ingestion import (
     _strip_safe_question_extraction_artifacts,
+    assessment_question_rendering_issue_details,
     assessment_question_rendering_issues,
     extract_assessment_questions,
     index_assessment_questions,
@@ -29,6 +30,59 @@ from services.prep_ingestion import (
 
 
 class GeneratedQuestionValidationTests(SimpleTestCase):
+    def test_flags_compound_inline_math_joined_to_prose_but_allows_single_tokens(self):
+        issues = assessment_question_rendering_issues(
+            "The result is valid$x + 1$for every value."
+        )
+        self.assertIn(
+            "compound inline math is joined directly to surrounding prose",
+            issues,
+        )
+        self.assertNotIn(
+            "compound inline math is joined directly to surrounding prose",
+            assessment_question_rendering_issues("Let x$x$th denote the value."),
+        )
+
+    def test_math_review_issues_include_codes_and_suggestions(self):
+        details = assessment_question_rendering_issue_details(
+            r"The set is \Re and Cov(X_i, X_j) applies when i e j; theseries converges."
+        )
+        by_code = {issue["code"]: issue for issue in details}
+
+        self.assertIn("math.notation.real_operator_ambiguous", by_code)
+        self.assertIn("math.ocr.not_equal", by_code)
+        self.assertIn("text.ocr.merged_words", by_code)
+        self.assertTrue(by_code["math.notation.real_operator_ambiguous"]["fix_suggestion"])
+
+    def test_ignores_code_blocks_and_repairs_only_unambiguous_question_text(self):
+        from services.prep_ai_router import repair_question_and_solution_text
+
+        source = (
+            "The value is valid$x + 1$for theseries.\n"
+            "```latex\n"
+            r"\Re theseries $x+1$"
+            "\n```"
+        )
+        repaired = repair_question_and_solution_text(source)
+
+        self.assertIn("valid $x + 1$ for the series", repaired)
+        self.assertIn(r"\Re theseries $x+1$", repaired)
+        self.assertFalse(assessment_question_rendering_issues(repaired))
+
+    def test_flags_unmatched_inline_math_delimiter_next_to_prose(self):
+        issues = assessment_question_rendering_issues("The extracted text reads e$by the result.")
+
+        self.assertIn(
+            "an inline-math delimiter is adjacent to prose but has no matching delimiter",
+            issues,
+        )
+
+    def test_note_format_validation_blocks_math_and_ocr_review_issues(self):
+        issues = _note_format_issues("The answer is $x+1$for theseries.")
+
+        self.assertIn("compound inline math is joined directly to surrounding prose", issues)
+        self.assertIn("text contains the likely OCR merge 'theseries'", issues)
+
     def test_question_splitter_retains_start_page_and_removes_page_headers(self):
         source = (
             "--- Page 4 ---\n"
@@ -1405,5 +1459,3 @@ class QuestionIndexProvenanceTests(TestCase):
         self.assertNotIn("Step-by-Step Rigorous Proof", result["solution"])
         question.refresh_from_db()
         self.assertIn("Positive economic statements are objective", question.solution_latex)
-
-

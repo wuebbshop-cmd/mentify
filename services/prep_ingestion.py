@@ -2090,7 +2090,11 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
     extraction did not recover the mathematical notation. They are not valid
     question content and must be reviewed or re-OCRed before publication.
     """
-    from services.prep_ai_router import _display_math_issues, _latex_syntax_issues
+    from services.prep_ai_router import (
+        _display_math_issues,
+        _latex_syntax_issues,
+        _math_content_review_issues,
+    )
 
     source = str(question_text or "")
     issues = []
@@ -2173,7 +2177,19 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         for issue in _latex_syntax_issues(source)
         if " is outside display math" not in issue
     )
+    issues.extend(
+        str(issue["message"])
+        for issue in _math_content_review_issues(source)
+        if issue["message"]
+    )
     return issues
+
+
+def assessment_question_rendering_issue_details(question_text: str) -> list[dict[str, str | None]]:
+    """Return structured codes and safe fix suggestions for math/text review issues."""
+    from services.prep_ai_router import _math_content_review_issues
+
+    return _math_content_review_issues(str(question_text or ""))
 
 
 def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: bool = True) -> int:
@@ -2834,4 +2850,3 @@ def _run_queued_document_ingestion(document_id) -> dict:
 def enqueue_prep_document_ingestion(document_id):
     """Submit a saved Stage 1 PrepDocument for non-blocking background ingestion."""
     return _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(document_id))
-

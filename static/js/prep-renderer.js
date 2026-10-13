@@ -6,7 +6,8 @@
  *
  * Guaranteed Invariants:
  * 1. ONE pipeline only: no separate JSON block dispatchers, no diverging branch logic.
- * 2. Pure rendering: NO server/client auto-repair regexes or destructive string mutation.
+ * 2. Rendering preserves source content; a narrow whitespace pass separates
+ *    compound inline math from adjacent prose without touching code or math.
  * 3. Math everywhere: Display math ($$...$$) and inline math ($...$) work inside
  *    paragraphs, blockquotes (Definition/Theorem boxes), lists, and tables.
  * 4. Code isolation: Code blocks with '$' (e.g. R df$column) are protected by
@@ -200,6 +201,57 @@
       window.Prism.highlightAllUnder(containerElement);
     } else if (window.Prism && typeof window.Prism.highlightAll === 'function') {
       window.Prism.highlightAll();
+    }
+  }
+
+  var reportedMathWarnings = {};
+  function warnMathReviewIssue(code, message) {
+    if (reportedMathWarnings[code] || !window.console || typeof window.console.warn !== 'function') return;
+    reportedMathWarnings[code] = true;
+    window.console.warn('[Prep renderer][' + code + '] ' + message);
+  }
+
+  function normalizeInlineMathBoundaries(markdown) {
+    var protectedBlocks = /(```[\s\S]*?```|`[^`\n]*`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])/g;
+    var inlineMath = /(?<!\\)\$(?!\$)([^$\n]+?)(?<!\\)\$(?!\$)|\\\(([\s\S]*?)\\\)/g;
+    var segments = markdown.split(protectedBlocks);
+
+    for (var segmentIndex = 0; segmentIndex < segments.length; segmentIndex += 2) {
+      segments[segmentIndex] = segments[segmentIndex].replace(inlineMath, function (token, dollarBody, parenBody, offset, source) {
+        var body = dollarBody === undefined ? parenBody : dollarBody;
+        if (/^[A-Za-z0-9_]+$/.test(body.trim())) return token;
+
+        var prefix = source.slice(0, offset);
+        var suffix = source.slice(offset + token.length);
+        var addSpaceBefore = /[A-Za-z0-9_]$/.test(prefix);
+        var addSpaceAfter = /^[A-Za-z0-9_]/.test(suffix);
+        if (addSpaceBefore || addSpaceAfter) {
+          warnMathReviewIssue(
+            'math.inline_boundary.missing_space',
+            'Inserted prose spacing around a compound inline-math expression.'
+          );
+        }
+        return (addSpaceBefore ? ' ' : '') + token + (addSpaceAfter ? ' ' : '');
+      });
+    }
+
+    return segments.join('');
+  }
+
+  function warnOnMathReviewTokens(markdown) {
+    var source = markdown.replace(/```[\s\S]*?```|`[^`\n]*`/g, '');
+    if (/(?<!\\)\\Re\b/.test(source)) {
+      warnMathReviewIssue(
+        'math.notation.real_operator_ambiguous',
+        'Review \\Re: use \\mathbb{R} for the real-number set, but retain \\Re for real-part notation.'
+      );
+    }
+    if (/\btheseries\b/i.test(source)) {
+      warnMathReviewIssue('text.ocr.merged_words', 'Possible OCR merge "theseries"; review or correct the source.');
+    }
+    if (/\bi\s+e\s+j\b/i.test(source) &&
+        /\b(?:cov(?:ariance)?|var(?:iance)?|correlation|matrix|independent)\b/i.test(source)) {
+      warnMathReviewIssue('math.ocr.not_equal', 'Possible OCR artifact "i e j" in statistical notation; review for "i != j".');
     }
   }
 
@@ -584,6 +636,8 @@
     var cleanText = replaceLiteralEscapedNewlines(markdownSource).trim();
     cleanText = cleanLatexDocumentMarkup(cleanText);
     cleanText = normalizeLegacyMathBlocks(cleanText);
+    warnOnMathReviewTokens(cleanText);
+    cleanText = normalizeInlineMathBoundaries(cleanText);
 
     // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     cleanText = cleanText.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
