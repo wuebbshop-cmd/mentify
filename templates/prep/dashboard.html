@@ -460,14 +460,6 @@
       <span class="ws-metric-value">{{ total_active_courses|default:0 }}</span>
     </a>
 
-    <a href="{% url 'prep:public_library' %}" class="ws-metric-item">
-      <span class="ws-metric-label">
-        <span>Banked Questions</span>
-        <span class="ws-metric-label-arrow">&rarr;</span>
-      </span>
-      <span class="ws-metric-value">{{ total_questions|default:0 }}</span>
-    </a>
-
     <a href="{% url 'prep:billing' %}" class="ws-metric-item">
       <span class="ws-metric-label">
         <span>Available Credits</span>

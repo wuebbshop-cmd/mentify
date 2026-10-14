@@ -48,8 +48,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Design system -->
-  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=20261006_mobile_touch_layout">
-  <script>if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark-theme');}</script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=20261014_sidebar_profile_bottom">
+  <script>
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-theme');
+    if (localStorage.getItem('main_sidebar_collapsed') === 'true') document.documentElement.classList.add('main-sidebar-collapsed');
+  </script>
 
   {% block extra_css %}{% endblock %}
   {% block extra_head %}{% endblock %}
@@ -102,24 +105,15 @@
     {{ PLATFORM_NAME }}
   </a>
 
+  {% if user.is_authenticated and user.is_tutor or user.is_authenticated and user.is_admin %}
   <ul class="navbar-nav" role="list">
-    {% if user.is_authenticated %}
-      {% if user.is_tutor %}
-        <li><a href="{% url 'courses:tutor_cohorts' %}" class="nav-link {% if request.resolver_match.url_name == 'tutor_cohorts' %}active{% endif %}">My Cohorts</a></li>
-      {% elif user.is_guardian %}
-        <li><a href="{% url 'accounts:guardian_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'guardian_dashboard' %}active{% endif %}">Dashboard</a></li>
-      {% elif user.is_admin %}
-        <li><a href="{% url 'accounts:admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">Admin Dashboard</a></li>
-        <li><a href="{% url 'courses:tutor_cohorts' %}" class="nav-link {% if request.resolver_match.url_name == 'tutor_cohorts' %}active{% endif %}">Manage Cohorts</a></li>
-      {% else %}
-        <li><a href="{% url 'courses:list' %}" class="nav-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}">Courses</a></li>
-      {% endif %}
-    {% else %}
-      <li><a href="{% url 'courses:list' %}" class="nav-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}">Courses</a></li>
+    {% if user.is_tutor %}
+      <li><a href="{% url 'courses:tutor_cohorts' %}" class="nav-link {% if request.resolver_match.url_name == 'tutor_cohorts' %}active{% endif %}">My Cohorts</a></li>
+    {% elif user.is_admin %}
+      <li><a href="{% url 'courses:tutor_cohorts' %}" class="nav-link {% if request.resolver_match.url_name == 'tutor_cohorts' %}active{% endif %}">Manage Cohorts</a></li>
     {% endif %}
-    <li><a href="{% url 'blog:index' %}" class="nav-link {% if request.resolver_match.app_name == 'blog' %}active{% endif %}">Blog</a></li>
-    <li><a href="{% url 'prep:dashboard' %}" class="nav-link {% if request.resolver_match.app_name == 'prep' %}active{% endif %}">Prep</a></li>
   </ul>
+  {% endif %}
 
   <div class="navbar-end">
     <button id="theme-toggle" type="button" class="theme-toggle" title="Switch to Dark Mode" aria-label="Switch to dark mode" style="margin-right: 4px;">
@@ -127,9 +121,6 @@
     </button>
 
     {% if user.is_authenticated %}
-      {% if user.is_learner %}
-      <a href="{% url 'accounts:dashboard' %}" class="btn btn-ghost btn-sm">Dashboard</a>
-      {% endif %}
       <a href="{% url 'accounts:profile' %}" class="nav-avatar{% if user.avatar_url %} has-image{% endif %}" title="{{ user.get_full_name }}">
         {% if user.avatar_url %}
         <img src="{{ user.avatar_url|public_asset_url }}" alt="{{ user.get_full_name }} profile image">
@@ -395,6 +386,77 @@
   if (menuBtn)  menuBtn.addEventListener('click', openDrawer);
   if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
   if (overlay)  overlay.addEventListener('click', closeDrawer);
+
+  // Add the same retract control to every main-app dashboard sidebar.
+  const mainSidebars = document.querySelectorAll('.dashboard-layout > .sidebar:not(#prep-sidebar)');
+  mainSidebars.forEach(function(sidebar, index) {
+    const layout = sidebar.closest('.dashboard-layout');
+    if (layout) layout.classList.add('main-app-dashboard-layout');
+    document.body.classList.add('main-app-sidebar-page');
+    if (!sidebar.id) sidebar.id = index === 0 ? 'main-sidebar' : `main-sidebar-${index + 1}`;
+
+    const profile = sidebar.querySelector('.sidebar-profile');
+    if (profile) {
+      profile.classList.add('sidebar-footer-profile');
+      sidebar.appendChild(profile);
+    }
+
+    let header = sidebar.querySelector('.sidebar-header-row');
+    if (!header) {
+      header = document.createElement('div');
+      header.className = 'sidebar-header-row';
+      const label = document.createElement('span');
+      label.className = 'sidebar-header-label';
+      label.textContent = 'Menu';
+      header.appendChild(label);
+      const nav = sidebar.querySelector('.sidebar-nav');
+      sidebar.insertBefore(header, nav || null);
+    }
+
+    let toggleButton = sidebar.querySelector('.sidebar-collapse-btn');
+    if (!toggleButton) {
+      toggleButton = document.createElement('button');
+      toggleButton.type = 'button';
+      toggleButton.className = 'sidebar-collapse-btn';
+      toggleButton.title = 'Toggle sidebar (Ctrl+B)';
+      toggleButton.setAttribute('aria-label', 'Toggle sidebar');
+      toggleButton.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>';
+      header.appendChild(toggleButton);
+    }
+
+    function toggleMainSidebar() {
+      const isCollapsed = document.documentElement.classList.toggle('main-sidebar-collapsed');
+      try {
+        localStorage.setItem('main_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+      } catch (e) {}
+      toggleButton.setAttribute('aria-expanded', String(!isCollapsed));
+    }
+
+    toggleButton.addEventListener('click', toggleMainSidebar);
+    toggleButton.setAttribute(
+      'aria-expanded',
+      String(!document.documentElement.classList.contains('main-sidebar-collapsed'))
+    );
+  });
+
+  if (mainSidebars.length) {
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        const activeTag = (document.activeElement && document.activeElement.tagName) || '';
+        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+          e.preventDefault();
+          const isCollapsed = document.documentElement.classList.toggle('main-sidebar-collapsed');
+          try {
+            localStorage.setItem('main_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+          } catch (error) {}
+          mainSidebars.forEach(function(sidebar) {
+            const button = sidebar.querySelector('.sidebar-collapse-btn');
+            if (button) button.setAttribute('aria-expanded', String(!isCollapsed));
+          });
+        }
+      }
+    });
+  }
 </script>
 
 {% include "includes/chatbot.html" %}
