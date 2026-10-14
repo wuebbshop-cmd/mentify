@@ -18,6 +18,12 @@ class Command(BaseCommand):
         parser.add_argument("--once", action="store_true", help="Process available jobs, then exit.")
         parser.add_argument("--poll-seconds", type=float, default=5.0)
         parser.add_argument(
+            "--reconcile-seconds",
+            type=float,
+            default=900.0,
+            help="Rescan published notes and questions for missing or stale artifacts.",
+        )
+        parser.add_argument(
             "--skip-initial-scan",
             action="store_true",
             help="Do not enqueue existing topic artifacts on worker startup.",
@@ -26,20 +32,29 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         once = options["once"]
         poll_seconds = max(1.0, options["poll_seconds"])
+        reconcile_seconds = max(60.0, options["reconcile_seconds"])
         self._wait_for_job_table(once, poll_seconds)
         initial_scan_complete = options["skip_initial_scan"]
+        next_reconciliation = (
+            time.monotonic() + reconcile_seconds
+            if initial_scan_complete
+            else 0.0
+        )
 
         while True:
             close_old_connections()
-            if not initial_scan_complete:
+            if not initial_scan_complete or time.monotonic() >= next_reconciliation:
                 try:
                     queued = enqueue_existing_topic_pdf_artifacts()
-                    self.stdout.write(f"Queued {queued} missing or stale topic PDF artifact(s).")
+                    self.stdout.write(
+                        f"Reconciled published topic PDFs; queued {queued} missing or stale artifact(s)."
+                    )
                     initial_scan_complete = True
+                    next_reconciliation = time.monotonic() + reconcile_seconds
                 except Exception:
                     if once:
                         raise
-                    logger.exception("Initial topic PDF scan failed; retrying after the poll interval.")
+                    logger.exception("Topic PDF reconciliation failed; retrying after the poll interval.")
                     time.sleep(poll_seconds)
                     continue
             try:

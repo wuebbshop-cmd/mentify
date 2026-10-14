@@ -372,6 +372,8 @@ def _process_artifact(claim: tuple[int, int]) -> None:
     if not pdf_bytes.startswith(b"%PDF") or len(pdf_bytes) < 1000:
         raise RuntimeError("The pinned Chromium renderer did not produce a valid PDF.")
 
+    # Chromium rendering can outlive MySQL's idle-connection timeout.
+    close_old_connections()
     latest = PrepTopicPdfArtifact.objects.get(pk=artifact_id)
     latest_signature, _ = _load_artifact_source(latest)
     if latest_signature != signature or latest.request_version != request_version:
@@ -419,6 +421,7 @@ def process_next_pdf_artifact() -> bool:
         _process_artifact(claim)
     except Exception as exc:
         logger.exception("PDF artifact job %s failed.", artifact_id)
+        close_old_connections()
         with transaction.atomic():
             artifact = PrepTopicPdfArtifact.objects.select_for_update().get(pk=artifact_id)
             artifact.last_error = str(exc)[:4000]

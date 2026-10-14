@@ -1,4 +1,6 @@
-from unittest.mock import patch
+from contextlib import nullcontext
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 import fitz
 from django.test import SimpleTestCase, TestCase
@@ -11,6 +13,56 @@ from services.prep_export_service import (
     export_paper_questions_pdf,
     export_topic_notes_pdf,
 )
+
+
+class PrepPdfArtifactConnectionTests(SimpleTestCase):
+    def test_worker_refreshes_expired_database_connection_after_render(self):
+        from services.prep_pdf_artifacts import _process_artifact
+
+        events = []
+        topic = SimpleNamespace(course=SimpleNamespace(code="TST 101"))
+        artifact = SimpleNamespace(
+            pk=42,
+            request_version=1,
+            topic=topic,
+            artifact_type="notes",
+            level="level_1",
+            source_signature="source-signature",
+        )
+        locked_artifact = Mock(
+            request_version=1,
+            source_signature="source-signature",
+        )
+        manager = Mock()
+        manager.select_related.return_value.get.return_value = artifact
+        manager.select_for_update.return_value.get.return_value = locked_artifact
+        manager.get.side_effect = lambda **kwargs: (
+            events.append("latest_read") or artifact
+        )
+
+        def render(_payload):
+            events.append("render")
+            return b"%PDF-" + (b"x" * 1200)
+
+        def close_connections():
+            events.append("close_connections")
+
+        with (
+            patch("services.prep_pdf_artifacts.PrepTopicPdfArtifact.objects", manager),
+            patch("services.prep_pdf_artifacts.transaction.atomic", return_value=nullcontext()),
+            patch(
+                "services.prep_pdf_artifacts._load_artifact_source",
+                return_value=("source-signature", {"kind": "notes", "content": "Validated notes"}),
+            ),
+            patch("services.prep_pdf_artifacts._render_artifact", side_effect=render),
+            patch("services.prep_pdf_artifacts._upload_artifact", return_value="pdfs/topic.pdf"),
+            patch("services.prep_pdf_artifacts.close_old_connections", side_effect=close_connections),
+        ):
+            _process_artifact((42, 1))
+
+        self.assertLess(events.index("render"), events.index("close_connections"))
+        self.assertLess(events.index("close_connections"), events.index("latest_read"))
+        self.assertEqual(locked_artifact.status, "ready")
 
 
 class PrepPdfExportTests(SimpleTestCase):

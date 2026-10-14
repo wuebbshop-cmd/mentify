@@ -318,7 +318,7 @@
         Go to Course Workspace &rarr;
       </a>
       {% else %}
-      <a href="{% url 'account_login' %}?next={% url 'prep:public_course' course.slug %}" class="btn btn-primary btn-sm">
+      <a href="{% url 'accounts:login' %}?next={% url 'prep:public_course' course.slug %}" class="btn btn-primary btn-sm">
         Sign In to Study
       </a>
       {% endif %}
