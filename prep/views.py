@@ -1117,29 +1117,10 @@ def prep_topic_study(request, topic_id):
             "is_adapted": q.question_type == "adapted",
         })
 
-    # 2. Existing Practice Variants in DB
+    # 2. Practice Variants: Do not preload on page load so students cannot view
+    # generated questions for free before clicking the generation button.
+    # Practice questions are generated / fetched on demand via api_generate_practice.
     generated_qs = []
-    from services.prep_ingestion import learner_visible_assessment_questions
-
-    gen_records = learner_visible_assessment_questions(
-        PrepQuestion.objects.filter(
-            topic=topic,
-            question_type="generated",
-            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
-        ).order_by("number", "id")
-    )[:10]
-    for q in gen_records:
-        clean_g_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
-        clean_g_sol = validated_question_solution(q)
-        generated_qs.append({
-            "id": q.id,
-            "number": q.number,
-            "marks": q.marks,
-            "topic_label": q.topic_label or topic_title,
-            "question_latex": clean_g_q,
-            "solution_latex": clean_g_sol,
-            "is_cached": True,
-        })
 
     # 3. Preload every already-published level. This is a read-only database
     # lookup, so opening a topic and switching levels never triggers AI work,
@@ -1179,11 +1160,16 @@ def prep_topic_study(request, topic_id):
         "summary": topic.summary if (topic and topic.summary) else "Core syllabus definitions, theorems, and proofs.",
     }
 
+    is_enrolled = PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists()
+    if not is_enrolled and request.user.is_authenticated:
+        PrepCourseEnrollment.objects.get_or_create(user=request.user, course=topic.course, defaults={"source": "topic_study"})
+        is_enrolled = True
+
     context = {
         "active_tab": "history" if from_tab == "history" else "courses",
         "active_subtab": active_subtab,
         "from_history": from_tab == "history",
-        "is_enrolled": PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists(),
+        "is_enrolled": is_enrolled,
         "user_credits": get_available_credits(wallet),
         "topic": topic_dict,
         "initial_level": initial_level,
@@ -1214,10 +1200,13 @@ def prep_topic_tutor_api(request, topic_id):
         or request.user.is_superuser
         or PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists()
     ):
-        return JsonResponse(
-            {"success": False, "error": "Add this course to your study list before opening its topic tutor."},
-            status=403,
-        )
+        if request.user.is_authenticated:
+            PrepCourseEnrollment.objects.get_or_create(user=request.user, course=topic.course, defaults={"source": "topic_tutor"})
+        else:
+            return JsonResponse(
+                {"success": False, "error": "Add this course to your study list before opening its topic tutor."},
+                status=403,
+            )
 
     from services.prep_topic_tutor import (
         MAX_MESSAGE_CHARS,
