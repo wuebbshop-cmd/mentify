@@ -938,26 +938,45 @@
     line-height: 1.4;
   }
   .topic-tutor-error {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 25;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    position: absolute;
-    z-index: 3;
-    right: 18px;
-    bottom: 128px;
-    left: 18px;
+    margin: 8px 18px 4px;
+    padding: 10px 14px;
+    border: 1px solid rgba(220, 38, 38, .3);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--danger);
+    font-size: .84rem;
+    line-height: 1.45;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .08);
   }
   .topic-tutor-error-dismiss {
     flex: 0 0 auto;
-    padding: 0 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
     border: 0;
+    border-radius: 4px;
     background: transparent;
     color: inherit;
-    font: inherit;
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     line-height: 1;
     cursor: pointer;
+    opacity: 0.75;
+    transition: opacity 0.15s ease, background 0.15s ease;
+  }
+  .topic-tutor-error-dismiss:hover,
+  .topic-tutor-error-dismiss:active {
+    opacity: 1;
+    background: rgba(220, 38, 38, .1);
   }
   .topic-tutor-message .katex-display { overflow-x: auto; max-width: 100%; }
   .topic-tutor-upload-chip {
@@ -1121,7 +1140,11 @@
       padding: 16px 12px 14px;
     }
     .topic-tutor-message { max-width: 96%; }
-    .topic-tutor-error { bottom: 80px; }
+    .topic-tutor-error {
+      margin: 6px 10px 4px;
+      padding: 9px 12px;
+      font-size: .82rem;
+    }
     .topic-tutor-history-toggle { display: inline-grid !important; }
     .topic-tutor-history-close { display: inline-grid !important; }
     .topic-tutor-subtitle,
@@ -1607,7 +1630,7 @@
           <p>Ask a question about {{ topic.title }}, or attach relevant study material. I’ll keep the explanation clear and focused.</p>
         </div>
       </div>
-      <div id="topic-tutor-error" class="topic-tutor-error" role="alert" style="display:none;padding:10px 12px;border:1px solid rgba(220,38,38,.25);border-radius:10px;background:var(--surface);color:var(--danger);font-size:.84rem;box-shadow:0 3px 12px rgba(0,0,0,.08);">
+      <div id="topic-tutor-error" class="topic-tutor-error" role="alert" style="display:none;">
         <span id="topic-tutor-error-message"></span>
         <button type="button" id="topic-tutor-error-dismiss" class="topic-tutor-error-dismiss" aria-label="Dismiss error message">&times;</button>
       </div>
@@ -1640,7 +1663,7 @@
           <button type="button" id="topic-tutor-camera-button" class="topic-tutor-icon-button" aria-label="Take photo with camera" title="Take photo with camera">
             <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </button>
-          <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" rows="1" maxlength="2000" placeholder="Ask about {{ topic.title }}…" aria-label="Ask a question about this topic" required></textarea>
+          <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" rows="1" maxlength="2000" placeholder="Ask about {{ topic.title }}…" aria-label="Ask a question about this topic"></textarea>
           <button type="submit" id="topic-tutor-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Send message">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
           </button>
@@ -1885,14 +1908,35 @@
   let publishedNotesByLevel = {};
   let notesUnavailableMessage = "No validated notes are available for this topic yet.";
 
+  function formatTopicTutorErrorMessage(message) {
+    if (!message || typeof message !== 'string') {
+      return "The topic tutor could not complete this request. Please try again.";
+    }
+    const trimmed = message.trim();
+    const lower = trimmed.toLowerCase();
+    if (
+      lower.includes('unexpected end of json') ||
+      lower.includes('failed to execute') ||
+      lower.includes('syntaxerror') ||
+      lower.includes('valid response') ||
+      lower.includes('internal server error')
+    ) {
+      return "The tutor service is temporarily busy. Please retry your question.";
+    }
+    if (lower.includes('failed to fetch') || lower.includes('networkerror') || lower.includes('network error')) {
+      return "Network connection issue. Please check your connection and try again.";
+    }
+    return trimmed;
+  }
+
   function showTopicTutorError(message) {
     const box = document.getElementById('topic-tutor-error');
     const messageEl = document.getElementById('topic-tutor-error-message');
     if (!box || !messageEl) return;
     clearTimeout(topicTutorErrorTimeout);
-    messageEl.textContent = message || "The topic tutor could not complete this request.";
+    messageEl.textContent = formatTopicTutorErrorMessage(message);
     box.style.display = 'flex';
-    topicTutorErrorTimeout = setTimeout(clearTopicTutorError, 10000);
+    // Kept visible without auto-dismiss: user can dismiss with the 'x' button or upon sending a new message
   }
 
   function clearTopicTutorError() {
@@ -2103,7 +2147,10 @@
         credentials: 'same-origin'
       });
       const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.error || 'Could not load conversation history.');
+      if (!response.ok || !data.success) {
+        console.warn('Topic tutor history notice:', data && data.error);
+        return;
+      }
       topicTutorInitialized = true;
       topicTutorConversations = data.conversations || [];
       renderTopicTutorHistory(topicTutorConversations);
@@ -2117,7 +2164,8 @@
         renderTopicTutorConversation(null);
       }
     } catch (error) {
-      showTopicTutorError(error.message);
+      console.warn('Topic tutor background initialization notice:', error);
+      // Suppress non-essential warning banner on background load
     }
   }
 
@@ -2168,11 +2216,14 @@
     const input = document.getElementById('topic-tutor-input');
     const send = document.getElementById('topic-tutor-send');
     const files = topicTutorSelectedFiles;
-    const text = input.value.trim();
+    let text = input.value.trim();
     if (!text) {
-      showTopicTutorError('Enter a question about this topic.');
-      input.focus();
-      return;
+      if (files.length > 0) {
+        text = "Please explain the attached material and answer any questions shown.";
+      } else {
+        input.focus();
+        return;
+      }
     }
     const formData = new FormData(form);
     formData.set('message', text);
