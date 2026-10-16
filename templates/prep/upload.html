@@ -462,8 +462,72 @@
     background: var(--border);
   }
 
+  /* Upload Mode Switcher (Documents vs Resource Links) */
+  .upload-mode-switcher {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .upload-mode-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    transition: all 0.16s ease;
+  }
+
+  .upload-mode-btn:hover {
+    border-color: var(--green);
+    color: var(--text);
+  }
+
+  .upload-mode-btn.is-active {
+    background: var(--green);
+    border-color: var(--green);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 118, 110, 0.2);
+  }
+
+  .upload-mode-btn .mode-label-mobile {
+    display: none;
+  }
+
   /* Mobile Adaptation */
   @media (max-width: 640px) {
+    .upload-mode-switcher {
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+    }
+
+    .upload-mode-btn {
+      flex: 1;
+      justify-content: center;
+      min-height: 44px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .upload-mode-btn .mode-label-desktop {
+      display: none;
+    }
+
+    .upload-mode-btn .mode-label-mobile {
+      display: inline;
+    }
+
     .upload-page-shell {
       padding-bottom: 24px;
     }
@@ -598,7 +662,21 @@
     </div>
   </div>
 
-  <form method="post" enctype="multipart/form-data" id="upload-doc-form" onsubmit="return validateForm()">
+  <!-- Upload Type Tab Switcher -->
+  <div class="upload-mode-switcher" role="tablist" aria-label="Upload mode selection">
+    <button type="button" id="tab-btn-document" class="upload-mode-btn {% if upload_tab != 'resource' %}is-active{% endif %}" onclick="switchUploadTab('document')" role="tab" aria-selected="{% if upload_tab != 'resource' %}true{% else %}false{% endif %}">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span class="mode-label-desktop">Document Batch (PDF, Word, CATs)</span>
+      <span class="mode-label-mobile">Documents</span>
+    </button>
+    <button type="button" id="tab-btn-resource" class="upload-mode-btn {% if upload_tab == 'resource' %}is-active{% endif %}" onclick="switchUploadTab('resource')" role="tab" aria-selected="{% if upload_tab == 'resource' %}true{% else %}false{% endif %}">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+      <span class="mode-label-desktop">Learning Resource Link (YouTube, Videos, Articles, Labs)</span>
+      <span class="mode-label-mobile">Resource Links</span>
+    </button>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" id="upload-doc-form" onsubmit="return validateForm()" style="display: {% if upload_tab == 'resource' %}none{% else %}block{% endif %};">
     {% csrf_token %}
 
     <!-- Step 1: Course & Document Metadata Card -->
@@ -720,6 +798,96 @@
         </button>
         <button type="button" id="clear-selection-btn" class="btn-clear-selection" onclick="clearSelectedFiles()">
           Clear selection
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Learning Resource Link Upload Form -->
+  <form method="post" id="upload-resource-form" style="display: {% if upload_tab == 'resource' %}block{% else %}none{% endif %};">
+    {% csrf_token %}
+    <input type="hidden" name="upload_mode" value="resource_link">
+
+    <div class="upload-card">
+      <span class="upload-card-section-label">Target Course &amp; Resource Details</span>
+      <div class="upload-meta-grid">
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="res-course-select" class="upload-field-label">Course *</label>
+            <select name="course_id" id="res-course-select" required class="upload-field-control">
+              <option value="">Select course...</option>
+              {% for course in upload_courses %}
+                <option value="{{ course.id }}" {% if selected_course_id == course.id|stringformat:'s' %}selected{% endif %}>{{ course.code }} — {{ course.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h10M7 12h10m-10 5h6"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="res-topic-select" class="upload-field-label">Topic (Optional)</label>
+            <select name="topic_id" id="res-topic-select" class="upload-field-control">
+              <option value="">Whole Course / General Resource</option>
+              {% for t in course_topics %}
+                <option value="{{ t.id }}">{{ t.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="upload-field-box">
+          <span class="upload-field-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </span>
+          <div class="upload-field-body">
+            <label for="res-type-select" class="upload-field-label">Resource Type</label>
+            <select name="resource_type" id="res-type-select" class="upload-field-control">
+              <option value="youtube">YouTube Video</option>
+              <option value="video">Other Video Lecture</option>
+              <option value="article">Reference Article / Research Paper</option>
+              <option value="simulation">Interactive Simulation / Lab</option>
+              <option value="website">Learning Website / Slide Deck</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-card">
+      <span class="upload-card-section-label">Link &amp; Context</span>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="upload-field-box" style="min-height: 58px;">
+          <div class="upload-field-body" style="width: 100%;">
+            <label for="res-url" class="upload-field-label">Resource URL *</label>
+            <input type="url" name="resource_url" id="res-url" required placeholder="https://www.youtube.com/watch?v=... or https://..." class="upload-field-control" style="width: 100%;">
+          </div>
+        </div>
+
+        <div class="upload-field-box" style="min-height: 58px;">
+          <div class="upload-field-body" style="width: 100%;">
+            <label for="res-title" class="upload-field-label">Title / Heading</label>
+            <input type="text" name="resource_title" id="res-title" placeholder="e.g. 3Blue1Brown - Essence of Linear Algebra" class="upload-field-control" style="width: 100%;">
+          </div>
+        </div>
+
+        <div class="upload-field-box" style="min-height: 80px; align-items: flex-start;">
+          <div class="upload-field-body" style="width: 100%;">
+            <label for="res-desc" class="upload-field-label">Why is this resource helpful?</label>
+            <textarea name="resource_description" id="res-desc" rows="2" placeholder="Briefly explain what concepts this resource explains well..." class="upload-field-control" style="width: 100%; resize: vertical; border: 0; background: transparent; padding: 4px 0; outline: none;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-actions-bar" style="margin-top: 18px;">
+        <button type="submit" class="btn-process-materials">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Submit Resource for Tutor Review</span>
         </button>
       </div>
     </div>
@@ -1109,6 +1277,75 @@
 
       xhr.send(formData);
     });
+  }
+
+  // --- Upload Tab Switcher & Dynamic Resource Topic population ---
+  function switchUploadTab(tab) {
+    const docForm = document.getElementById('upload-doc-form');
+    const resForm = document.getElementById('upload-resource-form');
+    const btnDoc = document.getElementById('tab-btn-document');
+    const btnRes = document.getElementById('tab-btn-resource');
+
+    if (tab === 'resource') {
+      if (docForm) docForm.style.display = 'none';
+      if (resForm) resForm.style.display = 'block';
+      if (btnDoc) {
+        btnDoc.classList.remove('is-active');
+        btnDoc.setAttribute('aria-selected', 'false');
+      }
+      if (btnRes) {
+        btnRes.classList.add('is-active');
+        btnRes.setAttribute('aria-selected', 'true');
+      }
+    } else {
+      if (docForm) docForm.style.display = 'block';
+      if (resForm) resForm.style.display = 'none';
+      if (btnDoc) {
+        btnDoc.classList.add('is-active');
+        btnDoc.setAttribute('aria-selected', 'true');
+      }
+      if (btnRes) {
+        btnRes.classList.remove('is-active');
+        btnRes.setAttribute('aria-selected', 'false');
+      }
+    }
+  }
+
+  const allTopicsData = [
+    {% for t in all_course_topics %}
+    { id: {{ t.id }}, courseId: "{{ t.course_id }}", title: "{{ t.title|escapejs }}" },
+    {% endfor %}
+  ];
+
+  function populateResourceTopics() {
+    const resCourseSelect = document.getElementById('res-course-select');
+    const resTopicSelect = document.getElementById('res-topic-select');
+    if (!resCourseSelect || !resTopicSelect) return;
+
+    const selectedCourse = resCourseSelect.value;
+    const currentTopicVal = resTopicSelect.value;
+    resTopicSelect.innerHTML = '<option value="">Whole Course / General Resource</option>';
+
+    if (!selectedCourse) return;
+
+    const matched = allTopicsData.filter(item => String(item.courseId) === String(selectedCourse));
+    matched.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title;
+      if (String(t.id) === String(currentTopicVal)) {
+        opt.selected = true;
+      }
+      resTopicSelect.appendChild(opt);
+    });
+  }
+
+  const resCourseEl = document.getElementById('res-course-select');
+  if (resCourseEl) {
+    resCourseEl.addEventListener('change', populateResourceTopics);
+    if (resCourseEl.value) {
+      populateResourceTopics();
+    }
   }
 </script>
 {% endblock %}

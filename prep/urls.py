@@ -45,5 +45,6 @@ urlpatterns = [
     path("api/notifications/read/", views.prep_mark_notification_read_api, name="api_notifications_read"),
     # Mentify Prep AI Assistant
     path("api/assistant/chat/", views.prep_assistant_chat_api, name="api_assistant_chat"),
+    path("api/topic/<int:topic_id>/wikipedia/", views.prep_topic_wikipedia_api, name="api_topic_wikipedia"),
 ]
 

@@ -37,6 +37,8 @@ from .models import (
     PrepTransaction,
     PrepHistory,
     PrepNotification,
+    PrepTopicResource,
+    PrepTopicWikipedia,
 )
 from services.credit_service import grant_credits, grant_subscription
 
@@ -1549,3 +1551,85 @@ class PrepNotificationAdmin(admin.ModelAdmin):
     list_display = ("user", "title", "category", "is_read", "created_at")
     list_filter = ("category", "is_read", "created_at")
     search_fields = ("user__email", "title", "message")
+
+
+@admin.register(PrepTopicResource)
+class PrepTopicResourceAdmin(admin.ModelAdmin):
+    """Admin review and moderation for student- and educator-submitted learning links and videos."""
+    list_display = (
+        "title",
+        "resource_type_badge",
+        "course",
+        "topic",
+        "is_approved_badge",
+        "submitted_by",
+        "created_at",
+        "open_link",
+    )
+    list_filter = ("is_approved", "resource_type", "course")
+    search_fields = ("title", "url", "description", "course__code", "topic__title")
+    autocomplete_fields = ("course", "topic")
+    actions = ["approve_resources", "unapprove_resources"]
+    readonly_fields = ("created_at", "reviewed_at", "preview_resource")
+
+    def resource_type_badge(self, obj):
+        colors = {
+            "youtube": "#dc2626",
+            "video": "#ea580c",
+            "article": "#2563eb",
+            "simulation": "#7c3aed",
+            "website": "#059669",
+        }
+        color = colors.get(obj.resource_type, "#475569")
+        return format_html(
+            '<span style="background:{}; color:#fff; padding:3px 8px; border-radius:12px; font-size:0.75rem; font-weight:600;">{}</span>',
+            color,
+            obj.get_resource_type_display(),
+        )
+    resource_type_badge.short_description = "Type"
+
+    def is_approved_badge(self, obj):
+        if obj.is_approved:
+            return format_html('<span style="color:#16a34a; font-weight:700;">✓ Approved</span>')
+        return format_html('<span style="color:#d97706; font-weight:700;">⚡ Pending Review</span>')
+    is_approved_badge.short_description = "Status"
+
+    def open_link(self, obj):
+        return format_html('<a href="{}" target="_blank" rel="noopener" style="text-decoration:underline;">Open ↗</a>', obj.url)
+    open_link.short_description = "Resource Link"
+
+    def preview_resource(self, obj):
+        if obj.embed_id and obj.resource_type == "youtube":
+            return format_html(
+                '<iframe width="420" height="236" src="https://www.youtube.com/embed/{}" frameborder="0" allowfullscreen></iframe>',
+                obj.embed_id,
+            )
+        if obj.thumbnail_url:
+            return format_html('<img src="{}" style="max-height:160px; border-radius:6px;" />', obj.thumbnail_url)
+        return format_html('<a href="{}" target="_blank" rel="noopener">Visit {}</a>', obj.url, obj.url)
+    preview_resource.short_description = "Resource Preview"
+
+    @admin.action(description="Approve and publish selected resources to Explore Further")
+    def approve_resources(self, request, queryset):
+        count = queryset.update(is_approved=True, reviewed_at=timezone.now())
+        self.message_user(request, f"Approved and published {count} resource(s) to Mentify Prep Explore Further.")
+
+    @admin.action(description="Unapprove / hide selected resources from Explore Further")
+    def unapprove_resources(self, request, queryset):
+        count = queryset.update(is_approved=False)
+        self.message_user(request, f"Unapproved {count} resource(s).")
+
+
+@admin.register(PrepTopicWikipedia)
+class PrepTopicWikipediaAdmin(admin.ModelAdmin):
+    """Wikipedia concept summaries cached for syllabus topics."""
+    list_display = ("wikipedia_title", "topic", "canonical_link", "fetched_at")
+    search_fields = ("wikipedia_title", "topic__title", "topic__course__code")
+    readonly_fields = ("fetched_at",)
+
+    def canonical_link(self, obj):
+        if obj.canonical_url:
+            return format_html('<a href="{}" target="_blank" rel="noopener">Wikipedia Page ↗</a>', obj.canonical_url)
+        return "-"
+    canonical_link.short_description = "Wikipedia Article"
+

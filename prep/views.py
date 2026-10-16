@@ -1046,7 +1046,7 @@ def prep_topic_study(request, topic_id):
     wallet = PrepWallet.get_or_create_wallet(request.user)
     from_tab = request.GET.get("from")
     active_subtab = request.GET.get("tab", "notes")
-    if active_subtab not in {"notes", "assistant", "past_questions", "practice"}:
+    if active_subtab not in {"notes", "assistant", "past_questions", "practice", "explore"}:
         active_subtab = "notes"
 
     topic = None
@@ -1151,9 +1151,12 @@ def prep_topic_study(request, topic_id):
     if not initial_notes:
         initial_notes_error = "No validated notes are available for this topic yet."
 
+    course_id_val = str(topic.course_id) if (topic and getattr(topic, "course_id", None)) else ""
+
     topic_dict = {
         "id": str(topic.id) if topic else str(topic_id),
         "title": topic_title,
+        "course_id": course_id_val,
         "course_code": course_code,
         "course_title": course_title,
         "subtopics": subtopics,
@@ -1171,6 +1174,7 @@ def prep_topic_study(request, topic_id):
         "from_history": from_tab == "history",
         "is_enrolled": is_enrolled,
         "user_credits": get_available_credits(wallet),
+        "course_id": course_id_val,
         "topic": topic_dict,
         "initial_level": initial_level,
         "initial_notes": initial_notes,
@@ -1186,7 +1190,41 @@ def prep_topic_study(request, topic_id):
             int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", 5)),
         ),
     }
+
+    # 4. Explore Further: Approved learning resources & Wikipedia concept overview
+    from prep.models import PrepTopicResource, PrepTopicWikipedia
+
+    topic_resources = PrepTopicResource.objects.filter(
+        Q(topic=topic) | (Q(topic__isnull=True) & Q(course=topic.course)),
+        is_approved=True,
+    ).order_by("-created_at")
+
+    # Fast DB cache read only (~1ms). Never block initial page render with external Wikimedia HTTP calls!
+    wiki_entry = PrepTopicWikipedia.objects.filter(topic=topic).first()
+
+    context["topic_resources"] = topic_resources
+    context["wiki_entry"] = wiki_entry
     return render(request, "prep/topic_study.html", context)
+
+
+@never_cache
+@require_http_methods(["GET"])
+def prep_topic_wikipedia_api(request, topic_id):
+    """Asynchronous background endpoint to fetch or retrieve cached Wikipedia summary without blocking page load."""
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    from services.prep_wikipedia import get_or_fetch_wikipedia_summary
+    entry = get_or_fetch_wikipedia_summary(topic)
+    if not entry or not entry.extract:
+        return JsonResponse({"success": False, "found": False})
+    return JsonResponse({
+        "success": True,
+        "found": True,
+        "title": entry.wikipedia_title,
+        "extract": entry.extract,
+        "canonical_url": entry.canonical_url,
+        "thumbnail_url": entry.thumbnail_url,
+        "description": entry.description,
+    })
 
 
 @login_required
@@ -1477,6 +1515,89 @@ def prep_upload(request):
             messages.info(request, "Please sign in or create a free account to upload study materials.")
             return redirect(f"/accounts/login/?next={request.path}")
 
+        upload_mode = request.POST.get("upload_mode", "document").strip()
+        if upload_mode == "resource_link":
+            resource_url = request.POST.get("resource_url", "").strip()
+            resource_title = request.POST.get("resource_title", "").strip()
+            resource_type = request.POST.get("resource_type", "website").strip()
+            resource_desc = request.POST.get("resource_description", "").strip()
+            course_id = request.POST.get("course_id", "").strip()
+            course_name = request.POST.get("course_name", "").strip()
+            target_topic_id = request.POST.get("topic_id", "").strip()
+
+            if not resource_url or not (resource_url.startswith("http://") or resource_url.startswith("https://")):
+                return _reject("Please enter a valid web URL starting with http:// or https://")
+
+            course = None
+            if course_id:
+                try:
+                    course = PrepCourse.objects.get(pk=int(course_id), is_active=True)
+                except (ValueError, PrepCourse.DoesNotExist):
+                    return _reject("Choose an active course from the list.")
+            else:
+                if not course_name:
+                    return _reject("Choose a course for this learning resource.")
+                course_code, course_title = parse_course_code_and_title(course_name)
+                course = PrepCourse.objects.filter(code__iexact=course_code).first()
+                if not course:
+                    course = PrepCourse.objects.create(
+                        code=course_code,
+                        title=course_title,
+                        level="Standard",
+                        category="Other",
+                    )
+
+            target_topic = None
+            if target_topic_id and target_topic_id.isdigit():
+                target_topic = PrepTopic.objects.filter(pk=int(target_topic_id), course=course).first()
+
+            from services.prep_wikipedia import extract_youtube_id
+            from prep.models import PrepTopicResource
+
+            yt_id = extract_youtube_id(resource_url)
+            embed_id = ""
+            thumbnail_url = ""
+            if yt_id:
+                embed_id = yt_id
+                resource_type = "youtube"
+                thumbnail_url = f"https://img.youtube.com/vi/{yt_id}/hqdefault.jpg"
+                if not resource_title:
+                    resource_title = f"{course.code} Video Lecture"
+
+            if not resource_title:
+                resource_title = f"{course.code} Learning Resource"
+
+            valid_types = {"youtube", "video", "article", "simulation", "website"}
+            if resource_type not in valid_types:
+                resource_type = "website"
+
+            PrepTopicResource.objects.create(
+                course=course,
+                topic=target_topic,
+                title=resource_title[:255],
+                url=resource_url[:500],
+                resource_type=resource_type,
+                description=resource_desc,
+                thumbnail_url=thumbnail_url,
+                embed_id=embed_id,
+                submitted_by=request.user,
+                is_approved=False,
+            )
+
+            PrepNotification.objects.create(
+                user=request.user,
+                title="Learning Resource Submitted",
+                message=f"'{resource_title}' has been submitted for {course.code} and placed in the tutor review queue.",
+                category="upload",
+                url=reverse("prep:course_detail", kwargs={"course_code": course.slug or course.code.replace(" ", "-")}),
+            )
+
+            success_msg = f"'{resource_title}' was submitted successfully! It is now in the review queue and will appear under Explore Further once approved."
+            if is_async:
+                return JsonResponse({"success": True, "message": success_msg})
+            messages.success(request, success_msg)
+            return redirect(f"{reverse('prep:upload')}?course_id={course.pk}&tab=resource")
+
         course_id = request.POST.get("course_id", "").strip()
         course_name = request.POST.get("course_name", "").strip()
         doc_type = request.POST.get("doc_type", "Lecture Notes")
@@ -1708,11 +1829,24 @@ def prep_upload(request):
     courses = PrepCourse.objects.filter(is_active=True).order_by("code")
     if not selected_course_id.isdigit() or not courses.filter(pk=selected_course_id).exists():
         selected_course_id = ""
+    upload_tab = request.GET.get("tab", "document").strip()
+    if upload_tab not in {"document", "resource"}:
+        upload_tab = "document"
+
+    course_topics = []
+    if selected_course_id:
+        course_topics = PrepTopic.objects.filter(course_id=int(selected_course_id), is_active=True).order_by("order", "id")
+
+    all_course_topics = PrepTopic.objects.filter(course__in=courses, is_active=True).values("id", "title", "course_id").order_by("order", "id")
+
     context = {
         "active_tab": "upload",
         "user_credits": user_credits,
         "upload_courses": courses,
         "selected_course_id": selected_course_id,
+        "upload_tab": upload_tab,
+        "course_topics": course_topics,
+        "all_course_topics": all_course_topics,
     }
     return render(request, "prep/upload.html", context)
 

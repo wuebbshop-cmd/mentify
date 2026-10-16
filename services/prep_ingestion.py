@@ -1654,7 +1654,12 @@ def extract_and_index_topics(course, text: str, prep_doc=None) -> list:
                 topic_obj.subtopics = subtopics
             if summary and not topic_obj.summary:
                 topic_obj.summary = summary
-            topic_obj.save()
+        if created:
+            try:
+                from services.prep_wikipedia import get_or_fetch_wikipedia_summary
+                get_or_fetch_wikipedia_summary(topic_obj)
+            except Exception:
+                pass
         created_topics.append(topic_obj)
 
     return created_topics

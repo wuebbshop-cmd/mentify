@@ -23,6 +23,11 @@
     align-items: center;
     gap: 8px;
   }
+  .topic-study-nav-tabs::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
   .study-tab-btn.active {
     color: var(--green);
     border-bottom-color: var(--green);
@@ -30,6 +35,107 @@
   }
   .study-tab-btn:hover:not(.active) {
     color: var(--text);
+  }
+
+  /* Explore Further (Pillar 5) Responsive Styles */
+  .explore-header-card {
+    margin-bottom: 22px;
+    padding: 20px 24px;
+    border-left: 4px solid var(--danger);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+
+  .explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .explore-readings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .explore-wiki-card {
+    padding: 22px 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .explore-wiki-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .explore-wiki-thumb {
+    width: 120px;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--white);
+  }
+
+  @media (max-width: 640px) {
+    .explore-header-card {
+      padding: 16px 14px !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 12px !important;
+      margin-bottom: 16px !important;
+    }
+
+    .explore-header-card h2 {
+      font-size: 1.08rem !important;
+    }
+
+    .explore-header-card p {
+      font-size: 0.82rem !important;
+    }
+
+    .explore-header-card .btn {
+      width: 100% !important;
+      justify-content: center !important;
+      min-height: 42px !important;
+    }
+
+    .explore-wiki-card {
+      padding: 16px 14px !important;
+    }
+
+    .explore-wiki-layout {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    .explore-wiki-thumb {
+      width: 100% !important;
+      max-height: 150px !important;
+    }
+
+    .explore-grid,
+    .explore-readings-grid {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+
+    #prep-video-modal {
+      padding: 8px !important;
+    }
+
+    #prep-video-modal > div {
+      border-radius: 8px !important;
+    }
   }
 
   /* Export PDF Split Button */
@@ -1467,7 +1573,7 @@
 </div>
 
 <!-- ─── Topic study navigation ─────────────────────────────────────────────── -->
-<div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 8px; overflow-x: auto;">
+<div class="topic-study-nav-tabs" style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;">
   <button type="button" data-study-tab="notes" class="study-tab-btn {% if active_subtab == 'notes' %}active{% endif %}" onclick="switchPillarTab('notes')">
     <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
     Topic Notes &amp; Explanations
@@ -1483,6 +1589,10 @@
   <button type="button" data-study-tab="practice" class="study-tab-btn {% if active_subtab == 'practice' %}active{% endif %}" onclick="switchPillarTab('practice')">
     <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
     Practice &amp; Variant Generator
+  </button>
+  <button type="button" data-study-tab="explore" class="study-tab-btn {% if active_subtab == 'explore' %}active{% endif %}" onclick="switchPillarTab('explore')">
+    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><circle cx="12" cy="12" r="10" stroke-width="2"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Explore Further
   </button>
 </div>
 
@@ -1869,6 +1979,218 @@
           <p style="font-size: 0.85rem; margin-bottom: 20px;">Select how many questions you want (1 to 5) above and click "Generate Similar Questions".</p>
         </div>
       {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     PILLAR 5: EXPLORE FURTHER (WIKIPEDIA ENCYCLOPEDIA & CURATED LEARNING RESOURCES)
+     ══════════════════════════════════════════════════════════════════════════════ -->
+<div id="pillar-explore" style="display: {% if active_subtab == 'explore' %}block{% else %}none{% endif %};">
+  <!-- Explore Header Card -->
+  <div class="card explore-header-card">
+    <div style="flex: 1; min-width: 0;">
+      <h2 style="font-size: 1.22rem; font-weight: 700; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; color: var(--text);">
+        <svg width="20" height="20" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><circle cx="12" cy="12" r="10" stroke-width="2"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Explore Further: {{ topic.title }}
+      </h2>
+      <p style="margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+        Supplementary knowledge, video breakdowns, and verified encyclopedia articles to build intuition and connect concepts across this topic.
+      </p>
+    </div>
+    <a href="{% url 'prep:upload' %}?course_id={{ course_id }}&tab=resource" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 0.82rem;">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Recommend Resource
+    </a>
+  </div>
+
+  <!-- Section 1: Wikipedia Encyclopedia Knowledge Brief -->
+  <div style="margin-bottom: 26px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+      <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--danger); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
+        Wikipedia Encyclopedia
+      </span>
+      <span style="font-size: 0.82rem; color: var(--text-muted);">Syllabus Context &amp; Definitions</span>
+    </div>
+
+    <div id="wiki-concept-brief-container">
+    {% if wiki_entry and wiki_entry.extract %}
+    <div class="card explore-wiki-card">
+      <div class="explore-wiki-layout">
+        {% if wiki_entry.thumbnail_url %}
+        <div style="flex-shrink: 0;">
+          <img class="explore-wiki-thumb" src="{{ wiki_entry.thumbnail_url }}" alt="{{ wiki_entry.wikipedia_title }}" loading="lazy">
+        </div>
+        {% endif %}
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+            <h3 style="font-size: 1.12rem; font-weight: 700; margin: 0; color: var(--text);">
+              {{ wiki_entry.wikipedia_title }}
+            </h3>
+            {% if wiki_entry.canonical_url %}
+            <a href="{{ wiki_entry.canonical_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;">
+              <span>Read on Wikipedia</span>
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+            {% endif %}
+          </div>
+          {% if wiki_entry.description %}
+          <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+            {{ wiki_entry.description }}
+          </div>
+          {% endif %}
+          <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text); margin: 0 0 12px;">
+            {{ wiki_entry.extract }}
+          </p>
+          <div style="font-size: 0.72rem; color: var(--text-muted); border-top: 1px dashed var(--border); padding-top: 8px;">
+            Content provided under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" style="color: var(--text-muted); text-decoration: underline;">Creative Commons Attribution-ShareAlike 4.0 License</a> from Wikimedia.
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card" style="padding: 24px; text-align: center; border: 1px dashed var(--border); background: var(--surface);">
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 12px;">
+        Explore encyclopedia overviews and background definitions for <strong>{{ topic.title }}</strong> directly from Wikipedia.
+      </p>
+      <a href="https://en.wikipedia.org/wiki/Special:Search?search={{ topic.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+        <span>Search Wikipedia for "{{ topic.title }}" ↗</span>
+      </a>
+    </div>
+    {% endif %}
+    </div>
+  </div>
+
+  <!-- Section 2: Video Lectures & Visual Tutorials -->
+  <div style="margin-bottom: 26px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--danger); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
+          Video Explanations
+        </span>
+        <span style="font-size: 0.82rem; color: var(--text-muted);">Curated Video Lectures &amp; Breakdowns</span>
+      </div>
+    </div>
+
+    <div class="explore-grid">
+      {% for res in topic_resources %}
+        {% if res.resource_type == 'youtube' or res.resource_type == 'video' %}
+        <div class="card" style="overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0;">
+          {% if res.embed_id %}
+          <div style="position: relative; aspect-ratio: 16/9; background: #000; cursor: pointer;" onclick="openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}')">
+            {% if res.thumbnail_url %}
+            <img src="{{ res.thumbnail_url }}" alt="{{ res.title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+            {% else %}
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #18181b;">
+              <svg width="40" height="40" fill="var(--danger)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            {% endif %}
+            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--danger); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
+                <svg width="22" height="22" fill="#ffffff" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div style="padding: 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--danger); font-size: 0.68rem; font-weight: 700;">YouTube</span>
+              </div>
+              <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0 0 6px; color: var(--text); line-height: 1.4;">
+                {{ res.title }}
+              </h4>
+              {% if res.description %}
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">
+                {{ res.description|truncatewords:20 }}
+              </p>
+              {% endif %}
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+              {% if res.embed_id %}
+              <button type="button" class="btn btn-outline btn-sm" onclick="openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}')" style="font-size: 0.78rem;">
+                Watch Video
+              </button>
+              {% endif %}
+              <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline;">
+                Open on YouTube ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% empty %}
+      <div class="card" style="grid-column: 1 / -1; padding: 24px; text-align: center; border: 1px dashed var(--border); color: var(--text-muted); font-size: 0.88rem;">
+        No video lectures recommended yet. Found a helpful YouTube tutorial for this topic?
+        <div style="margin-top: 10px;">
+          <a href="{% url 'prep:upload' %}?course_id={{ course_id }}&tab=resource" class="btn btn-outline btn-sm">
+            Recommend a Video ↗
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Section 3: Reference Articles, Interactive Simulations & Slides -->
+  <div style="margin-bottom: 26px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+      <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--green); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
+        Curated Readings &amp; Tools
+      </span>
+      <span style="font-size: 0.82rem; color: var(--text-muted);">Interactive Labs, Course Slides &amp; Papers</span>
+    </div>
+
+    <div class="explore-readings-grid">
+      {% for res in topic_resources %}
+        {% if res.resource_type != 'youtube' and res.resource_type != 'video' %}
+        <div class="card" style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-size: 0.68rem; font-weight: 600;">
+                {{ res.get_resource_type_display }}
+              </span>
+            </div>
+            <h4 style="font-size: 0.94rem; font-weight: 600; margin: 0 0 6px; color: var(--text); line-height: 1.4;">
+              {{ res.title }}
+            </h4>
+            {% if res.description %}
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">
+              {{ res.description|truncatewords:24 }}
+            </p>
+            {% endif %}
+          </div>
+          <div style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+            <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; display: inline-flex; align-items: center; gap: 5px; width: 100%; justify-content: center;">
+              <span>Visit Resource</span>
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+        </div>
+        {% endif %}
+      {% empty %}
+      <div class="card" style="grid-column: 1 / -1; padding: 24px; text-align: center; border: 1px dashed var(--border); color: var(--text-muted); font-size: 0.88rem;">
+        No additional web links or simulations submitted yet. Know a great interactive tool or reference paper for this topic?
+        <div style="margin-top: 10px;">
+          <a href="{% url 'prep:upload' %}?course_id={{ course_id }}&tab=resource" class="btn btn-outline btn-sm">
+            Recommend a Link ↗
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Video Modal Player for YouTube Embeds -->
+<div id="prep-video-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
+  <div style="position: relative; width: 100%; max-width: 860px; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.5);">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);">
+      <h3 id="prep-video-modal-title" style="font-size: 0.95rem; font-weight: 600; margin: 0; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Video Player</h3>
+      <button type="button" onclick="closeVideoModal()" style="border: 0; background: transparent; color: var(--text); font-size: 1.4rem; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+    </div>
+    <div style="position: relative; aspect-ratio: 16/9; width: 100%;">
+      <iframe id="prep-video-iframe" src="" style="width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
   </div>
 </div>
@@ -2432,19 +2754,73 @@
   }
 
   // ─── Tab Switching ────────────────────────────────────────────────────────
+  let wikiBriefLoaded = {% if wiki_entry and wiki_entry.extract %}true{% else %}false{% endif %};
+  function loadWikipediaBriefLazy() {
+    if (wikiBriefLoaded) return;
+    const container = document.getElementById('wiki-concept-brief-container');
+    if (!container) return;
+    wikiBriefLoaded = true;
+    fetch("{% url 'prep:api_topic_wikipedia' topic_id=topic.id %}")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && data.found && data.extract) {
+          const thumbHtml = data.thumbnail_url ? `
+            <div style="flex-shrink: 0;">
+              <img src="${data.thumbnail_url}" alt="${data.title}" style="width: 120px; max-height: 120px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: var(--white);" loading="lazy">
+            </div>` : '';
+          const linkHtml = data.canonical_url ? `
+            <a href="${data.canonical_url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;">
+              <span>Read on Wikipedia</span>
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>` : '';
+          const descHtml = data.description ? `
+            <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+              ${data.description}
+            </div>` : '';
+          container.innerHTML = `
+            <div class="card" style="padding: 22px 24px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);">
+              <div style="display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+                ${thumbHtml}
+                <div style="flex: 1; min-width: 240px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <h3 style="font-size: 1.12rem; font-weight: 700; margin: 0; color: var(--text);">
+                      ${data.title}
+                    </h3>
+                    ${linkHtml}
+                  </div>
+                  ${descHtml}
+                  <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text); margin: 0 0 12px;">
+                    ${data.extract}
+                  </p>
+                  <div style="font-size: 0.72rem; color: var(--text-muted); border-top: 1px dashed var(--border); padding-top: 8px;">
+                    Content provided under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" style="color: var(--text-muted); text-decoration: underline;">Creative Commons Attribution-ShareAlike 4.0 License</a> from Wikimedia.
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      })
+      .catch(() => {});
+  }
+
   function switchPillarTab(tabName) {
     document.querySelectorAll('.study-tab-btn').forEach(btn => btn.classList.remove('active'));
-    ['notes', 'assistant', 'past_questions', 'practice'].forEach(name => {
+    ['notes', 'assistant', 'past_questions', 'practice', 'explore'].forEach(name => {
       const panel = document.getElementById(`pillar-${name}`);
       if (panel) panel.style.display = name === tabName ? 'block' : 'none';
     });
     const activeButton = document.querySelector(`[data-study-tab="${tabName}"]`);
+    if (activeButton) activeButton.classList.add('active');
     if (tabName === 'assistant') {
       initializeTopicTutor();
       if (window.innerWidth <= 800) {
         const panel = document.getElementById('pillar-assistant');
         if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    }
+    if (tabName === 'explore') {
+      loadWikipediaBriefLazy();
     }
   }
 
@@ -3247,6 +3623,41 @@
       } catch (e) {
         console.error("Error parsing generated questions JSON:", e);
       }
+    }
+
+    // 4. Video Modal Controller for YouTube Embeds
+    window.openVideoModal = function(embedId, title) {
+      const modal = document.getElementById('prep-video-modal');
+      const iframe = document.getElementById('prep-video-iframe');
+      const titleEl = document.getElementById('prep-video-modal-title');
+      if (modal && iframe) {
+        iframe.src = `https://www.youtube-nocookie.com/embed/${embedId}?autoplay=1`;
+        if (titleEl) titleEl.textContent = title || 'Video Player';
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    window.closeVideoModal = function() {
+      const modal = document.getElementById('prep-video-modal');
+      const iframe = document.getElementById('prep-video-iframe');
+      if (modal && iframe) {
+        iframe.src = '';
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    };
+
+    const videoModal = document.getElementById('prep-video-modal');
+    if (videoModal) {
+      videoModal.addEventListener('click', function(e) {
+        if (e.target === this) window.closeVideoModal();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && videoModal.style.display === 'flex') {
+          window.closeVideoModal();
+        }
+      });
     }
   });
 </script>

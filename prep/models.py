@@ -952,3 +952,61 @@ class PrepNotification(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.title} ({'Read' if self.is_read else 'Unread'})"
+
+
+class PrepTopicResource(models.Model):
+    """External learning resource (video lecture, reference paper, simulator, slides) attached to a course or topic."""
+    RESOURCE_TYPES = [
+        ("youtube", "YouTube Video"),
+        ("video", "Video Lecture"),
+        ("article", "Reference Article / Paper"),
+        ("simulation", "Interactive Simulation / Lab"),
+        ("website", "Learning Website / Slides"),
+    ]
+
+    course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="resources")
+    topic = models.ForeignKey(PrepTopic, on_delete=models.SET_NULL, null=True, blank=True, related_name="resources")
+    title = models.CharField(max_length=255)
+    url = models.URLField(max_length=500)
+    resource_type = models.CharField(max_length=30, choices=RESOURCE_TYPES, default="website")
+    description = models.TextField(blank=True, default="")
+    thumbnail_url = models.URLField(max_length=500, blank=True, default="")
+    embed_id = models.CharField(max_length=100, blank=True, default="", help_text="e.g. YouTube video ID for embedded player")
+
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="submitted_prep_resources",
+    )
+    is_approved = models.BooleanField(default=False, db_index=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Prep Topic Resource"
+        verbose_name_plural = "Prep Topic Resources"
+
+    def __str__(self):
+        return f"[{self.get_resource_type_display()}] {self.title} ({self.course.code})"
+
+
+class PrepTopicWikipedia(models.Model):
+    """Cached encyclopedia concept summary retrieved from Wikimedia APIs for a syllabus topic."""
+    topic = models.OneToOneField(PrepTopic, on_delete=models.CASCADE, related_name="wikipedia_entry")
+    wikipedia_title = models.CharField(max_length=255)
+    extract = models.TextField(blank=True, default="", help_text="Concise definition/summary from Wikipedia")
+    canonical_url = models.URLField(max_length=500, blank=True, default="")
+    thumbnail_url = models.URLField(max_length=500, blank=True, default="")
+    description = models.CharField(max_length=255, blank=True, default="")
+    fetched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Prep Topic Wikipedia Entry"
+        verbose_name_plural = "Prep Topic Wikipedia Entries"
+
+    def __str__(self):
+        return f"Wikipedia: {self.wikipedia_title} ({self.topic.title})"
+
