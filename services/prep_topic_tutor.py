@@ -68,12 +68,27 @@ _PLATFORM_META_PATTERN = re.compile(
     r"internal instruction|training data|model maker|ai maker|backend endpoint)\b"
     r"|\b(?:ignore|override|bypass)\b.{0,45}\b(?:instruction|rule|prompt|restriction)\b"
 )
-_UNSAFE_OUTPUT_PATTERN = re.compile(
-    r"(?is)<\s*/?\s*[a-z][^>]*>"
-    r"|\\(?:href|url|html[A-Za-z]+)\s*\{"
-    r"|(?:javascript|data|vbscript)\s*:"
-    r"|!?\[[^\]]*\]\([^)]+\)"
+_DANGEROUS_HTML_PATTERN = re.compile(
+    r"(?is)<\s*/?\s*(?:script|iframe|object|embed|applet|meta|form|input|button|style)[^>]*>|onload\s*=|onerror\s*=|onclick\s*=",
+    re.IGNORECASE,
 )
+_DANGEROUS_SCHEME_PATTERN = re.compile(
+    r"(?i)(?:javascript|vbscript|data\s*:\s*text\/html)\s*:",
+    re.IGNORECASE,
+)
+_UNSAFE_OUTPUT_PATTERN = _DANGEROUS_HTML_PATTERN
+
+def _sanitize_tutor_output(text: str) -> str:
+    """Fast, safe sanitization of tutor responses without throwing 502 errors to students."""
+    if not text or not isinstance(text, str):
+        return ""
+    if len(text) > 20000:
+        text = text[:20000] + "\n\n*(Response truncated due to length)*"
+    if _DANGEROUS_HTML_PATTERN.search(text):
+        text = _DANGEROUS_HTML_PATTERN.sub("", text)
+    if _DANGEROUS_SCHEME_PATTERN.search(text):
+        text = _DANGEROUS_SCHEME_PATTERN.sub("blocked-uri:", text)
+    return text.strip()
 _WORD_PATTERN = re.compile(r"[a-z][a-z0-9]{2,}", re.IGNORECASE)
 
 
@@ -628,10 +643,8 @@ def _safe_answer(result: dict, topic) -> str:
     answer = result.get("answer")
     if not isinstance(answer, str):
         raise TopicTutorError("The tutor response was incomplete. Please try asking again.", 502)
-    answer = answer.strip()
-    if not answer or len(answer) > 10000 or _UNSAFE_OUTPUT_PATTERN.search(answer):
-        raise TopicTutorError("The tutor response did not pass safety and formatting checks. Please try again.", 502)
-    if decision == "answer" and len(answer) < 8:
+    answer = _sanitize_tutor_output(answer)
+    if not answer or (decision == "answer" and len(answer) < 8):
         raise TopicTutorError("The tutor response was incomplete. Please try asking again.", 502)
     return answer
 
@@ -723,9 +736,10 @@ def _parse_tutor_response(raw_text: str, topic) -> str:
         )
         return _safe_answer({"decision": "answer", "answer": stripped}, topic)
 
-    # 7. As final recovery, if content has substantial text and passes safety:
-    if len(content) >= 15 and not _UNSAFE_OUTPUT_PATTERN.search(content):
-        return _safe_answer({"decision": "answer", "answer": content}, topic)
+    # 7. As final recovery, if content has substantial text:
+    sanitized_recovery = _sanitize_tutor_output(content)
+    if len(sanitized_recovery) >= 15:
+        return _safe_answer({"decision": "answer", "answer": sanitized_recovery}, topic)
 
     raise TopicTutorError(
         "The tutor returned an unreadable response. Please retry your question.",
