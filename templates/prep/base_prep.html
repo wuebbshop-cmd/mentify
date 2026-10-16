@@ -146,39 +146,82 @@
       font-size: 0.8rem !important;
       font-weight: 700 !important;
     }
-    @media (max-width: 480px) {
+    #prep-navbar-credit-badge .credit-label-full {
+      display: inline !important;
+    }
+    #prep-navbar-credit-badge .credit-label-short {
+      display: none !important;
+    }
+
+    @media (max-width: 860px) {
       .navbar {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-        gap: 4px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        gap: 6px !important;
       }
       .navbar-brand {
         font-size: 0.95rem !important;
         gap: 5px !important;
+        flex-shrink: 0 !important;
       }
       .navbar-end {
         gap: 5px !important;
+        flex-shrink: 0 !important;
       }
       #prep-navbar-credit-badge,
       .navbar-end > a[href*="/prep/billing/"] {
         padding: 4px 8px !important;
-        font-size: 0.74rem !important;
+        font-size: 0.76rem !important;
+        gap: 3px !important;
+        flex-shrink: 0 !important;
+      }
+      #prep-navbar-credit-badge .credit-label-full {
+        display: none !important;
+      }
+      #prep-navbar-credit-badge .credit-label-short {
+        display: inline !important;
+      }
+      .prep-header-signout {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
         gap: 4px !important;
+      }
+      .navbar-brand {
+        font-size: 0.88rem !important;
+        gap: 4px !important;
+      }
+      .navbar-brand img {
+        height: 24px !important;
+        width: 24px !important;
+      }
+      .navbar-end {
+        gap: 4px !important;
+      }
+      #prep-navbar-credit-badge,
+      .navbar-end > a[href*="/prep/billing/"] {
+        padding: 3px 6px !important;
+        font-size: 0.72rem !important;
+        gap: 2px !important;
+      }
+      #prep-navbar-credit-badge svg {
+        width: 12px !important;
+        height: 12px !important;
       }
       #prep-navbar-credit-badge span,
       .navbar-end > a[href*="/prep/billing/"] span {
-        font-size: 0.74rem !important;
+        font-size: 0.72rem !important;
       }
     }
 
     .prep-header-signout {
       display: inline-flex;
       align-items: center;
-    }
-    @media (max-width: 860px) {
-      .prep-header-signout {
-        display: none !important;
-      }
     }
 
     /* ─── Shared Course Discipline SVG Icon Tile & Tag ──────────── */
@@ -386,7 +429,7 @@
     <!-- Credit Badge (Always pill, number visible) -->
     <a href="{% url 'prep:billing' %}" id="prep-navbar-credit-badge" class="badge badge-accent" title="Your Credit Balance">
       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-      <span id="prep-navbar-credit-count">{{ user_credits|default:0 }} Credits</span>
+      <span id="prep-navbar-credit-count"><span class="credit-num">{{ user_credits|default:0 }}</span><span class="credit-label-full"> Credits</span><span class="credit-label-short"> C</span></span>
     </a>
 
     <!-- Live Notification Bell & Dropdown (Plain SVG like theme toggle) -->
@@ -988,7 +1031,12 @@
       const displayVal = isNaN(balanceNum) ? String(balance) : String(Math.max(0, balanceNum));
       const badgeSpan = document.getElementById('prep-navbar-credit-count') || document.querySelector('#prep-navbar-credit-badge span');
       if (badgeSpan) {
-        badgeSpan.textContent = displayVal + ' Credits';
+        const numEl = badgeSpan.querySelector('.credit-num');
+        if (numEl) {
+          numEl.textContent = displayVal;
+        } else {
+          badgeSpan.innerHTML = '<span class="credit-num">' + displayVal + '</span><span class="credit-label-full"> Credits</span><span class="credit-label-short"> C</span>';
+        }
       }
       document.querySelectorAll('#wallet-balance-indicator, .credit-counter-value, .topic-tutor-balance-val').forEach(function (el) {
         el.textContent = displayVal;
