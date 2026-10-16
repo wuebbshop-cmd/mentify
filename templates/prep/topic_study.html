@@ -2061,6 +2061,7 @@
     </div>
   </div>
 
+  {% if topic_videos %}
   <!-- Section 2: Video Lectures & Visual Tutorials -->
   <div style="margin-bottom: 26px;">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -2073,8 +2074,7 @@
     </div>
 
     <div class="explore-grid">
-      {% for res in topic_resources %}
-        {% if res.resource_type == 'youtube' or res.resource_type == 'video' %}
+      {% for res in topic_videos %}
         <div class="card" style="overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0;">
           {% if res.embed_id %}
           <div style="position: relative; aspect-ratio: 16/9; background: #000; cursor: pointer;" onclick="openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}')">
@@ -2118,20 +2118,12 @@
             </div>
           </div>
         </div>
-        {% endif %}
-      {% empty %}
-      <div class="card" style="grid-column: 1 / -1; padding: 24px; text-align: center; border: 1px dashed var(--border); color: var(--text-muted); font-size: 0.88rem;">
-        No video lectures recommended yet. Found a helpful YouTube tutorial for this topic?
-        <div style="margin-top: 10px;">
-          <a href="{% url 'prep:upload' %}?course_id={{ course_id }}&tab=resource" class="btn btn-outline btn-sm">
-            Recommend a Video ↗
-          </a>
-        </div>
-      </div>
       {% endfor %}
     </div>
   </div>
+  {% endif %}
 
+  {% if topic_readings %}
   <!-- Section 3: Reference Articles, Interactive Simulations & Slides -->
   <div style="margin-bottom: 26px;">
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
@@ -2142,8 +2134,7 @@
     </div>
 
     <div class="explore-readings-grid">
-      {% for res in topic_resources %}
-        {% if res.resource_type != 'youtube' and res.resource_type != 'video' %}
+      {% for res in topic_readings %}
         <div class="card" style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
@@ -2167,19 +2158,10 @@
             </a>
           </div>
         </div>
-        {% endif %}
-      {% empty %}
-      <div class="card" style="grid-column: 1 / -1; padding: 24px; text-align: center; border: 1px dashed var(--border); color: var(--text-muted); font-size: 0.88rem;">
-        No additional web links or simulations submitted yet. Know a great interactive tool or reference paper for this topic?
-        <div style="margin-top: 10px;">
-          <a href="{% url 'prep:upload' %}?course_id={{ course_id }}&tab=resource" class="btn btn-outline btn-sm">
-            Recommend a Link ↗
-          </a>
-        </div>
-      </div>
       {% endfor %}
     </div>
   </div>
+  {% endif %}
 </div>
 
 <!-- Video Modal Player for YouTube Embeds -->

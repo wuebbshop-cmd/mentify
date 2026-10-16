@@ -1194,15 +1194,20 @@ def prep_topic_study(request, topic_id):
     # 4. Explore Further: Approved learning resources & Wikipedia concept overview
     from prep.models import PrepTopicResource, PrepTopicWikipedia
 
-    topic_resources = PrepTopicResource.objects.filter(
+    topic_resources_list = list(PrepTopicResource.objects.filter(
         Q(topic=topic) | (Q(topic__isnull=True) & Q(course=topic.course)),
         is_approved=True,
-    ).order_by("-created_at")
+    ).order_by("-created_at"))
+
+    topic_videos = [r for r in topic_resources_list if r.resource_type in ("youtube", "video")]
+    topic_readings = [r for r in topic_resources_list if r.resource_type not in ("youtube", "video")]
 
     # Fast DB cache read only (~1ms). Never block initial page render with external Wikimedia HTTP calls!
     wiki_entry = PrepTopicWikipedia.objects.filter(topic=topic).first()
 
-    context["topic_resources"] = topic_resources
+    context["topic_resources"] = topic_resources_list
+    context["topic_videos"] = topic_videos
+    context["topic_readings"] = topic_readings
     context["wiki_entry"] = wiki_entry
     return render(request, "prep/topic_study.html", context)
 
