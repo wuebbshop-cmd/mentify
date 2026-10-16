@@ -171,6 +171,16 @@
       }
     }
 
+    .prep-header-signout {
+      display: inline-flex;
+      align-items: center;
+    }
+    @media (max-width: 860px) {
+      .prep-header-signout {
+        display: none !important;
+      }
+    }
+
     /* ─── Shared Course Discipline SVG Icon Tile & Tag ──────────── */
     .course-type-icon {
       width: 40px;
@@ -414,7 +424,7 @@
         {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
         {% endif %}
       </a>
-      <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+      <form method="post" action="{% url 'accounts:logout' %}" class="prep-header-signout" style="display:inline;">
         {% csrf_token %}
         <button type="submit" class="btn btn-secondary btn-sm">Sign Out</button>
       </form>
