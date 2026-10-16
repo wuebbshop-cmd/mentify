@@ -12,8 +12,9 @@ _configured_base_url = os.environ.get("BASE_URL", "").strip().rstrip("/")
 BASE_URL = (
     _configured_base_url
     if _configured_base_url and "localhost" not in _configured_base_url and "127.0.0.1" not in _configured_base_url
-    else "https://mlaudit.info"
+    else "https://mentify.study"
 )
+SITE_URL = BASE_URL
 
 # Allowed hosts: custom domain, Render domains, and dynamic Render hostname.
 env_hosts = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]
@@ -23,6 +24,8 @@ ALLOWED_HOSTS = list(set(
     ALLOWED_HOSTS
     + env_hosts
     + [
+        "mentify.study",
+        "www.mentify.study",
         "mlaudit.info",
         "www.mlaudit.info",
         ".onrender.com",
@@ -58,6 +61,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_TRUSTED_ORIGINS = list(set(
     [origin.strip() for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()]
     + [
+        "https://mentify.study",
+        "https://www.mentify.study",
         "https://mlaudit.info",
         "https://www.mlaudit.info",
         "https://*.onrender.com",

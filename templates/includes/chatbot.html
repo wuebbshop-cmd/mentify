@@ -466,7 +466,7 @@
     // 1. Explicit Markdown Links: [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, linkText, url) {
       const cleanUrl = url.trim().replace(/&amp;/g, '&');
-      if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mlaudit.info')) {
+      if (cleanUrl.startsWith('/') || cleanUrl.startsWith('https://wa.me') || cleanUrl.startsWith('https://mentify.study') || cleanUrl.startsWith('https://mlaudit.info')) {
         return `<a href="${cleanUrl}">${linkText}</a>`;
       }
       return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;

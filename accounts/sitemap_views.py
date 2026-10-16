@@ -273,6 +273,6 @@ def llms_txt(request):
 ## Founder & Lead Educator
 - Founder & Author: John Shivogo
 - Platform Name: Mentify
-- Domain: mlaudit.info
+- Domain: {base_url.replace('https://', '').replace('http://', '')}
 """
     return HttpResponse(llms_content, content_type='text/markdown')

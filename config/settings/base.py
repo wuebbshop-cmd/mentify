@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 # ─── Middleware ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
+    "config.middleware.domain_redirect_middleware.DomainRedirectMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "config.middleware.security_error_middleware.SecurityErrorMiddleware",
@@ -194,6 +195,19 @@ BUNNY_TOKEN_AUTH_KEY = os.environ.get("BUNNY_TOKEN_AUTH_KEY", "")  # for signed 
 
 # ─── Platform ────────────────────────────────────────────────────────────────
 PLATFORM_NAME = os.environ.get("PLATFORM_NAME", "Mentify")
+PRIMARY_DOMAIN = os.environ.get("PRIMARY_DOMAIN", "mentify.study")
+REDIRECT_DOMAINS = set(
+    filter(
+        None,
+        [
+            d.strip().lower()
+            for d in os.environ.get(
+                "REDIRECT_DOMAINS",
+                "mlaudit.info,www.mlaudit.info,www.mentify.study",
+            ).split(",")
+        ],
+    )
+)
 BASE_URL = os.environ.get("BASE_URL", "http://127.0.0.1:8000")
 
 

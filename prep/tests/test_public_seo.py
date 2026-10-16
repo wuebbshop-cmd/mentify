@@ -171,3 +171,47 @@ class PublicPrepSeoTests(TestCase):
         public_notes, _ = _public_topic_notes(topic)
 
         self.assertEqual(public_notes, "")
+
+
+class DomainRedirectMiddlewareTests(SimpleTestCase):
+    def setUp(self):
+        from django.test import RequestFactory
+        from django.http import HttpResponse
+        from config.middleware.domain_redirect_middleware import DomainRedirectMiddleware
+
+        self.factory = RequestFactory()
+        self.middleware = DomainRedirectMiddleware(lambda req: HttpResponse("OK", status=200))
+
+    def test_legacy_domain_redirects_permanently_with_path_and_query(self):
+        request = self.factory.get("/prep/topic/45/?level=level_2", HTTP_HOST="mlaudit.info")
+        response = self.middleware(request)
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "https://mentify.study/prep/topic/45/?level=level_2")
+
+    def test_www_legacy_domain_redirects_permanently(self):
+        request = self.factory.get("/courses/", HTTP_HOST="www.mlaudit.info")
+        response = self.middleware(request)
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "https://mentify.study/courses/")
+
+    def test_www_mentify_study_redirects_to_apex(self):
+        request = self.factory.get("/", HTTP_HOST="www.mentify.study")
+        response = self.middleware(request)
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "https://mentify.study/")
+
+    def test_primary_domain_passes_through_without_redirect(self):
+        request = self.factory.get("/prep/", HTTP_HOST="mentify.study")
+        response = self.middleware(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"OK")
+
+    def test_local_host_passes_through(self):
+        request = self.factory.get("/", HTTP_HOST="127.0.0.1:8000")
+        response = self.middleware(request)
+
+        self.assertEqual(response.status_code, 200)

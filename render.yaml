@@ -22,9 +22,9 @@ services:
       - key: DJANGO_SECRET_KEY
         sync: false
       - key: ALLOWED_HOSTS
-        value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
+        value: mentify.study,www.mentify.study,mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://mlaudit.info,https://www.mlaudit.info,https://*.onrender.com,https://mentify-klm7.onrender.com
+        value: https://mentify.study,https://www.mentify.study,https://mlaudit.info,https://www.mlaudit.info,https://*.onrender.com,https://mentify-klm7.onrender.com
       - key: PYTHON_VERSION
         value: 3.11.11
       # Required for GitHub-hosted course banners, avatars, and uploads
@@ -74,7 +74,7 @@ services:
       - key: DB_TABLE_SUFFIX
         sync: false
       - key: ALLOWED_HOSTS
-        value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
+        value: mentify.study,www.mentify.study,mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
       - key: DEEPSEEK_API
         sync: false
       - key: DEEPSEEK_BASE_URL
@@ -129,7 +129,7 @@ services:
       - key: DB_TABLE_SUFFIX
         sync: false
       - key: ALLOWED_HOSTS
-        value: mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
+        value: mentify.study,www.mentify.study,mlaudit.info,www.mlaudit.info,.onrender.com,mentify-klm7.onrender.com
       - key: DEEPSEEK_API
         sync: false
       - key: DEEPSEEK_BASE_URL

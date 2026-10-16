@@ -157,7 +157,7 @@ OPERATING INSTRUCTION: Politely inform the student that this course is not curre
         except Exception as e:
             logger.warning(f"Could not load user wallet context: {e}")
 
-    system_prompt = f"""You are Mentify Prep Assistant, the specialized AI academic revision and customer support assistant for Mentify Prep (https://mlaudit.info/prep/).
+    system_prompt = f"""You are Mentify Prep Assistant, the specialized AI academic revision and customer support assistant for Mentify Prep (https://mentify.study/prep/).
 
 ### PLATFORM OVERVIEW:
 Mentify Prep is an exam readiness, syllabus study, and past-paper revision engine for students preparing for Continuous Assessment Tests (CATs) and final examinations.

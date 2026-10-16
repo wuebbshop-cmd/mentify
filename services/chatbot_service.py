@@ -55,7 +55,7 @@ def get_mentify_system_context() -> str:
 
     courses_block = "\n".join(courses_context_lines)
 
-    system_prompt = f"""You are Mentify Assistant, the friendly, intelligent AI customer service assistant for Mentify (https://mlaudit.info).
+    system_prompt = f"""You are Mentify Assistant, the friendly, intelligent AI customer service assistant for Mentify (https://mentify.study).
 
 ### PLATFORM OVERVIEW:
 Mentify is an online learning platform offering high-quality courses and tutoring for curious learners everywhere.
