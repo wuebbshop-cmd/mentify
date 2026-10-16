@@ -1290,13 +1290,13 @@ def prep_topic_tutor_api(request, topic_id):
                 "credits_balance": get_available_credits(wallet),
                 "credits_charged": exc.credits_charged,
             },
-            status=exc.status,
+            status=200,
         )
     except Exception:
         logger.exception("Topic tutor request failed for topic %s and user %s", topic.pk, request.user.pk)
         return JsonResponse(
             {"success": False, "error": "The topic tutor could not complete this request. Please try again."},
-            status=500,
+            status=200,
         )
 
     wallet = PrepWallet.get_or_create_wallet(request.user)

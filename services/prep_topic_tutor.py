@@ -637,33 +637,100 @@ def _safe_answer(result: dict, topic) -> str:
 
 
 def _parse_tutor_response(raw_text: str, topic) -> str:
-    """Parse the structured tutor reply, accepting safe plain-text model output."""
+    """Parse the structured tutor reply, accepting safe plain-text or repaired model output."""
+    import re
     from services.prep_ai_router import robust_json_loads
 
     content = str(raw_text or "").strip()
-    try:
-        parsed = robust_json_loads(content)
-    except (ValueError, TypeError) as exc:
-        if not content or content.startswith(("{", "[")) or re.search(
-            r'"decision"\s*:', content, re.IGNORECASE
-        ):
-            raise TopicTutorError(
-                "The tutor returned an unreadable response. Please retry your question.",
-                502,
-            ) from exc
-        logger.warning(
-            "Topic tutor returned plain text instead of JSON for topic %s; "
-            "validating the text response directly.",
-            getattr(topic, "pk", topic.title),
-        )
-        return _safe_answer({"decision": "answer", "answer": content}, topic)
-
-    if not isinstance(parsed, dict):
+    if not content:
         raise TopicTutorError(
-            "The tutor returned an invalid response. Please retry your question.",
+            "The topic tutor produced an empty response. Please retry your question.",
             502,
         )
-    return _safe_answer(parsed, topic)
+
+    # 1. Clean markdown code fences if wrapped in ```json ... ```
+    cleaned = content
+    if cleaned.startswith("```json"):
+        cleaned = cleaned[7:]
+    elif cleaned.startswith("```"):
+        cleaned = cleaned[3:]
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+    cleaned = cleaned.strip()
+
+    # 2. Try parsing via robust_json_loads
+    parsed = None
+    try:
+        parsed = robust_json_loads(cleaned)
+    except Exception:
+        pass
+
+    if isinstance(parsed, dict):
+        return _safe_answer(parsed, topic)
+
+    # 3. Check if decision is out_of_scope, unrelated_upload, or unsupported_visual
+    lower_content = cleaned.lower()
+    if re.search(r'"decision"\s*:\s*"out_of_scope"', lower_content):
+        return _safe_answer({"decision": "out_of_scope"}, topic)
+    if re.search(r'"decision"\s*:\s*"unrelated_upload"', lower_content):
+        return _safe_answer({"decision": "unrelated_upload"}, topic)
+    if re.search(r'"decision"\s*:\s*"unsupported_visual"', lower_content):
+        return _safe_answer({"decision": "unsupported_visual"}, topic)
+
+    # 4. Attempt regex extraction of "answer" field from malformed JSON
+    answer_match = re.search(
+        r'"answer"\s*:\s*"(?P<ans>(?:[^"\\]|\\.)*)"',
+        cleaned,
+        re.DOTALL,
+    )
+    if answer_match:
+        raw_ans = answer_match.group("ans")
+        try:
+            ans_decoded = json.loads(f'"{raw_ans}"')
+        except Exception:
+            ans_decoded = (
+                raw_ans.replace('\\"', '"')
+                .replace('\\n', '\n')
+                .replace('\\t', '\t')
+                .replace('\\\\', '\\')
+            )
+        if len(ans_decoded.strip()) >= 8:
+            return _safe_answer({"decision": "answer", "answer": ans_decoded}, topic)
+
+    # 5. Extract answer if format is "answer": "<content until end or closing brace>"
+    ans_loose_match = re.search(
+        r'"answer"\s*:\s*"(?P<ans>.*?)(?:"\s*\}|\s*"[\s,\n]*$|\Z)',
+        cleaned,
+        re.DOTALL,
+    )
+    if ans_loose_match:
+        candidate = ans_loose_match.group("ans").strip()
+        candidate = candidate.replace('\\"', '"').replace('\\n', '\n').replace('\\\\', '\\')
+        if len(candidate) >= 8:
+            return _safe_answer({"decision": "answer", "answer": candidate}, topic)
+
+    # 6. If model returned plain text or pseudo-JSON, strip any framing
+    stripped = cleaned
+    if stripped.startswith("{"):
+        stripped = re.sub(r'^\s*\{\s*"decision"\s*:\s*"[^"]+"\s*,\s*"answer"\s*:\s*"?', '', stripped)
+        stripped = re.sub(r'"?\s*\}\s*$', '', stripped)
+        stripped = stripped.replace('\\"', '"').replace('\\n', '\n').replace('\\\\', '\\').strip()
+
+    if len(stripped) >= 8 and not stripped.startswith(("{", "[")):
+        logger.warning(
+            "Topic tutor recovered answer from plain-text/unstructured content for topic %s.",
+            getattr(topic, "pk", topic.title),
+        )
+        return _safe_answer({"decision": "answer", "answer": stripped}, topic)
+
+    # 7. As final recovery, if content has substantial text and passes safety:
+    if len(content) >= 15 and not _UNSAFE_OUTPUT_PATTERN.search(content):
+        return _safe_answer({"decision": "answer", "answer": content}, topic)
+
+    raise TopicTutorError(
+        "The tutor returned an unreadable response. Please retry your question.",
+        502,
+    )
 
 
 def list_topic_conversations(user, topic) -> list[dict]:

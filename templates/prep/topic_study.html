@@ -2223,9 +2223,16 @@
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
       });
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (jsonErr) {
+        throw new Error('The tutor service did not return a valid response. Please retry your question.');
+      }
       loading.remove();
-      updateTopicTutorBalance(data.credits_balance);
+      if (data && data.credits_balance !== undefined) {
+        updateTopicTutorBalance(data.credits_balance);
+      }
       if (!response.ok || !data.success) throw new Error(data.error || 'The tutor could not answer this question.');
       topicTutorSessionId = data.session_id;
       renderTopicTutorConversation(data.conversation);

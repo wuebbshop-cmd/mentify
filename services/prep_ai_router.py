@@ -4571,44 +4571,69 @@ def robust_json_loads(raw_text: str):
         cleaned = cleaned[:-3]
     cleaned = cleaned.strip()
 
-    # Parse valid JSON before applying legacy array-extraction heuristics;
-    # LaTeX strings may contain square brackets inside otherwise valid objects.
+    # Parse valid JSON before applying recovery heuristics
     try:
         return json.loads(cleaned, strict=False)
     except Exception:
         pass
 
-    if "[" in cleaned:
+    # Determine whether the root payload is an object ({...}) or an array ([...])
+    first_brace = cleaned.find("{")
+    first_bracket = cleaned.find("[")
+    is_object = first_brace != -1 and (first_bracket == -1 or first_brace < first_bracket)
+
+    if not is_object and "[" in cleaned:
         start_idx = cleaned.find("[")
         cleaned = cleaned[start_idx:]
         if "]" in cleaned:
             end_idx = cleaned.rfind("]") + 1
             cleaned = cleaned[:end_idx]
+    elif is_object and "{" in cleaned:
+        start_idx = cleaned.find("{")
+        cleaned = cleaned[start_idx:]
+        if "}" in cleaned:
+            end_idx = cleaned.rfind("}") + 1
+            cleaned = cleaned[:end_idx]
 
     # Strategy 2: Escape unescaped backslashes commonly found in LaTeX formulas
     try:
-        sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', cleaned)
+        # First fix \u that is not followed by 4 hex digits (e.g. LaTeX \upsilon, \under, \uparrow)
+        sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', cleaned)
+        sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', sanitized)
         return json.loads(sanitized, strict=False)
     except Exception:
         pass
 
-    # Strategy 3: Auto-close truncated JSON array
-    last_brace = cleaned.rfind("}")
-    if last_brace != -1:
-        truncated_repaired = cleaned[:last_brace + 1].strip() + "\n]"
-        try:
-            sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', truncated_repaired)
-            return json.loads(sanitized, strict=False)
-        except Exception:
-            pass
+    # Strategy 3: Auto-close truncated JSON structure
+    if not is_object:
+        last_brace = cleaned.rfind("}")
+        if last_brace != -1:
+            truncated_repaired = cleaned[:last_brace + 1].strip() + "\n]"
+            try:
+                sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', truncated_repaired)
+                sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', sanitized)
+                return json.loads(sanitized, strict=False)
+            except Exception:
+                pass
+    else:
+        # If object is truncated, attempt closing with quote and brace
+        for suffix in ("\"}", "}", " \"\n}"):
+            try:
+                repaired = cleaned.rstrip() + suffix
+                sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', repaired)
+                sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', sanitized)
+                return json.loads(sanitized, strict=False)
+            except Exception:
+                pass
 
-    # Strategy 4: Regex-based object extraction
+    # Strategy 4: Regex-based object extraction (for practice questions array or single object)
     objects = []
     pattern = re.compile(r'\{[^{}]*"number"[^{}]*\}', re.DOTALL)
     for match in pattern.finditer(cleaned):
         obj_text = match.group(0)
         try:
-            sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', obj_text)
+            sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', obj_text)
+            sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', sanitized)
             parsed_obj = json.loads(sanitized, strict=False)
             objects.append(parsed_obj)
         except Exception:
