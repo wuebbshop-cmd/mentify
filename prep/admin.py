@@ -297,8 +297,15 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         "requeue_stage_1_extraction",
         "propose_course_study_profile",
         "index_assessment_questions",
+        "unmark_duplicate_action",
         "reject_document",
+        "delete_selected",
     ]
+
+    @admin.action(description="🔓 Unmark duplicate flag (allow independent processing)")
+    def unmark_duplicate_action(self, request, queryset):
+        updated = queryset.filter(is_duplicate=True).update(is_duplicate=False, duplicate_of=None)
+        self.message_user(request, f"Unmarked {updated} document(s) as duplicate. They can now be reviewed and published independently.")
 
     def _apply_safe_content_updates(self, document, reviewer, now):
         """Apply only additive, reviewer-approved updates; never overwrite a topic."""
@@ -444,20 +451,25 @@ class PrepDocumentAdmin(admin.ModelAdmin):
 
         for doc in queryset:
             if doc.is_duplicate:
-                continue
+                # When an admin approves a document, unmark duplicate so it can be independently published
+                doc.is_duplicate = False
+                doc.duplicate_of = None
+                doc.save(update_fields=["is_duplicate", "duplicate_of"])
 
             # Admin publication is the final ingestion gate. Older uploads or
             # failed requests may have no extracted text; never publish those rows until ingestion succeeds.
-            if not doc.extracted_text.strip():
+            if not (doc.extracted_text and doc.extracted_text.strip()):
                 from services.prep_ingestion import process_prep_document
 
                 try:
                     ingestion_result = process_prep_document(doc)
                 except Exception as exc:
                     ingestion_result = {"success": False, "error": str(exc)}
-                if not ingestion_result.get("success") or not doc.extracted_text.strip():
+                doc.refresh_from_db()
+                if not ingestion_result.get("success") or not (doc.extracted_text and doc.extracted_text.strip()):
                     ingestion_failures += 1
-                    doc.tutor_review_notes = f"Publication blocked: ingestion failed. {ingestion_result.get('error', 'No extracted content was produced.')[:1000]}"
+                    err_msg = ingestion_result.get("error") or "No readable text was extracted (scanned image or empty PDF)."
+                    doc.tutor_review_notes = f"Publication blocked: ingestion produced no text. {err_msg[:500]}"
                     doc.save(update_fields=["tutor_review_notes", "updated_at"])
                     continue
 
@@ -556,15 +568,23 @@ class PrepDocumentAdmin(admin.ModelAdmin):
             _, queued = enqueue_course_note_precompute(course)
             queued_precomputations += int(queued)
 
-        self.message_user(
-            request,
-            f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
-            f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
-            f"Queued all-level note preparation for {queued_precomputations} course(s). "
-            f"Queued {queued_assessment_jobs} assessment indexing job(s). "
-            f"Blocked {ingestion_failures} document(s) whose ingestion did not complete and "
-            f"{validation_failures} document(s) with validation errors."
-        )
+        msg_parts = []
+        if published_documents_count > 0:
+            msg_parts.append(
+                f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
+                f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
+                f"Queued all-level note preparation for {queued_precomputations} course(s). "
+                f"Queued {queued_assessment_jobs} assessment indexing job(s)."
+            )
+        if ingestion_failures > 0:
+            msg_parts.append(f"Blocked {ingestion_failures} document(s) whose text ingestion produced no readable text.")
+        if validation_failures > 0:
+            msg_parts.append(f"Blocked {validation_failures} document(s) with validation errors.")
+
+        if not msg_parts:
+            msg_parts.append("No selected documents were published. Check the Tutor Review Notes column for details.")
+
+        self.message_user(request, " ".join(msg_parts))
 
     @admin.action(description="Propose subject profile from selected lecture notes")
     def propose_course_study_profile(self, request, queryset):
