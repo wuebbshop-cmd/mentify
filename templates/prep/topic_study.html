@@ -37,97 +37,261 @@
     color: var(--text);
   }
 
-  /* Explore Further (Pillar 5) Responsive Styles */
-  .explore-header-card {
-    margin-bottom: 22px;
-    padding: 20px 24px;
-    border-left: 4px solid var(--danger);
+  /* Explore Further (Pillar 5) Minimal Design System */
+  .explore-section {
+    margin-bottom: 32px;
+  }
+
+  .explore-section-header {
+    margin-bottom: 16px;
+  }
+
+  .explore-section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .explore-section-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  /* Minimal Encyclopedia Card */
+  .explore-encyclopedia-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    background: var(--surface);
-    border-radius: var(--radius);
+    gap: 20px;
+    transition: border-color 0.15s ease;
   }
 
-  .explore-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+  body.dark-theme .explore-encyclopedia-card {
+    background: #0d1520;
+    border-color: rgba(255, 255, 255, 0.08);
   }
 
-  .explore-readings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
-  }
-
-  .explore-wiki-card {
-    padding: 22px 24px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-  }
-
-  .explore-wiki-layout {
+  .explore-encyclopedia-main {
     display: flex;
     align-items: flex-start;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
   }
 
-  .explore-wiki-thumb {
-    width: 120px;
-    max-height: 120px;
-    object-fit: contain;
+  .explore-encyclopedia-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: rgba(20, 184, 166, 0.12);
+    border: 1px solid rgba(20, 184, 166, 0.25);
+    color: #14b8a6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .explore-encyclopedia-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .explore-encyclopedia-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 6px 0;
+  }
+
+  .explore-encyclopedia-extract {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .explore-encyclopedia-source {
+    font-size: 0.76rem;
+    color: var(--text-light, #64748b);
+  }
+
+  .explore-encyclopedia-action {
+    flex-shrink: 0;
+  }
+
+  .explore-outline-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
     border-radius: 8px;
     border: 1px solid var(--border);
-    background: var(--white);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  body.dark-theme .explore-outline-btn {
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #e2e8f0;
+  }
+
+  .explore-outline-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: var(--text);
+  }
+
+  /* Research Papers & Multi-Card Grids */
+  .explore-papers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  @media (max-width: 1024px) {
+    .explore-papers-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media (max-width: 640px) {
-    .explore-header-card {
-      padding: 16px 14px !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: 12px !important;
-      margin-bottom: 16px !important;
+    .explore-papers-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
+    .explore-encyclopedia-card {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 16px;
+      gap: 14px;
+    }
+    .explore-outline-btn {
+      width: 100%;
+    }
+  }
 
-    .explore-header-card h2 {
-      font-size: 1.08rem !important;
-    }
+  /* Minimal Paper / Resource Card */
+  .explore-paper-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
 
-    .explore-header-card p {
-      font-size: 0.82rem !important;
-    }
+  body.dark-theme .explore-paper-card {
+    background: #0d1520;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
 
-    .explore-header-card .btn {
-      width: 100% !important;
-      justify-content: center !important;
-      min-height: 42px !important;
-    }
+  .explore-paper-card:hover {
+    border-color: rgba(20, 184, 166, 0.35);
+  }
 
-    .explore-wiki-card {
-      padding: 16px 14px !important;
-    }
+  .explore-paper-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #10b981;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
 
-    .explore-wiki-layout {
-      flex-direction: column !important;
-      gap: 12px !important;
-    }
+  .explore-paper-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    margin: 0 0 6px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
-    .explore-wiki-thumb {
-      width: 100% !important;
-      max-height: 150px !important;
-    }
+  .explore-paper-author {
+    font-size: 0.78rem;
+    color: var(--text-light, #64748b);
+    margin-bottom: 12px;
+  }
 
-    .explore-grid,
-    .explore-readings-grid {
-      grid-template-columns: 1fr !important;
-      gap: 12px !important;
-    }
+  .explore-paper-abstract {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .explore-paper-citations {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-light, #64748b);
+    margin-bottom: 16px;
+  }
+
+  .explore-paper-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .explore-card-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  body.dark-theme .explore-card-btn {
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+  }
+
+  .explore-card-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
 
     #prep-video-modal {
       padding: 8px !important;
@@ -1670,7 +1834,7 @@
     Practice &amp; Variant Generator
   </button>
   <button type="button" data-study-tab="explore" class="study-tab-btn {% if active_subtab == 'explore' %}active{% endif %}" onclick="switchPillarTab('explore')">
-    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><circle cx="12" cy="12" r="10" stroke-width="2"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2" stroke-linecap="round"/></svg>
     Explore Further
   </button>
 </div>
@@ -2071,292 +2235,199 @@
      PILLAR 5: EXPLORE FURTHER (WIKIPEDIA ENCYCLOPEDIA & CURATED LEARNING RESOURCES)
      ══════════════════════════════════════════════════════════════════════════════ -->
 <div id="pillar-explore" style="display: {% if active_subtab == 'explore' %}block{% else %}none{% endif %};">
-  <!-- Explore Header Card -->
-  <div class="card explore-header-card">
-    <div style="flex: 1; min-width: 0;">
-      <h2 style="font-size: 1.22rem; font-weight: 700; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; color: var(--text);">
-        <svg width="20" height="20" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><circle cx="12" cy="12" r="10" stroke-width="2"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Explore Further: {{ topic.title }}
-      </h2>
-      <p style="margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
-        Supplementary knowledge, video breakdowns, and verified encyclopedia articles to build intuition and connect concepts across this topic.
-      </p>
-    </div>
-    <a href="{% url 'prep:upload' %}?course_id={{ course_id }}&tab=resource" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 0.82rem;">
-      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      Recommend Resource
-    </a>
-  </div>
-
-  <!-- Section 1: Wikipedia Encyclopedia Knowledge Brief -->
-  <div style="margin-bottom: 26px;">
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-      <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--danger); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
-        Wikipedia Encyclopedia
-      </span>
-      <span style="font-size: 0.82rem; color: var(--text-muted);">Syllabus Context &amp; Definitions</span>
+  <!-- Section 1: Encyclopedia -->
+  <div class="explore-section">
+    <div class="explore-section-header">
+      <h3 class="explore-section-title">Encyclopedia</h3>
+      <p class="explore-section-subtitle">Quick reference for the core concept, with a concise explanation.</p>
     </div>
 
     <div id="wiki-concept-brief-container">
     {% if wiki_entry and wiki_entry.extract %}
-    <div class="card explore-wiki-card">
-      <div class="explore-wiki-layout">
-        {% if wiki_entry.thumbnail_url %}
-        <div style="flex-shrink: 0;">
-          <img class="explore-wiki-thumb" src="{{ wiki_entry.thumbnail_url }}" alt="{{ wiki_entry.wikipedia_title }}" loading="lazy">
+      <div class="explore-encyclopedia-card">
+        <div class="explore-encyclopedia-main">
+          <div class="explore-encyclopedia-icon" aria-hidden="true">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="explore-encyclopedia-content">
+            <h4 class="explore-encyclopedia-title">{{ wiki_entry.wikipedia_title|default:topic.title }}</h4>
+            <p class="explore-encyclopedia-extract">{{ wiki_entry.extract }}</p>
+            <div class="explore-encyclopedia-source">Source: Wikipedia</div>
+          </div>
         </div>
-        {% endif %}
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
-            <h3 style="font-size: 1.12rem; font-weight: 700; margin: 0; color: var(--text);">
-              {{ wiki_entry.wikipedia_title }}
-            </h3>
-            {% if wiki_entry.canonical_url %}
-            <a href="{{ wiki_entry.canonical_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;">
-              <span>Read on Wikipedia</span>
-              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            </a>
-            {% endif %}
-          </div>
-          {% if wiki_entry.description %}
-          <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
-            {{ wiki_entry.description }}
-          </div>
-          {% endif %}
-          <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text); margin: 0 0 12px;">
-            {{ wiki_entry.extract }}
-          </p>
-          <div style="font-size: 0.72rem; color: var(--text-muted); border-top: 1px dashed var(--border); padding-top: 8px;">
-            Content provided under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" style="color: var(--text-muted); text-decoration: underline;">Creative Commons Attribution-ShareAlike 4.0 License</a> from Wikimedia.
-          </div>
+        <div class="explore-encyclopedia-action">
+          <a href="{{ wiki_entry.canonical_url|default:'https://en.wikipedia.org/wiki/Special:Search?search='|add:topic.title }}" target="_blank" rel="noopener noreferrer" class="explore-outline-btn">
+            <span>Read on Wikipedia</span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
         </div>
       </div>
-    </div>
     {% else %}
-    <div class="card" style="padding: 24px; text-align: center; border: 1px dashed var(--border); background: var(--surface);">
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 12px;">
-        Explore encyclopedia overviews and background definitions for <strong>{{ topic.title }}</strong> directly from Wikipedia.
-      </p>
-      <a href="https://en.wikipedia.org/wiki/Special:Search?search={{ topic.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-        <span>Search Wikipedia for "{{ topic.title }}" ↗</span>
-      </a>
-    </div>
+      <div class="explore-encyclopedia-card">
+        <div class="explore-encyclopedia-main">
+          <div class="explore-encyclopedia-icon" aria-hidden="true">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="explore-encyclopedia-content">
+            <h4 class="explore-encyclopedia-title">{{ topic.title }}</h4>
+            <p class="explore-encyclopedia-extract">Explore background definitions, formal proofs, and historical context for this topic on Wikipedia.</p>
+            <div class="explore-encyclopedia-source">Source: Wikipedia</div>
+          </div>
+        </div>
+        <div class="explore-encyclopedia-action">
+          <a href="https://en.wikipedia.org/wiki/Special:Search?search={{ topic.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="explore-outline-btn">
+            <span>Read on Wikipedia</span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+        </div>
+      </div>
     {% endif %}
     </div>
   </div>
 
-  {% if topic_simulations %}
-  <!-- Section 2: Interactive Simulations & Virtual Labs (PhET, Desmos, GeoGebra) -->
-  <div style="margin-bottom: 26px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span class="badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
-          Interactive Simulations &amp; Labs
-        </span>
-        <span style="font-size: 0.82rem; color: var(--text-muted);">PhET Visual Labs, Graphing &amp; Experiments</span>
-      </div>
+  <!-- Section 2: Research Papers (Semantic Scholar / OpenAlex) -->
+  <div id="academic-papers-section" class="explore-section" style="{% if not topic_papers %}display: none;{% endif %}">
+    <div class="explore-section-header">
+      <h3 class="explore-section-title">Research Papers</h3>
+      <p class="explore-section-subtitle">Peer-reviewed papers and open access resources for deeper study.</p>
     </div>
 
-    <div class="explore-grid">
-      {% for res in topic_simulations %}
-        <div class="card" style="overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0;">
-          <div style="position: relative; aspect-ratio: 16/9; background: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%); cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="openInteractiveModal('{{ res.url|escapejs }}', '{{ res.title|escapejs }}')">
-            {% if res.thumbnail_url %}
-            <img src="{{ res.thumbnail_url }}" alt="{{ res.title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
-            {% else %}
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff;">
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
-                <svg width="22" height="22" fill="none" stroke="#ffffff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-              </div>
-              <span style="font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px; opacity: 0.9;">Interactive Lab</span>
-            </div>
-            {% endif %}
+    <div id="academic-papers-grid" class="explore-papers-grid">
+      {% for paper in topic_papers %}
+      <div class="explore-paper-card">
+        <div>
+          <div class="explore-paper-tag">OPEN ACCESS</div>
+          <h4 class="explore-paper-title" title="{{ paper.title }}">{{ paper.title }}</h4>
+          {% if paper.authors or paper.year %}
+          <div class="explore-paper-author">{{ paper.authors }}{% if paper.year %} ({{ paper.year }}){% endif %}</div>
+          {% endif %}
+          {% if paper.abstract %}
+          <p class="explore-paper-abstract">{{ paper.abstract }}</p>
+          {% endif %}
+        </div>
+        <div>
+          <div class="explore-paper-citations">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>{{ paper.citation_count|default:0 }} citations</span>
           </div>
-          <div style="padding: 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                <span class="badge" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed; font-size: 0.68rem; font-weight: 700;">Simulation</span>
-              </div>
-              <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0 0 6px; color: var(--text); line-height: 1.4;">
-                {{ res.title }}
-              </h4>
-              {% if res.description %}
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">
-                {{ res.description|truncatewords:20 }}
-              </p>
-              {% endif %}
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
-              <button type="button" class="btn btn-outline btn-sm" onclick="openInteractiveModal('{{ res.url|escapejs }}', '{{ res.title|escapejs }}')" style="font-size: 0.78rem; color: #7c3aed; border-color: rgba(124, 58, 237, 0.4);">
-                Launch Simulation ↗
-              </button>
-              <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline;">
-                New Tab ↗
-              </a>
-            </div>
+          <div class="explore-paper-actions">
+            {% if paper.open_access_pdf_url or paper.doi_url %}
+            <a href="{{ paper.open_access_pdf_url|default:paper.doi_url }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Read Paper</span>
+            </a>
+            {% else %}
+            <a href="https://scholar.google.com/scholar?q={{ paper.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span>Find Copy</span>
+            </a>
+            {% endif %}
+            <a href="https://www.semanticscholar.org/search?q={{ paper.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn" title="View details and citations on Semantic Scholar">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>View Details</span>
+            </a>
           </div>
         </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if topic_simulations %}
+  <!-- Section 3: Interactive Simulations & Virtual Labs -->
+  <div class="explore-section">
+    <div class="explore-section-header">
+      <h3 class="explore-section-title">Interactive Simulations</h3>
+      <p class="explore-section-subtitle">Virtual labs, graphing and interactive visual experiments.</p>
+    </div>
+    <div class="explore-papers-grid">
+      {% for res in topic_simulations %}
+      <div class="explore-paper-card">
+        <div>
+          <div class="explore-paper-tag" style="color: #38bdf8;">SIMULATION</div>
+          <h4 class="explore-paper-title">{{ res.title }}</h4>
+          {% if res.description %}
+          <p class="explore-paper-abstract">{{ res.description|truncatewords:24 }}</p>
+          {% endif %}
+        </div>
+        <div class="explore-paper-actions" style="margin-top: 14px;">
+          <button type="button" class="explore-card-btn" onclick="openInteractiveModal('{{ res.url|escapejs }}', '{{ res.title|escapejs }}')">
+            <span>Launch Lab ↗</span>
+          </button>
+          <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+            <span>New Tab ↗</span>
+          </a>
+        </div>
+      </div>
       {% endfor %}
     </div>
   </div>
   {% endif %}
 
   {% if topic_videos %}
-  <!-- Section 3: Video Lectures & Visual Tutorials -->
-  <div style="margin-bottom: 26px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--danger); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
-          Video Explanations
-        </span>
-        <span style="font-size: 0.82rem; color: var(--text-muted);">Curated Video Lectures &amp; Breakdowns</span>
-      </div>
+  <!-- Section 4: Video Lectures & Visual Tutorials -->
+  <div class="explore-section">
+    <div class="explore-section-header">
+      <h3 class="explore-section-title">Video Lectures</h3>
+      <p class="explore-section-subtitle">Curated video breakdowns and visual tutorials.</p>
     </div>
-
-    <div class="explore-grid">
+    <div class="explore-papers-grid">
       {% for res in topic_videos %}
-        <div class="card" style="overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0;">
-          {% if res.embed_id %}
-          <div style="position: relative; aspect-ratio: 16/9; background: #000; cursor: pointer;" onclick="openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}')">
-            {% if res.thumbnail_url %}
-            <img src="{{ res.thumbnail_url }}" alt="{{ res.title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
-            {% else %}
-            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #18181b;">
-              <svg width="40" height="40" fill="var(--danger)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-            {% endif %}
-            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--danger); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
-                <svg width="22" height="22" fill="#ffffff" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-            </div>
-          </div>
+      <div class="explore-paper-card">
+        <div>
+          <div class="explore-paper-tag" style="color: #f43f5e;">VIDEO</div>
+          <h4 class="explore-paper-title">{{ res.title }}</h4>
+          {% if res.description %}
+          <p class="explore-paper-abstract">{{ res.description|truncatewords:24 }}</p>
           {% endif %}
-          <div style="padding: 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--danger); font-size: 0.68rem; font-weight: 700;">YouTube</span>
-              </div>
-              <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0 0 6px; color: var(--text); line-height: 1.4;">
-                {{ res.title }}
-              </h4>
-              {% if res.description %}
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">
-                {{ res.description|truncatewords:20 }}
-              </p>
-              {% endif %}
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
-              {% if res.embed_id %}
-              <button type="button" class="btn btn-outline btn-sm" onclick="openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}')" style="font-size: 0.78rem;">
-                Watch Video
-              </button>
-              {% endif %}
-              <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline;">
-                Open on YouTube ↗
-              </a>
-            </div>
-          </div>
         </div>
+        <div class="explore-paper-actions" style="margin-top: 14px;">
+          {% if res.embed_id %}
+          <button type="button" class="explore-card-btn" onclick="openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}')">
+            <span>Watch Video ↗</span>
+          </button>
+          {% endif %}
+          <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+            <span>Open Video ↗</span>
+          </a>
+        </div>
+      </div>
       {% endfor %}
     </div>
   </div>
   {% endif %}
 
   {% if topic_readings %}
-  <!-- Section 4: Reference Articles, Slide Decks & Papers -->
-  <div style="margin-bottom: 26px;">
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-      <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--green); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
-        Curated Readings &amp; Tools
-      </span>
-      <span style="font-size: 0.82rem; color: var(--text-muted);">Interactive Labs, Course Slides &amp; Papers</span>
+  <!-- Section 5: Curated Readings & Supplemental Materials -->
+  <div class="explore-section">
+    <div class="explore-section-header">
+      <h3 class="explore-section-title">Curated Readings</h3>
+      <p class="explore-section-subtitle">Recommended course notes, guides and supplemental articles.</p>
     </div>
-
-    <div class="explore-readings-grid">
+    <div class="explore-papers-grid">
       {% for res in topic_readings %}
-        <div class="card" style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-              <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: var(--green); font-size: 0.68rem; font-weight: 600;">
-                {{ res.get_resource_type_display }}
-              </span>
-            </div>
-            <h4 style="font-size: 0.94rem; font-weight: 600; margin: 0 0 6px; color: var(--text); line-height: 1.4;">
-              {{ res.title }}
-            </h4>
-            {% if res.description %}
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">
-              {{ res.description|truncatewords:24 }}
-            </p>
-            {% endif %}
-          </div>
-          <div style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
-            <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; display: inline-flex; align-items: center; gap: 5px; width: 100%; justify-content: center;">
-              <span>Visit Resource</span>
-              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            </a>
-          </div>
+      <div class="explore-paper-card">
+        <div>
+          <div class="explore-paper-tag">{{ res.get_resource_type_display|upper }}</div>
+          <h4 class="explore-paper-title">{{ res.title }}</h4>
+          {% if res.description %}
+          <p class="explore-paper-abstract">{{ res.description|truncatewords:24 }}</p>
+          {% endif %}
         </div>
+        <div class="explore-paper-actions" style="margin-top: 14px;">
+          <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+            <span>Open Resource ↗</span>
+          </a>
+        </div>
+      </div>
       {% endfor %}
     </div>
   </div>
   {% endif %}
-
-  <!-- Section 5: Academic Research & Seminal Papers (Semantic Scholar / OpenAlex) -->
-  <div id="academic-papers-section" style="margin-bottom: 26px; {% if not topic_papers %}display: none;{% endif %}">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px;">
-          Academic Research &amp; Papers
-        </span>
-        <span style="font-size: 0.82rem; color: var(--text-muted);">Peer-Reviewed Research &amp; Open Access Preprints</span>
-      </div>
-    </div>
-
-    <div id="academic-papers-grid" class="explore-readings-grid">
-      {% for paper in topic_papers %}
-        <div class="card" style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 6px;">
-              <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.68rem; font-weight: 700;">
-                {{ paper.source|title }}
-              </span>
-              {% if paper.citation_count %}
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">
-                ★ {{ paper.citation_count }} citations
-              </span>
-              {% endif %}
-            </div>
-            <h4 style="font-size: 0.94rem; font-weight: 600; margin: 0 0 4px; color: var(--text); line-height: 1.4;">
-              {{ paper.title }}
-            </h4>
-            {% if paper.authors or paper.year %}
-            <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 8px;">
-              {{ paper.authors }}{% if paper.year %} ({{ paper.year }}){% endif %}
-            </div>
-            {% endif %}
-            {% if paper.abstract %}
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">
-              {{ paper.abstract|truncatewords:28 }}
-            </p>
-            {% endif %}
-          </div>
-          <div class="academic-paper-actions" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-            {% if paper.open_access_pdf_url or paper.doi_url %}
-            <a href="{{ paper.open_access_pdf_url|default:paper.doi_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; color: #2563eb; border-color: rgba(37, 99, 235, 0.4); display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;">
-              <span>Read Paper ↗</span>
-            </a>
-            {% endif %}
-            <a href="https://www.semanticscholar.org/search?q={{ paper.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; color: var(--text-muted); border-color: var(--border); display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;" title="Find open-access PDF copies, preprints, and citations on Semantic Scholar">
-              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <span>Free PDF / Semantic Scholar ↗</span>
-            </a>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
 </div>
 
 <!-- Interactive Modal Player for Videos & PhET/HTML5 Simulations -->
@@ -4036,30 +4107,35 @@
             const grid = document.getElementById('academic-papers-grid');
             if (grid) {
               grid.innerHTML = data.papers.map(p => `
-                <div class="card" style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="explore-paper-card">
                   <div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 6px;">
-                      <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.68rem; font-weight: 700;">
-                        ${(p.source || 'RESEARCH').toUpperCase()}
-                      </span>
-                      ${p.citation_count ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">★ ${p.citation_count} citations</span>` : ''}
-                    </div>
-                    <h4 style="font-size: 0.94rem; font-weight: 600; margin: 0 0 4px; color: var(--text); line-height: 1.4;">
-                      ${p.title}
-                    </h4>
-                    ${(p.authors || p.year) ? `<div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 8px;">${p.authors || ''}${p.year ? ` (${p.year})` : ''}</div>` : ''}
-                    ${p.abstract ? `<p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">${p.abstract.slice(0, 180)}...</p>` : ''}
+                    <div class="explore-paper-tag">OPEN ACCESS</div>
+                    <h4 class="explore-paper-title" title="${p.title || ''}">${p.title || ''}</h4>
+                    ${(p.authors || p.year) ? `<div class="explore-paper-author">${p.authors || ''}${p.year ? ` (${p.year})` : ''}</div>` : ''}
+                    ${p.abstract ? `<p class="explore-paper-abstract">${p.abstract}</p>` : ''}
                   </div>
-                  <div class="academic-paper-actions" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-                    ${(p.open_access_pdf_url || p.doi_url) ? `
-                      <a href="${p.open_access_pdf_url || p.doi_url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.78rem; color: #2563eb; border-color: rgba(37, 99, 235, 0.4); display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;">
-                        <span>Read Paper ↗</span>
+                  <div>
+                    <div class="explore-paper-citations">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                      <span>${p.citation_count || 0} citations</span>
+                    </div>
+                    <div class="explore-paper-actions">
+                      ${(p.open_access_pdf_url || p.doi_url) ? `
+                        <a href="${p.open_access_pdf_url || p.doi_url}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+                          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                          <span>Read Paper</span>
+                        </a>
+                      ` : `
+                        <a href="https://scholar.google.com/scholar?q=${encodeURIComponent(p.title || '')}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
+                          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                          <span>Find Copy</span>
+                        </a>
+                      `}
+                      <a href="https://www.semanticscholar.org/search?q=${encodeURIComponent(p.title || '')}" target="_blank" rel="noopener noreferrer" class="explore-card-btn" title="View details and citations on Semantic Scholar">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                        <span>View Details</span>
                       </a>
-                    ` : ''}
-                    <a href="https://www.semanticscholar.org/search?q=${encodeURIComponent(p.title)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; color: var(--text-muted); border-color: var(--border); display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;" title="Find open-access PDF copies, preprints, and citations on Semantic Scholar">
-                      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                      <span>Free PDF / Semantic Scholar ↗</span>
-                    </a>
+                    </div>
                   </div>
                 </div>
               `).join('');
