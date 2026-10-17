@@ -159,112 +159,13 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(f"Course notes precompute failed for {job.course.code}: {exc}"))
 
     def _process_topic_notes_job(self, job):
-        from services.prep_ai_router import (
-            _note_completion_issues,
-            _note_validation_options,
-            _topic_notes_cache_signature,
-            get_or_generate_topic_notes,
-        )
-        from services.credit_service import credits_for_usage
-        from services.prep_course_billing import create_shared_course_cost, settle_course_cost_share
+        from services.prep_note_precompute import process_single_topic_notes_job
 
         try:
-            topic = job.topic
-            result = get_or_generate_topic_notes(
-                topic.course.code,
-                topic.title,
-                subtopics=topic.subtopics if isinstance(topic.subtopics, list) else [],
-                level=job.level,
-                course_obj=topic.course,
-                topic_obj=topic,
-            )
-            notes = str(result.get("notes") or result.get("content") or "").strip()
-            usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
-            model_name = str(result.get("model") or result.get("model_used") or "")
-            if not notes:
-                raise RuntimeError(
-                    result.get("error") or "The notes provider did not return validated notes."
-                )
-            if result.get("stale"):
-                raise RuntimeError("A stale note cannot complete a job for the current source version.")
-            review_status = result.get("review_status")
-            if review_status and review_status != "passed":
-                raise RuntimeError(
-                    "The notes worker rejected notes without a successful independent review: "
-                    + str(review_status)
-                )
-            if not result.get("cached") and review_status != "passed":
-                raise RuntimeError(
-                    "Fresh notes cannot complete a job without a successful independent review."
-                )
-
-            validation_options = _note_validation_options(
-                topic.course,
-                topic.title,
-                topic.summary,
-                topic.subtopics,
-                topic_obj=topic,
-            )
-            validation_issues = _note_completion_issues(
-                notes,
-                topic.title,
-                **validation_options,
-            )
-            if validation_issues:
-                raise RuntimeError(
-                    "The notes worker rejected unvalidated content: "
-                    + "; ".join(validation_issues)
-                )
-
-            if not result.get("cached") and job.level == "level_2":
-                signature = _topic_notes_cache_signature(
-                    topic.course,
-                    topic,
-                    topic.title,
-                    topic.subtopics,
-                )
-                cost = create_shared_course_cost(
-                    course=topic.course,
-                    cost_type="topic_notes",
-                    total_credits=credits_for_usage(usage, minimum=1),
-                    source_key=f"topic-notes:{topic.pk}:{job.level}:{signature}",
-                    topic=topic,
-                    level=job.level,
-                    usage=usage,
-                    model_name=model_name or "deepseek-chat",
-                )
-                for share in cost.shares.select_related("user", "cost").all():
-                    settle_course_cost_share(share)
-
-            job.status = "complete"
-            job.completed_at = timezone.now()
-            job.last_error = ""
-            job.provider_usage = usage
-            job.model_name = model_name
-            self._save_job_resilient(
-                job,
-                update_fields=[
-                    "status",
-                    "completed_at",
-                    "last_error",
-                    "provider_usage",
-                    "model_name",
-                ],
-            )
+            process_single_topic_notes_job(job)
             self.stdout.write(
-                self.style.SUCCESS(f"Prepared {job.level} notes for topic {topic.pk}.")
+                self.style.SUCCESS(f"Prepared {job.level} notes for topic {job.topic_id}.")
             )
-            try:
-                from services.prep_pdf_artifacts import enqueue_topic_pdf_artifact
-
-                enqueue_topic_pdf_artifact(topic, "notes", job.level)
-            except Exception:
-                self.stderr.write(
-                    self.style.ERROR(
-                        f"Could not queue the {job.level} PDF for topic {topic.pk}; "
-                        "the notes remain complete and the PDF worker startup scan can retry."
-                    )
-                )
         except Exception as exc:
             job.status = "pending" if job.attempts < 3 else "failed"
             job.last_error = str(exc)[:4000]
