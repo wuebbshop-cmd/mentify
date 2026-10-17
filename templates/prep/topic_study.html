@@ -2372,7 +2372,12 @@
       {% for res in topic_simulations %}
       <div class="explore-paper-card">
         <div>
-          <div class="explore-paper-tag" style="color: #38bdf8;">SIMULATION</div>
+          {% if res.thumbnail_url %}
+          <div style="aspect-ratio: 16/9; width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 12px; border: 1px solid rgba(15, 118, 110, 0.2); background: #000; cursor: pointer;" onclick="openInteractiveModal('{{ res.url|escapejs }}', '{{ res.title|escapejs }}')">
+            <img src="{{ res.thumbnail_url }}" alt="{{ res.title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          {% endif %}
+          <div class="explore-paper-tag">SIMULATION</div>
           <h4 class="explore-paper-title">{{ res.title }}</h4>
           {% if res.description %}
           <p class="explore-paper-abstract">{{ res.description|truncatewords:24 }}</p>
@@ -2403,7 +2408,12 @@
       {% for res in topic_videos %}
       <div class="explore-paper-card">
         <div>
-          <div class="explore-paper-tag" style="color: #f43f5e;">VIDEO</div>
+          {% if res.thumbnail_url %}
+          <div style="aspect-ratio: 16/9; width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 12px; border: 1px solid rgba(15, 118, 110, 0.2); background: #000; cursor: pointer;" onclick="{% if res.embed_id %}openVideoModal('{{ res.embed_id }}', '{{ res.title|escapejs }}'){% endif %}">
+            <img src="{{ res.thumbnail_url }}" alt="{{ res.title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          {% endif %}
+          <div class="explore-paper-tag">VIDEO</div>
           <h4 class="explore-paper-title">{{ res.title }}</h4>
           {% if res.description %}
           <p class="explore-paper-abstract">{{ res.description|truncatewords:24 }}</p>
