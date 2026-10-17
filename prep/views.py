@@ -1470,8 +1470,6 @@ def prep_topic_tutor_api(request, topic_id):
             status=400,
         )
 
-    from services.credit_service import get_available_credits
-
     wallet = PrepWallet.get_or_create_wallet(request.user)
     available_credits = get_available_credits(wallet)
     if available_credits < 1:
