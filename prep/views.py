@@ -795,6 +795,11 @@ def prep_dashboard(request):
             for d in PrepDocument.objects.filter(user=request.user, stage="stage_2").select_related("course").order_by("-created_at")[:5]
         ]
 
+    due_spaced_cards = []
+    if request.user.is_authenticated:
+        from services.prep_spaced_repetition import get_due_spaced_cards
+        due_spaced_cards = get_due_spaced_cards(request.user, limit=5)
+
     context = {
         "active_tab": "dashboard",
         "user_credits": user_credits,
@@ -810,6 +815,7 @@ def prep_dashboard(request):
         "featured_topics": featured_topics,
         "latest_study_item": latest_study_item,
         "user_pending_review_docs": user_pending_review_docs,
+        "due_spaced_cards": due_spaced_cards,
     }
     return render(request, "prep/dashboard.html", context)
 
@@ -1192,23 +1198,34 @@ def prep_topic_study(request, topic_id):
     }
 
     # 4. Explore Further: Approved learning resources & Wikipedia concept overview
-    from prep.models import PrepTopicResource, PrepTopicWikipedia
+    from prep.models import PrepTopicResource, PrepTopicWikipedia, PrepTopicAcademicPaper, PrepStudentSpacedCard
 
     topic_resources_list = list(PrepTopicResource.objects.filter(
         Q(topic=topic) | (Q(topic__isnull=True) & Q(course=topic.course)),
         is_approved=True,
     ).order_by("-created_at"))
 
+    topic_simulations = [r for r in topic_resources_list if r.resource_type == "simulation"]
     topic_videos = [r for r in topic_resources_list if r.resource_type in ("youtube", "video")]
-    topic_readings = [r for r in topic_resources_list if r.resource_type not in ("youtube", "video")]
+    topic_readings = [r for r in topic_resources_list if r.resource_type not in ("youtube", "video", "simulation")]
 
     # Fast DB cache read only (~1ms). Never block initial page render with external Wikimedia HTTP calls!
     wiki_entry = PrepTopicWikipedia.objects.filter(topic=topic).first()
+    topic_papers = list(PrepTopicAcademicPaper.objects.filter(topic=topic, is_approved=True).order_by("-citation_count", "-year")[:5])
+
+    is_in_spaced_deck = False
+    if request.user.is_authenticated:
+        is_in_spaced_deck = PrepStudentSpacedCard.objects.filter(
+            user=request.user, topic=topic, question__isnull=True
+        ).exists()
 
     context["topic_resources"] = topic_resources_list
+    context["topic_simulations"] = topic_simulations
     context["topic_videos"] = topic_videos
     context["topic_readings"] = topic_readings
+    context["topic_papers"] = topic_papers
     context["wiki_entry"] = wiki_entry
+    context["is_in_spaced_deck"] = is_in_spaced_deck
     return render(request, "prep/topic_study.html", context)
 
 
@@ -1229,6 +1246,120 @@ def prep_topic_wikipedia_api(request, topic_id):
         "canonical_url": entry.canonical_url,
         "thumbnail_url": entry.thumbnail_url,
         "description": entry.description,
+    })
+
+
+@never_cache
+@require_http_methods(["GET"])
+def prep_topic_papers_api(request, topic_id):
+    """Asynchronous background endpoint to fetch or retrieve cached academic research papers."""
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    from services.prep_research import get_or_fetch_academic_papers
+    papers = get_or_fetch_academic_papers(topic, limit=3)
+    papers_data = []
+    for p in papers:
+        papers_data.append({
+            "id": p.id,
+            "title": p.title,
+            "authors": p.authors,
+            "year": p.year,
+            "venue": p.venue,
+            "abstract": p.abstract,
+            "citation_count": p.citation_count,
+            "open_access_pdf_url": p.open_access_pdf_url,
+            "doi_url": p.doi_url,
+            "source": p.source,
+        })
+    return JsonResponse({
+        "success": True,
+        "count": len(papers_data),
+        "papers": papers_data,
+    })
+
+
+@login_required
+@never_cache
+@require_http_methods(["GET"])
+def prep_spaced_cards_due_api(request):
+    """Returns spaced repetition topic cards due for review for the authenticated student."""
+    from services.prep_spaced_repetition import get_due_spaced_cards
+    topic_id = request.GET.get("topic_id")
+    topic = None
+    if topic_id and topic_id.isdigit():
+        topic = PrepTopic.objects.filter(pk=int(topic_id), is_active=True).first()
+    
+    cards = get_due_spaced_cards(request.user, topic=topic, limit=12)
+    cards_data = []
+    for c in cards:
+        cards_data.append({
+            "id": c.id,
+            "topic_id": c.topic_id,
+            "topic_title": c.topic.title,
+            "course_code": c.topic.course.code if c.topic.course else "",
+            "card_title": c.card_title or c.topic.title,
+            "prompt_text": c.prompt_text,
+            "answer_text": c.answer_text,
+            "reps": c.reps,
+            "state": c.state,
+            "due_date": c.due_date.isoformat(),
+        })
+    return JsonResponse({
+        "success": True,
+        "count": len(cards_data),
+        "cards": cards_data,
+    })
+
+
+@login_required
+@never_cache
+@require_http_methods(["POST"])
+def prep_spaced_card_review_api(request, card_id):
+    """Applies FSRS memory rating for a card ('again', 'hard', 'good', 'easy')."""
+    from services.prep_spaced_repetition import review_spaced_card
+    try:
+        import json
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        payload = {}
+    
+    rating = payload.get("rating", "good")
+    res = review_spaced_card(card_id, request.user, rating)
+    if not res:
+        return JsonResponse({"success": False, "error": "Card not found or access denied."}, status=404)
+    return JsonResponse({
+        "success": True,
+        "card": res,
+    })
+
+
+@login_required
+@never_cache
+@require_http_methods(["POST"])
+def prep_spaced_card_add_api(request):
+    """Enrolls or removes a syllabus topic in the student's FSRS spaced repetition daily deck."""
+    from services.prep_spaced_repetition import toggle_spaced_card_for_topic
+    try:
+        import json
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        payload = {}
+
+    topic_id = payload.get("topic_id")
+    if not topic_id:
+        return JsonResponse({"success": False, "error": "topic_id is required."}, status=400)
+
+    topic = PrepTopic.objects.filter(pk=topic_id).first()
+    if not topic:
+        return JsonResponse({"success": False, "error": "Topic not found."}, status=404)
+
+    card, is_enrolled = toggle_spaced_card_for_topic(request.user, topic)
+    return JsonResponse({
+        "success": True,
+        "is_enrolled": is_enrolled,
+        "card_id": card.id if card else None,
+        "due_date": card.due_date.isoformat() if card else None,
+        "topic_id": topic.id,
+        "topic_title": topic.title,
     })
 
 

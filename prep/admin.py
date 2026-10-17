@@ -39,6 +39,8 @@ from .models import (
     PrepNotification,
     PrepTopicResource,
     PrepTopicWikipedia,
+    PrepTopicAcademicPaper,
+    PrepStudentSpacedCard,
 )
 from services.credit_service import grant_credits, grant_subscription
 
@@ -1632,4 +1634,48 @@ class PrepTopicWikipediaAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank" rel="noopener">Wikipedia Page ↗</a>', obj.canonical_url)
         return "-"
     canonical_link.short_description = "Wikipedia Article"
+
+
+@admin.register(PrepTopicAcademicPaper)
+class PrepTopicAcademicPaperAdmin(admin.ModelAdmin):
+    """Academic papers and research discovery for course topics."""
+    list_display = ("title", "authors", "year", "venue", "citation_count", "source", "is_approved", "pdf_link")
+    list_filter = ("is_approved", "source", "year")
+    search_fields = ("title", "authors", "topic__title", "topic__course__code", "venue")
+    actions = ["approve_papers", "unapprove_papers"]
+
+    def pdf_link(self, obj):
+        if obj.open_access_pdf_url:
+            return format_html('<a href="{}" target="_blank" rel="noopener" style="color:#2563eb;font-weight:600;">PDF ↗</a>', obj.open_access_pdf_url)
+        if obj.doi_url:
+            return format_html('<a href="{}" target="_blank" rel="noopener">DOI ↗</a>', obj.doi_url)
+        return "-"
+    pdf_link.short_description = "Open Access"
+
+    @admin.action(description="Approve selected academic papers")
+    def approve_papers(self, request, queryset):
+        c = queryset.update(is_approved=True)
+        self.message_user(request, f"Approved {c} academic paper(s).")
+
+    @admin.action(description="Unapprove selected academic papers")
+    def unapprove_papers(self, request, queryset):
+        c = queryset.update(is_approved=False)
+        self.message_user(request, f"Unapproved {c} academic paper(s).")
+
+
+@admin.register(PrepStudentSpacedCard)
+class PrepStudentSpacedCardAdmin(admin.ModelAdmin):
+    """FSRS spaced repetition memory tracking per student."""
+    list_display = ("user", "topic", "card_title", "due_date", "reps", "state_label", "stability", "difficulty")
+    list_filter = ("state", "topic__course")
+    search_fields = ("user__username", "user__email", "topic__title", "card_title")
+    autocomplete_fields = ("topic",)
+    readonly_fields = ("created_at", "updated_at")
+
+    def state_label(self, obj):
+        labels = {0: "New", 1: "Learning", 2: "Review", 3: "Relearning"}
+        return labels.get(obj.state, "Unknown")
+    state_label.short_description = "FSRS State"
+
+
 

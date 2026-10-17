@@ -1010,3 +1010,66 @@ class PrepTopicWikipedia(models.Model):
     def __str__(self):
         return f"Wikipedia: {self.wikipedia_title} ({self.topic.title})"
 
+
+class PrepTopicAcademicPaper(models.Model):
+    """Stores curated / auto-retrieved open-access academic research papers from Semantic Scholar / OpenAlex / arXiv."""
+    topic = models.ForeignKey(
+        PrepTopic,
+        on_delete=models.CASCADE,
+        related_name="academic_papers",
+        db_index=True,
+    )
+    title = models.CharField(max_length=300)
+    authors = models.CharField(max_length=300, blank=True, default="")
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
+    venue = models.CharField(max_length=200, blank=True, default="")
+    abstract = models.TextField(blank=True, default="")
+    citation_count = models.PositiveIntegerField(default=0)
+    open_access_pdf_url = models.URLField(max_length=500, blank=True, default="")
+    doi_url = models.URLField(max_length=500, blank=True, default="")
+    source = models.CharField(max_length=50, default="semantic_scholar")
+    is_approved = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-citation_count", "-year"]
+        verbose_name = "Prep Topic Academic Paper"
+        verbose_name_plural = "Prep Topic Academic Papers"
+
+class PrepStudentSpacedCard(models.Model):
+    """Tracks FSRS spaced repetition state per student for past exam questions and topic revision cards."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="spaced_cards", db_index=True)
+    topic = models.ForeignKey(PrepTopic, on_delete=models.CASCADE, related_name="spaced_cards", db_index=True)
+    question = models.ForeignKey(PrepQuestion, on_delete=models.CASCADE, null=True, blank=True, related_name="spaced_cards")
+    card_title = models.CharField(max_length=255, blank=True, default="")
+    prompt_text = models.TextField(blank=True, default="")
+    answer_text = models.TextField(blank=True, default="")
+
+    # FSRS Card State Fields
+    due_date = models.DateTimeField(db_index=True)
+    stability = models.FloatField(default=0.0)
+    difficulty = models.FloatField(default=0.0)
+    elapsed_days = models.IntegerField(default=0)
+    scheduled_days = models.IntegerField(default=0)
+    reps = models.IntegerField(default=0)
+    lapses = models.IntegerField(default=0)
+    state = models.PositiveSmallIntegerField(default=0, help_text="0=New, 1=Learning, 2=Review, 3=Relearning")
+    last_review = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["due_date"]
+        verbose_name = "Prep Student Spaced Card"
+        verbose_name_plural = "Prep Student Spaced Cards"
+        indexes = [
+            models.Index(fields=["user", "due_date"]),
+            models.Index(fields=["user", "topic"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user} - {self.topic.title} (Due: {self.due_date.strftime('%Y-%m-%d')})"
+
+
+
+

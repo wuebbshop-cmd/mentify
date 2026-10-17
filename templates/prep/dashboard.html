@@ -402,6 +402,30 @@
       min-height: auto;
       padding: 15px;
     }
+
+    .topic-revision-deck-grid {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+
+    .topic-revision-card-actions {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+    }
+
+    .topic-revision-card-actions > a,
+    .topic-revision-card-actions > div {
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+
+    .topic-revision-card-actions > div > button {
+      flex: 1 !important;
+      padding: 7px 12px !important;
+      text-align: center !important;
+    }
   }
 </style>
 {% endblock %}
@@ -476,6 +500,80 @@
       <span class="ws-metric-value">{{ today_credits_used|default:0 }} <span class="ws-metric-sub">today &middot; {{ week_credits_used|default:0 }} (7d)</span></span>
     </a>
   </div>
+
+  {% if due_spaced_cards %}
+  <!-- Daily Spaced Repetition Revision Deck (FSRS) -->
+  <section style="margin-bottom: 28px;">
+    <div class="ws-section-header">
+      <div class="ws-section-title-group">
+        <h2 class="ws-section-title" style="display:flex;align-items:center;gap:8px;">
+          <svg width="18" height="18" fill="none" stroke="var(--green)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Today's Topic Revision Deck</span>
+        </h2>
+        <span class="ws-count-text">({{ due_spaced_cards|length }} topic{{ due_spaced_cards|length|pluralize }} due)</span>
+      </div>
+    </div>
+
+    <div class="topic-revision-deck-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(min(100%, 280px), 1fr));gap:14px;">
+      {% for card in due_spaced_cards %}
+      <div id="spaced-card-box-{{ card.id }}" class="card" style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px;">
+            <span class="badge" style="background:var(--green-light);color:var(--green);font-size:0.7rem;font-weight:700;">{{ card.topic.course.code }}</span>
+            <span style="font-size:0.72rem;color:var(--text-muted);font-weight:600;">Repetition #{{ card.reps }}</span>
+          </div>
+          <h4 style="font-size:0.92rem;font-weight:600;margin:0 0 6px;color:var(--text);line-height:1.4;">
+            {{ card.card_title|default:card.topic.title }}
+          </h4>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 10px;line-height:1.45;">
+            {{ card.prompt_text|truncatewords:20|default:"Review core syllabus concepts, derivations, and problem sets." }}
+          </p>
+        </div>
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+          <div class="topic-revision-card-actions" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+            <a href="{% url 'prep:topic_study' topic_id=card.topic.id %}" class="btn btn-outline btn-sm" style="font-size:0.76rem;padding:6px 10px;">
+              Revise Topic ↗
+            </a>
+            <div style="display:flex;gap:6px;">
+              <button type="button" onclick="rateSpacedCard({{ card.id }}, 'again')" class="btn btn-outline btn-sm" style="font-size:0.72rem;padding:5px 8px;color:var(--danger);border-color:rgba(220,38,38,0.3);" title="Need more practice">Again</button>
+              <button type="button" onclick="rateSpacedCard({{ card.id }}, 'good')" class="btn btn-outline btn-sm" style="font-size:0.72rem;padding:5px 8px;color:var(--green);border-color:rgba(16,185,129,0.3);" title="Remembered well">Good</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <script>
+    function rateSpacedCard(cardId, rating) {
+      const box = document.getElementById(`spaced-card-box-${cardId}`);
+      if (box) box.style.opacity = '0.5';
+      fetch(`/prep/api/spaced-cards/${cardId}/review/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify({ rating: rating }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && box) {
+          box.style.transition = 'all 0.3s ease';
+          box.style.transform = 'scale(0.95)';
+          box.style.opacity = '0';
+          setTimeout(() => box.remove(), 300);
+        } else if (box) {
+          box.style.opacity = '1';
+        }
+      })
+      .catch(() => {
+        if (box) box.style.opacity = '1';
+      });
+    }
+  </script>
+  {% endif %}
 
   <!-- 3. My Courses Multi-Column Grid (Rows & Columns) -->
   <section>

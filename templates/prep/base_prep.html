@@ -217,6 +217,29 @@
       .navbar-end > a[href*="/prep/billing/"] span {
         font-size: 0.72rem !important;
       }
+      #nav-login-btn,
+      #nav-register-btn {
+        padding: 4px 8px !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+      }
+    }
+
+    #text-selection-toolbar {
+      transition: opacity 0.12s ease, transform 0.12s ease;
+    }
+    @media (max-width: 768px) {
+      #text-selection-toolbar {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.28) !important;
+        border: 1px solid var(--border) !important;
+        padding: 6px 12px !important;
+        gap: 8px !important;
+        background: var(--surface) !important;
+      }
+      #text-selection-toolbar button {
+        font-size: 0.84rem !important;
+        padding: 6px 10px !important;
+      }
     }
 
     .prep-header-signout {
@@ -426,6 +449,7 @@
   </div>
 
   <div class="navbar-end" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+    {% if user.is_authenticated %}
     <!-- Credit Badge (Always pill, number visible) -->
     <a href="{% url 'prep:billing' %}" id="prep-navbar-credit-badge" class="badge badge-accent" title="Your Credit Balance">
       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -453,6 +477,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
     <!-- Theme Toggle matching Mentify base.html -->
     <button id="theme-toggle" type="button" class="theme-toggle" title="Switch to Dark Mode" aria-label="Switch to dark mode" style="margin-right: 4px;">
@@ -1062,6 +1087,286 @@
         } catch (e) {}
         return response;
       };
+    }
+  })();
+</script>
+
+<!-- Text Selection Floating Toolbar (Wikipedia Everywhere; Ask Tutor Activated on Topic Pages) -->
+<div id="text-selection-toolbar" onmousedown="event.preventDefault()" style="display:none;position:absolute;z-index:9998;background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,0.18);padding:3px 6px;align-items:center;gap:4px;user-select:none;">
+  <button type="button" id="btn-sel-wiki" onclick="handleToolbarWikiClick(event)" onmousedown="event.preventDefault()" style="display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:var(--text);font-size:0.78rem;font-weight:600;padding:5px 9px;border-radius:16px;cursor:pointer;transition:background 0.15s ease;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
+    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35"/></svg>
+    <span>Wikipedia</span>
+  </button>
+  <div id="toolbar-tutor-divider" style="display:none;width:1px;height:14px;background:var(--border);"></div>
+  <button type="button" id="btn-sel-ask-tutor" onclick="handleToolbarTutorClick(event)" onmousedown="event.preventDefault()" style="display:none;align-items:center;gap:5px;border:0;background:transparent;color:var(--green);font-size:0.78rem;font-weight:600;padding:5px 9px;border-radius:16px;cursor:pointer;transition:background 0.15s ease;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
+    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m-8 6 2.2-2.2A8 8 0 1 1 20 15"/></svg>
+    <span>Ask Tutor</span>
+  </button>
+</div>
+
+<!-- Wikipedia Article Preview Modal -->
+<div id="prep-wiki-preview-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:12px;">
+  <div class="wiki-preview-modal-dialog" style="position:relative;width:100%;max-width:540px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,0.3);overflow:hidden;display:flex;flex-direction:column;max-height:86vh;max-height:86dvh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--hover);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <span class="badge" style="background:#1e293b;color:#f8fafc;font-size:0.7rem;font-weight:700;">WIKIPEDIA</span>
+        <span id="wiki-preview-title" style="font-size:0.92rem;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px;">Encyclopedia Definition</span>
+      </div>
+      <button type="button" onclick="closeWikiPreviewModal()" style="border:0;background:transparent;color:var(--text-muted);font-size:1.4rem;cursor:pointer;padding:6px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;line-height:1;" aria-label="Close Wikipedia preview">&times;</button>
+    </div>
+    <div id="wiki-preview-body" style="padding:16px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;font-size:0.88rem;line-height:1.6;color:var(--text);">
+      <div style="text-align:center;padding:24px 0;color:var(--text-muted);">
+        <span style="display:inline-block;animation:pulse 1s infinite;">Looking up Wikipedia overview…</span>
+      </div>
+    </div>
+    <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--hover);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;">
+      <span style="font-size:0.72rem;color:var(--text-muted);">Wikimedia CC BY-SA 4.0</span>
+      <a id="wiki-preview-external-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size:0.76rem;display:inline-flex;align-items:center;gap:4px;">
+        <span>Open on Wikipedia ↗</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── Global Selection Manager (Wikipedia Everywhere; Ask Tutor on Topic Pages) ───
+  (function initGlobalSelectionToolbar() {
+    let currentSelectionText = '';
+    let isUserSelecting = false;
+    let selDebounceTimer = null;
+
+    function getValidSelectionText() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return '';
+      const text = sel.toString().trim();
+      if (!text || text.length < 2 || text.length > 600) return '';
+      const anchorNode = sel.anchorNode;
+      const focusNode = sel.focusNode;
+      const checkNode = (node) => {
+        const el = node && node.nodeType === 1 ? node : (node ? node.parentElement : null);
+        return el && el.closest('input, textarea, select, pre, code, #text-selection-toolbar, #prep-wiki-preview-modal');
+      };
+      if (checkNode(anchorNode) || checkNode(focusNode)) {
+        return '';
+      }
+      return text;
+    }
+
+    function positionSelectionToolbar() {
+      if (isUserSelecting) return;
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (!toolbar) return;
+      const text = getValidSelectionText();
+      if (!text) {
+        toolbar.style.display = 'none';
+        currentSelectionText = '';
+        return;
+      }
+      currentSelectionText = text;
+
+      // Ask Tutor is activated on topic study pages (including inside the chat area for quoting text)
+      const isTopicStudyPage = Boolean(window.askTutorWithExcerpt && document.getElementById('topic-tutor-input'));
+      const tutorBtn = document.getElementById('btn-sel-ask-tutor');
+      const tutorDivider = document.getElementById('toolbar-tutor-divider');
+
+      if (isTopicStudyPage && tutorBtn && tutorDivider) {
+        tutorBtn.style.display = 'inline-flex';
+        tutorDivider.style.display = 'block';
+      } else {
+        if (tutorBtn) tutorBtn.style.display = 'none';
+        if (tutorDivider) tutorDivider.style.display = 'none';
+      }
+
+      // Mobile screens (<=768px): Dock as bottom pill for optimal thumb-reach
+      if (window.innerWidth <= 768) {
+        toolbar.style.position = 'fixed';
+        toolbar.style.bottom = 'max(18px, env(safe-area-inset-bottom, 18px))';
+        toolbar.style.top = 'auto';
+        toolbar.style.left = '50%';
+        toolbar.style.transform = 'translateX(-50%)';
+        toolbar.style.display = 'inline-flex';
+        return;
+      }
+
+      // Desktop: Float directly above the highlighted selection
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return;
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      if (!rect || (rect.width === 0 && rect.height === 0)) return;
+
+      toolbar.style.position = 'absolute';
+      toolbar.style.bottom = 'auto';
+      toolbar.style.transform = 'none';
+
+      const toolbarWidth = toolbar.offsetWidth || (isTopicStudyPage ? 205 : 110);
+      let left = rect.left + (rect.width / 2) - (toolbarWidth / 2) + window.scrollX;
+      if (left < 10) left = 10;
+      if (left + toolbarWidth > window.innerWidth - 10) left = window.innerWidth - toolbarWidth - 10;
+      let top = rect.top + window.scrollY - 44;
+      if (top < window.scrollY + 10) {
+        top = rect.bottom + window.scrollY + 10;
+      }
+
+      toolbar.style.left = `${left}px`;
+      toolbar.style.top = `${top}px`;
+      toolbar.style.display = 'inline-flex';
+    }
+
+    function schedulePositionToolbar(delay = 80) {
+      clearTimeout(selDebounceTimer);
+      selDebounceTimer = setTimeout(positionSelectionToolbar, delay);
+    }
+
+    document.addEventListener('mousedown', function(e) {
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (toolbar && toolbar.contains(e.target)) return;
+      isUserSelecting = true;
+    });
+
+    document.addEventListener('mouseup', function(e) {
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (toolbar && toolbar.contains(e.target)) return;
+      isUserSelecting = false;
+      schedulePositionToolbar(50);
+    });
+
+    document.addEventListener('touchstart', function(e) {
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (toolbar && toolbar.contains(e.target)) return;
+      isUserSelecting = true;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (toolbar && toolbar.contains(e.target)) return;
+      isUserSelecting = false;
+      schedulePositionToolbar(160);
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', function() {
+      isUserSelecting = false;
+    }, { passive: true });
+
+    document.addEventListener('keyup', function(e) {
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Shift'].includes(e.key)) {
+        isUserSelecting = false;
+        schedulePositionToolbar(60);
+      }
+    });
+
+    document.addEventListener('selectionchange', function() {
+      if (isUserSelecting) return;
+      schedulePositionToolbar(180);
+    });
+
+    window.handleToolbarWikiClick = function(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      const phrase = currentSelectionText || getValidSelectionText();
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (toolbar) toolbar.style.display = 'none';
+      if (!phrase) return;
+      openWikiPreviewModal(phrase);
+    };
+
+    window.handleToolbarTutorClick = function(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      const phrase = currentSelectionText || getValidSelectionText();
+      const toolbar = document.getElementById('text-selection-toolbar');
+      if (toolbar) toolbar.style.display = 'none';
+      if (!phrase) return;
+      if (typeof window.askTutorWithExcerpt === 'function') {
+        window.askTutorWithExcerpt(phrase);
+      }
+    };
+
+    window.closeWikiPreviewModal = function() {
+      const modal = document.getElementById('prep-wiki-preview-modal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.openWikiPreviewModal = function(phrase) {
+      const modal = document.getElementById('prep-wiki-preview-modal');
+      const titleEl = document.getElementById('wiki-preview-title');
+      const bodyEl = document.getElementById('wiki-preview-body');
+      const extLink = document.getElementById('wiki-preview-external-link');
+      if (!modal || !bodyEl) return;
+
+      const cleanPhrase = phrase.replace(/^[^\w]+|[^\w]+$/g, '').trim();
+      if (titleEl) titleEl.textContent = cleanPhrase || phrase;
+      if (extLink) extLink.href = `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(cleanPhrase || phrase)}`;
+      bodyEl.innerHTML = `
+        <div style="text-align:center;padding:28px 0;color:var(--text-muted);">
+          <span style="display:inline-block;animation:pulse 1s infinite;">Looking up "${cleanPhrase || phrase}" on Wikipedia…</span>
+        </div>
+      `;
+      modal.style.display = 'flex';
+
+      const searchParam = encodeURIComponent(cleanPhrase || phrase);
+      fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${searchParam.replace(/%20/g, '_')}`)
+        .then(r => {
+          if (r.ok) return r.json();
+          throw new Error('Fallback needed');
+        })
+        .then(data => renderWikiSummaryData(data, cleanPhrase || phrase))
+        .catch(() => {
+          fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${searchParam}&limit=1&namespace=0&format=json&origin=*`)
+            .then(r => r.json())
+            .then(osData => {
+              if (Array.isArray(osData) && osData[1] && osData[1][0]) {
+                const canonicalTitle = osData[1][0];
+                return fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(canonicalTitle.replace(/\s+/g, '_'))}`)
+                  .then(r => r.json())
+                  .then(data => renderWikiSummaryData(data, canonicalTitle));
+              } else {
+                throw new Error('No match');
+              }
+            })
+            .catch(() => {
+              bodyEl.innerHTML = `
+                <div style="padding:16px;background:var(--hover);border-radius:10px;border:1px dashed var(--border);text-align:center;">
+                  <p style="margin:0 0 12px;color:var(--text-muted);font-size:0.88rem;">
+                    No direct Wikipedia article summary matched "<strong>${cleanPhrase || phrase}</strong>".
+                  </p>
+                  <a href="https://en.wikipedia.org/wiki/Special:Search?search=${searchParam}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:6px;">
+                    <span>Search Wikipedia Directly ↗</span>
+                  </a>
+                </div>
+              `;
+            });
+        });
+    };
+
+    function renderWikiSummaryData(data, title) {
+      const bodyEl = document.getElementById('wiki-preview-body');
+      const titleEl = document.getElementById('wiki-preview-title');
+      const extLink = document.getElementById('wiki-preview-external-link');
+      if (!bodyEl) return;
+
+      if (titleEl && data.title) titleEl.textContent = data.title;
+      if (extLink && data.content_urls && data.content_urls.desktop) {
+        extLink.href = data.content_urls.desktop.page;
+      }
+
+      let imgHtml = '';
+      if (data.thumbnail && data.thumbnail.source) {
+        imgHtml = `
+          <div style="margin-bottom:12px;text-align:center;">
+            <img src="${data.thumbnail.source}" alt="${data.title || title}" style="max-height:180px;max-width:100%;border-radius:8px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          </div>
+        `;
+      }
+
+      const description = data.description ? `<p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 10px;font-style:italic;">${data.description}</p>` : '';
+      const extract = data.extract_html || (data.extract ? `<p style="margin:0 0 12px;">${data.extract}</p>` : '<p style="color:var(--text-muted);">No brief overview available for this entry.</p>');
+
+      bodyEl.innerHTML = `
+        ${imgHtml}
+        ${description}
+        <div style="color:var(--text);line-height:1.65;font-size:0.9rem;">
+          ${extract}
+        </div>
+      `;
     }
   })();
 </script>

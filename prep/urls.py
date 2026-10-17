@@ -46,5 +46,9 @@ urlpatterns = [
     # Mentify Prep AI Assistant
     path("api/assistant/chat/", views.prep_assistant_chat_api, name="api_assistant_chat"),
     path("api/topic/<int:topic_id>/wikipedia/", views.prep_topic_wikipedia_api, name="api_topic_wikipedia"),
+    path("api/topic/<int:topic_id>/papers/", views.prep_topic_papers_api, name="api_topic_papers"),
+    path("api/spaced-cards/due/", views.prep_spaced_cards_due_api, name="api_spaced_cards_due"),
+    path("api/spaced-cards/add/", views.prep_spaced_card_add_api, name="api_spaced_card_add"),
+    path("api/spaced-cards/<int:card_id>/review/", views.prep_spaced_card_review_api, name="api_spaced_card_review"),
 ]
 

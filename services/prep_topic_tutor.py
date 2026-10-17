@@ -50,7 +50,7 @@ MAX_NOTES_CONTEXT_CHARS = 3500
 MAX_APPROVED_PDF_CONTEXT_CHARS = 2500
 MAX_PAST_QUESTIONS_CONTEXT_CHARS = 2500
 MAX_HISTORY_MESSAGES = 8
-CHAT_MAX_OUTPUT_TOKENS = 1000
+CHAT_MAX_OUTPUT_TOKENS = 3500
 MIN_OCR_CREDITS = 5
 
 _TOPIC_STOP_WORDS = {
@@ -624,6 +624,7 @@ def _build_prompt(
         "- Monthly Subscriptions: Basic (KES 399/mo, 250 credits, 20 uploads), Plus (KES 499/mo, 450 credits, 40 uploads), Pro (KES 799/mo, 750 credits, unlimited uploads).\n"
         "- Top-Ups: Open to all users (including Freemium). Custom amounts starting from 10 credits at KES 1.50 per credit via M-Pesa (e.g., 50 credits = KES 75, 100 credits = KES 150), valid for 30 days.\n"
         "- Credit Deductions: Cached notes and past questions are free (0 credits). Generating fresh topic notes or variants costs 1-5 credits. AI Tutor messages start at 1 credit and scale with token length (longer derivations or documents cost 2-5 credits). An initial one-time course-share contribution may apply when unlocking a previously unindexed course unit.\n"
+        "COMPLETENESS: Always write complete, well-formed explanations. Never truncate, omit steps, or stop midway through an equation, proof, or sentence.\n"
         "Return a single valid JSON object with keys `decision` and `answer`."
     )
     return system_prompt, user_prompt
@@ -690,39 +691,26 @@ def _parse_tutor_response(raw_text: str, topic) -> str:
     if re.search(r'"decision"\s*:\s*"unsupported_visual"', lower_content):
         return _safe_answer({"decision": "unsupported_visual"}, topic)
 
-    # 4. Attempt regex extraction of "answer" field from malformed JSON
-    answer_match = re.search(
-        r'"answer"\s*:\s*"(?P<ans>(?:[^"\\]|\\.)*)"',
-        cleaned,
-        re.DOTALL,
-    )
-    if answer_match:
-        raw_ans = answer_match.group("ans")
-        try:
-            ans_decoded = json.loads(f'"{raw_ans}"')
-        except Exception:
-            ans_decoded = (
-                raw_ans.replace('\\"', '"')
-                .replace('\\n', '\n')
-                .replace('\\t', '\t')
-                .replace('\\\\', '\\')
-            )
-        if len(ans_decoded.strip()) >= 8:
-            return _safe_answer({"decision": "answer", "answer": ans_decoded}, topic)
-
-    # 5. Extract answer if format is "answer": "<content until end or closing brace>"
-    ans_loose_match = re.search(
-        r'"answer"\s*:\s*"(?P<ans>.*?)(?:"\s*\}|\s*"[\s,\n]*$|\Z)',
-        cleaned,
-        re.DOTALL,
-    )
-    if ans_loose_match:
-        candidate = ans_loose_match.group("ans").strip()
-        candidate = candidate.replace('\\"', '"').replace('\\n', '\n').replace('\\\\', '\\')
+    # 4. Attempt regex extraction of "answer" field from malformed or unclosed JSON
+    # When models output JSON with unescaped internal quotes (e.g. "We define "social facts" as...")
+    # or LaTeX formulas, standard non-greedy quote matching cuts off at the very first quote inside the answer.
+    # Locate where `"answer"\s*:\s*"?` begins and extract through to the trailing JSON close.
+    ans_start = re.search(r'"answer"\s*:\s*"?', cleaned)
+    if ans_start:
+        candidate = cleaned[ans_start.end():]
+        # Strip trailing JSON closing syntax e.g. "}\n``` or "}
+        candidate = re.sub(r'"?\s*\}?\s*$', '', candidate)
+        candidate = (
+            candidate.replace('\\"', '"')
+            .replace('\\n', '\n')
+            .replace('\\t', '\t')
+            .replace('\\\\', '\\')
+            .strip()
+        )
         if len(candidate) >= 8:
             return _safe_answer({"decision": "answer", "answer": candidate}, topic)
 
-    # 6. If model returned plain text or pseudo-JSON, strip any framing
+    # 5. If model returned plain text or pseudo-JSON, strip any framing
     stripped = cleaned
     if stripped.startswith("{"):
         stripped = re.sub(r'^\s*\{\s*"decision"\s*:\s*"[^"]+"\s*,\s*"answer"\s*:\s*"?', '', stripped)
@@ -985,7 +973,7 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
             is_complex_proof=False,
             system_prompt=system_prompt,
             max_tokens_override=CHAT_MAX_OUTPUT_TOKENS,
-            auto_continue=False,
+            auto_continue=True,
             thinking_enabled=False,
         )
         chat_usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
