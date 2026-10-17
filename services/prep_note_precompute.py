@@ -180,6 +180,11 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
             "model_name",
         ]
     )
+    from django.core.cache import cache
+    cache.delete(f"prep_pub_levels_{topic.pk}_True")
+    cache.delete(f"prep_pub_levels_{topic.pk}_False")
+    if topic.course:
+        cache.delete(f"prep_course_topics_summary_v4_{topic.course.pk}")
     try:
         enqueue_topic_pdf_artifact(topic, "notes", job.level)
     except Exception:

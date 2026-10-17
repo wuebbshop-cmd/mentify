@@ -530,7 +530,17 @@ def _approved_course_source_references(course_obj, topic_title: str, *, limit: i
     for document, _is_topic_document in _approved_course_source_documents(course_obj, topic_title):
         text = str(document.extracted_text or "")
         matches = list(page_header.finditer(text))
-        section_pages, ambiguous_section_pages = map_pdf_topic_sections(text, topics)
+        doc_pk = getattr(document, "pk", None)
+        topic_count = len(topics)
+        from django.core.cache import cache
+        sec_cache_key = f"prep_pdf_sections_{doc_pk}_{topic_count}" if doc_pk else None
+        cached_sec = cache.get(sec_cache_key) if sec_cache_key else None
+        if cached_sec is not None:
+            section_pages, ambiguous_section_pages = cached_sec
+        else:
+            section_pages, ambiguous_section_pages = map_pdf_topic_sections(text, topics)
+            if sec_cache_key:
+                cache.set(sec_cache_key, (section_pages, ambiguous_section_pages), 3600)
         document_topic = " ".join(str(document.topic_name or "").casefold().split())
         page_texts = {}
         if matches:
@@ -2028,6 +2038,10 @@ def store_cached_content(
                 "topic": topic,
             },
         )
+        if topic and getattr(topic, "pk", None) and content_type == "topic_notes":
+            from django.core.cache import cache
+            cache.delete(f"prep_pub_levels_{topic.pk}_True")
+            cache.delete(f"prep_pub_levels_{topic.pk}_False")
         logger.info(f"[PrepCache STORED] {cache_key}")
     except Exception as e:
         logger.error(f"[PrepCache] Error storing cache {cache_key}: {e}")
@@ -2333,7 +2347,10 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             levels[lvl] = fallback_content
 
     from django.core.cache import cache
-    cache.set(levels_cache_key, levels, 900)
+    if levels:
+        cache.set(levels_cache_key, levels, 900)
+    else:
+        cache.delete(levels_cache_key)
     return levels
 
 
