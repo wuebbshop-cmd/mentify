@@ -105,7 +105,7 @@ def is_trial_exempt_for_course_cost(wallet, cost_type: str, level: str = "") -> 
     return (
         cost_type in {"upload", "topic_notes"}
         and (cost_type != "topic_notes" or level == "level_2")
-        and wallet.current_plan == "trial"
+        and wallet.current_plan in {"trial", "freemium"}
         and wallet.plan_expires_at is not None
         and wallet.plan_expires_at > timezone.now()
     )

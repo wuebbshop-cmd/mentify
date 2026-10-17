@@ -2852,6 +2852,64 @@ def _run_queued_document_ingestion(document_id) -> dict:
         close_old_connections()
 
 
+def dispatch_to_remote_worker(document_id: str) -> bool:
+    """
+    Dispatch a document ingestion job to the dedicated Render worker web service (Option B).
+    Returns True if successfully acknowledged by remote worker; False if local fallback is required.
+    """
+    worker_url = getattr(settings, "WORKER_SERVICE_URL", "").strip().rstrip("/")
+    if not worker_url:
+        return False
+
+    secret = getattr(settings, "INTERNAL_WORKER_SECRET", "").strip()
+    target = f"{worker_url}/api/internal/ingest-document/"
+    timeout = getattr(settings, "WORKER_REQUEST_TIMEOUT", 4.0)
+
+    try:
+        response = requests.post(
+            target,
+            json={"document_id": str(document_id)},
+            headers={
+                "X-Internal-Worker-Secret": secret,
+                "Content-Type": "application/json",
+                "User-Agent": "Mentify-Main-App/1.0",
+            },
+            timeout=timeout,
+        )
+        if response.status_code == 200:
+            logger.info("[Worker Dispatch] Successfully delegated document %s to remote worker %s", document_id, worker_url)
+            return True
+        logger.warning(
+            "[Worker Dispatch] Remote worker responded with status %s: %s. Falling back to local execution.",
+            response.status_code,
+            response.text[:200],
+        )
+        return False
+    except Exception as exc:
+        logger.warning(
+            "[Worker Dispatch] Could not connect to remote worker at %s (%s). Falling back to local execution.",
+            target,
+            exc,
+        )
+        return False
+
+
+def _dispatch_or_run_locally(document_id: str) -> dict:
+    """Attempt remote worker dispatch; if skipped or failed, run ingestion locally."""
+    dispatched = dispatch_to_remote_worker(document_id)
+    if dispatched:
+        return {"success": True, "delegated": True, "document_id": document_id}
+    logger.info("[Prep Ingestion] Fallback executing document %s locally in thread pool.", document_id)
+    return _run_queued_document_ingestion(document_id)
+
+
 def enqueue_prep_document_ingestion(document_id):
-    """Submit a saved Stage 1 PrepDocument for non-blocking background ingestion."""
+    """
+    Submit a saved Stage 1 PrepDocument for non-blocking background ingestion.
+    If WORKER_SERVICE_URL is set (Option B), asynchronously delegates to the remote worker.
+    Falls back gracefully to local ThreadPoolExecutor if remote worker is unavailable or not configured.
+    """
+    worker_url = getattr(settings, "WORKER_SERVICE_URL", "").strip().rstrip("/")
+    if worker_url:
+        return _DOCUMENT_INGESTION_EXECUTOR.submit(_dispatch_or_run_locally, str(document_id))
     return _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(document_id))

@@ -290,3 +290,13 @@ TOGETHER_MAX_PAGES_PER_RUN = int(os.environ.get("TOGETHER_MAX_PAGES_PER_RUN", 15
 
 # Automatically start worker threads in development when running runserver
 ENABLE_LOCAL_PREP_WORKERS = os.environ.get("ENABLE_LOCAL_PREP_WORKERS", "true").lower() in ("1", "true")
+
+# ─── Dedicated Background Worker Web Service (Option B) ───────────────────────
+# When WORKER_SERVICE_URL is set (e.g. to https://eduai-worker.onrender.com),
+# heavy document extraction jobs are delegated via internal webhook to the worker web service,
+# freeing the main user-facing web dyno from CPU/RAM loads.
+# In local development, leaving WORKER_SERVICE_URL empty falls back to local threads.
+WORKER_SERVICE_URL = os.environ.get("WORKER_SERVICE_URL", "").rstrip("/")
+INTERNAL_WORKER_SECRET = os.environ.get("INTERNAL_WORKER_SECRET", "mentify-internal-worker-secret-key-change-in-prod")
+WORKER_REQUEST_TIMEOUT = float(os.environ.get("WORKER_REQUEST_TIMEOUT", "4.0"))
+IS_WORKER_INSTANCE = os.environ.get("IS_WORKER_INSTANCE", "false").lower() in ("1", "true")

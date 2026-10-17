@@ -210,7 +210,7 @@
     border: none !important;
     background: transparent !important;
     color: var(--text);
-    font-size: 0.88rem;
+    font-size: 16px;
     font-weight: 600;
     padding: 0 !important;
     margin: 0;
@@ -763,7 +763,7 @@
           Drop your PDFs here or <span class="browse-link">browse files</span>
         </div>
         <p class="upload-dropzone-sub">PDF, Word, Markdown, or text &middot; Up to 10 files &middot; 15 MB per file</p>
-        <input type="file" name="files" id="prep-files" class="upload-file-input-hidden" accept=".pdf,.docx,.doc,.md,.txt" multiple required onchange="handleFileInputChange(this)">
+        <input type="file" name="files" id="prep-files" class="upload-file-input-hidden" accept=".pdf,.docx,.doc,.md,.txt" multiple onchange="handleFileInputChange(this)">
       </div>
 
       <!-- Selected Files Staged List -->
@@ -786,7 +786,10 @@
         </div>
         <div id="upload-progress-detail" style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
           <span id="upload-progress-subtext">Transferring files to Mentify Prep...</span>
-          <a id="upload-course-link" href="#" style="display: none; font-weight: 600; color: var(--green); text-decoration: none;">Open Course &rarr;</a>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <a id="upload-course-link" href="#" style="display: none; font-weight: 600; color: var(--green); text-decoration: none;">Open Course &rarr;</a>
+            <button type="button" id="upload-dismiss-btn" onclick="dismissProgressPanel()" style="display: none; background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 0.76rem; color: var(--text-muted); cursor: pointer;">Upload More</button>
+          </div>
         </div>
       </div>
 
@@ -1044,7 +1047,7 @@
     const combined = stagedFiles.slice();
     for (const file of incoming) {
       if (file.size > 15 * 1024 * 1024) {
-        alert(`${file.name} exceeds the 15 MB per-file limit.`);
+        showUploadNotice(`${file.name} exceeds the 15 MB per-file limit.`);
         continue;
       }
       const duplicateInStage = combined.some(existing => existing.name === file.name && existing.size === file.size);
@@ -1054,7 +1057,7 @@
     }
 
     if (combined.length > 10) {
-      alert("Select no more than 10 documents in one group.");
+      showUploadNotice("You can upload up to 10 documents in one batch. Extra files were omitted.");
       stagedFiles = combined.slice(0, 10);
     } else {
       stagedFiles = combined;
@@ -1065,24 +1068,10 @@
   }
 
   function handleFileInputChange(input) {
-    const files = Array.from(input.files || []);
-    if (files.length > 10) {
-      alert("Select no more than 10 documents in one group.");
-      input.value = "";
-      stagedFiles = [];
-      renderSelectedFiles();
-      return;
+    if (input && input.files && input.files.length) {
+      addFilesToSelection(input.files);
     }
-    const oversized = files.find(file => file.size > 15 * 1024 * 1024);
-    if (oversized) {
-      alert(`${oversized.name} exceeds the 15 MB per-file limit.`);
-      input.value = "";
-      stagedFiles = [];
-      renderSelectedFiles();
-      return;
-    }
-    stagedFiles = files;
-    renderSelectedFiles();
+    if (input) input.value = "";
   }
 
   function removeStagedFile(index) {
@@ -1097,6 +1086,7 @@
   function clearSelectedFiles() {
     stagedFiles = [];
     if (fileInput) fileInput.value = '';
+    syncStagedFilesToInput();
     renderSelectedFiles();
   }
 
@@ -1127,17 +1117,78 @@
     });
   }
 
+  function showUploadNotice(message, isError = true) {
+    let banner = document.getElementById('upload-validation-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'upload-validation-banner';
+      banner.style.cssText = 'position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:10000;padding:11px 20px;border-radius:10px;font-size:0.88rem;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.22);display:flex;align-items:center;gap:10px;max-width:92%;box-sizing:border-box;pointer-events:auto;transition:opacity 0.25s ease;';
+      document.body.appendChild(banner);
+    }
+    banner.style.background = isError ? '#dc2626' : 'var(--green)';
+    banner.style.color = '#ffffff';
+    banner.style.display = 'flex';
+    banner.innerHTML = `
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      <span>${escapeHtml(message)}</span>
+    `;
+    clearTimeout(banner._dismissTimer);
+    banner._dismissTimer = setTimeout(() => {
+      if (banner) banner.style.display = 'none';
+    }, 4000);
+  }
+
   function validateForm() {
     if ((!fileInput.files || !fileInput.files.length) && stagedFiles.length === 0) {
-      alert("Please select at least one document.");
+      showUploadNotice("Please select or drop at least one document file first.");
       return false;
     }
     if (!courseSelect.value && !courseNameInput.value.trim()) {
-      alert("Choose an existing course or enter a new course code and title.");
+      showUploadNotice("Choose an existing course or enter a new course code and title.");
       return false;
     }
     return true;
   }
+
+  // Prevent accidental Enter key submissions across all single-line input controls
+  if (uploadForm) {
+    uploadForm.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        const tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'SELECT') {
+          e.preventDefault();
+          e.stopPropagation();
+          e.target.blur();
+          return false;
+        }
+      }
+    });
+  }
+
+  const resFormEl = document.getElementById('upload-resource-form');
+  if (resFormEl) {
+    resFormEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        const tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'SELECT') {
+          e.preventDefault();
+          e.stopPropagation();
+          e.target.blur();
+          return false;
+        }
+      }
+    });
+  }
+
+  window.dismissProgressPanel = function() {
+    if (progressPanel) progressPanel.style.display = 'none';
+    if (submitBtn) submitBtn.disabled = false;
+    if (submitLabel) submitLabel.textContent = 'Process materials';
+    const dismissBtn = document.getElementById('upload-dismiss-btn');
+    if (dismissBtn) dismissBtn.style.display = 'none';
+    clearSelectedFiles();
+    updateStepperState(false);
+  };
 
   function pollCurrentBatchStatus() {
     if (!activeUploadDocIds.length) {
@@ -1162,6 +1213,8 @@
           if (progressPanel && progressPanel.style.display !== 'none') {
             progressTitle.textContent = 'Processing complete';
             progressSubtext.textContent = 'Your study materials have been extracted and queued for course indexing.';
+            const dismissBtn = document.getElementById('upload-dismiss-btn');
+            if (dismissBtn) dismissBtn.style.display = 'inline-block';
           }
         }
       })
@@ -1258,12 +1311,16 @@
               .map(d => d.id);
             pollCurrentBatchStatus();
           }
+          const dismissBtn = document.getElementById('upload-dismiss-btn');
+          if (dismissBtn) dismissBtn.style.display = 'inline-block';
         } else {
           progressBar.style.width = '100%';
           progressBar.style.background = 'var(--danger)';
           progressPct.textContent = 'Error';
           progressTitle.textContent = 'Upload needs attention';
           progressSubtext.textContent = (payload && (payload.error || payload.message)) || 'Unable to process upload.';
+          const dismissBtn = document.getElementById('upload-dismiss-btn');
+          if (dismissBtn) dismissBtn.style.display = 'inline-block';
         }
       };
 
@@ -1273,6 +1330,8 @@
         progressBar.style.background = 'var(--danger)';
         progressTitle.textContent = 'Network error during upload';
         progressSubtext.textContent = 'Please check your connection and try again.';
+        const dismissBtn = document.getElementById('upload-dismiss-btn');
+        if (dismissBtn) dismissBtn.style.display = 'inline-block';
       };
 
       xhr.send(formData);

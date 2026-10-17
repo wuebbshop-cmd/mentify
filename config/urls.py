@@ -12,6 +12,7 @@ from accounts.sitemap_views import sitemap, robots_txt, llms_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
 from services.chat_views import chatbot_api_view
 from accounts.views import contact_page, privacy_policy, terms_of_service, cookie_policy
+from prep.internal_views import internal_ingest_document_api, internal_worker_health_api
 import os
 
 def health_check(request):
@@ -93,6 +94,18 @@ def favicon(request):
 urlpatterns = [
     # Health check for uptime monitoring & diagnostics
     path("health/", health_check, name="health_check"),
+
+    # Dedicated Background Worker Web Service Endpoints (Option B)
+    path(
+        "api/internal/ingest-document/",
+        internal_ingest_document_api,
+        name="internal_ingest_document",
+    ),
+    path(
+        "api/internal/health/",
+        internal_worker_health_api,
+        name="internal_worker_health",
+    ),
 
     # Mentify AI Customer Service Chatbot API
     path("api/chat/", chatbot_api_view, name="chatbot_api"),

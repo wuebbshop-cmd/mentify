@@ -2348,9 +2348,9 @@
               <span>Read Paper ↗</span>
             </a>
             {% endif %}
-            <a href="https://scholar.google.com/scholar?q={{ paper.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; color: var(--text-muted); border-color: var(--border); display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;" title="Find open-access PDF copies, preprints, and mirrors on Google Scholar">
+            <a href="https://www.semanticscholar.org/search?q={{ paper.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; color: var(--text-muted); border-color: var(--border); display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;" title="Find open-access PDF copies, preprints, and citations on Semantic Scholar">
               <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <span>Free PDF / Scholar ↗</span>
+              <span>Free PDF / Semantic Scholar ↗</span>
             </a>
           </div>
         </div>
@@ -3022,8 +3022,8 @@
                 <span>Read Open-Access PDF</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
               </a>` : `
-              <a href="https://scholar.google.com/scholar?q=${encodeURIComponent(p.title)}" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;">
-                Search Citations ↗
+              <a href="https://www.semanticscholar.org/search?q=${encodeURIComponent(p.title)}" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;" title="Find open-access PDF copies and citations on Semantic Scholar">
+                Search Semantic Scholar ↗
               </a>`;
 
             html += `
@@ -4056,9 +4056,9 @@
                         <span>Read Paper ↗</span>
                       </a>
                     ` : ''}
-                    <a href="https://scholar.google.com/scholar?q=${encodeURIComponent(p.title)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; color: var(--text-muted); border-color: var(--border); display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;" title="Find open-access PDF copies, preprints, and mirrors on Google Scholar">
+                    <a href="https://www.semanticscholar.org/search?q=${encodeURIComponent(p.title)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; color: var(--text-muted); border-color: var(--border); display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;" title="Find open-access PDF copies, preprints, and citations on Semantic Scholar">
                       <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                      <span>Free PDF / Scholar ↗</span>
+                      <span>Free PDF / Semantic Scholar ↗</span>
                     </a>
                   </div>
                 </div>

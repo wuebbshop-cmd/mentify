@@ -1432,16 +1432,15 @@ def prep_topic_tutor_api(request, topic_id):
             status=400,
         )
 
-    from services.prep_course_billing import ensure_note_access
-    allowed, available_credits = ensure_note_access(request.user, topic, "level_2")
-    if not allowed:
+    from services.credit_service import get_available_credits
+
+    wallet = PrepWallet.get_or_create_wallet(request.user)
+    available_credits = get_available_credits(wallet)
+    if available_credits < 1:
         return JsonResponse(
             {
                 "success": False,
-                "error": (
-                    "Your course materials are not covered by the current credit balance. "
-                    "Top up to unlock this topic's notes and tutor."
-                ),
+                "error": "You need at least 1 credit to ask the AI Tutor. Please top up your wallet to continue.",
                 "credits_balance": available_credits,
             },
             status=402,
