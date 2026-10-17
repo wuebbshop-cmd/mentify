@@ -46,6 +46,10 @@ class PrepCourse(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.code)
+        if isinstance(self.study_profile, dict) and self.study_profile.get("version"):
+            prof_v = int(self.study_profile["version"])
+            if not self.study_profile_version or self.study_profile_version < prof_v:
+                self.study_profile_version = prof_v
         super().save(*args, **kwargs)
         from django.core.cache import cache
         cache.delete("prep_pub_lib_courses")

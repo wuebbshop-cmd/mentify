@@ -175,7 +175,13 @@ def _course_study_profile(course_obj) -> dict:
 
 
 def _course_study_profile_version(course_obj) -> int:
-    return int(getattr(course_obj, "study_profile_version", 0) or 0)
+    db_version = getattr(course_obj, "study_profile_version", 0)
+    if db_version:
+        return int(db_version)
+    profile = getattr(course_obj, "study_profile", None) or {}
+    if isinstance(profile, dict) and profile.get("version"):
+        return int(profile["version"])
+    return 0
 
 
 def _topic_content_rules_version(topic_obj) -> int:
@@ -2236,6 +2242,7 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
     from prep.models import PrepContentCache
 
     levels: dict[str, str] = {}
+    fallback_levels: dict[str, str] = {}
     source_signature = _topic_notes_cache_signature(
         topic_obj.course,
         topic_obj,
@@ -2253,12 +2260,17 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         if payload.get("review_status") == "skipped_no_source":
             continue
         level = payload.get("level") or "level_2"
-        if level not in {"level_1", "level_2", "level_3"} or level in levels:
+        if level not in {"level_1", "level_2", "level_3"}:
+            continue
+        if level in levels and level in fallback_levels:
             continue
         payload_signature = str(payload.get("source_signature") or "")
         payload_validation_state = str(payload.get("validation_state") or "")
+        is_exact_signature = (payload_signature == source_signature)
         if payload_validation_state:
-            if payload_validation_state != NOTE_VALIDATION_STATE or payload_signature != source_signature:
+            if payload_validation_state != NOTE_VALIDATION_STATE:
+                continue
+            if not is_exact_signature and (level in levels or level in fallback_levels):
                 continue
         elif validated_only:
             continue
@@ -2293,24 +2305,33 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             # A new policy can invalidate an older published row without
             # changing the underlying syllabus source.
             continue
-        if content != payload.get("content"):
-            payload = dict(payload)
-            payload["content"] = content
-            payload["validation_state"] = NOTE_VALIDATION_STATE
-            payload["validated_at"] = timezone.now().isoformat()
-            payload["study_profile_version"] = _course_study_profile_version(topic_obj.course)
-            payload["topic_content_rules_version"] = _topic_content_rules_version(topic_obj)
-            payload["source_references"] = _approved_course_source_references(topic_obj.course, topic_obj.title)
-            payload["source_signature"] = source_signature
-            entry.payload = payload
-            entry.save(update_fields=["payload", "updated_at"])
-        elif not payload.get("level"):
-            payload = dict(payload)
-            payload["level"] = level
-            entry.payload = payload
-            entry.save(update_fields=["payload", "updated_at"])
-        if content:
-            levels[level] = content
+        if is_exact_signature:
+            if content != payload.get("content"):
+                payload = dict(payload)
+                payload["content"] = content
+                payload["validation_state"] = NOTE_VALIDATION_STATE
+                payload["validated_at"] = timezone.now().isoformat()
+                payload["study_profile_version"] = _course_study_profile_version(topic_obj.course)
+                payload["topic_content_rules_version"] = _topic_content_rules_version(topic_obj)
+                payload["source_references"] = _approved_course_source_references(topic_obj.course, topic_obj.title)
+                payload["source_signature"] = source_signature
+                entry.payload = payload
+                entry.save(update_fields=["payload", "updated_at"])
+            elif not payload.get("level"):
+                payload = dict(payload)
+                payload["level"] = level
+                entry.payload = payload
+                entry.save(update_fields=["payload", "updated_at"])
+            if content and level not in levels:
+                levels[level] = content
+        else:
+            if content and level not in fallback_levels and level not in levels:
+                fallback_levels[level] = content
+
+    for lvl, fallback_content in fallback_levels.items():
+        if lvl not in levels:
+            levels[lvl] = fallback_content
+
     from django.core.cache import cache
     cache.set(levels_cache_key, levels, 900)
     return levels
@@ -2331,6 +2352,10 @@ def _note_generation_guard(topic_obj, level: str, source_signature: str):
 def _blocked_note_generation(topic_obj, level: str, source_signature: str) -> dict | None:
     guard = _note_generation_guard(topic_obj, level, source_signature)
     if not guard or guard.status != "needs_review":
+        return None
+    # Never block access if valid published or fallback notes exist for this level
+    pub_notes = get_published_topic_note_levels(topic_obj, validated_only=False) if topic_obj else {}
+    if level in pub_notes:
         return None
     from prep.models import PrepNoteRepair
 

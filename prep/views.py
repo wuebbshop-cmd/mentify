@@ -2988,6 +2988,38 @@ def prep_topic_notes_api(request):
                 status=202,
             )
         if job.status == "failed":
+            from services.prep_ai_router import get_published_topic_note_levels
+            published_notes = get_published_topic_note_levels(topic_obj, validated_only=False) if topic_obj else {}
+            if level in published_notes:
+                wallet.refresh_from_db()
+                return JsonResponse({
+                    "success": True,
+                    "notes": published_notes[level],
+                    "level": level,
+                    "cached": True,
+                    "credits_deducted": credits_deducted,
+                    "credits_balance": get_available_credits(wallet),
+                    "model": "Published Shared Notes",
+                })
+            # If the failure was due to missing sources but approved sources now exist, auto-reset the job
+            if "approved course material" in (job.last_error or "").lower() or "independent review" in (job.last_error or "").lower():
+                from services.prep_ai_router import _approved_course_source_context
+                if topic_obj and _approved_course_source_context(topic_obj.course, topic_obj.title):
+                    logger.info("Auto-resetting failed topic notes job %s for topic %s now that approved sources are available", job.pk, topic_obj.pk)
+                    job.status = "pending"
+                    job.attempts = 0
+                    job.last_error = ""
+                    job.save(update_fields=["status", "attempts", "last_error", "started_at"])
+                    return JsonResponse(
+                        {
+                            "success": True,
+                            "pending": True,
+                            "job_id": job.pk,
+                            "status": "pending",
+                            "level": level,
+                        },
+                        status=202,
+                    )
             logger.error(
                 "Topic notes job failed topic=%s level=%s job=%s: %s",
                 topic_obj.pk,

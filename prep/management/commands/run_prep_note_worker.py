@@ -28,6 +28,7 @@ class Command(BaseCommand):
                     self._expire_due_credits()
                     last_expiry_sweep = time.time()
                 self._recover_stale_jobs()
+                self._recover_stale_documents()
                 notes_job = self._claim_topic_notes_job()
                 job = None if notes_job else self._claim_job()
             except OperationalError:
@@ -72,6 +73,20 @@ class Command(BaseCommand):
             status="running",
             started_at__lt=cutoff,
         ).update(status="pending", started_at=None)
+
+    def _recover_stale_documents(self):
+        from prep.models import PrepDocument
+        from services.prep_ingestion import enqueue_prep_document_ingestion
+
+        cutoff = timezone.now() - timedelta(minutes=5)
+        stale_docs = PrepDocument.objects.filter(
+            stage="stage_1",
+            created_at__lt=cutoff,
+            extracted_text="",
+        ).exclude(tutor_review_notes__startswith="Ingestion failed")
+        for doc in stale_docs[:5]:
+            self.stdout.write(f"Recovering stale Stage 1 document {doc.id} ({doc.file.name})")
+            enqueue_prep_document_ingestion(doc.pk)
 
     def _claim_topic_notes_job(self):
         completed_level_two = PrepTopicNotesJob.objects.filter(

@@ -2572,6 +2572,29 @@ def process_prep_document(prep_document) -> dict:
             }
         return {"success": False, "error": f"Document file could not be read: {exc}"}
 
+    # Course Code Mismatch Safeguard: Ensure document belongs to the right course
+    from prep.models import PrepCourse
+    file_name_attr = prep_document.file.name if prep_document.file else ""
+    clean_base = os.path.basename(file_name_attr)
+    file_code_match = re.search(r'\b([A-Za-z]{2,4})[_\s-]*(\d{3,4})\b', clean_base)
+    if file_code_match:
+        detected_prefix = file_code_match.group(1).upper()
+        detected_num = file_code_match.group(2)
+        detected_course = (
+            PrepCourse.objects.filter(code__iexact=f"{detected_prefix} {detected_num}", is_active=True).first()
+            or PrepCourse.objects.filter(code__iexact=f"{detected_prefix}{detected_num}", is_active=True).first()
+        )
+        if detected_course and detected_course.id != prep_document.course_id:
+            logger.warning(
+                "[Prep Ingestion] Re-routing document %s from %s to matching course %s based on filename %s",
+                prep_document.id,
+                prep_document.course.code,
+                detected_course.code,
+                clean_base,
+            )
+            prep_document.course = detected_course
+            prep_document.save(update_fields=["course", "updated_at"])
+
     # Stop exact duplicates before storage, OCR, AI extraction, or credit use.
     prep_document.file_sha256 = hashlib.sha256(file_content).hexdigest()
     duplicate = (
