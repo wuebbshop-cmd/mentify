@@ -275,14 +275,6 @@
     overflow: hidden;
   }
 
-  .explore-paper-citations {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.78rem;
-    color: var(--text-light, #64748b);
-    margin-bottom: 16px;
-  }
 
   .explore-paper-actions {
     display: flex;
@@ -2334,10 +2326,6 @@
           {% endif %}
         </div>
         <div>
-          <div class="explore-paper-citations">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span>{{ paper.citation_count|default:0 }} citations</span>
-          </div>
           <div class="explore-paper-actions">
             {% if paper.open_access_pdf_url or paper.doi_url %}
             <a href="{{ paper.open_access_pdf_url|default:paper.doi_url }}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
@@ -4149,10 +4137,6 @@
                     ${p.abstract ? `<p class="explore-paper-abstract">${p.abstract}</p>` : ''}
                   </div>
                   <div>
-                    <div class="explore-paper-citations">
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                      <span>${p.citation_count || 0} citations</span>
-                    </div>
                     <div class="explore-paper-actions">
                       ${(p.open_access_pdf_url || p.doi_url) ? `
                         <a href="${p.open_access_pdf_url || p.doi_url}" target="_blank" rel="noopener noreferrer" class="explore-card-btn">
