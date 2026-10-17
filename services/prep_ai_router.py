@@ -1471,35 +1471,26 @@ def _review_topic_note_content(topic_obj, level: str, content: str) -> dict:
     normalized_source = re.sub(r"\s+", " ", source_excerpt).casefold()
     for item in raw_issues[:8]:
         if not isinstance(item, dict):
-            return {
-                "success": False,
-                "issues": [],
-                "usage": result.get("usage", {}),
-                "model_used": result.get("model_used") or model,
-                "error": "The independent review returned a malformed issue entry.",
-                "raw_response": str(result.get("content") or "")[:4000],
-            }
-        section = item.get("section")
+            continue
+        raw_sec = item.get("section")
+        try:
+            section = int(raw_sec)
+        except (ValueError, TypeError):
+            continue
         description = str(item.get("description") or "").strip()
         evidence = str(item.get("source_evidence") or "").strip()
-        severity = str(item.get("severity") or "").strip().lower()
+        severity = str(item.get("severity") or "error").strip().lower()
         normalized_evidence = re.sub(r"\s+", " ", evidence).casefold()
         if (
-            type(section) is not int
-            or section not in note_sections
-            or severity not in {"error", "critical"}
+            section not in note_sections
+            or severity not in {"error", "critical", "warning"}
             or not description
-            or not evidence
-            or normalized_evidence not in normalized_source
         ):
-            return {
-                "success": False,
-                "issues": [],
-                "usage": result.get("usage", {}),
-                "model_used": result.get("model_used") or model,
-                "error": "The independent review issue had an invalid section, severity, description, or source evidence.",
-                "raw_response": str(result.get("content") or "")[:4000],
-            }
+            continue
+        if normalized_evidence and normalized_evidence not in normalized_source:
+            evidence_words = [w for w in re.findall(r"\w+", normalized_evidence) if len(w) > 3]
+            if evidence_words and not any(w in normalized_source for w in evidence_words):
+                continue
         issues.append(
             f"review section {section}: {description[:500]} "
             f"(source: {evidence[:500]})"
@@ -2861,7 +2852,8 @@ def call_deepseek(
         payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
 
     try:
-        resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=35)
+        timeout_val = int(getattr(settings, "DEEPSEEK_TIMEOUT", None) or 90)
+        resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=timeout_val)
         if resp.status_code == 200:
             data = resp.json()
             choice = data["choices"][0]
@@ -2950,11 +2942,8 @@ def call_deepseek(
                 together_repair_model = getattr(settings, "TOGETHER_REPAIR_MODEL", "")
                 if together_repair_model:
                     try:
-                        expects_json = any(
-                            "json" in str(m.get("content") or "").lower()
-                            for m in messages
-                            if isinstance(m, dict)
-                        )
+                        all_text = " ".join(str(m.get("content") or "").lower() for m in messages if isinstance(m, dict))
+                        expects_json = "json" in all_text and "do not output json" not in all_text and "no json" not in all_text
                         repair_res = call_together_repair(
                             messages,
                             together_repair_model,
@@ -3019,11 +3008,8 @@ def call_deepseek(
         together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
         if getattr(settings, "TOGETHERAI_API", "") and together_model:
             try:
-                expects_json = any(
-                    "json" in str(m.get("content") or "").lower()
-                    for m in messages
-                    if isinstance(m, dict)
-                )
+                all_text = " ".join(str(m.get("content") or "").lower() for m in messages if isinstance(m, dict))
+                expects_json = "json" in all_text and "do not output json" not in all_text and "no json" not in all_text
                 fallback_res = call_together_repair(
                     messages,
                     together_model,

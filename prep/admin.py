@@ -435,156 +435,60 @@ class PrepDocumentAdmin(admin.ModelAdmin):
     def approve_stage_3_publish(self, request, queryset):
         """
         Publishing Engine:
-        1. Promotes selected documents to Stage 3 (Published).
-        2. Automatically creates or publishes derived PrepPaper if the document is a CAT/Exam paper.
-        3. Stamps reviewed_by and reviewed_at.
-        4. Logs publication into student's PrepHistory for real-time dashboard notification.
+        Promotes selected documents to Stage 3 (Published) through canonical publish_prep_document service,
+        ensuring topics exist, derived assessment papers are generated & indexed, visuals mapped, and notes queued.
         """
+        from services.prep_ingestion import publish_prep_document
+
+        published_documents_count = 0
         published_papers_count = 0
         applied_updates_count = 0
-        published_documents_count = 0
-        ingestion_failures = 0
-        validation_failures = 0
         queued_assessment_jobs = 0
-        courses_to_precompute = set()
+        queued_note_jobs = 0
+        failures = 0
         now = timezone.now()
 
         for doc in queryset:
-            if doc.is_duplicate:
-                # When an admin approves a document, unmark duplicate so it can be independently published
-                doc.is_duplicate = False
-                doc.duplicate_of = None
-                doc.save(update_fields=["is_duplicate", "duplicate_of"])
-
-            # Admin publication is the final ingestion gate. Older uploads or
-            # failed requests may have no extracted text; never publish those rows until ingestion succeeds.
-            if not (doc.extracted_text and doc.extracted_text.strip()):
-                from services.prep_ingestion import process_prep_document
-
-                try:
-                    ingestion_result = process_prep_document(doc)
-                except Exception as exc:
-                    ingestion_result = {"success": False, "error": str(exc)}
-                doc.refresh_from_db()
-                if not ingestion_result.get("success") or not (doc.extracted_text and doc.extracted_text.strip()):
-                    ingestion_failures += 1
-                    err_msg = ingestion_result.get("error") or "No readable text was extracted (scanned image or empty PDF)."
-                    doc.tutor_review_notes = f"Publication blocked: ingestion produced no text. {err_msg[:500]}"
-                    doc.save(update_fields=["tutor_review_notes", "updated_at"])
-                    continue
-
-            from prep.document_validation import validate_prep_document
-
-            doc.validation_report = validate_prep_document(doc)
-            doc.save(update_fields=["validation_report", "updated_at"])
-            blocking_issues = [
-                issue for issue in doc.validation_report.get("issues", [])
-                if issue.get("severity") == "error"
-            ]
-            if blocking_issues:
-                validation_failures += 1
-                reasons = "; ".join(issue.get("message", "Validation error") for issue in blocking_issues)
-                doc.tutor_review_notes = f"Publication blocked by validation: {reasons}"[:2000]
-                doc.save(update_fields=["tutor_review_notes", "updated_at"])
-                continue
-
-            doc.stage = "stage_3"
-            doc.reviewed_by = request.user
-            doc.reviewed_at = now
-            if not doc.tutor_review_notes:
-                doc.tutor_review_notes = f"Approved and verified for syllabus inclusion by {request.user.get_full_name() or request.user.email}."
-            doc.save()
-            applied_updates_count += self._apply_safe_content_updates(doc, request.user, now)
-            if doc.doc_type in {"Lecture Notes", "Revision Sheet"} and doc.visual_candidates.exists():
-                from services.prep_ingestion import assign_visuals_to_topics
-
-                assign_visuals_to_topics(
-                    doc,
-                    list(doc.course.topics.filter(is_active=True).order_by("order", "id")),
-                    allow_auto_approval=True,
-                )
-            published_documents_count += 1
-            if doc.doc_type in {"Lecture Notes", "Revision Sheet"}:
-                courses_to_precompute.add(doc.course_id)
-
-            # Auto-create or publish derived paper if doc is CAT or Exam
-            if doc.doc_type in ["Continuous Assessment Test (CAT)", "Final Examination Paper"]:
-                paper_id = f"{doc.course.code.lower().replace(' ', '')}-doc-{str(doc.id)[:8]}"
-                title = f"{doc.doc_type} ({doc.academic_year or 'Current Session'})"
-                marks = 70 if "Final" in doc.doc_type else 30
-
-                paper, created = PrepPaper.objects.get_or_create(
-                    id=paper_id,
-                    defaults={
-                        "course": doc.course,
-                        "title": title,
-                        "year": doc.academic_year or "Current Academic Year",
-                        "total_marks": marks,
-                        "source_document": doc,
-                        "is_published": True,
-                    }
-                )
-                if not created and not paper.is_published:
-                    paper.is_published = True
-                    paper.save()
-                if paper.source_document_id != doc.pk:
-                    paper.source_document = doc
-                    paper.save(update_fields=["source_document"])
-                from services.prep_assessment_index import enqueue_assessment_index
-                _, queued = enqueue_assessment_index(paper)
-                queued_assessment_jobs += int(queued)
-                published_papers_count += 1
-
-            # Log to student's history
-            if doc.user:
-                PrepHistory.objects.create(
-                    user=doc.user,
-                    title=f"Verified: {doc.course.code} {doc.doc_type}",
-                    course_code=doc.course.code,
-                    item_type="Document Verified",
-                    url=reverse("prep:past_papers") if "CAT" in doc.doc_type or "Exam" in doc.doc_type else reverse("prep:courses"),
-                )
-                course_slug = doc.course.slug or doc.course.code.replace(" ", "-")
-                PrepNotification.objects.create(
-                    user=doc.user,
-                    title=f"Published: {doc.course.code} {doc.doc_type}",
-                    message=f"Your uploaded material for '{doc.course.code}' has been reviewed, verified, and published to the live course knowledge graph.",
-                    category="published",
-                    url=reverse("prep:course_detail", kwargs={"course_code": course_slug}),
-                )
-
-            # Trigger Step 6 Email Automation (Resend)
-            try:
-                from services.email_service import send_prep_review_completed_email
-                send_prep_review_completed_email(doc)
-            except Exception as e:
-                pass
-
-        queued_precomputations = 0
-        for course_id in courses_to_precompute:
-            from services.prep_note_precompute import enqueue_course_note_precompute
-
-            course = PrepCourse.objects.get(pk=course_id)
-            _, queued = enqueue_course_note_precompute(course)
-            queued_precomputations += int(queued)
+            result = publish_prep_document(doc, reviewer=request.user, now=now)
+            if result.get("success"):
+                published_documents_count += 1
+                applied_updates_count += result.get("applied_updates", 0)
+                if result.get("paper"):
+                    published_papers_count += 1
+                queued_assessment_jobs += result.get("queued_assessment_jobs", 0)
+                queued_note_jobs += result.get("queued_note_jobs", 0)
+            else:
+                failures += 1
 
         msg_parts = []
         if published_documents_count > 0:
             msg_parts.append(
                 f"Successfully approved and published {published_documents_count} document(s) to Stage 3. "
                 f"Applied {applied_updates_count} additive course update(s) and activated {published_papers_count} course paper(s). "
-                f"Queued all-level note preparation for {queued_precomputations} course(s). "
+                f"Queued all-level note preparation for {queued_note_jobs} course(s). "
                 f"Queued {queued_assessment_jobs} assessment indexing job(s)."
             )
-        if ingestion_failures > 0:
-            msg_parts.append(f"Blocked {ingestion_failures} document(s) whose text ingestion produced no readable text.")
-        if validation_failures > 0:
-            msg_parts.append(f"Blocked {validation_failures} document(s) with validation errors.")
+        if failures > 0:
+            msg_parts.append(f"Blocked {failures} document(s). Check the Tutor Review Notes column for details.")
 
         if not msg_parts:
             msg_parts.append("No selected documents were published. Check the Tutor Review Notes column for details.")
 
         self.message_user(request, " ".join(msg_parts))
+
+    def save_model(self, request, obj, form, change):
+        if obj.stage == "stage_3":
+            from services.prep_ingestion import publish_prep_document
+            result = publish_prep_document(obj, reviewer=request.user)
+            if not result.get("success"):
+                from django.contrib import messages
+                self.message_user(
+                    request,
+                    f"Warning: Document saved, but publication gate reported: {result.get('error')}",
+                    level=messages.WARNING,
+                )
+        else:
+            super().save_model(request, obj, form, change)
 
     @admin.action(description="Propose subject profile from selected lecture notes")
     def propose_course_study_profile(self, request, queryset):

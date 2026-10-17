@@ -652,14 +652,17 @@ def assign_visuals_to_topics(prep_document, topics, *, allow_auto_approval: bool
             match_method = "ambiguous_pdf_topic_section_boundary"
         elif section_topic:
             context_topic, score, margin, evidence = score_topic_context(context, topics)
-            topic = section_topic
             section_title = str(getattr(section_topic, "title", "")).casefold()
             context_title = str(getattr(context_topic, "title", "")).casefold() if context_topic else ""
-            match_method = (
-                "pdf_topic_section_and_context"
-                if context_title == section_title and score >= 6 and margin >= 3 and len(evidence) >= 2
-                else "pdf_topic_section_context_needs_review"
-            )
+            if context_topic and context_title != section_title and score >= 6 and margin >= 3:
+                topic = None
+                match_method = "conflicting_section_and_context"
+            elif context_title == section_title and score >= 6 and margin >= 3 and len(evidence) >= 2:
+                topic = section_topic
+                match_method = "pdf_topic_section_and_context"
+            else:
+                topic = section_topic
+                match_method = "pdf_topic_section"
         else:
             match_method = "page_context"
         metadata.update({
@@ -669,8 +672,11 @@ def assign_visuals_to_topics(prep_document, topics, *, allow_auto_approval: bool
             "auto_match_terms": evidence,
             "auto_match_method": match_method,
         })
-        confident = topic is not None and score >= 6 and margin >= 3 and len(evidence) >= 2
-        if match_method == "pdf_topic_section_context_needs_review":
+        confident = topic is not None and (
+            match_method in {"pdf_topic_section", "pdf_topic_section_and_context"}
+            or (score >= 6 and margin >= 3 and len(evidence) >= 2)
+        )
+        if match_method == "conflicting_section_and_context":
             visual.status = "needs_review"
             metadata["auto_decision"] = "needs_review_ambiguous_section_context"
             counts["review"] += 1
@@ -2936,3 +2942,205 @@ def enqueue_prep_document_ingestion(document_id):
     if worker_url:
         return _DOCUMENT_INGESTION_EXECUTOR.submit(_dispatch_or_run_locally, str(document_id))
     return _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(document_id))
+
+
+def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
+    """
+    Architectural Publication Anchor:
+    Single canonical gateway to promote any PrepDocument to Stage 3 (Published).
+    Guarantees that regardless of how a document is promoted:
+      1. Extraction & validation integrity verified (text ingested if empty).
+      2. Document promoted to stage_3 with reviewer audit stamp.
+      3. Course topics exist (from pending content updates or auto-extracted fallback).
+      4. CAT/Exam papers derived into published PrepPaper and indexed into PrepQuestion.
+      5. Source visuals assigned and auto-approved to verified topics.
+      6. Student notification and PrepHistory recorded.
+      7. Note preparation queued.
+    """
+    from django.utils import timezone
+    from django.urls import reverse
+    from prep.models import PrepDocument, PrepPaper, PrepTopic, PrepHistory, PrepNotification
+    from prep.document_validation import validate_prep_document
+
+    now = now or timezone.now()
+    doc = prep_document
+
+    if doc.is_duplicate:
+        doc.is_duplicate = False
+        doc.duplicate_of = None
+        doc.save(update_fields=["is_duplicate", "duplicate_of"])
+
+    # Ensure extracted text is present
+    if not (doc.extracted_text and doc.extracted_text.strip()):
+        try:
+            ingestion_result = process_prep_document(doc)
+        except Exception as exc:
+            ingestion_result = {"success": False, "error": str(exc)}
+        doc.refresh_from_db()
+        if not ingestion_result.get("success") or not (doc.extracted_text and doc.extracted_text.strip()):
+            err_msg = ingestion_result.get("error") or "No readable text was extracted (scanned image or empty PDF)."
+            doc.tutor_review_notes = f"Publication blocked: ingestion produced no text. {err_msg[:500]}"
+            doc.save(update_fields=["tutor_review_notes", "updated_at"])
+            return {"success": False, "error": err_msg, "document": doc}
+
+    # Run validation report
+    doc.validation_report = validate_prep_document(doc)
+    doc.save(update_fields=["validation_report", "updated_at"])
+    blocking_issues = [
+        issue for issue in doc.validation_report.get("issues", [])
+        if issue.get("severity") == "error"
+    ]
+    if blocking_issues:
+        reasons = "; ".join(issue.get("message", "Validation error") for issue in blocking_issues)
+        doc.tutor_review_notes = f"Publication blocked by validation: {reasons}"[:2000]
+        doc.save(update_fields=["tutor_review_notes", "updated_at"])
+        return {"success": False, "error": reasons, "document": doc}
+
+    # Promote to stage_3
+    doc.stage = "stage_3"
+    if reviewer:
+        doc.reviewed_by = reviewer
+    doc.reviewed_at = now
+    if not doc.tutor_review_notes:
+        reviewer_name = (reviewer.get_full_name() or reviewer.email) if reviewer else "System Verification"
+        doc.tutor_review_notes = f"Approved and verified for syllabus inclusion by {reviewer_name}."
+    doc.save(update_fields=["stage", "reviewed_by", "reviewed_at", "tutor_review_notes", "updated_at"])
+
+    applied_updates_count = 0
+    published_paper = None
+    queued_assessment_jobs = 0
+    queued_note_jobs = 0
+
+    # Lecture Notes / Revision Sheet
+    if doc.doc_type in {"Lecture Notes", "Revision Sheet"}:
+        # Apply pending content updates
+        for update in doc.content_updates.filter(status="pending").select_related("topic"):
+            data = update.proposed_data if isinstance(update.proposed_data, dict) else {}
+            if update.update_type == "new_topic":
+                order = int(data.get("order") or 1)
+                title = str(data.get("title") or "").strip()
+                if title:
+                    topic, created = PrepTopic.objects.get_or_create(
+                        course=doc.course,
+                        order=order,
+                        defaults={
+                            "title": title,
+                            "subtopics": data.get("subtopics") if isinstance(data.get("subtopics"), list) else [],
+                            "summary": str(data.get("summary") or "").strip(),
+                        },
+                    )
+                    applied_updates_count += 1
+            elif update.update_type == "add_subtopics" and update.topic:
+                existing = update.topic.subtopics if isinstance(update.topic.subtopics, list) else []
+                existing_keys = {str(item).strip().casefold() for item in existing}
+                additions = [
+                    str(item).strip() for item in data.get("subtopics", [])
+                    if str(item).strip() and str(item).strip().casefold() not in existing_keys
+                ]
+                if additions:
+                    update.topic.subtopics = [*existing, *additions]
+                    update.topic.save(update_fields=["subtopics"])
+                    applied_updates_count += 1
+            update.status = "approved"
+            update.reviewed_by = reviewer
+            update.reviewed_at = now
+            update.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
+
+        # Fallback: If course still has 0 active topics, extract from document text immediately
+        active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))
+        if not active_topics and doc.extracted_text:
+            extracted_cands = extract_topic_candidates(doc.extracted_text)
+            if extracted_cands:
+                for cand in extracted_cands:
+                    PrepTopic.objects.get_or_create(
+                        course=doc.course,
+                        order=cand.get("order") or 1,
+                        defaults={
+                            "title": str(cand.get("title") or "").strip(),
+                            "subtopics": cand.get("subtopics") if isinstance(cand.get("subtopics"), list) else [],
+                            "summary": str(cand.get("summary") or "").strip(),
+                        },
+                    )
+                active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))
+
+        # Map and auto-approve visuals
+        if active_topics and doc.visual_candidates.exists():
+            assign_visuals_to_topics(doc, active_topics, allow_auto_approval=True)
+
+        # Synchronize any other documents for this course whose visual candidates were unassigned
+        for other_doc in doc.course.documents.filter(stage="stage_3").exclude(pk=doc.pk):
+            if other_doc.visual_candidates.filter(status__in=["candidate", "needs_review"]).exists():
+                assign_visuals_to_topics(other_doc, active_topics, allow_auto_approval=True)
+
+        # Enqueue note precomputation
+        from services.prep_note_precompute import enqueue_course_note_precompute
+        _, queued = enqueue_course_note_precompute(doc.course)
+        queued_note_jobs += int(queued)
+
+    # CAT / Final Exam
+    if doc.doc_type in ["Continuous Assessment Test (CAT)", "Final Examination Paper"]:
+        paper_id = f"{doc.course.code.lower().replace(' ', '')}-doc-{str(doc.id)[:8]}"
+        title = f"{doc.doc_type} ({doc.academic_year or 'Current Session'})"
+        marks = 70 if "Final" in doc.doc_type else 30
+
+        paper, created = PrepPaper.objects.get_or_create(
+            id=paper_id,
+            defaults={
+                "course": doc.course,
+                "title": title,
+                "year": doc.academic_year or "Current Academic Year",
+                "total_marks": marks,
+                "source_document": doc,
+                "is_published": True,
+            },
+        )
+        if not created and not paper.is_published:
+            paper.is_published = True
+            paper.save(update_fields=["is_published"])
+        if paper.source_document_id != doc.pk:
+            paper.source_document = doc
+            paper.save(update_fields=["source_document"])
+        published_paper = paper
+
+        from services.prep_assessment_index import enqueue_assessment_index
+        _, queued = enqueue_assessment_index(paper)
+        queued_assessment_jobs += int(queued)
+
+        # Map visuals to existing course topics if available
+        active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))
+        if active_topics and doc.visual_candidates.exists():
+            assign_visuals_to_topics(doc, active_topics, allow_auto_approval=True)
+
+    # Student history & notifications
+    if doc.user:
+        PrepHistory.objects.create(
+            user=doc.user,
+            title=f"Verified: {doc.course.code} {doc.doc_type}",
+            course_code=doc.course.code,
+            item_type="Document Verified",
+            url=reverse("prep:past_papers") if "CAT" in doc.doc_type or "Exam" in doc.doc_type else reverse("prep:courses"),
+        )
+        course_slug = doc.course.slug or doc.course.code.replace(" ", "-")
+        PrepNotification.objects.create(
+            user=doc.user,
+            title=f"Published: {doc.course.code} {doc.doc_type}",
+            message=f"Your uploaded material for '{doc.course.code}' has been reviewed, verified, and published to the live course knowledge graph.",
+            category="published",
+            url=reverse("prep:course_detail", kwargs={"course_code": course_slug}),
+        )
+
+    # Review completed email
+    try:
+        from services.email_service import send_prep_review_completed_email
+        send_prep_review_completed_email(doc)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "document": doc,
+        "applied_updates": applied_updates_count,
+        "paper": published_paper,
+        "queued_assessment_jobs": queued_assessment_jobs,
+        "queued_note_jobs": queued_note_jobs,
+    }

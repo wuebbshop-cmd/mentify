@@ -42,28 +42,41 @@ def map_pdf_topic_sections(text, topics):
     """Map PDF pages to explicitly headed syllabus sections and flag split pages."""
     page_header = re.compile(r"(?m)^--- Page (\d+)(?:\s+\([^\n]*\))? ---\s*$")
     explicit_heading = re.compile(
-        r"^\s*(?:#{1,6}\s*)?(?:(?:unit|module|chapter|topic)\s+)?"
-        r"\d+\s*[.:)\-]\s*(.*?)\s*$",
+        r"^\s*(?:#{1,6}\s*)?(?:(?:unit|module|chapter|topic|lesson|part|section)\s+)?"
+        r"(?:(?:\d+(?:\.\d+)*)|(?:one|two|three|four|five|six|seven|eight|nine|ten|[ivxlc]+))\s*[.:)\-]?\s+(.*?)\s*$",
         re.IGNORECASE,
     )
 
     title_lookup = {}
+    topic_distinctive_tokens = {}
+    all_topic_tokens = []
     for topic in topics:
         title = str(_topic_value(topic, "title", "") or "")
         normalized = " ".join(re.findall(r"[a-z0-9]+", title.casefold()))
         if normalized and normalized not in title_lookup:
             title_lookup[normalized] = topic
+        all_topic_tokens.append(set(_tokens(title)))
+
+    for i, topic in enumerate(topics):
+        unique_tokens = all_topic_tokens[i].copy()
+        for j, other_tokens in enumerate(all_topic_tokens):
+            if i != j:
+                unique_tokens -= other_tokens
+        topic_distinctive_tokens[id(topic)] = unique_tokens or all_topic_tokens[i]
 
     page_matches = list(page_header.finditer(str(text or "")))
     page_numbers = [int(match.group(1)) for match in page_matches]
     headings_by_page = {}
     for index, page_match in enumerate(page_matches):
+        p_num = int(page_match.group(1))
         end = page_matches[index + 1].start() if index + 1 < len(page_matches) else len(text)
         page_text = str(text or "")[page_match.end():end]
         for line in page_text.splitlines():
             clean_line = line.strip()
-            heading_match = explicit_heading.match(line)
-            heading_text = heading_match.group(1) if heading_match else clean_line.lstrip("# ")
+            if not clean_line or len(clean_line) > 120 or clean_line.endswith("."):
+                continue
+            heading_match = explicit_heading.match(clean_line)
+            heading_text = heading_match.group(1).strip() if heading_match else clean_line.lstrip("# ")
             normalized = " ".join(re.findall(r"[a-z0-9]+", heading_text.casefold()))
             is_heading = bool(
                 heading_match
@@ -72,11 +85,19 @@ def map_pdf_topic_sections(text, topics):
             )
             topic = title_lookup.get(normalized) if is_heading else None
             if not topic and is_heading:
+                # Check distinctive title tokens
+                heading_tokens = set(_tokens(heading_text))
+                for top in topics:
+                    dist = topic_distinctive_tokens.get(id(top), set())
+                    if dist and dist.issubset(heading_tokens):
+                        topic = top
+                        break
+            if not topic and is_heading:
                 candidate, score, margin, evidence = score_topic_context(heading_text, topics)
-                if candidate and score >= 6 and margin >= 3:
+                if candidate and ((score >= 6 and margin >= 3) or (score >= 10 and margin >= 5)):
                     topic = candidate
             if topic:
-                page_topics = headings_by_page.setdefault(int(page_match.group(1)), [])
+                page_topics = headings_by_page.setdefault(p_num, [])
                 if not page_topics or _topic_value(page_topics[-1], "title") != _topic_value(topic, "title"):
                     page_topics.append(topic)
 
@@ -98,6 +119,7 @@ def map_pdf_topic_sections(text, topics):
 def score_topic_context(context, topics):
     """Rank topic objects against source-page evidence; return best match and margin."""
     source = " ".join(_tokens(context))
+    source_tokens = set(_tokens(context))
     topic_phrases = []
     term_topic_counts = {}
     for topic in topics:
@@ -106,19 +128,26 @@ def score_topic_context(context, topics):
         if isinstance(subtopics, list):
             phrases.extend(subtopics)
         filtered_phrases = []
+        topic_all_tokens = set()
         for phrase in phrases:
             phrase_tokens = _tokens(phrase)
             if not phrase_tokens:
                 continue
             filtered_phrases.append((" ".join(phrase_tokens), phrase_tokens))
-            for token in set(phrase_tokens):
-                term_topic_counts[token] = term_topic_counts.get(token, 0) + 1
+            topic_all_tokens.update(phrase_tokens)
         topic_phrases.append((topic, filtered_phrases))
+        for token in topic_all_tokens:
+            term_topic_counts[token] = term_topic_counts.get(token, 0) + 1
 
     scores = []
     for topic, phrases in topic_phrases:
         score = 0
         matched = set()
+        title_tokens = set(_tokens(_topic_value(topic, "title", "")))
+        if title_tokens and title_tokens.issubset(source_tokens):
+            score += 15
+            matched.update(title_tokens)
+
         for phrase, phrase_tokens in phrases:
             if len(phrase_tokens) >= 2 and re.search(rf"(?<!\w){re.escape(phrase)}(?!\w)", source):
                 score += 4 + len(set(phrase_tokens))

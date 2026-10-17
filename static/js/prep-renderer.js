@@ -189,7 +189,22 @@
         gfm: true,
         breaks: true,
         headerIds: false,
-        mangle: false
+        mangle: false,
+        renderer: {
+          image: function(tokenOrHref, title, text) {
+            var href = (typeof tokenOrHref === 'object' && tokenOrHref) ? tokenOrHref.href : tokenOrHref;
+            var alt = (typeof tokenOrHref === 'object' && tokenOrHref) ? tokenOrHref.text : text;
+            var imgTitle = (typeof tokenOrHref === 'object' && tokenOrHref) ? tokenOrHref.title : title;
+            var cleanAlt = escapeHtml(alt || '');
+            var cleanHref = String(href || '').replace(/"/g, '&quot;');
+            var cleanTitle = imgTitle ? ' title="' + escapeHtml(imgTitle) + '"' : '';
+            var captionHtml = cleanAlt ? '<figcaption class="prep-visual-caption">' + cleanAlt + '</figcaption>' : '';
+            return '<figure class="prep-visual-figure">' +
+              '<img src="' + cleanHref + '" alt="' + cleanAlt + '"' + cleanTitle + ' loading="lazy">' +
+              captionHtml +
+              '</figure>';
+          }
+        }
       });
       window.marked.use(createMathExtension());
       mathExtensionConfigured = true;

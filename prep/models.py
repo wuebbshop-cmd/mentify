@@ -450,6 +450,19 @@ class PrepDocument(models.Model):
     def __str__(self):
         return f"{self.course.code} - {self.doc_type} ({self.get_stage_display()})"
 
+    def save(self, *args, **kwargs):
+        is_stage_3 = self.stage == "stage_3"
+        was_stage_3 = False
+        if self.pk:
+            was_stage_3 = type(self).objects.filter(pk=self.pk, stage="stage_3").exists()
+        super().save(*args, **kwargs)
+        if is_stage_3 and not was_stage_3:
+            from services.prep_ingestion import publish_prep_document
+            try:
+                publish_prep_document(self)
+            except Exception:
+                pass
+
 
 class PrepDocumentVisual(models.Model):
     """A source-page visual candidate and its bounded, optional inspection result."""

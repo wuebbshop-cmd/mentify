@@ -960,7 +960,7 @@
     width: auto;
     min-width: 520px;
   }
-  /* Images must never overflow their container.                             */
+  /* Images must never overflow their container and remain crisp in all themes */
   #notes-body img,
   .exam-problem-box img,
   .exam-solution-box img,
@@ -968,6 +968,27 @@
     max-width: 100%;
     height: auto;
     display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+  .prep-visual-figure {
+    margin: 20px auto;
+    text-align: center;
+    max-width: 100%;
+  }
+  .prep-visual-caption {
+    font-size: 0.82rem;
+    color: var(--muted, #64748b);
+    margin-top: 8px;
+    font-style: italic;
+    text-align: center;
+    line-height: 1.4;
+  }
+  body.dark-theme .prep-visual-caption {
+    color: #94a3b8;
   }
   /* Thin scrollbar for aesthetic consistency                                */
   #notes-body::-webkit-scrollbar,
