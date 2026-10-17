@@ -1815,6 +1815,21 @@ def prep_upload(request):
             created_docs = []
 
             for uploaded_file in uploaded_files:
+                target_course = course
+                # Course Code Mismatch Safeguard: if filename explicitly mentions another active course
+                # (e.g. SMA 190 in SMA_190_NOTES.pdf while SMA 103 was selected), auto-route to correct course
+                file_code_match = re.search(r'\b([A-Za-z]{2,4})[_\s-]*(\d{3,4})\b', uploaded_file.name)
+                if file_code_match:
+                    detected_prefix = file_code_match.group(1).upper()
+                    detected_num = file_code_match.group(2)
+                    detected_course = (
+                        PrepCourse.objects.filter(code__iexact=f"{detected_prefix} {detected_num}", is_active=True).first()
+                        or PrepCourse.objects.filter(code__iexact=f"{detected_prefix}{detected_num}", is_active=True).first()
+                    )
+                    if detected_course and detected_course.id != course.id:
+                        logger.info("Auto-routing '%s' from %s to matching course %s", uploaded_file.name, course.code, detected_course.code)
+                        target_course = detected_course
+
                 try:
                     raw_bytes = uploaded_file.read()
                     uploaded_file.seek(0)
@@ -1824,14 +1839,14 @@ def prep_upload(request):
 
                 file_sha256 = hashlib.sha256(raw_bytes).hexdigest()
                 duplicate = (
-                    PrepDocument.objects.filter(course=course, file_sha256=file_sha256)
+                    PrepDocument.objects.filter(course=target_course, file_sha256=file_sha256)
                     .order_by("created_at")
                     .first()
                 )
                 if duplicate:
                     prep_doc = PrepDocument.objects.create(
                         user=request.user,
-                        course=course,
+                        course=target_course,
                         doc_type=doc_type,
                         academic_year=academic_year,
                         topic_name=topic_name,
@@ -1854,7 +1869,7 @@ def prep_upload(request):
 
                 prep_doc = PrepDocument.objects.create(
                     user=request.user,
-                    course=course,
+                    course=target_course,
                     doc_type=doc_type,
                     academic_year=academic_year,
                     topic_name=topic_name,
@@ -1863,12 +1878,14 @@ def prep_upload(request):
                     file_sha256=file_sha256,
                     stage="stage_1",
                 )
+                target_slug = target_course.slug or target_course.code.replace(" ", "-")
+                target_course_url = reverse("prep:course_detail", kwargs={"course_code": target_slug})
                 PrepHistory.objects.create(
                     user=request.user,
                     title=f"Uploaded {uploaded_file.name}",
-                    course_code=course.code,
+                    course_code=target_course.code,
                     item_type=doc_type,
-                    url=course_url,
+                    url=target_course_url,
                 )
                 enqueue_prep_document_ingestion(prep_doc.pk)
                 record_upload(wallet)   # increment monthly upload counter
@@ -1910,9 +1927,22 @@ def prep_upload(request):
         duplicates = 0
         failures = []
         for uploaded_file in uploaded_files:
+            target_course = course
+            file_code_match = re.search(r'\b([A-Za-z]{2,4})[_\s-]*(\d{3,4})\b', uploaded_file.name)
+            if file_code_match:
+                detected_prefix = file_code_match.group(1).upper()
+                detected_num = file_code_match.group(2)
+                detected_course = (
+                    PrepCourse.objects.filter(code__iexact=f"{detected_prefix} {detected_num}", is_active=True).first()
+                    or PrepCourse.objects.filter(code__iexact=f"{detected_prefix}{detected_num}", is_active=True).first()
+                )
+                if detected_course and detected_course.id != course.id:
+                    logger.info("Auto-routing '%s' from %s to matching course %s", uploaded_file.name, course.code, detected_course.code)
+                    target_course = detected_course
+
             prep_doc = PrepDocument.objects.create(
                 user=request.user,
-                course=course,
+                course=target_course,
                 doc_type=doc_type,
                 academic_year=academic_year,
                 topic_name=topic_name,
@@ -1934,11 +1964,11 @@ def prep_upload(request):
                 else:
                     succeeded += 1
 
-                course_slug = course.slug or course.code.replace(" ", "-")
+                course_slug = target_course.slug or target_course.code.replace(" ", "-")
                 PrepHistory.objects.create(
                     user=request.user,
                     title=f"Uploaded {uploaded_file.name}",
-                    course_code=course.code,
+                    course_code=target_course.code,
                     item_type=doc_type,
                     url=reverse("prep:course_detail", kwargs={"course_code": course_slug}),
                 )
