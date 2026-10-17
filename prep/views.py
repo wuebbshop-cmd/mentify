@@ -106,6 +106,75 @@ def parse_course_code_and_title(raw_name: str) -> tuple[str, str]:
     return raw_name.upper(), raw_name
 
 
+def infer_course_category(code: str, title: str) -> str:
+    """Infer standard PrepCourse.category from course code and title."""
+    code_upper = str(code or "").strip().upper()
+    title_lower = str(title or "").strip().lower()
+    prefix = re.split(r"[\s\-_0-9]+", code_upper)[0] if code_upper else ""
+
+    # 1. Computing / Computer Science
+    if prefix in {"CIT", "CCS", "CSC", "ICS", "BIT", "SIT", "COM", "CSE"} or any(
+        kw in title_lower for kw in ("computer", "computing", "programming", "software", "algorithm", "data structure", "database", "information technology")
+    ):
+        return "Computing"
+
+    # 2. Statistics
+    if prefix in {"SST", "STA", "ACT"} or any(
+        kw in title_lower for kw in ("statistic", "estimation", "probability", "stochastic", "regression", "time series", "sampling", "actuarial")
+    ):
+        return "Statistics"
+
+    # 3. Mathematics
+    if prefix in {"SMA", "MAT", "MATH", "MTH", "CAL", "ALG", "GEO"} or any(
+        kw in title_lower for kw in ("mathematic", "calculus", "geometry", "algebra", "trigonometry", "linear algebra", "discrete math", "differential equation", "real analysis")
+    ):
+        return "Mathematics"
+
+    # 4. Business & Economics
+    if prefix in {"EET", "ECO", "BBA", "BCOM", "FIN", "ACC", "BUS"} or any(
+        kw in title_lower for kw in ("economic", "microeconomic", "macroeconomic", "finance", "accounting", "business", "commerce", "management")
+    ):
+        return "Business & Economics"
+
+    # 5. Social Sciences
+    if prefix in {"ASC", "SOC", "PSY", "ANT", "POL", "DEV"} or any(
+        kw in title_lower for kw in ("sociology", "psychology", "anthropology", "political", "social", "society", "development studies")
+    ):
+        return "Social Sciences"
+
+    # 6. Chemistry
+    if prefix in {"SCH", "CHE", "BCH"} or any(
+        kw in title_lower for kw in ("chemistry", "chemical", "organic", "inorganic", "biochemistry")
+    ):
+        return "Chemistry"
+
+    # 7. Physics
+    if prefix in {"SPH", "PHY"} or any(
+        kw in title_lower for kw in ("physics", "mechanics", "electromagnetism", "quantum", "optics")
+    ):
+        return "Physics"
+
+    # 8. Engineering
+    if prefix in {"ENG", "ECE", "MCE", "CVE", "EEE", "MECH", "CIV"} or any(
+        kw in title_lower for kw in ("engineering", "circuit", "structural")
+    ):
+        return "Engineering"
+
+    # 9. Health & Sciences / General Sciences
+    if prefix in {"SBT", "SZL", "MED", "NUR", "PHA", "HNS", "BIO"} or any(
+        kw in title_lower for kw in ("health", "medical", "nursing", "clinical", "anatomy", "physiology", "pathology", "pharmacology", "biology", "genetics")
+    ):
+        return "General Sciences"
+
+    # 10. Humanities
+    if prefix in {"UCU", "AEN", "ALT", "AHI", "ARE", "APS", "PHI", "LIT", "HIS", "REL"} or any(
+        kw in title_lower for kw in ("communication", "communication skills", "literature", "history", "philosophy", "linguistics", "ethics", "critical thinking", "writing")
+    ):
+        return "Humanities"
+
+    return "Other"
+
+
 def clean_tag_label(label: str) -> str:
     """Robustly clean topic/subtopic tag labels so no equations, mathematical notations, or symbols belong to tags."""
     if not label or not isinstance(label, str):
@@ -578,21 +647,40 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
     """Resolve a course's discipline key and clean display tag from its study_profile, category, and title."""
     code_upper = str(course.code or "").strip().upper()
     title_lower = str(course.title or "").strip().lower()
+    raw_cat = str(course.category or "").strip()
     profile = course.study_profile if isinstance(course.study_profile, dict) else {}
     family = str(profile.get("subject_family") or "").strip().lower()
     caps = profile.get("capabilities") if isinstance(profile.get("capabilities"), dict) else {}
 
-    # 1. Explicit programming / computing courses (e.g. SST 301 Programming Language for Statistics I)
+    cat_map = {
+        "Mathematics": ("mathematics", "Mathematics"),
+        "Statistics": ("statistics", "Statistics"),
+        "Computing": ("computing", "Computing"),
+        "Business & Economics": ("economics", "Economics"),
+        "Social Sciences": ("social_science", "Social Sciences"),
+        "Humanities": ("humanities", "Humanities"),
+        "Chemistry": ("chemistry", "Chemistry"),
+        "Physics": ("physics", "Physics"),
+        "Engineering": ("engineering", "Engineering"),
+        "General Sciences": ("general_science", "General Sciences"),
+    }
+
+    # 1. Non-default model category field (explicit category assigned in DB)
+    if raw_cat in cat_map and raw_cat != "Other":
+        sk, label = cat_map[raw_cat]
+        return {"subject_key": sk, "category": label}
+
+    # 2. Explicit computing / programming course signals from title or code
     if (
-        family == "computing"
-        or any(kw in title_lower for kw in ("programming", "software", "algorithm", "data structure", "database", "computer"))
+        any(kw in title_lower for kw in ("programming", "software", "algorithm", "data structure", "database", "computer"))
         or (caps.get("code") and "programming" in title_lower)
     ):
         return {"subject_key": "computing", "category": "Computing"}
 
-    # 2. Study profile family mapping
+    # 3. Study profile family mapping (if profile was properly extracted)
     family_map = {
         "statistics": ("statistics", "Statistics"),
+        "computing": ("computing", "Computing"),
         "business_economics": ("economics", "Economics"),
         "social_science": ("social_science", "Social Sciences"),
         "humanities": ("humanities", "Humanities"),
@@ -606,62 +694,12 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
         sk, label = family_map[family]
         return {"subject_key": sk, "category": label}
 
-    # 3. Non-default model category field
-    raw_cat = str(course.category or "").strip()
-    cat_map = {
-        "Statistics": ("statistics", "Statistics"),
-        "Computing": ("computing", "Computing"),
-        "Business & Economics": ("economics", "Economics"),
-        "Social Sciences": ("social_science", "Social Sciences"),
-        "Humanities": ("humanities", "Humanities"),
-        "Chemistry": ("chemistry", "Chemistry"),
-        "Physics": ("physics", "Physics"),
-        "Engineering": ("engineering", "Engineering"),
-        "General Sciences": ("general_science", "General Sciences"),
-    }
-    if raw_cat in cat_map:
-        sk, label = cat_map[raw_cat]
+    # 4. Fallback inference by code prefix and title keywords
+    inferred = infer_course_category(code_upper, course.title)
+    if inferred in cat_map:
+        sk, label = cat_map[inferred]
         return {"subject_key": sk, "category": label}
 
-    # 4. Fallback inference when category is still the default "Mathematics"
-    prefix = re.split(r"[\s\-_0-9]+", code_upper)[0] if code_upper else ""
-    if prefix in {"EET", "ECO", "BBA", "BCOM", "FIN", "ACC"} or any(
-        kw in title_lower for kw in ("economic", "microeconomic", "macroeconomic", "finance", "accounting", "business", "commerce")
-    ):
-        return {"subject_key": "economics", "category": "Economics"}
-    if prefix in {"ASC", "SOC", "PSY", "ANT", "POL", "DEV"} or any(
-        kw in title_lower for kw in ("sociology", "psychology", "anthropology", "political", "social", "society")
-    ):
-        return {"subject_key": "social_science", "category": "Social Sciences"}
-    if prefix in {"CIT", "CCS", "CSC", "ICS", "BIT", "SIT", "COM"}:
-        return {"subject_key": "computing", "category": "Computing"}
-    if prefix in {"SST", "STA", "ACT"} or any(
-        kw in title_lower for kw in ("statistic", "estimation", "probability", "stochastic", "regression", "time series", "sampling", "actuarial")
-    ):
-        return {"subject_key": "statistics", "category": "Statistics"}
-    if prefix in {"SCH", "CHE", "BCH"} or any(
-        kw in title_lower for kw in ("chemistry", "chemical", "organic", "inorganic", "biochemistry")
-    ):
-        return {"subject_key": "chemistry", "category": "Chemistry"}
-    if prefix in {"SPH", "PHY"} or any(
-        kw in title_lower for kw in ("physics", "mechanics", "electromagnetism", "quantum", "optics")
-    ):
-        return {"subject_key": "physics", "category": "Physics"}
-    if prefix in {"ENG", "ECE", "MCE", "CVE", "EEE"} or any(
-        kw in title_lower for kw in ("engineering", "circuit", "structural")
-    ):
-        return {"subject_key": "engineering", "category": "Engineering"}
-    if prefix in {"SBT", "SZL", "MED", "NUR", "PHA", "HNS", "BIO"} or any(
-        kw in title_lower for kw in ("health", "medical", "nursing", "clinical", "anatomy", "physiology", "pathology", "pharmacology", "biology", "genetics")
-    ):
-        return {"subject_key": "general_science", "category": "Health & Sciences"}
-    if prefix in {"AEN", "ALT", "AHI", "ARE", "APS"} or any(
-        kw in title_lower for kw in ("literature", "history", "philosophy", "linguistics", "ethics")
-    ):
-        return {"subject_key": "humanities", "category": "Humanities"}
-
-    if raw_cat == "Mathematics":
-        return {"subject_key": "mathematics", "category": "Mathematics"}
     return {"subject_key": "other", "category": raw_cat or "Other"}
 
 
@@ -1679,7 +1717,7 @@ def prep_upload(request):
                         code=course_code,
                         title=course_title,
                         level="Standard",
-                        category="Other",
+                        category=infer_course_category(course_code, course_title),
                     )
 
             target_topic = None
@@ -1784,7 +1822,7 @@ def prep_upload(request):
                     code=course_code,
                     title=course_title,
                     level="Standard",
-                    category="Other",
+                    category=infer_course_category(course_code, course_title),
                 )
 
         PrepCourseEnrollment.objects.get_or_create(

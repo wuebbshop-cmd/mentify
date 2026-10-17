@@ -1040,9 +1040,30 @@
     updateStepperState();
   }
 
+  function resetProgressPanel() {
+    if (statusPollTimer) {
+      clearTimeout(statusPollTimer);
+      statusPollTimer = null;
+    }
+    activeUploadDocIds = [];
+    if (progressPanel) progressPanel.style.display = 'none';
+    if (progressBar) {
+      progressBar.style.width = '0%';
+      progressBar.style.background = 'var(--green)';
+    }
+    if (progressPct) progressPct.textContent = '0%';
+    if (progressTitle) progressTitle.textContent = 'Uploading documents...';
+    if (progressSubtext) progressSubtext.textContent = 'Transferring files to Mentify Prep...';
+    if (courseLink) courseLink.style.display = 'none';
+    const dismissBtn = document.getElementById('upload-dismiss-btn');
+    if (dismissBtn) dismissBtn.style.display = 'none';
+  }
+
   function addFilesToSelection(incomingFiles) {
     const incoming = Array.from(incomingFiles || []);
     if (!incoming.length) return;
+
+    resetProgressPanel();
 
     const combined = stagedFiles.slice();
     for (const file of incoming) {
@@ -1088,6 +1109,7 @@
     if (fileInput) fileInput.value = '';
     syncStagedFilesToInput();
     renderSelectedFiles();
+    resetProgressPanel();
   }
 
   if (dropzone && fileInput) {
@@ -1181,11 +1203,9 @@
   }
 
   window.dismissProgressPanel = function() {
-    if (progressPanel) progressPanel.style.display = 'none';
+    resetProgressPanel();
     if (submitBtn) submitBtn.disabled = false;
     if (submitLabel) submitLabel.textContent = 'Process materials';
-    const dismissBtn = document.getElementById('upload-dismiss-btn');
-    if (dismissBtn) dismissBtn.style.display = 'none';
     clearSelectedFiles();
     updateStepperState(false);
   };
