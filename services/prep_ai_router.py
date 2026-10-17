@@ -1213,8 +1213,10 @@ _VISUAL_REFERENCE_PATTERN = re.compile(
     r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:(?:in|by)\s+)?(?:the\s+)?"
     r"(?:figure|diagram|graph|plot|chart|table)"
     r"|(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart|table|fig\.?\s*\d+)"
-    r"|(?:in|from|using)\s+(?:the\s+|this\s+|that\s+|following\s+|above\s+|below\s+)"
+    r"|(?:in|from|using)\s+(?:the\s+|this\s+|that\s+)?(?:following|above|below)\s+"
     r"(?:figure|diagram|graph|plot|chart|table)"
+    r"|(?:in|from|using)\s+(?:the\s+|this\s+|that\s+)"
+    r"(?:figure|diagram|graph|plot|chart)"
     r"|(?:the\s+|this\s+|that\s+)(?:figure|diagram|graph|plot|chart|table)(?:\s+\d+)?\s+"
     r"(?:above|below|on\s+the\s+(?:left|right)|shows|illustrates|depicts|indicates)"
     r"|(?:figure|diagram|graph|plot|chart|table)\s+\d+\s+"
@@ -1233,19 +1235,82 @@ _DIRECTIONAL_VISUAL_REFERENCE_PATTERN = re.compile(
 )
 
 
+def _repair_dangling_visual_references(text: str) -> str:
+    """Auto-repair dangling figure/diagram references if no image or diagram exists in the note."""
+    has_image = bool(re.search(r"!\[[^\]]*\]\([^)]+\)", text))
+    has_code_diagram = bool(
+        re.search(
+            r"```(?:mermaid|text|ascii|[\w-]*)\s*\n[\s\S]*?(?:--|\+--|==|->|<-|\||\[|\+-)[\s\S]*?```",
+            text,
+        )
+    )
+    if has_image or has_code_diagram:
+        return text
+
+    protected = re.compile(r"(```[\s\S]*?```|`[^`\n]*`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])")
+    segments = protected.split(text)
+    for i in range(0, len(segments), 2):
+        prose = segments[i]
+        prose = re.sub(
+            r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:(?:in|by)\s+)?(?:the\s+)?)"
+            r"(?:figure|diagram|graph|plot|chart)\s+(?:above|below)\b",
+            lambda m: "as outlined below" if "below" in m.group(0).lower() else "as outlined above",
+            prose,
+            flags=re.IGNORECASE,
+        )
+        prose = re.sub(
+            r"\b(?:as\s+(?:shown|illustrated|depicted|seen)\s+(?:(?:in|by)\s+)?(?:the\s+)?)"
+            r"(?:figure|diagram|graph|plot|chart)\b",
+            "as outlined",
+            prose,
+            flags=re.IGNORECASE,
+        )
+        prose = re.sub(
+            r"\b(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart)\s+(?:above|below)\b",
+            lambda m: "see the details below" if "below" in m.group(0).lower() else "see the details above",
+            prose,
+            flags=re.IGNORECASE,
+        )
+        prose = re.sub(
+            r"\b(?:see|refer\s+to)\s+(?:the\s+)?(?:figure|diagram|graph|plot|chart)\b",
+            "see the discussion",
+            prose,
+            flags=re.IGNORECASE,
+        )
+        segments[i] = prose
+    return "".join(segments)
+
+
 def _unavailable_visual_reference_issues(content: str) -> list[str]:
     """Reject figure callouts only when the referenced visual or table is actually absent from the note."""
     source = re.sub(r"```[\s\S]*?```", "", str(content or ""))
     has_markdown_table = bool(re.search(r"(?m)^\s*\|[^|\n]+\|.*\n\s*\|[\s:\-|]+\|", source))
     has_embedded_image = bool(re.search(r"!\[[^\]]*\]\([^)]+\)", source))
+    has_code_diagram = bool(
+        re.search(
+            r"```(?:mermaid|text|ascii|[\w-]*)\s*\n[\s\S]*?(?:--|\+--|==|->|<-|\||\[|\+-)[\s\S]*?```",
+            str(content or ""),
+        )
+    )
     for match in _VISUAL_REFERENCE_PATTERN.finditer(source):
         phrase = match.group(0).lower()
         if re.search(r"\b(?:cannot|can't|unable\s+to|not\s+able\s+to)\s+see\b", phrase):
             return [_MISSING_VISUAL_REFERENCE_ISSUE]
-        if "table" in phrase and has_markdown_table:
-            continue
-        if any(word in phrase for word in ("figure", "diagram", "graph", "plot", "chart", "fig")) and has_embedded_image:
-            continue
+        if "table" in phrase:
+            if has_markdown_table:
+                continue
+            start = match.start()
+            end = match.end()
+            surrounding = source[max(0, start - 50):min(len(source), end + 50)].lower()
+            if any(term in surrounding for term in (
+                "database", "relational", "primary key", "foreign key", "many", "one-to-many",
+                "junction", "entity", "schema", "column", "row", "record", "attribute",
+                "field", "query", "access", "sql", "hash", "routing", "truth",
+            )):
+                continue
+        if any(word in phrase for word in ("figure", "diagram", "graph", "plot", "chart", "fig")):
+            if has_embedded_image or has_code_diagram:
+                continue
         return [_MISSING_VISUAL_REFERENCE_ISSUE]
     return []
 
@@ -3743,6 +3808,7 @@ def repair_question_and_solution_text(text: str) -> str:
     # 5. Apply core delimiter normalization
     text = normalize_math_delimiters(text)
     text = _repair_safe_math_text_issues(text)
+    text = _repair_dangling_visual_references(text)
 
     # 6. Re-verify fences and display math post-normalization
     if text.count("```") % 2 != 0:
