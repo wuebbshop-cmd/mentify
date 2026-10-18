@@ -50,6 +50,20 @@ services:
         sync: false
       - key: INTERNAL_WORKER_SECRET
         sync: false
+      # AI Provider Credentials for Main App (Topic Drills, Tutor, Practice Gen)
+      - key: DEEPSEEK_API
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: DEEPSEEK_CHAT_MODEL
+        value: deepseek-chat
+      - key: DEEPSEEK_REASONER_MODEL
+        value: deepseek-reasoner
+      - key: TOGETHERAI_API
+        sync: false
+      - key: TOGETHERAI_ID
+        sync: false
+
 
   # ─── Option B: Dedicated Worker Free Web Service ─────────────────────────
   # Runs as a second free web service to execute heavy PDF/OCR extraction,

@@ -12,6 +12,7 @@ from prep.models import (
 )
 from services.prep_ai_router import (
     call_deepseek,
+    call_together_repair,
     repair_question_and_solution_text,
     robust_json_loads,
     _approved_course_source_context,
@@ -59,11 +60,65 @@ def _detect_course_discipline(course) -> str:
     return "General"
 
 
+def _extract_json_objects_from_array(text: str) -> list[dict]:
+    """
+    Parses individual JSON question objects by tracking curly brace depth
+    while properly skipping string literals and escape characters.
+    This guarantees nested objects (like explanation.why_others_wrong)
+    and LaTeX math backslashes are extracted in full without regex truncation.
+    """
+    objs = []
+    i = 0
+    n = len(text)
+    while i < n:
+        if text[i] == '{':
+            depth = 1
+            start = i
+            i += 1
+            in_str = False
+            escape = False
+            while i < n and depth > 0:
+                ch = text[i]
+                if in_str:
+                    if escape:
+                        escape = False
+                    elif ch == '\\':
+                        escape = True
+                    elif ch == '"':
+                        in_str = False
+                else:
+                    if ch == '"':
+                        in_str = True
+                    elif ch == '{':
+                        depth += 1
+                    elif ch == '}':
+                        depth -= 1
+                i += 1
+            if depth == 0:
+                raw_chunk = text[start:i]
+                chunk_sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', raw_chunk)
+                chunk_sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', chunk_sanitized)
+                try:
+                    obj = json.loads(chunk_sanitized, strict=False)
+                    if isinstance(obj, dict) and "question" in obj and "options" in obj:
+                        objs.append(obj)
+                except Exception:
+                    try:
+                        obj = robust_json_loads(chunk_sanitized)
+                        if isinstance(obj, dict) and "question" in obj and "options" in obj:
+                            objs.append(obj)
+                    except Exception:
+                        pass
+        else:
+            i += 1
+    return objs
+
+
 def parse_quiz_json_response(raw_text: str) -> list[dict]:
     """
     Robust JSON parser specifically engineered for quiz questions across disciplines.
     Handles LaTeX equations ($...$), code snippets (`...`), unescaped quotes,
-    escaped backslashes (e.g. \\times, \\frac), and auto-repairs truncated JSON arrays.
+    escaped backslashes (e.g. \\times, \\frac), and nested explanations.
     """
     content = str(raw_text or "").strip()
     if not content:
@@ -82,13 +137,20 @@ def parse_quiz_json_response(raw_text: str) -> list[dict]:
     try:
         parsed = robust_json_loads(content)
         if isinstance(parsed, list):
-            return parsed
-        if isinstance(parsed, dict):
+            valid = [q for q in parsed if isinstance(q, dict) and "question" in q and "options" in q]
+            if valid:
+                return valid
+        elif isinstance(parsed, dict) and "question" in parsed and "options" in parsed:
             return [parsed]
     except Exception as e:
         logger.debug(f"[Topic Quiz Parser] Direct robust_json_loads failed: {e}")
 
-    # 2. Repair LaTeX / Code unescaped backslashes and auto-close truncated arrays
+    # 2. Extract objects with brace-depth parser (handles nested dicts and LaTeX backslashes)
+    extracted = _extract_json_objects_from_array(content)
+    if extracted:
+        return extracted
+
+    # 3. Repair LaTeX / Code unescaped backslashes and auto-close truncated arrays
     repaired = content
     repaired = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', repaired)
     repaired = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', repaired)
@@ -101,37 +163,19 @@ def parse_quiz_json_response(raw_text: str) -> list[dict]:
             try:
                 parsed = json.loads(candidate, strict=False)
                 if isinstance(parsed, list):
-                    return parsed
+                    valid = [q for q in parsed if isinstance(q, dict) and "question" in q and "options" in q]
+                    if valid:
+                        return valid
             except Exception:
                 pass
 
-    # 3. Regex extraction of individual valid question objects
-    extracted = []
-    pattern = re.compile(
-        r'\{[^{}]*"question"\s*:\s*".*?"options"\s*:\s*\{[^{}]*\}.*?"correct_option"\s*:\s*"[A-D]".*?\}',
-        re.DOTALL
-    )
-    for m in pattern.finditer(content):
-        chunk = m.group(0)
-        try:
-            chunk_sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', chunk)
-            chunk_sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', chunk_sanitized)
-            obj = json.loads(chunk_sanitized, strict=False)
-            if isinstance(obj, dict) and "question" in obj and "options" in obj:
-                extracted.append(obj)
-        except Exception:
-            continue
-
-    if extracted:
-        return extracted
-
-    # Fallback to secondary extraction using robust_json_loads with sanitized string
+    # 4. Fallback to sanitized robust_json_loads
     try:
         sanitized_fallback = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', content)
         res = robust_json_loads(sanitized_fallback)
         if isinstance(res, list):
-            return res
-        if isinstance(res, dict):
+            return [q for q in res if isinstance(q, dict) and "question" in q and "options" in q]
+        if isinstance(res, dict) and "question" in res and "options" in res:
             return [res]
     except Exception:
         pass
@@ -262,11 +306,29 @@ Important rules:
         model=model_name,
         max_tokens=5000,
         temperature=0.2,
-        thinking_enabled=False,
     )
 
-    if not ai_response.get("success"):
-        logger.error(f"[Topic Quiz] AI call failed for topic {topic.id}: {ai_response.get('error')}")
+    if not ai_response.get("success") or not ai_response.get("content"):
+        logger.warning(
+            f"[Topic Quiz] DeepSeek call failed for topic {topic.id}: {ai_response.get('error')}. Attempting Together AI fallback..."
+        )
+        together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V3")
+        if getattr(settings, "TOGETHERAI_API", ""):
+            try:
+                ai_response = call_together_repair(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    model=together_model,
+                    max_tokens=5000,
+                    json_mode=True,
+                )
+            except Exception as fb_err:
+                logger.error(f"[Topic Quiz] Together AI fallback failed for topic {topic.id}: {fb_err}")
+
+    if not ai_response.get("success") or not ai_response.get("content"):
+        logger.error(f"[Topic Quiz] All AI providers failed for topic {topic.id}: {ai_response.get('error')}")
         return []
 
     content = str(ai_response.get("content") or "").strip()
@@ -421,6 +483,25 @@ def get_or_create_topic_quiz(
         all_ids = list(available_qs.values_list("id", flat=True))
         selected_ids = random.sample(all_ids, min(count, len(all_ids)))
         selected = list(available_qs.filter(id__in=selected_ids).order_by("?"))
+        if mark_seen and user and user.is_authenticated and selected:
+            records = [
+                PrepStudentQuizSeen(user=user, quiz_question=q, topic=topic)
+                for q in selected
+            ]
+            PrepStudentQuizSeen.objects.bulk_create(records, ignore_conflicts=True)
+        return selected
+
+    # 5. Fallback recycle: If all unseen questions are exhausted and new questions could not be prepared,
+    # recycle from the entire active topic question bank so the student can continuously practice active recall!
+    recycle_qs = PrepTopicQuizQuestion.objects.filter(topic=topic, is_active=True)
+    if recycle_qs.exists():
+        logger.info(f"[Topic Quiz] Unseen questions exhausted for topic {topic.id}. Recycling active question bank.")
+        # Reset seen history for this topic so the student enters a new recall cycle
+        if user and user.is_authenticated:
+            PrepStudentQuizSeen.objects.filter(user=user, topic=topic).delete()
+        all_ids = list(recycle_qs.values_list("id", flat=True))
+        selected_ids = random.sample(all_ids, min(count, len(all_ids)))
+        selected = list(recycle_qs.filter(id__in=selected_ids).order_by("?"))
         if mark_seen and user and user.is_authenticated and selected:
             records = [
                 PrepStudentQuizSeen(user=user, quiz_question=q, topic=topic)

@@ -283,9 +283,9 @@ PREP_OCR_CREDITS_PER_IMAGE_PAGE = int(os.environ.get("PREP_OCR_CREDITS_PER_IMAGE
 
 TOGETHERAI_API = os.environ.get("TOGETHERAI_API", "")
 TOGETHERAI_ID = os.environ.get("TOGETHERAI_ID", "")
-TOGETHER_VISION_MODEL = os.environ.get("TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
-TOGETHER_REPAIR_MODEL = os.environ.get("TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
-TOGETHER_CHAT_MODEL = os.environ.get("TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+TOGETHER_VISION_MODEL = os.environ.get("TOGETHER_VISION_MODEL", "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo")
+TOGETHER_REPAIR_MODEL = os.environ.get("TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V3")
+TOGETHER_CHAT_MODEL = os.environ.get("TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V3")
 TOGETHER_MAX_PAGES_PER_RUN = int(os.environ.get("TOGETHER_MAX_PAGES_PER_RUN", 15))
 
 # Automatically start worker threads in development when running runserver

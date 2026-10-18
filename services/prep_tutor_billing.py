@@ -30,6 +30,11 @@ _DEEPSEEK_RATES_USD_PER_MILLION = {
     },
 }
 _TOGETHER_RATES_USD_PER_MILLION = {
+    "deepseek-ai/deepseek-v3": {
+        "input": "0.30",
+        "cached_input": "0.006",
+        "output": "1.20",
+    },
     "deepseek-ai/deepseek-v4.1-flash": {
         "input": "0.30",
         "cached_input": "0.006",

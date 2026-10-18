@@ -2706,7 +2706,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 {"role": "system", "content": "Repair one Markdown/LaTeX block surgically. Never split words, theorem titles, or sentences across lines. Preserve Markdown blockquote prefixes on every theorem line."},
                 {"role": "user", "content": repair_instruction + "\nIssues: " + json.dumps(issues) + "\nSource (only the affected section when identifiable):\n" + repair_scope},
             ],
-            model=getattr(settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash"),
+            model=getattr(settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V3"),
             max_tokens=2000,
         )
         repair_usage = _merge_usage(repair_usage, result.get("usage", {}))
@@ -2715,7 +2715,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             "stage": "targeted_block_repair",
             "attempt": repair.attempts,
             "model": result.get("model_used") or getattr(
-                settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash"
+                settings, "TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V3"
             ),
             "issues": issues[:20],
             "response": str(result.get("content") or "")[:2000],
@@ -2930,9 +2930,6 @@ def call_deepseek(
 
         "temperature": temperature,
     }
-    if thinking_enabled is not None:
-        payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
-
     try:
         timeout_val = int(getattr(settings, "DEEPSEEK_TIMEOUT", None) or 90)
         resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=timeout_val)
@@ -2965,11 +2962,6 @@ def call_deepseek(
                     "max_tokens": max_tokens,
                     "temperature": temperature,
                 }
-                if thinking_enabled is not None:
-                    cont_payload["thinking"] = {"type": "enabled" if thinking_enabled else "disabled"}
-                elif not content:
-                    # Explicitly disable thinking on retry if reasoning swallowed the token budget
-                    cont_payload["thinking"] = {"type": "disabled"}
                 try:
                     cont_resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=cont_payload, timeout=90)
                     if cont_resp.status_code == 200:
@@ -3066,7 +3058,7 @@ def call_deepseek(
             }
         else:
             logger.warning(f"[DeepSeek API Error] HTTP {resp.status_code}: {resp.text[:300]}. Attempting Together AI fallback...")
-            together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+            together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V3")
             if getattr(settings, "TOGETHERAI_API", "") and together_model:
                 try:
                     expects_json = any(
@@ -3087,7 +3079,7 @@ def call_deepseek(
             return {"success": False, "error": "The AI service encountered an issue while processing your request. Please try again shortly."}
     except Exception as e:
         logger.warning(f"[DeepSeek API Exception] {e}. Attempting Together AI fallback...")
-        together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+        together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V3")
         if getattr(settings, "TOGETHERAI_API", "") and together_model:
             try:
                 all_text = " ".join(str(m.get("content") or "").lower() for m in messages if isinstance(m, dict))
