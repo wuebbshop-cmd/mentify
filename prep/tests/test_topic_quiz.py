@@ -197,7 +197,9 @@ class PrepTopicQuizServiceTests(TestCase):
         resp = prep_topic_study(request, topic_id=self.topic.id)
         self.assertEqual(resp.status_code, 200)
         content = resp.content.decode("utf-8")
-        self.assertIn("💡 Quiz me", content)
+        self.assertIn("Quiz me", content)
+        self.assertIn("Core concept", content)
+        self.assertIn("Past exam question", content)
         self.assertIn("triggerTopicTutorPrompt", content)
         self.assertIn('id="pillar-quiz"', content)
 
