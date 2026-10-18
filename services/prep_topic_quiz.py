@@ -312,8 +312,15 @@ Important rules:
         logger.warning(
             f"[Topic Quiz] DeepSeek call failed for topic {topic.id}: {ai_response.get('error')}. Attempting Together AI fallback..."
         )
+        together_key = (
+            getattr(settings, "TOGETHERAI_API", "")
+            or getattr(settings, "TOGETHER_API_KEY", "")
+            or os.environ.get("TOGETHERAI_API", "")
+            or os.environ.get("TOGETHER_API_KEY", "")
+            or os.environ.get("TOGETHER_API", "")
+        )
         together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
-        if getattr(settings, "TOGETHERAI_API", ""):
+        if together_key:
             try:
                 ai_response = call_together_repair(
                     messages=[

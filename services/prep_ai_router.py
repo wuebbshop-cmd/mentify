@@ -2905,7 +2905,13 @@ def call_deepseek(
     Make a guarded API call to DeepSeek.
     Enforces maximum token caps with auto-continuation if output hits length limit.
     """
-    api_key = getattr(settings, "DEEPSEEK_API", "") or os.environ.get("DEEPSEEK_API", "")
+    api_key = (
+        getattr(settings, "DEEPSEEK_API", "")
+        or getattr(settings, "DEEPSEEK_API_KEY", "")
+        or os.environ.get("DEEPSEEK_API", "")
+        or os.environ.get("DEEPSEEK_API_KEY", "")
+        or os.environ.get("DEEPSEEK_KEY", "")
+    )
     base_url = getattr(settings, "DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "https://api.deepseek.com"
 
     if not api_key:
@@ -3105,7 +3111,14 @@ def call_together_repair(
     json_mode: bool = True,
 ) -> dict:
     """Make one bounded Together.ai repair call with no continuation."""
-    api_key = getattr(settings, "TOGETHERAI_API", "") or os.environ.get("TOGETHERAI_API", "")
+    api_key = (
+        getattr(settings, "TOGETHERAI_API", "")
+        or getattr(settings, "TOGETHER_API_KEY", "")
+        or os.environ.get("TOGETHERAI_API", "")
+        or os.environ.get("TOGETHER_API_KEY", "")
+        or os.environ.get("TOGETHER_API", "")
+        or os.environ.get("TOGETHERAI_API_KEY", "")
+    )
     if not api_key:
         logger.warning("[Together Repair] TOGETHERAI_API key is not configured.")
         return {"success": False, "error": "The AI verification service is temporarily unavailable."}

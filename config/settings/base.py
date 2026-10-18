@@ -265,7 +265,7 @@ ADMIN_EMAILS_NOTIFICATIONS = [
 
 
 # ─── Mentify Prep & AI Configuration ─────────────────────────────────────────
-DEEPSEEK_API = os.environ.get("DEEPSEEK_API", "")
+DEEPSEEK_API = os.environ.get("DEEPSEEK_API", "") or os.environ.get("DEEPSEEK_API_KEY", "") or os.environ.get("DEEPSEEK_KEY", "")
 DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 DEEPSEEK_CHAT_MODEL = os.environ.get("DEEPSEEK_CHAT_MODEL", "deepseek-chat")
 DEEPSEEK_REASONER_MODEL = os.environ.get("DEEPSEEK_REASONER_MODEL", "deepseek-reasoner")
@@ -281,7 +281,12 @@ PREP_AI_COST_MARGIN_MULTIPLIER = os.environ.get("PREP_AI_COST_MARGIN_MULTIPLIER"
 PREP_CHAT_RESERVE_MULTIPLIER = os.environ.get("PREP_CHAT_RESERVE_MULTIPLIER", "2")
 PREP_OCR_CREDITS_PER_IMAGE_PAGE = int(os.environ.get("PREP_OCR_CREDITS_PER_IMAGE_PAGE", 5))
 
-TOGETHERAI_API = os.environ.get("TOGETHERAI_API", "")
+TOGETHERAI_API = (
+    os.environ.get("TOGETHERAI_API", "")
+    or os.environ.get("TOGETHER_API_KEY", "")
+    or os.environ.get("TOGETHER_API", "")
+    or os.environ.get("TOGETHERAI_API_KEY", "")
+)
 TOGETHERAI_ID = os.environ.get("TOGETHERAI_ID", "")
 TOGETHER_VISION_MODEL = os.environ.get("TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
 TOGETHER_REPAIR_MODEL = os.environ.get("TOGETHER_REPAIR_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
