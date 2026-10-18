@@ -1417,7 +1417,13 @@ def prep_topic_quiz_api(request, topic_id):
     except (ValueError, TypeError):
         count = 5
 
-    questions = get_or_create_topic_quiz(topic, count=count, user=request.user if request.user.is_authenticated else None)
+    fresh = request.GET.get("fresh") in {"1", "true", "True"}
+    questions = get_or_create_topic_quiz(
+        topic,
+        count=count,
+        user=request.user if request.user.is_authenticated else None,
+        force_fresh=fresh,
+    )
     data = []
     for q in questions:
         data.append({

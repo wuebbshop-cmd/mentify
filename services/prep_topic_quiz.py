@@ -359,7 +359,8 @@ def get_or_create_topic_quiz(
 
     qs = PrepTopicQuizQuestion.objects.filter(topic=topic, is_active=True)
 
-    if not force_fresh and qs.count() >= count:
+    # Fast-path: If cached questions exist and fresh is not requested, return them immediately
+    if not force_fresh and qs.exists():
         all_ids = list(qs.values_list("id", flat=True))
         # If user is authenticated, prioritize questions the user hasn't gotten correct recently
         if user and user.is_authenticated:
@@ -373,22 +374,32 @@ def get_or_create_topic_quiz(
             unmastered_ids = [qid for qid in all_ids if qid not in correctly_answered]
             if len(unmastered_ids) >= count:
                 selected_ids = random.sample(unmastered_ids, count)
-            else:
+            elif unmastered_ids:
                 remaining_needed = count - len(unmastered_ids)
                 mastered_ids = [qid for qid in all_ids if qid in correctly_answered]
                 selected_ids = unmastered_ids + random.sample(mastered_ids, min(remaining_needed, len(mastered_ids)))
+            else:
+                selected_ids = random.sample(all_ids, min(count, len(all_ids)))
         else:
             selected_ids = random.sample(all_ids, min(count, len(all_ids)))
 
         return list(qs.filter(id__in=selected_ids).order_by("?"))
 
-    # Need to generate more questions
-    needed = max(count - qs.count(), 3)
-    new_questions = generate_topic_quiz_questions(topic, count=max(needed, count))
-    
-    # Return fresh selection
-    combined = list(PrepTopicQuizQuestion.objects.filter(topic=topic, is_active=True).order_by("?"))
-    return combined[:count]
+    # Need fresh generation (0 questions cached, or user requested "New Questions")
+    target_count = max(count, 5)
+    new_questions = generate_topic_quiz_questions(topic, count=target_count)
+
+    # Resilient retry: if first attempt produced 0 questions, retry once
+    if not new_questions:
+        logger.warning(f"[Topic Quiz] Initial generation returned 0 questions for topic {topic.id}. Retrying once...")
+        new_questions = generate_topic_quiz_questions(topic, count=target_count)
+
+    # Return whatever active questions exist for this topic
+    available_qs = PrepTopicQuizQuestion.objects.filter(topic=topic, is_active=True)
+    if available_qs.exists():
+        return list(available_qs.order_by("?")[:count])
+
+    return []
 
 
 def evaluate_quiz_answer(

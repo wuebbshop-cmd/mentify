@@ -4405,7 +4405,15 @@
     const cardEl = document.getElementById('quiz-active-card');
     const summaryEl = document.getElementById('quiz-summary-card');
 
-    if (loadingEl) loadingEl.style.display = 'block';
+    if (loadingEl) {
+      loadingEl.style.display = 'block';
+      const p = loadingEl.querySelector('p');
+      if (p) {
+        p.textContent = forceRefresh
+          ? 'Generating fresh active recall drill questions...'
+          : 'Preparing active recall drill questions...';
+      }
+    }
     if (cardEl) cardEl.style.display = 'none';
     if (summaryEl) summaryEl.style.display = 'none';
 
@@ -4421,7 +4429,14 @@
         } else {
           if (cardEl) {
             cardEl.style.display = 'block';
-            cardEl.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">No drill questions available yet for this topic. Click "New Questions" above to generate a set.</p>`;
+            cardEl.innerHTML = `
+              <div style="text-align: center; padding: 48px 20px;">
+                <p style="font-weight: 600; font-size: 1.05rem; color: var(--text); margin-bottom: 8px;">Active Recall Drill</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 440px; margin: 0 auto 20px;">Drill questions are being generated for this topic. Click below to load your questions.</p>
+                <button type="button" class="btn btn-primary" onclick="restartTopicQuiz(true)" style="background: var(--green); border-color: var(--green); font-weight: 600; padding: 8px 22px;">
+                  Generate Questions
+                </button>
+              </div>`;
           }
         }
       })
@@ -4430,7 +4445,14 @@
         if (loadingEl) loadingEl.style.display = 'none';
         if (cardEl) {
           cardEl.style.display = 'block';
-          cardEl.innerHTML = `<p style="text-align: center; color: var(--danger); padding: 40px;">Failed to load questions. Please check your connection and retry.</p>`;
+          cardEl.innerHTML = `
+            <div style="text-align: center; padding: 48px 20px;">
+              <p style="font-weight: 600; font-size: 1.05rem; color: var(--text); margin-bottom: 8px;">Active Recall Drill</p>
+              <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 440px; margin: 0 auto 20px;">Unable to load drill questions. Please check your connection and retry.</p>
+              <button type="button" class="btn btn-primary" onclick="restartTopicQuiz(false)" style="background: var(--green); border-color: var(--green); font-weight: 600; padding: 8px 22px;">
+                Retry
+              </button>
+            </div>`;
         }
       });
   }
