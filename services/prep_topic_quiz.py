@@ -8,6 +8,7 @@ from prep.models import (
     PrepTopicQuizQuestion,
     PrepTopicQuizAttempt,
     PrepStudentSpacedCard,
+    PrepStudentQuizSeen,
 )
 from services.prep_ai_router import (
     call_deepseek,
@@ -351,45 +352,51 @@ def get_or_create_topic_quiz(
     count: int = 5,
     user=None,
     force_fresh: bool = False,
+    mark_seen: bool = True,
 ) -> list[PrepTopicQuizQuestion]:
     """
     Returns `count` active quiz questions for a topic.
-    If fewer than `count` exist or `force_fresh=True`, generates new ones.
-    Prioritizes questions the user hasn't mastered yet.
+    Guarantees that a student never receives questions they have already seen/paid for.
+    If fewer than `count` unseen questions exist or `force_fresh=True`, generates new ones.
+    Records delivered questions in PrepStudentQuizSeen for authenticated students.
     """
     if not topic:
         return []
 
-    qs = PrepTopicQuizQuestion.objects.filter(topic=topic, is_active=True)
+    # 1. Identify question IDs already seen by this user
+    seen_ids = set()
+    if user and user.is_authenticated:
+        seen_ids = set(
+            PrepStudentQuizSeen.objects.filter(
+                user=user,
+                topic=topic,
+            ).values_list("quiz_question_id", flat=True)
+        )
 
-    # Fast-path: If cached questions exist and fresh is not requested, return them immediately
-    if not force_fresh and qs.exists():
-        all_ids = list(qs.values_list("id", flat=True))
-        # If user is authenticated, prioritize questions the user hasn't gotten correct recently
-        if user and user.is_authenticated:
-            correctly_answered = set(
-                PrepTopicQuizAttempt.objects.filter(
-                    user=user,
-                    quiz_question__topic=topic,
-                    is_correct=True,
-                ).values_list("quiz_question_id", flat=True)
-            )
-            unmastered_ids = [qid for qid in all_ids if qid not in correctly_answered]
-            if len(unmastered_ids) >= count:
-                selected_ids = random.sample(unmastered_ids, count)
-            elif unmastered_ids:
-                remaining_needed = count - len(unmastered_ids)
-                mastered_ids = [qid for qid in all_ids if qid in correctly_answered]
-                selected_ids = unmastered_ids + random.sample(mastered_ids, min(remaining_needed, len(mastered_ids)))
-            else:
-                selected_ids = random.sample(all_ids, min(count, len(all_ids)))
-        else:
-            selected_ids = random.sample(all_ids, min(count, len(all_ids)))
+    # 2. Query available active questions excluding questions already seen by user
+    available_qs = PrepTopicQuizQuestion.objects.filter(
+        topic=topic,
+        is_active=True,
+    )
+    if seen_ids:
+        available_qs = available_qs.exclude(id__in=seen_ids)
 
-        return list(qs.filter(id__in=selected_ids).order_by("?"))
+    # 3. Fast-path: If enough unseen questions exist and fresh is not forced, serve them
+    if not force_fresh and available_qs.count() >= count:
+        all_ids = list(available_qs.values_list("id", flat=True))
+        selected_ids = random.sample(all_ids, min(count, len(all_ids)))
+        selected = list(available_qs.filter(id__in=selected_ids).order_by("?"))
+        if mark_seen and user and user.is_authenticated and selected:
+            records = [
+                PrepStudentQuizSeen(user=user, quiz_question=q, topic=topic)
+                for q in selected
+            ]
+            PrepStudentQuizSeen.objects.bulk_create(records, ignore_conflicts=True)
+        return selected
 
-    # Need fresh generation (0 questions cached, or user requested "New Questions")
-    target_count = max(count, 5)
+    # 4. Fresh generation needed (unseen count < count, or user requested "New Questions")
+    needed = count if force_fresh else max(1, count - available_qs.count())
+    target_count = max(needed, 5)
     new_questions = generate_topic_quiz_questions(topic, count=target_count)
 
     # Resilient retry: if first attempt produced 0 questions, retry once
@@ -397,10 +404,25 @@ def get_or_create_topic_quiz(
         logger.warning(f"[Topic Quiz] Initial generation returned 0 questions for topic {topic.id}. Retrying once...")
         new_questions = generate_topic_quiz_questions(topic, count=target_count)
 
-    # Return whatever active questions exist for this topic
-    available_qs = PrepTopicQuizQuestion.objects.filter(topic=topic, is_active=True)
+    # Re-query unseen questions (includes newly generated questions, excluding already seen)
+    available_qs = PrepTopicQuizQuestion.objects.filter(
+        topic=topic,
+        is_active=True,
+    )
+    if seen_ids:
+        available_qs = available_qs.exclude(id__in=seen_ids)
+
     if available_qs.exists():
-        return list(available_qs.order_by("?")[:count])
+        all_ids = list(available_qs.values_list("id", flat=True))
+        selected_ids = random.sample(all_ids, min(count, len(all_ids)))
+        selected = list(available_qs.filter(id__in=selected_ids).order_by("?"))
+        if mark_seen and user and user.is_authenticated and selected:
+            records = [
+                PrepStudentQuizSeen(user=user, quiz_question=q, topic=topic)
+                for q in selected
+            ]
+            PrepStudentQuizSeen.objects.bulk_create(records, ignore_conflicts=True)
+        return selected
 
     return []
 

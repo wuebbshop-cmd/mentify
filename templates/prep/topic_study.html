@@ -2678,20 +2678,49 @@
 
   <!-- Active Question Container Card -->
   <div id="quiz-active-card" class="quiz-active-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-    <!-- Question Statement with KaTeX -->
-    <div id="quiz-question-text" class="markdown-rendered quiz-question-text" style="font-size: 1.06rem; font-weight: 600; line-height: 1.6; color: var(--text); margin-bottom: 24px;"></div>
+    <!-- Launch Card (Shown before student starts drill) -->
+    <div id="quiz-launch-card" style="text-align: center; padding: 32px 16px;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(15, 118, 110, 0.12); color: var(--green); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 8px;">
+        Active Recall Drill: {{ topic.title }}
+      </h3>
+      <p style="font-size: 0.92rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 16px; line-height: 1.55;">
+        Test your understanding of core concepts, formulas, and proofs with 5 exam-calibrated multiple-choice questions. Get instant feedback with complete distractor explanations.
+      </p>
+      <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 24px;">
+        <span class="badge" style="background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 0.78rem; padding: 4px 10px; border-radius: 6px;">
+          5 Questions
+        </span>
+        <span class="badge" style="background: rgba(15, 118, 110, 0.12); color: var(--green); font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;">
+          5 Credits
+        </span>
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary" onclick="restartTopicQuiz(false)" style="background: var(--green); border-color: var(--green); font-weight: 600; padding: 10px 28px; font-size: 0.95rem; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(15, 118, 110, 0.2);">
+          Start Active Recall Drill (5 credits)
+        </button>
+      </div>
+    </div>
 
-    <!-- Options List (A, B, C, D) -->
-    <div id="quiz-options-grid" class="quiz-options-grid" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;"></div>
+    <!-- Active Question Container (Visible while taking drill) -->
+    <div id="quiz-question-box" style="display: none;">
+      <!-- Question Statement with KaTeX -->
+      <div id="quiz-question-text" class="markdown-rendered quiz-question-text" style="font-size: 1.06rem; font-weight: 600; line-height: 1.6; color: var(--text); margin-bottom: 24px;"></div>
 
-    <!-- Immediate Feedback Drawer -->
-    <div id="quiz-feedback-drawer" class="quiz-feedback-drawer" style="display: none; border-radius: 12px; padding: 20px; margin-top: 20px; transition: all 0.2s ease;"></div>
+      <!-- Options List (A, B, C, D) -->
+      <div id="quiz-options-grid" class="quiz-options-grid" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;"></div>
 
-    <!-- Navigation Action -->
-    <div class="quiz-action-footer" style="display: flex; justify-content: flex-end; align-items: center; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
-      <button type="button" id="quiz-next-btn" class="btn btn-primary quiz-next-btn" style="display: none; background: var(--green); border-color: var(--green); font-weight: 600; padding: 8px 24px;" onclick="advanceQuizQuestion()">
-        Next Question &rarr;
-      </button>
+      <!-- Immediate Feedback Drawer -->
+      <div id="quiz-feedback-drawer" class="quiz-feedback-drawer" style="display: none; border-radius: 12px; padding: 20px; margin-top: 20px; transition: all 0.2s ease;"></div>
+
+      <!-- Navigation Action -->
+      <div class="quiz-action-footer" style="display: flex; justify-content: flex-end; align-items: center; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button type="button" id="quiz-next-btn" class="btn btn-primary quiz-next-btn" style="display: none; background: var(--green); border-color: var(--green); font-weight: 600; padding: 8px 24px;" onclick="advanceQuizQuestion()">
+          Next Question &rarr;
+        </button>
+      </div>
     </div>
   </div>
 
@@ -4439,8 +4468,9 @@
   let quizHasLoadedOnce = false;
 
   function loadTopicQuizLazy() {
+    // Passive: Do not auto-run or deduct student credits!
+    // The student must explicitly choose to start the drill via the launch card.
     if (quizHasLoadedOnce && quizQuestions.length > 0) return;
-    restartTopicQuiz(false);
   }
 
   function restartTopicQuiz(forceRefresh = false) {
@@ -4551,6 +4581,8 @@
     const q = quizQuestions[index];
 
     const cardEl = document.getElementById('quiz-active-card');
+    const launchCard = document.getElementById('quiz-launch-card');
+    const questionBox = document.getElementById('quiz-question-box');
     const badgeEl = document.getElementById('quiz-question-badge');
     const questionTextEl = document.getElementById('quiz-question-text');
     const optionsGrid = document.getElementById('quiz-options-grid');
@@ -4558,6 +4590,8 @@
     const nextBtn = document.getElementById('quiz-next-btn');
 
     if (cardEl) cardEl.style.display = 'block';
+    if (launchCard) launchCard.style.display = 'none';
+    if (questionBox) questionBox.style.display = 'block';
     if (badgeEl) badgeEl.textContent = `Question ${index + 1} of ${quizQuestions.length}`;
     if (feedbackDrawer) {
       feedbackDrawer.style.display = 'none';
@@ -4787,11 +4821,8 @@
         You scored <strong>${quizScore} out of ${total}</strong> (${pct}% correct)
       </p>
       <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-        <button type="button" class="btn btn-primary" style="background: var(--green); border-color: var(--green); font-weight: 600;" onclick="restartTopicQuiz(false)">
-          Retake Drill
-        </button>
-        <button type="button" class="btn btn-outline" onclick="restartTopicQuiz(true)">
-          Generate New Questions
+        <button type="button" class="btn btn-primary" style="background: var(--green); border-color: var(--green); font-weight: 600; padding: 8px 22px;" onclick="restartTopicQuiz(true)">
+          Start New Drill (5 credits)
         </button>
         <button type="button" class="btn btn-outline" onclick="switchPillarTab('notes')">
           Review Topic Notes

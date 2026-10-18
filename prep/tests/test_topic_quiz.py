@@ -7,6 +7,9 @@ from prep.models import (
     PrepTopicQuizQuestion,
     PrepTopicQuizAttempt,
     PrepStudentSpacedCard,
+    PrepStudentQuizSeen,
+    PrepStudentQuestionUnlock,
+    PrepQuestion,
 )
 from services.prep_topic_quiz import evaluate_quiz_answer, get_or_create_topic_quiz
 
@@ -232,5 +235,68 @@ class PrepTopicQuizServiceTests(TestCase):
         self.assertIn("Past exam question", content)
         self.assertIn("triggerTopicTutorPrompt", content)
         self.assertIn('id="pillar-quiz"', content)
+        self.assertIn("Start Active Recall Drill", content)
+
+    def test_active_recall_drill_deduplication(self):
+        # Initial delivery serves 1 question and marks it seen
+        questions = get_or_create_topic_quiz(self.topic, count=1, user=self.user)
+        self.assertEqual(len(questions), 1)
+        served_id = questions[0].id
+
+        # Verify seen record was created in database
+        seen_count = PrepStudentQuizSeen.objects.filter(user=self.user, topic=self.topic).count()
+        self.assertEqual(seen_count, 1)
+
+        # Second delivery must exclude served_id and return the remaining unseen question
+        questions_second = get_or_create_topic_quiz(self.topic, count=1, user=self.user)
+        self.assertEqual(len(questions_second), 1)
+        self.assertNotEqual(questions_second[0].id, served_id)
+
+    def test_practice_variant_persistence_and_privacy(self):
+        # Create generated variant in DB
+        variant = PrepQuestion.objects.create(
+            topic=self.topic,
+            question_type="generated",
+            number=1,
+            marks=5,
+            topic_label="Architecture",
+            question_latex="Design a modular microservices architecture.",
+            solution_latex="Break into bounded contexts with asynchronous event buses.",
+            verification_status="verified",
+        )
+
+        # 1. User has NOT unlocked variant -> generated_questions is empty (no free viewing!)
+        self.client.force_login(self.user)
+        resp1 = self.client.get(f"/prep/topic/{self.topic.id}/")
+        self.assertEqual(resp1.status_code, 200)
+        self.assertEqual(resp1.context["generated_questions"], [])
+        self.assertIn("Ready to practice exam-standard variants?", resp1.content.decode("utf-8"))
+
+        # 2. User unlocks the variant
+        PrepStudentQuestionUnlock.objects.create(
+            user=self.user,
+            question=variant,
+            topic=self.topic,
+        )
+
+        # 3. User revisits page -> unlocked variant persists and displays!
+        resp2 = self.client.get(f"/prep/topic/{self.topic.id}/")
+        self.assertEqual(resp2.status_code, 200)
+        unlocked_qs = resp2.context["generated_questions"]
+        self.assertEqual(len(unlocked_qs), 1)
+        self.assertEqual(unlocked_qs[0]["id"], variant.id)
+        self.assertIn("Design a modular microservices architecture", resp2.content.decode("utf-8"))
+
+        # 4. A different user visits -> cannot see variant for free!
+        other_user = User.objects.create_user(
+            username="other_student",
+            email="other_student@example.com",
+            password="secretpassword",
+        )
+        self.client.force_login(other_user)
+        resp3 = self.client.get(f"/prep/topic/{self.topic.id}/")
+        self.assertEqual(resp3.status_code, 200)
+        self.assertEqual(resp3.context["generated_questions"], [])
+        self.assertNotIn("Design a modular microservices architecture", resp3.content.decode("utf-8"))
 
 

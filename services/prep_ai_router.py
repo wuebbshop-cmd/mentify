@@ -4779,11 +4779,13 @@ def generate_similar_practice_questions(
     topic_obj=None,
     course_obj=None,
     force_fresh: bool = False,
+    exclude_question_ids: list[int] | None = None,
 ) -> dict:
     """
     Generate 1 to 5 similar practice questions + step-by-step answers per topic.
-    If force_fresh is False and questions exist, returns existing variants ($0 cost).
-    If force_fresh is True or no questions exist, invokes AI to generate fresh variants.
+    If force_fresh is False and unseen questions exist, returns existing unseen variants.
+    If force_fresh is True or no unseen questions exist, invokes AI to generate fresh variants.
+    Guarantees that a student never receives duplicate questions they have already unlocked.
     Saves new questions to PrepQuestion with sequential numbering and question_type='generated'.
     """
     from prep.models import PrepQuestion
@@ -4791,23 +4793,27 @@ def generate_similar_practice_questions(
     # Enforce strictly 1 to 5 questions
     count = max(1, min(int(question_count), 5))
 
-    # 1. Check existing generated questions in DB for this topic
+    # 1. Check existing generated questions in DB for this topic (excluding already unlocked)
     existing_qs = []
     if topic_obj:
         from services.prep_ingestion import learner_visible_assessment_questions
 
+        qs_filter = PrepQuestion.objects.filter(
+            topic=topic_obj,
+            question_type="generated",
+            verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+        )
+        if exclude_question_ids:
+            qs_filter = qs_filter.exclude(id__in=exclude_question_ids)
+
         existing_qs = list(
-            learner_visible_assessment_questions(PrepQuestion.objects.filter(
-                topic=topic_obj,
-                question_type="generated",
-                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
-            ).order_by("number", "id"))
+            learner_visible_assessment_questions(qs_filter.order_by("number", "id"))
         )
 
-    # Return cached questions only when force_fresh is False and existing questions exist
-    if not force_fresh and existing_qs:
+    # Return cached unseen questions when force_fresh is False and enough unseen questions exist
+    if not force_fresh and len(existing_qs) >= count:
         results = []
-        for q in existing_qs:
+        for q in existing_qs[:count]:
             clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
             clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
             results.append({
@@ -4826,7 +4832,7 @@ def generate_similar_practice_questions(
             "all_questions": results,
             "fresh_generated_count": 0,
             "cached": True,
-            "model": "Database Cache ($0)",
+            "model": "Database Cache",
         }
 
     # If force_fresh is requested, generate exactly `count` new variants. Otherwise remainder.
@@ -5144,7 +5150,13 @@ def generate_similar_practice_questions(
             newly_created.append(q_record)
 
     all_combined = existing_qs + newly_created
-    return_qs = newly_created if (force_fresh and newly_created) else all_combined
+    if force_fresh and newly_created:
+        return_qs = newly_created[:count]
+    elif newly_created:
+        remainder_needed = max(0, count - len(newly_created))
+        return_qs = (existing_qs[:remainder_needed] + newly_created)[:count]
+    else:
+        return_qs = existing_qs[:count]
     results = []
     for q in return_qs:
         clean_q = repair_question_and_solution_text(q.question_latex) if q.question_latex else ""
