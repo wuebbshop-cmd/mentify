@@ -17,7 +17,125 @@ from services.prep_ai_router import (
 )
 from services.prep_spaced_repetition import review_spaced_card, RATING_MAP
 
+import re
+
 logger = logging.getLogger(__name__)
+
+
+def _detect_course_discipline(course) -> str:
+    """Detect whether a course is Computing, Mathematics, Statistics, Physics, Chemistry, or General."""
+    if not course:
+        return "General"
+    code = str(course.code or "").strip().upper()
+    title = str(course.title or "").strip().lower()
+    prefix = re.split(r"[\s\-_0-9]+", code)[0] if code else ""
+
+    if prefix in {"CIT", "CCS", "CSC", "ICS", "BIT", "SIT", "COM", "CSE"} or any(
+        kw in title for kw in ("computer", "computing", "programming", "software", "algorithm", "database", "data structure", "information technology", "coding", "python", "java", "sql", "windows")
+    ):
+        return "Computing"
+
+    if prefix in {"SST", "STA", "ACT"} or any(
+        kw in title for kw in ("statistic", "probability", "regression", "sampling", "actuarial", "r programming", "data analysis", "matrix")
+    ):
+        return "Statistics"
+
+    if prefix in {"SMA", "MAT", "MATH", "MTH", "CAL", "ALG", "GEO"} or any(
+        kw in title for kw in ("mathematic", "calculus", "geometry", "algebra", "trigonometry", "differential equation", "linear algebra")
+    ):
+        return "Mathematics"
+
+    if prefix in {"SPH", "PHY"} or any(
+        kw in title for kw in ("physics", "mechanics", "electromagnetism", "quantum", "optics")
+    ):
+        return "Physics"
+
+    if prefix in {"SCH", "CHE", "BCH"} or any(
+        kw in title for kw in ("chemistry", "chemical", "organic", "inorganic", "biochemistry")
+    ):
+        return "Chemistry"
+
+    return "General"
+
+
+def parse_quiz_json_response(raw_text: str) -> list[dict]:
+    """
+    Robust JSON parser specifically engineered for quiz questions across disciplines.
+    Handles LaTeX equations ($...$), code snippets (`...`), unescaped quotes,
+    escaped backslashes (e.g. \\times, \\frac), and auto-repairs truncated JSON arrays.
+    """
+    content = str(raw_text or "").strip()
+    if not content:
+        return []
+
+    # Strip markdown code blocks if wrapped
+    if content.startswith("```json"):
+        content = content[7:]
+    elif content.startswith("```"):
+        content = content[3:]
+    if content.endswith("```"):
+        content = content[:-3]
+    content = content.strip()
+
+    # 1. Try robust_json_loads directly
+    try:
+        parsed = robust_json_loads(content)
+        if isinstance(parsed, list):
+            return parsed
+        if isinstance(parsed, dict):
+            return [parsed]
+    except Exception as e:
+        logger.debug(f"[Topic Quiz Parser] Direct robust_json_loads failed: {e}")
+
+    # 2. Repair LaTeX / Code unescaped backslashes and auto-close truncated arrays
+    repaired = content
+    repaired = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', repaired)
+    repaired = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', repaired)
+
+    if "[" in repaired:
+        start_bracket = repaired.find("[")
+        last_brace = repaired.rfind("}")
+        if last_brace > start_bracket:
+            candidate = repaired[start_bracket:last_brace + 1].strip() + "\n]"
+            try:
+                parsed = json.loads(candidate, strict=False)
+                if isinstance(parsed, list):
+                    return parsed
+            except Exception:
+                pass
+
+    # 3. Regex extraction of individual valid question objects
+    extracted = []
+    pattern = re.compile(
+        r'\{[^{}]*"question"\s*:\s*".*?"options"\s*:\s*\{[^{}]*\}.*?"correct_option"\s*:\s*"[A-D]".*?\}',
+        re.DOTALL
+    )
+    for m in pattern.finditer(content):
+        chunk = m.group(0)
+        try:
+            chunk_sanitized = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', chunk)
+            chunk_sanitized = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', chunk_sanitized)
+            obj = json.loads(chunk_sanitized, strict=False)
+            if isinstance(obj, dict) and "question" in obj and "options" in obj:
+                extracted.append(obj)
+        except Exception:
+            continue
+
+    if extracted:
+        return extracted
+
+    # Fallback to secondary extraction using robust_json_loads with sanitized string
+    try:
+        sanitized_fallback = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', content)
+        res = robust_json_loads(sanitized_fallback)
+        if isinstance(res, list):
+            return res
+        if isinstance(res, dict):
+            return [res]
+    except Exception:
+        pass
+
+    return []
 
 
 def generate_topic_quiz_questions(
@@ -48,6 +166,34 @@ def generate_topic_quiz_questions(
     if not source_context and topic.summary:
         source_context = f"Topic Summary: {topic.summary}"
 
+    discipline = _detect_course_discipline(course)
+    if discipline in {"Mathematics", "Statistics", "Physics"}:
+        discipline_rules = (
+            "DISCIPLINE GUIDELINES (Mathematics / Statistics / Physics):\n"
+            "- Mathematical Formulation: Use standard LaTeX notation enclosed in $...$ for inline formulas (e.g., $x^2 + y^2 = r^2$, $\\int_0^1 x\\,dx$) or $$...$$ for block equations.\n"
+            "- Escape Backslashes: In your JSON string values, ALWAYS double-escape LaTeX backslashes (e.g. write \\\\times, \\\\frac, \\\\sqrt, \\\\alpha, \\\\beta, \\\\sum, \\\\int) so the JSON parser does not fail on unescaped backslashes.\n"
+            "- Code in Statistics / R: If referencing statistical commands, syntax, or output matrices, use code backticks (`...`) and use single quotes ('...') inside code strings."
+        )
+    elif discipline == "Computing":
+        discipline_rules = (
+            "DISCIPLINE GUIDELINES (Computing / Software / Programming / Databases):\n"
+            "- Code & Syntax Formatting: For any programming commands, functions, syntax, code snippets, database queries, or variables (e.g. in Python, R, C++, Java, SQL, bash), enclose them in backticks (`...`) or block code fences.\n"
+            "- Quotation Escaping: Inside code strings and values, use single quotes ('...') or properly escaped double quotes (\\\") so they do not break JSON string boundaries.\n"
+            "- Output & Tracing: When asking what code outputs or how an algorithm executes, provide clear, exact code representation."
+        )
+    elif discipline == "Chemistry":
+        discipline_rules = (
+            "DISCIPLINE GUIDELINES (Chemistry / Biochemistry):\n"
+            "- Chemical Notation: Format chemical equations and formulas using LaTeX (e.g. $\\text{H}_2\\text{SO}_4$, $\\to$, $\\Delta H$) with properly double-escaped backslashes.\n"
+            "- Scientific Accuracy: Distractors must reflect plausible misconceptions about oxidation states, stoichiometry, mechanisms, or functional groups."
+        )
+    else:
+        discipline_rules = (
+            "DISCIPLINE GUIDELINES (Conceptual & Applied Domain):\n"
+            "- Deep Understanding: Focus on applied scenarios, critical definitions, comparative principles, and real-world domain problems.\n"
+            "- Clean JSON: Use single quotes ('...') inside question text when quoting phrases or titles."
+        )
+
     system_prompt = (
         "You are an expert university examiner. You create rigorous, high-yield "
         "multiple choice questions for university students. Each question must test conceptual understanding, "
@@ -65,10 +211,12 @@ Available Syllabus / Topic Material:
 {source_context[:4500]}
 \"\"\"
 
+{discipline_rules}
+
 Required JSON schema:
 [
   {{
-    "question": "Clear problem statement or question using LaTeX ($...$ or $$...$$) for any mathematical notation",
+    "question": "Clear problem statement or question using LaTeX ($...$ or $$...$$) for any mathematical notation or backticks (`...`) for code",
     "options": {{
       "A": "Option text",
       "B": "Option text",
@@ -92,7 +240,7 @@ Important rules:
 1. Every question must have exactly 4 choices: A, B, C, and D.
 2. The correct_option must be exactly one uppercase letter ('A', 'B', 'C', or 'D').
 3. Distractors (incorrect options) must represent authentic, common misconceptions rather than absurd choices.
-4. If the topic involves mathematics or physics, use proper LaTeX notation enclosed in $...$ for inline or $$...$$ for display math.
+4. Follow the DISCIPLINE GUIDELINES above for math formulas vs code syntax.
 5. Return ONLY a single raw JSON array of objects.
 """
 
@@ -103,8 +251,9 @@ Important rules:
             {"role": "user", "content": user_prompt},
         ],
         model=model_name,
-        max_tokens=4000,
-        temperature=0.3,
+        max_tokens=5000,
+        temperature=0.2,
+        thinking_enabled=False,
     )
 
     if not ai_response.get("success"):
@@ -112,13 +261,10 @@ Important rules:
         return []
 
     content = str(ai_response.get("content") or "").strip()
-    parsed_items = robust_json_loads(content)
-    if not isinstance(parsed_items, list):
-        if isinstance(parsed_items, dict):
-            parsed_items = [parsed_items]
-        else:
-            logger.warning(f"[Topic Quiz] Failed to parse JSON list from AI response for topic {topic.id}")
-            return []
+    parsed_items = parse_quiz_json_response(content)
+    if not isinstance(parsed_items, list) or not parsed_items:
+        logger.warning(f"[Topic Quiz] Failed to parse JSON list from AI response for topic {topic.id}")
+        return []
 
     created_questions = []
     valid_letters = {"A", "B", "C", "D"}
