@@ -167,6 +167,9 @@ def generate_topic_quiz_questions(
     if not source_context and topic.summary:
         source_context = f"Topic Summary: {topic.summary}"
 
+    from services.prep_sanitizer import purge_institutional_metadata
+    source_context = purge_institutional_metadata(source_context)
+
     discipline = _detect_course_discipline(course)
     if discipline in {"Mathematics", "Statistics", "Physics"}:
         discipline_rules = (
@@ -204,6 +207,7 @@ def generate_topic_quiz_questions(
         "analytical reasoning, or problem-solving. Every question must have exactly 4 options (A, B, C, D), "
         "one clearly correct answer, and detailed explanations of why the correct option is right and "
         "why each incorrect distractor is wrong.\n"
+        "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. If source material uses an institution as an example, generalize it to 'a higher education institution' or 'an academic institution'.\n"
         "Return ONLY a valid JSON list of question objects with no markdown fences, no preamble, and no HTML."
     )
 
@@ -245,7 +249,8 @@ Important rules:
 2. The correct_option must be exactly one uppercase letter ('A', 'B', 'C', or 'D').
 3. Distractors (incorrect options) must represent authentic, common misconceptions rather than absurd choices.
 4. Follow the DISCIPLINE GUIDELINES above for math formulas vs code syntax.
-5. Return ONLY a single raw JSON array of objects.
+5. STRICT INSTITUTIONAL ANONYMITY: Do NOT mention any specific university, college, or lecturer name. Generalize any institutional examples to 'a higher education institution' or 'an academic institution'.
+6. Return ONLY a single raw JSON array of objects.
 """
 
     model_name = getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-flash")
@@ -277,7 +282,7 @@ Important rules:
         if not isinstance(item, dict):
             continue
 
-        q_text = str(item.get("question") or "").strip()
+        q_text = repair_question_and_solution_text(str(item.get("question") or "").strip())
         raw_options = item.get("options")
         correct_letter = str(item.get("correct_option") or "").strip().upper()
         raw_explanation = item.get("explanation")

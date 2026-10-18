@@ -415,6 +415,8 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
 
 def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
     """Return bounded excerpts from approved coursework for grounded generation."""
+    from services.prep_sanitizer import purge_institutional_metadata
+
     selected = _approved_course_source_documents(course_obj, topic_title)
     if not selected:
         return ""
@@ -422,6 +424,7 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
     excerpts = []
     for document, is_topic_document in selected:
         text = _strip_course_administrative_front_matter(str(document.extracted_text or "")).strip()
+        text = purge_institutional_metadata(text)
         excerpt_limit = min(limit - total_length, limit if is_topic_document else 5000)
         if excerpt_limit <= 0:
             break
@@ -1748,6 +1751,8 @@ def _regenerate_invalid_note_sections(
             repair.save(update_fields=["current_content", "validation_issues", "updated_at"])
             continue
 
+        from services.prep_sanitizer import purge_institutional_metadata, sanitize_notes_payload
+        candidate = purge_institutional_metadata(candidate)
         entry = PrepContentCache.objects.filter(cache_key=cache_key).first()
         if not entry:
             return None
@@ -1772,6 +1777,8 @@ def _regenerate_invalid_note_sections(
                 "skipped": (review or {}).get("skipped", "")
             },
         })
+        payload = sanitize_notes_payload(payload)
+        candidate = payload.get("content", candidate)
         entry.payload = payload
         entry.save(update_fields=["payload", "updated_at"])
         repair.current_content = candidate
@@ -2762,6 +2769,8 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 repair.validation_issues = candidate_issues
                 repair.save(update_fields=["current_content", "validation_issues", "updated_at"])
                 continue
+            from services.prep_sanitizer import purge_institutional_metadata, sanitize_notes_payload
+            candidate = purge_institutional_metadata(candidate)
             entry = PrepContentCache.objects.filter(cache_key=cache_key).first()
             if not entry:
                 return None
@@ -2781,6 +2790,8 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                     "skipped": (review or {}).get("skipped", "")
                 },
             })
+            payload = sanitize_notes_payload(payload)
+            candidate = payload.get("content", candidate)
             entry.payload = payload
             entry.save(update_fields=["payload", "updated_at"])
             repair.current_content = candidate
@@ -3817,6 +3828,10 @@ def repair_question_and_solution_text(text: str) -> str:
     if prose_after.count("$$") % 2 != 0:
         text = text.rstrip() + "\n$$\n"
 
+    # 7. Purge institutional metadata, lecturer names, and generalize university examples
+    from services.prep_sanitizer import purge_institutional_metadata
+    text = purge_institutional_metadata(text)
+
     return text.strip()
 
 
@@ -3944,11 +3959,14 @@ def get_or_generate_topic_notes(
                         "available for independent review."
                     ),
                 }
+            from services.prep_sanitizer import purge_institutional_metadata, sanitize_data_structure
+            cached_content = purge_institutional_metadata(cached_content)
+            cached_blocks = sanitize_data_structure(cached.get("blocks")) if cached.get("blocks") else cached.get("blocks")
             # Strict read-only: never mutate or overwrite a valid cache on read.
             _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
             return {
                 "notes": cached_content,
-                "blocks": cached.get("blocks"),
+                "blocks": cached_blocks,
                 "schema_version": cached.get("schema_version", 1),
                 "cached": True,
                 "level": level,
@@ -4129,14 +4147,16 @@ def get_or_generate_topic_notes(
                 ).order_by("number", "id")[:8]
             )
             if topic_past_qs:
+                from services.prep_sanitizer import purge_institutional_metadata
+
                 q_lines = []
                 for q in topic_past_qs:
-                    q_text = (q.question_latex or "").strip()
+                    q_text = purge_institutional_metadata((q.question_latex or "").strip())
                     if not q_text or assessment_question_rendering_issues(q_text):
                         continue
                     entry = f"- Question {q.number} ({q.marks or 5} marks): {q_text[:350]}"
                     if q.solution_latex:
-                        sol_snippet = q.solution_latex.strip()[:250]
+                        sol_snippet = purge_institutional_metadata(q.solution_latex.strip())[:250]
                         entry += f"\n  Key solution technique / marking criteria: {sol_snippet}"
                     q_lines.append(entry)
                 if q_lines:
@@ -4330,8 +4350,10 @@ def get_or_generate_topic_notes(
         f"{past_questions_context_block}"
         f"{source_reference_block}"
         f"{visual_independence_block}"
-        "NON-STUDY ADMINISTRATIVE DETAILS POLICY (all disciplines):\n"
-        "Do not include lecturer or instructor names or credentials, course codes, course delivery details, university/faculty/department names as course metadata, contact details, email addresses, phone numbers, download records, hosting-platform disclaimers, or title-page administration. These are not study content even when present in the source. Discuss institutions or their people only when they are themselves the subject of the lesson, not as information about who offers or distributes this course.\n\n"
+        "STRICT INSTITUTIONAL ANONYMITY AND GENERALIZATION POLICY (MANDATORY FOR ALL DISCIPLINES):\n"
+        "- NEVER include or mention specific university, college, school, faculty, or department names (e.g., Kenyatta University, University of Nairobi, JKUAT, Harvard, etc.).\n"
+        "- NEVER include lecturer, professor, instructor, author, or student names, degree titles, course codes, or administrative markers.\n"
+        "- If any source document, syllabus, or past exam question uses a specific university as an example, scenario, or case study (e.g., 'Using Kenyatta University as an illustrative example...', 'social structure at Kenyatta University'), YOU MUST GENERALIZE IT to universal academic terminology such as 'a higher education institution', 'an academic institution', or 'a university setting'. NEVER use the actual university name anywhere in the notes, worked applications, or examples!\n\n"
         f"{curriculum_boundary_block}"
         f"{level_instruction}\n\n"
         f"{code_policy}\n"
@@ -4346,6 +4368,7 @@ def get_or_generate_topic_notes(
         note_system_prompt = (
             f"You are an expert academic tutor for the approved subject family {study_profile.get('subject_family')}. "
             "Treat uploaded notes and quoted evidence as the sole factual scope. Do not infer content from course codes, exams, or generic conventions. "
+            "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. If any source uses a specific university as an illustrative example, generalize it to 'a higher education institution' or 'an academic institution'. "
             + ("Do not use equations, mathematical symbols, LaTeX, or code because the approved notes contain none. " if not allows_math and not allows_code else "")
             + ("Include code only where the approved topic notes support it. " if allows_code else "Do not include code or pseudocode. ")
             + ("Use mathematical notation only where the approved notes support it. " if allows_math else "Do not include mathematical notation or equations. ")
@@ -4456,7 +4479,8 @@ def get_or_generate_topic_notes(
         content = _resolve_approved_visual_markers(content, validation_options["source_references"])
         content = _dedupe_approved_visual_images(content, validation_options["source_references"])
         content = _normalize_approved_visual_captions(content, validation_options["source_references"])
-        content = str(content).strip()
+        from services.prep_sanitizer import purge_institutional_metadata
+        content = purge_institutional_metadata(str(content).strip())
         completion_issues = _note_completion_issues(content, topic_title, **validation_options)
         review = None
         if not completion_issues:
@@ -4614,6 +4638,10 @@ def get_or_generate_topic_notes(
             },
             "generated_at": timezone.now().isoformat(),
         }
+        from services.prep_sanitizer import sanitize_notes_payload
+        payload = sanitize_notes_payload(payload)
+        content = payload.get("content", content)
+        blocks = payload.get("blocks", blocks)
         store_cached_content(cache_key, "topic_notes", p_hash, payload, course=course_obj, topic=topic_obj)
         _clear_note_generation_guard(topic_obj, level, cache_signature)
         return {
@@ -4813,9 +4841,11 @@ def generate_similar_practice_questions(
     # Return cached unseen questions when force_fresh is False and enough unseen questions exist
     if not force_fresh and len(existing_qs) >= count:
         results = []
+        from services.prep_sanitizer import purge_institutional_metadata
+
         for q in existing_qs[:count]:
-            clean_q = normalize_math_delimiters(q.question_latex) if q.question_latex else ""
-            clean_sol = normalize_math_delimiters(q.solution_latex) if q.solution_latex else ""
+            clean_q = purge_institutional_metadata(normalize_math_delimiters(q.question_latex)) if q.question_latex else ""
+            clean_sol = purge_institutional_metadata(normalize_math_delimiters(q.solution_latex)) if q.solution_latex else ""
             results.append({
                 "id": q.id,
                 "number": q.number,
@@ -4918,7 +4948,9 @@ def generate_similar_practice_questions(
 
     samples_context = ""
     if authentic_samples:
-        samples_formatted = "\n---\n".join(authentic_samples[:5])
+        from services.prep_sanitizer import purge_institutional_metadata
+        sanitized_samples = [purge_institutional_metadata(s) for s in authentic_samples[:5]]
+        samples_formatted = "\n---\n".join(sanitized_samples)
         samples_context = (
             f"Here are authentic historical examination questions for this topic:\n"
             f"{samples_formatted}\n\n"
@@ -4935,6 +4967,8 @@ def generate_similar_practice_questions(
         if published_notes:
             core_note = published_notes.get("level_2") or published_notes.get("level_1") or ""
             if core_note:
+                from services.prep_sanitizer import purge_institutional_metadata
+                core_note = purge_institutional_metadata(core_note)
                 notes_context_block = (
                     f"SYLLABUS LECTURE NOTES REFERENCE:\n"
                     f"{core_note[:2500]}\n\n"
@@ -4958,7 +4992,8 @@ def generate_similar_practice_questions(
         sys_prompt = (
             f"You are an expert university examiner for {course_code} ({topic_title}). "
             "Output strictly a valid JSON array of question objects without any conversational text. "
-            "Ensure all backslashes in JSON strings are escaped as \\\\."
+            "Ensure all backslashes in JSON strings are escaped as \\\\. "
+            "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. If any source uses a specific university as an illustrative example, generalize it to 'a higher education institution' or 'an academic institution'."
         )
     else:
         solution_rule_line = (
@@ -4969,7 +5004,11 @@ def generate_similar_practice_questions(
         solution_key_desc = (
             "- \"solution_latex\": string (complete step-by-step mathematical solution with vertical derivations in \\begin{aligned}...\\end{aligned}, intermediate justifications, and final answer)\n"
         )
-        sys_prompt = "You are an expert exam creator and mathematician. Output strictly a valid JSON array of question objects without any conversational text. Ensure all backslashes in JSON strings are escaped as \\\\."
+        sys_prompt = (
+            "You are an expert exam creator and mathematician. Output strictly a valid JSON array of question objects without any conversational text. "
+            "Ensure all backslashes in JSON strings are escaped as \\\\. "
+            "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. If any source uses a specific university as an illustrative example, generalize it to 'a higher education institution' or 'an academic institution'."
+        )
 
     prompt = (
         f"You are an expert exam creator for {course_code}: {topic_title}.\n"
@@ -4979,6 +5018,7 @@ def generate_similar_practice_questions(
         f"Generate exactly {needed} practice questions.\n"
         f"Verified source question IDs used as style/evidence: {json.dumps(source_question_ids)}.\n"
         "RULES:\n"
+        "- STRICT INSTITUTIONAL ANONYMITY: NEVER include or mention any specific university, college, school, faculty, department, or lecturer name. If a problem statement or scenario requires an institution as an example, generalize it to universal academic terms like 'a higher education institution' or 'an academic institution'.\n"
         "- Questions must test strictly the current topic, with absolutely zero leakage of future topics.\n"
         "- In question_latex and solution_latex, write clear multi-line formatting with `\\n\\n` between question parts (e.g. `(i)`, `(ii)`).\n"
         f"{code_rule_line}"
@@ -5488,12 +5528,15 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
     # First attempt deterministic evaluation if algebraic
     sympy_res = evaluate_symbolic_math(question_latex)
 
+    from services.prep_sanitizer import purge_institutional_metadata
+    clean_question_latex = purge_institutional_metadata(str(question_latex or "").strip())
+
     if is_nontechnical:
         prompt = (
             f"Provide a clear, academically rigorous university marking-scheme answer for this examination question from course {course_code} "
             f"({topic_label}), question type {question_type}):\n\n"
             f"{question_type_guidance}\n{modality_guidance}\n\n"
-            f"{question_latex}\n\n"
+            f"{clean_question_latex}\n\n"
             f"Approved topic summary:\n{topic_summary or 'No approved topic summary is available.'}\n\n"
             "Structure your response:\n"
             "- If the question has multiple parts (such as `(a)`, `(b)`, `(i)`, `(ii)`), answer EVERY part in order under its own clear bold heading (with mark allocation if shown).\n"
@@ -5504,12 +5547,14 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             "  4. **Conclusion / Summary**\n"
             "- For quantitative, table, or graphical parts (e.g., opportunity cost tables, elasticity, market equilibrium), state the formula, show the step-by-step calculation clearly, and interpret the result.\n"
             "- If you refer to tabular data, include the relevant Markdown table in your answer, and never use dangling visual callouts like 'as shown in the diagram/figure above' without explaining the coordinates and curve behavior directly in text.\n\n"
+            "STRICT INSTITUTIONAL ANONYMITY: Do NOT mention any specific university, college, school, faculty, department, or lecturer name. If the question refers to an institution as an example, generalize it to 'a higher education institution' or 'an academic institution'.\n\n"
             "Use exact definitions, theoretical principles, and clear academic reasoning. "
             "Do not convert it into a proof, derivation, or theorem exercise."
         )
         system_prompt = (
             "You are an expert university examiner and tutor in economics, business, social sciences, and humanities. "
             "Answer every sub-question thoroughly with clear definitions, theoretical analysis, step-by-step calculations where quantitative data are given, and concrete examples. "
+            "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. Generalize any institutional examples to 'a higher education institution' or 'an academic institution'. "
             "Do not rewrite the question as a mathematical proof or theorem derivation."
         )
         is_complex_proof = False
@@ -5518,14 +5563,15 @@ def get_or_generate_question_solution(question_latex: str, course_code: str, top
             f"Provide a rigorous, step-by-step mathematical proof and solution for this examination question "
             f"from course {course_code} ({topic_label}), question type {question_type}):\n\n"
             f"{question_type_guidance}\n{modality_guidance}\n\n"
-            f"$$\n{question_latex}\n$$\n\n"
+            f"$$\n{clean_question_latex}\n$$\n\n"
             f"Approved topic summary:\n{topic_summary or 'No approved topic summary is available.'}\n\n"
             "Structure your response:\n"
             "1. **Problem Statement & Given Conditions**\n"
             "2. **Step-by-Step Rigorous Proof / Derivation** with complete intermediate steps (never chain equalities horizontally)\n"
-            "3. **Final Result / Q.E.D.**"
+            "3. **Final Result / Q.E.D.**\n\n"
+            "STRICT INSTITUTIONAL ANONYMITY: Do NOT mention any specific university, college, school, faculty, department, or lecturer name. Generalize any institutional examples to 'a higher education institution' or 'an academic institution'."
         )
-        system_prompt = None
+        system_prompt = "You are a university mathematics examiner. Provide rigorous, step-by-step solutions. STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name."
         is_complex_proof = True
 
     source_excerpt = _approved_course_source_context(course_obj, topic_title, limit=5000)
@@ -5797,6 +5843,9 @@ def generate_adapted_past_question(question_obj) -> dict:
             end = page_headers[index + 1].start() if index + 1 < len(page_headers) else len(source_document.extracted_text)
             source_page_context = str(source_document.extracted_text)[header.end():end].strip()[:2000]
             break
+    from services.prep_sanitizer import purge_institutional_metadata
+    question_text = purge_institutional_metadata(question_text)
+    source_page_context = purge_institutional_metadata(source_page_context)
     if source_context:
         topic_context.append("Approved course material excerpts:\n" + source_context)
     topic_context_block = "\n\n".join(topic_context) or "No approved topic notes are available. Use only the explicit topic and source fragments."
@@ -5810,6 +5859,7 @@ def generate_adapted_past_question(question_obj) -> dict:
         f"Source-page context (verbatim):\n{source_page_context or 'No page-level text available.'}\n\n"
         f"Marks on the source: {question_obj.marks}.\n"
         "Use the approved topic context, visible fragments, source marks, and standard examination conventions. "
+        "STRICT INSTITUTIONAL ANONYMITY: NEVER include or mention any specific university, college, school, faculty, department, or lecturer name. Generalize any institutional examples to 'a higher education institution' or 'an academic institution'. "
         "Do not introduce material outside the stated topic or pretend to reproduce the original wording. "
         "Create a mathematically coherent equivalent "
         "that tests the same likely skill. Include a complete step-by-step solution. Return only one JSON "
@@ -5823,6 +5873,7 @@ def generate_adapted_past_question(question_obj) -> dict:
     )
     system_prompt = (
         "You are a careful academic mathematics examiner. Return only valid JSON. "
+        "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. "
         "All LaTeX backslashes inside JSON strings must be escaped. Keep the adapted question at the same "
         "academic level and topic as the source."
     )

@@ -1404,7 +1404,9 @@ def extract_topic_candidates(text: str) -> list[dict]:
         except Exception as ex:
             logger.warning(f"[Topic Extraction] LLM fallback exception: {ex}")
 
-    # Sanitize any institutional / school / lecturer references from extracted summaries and titles
+    # Sanitize any institutional / school / lecturer references from extracted summaries, titles, and subtopics
+    from services.prep_sanitizer import purge_institutional_metadata, sanitize_data_structure
+
     _inst_re = re.compile(
         r"(?i)\b(?:offered\s+at|taught\s+at|at\s+[A-Z][A-Za-z\s]+(?:University|College|Institute|School|Polytechnic)|"
         r"using\s+[A-Z][A-Za-z\s]+(?:University|College|Institute)\s+as\s+an?\s+(?:illustrative\s+)?example|"
@@ -1414,18 +1416,20 @@ def extract_topic_candidates(text: str) -> list[dict]:
     for t in topics:
         if not isinstance(t, dict):
             continue
-        raw_title = str(t.get("title") or "").strip()
+        raw_title = purge_institutional_metadata(str(t.get("title") or "").strip())
         raw_title = re.sub(r"(?i)\b(?:university|college|polytechnic|school\s+of|department\s+of)\b.*", "", raw_title).strip(" ,.;:-")
-        raw_summary = str(t.get("summary") or "").strip()
+        raw_summary = purge_institutional_metadata(str(t.get("summary") or "").strip())
         if _inst_re.search(raw_summary):
             raw_summary = _inst_re.sub("", raw_summary).strip(" ,.;:-")
             if len(raw_summary) < 20 or re.match(r"(?i)^an?\s+(?:introductory\s+)?course\b", raw_summary):
                 raw_summary = ""
+        subtopics = [purge_institutional_metadata(st) for st in (t.get("subtopics") or []) if isinstance(st, str)]
         t["title"] = raw_title.title()
+        t["subtopics"] = [st for st in subtopics if st.strip()]
         t["summary"] = raw_summary or f"Foundational concepts, theoretical principles, and core analytical methods for {t['title']}."
         cleaned_topics.append(t)
 
-    return cleaned_topics
+    return sanitize_data_structure(cleaned_topics)
 
 
 COURSE_STUDY_FAMILIES = {
@@ -2215,11 +2219,13 @@ def index_assessment_questions(prep_document, paper, *, reconstruct_invalid: boo
         return 0
 
     from services.prep_ai_router import clean_latex_document_markup, normalize_math_delimiters
+    from services.prep_sanitizer import purge_institutional_metadata
 
     for item in parsed_questions:
         cleaned_latex = clean_latex_document_markup(item.get("question_latex", ""))
         if cleaned_latex:
-            item["question_latex"] = normalize_math_delimiters(cleaned_latex)
+            cleaned_latex = normalize_math_delimiters(cleaned_latex)
+        item["question_latex"] = purge_institutional_metadata(cleaned_latex)
 
     parsed_questions = split_multi_topic_assessment_questions(prep_document.course, parsed_questions)
 
@@ -2686,7 +2692,10 @@ def process_prep_document(prep_document) -> dict:
         text = merge_local_and_ocr_pages(text, ocr_text)
 
     from services.prep_ai_router import clean_latex_document_markup, normalize_math_delimiters
+    from services.prep_sanitizer import purge_institutional_metadata
     cleaned_doc_text = normalize_math_delimiters(clean_latex_document_markup(text)) if text.strip() else text
+    if cleaned_doc_text.strip():
+        cleaned_doc_text = purge_institutional_metadata(cleaned_doc_text)
     prep_document.extracted_text = cleaned_doc_text
     prep_document.text_sha256 = hashlib.sha256(_normalise_document_text(cleaned_doc_text).encode("utf-8")).hexdigest() if cleaned_doc_text.strip() else ""
 
