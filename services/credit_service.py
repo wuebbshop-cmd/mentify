@@ -162,18 +162,28 @@ def get_plan_upload_limit(wallet):
     return PLAN_UPLOAD_LIMITS.get(wallet.current_plan, 0)
 
 
-def can_upload(wallet):
-    """Check whether the wallet may perform a PDF/image upload right now."""
+def get_remaining_upload_allowance(wallet):
+    """Monthly PDF/image upload allowance remaining on the current plan. None = unlimited (Pro)."""
     limit = get_plan_upload_limit(wallet)
     if limit is None:
-        return True   # Pro: unlimited
+        return None
     if limit == 0:
-        return False  # Freemium / expired: fully blocked
+        return 0
     now = timezone.now()
-    # Reset counter if the window has lapsed (defensive guard; command also does this)
     if wallet.pdf_uploads_reset_at and wallet.pdf_uploads_reset_at <= now:
-        return True   # Counter will be reset on record_upload()
-    return wallet.pdf_uploads_this_month < limit
+        return limit
+    return max(0, limit - wallet.pdf_uploads_this_month)
+
+
+def can_upload(wallet, required_credits: int = 2):
+    """
+    Check whether the wallet may perform a document upload right now.
+    Allowed if the student has free monthly allowance OR sufficient credits.
+    """
+    allowance = get_remaining_upload_allowance(wallet)
+    if allowance is None or allowance > 0:
+        return True
+    return get_available_credits(wallet) >= required_credits
 
 
 def record_upload(wallet):
@@ -193,33 +203,27 @@ def record_upload(wallet):
     wallet.refresh_from_db(fields=["pdf_uploads_this_month", "pdf_uploads_reset_at"])
 
 
-def enforce_upload_limit(wallet):
+def enforce_upload_limit(wallet, required_credits: int = 2):
     """
-    Raise UploadLimitExceeded if the wallet cannot perform a PDF/image upload.
-    Call this before processing any uploaded file. On success, call record_upload().
+    Validates whether the student can perform a document upload.
+    If the free monthly plan allowance is exhausted or on Freemium,
+    students can upload seamlessly using credits (2 credits for digital, 5 for OCR).
+    Raises InsufficientCredits if the user has neither allowance nor enough credits.
     """
-    limit = get_plan_upload_limit(wallet)
-    if limit is None:
-        return  # Pro: unlimited, always allowed
-    if limit == 0:
+    allowance = get_remaining_upload_allowance(wallet)
+    if allowance is None or allowance > 0:
+        return  # Covered by plan allowance or unlimited Pro plan
+
+    available = get_available_credits(wallet)
+    if available < required_credits:
         if wallet.current_plan == "freemium":
-            raise UploadLimitExceeded(
-                "PDF and image uploads are not available on the Free Plan. "
-                "Upgrade to Basic or higher to unlock uploads."
+            raise InsufficientCredits(
+                f"Course document uploads require {required_credits} credits on Freemium. "
+                f"You currently have {available} credits. Please top up your credits or subscribe to a plan."
             )
-        raise UploadLimitExceeded(
-            "Your current plan does not include PDF or image uploads. "
-            "Please upgrade to continue."
-        )
-    now = timezone.now()
-    # If the reset window has passed, the counter will be reset on record_upload — allow it
-    if wallet.pdf_uploads_reset_at and wallet.pdf_uploads_reset_at <= now:
-        return
-    if wallet.pdf_uploads_this_month >= limit:
-        raise UploadLimitExceeded(
-            f"You've used all {limit} PDF/image uploads for this month on your "
-            f"{wallet.current_plan.title()} plan. Upgrade to Pro for unlimited uploads, "
-            "or wait for your plan to renew."
+        raise InsufficientCredits(
+            f"You have used your monthly plan upload allowance and have {available} credits. "
+            f"At least {required_credits} credits are required to upload additional materials. Please top up credits or upgrade to Pro."
         )
 
 

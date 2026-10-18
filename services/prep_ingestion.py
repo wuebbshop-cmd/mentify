@@ -2663,7 +2663,9 @@ def process_prep_document(prep_document) -> dict:
         try:
             enforce_subscription_limit(wallet, quota_name)
         except PlanLimitExceeded as exc:
-            return {"success": False, "error": str(exc), "credits_balance": get_available_credits(wallet)}
+            # If the student can cover the upload cost via their credit balance or is on Freemium, allow it
+            if get_available_credits(wallet) < credit_cost:
+                return {"success": False, "error": str(exc), "credits_balance": get_available_credits(wallet)}
 
     # 2. Permanent GitHub Storage only after the request is eligible to run.
     with prep_document.file.open("rb") as uploaded_file:

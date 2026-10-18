@@ -642,6 +642,21 @@
   <div class="upload-hero">
     <h1>Upload study materials</h1>
     <p>Add your lecture notes, CAT papers or past exams. We'll process them into organized study notes for your course.</p>
+    {% if request.user.is_authenticated %}
+    <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; background: rgba(15, 118, 110, 0.08); border: 1px solid rgba(15, 118, 110, 0.2); padding: 4px 12px; border-radius: 20px; color: var(--green);">
+      <span>
+        {% if uploads_remaining is None %}
+          <strong>Pro Plan:</strong> Unlimited Free Document Uploads
+        {% elif uploads_remaining > 0 %}
+          <strong>{{ wallet_plan|title }} Plan:</strong> {{ uploads_remaining }} free upload{{ uploads_remaining|pluralize }} remaining this month (then 2–5 credits)
+        {% else %}
+          <strong>Pay-As-You-Go:</strong> 2 credits (text) &bull; 5 credits (OCR scan) &bull; Duplicates $0 free
+        {% endif %}
+      </span>
+      <span style="opacity: 0.5;">&bull;</span>
+      <span>Balance: <strong>{{ user_credits }} Credits</strong></span>
+    </div>
+    {% endif %}
   </div>
 
   <!-- 3-Step Horizontal Stepper -->
@@ -762,7 +777,7 @@
         <div class="upload-dropzone-title">
           Drop your PDFs here or <span class="browse-link">browse files</span>
         </div>
-        <p class="upload-dropzone-sub">PDF, Word, Markdown, or text &middot; Up to 10 files &middot; 15 MB per file</p>
+        <p class="upload-dropzone-sub">PDF, Word, Markdown, or text &middot; Uses plan allowance or 2–5 credits &middot; Duplicates $0 free</p>
         <input type="file" name="files" id="prep-files" class="upload-file-input-hidden" accept=".pdf,.docx,.doc,.md,.txt" multiple onchange="handleFileInputChange(this)">
       </div>
 

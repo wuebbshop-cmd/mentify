@@ -33,14 +33,18 @@ from .models import (
 from services.credit_service import (
     InsufficientCredits,
     PlanLimitExceeded,
+    UploadLimitExceeded,
     consume_credits,
     credits_for_usage,
     enforce_subscription_limit,
+    enforce_upload_limit,
     estimated_generation_credits,
     get_available_credits,
+    get_remaining_upload_allowance,
     grant_purchased_topup,
     grant_subscription,
     has_active_subscription,
+    record_upload,
 )
 
 logger = logging.getLogger(__name__)
@@ -2037,13 +2041,19 @@ def prep_upload(request):
         if is_async:
             import hashlib
             from services.prep_ingestion import enqueue_prep_document_ingestion
-            from services.credit_service import enforce_upload_limit, record_upload, UploadLimitExceeded
 
             wallet = PrepWallet.get_or_create_wallet(request.user)
 
-            # ── Plan upload gate — check BEFORE touching any files ─────────────
+            # ── Plan upload gate — check allowance or credit balance before touching files ──
             try:
-                enforce_upload_limit(wallet)
+                enforce_upload_limit(wallet, required_credits=2)
+            except InsufficientCredits as exc:
+                return JsonResponse({
+                    "success": False,
+                    "error": str(exc),
+                    "credits_balance": get_available_credits(wallet),
+                    "upgrade_required": True,
+                }, status=402)
             except UploadLimitExceeded as exc:
                 return JsonResponse({"success": False, "error": str(exc), "upgrade_required": True}, status=403)
 
@@ -2054,6 +2064,7 @@ def prep_upload(request):
             duplicates = 0
             failures = []
             created_docs = []
+            total_credits_deducted = 0
 
             for uploaded_file in uploaded_files:
                 target_course = course
@@ -2102,11 +2113,33 @@ def prep_upload(request):
                     created_docs.append(_serialize_upload_document(prep_doc))
                     continue
 
-                try:
-                    enforce_subscription_limit(wallet, "document_uploads")
-                except PlanLimitExceeded as exc:
-                    failures.append(f"{uploaded_file.name}: {exc}")
-                    continue
+                # Document is NOT a duplicate. Check plan allowance or deduct credits.
+                is_scanned_ocr = "scanned" in doc_type.lower() or "exam" in doc_type.lower()
+                doc_credit_cost = 5 if is_scanned_ocr else 2
+                allowance = get_remaining_upload_allowance(wallet)
+
+                if allowance is None:
+                    # Pro: unlimited free uploads
+                    pass
+                elif allowance > 0:
+                    # Use 1 free slot from monthly plan allowance
+                    record_upload(wallet)
+                else:
+                    # Plan allowance exhausted or Freemium: pay with credits
+                    try:
+                        consume_credits(
+                            wallet,
+                            amount=doc_credit_cost,
+                            action_type="upload_ocr" if is_scanned_ocr else "upload_text",
+                            description=f"Course Material Upload ({'OCR' if is_scanned_ocr else 'Digital'}): {target_course.code} - {uploaded_file.name}",
+                            metadata={"course_code": target_course.code, "file_name": uploaded_file.name},
+                        )
+                        total_credits_deducted += doc_credit_cost
+                    except InsufficientCredits:
+                        failures.append(
+                            f"{uploaded_file.name}: requires {doc_credit_cost} credits (available: {get_available_credits(wallet)})"
+                        )
+                        continue
 
                 prep_doc = PrepDocument.objects.create(
                     user=request.user,
@@ -2129,7 +2162,6 @@ def prep_upload(request):
                     url=target_course_url,
                 )
                 enqueue_prep_document_ingestion(prep_doc.pk)
-                record_upload(wallet)   # increment monthly upload counter
                 queued += 1
                 created_docs.append(_serialize_upload_document(prep_doc))
 
@@ -2138,13 +2170,16 @@ def prep_upload(request):
                 status_parts.append(
                     f"Uploaded {queued} document(s) for {course.code}. Background extraction & syllabus indexing has started."
                 )
+                if total_credits_deducted > 0:
+                    status_parts.append(f"({total_credits_deducted} credits deducted).")
             if duplicates:
                 status_parts.append(
-                    f"{duplicates} duplicate document(s) were recognized instantly and saved for audit without re-indexing."
+                    f"{duplicates} duplicate document(s) recognized ($0 free) and saved without re-indexing."
                 )
             if failures:
                 status_parts.append(f"{len(failures)} document(s) need attention: " + "; ".join(failures)[:500])
 
+            status_code = 202 if queued else (200 if duplicates else (402 if any("requires" in f for f in failures) else 400))
             return JsonResponse(
                 {
                     "success": bool(queued or duplicates or not failures),
@@ -2158,9 +2193,11 @@ def prep_upload(request):
                     "course_title": f"{course.code} — {course.title}",
                     "course_url": course_url,
                     "status_url": reverse("prep:api_document_upload_status"),
+                    "credits_deducted": total_credits_deducted,
+                    "credits_balance": get_available_credits(wallet),
                     "documents": created_docs,
                 },
-                status=202 if queued else (200 if duplicates else 400),
+                status=status_code,
             )
 
         from services.prep_ingestion import process_prep_document
@@ -2228,9 +2265,13 @@ def prep_upload(request):
         return redirect(f"{reverse('prep:upload')}?course_id={course.pk}")
 
     user_credits = 0
+    uploads_remaining = 0
+    wallet_plan = "freemium"
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
         user_credits = get_available_credits(wallet)
+        uploads_remaining = get_remaining_upload_allowance(wallet)
+        wallet_plan = wallet.current_plan
     selected_course_id = request.GET.get("course_id", "").strip()
     courses = PrepCourse.objects.filter(is_active=True).order_by("code")
     if not selected_course_id.isdigit() or not courses.filter(pk=selected_course_id).exists():
@@ -2248,6 +2289,8 @@ def prep_upload(request):
     context = {
         "active_tab": "upload",
         "user_credits": user_credits,
+        "uploads_remaining": uploads_remaining,
+        "wallet_plan": wallet_plan,
         "upload_courses": courses,
         "selected_course_id": selected_course_id,
         "upload_tab": upload_tab,
@@ -2373,7 +2416,7 @@ def prep_billing(request):
                     "Cached Lecture Notes (Read Only)",
                     "Past Exam Questions & Answers",
                     "AI Tutor & Generated Questions (uses credits)",
-                    "No PDF / Image Uploads",
+                    "Upload Course Documents (2–5 credits/doc)",
                     "Buy credit top-ups anytime",
                 ],
                 "active": current_plan_code == "freemium",
@@ -2391,7 +2434,7 @@ def prep_billing(request):
                 "badge_label": "STARTER",
                 "features": [
                     "250 Monthly Credits",
-                    "20 PDF / Image Uploads per month",
+                    "20 Free PDF / Document Uploads/mo (then 2–5 credits)",
                     "100 Practice Exam Questions",
                     "5 Handwritten & Scanned Exam Uploads",
                     "Full PDF & DOCX Study Pack Downloads",
@@ -2414,7 +2457,7 @@ def prep_billing(request):
                 "badge_label": "RECOMMENDED",
                 "features": [
                     "450 Monthly Credits",
-                    "40 PDF / Image Uploads per month",
+                    "40 Free PDF / Document Uploads/mo (then 2–5 credits)",
                     "200 Practice Exam Questions",
                     "15 Handwritten & Scanned Exam Uploads",
                     "Full PDF & DOCX Study Pack Downloads",
@@ -2437,7 +2480,7 @@ def prep_billing(request):
                 "badge_label": "FULL ACCESS",
                 "features": [
                     "750 Monthly Credits",
-                    "Unlimited PDF / Image Uploads",
+                    "Unlimited Free Document Uploads",
                     "350 Practice Exam Questions",
                     "30 Handwritten & Scanned Exam Uploads",
                     "Full PDF & DOCX Study Pack Downloads",

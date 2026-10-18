@@ -77,9 +77,9 @@
       <a href="{% url 'prep:dashboard' %}#credit-activity" style="color: var(--green); text-decoration: none; font-weight: 500;">View Activity on Dashboard &rarr;</a>
     </div>
     <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
-      📎 Monthly Upload Quota:
+      📎 Included Monthly Uploads:
       <strong style="color: var(--text);">
-        {{ uploads_used }} / {% if upload_limit is None %}Unlimited{% else %}{{ upload_limit }}{% endif %}
+        {{ uploads_used }} / {% if upload_limit is None %}Unlimited{% elif upload_limit == 0 %}0 (2–5 credits/doc){% else %}{{ upload_limit }} (then 2–5 credits){% endif %}
       </strong>
     </div>
   </div>
@@ -103,7 +103,7 @@
           >
           <span style="font-size: 0.85rem; color: var(--text-muted);">credits</span>
         </div>
-        <button type="submit" id="topup-submit-btn" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger); font-size: 0.9rem; padding: 8px 16px;">
+        <button type="submit" id="topup-submit-btn" class="btn btn-primary" style="background: var(--green); border-color: var(--green); color: #fff; font-size: 0.9rem; padding: 8px 16px;">
           Pay KES 150 via M-Pesa
         </button>
       </form>
@@ -212,8 +212,8 @@
 
     <!-- Transparent Notice on Course Sharing & Tutor Estimation -->
     <div style="padding: 12px 22px; background: rgba(245, 158, 11, 0.08); border-bottom: 1px solid rgba(245, 158, 11, 0.2); font-size: 0.82rem; color: #92400e; line-height: 1.5;">
-      💡 <strong>Course Cost Share &amp; Tutor Usage Note:</strong>
-      Cached lecture notes and past papers are free to read. When unlocking an uncached, freshly synthesized course unit or custom course pack for the first time, an initial one-time course-share credit deduction may apply. AI Tutor replies start at 1 credit for standard questions, and scale proportionally (2–5 credits) for long inquiries, heavy proofs, or attached documents based on model tokens.
+      💡 <strong>Course Upload &amp; Credit Usage Note:</strong>
+      Cached lecture notes and past papers are free to read. Document uploads use your monthly plan allowance first (Basic: 20 free, Plus: 40 free, Pro: unlimited). Once plan allowance is used up or on Freemium, students can upload materials anytime using credits (2 credits for digital text, 5 credits for scanned/OCR). Exact duplicate documents are always 0 credits ($0 free).
     </div>
 
     <!-- Structured Rules List -->
@@ -258,7 +258,7 @@
           </div>
           <div>
             <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Tutor Image &amp; Scanned PDF Upload (OCR)</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Visual OCR extraction for photos and scanned pages (subject to plan monthly upload limits)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Visual OCR extraction for photos and scanned pages (uses plan allowance first, then 5 credits)</div>
           </div>
         </div>
         <span class="badge" style="background: rgba(230, 126, 34, 0.12); color: #d97706; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">
@@ -274,7 +274,7 @@
           </div>
           <div>
             <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Document / PDF Upload</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Digital lecture notes, course outlines, and typed syllabus materials (subject to plan monthly upload limits)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Digital lecture notes, course outlines, and typed syllabus materials (uses plan allowance first, then 2 credits)</div>
           </div>
         </div>
         <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 12px;">

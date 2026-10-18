@@ -9,9 +9,11 @@ from accounts.models import User
 from prep.models import (
     PrepCourse,
     PrepCourseEnrollment,
+    PrepCreditGrant,
     PrepDocument,
     PrepNoteGenerationGuard,
     PrepTopic,
+    PrepWallet,
 )
 from services.email_service import send_prep_note_generation_failure_email
 
@@ -205,6 +207,110 @@ class PrepUploadWorkflowTests(TestCase):
         self.assertEqual(dup_payload["duplicate_count"], 1)
         # Background worker must not be called again for an exact duplicate
         self.assertEqual(enqueue_ingestion.call_count, 1)
+
+    @patch("services.prep_ingestion.enqueue_prep_document_ingestion")
+    def test_freemium_user_with_credits_can_upload_and_credits_are_deducted(self, enqueue_ingestion):
+        from services.credit_service import grant_purchased_topup
+        wallet = PrepWallet.get_or_create_wallet(self.user)
+        wallet.credit_grants.all().delete()
+        wallet.credits_balance = 0
+        wallet.current_plan = "freemium"
+        wallet.save()
+
+        grant_purchased_topup(wallet, 20, "TEST-TOPUP-20", "20 Credit Topup")
+        wallet.refresh_from_db()
+
+        response = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "files": [SimpleUploadedFile("digital_notes.pdf", b"%PDF-1.4 digital content", content_type="application/pdf")],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+        payload = response.json()
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["credits_deducted"], 2)
+        self.assertEqual(payload["credits_balance"], 18)
+        self.assertEqual(enqueue_ingestion.call_count, 1)
+
+    @patch("services.prep_ingestion.enqueue_prep_document_ingestion")
+    def test_freemium_user_with_zero_credits_is_prompted_to_top_up(self, enqueue_ingestion):
+        wallet = PrepWallet.get_or_create_wallet(self.user)
+        wallet.credit_grants.all().delete()
+        wallet.current_plan = "freemium"
+        wallet.credits_balance = 0
+        wallet.save()
+
+        response = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "files": [SimpleUploadedFile("notes_blocked.pdf", b"%PDF-1.4 notes blocked", content_type="application/pdf")],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 402)
+        payload = response.json()
+        self.assertFalse(payload["success"])
+        self.assertTrue(payload.get("upgrade_required"))
+        self.assertIn("2 credits", payload["error"])
+        enqueue_ingestion.assert_not_called()
+
+    @patch("services.prep_ingestion.enqueue_prep_document_ingestion")
+    def test_basic_plan_uses_allowance_first_then_deducts_credits_when_exhausted(self, enqueue_ingestion):
+        from services.credit_service import grant_subscription
+        wallet = PrepWallet.get_or_create_wallet(self.user)
+        wallet.credit_grants.all().delete()
+        wallet.credits_balance = 0
+        wallet.save()
+
+        grant_subscription(wallet, "basic", 250, reference_code="TEST-BASIC-ALLOWANCE")
+        wallet.refresh_from_db()
+        self.assertEqual(wallet.pdf_uploads_this_month, 0)
+        self.assertEqual(wallet.credits_balance, 250)
+
+        # 1. First upload: uses allowance, 0 credits deducted
+        res1 = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "files": [SimpleUploadedFile("doc1.pdf", b"%PDF-1.4 doc 1 content", content_type="application/pdf")],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(res1.status_code, 202)
+        payload1 = res1.json()
+        self.assertEqual(payload1["credits_deducted"], 0)
+        wallet.refresh_from_db()
+        self.assertEqual(wallet.pdf_uploads_this_month, 1)
+
+        # 2. Simulate allowance exhausted (20 used out of 20 limit)
+        wallet.pdf_uploads_this_month = 20
+        wallet.save()
+
+        # 3. Next upload: allowance exhausted, falls back to credit deduction (2 credits)
+        res2 = self.client.post(
+            reverse("prep:upload"),
+            {
+                "course_id": str(self.course.pk),
+                "doc_type": "Lecture Notes",
+                "academic_year": "2025/2026",
+                "files": [SimpleUploadedFile("doc2.pdf", b"%PDF-1.4 doc 2 content", content_type="application/pdf")],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(res2.status_code, 202)
+        payload2 = res2.json()
+        self.assertEqual(payload2["credits_deducted"], 2)
+        self.assertEqual(payload2["credits_balance"], 248)
 
 
 class PrepFailureNotificationRecipientTests(TestCase):
