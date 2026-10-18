@@ -35,9 +35,9 @@ PLAN_UPLOAD_LIMITS = {
 # These are the server-side counterparts of the limits shown on the billing
 # page. Credits pay for model use; these caps bound plan volume independently.
 SUBSCRIPTION_USAGE_LIMITS = {
-    "basic": {"document_uploads": 10, "scanned_uploads": 5,  "practice_questions": 100},
-    "plus":  {"document_uploads": 20, "scanned_uploads": 15, "practice_questions": 200},
-    "pro":   {"document_uploads": 40, "scanned_uploads": 30, "practice_questions": 350},
+    "basic": {"document_uploads": 20, "scanned_uploads": 5,  "practice_questions": 100},
+    "plus":  {"document_uploads": 40, "scanned_uploads": 15, "practice_questions": 200},
+    "pro":   {"document_uploads": None, "scanned_uploads": 30, "practice_questions": 350},
 }
 
 
@@ -446,45 +446,100 @@ def subscription_usage(wallet) -> dict:
     cycle_start = wallet.plan_expires_at - timedelta(days=30)
     transactions = PrepTransaction.objects.filter(wallet=wallet, created_at__gte=cycle_start)
     practice_questions = 0
-    for entry in transactions.filter(action_type="ai_practice_gen").only("amount", "description", "metadata"):
+    for entry in transactions.filter(action_type__in=["ai_practice_gen", "active_recall_drill", "deep_reasoning"]).only("amount", "description", "metadata"):
         metadata = entry.metadata if isinstance(entry.metadata, dict) else {}
-        count = metadata.get("question_count")
+        count = metadata.get("question_count") or metadata.get("count")
         if isinstance(count, int) and count > 0:
             practice_questions += count
             continue
         # Preserve accurate counting for transactions created before the
         # question_count metadata field was introduced.
-        match = re.search(r"Generated\s+(\d+)\s+Practice Questions", entry.description or "", re.IGNORECASE)
+        match = re.search(r"(?:Generated|Active Recall Drill \()\s*(\d+)\s*(?:Practice Questions|Qs)", entry.description or "", re.IGNORECASE)
         if match:
             practice_questions += int(match.group(1))
+            continue
+        practice_questions += 1
 
     return {
         "document_uploads": transactions.filter(action_type="upload_text").count(),
-        "scanned_uploads": transactions.filter(action_type="upload_ocr").count(),
+        "scanned_uploads": transactions.filter(action_type__in=["upload_ocr", "topic_tutor_ocr"]).count(),
         "practice_questions": practice_questions,
     }
 
 
-def enforce_subscription_limit(wallet, limit_name: str, requested: int = 1) -> dict:
-    """Reject paid-plan work that would exceed its published per-cycle cap."""
+def get_remaining_practice_question_allowance(wallet) -> int:
+    """Monthly practice/drill questions allowance remaining on the current paid plan. 0 for freemium/trial."""
+    if not has_active_subscription(wallet):
+        return 0
+    limits = SUBSCRIPTION_USAGE_LIMITS.get(wallet.current_plan, {})
+    limit = limits.get("practice_questions")
+    if limit is None:
+        return 999999
+    usage = subscription_usage(wallet)
+    used = usage.get("practice_questions", 0)
+    return max(0, limit - used)
+
+
+def get_remaining_scanned_allowance(wallet) -> int | None:
+    """Monthly scanned/OCR upload allowance remaining on the current paid plan. None = unlimited."""
+    if not has_active_subscription(wallet):
+        return 0
+    limits = SUBSCRIPTION_USAGE_LIMITS.get(wallet.current_plan, {})
+    limit = limits.get("scanned_uploads")
+    if limit is None:
+        return None
+    usage = subscription_usage(wallet)
+    used = usage.get("scanned_uploads", 0)
+    return max(0, limit - used)
+
+
+def enforce_subscription_limit(wallet, limit_name: str, requested: int = 1, required_credits: int = 0) -> dict:
+    """
+    Validates whether the student has plan allowance or sufficient credits to perform this action.
+    If the plan allowance is exhausted, allows seamless continuation with credits.
+    Raises InsufficientCredits if the student has neither allowance nor enough credits.
+    """
     requested = max(0, int(requested))
     limits = SUBSCRIPTION_USAGE_LIMITS.get(wallet.current_plan)
     if not limits or not has_active_subscription(wallet):
-        # Trial / Freemium access is governed solely by dated credit grants.
-        return {}
+        # Trial / Freemium access is governed solely by credit balance
+        available = get_available_credits(wallet)
+        if required_credits > 0 and available < required_credits:
+            raise InsufficientCredits(
+                f"This action requires {required_credits} credits on {wallet.current_plan.title()}. "
+                f"You currently have {available} credits. Please top up your credits or subscribe to a plan."
+            )
+        return {"covered_by_plan": False, "remaining": 0, "used": 0, "limit": 0}
+
     if limit_name not in limits:
         raise ValueError(f"Unknown subscription limit: {limit_name}")
 
     usage = subscription_usage(wallet)
     used = usage.get(limit_name, 0)
     limit = limits[limit_name]
-    if used + requested > limit:
+
+    if limit is None:
+        return {"covered_by_plan": True, "remaining": None, "used": used, "limit": None}
+
+    if used + requested <= limit:
+        return {"covered_by_plan": True, "remaining": limit - used - requested, "used": used, "limit": limit}
+
+    # Allowance exhausted: fallback to credits
+    available = get_available_credits(wallet)
+    if required_credits > 0 and available < required_credits:
+        label = limit_name.replace("_", " ")
+        raise InsufficientCredits(
+            f"You have used your monthly plan allowance of {limit} {label} on your {wallet.current_plan.title()} plan. "
+            f"At least {required_credits} credits are required to continue (available: {available}). Please top up credits or upgrade to Pro."
+        )
+    elif required_credits == 0 and used + requested > limit and available == 0:
         label = limit_name.replace("_", " ")
         raise PlanLimitExceeded(
             f"Your {wallet.current_plan.title()} plan includes {limit} {label} per 30-day plan period. "
             f"You have used {used}; this request needs {requested} more."
         )
-    return {"used": used, "limit": limit, "remaining": limit - used}
+
+    return {"covered_by_plan": False, "remaining": 0, "used": used, "limit": limit}
 
 
 def grant_subscription(wallet, plan_id: str, amount: int, reference_code: str = ""):

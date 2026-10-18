@@ -40,6 +40,8 @@ from services.credit_service import (
     enforce_upload_limit,
     estimated_generation_credits,
     get_available_credits,
+    get_remaining_practice_question_allowance,
+    get_remaining_scanned_allowance,
     get_remaining_upload_allowance,
     grant_purchased_topup,
     grant_subscription,
@@ -1470,25 +1472,24 @@ def prep_topic_quiz_api(request, topic_id):
         count = 5
 
     wallet = PrepWallet.get_or_create_wallet(request.user)
-
-    # 1. Enforce subscription usage limit for practice/drill questions
-    try:
-        enforce_subscription_limit(wallet, "practice_questions", count)
-    except PlanLimitExceeded as exc:
-        return JsonResponse({
-            "success": False,
-            "error": str(exc),
-            "credits_balance": get_available_credits(wallet),
-        }, status=403)
-
-    # 2. Check sufficient credit balance
     available_credits = get_available_credits(wallet)
-    required_credits = count
-    if available_credits < required_credits:
+
+    # Check whether the drill is covered by active subscription allowance
+    has_sub = has_active_subscription(wallet)
+    allowance = get_remaining_practice_question_allowance(wallet) if has_sub else 0
+    is_covered_by_plan = has_sub and allowance >= count
+
+    cost_in_credits = 0 if is_covered_by_plan else count
+    if cost_in_credits > 0 and available_credits < cost_in_credits:
+        if wallet.current_plan == "freemium":
+            err_msg = f"Insufficient credits: Active recall drills require {cost_in_credits} credits on Freemium. You currently have {available_credits} credits. Please top up your credits or subscribe to a plan."
+        else:
+            err_msg = f"Insufficient credits: You have used your monthly plan question allowance and have {available_credits} credits. At least {cost_in_credits} credits are required to launch this drill. Please top up credits or upgrade to Pro."
         return JsonResponse({
             "success": False,
-            "error": f"Insufficient credits. At least {required_credits} credits are required to launch this active recall drill.",
+            "error": err_msg,
             "credits_balance": available_credits,
+            "upgrade_required": True,
         }, status=402)
 
     fresh = request.GET.get("fresh") in {"1", "true", "True"}
@@ -1506,23 +1507,32 @@ def prep_topic_quiz_api(request, topic_id):
             "credits_balance": get_available_credits(wallet),
         }, status=503)
 
-    # 3. Deduct credits for the delivered drill session
-    credits_deducted = min(len(questions), required_credits)
     course_code = topic.course.code if topic.course else ""
-    try:
-        consume_credits(
-            wallet,
-            amount=credits_deducted,
+    if is_covered_by_plan:
+        credits_deducted = 0
+        PrepTransaction.objects.create(
+            wallet=wallet,
+            amount=0,
             action_type="active_recall_drill",
-            description=f"Active Recall Drill ({len(questions)} Qs): {course_code} - {topic.title}",
-            metadata={"topic_id": topic.id, "count": len(questions)},
+            description=f"Active Recall Drill ({len(questions)} Qs, Plan Allowance): {course_code} - {topic.title}",
+            metadata={"topic_id": topic.id, "count": len(questions), "covered_by_plan": True},
         )
-    except InsufficientCredits:
-        return JsonResponse({
-            "success": False,
-            "error": "Insufficient credits to start this drill session.",
-            "credits_balance": get_available_credits(wallet),
-        }, status=402)
+    else:
+        credits_deducted = min(len(questions), cost_in_credits)
+        try:
+            consume_credits(
+                wallet,
+                amount=credits_deducted,
+                action_type="active_recall_drill",
+                description=f"Active Recall Drill ({len(questions)} Qs): {course_code} - {topic.title}",
+                metadata={"topic_id": topic.id, "count": len(questions)},
+            )
+        except InsufficientCredits:
+            return JsonResponse({
+                "success": False,
+                "error": f"Active recall drill requires {credits_deducted} credits (available: {get_available_credits(wallet)}).",
+                "credits_balance": get_available_credits(wallet),
+            }, status=402)
 
     # Downgrade trial -> freemium immediately if trial credits hit zero
     if wallet.current_plan == "trial" and get_available_credits(wallet) == 0:
@@ -2117,13 +2127,25 @@ def prep_upload(request):
                 is_scanned_ocr = "scanned" in doc_type.lower() or "exam" in doc_type.lower()
                 doc_credit_cost = 5 if is_scanned_ocr else 2
                 allowance = get_remaining_upload_allowance(wallet)
+                scanned_allowance = get_remaining_scanned_allowance(wallet)
+                has_sub = has_active_subscription(wallet)
 
-                if allowance is None:
-                    # Pro: unlimited free uploads
-                    pass
-                elif allowance > 0:
-                    # Use 1 free slot from monthly plan allowance
+                # Paid subscriptions (Basic, Plus, Pro) cover uploads within their allowance
+                if is_scanned_ocr:
+                    covered_by_plan = has_sub and (scanned_allowance is None or scanned_allowance > 0)
+                else:
+                    covered_by_plan = allowance is None or (allowance > 0 if has_sub else False)
+
+                if covered_by_plan:
+                    # Covered by plan allowance (0 credits deducted)
                     record_upload(wallet)
+                    PrepTransaction.objects.create(
+                        wallet=wallet,
+                        amount=0,
+                        action_type="upload_ocr" if is_scanned_ocr else "upload_text",
+                        description=f"Course Material Upload (Plan Allowance - {'OCR' if is_scanned_ocr else 'Digital'}): {target_course.code} - {uploaded_file.name}",
+                        metadata={"course_code": target_course.code, "file_name": uploaded_file.name, "covered_by_plan": True},
+                    )
                 else:
                     # Plan allowance exhausted or Freemium: pay with credits
                     try:
@@ -2906,14 +2928,23 @@ def prep_solve_question_api(request):
     if not question_latex:
         return JsonResponse({"success": False, "error": "No question LaTeX provided."}, status=400)
 
-    # Check credit balance before fresh AI call
+    # Check allowance or credit balance before fresh AI call
+    has_sub = has_active_subscription(wallet)
+    allowance = get_remaining_practice_question_allowance(wallet) if has_sub else 0
+    is_covered_by_plan = has_sub and allowance >= 1
+
     minimum_cost = 5
-    required_balance = estimated_generation_credits(minimum=minimum_cost)
-    if get_available_credits(wallet) < required_balance:
+    required_balance = 0 if is_covered_by_plan else estimated_generation_credits(minimum=minimum_cost)
+    if not is_covered_by_plan and get_available_credits(wallet) < required_balance:
+        if wallet.current_plan == "freemium":
+            err_msg = f"Insufficient credits. You need at least {required_balance} credits available on Freemium before generating a step-by-step verified solution. Please subscribe or top up."
+        else:
+            err_msg = f"You have used your monthly plan question allowance ({wallet.current_plan.title()}). At least {required_balance} credits are required to generate verified solutions. Please top up credits or upgrade to Pro."
         return JsonResponse({
             "success": False,
-            "error": f"Insufficient credits. You need at least {required_balance} credits available before generating a step-by-step verified solution. Please subscribe or top up.",
+            "error": err_msg,
             "credits_balance": get_available_credits(wallet),
+            "upgrade_required": True,
         }, status=402)
 
     # Call AI router (with DB cache layer)
@@ -2935,22 +2966,41 @@ def prep_solve_question_api(request):
     credits_deducted = 0
 
     if not res.get("cached"):
-        credits_deducted = credits_for_usage(res.get("usage"), minimum=minimum_cost)
-        try:
-            consume_credits(
-                wallet,
-                credits_deducted,
+        if is_covered_by_plan:
+            credits_deducted = 0
+            u_data = res.get("usage") if isinstance(res.get("usage"), dict) else {}
+            in_tok = int(u_data.get("prompt_tokens") or u_data.get("input_tokens") or 0)
+            out_tok = int(u_data.get("completion_tokens") or u_data.get("output_tokens") or 0)
+            tot_tok = int(u_data.get("total_tokens") or (in_tok + out_tok))
+            PrepTransaction.objects.create(
+                wallet=wallet,
+                amount=0,
                 action_type="deep_reasoning",
-                description=f"Verified Solution & Proof: {course_code} ({topic_label})",
-                usage=res.get("usage"),
+                description=f"Verified Solution & Proof (Plan Allowance): {course_code} ({topic_label})",
+                input_tokens=in_tok or None,
+                output_tokens=out_tok or None,
+                total_tokens=tot_tok or None,
                 model_name=res.get("model", "deepseek-reasoner"),
+                metadata={"covered_by_plan": True, "question_count": 1},
             )
-        except InsufficientCredits:
-            return JsonResponse({
-                "success": False,
-                "error": "The generated solution requires more credits than are currently available. Please subscribe or top up, then try again.",
-                "credits_balance": get_available_credits(wallet),
-            }, status=402)
+        else:
+            credits_deducted = credits_for_usage(res.get("usage"), minimum=minimum_cost)
+            try:
+                consume_credits(
+                    wallet,
+                    credits_deducted,
+                    action_type="deep_reasoning",
+                    description=f"Verified Solution & Proof: {course_code} ({topic_label})",
+                    usage=res.get("usage"),
+                    model_name=res.get("model", "deepseek-reasoner"),
+                    metadata={"question_count": 1},
+                )
+            except InsufficientCredits:
+                return JsonResponse({
+                    "success": False,
+                    "error": "The generated solution requires more credits than are currently available. Please subscribe or top up, then try again.",
+                    "credits_balance": get_available_credits(wallet),
+                }, status=402)
 
         # Downgrade trial → freemium immediately if credits are now zero
         from services.credit_service import check_and_downgrade_trial
@@ -3049,18 +3099,23 @@ def prep_adapt_question_api(request):
             "credits_balance": get_available_credits(wallet),
         })
 
-    try:
-        enforce_subscription_limit(wallet, "practice_questions", 1)
-    except PlanLimitExceeded as exc:
-        return JsonResponse({"success": False, "error": str(exc)}, status=403)
+    # Check allowance or credit balance before fresh AI call
+    has_sub = has_active_subscription(wallet)
+    allowance = get_remaining_practice_question_allowance(wallet) if has_sub else 0
+    is_covered_by_plan = has_sub and allowance >= 1
 
     minimum_cost = 5
-    required_balance = estimated_generation_credits(minimum=minimum_cost)
-    if get_available_credits(wallet) < required_balance:
+    required_balance = 0 if is_covered_by_plan else estimated_generation_credits(minimum=minimum_cost)
+    if not is_covered_by_plan and get_available_credits(wallet) < required_balance:
+        if wallet.current_plan == "freemium":
+            err_msg = f"Insufficient credits. At least {required_balance} credits are required to reconstruct this question on Freemium. Please subscribe or top up."
+        else:
+            err_msg = f"You have used your monthly plan question allowance ({wallet.current_plan.title()}). At least {required_balance} credits are required to reconstruct this question. Please top up credits or upgrade to Pro."
         return JsonResponse({
             "success": False,
-            "error": f"Insufficient credits. At least {required_balance} credits are required to reconstruct this question.",
+            "error": err_msg,
             "credits_balance": get_available_credits(wallet),
+            "upgrade_required": True,
         }, status=402)
 
     try:
@@ -3088,25 +3143,46 @@ def prep_adapt_question_api(request):
             "error": "The adapted solution failed current course/topic answer validation and was not saved.",
         }, status=422)
     item["solution_latex"] = validated_answer
-    try:
-        credits_deducted = credits_for_usage(result.get("usage"), minimum=minimum_cost)
-        course_name = question.paper.course.code if question.paper else (question.topic.course.code if question.topic else "Course")
-        t_label = question.topic_label or (target_topic.title if target_topic else (question.topic.title if question.topic else "Mathematics"))
-        consume_credits(
-            wallet,
-            credits_deducted,
+
+    credits_deducted = 0
+    course_name = question.paper.course.code if question.paper else (question.topic.course.code if question.topic else "Course")
+    t_label = question.topic_label or (target_topic.title if target_topic else (question.topic.title if question.topic else "Mathematics"))
+
+    if is_covered_by_plan:
+        credits_deducted = 0
+        u_data = result.get("usage") if isinstance(result.get("usage"), dict) else {}
+        in_tok = int(u_data.get("prompt_tokens") or u_data.get("input_tokens") or 0)
+        out_tok = int(u_data.get("completion_tokens") or u_data.get("output_tokens") or 0)
+        tot_tok = int(u_data.get("total_tokens") or (in_tok + out_tok))
+        PrepTransaction.objects.create(
+            wallet=wallet,
+            amount=0,
             action_type="ai_practice_gen",
-            description=f"Adapted Past Question: {course_name} - {t_label}",
-            usage=result.get("usage"),
+            description=f"Adapted Past Question (Plan Allowance): {course_name} - {t_label}",
+            input_tokens=in_tok or None,
+            output_tokens=out_tok or None,
+            total_tokens=tot_tok or None,
             model_name=result.get("model", "deepseek-reasoner"),
-            metadata={"source_question_id": question.id, "adapted": True},
+            metadata={"source_question_id": question.id, "adapted": True, "covered_by_plan": True, "question_count": 1},
         )
-    except InsufficientCredits:
-        return JsonResponse({
-            "success": False,
-            "error": "The adapted question requires more credits than are currently available.",
-            "credits_balance": get_available_credits(wallet),
-        }, status=402)
+    else:
+        try:
+            credits_deducted = credits_for_usage(result.get("usage"), minimum=minimum_cost)
+            consume_credits(
+                wallet,
+                credits_deducted,
+                action_type="ai_practice_gen",
+                description=f"Adapted Past Question: {course_name} - {t_label}",
+                usage=result.get("usage"),
+                model_name=result.get("model", "deepseek-reasoner"),
+                metadata={"source_question_id": question.id, "adapted": True, "question_count": 1},
+            )
+        except InsufficientCredits:
+            return JsonResponse({
+                "success": False,
+                "error": "The adapted question requires more credits than are currently available.",
+                "credits_balance": get_available_credits(wallet),
+            }, status=402)
 
     # Downgrade trial → freemium immediately if credits are now zero
     from services.credit_service import check_and_downgrade_trial
@@ -3639,19 +3715,21 @@ def prep_generate_practice_api(request):
         fresh_needed = count - existing_unseen_count
         should_force_fresh = False
 
-    if fresh_needed > 0:
-        try:
-            enforce_subscription_limit(wallet, "practice_questions", fresh_needed)
-        except PlanLimitExceeded as exc:
-            return JsonResponse({"success": False, "error": str(exc)}, status=403)
+    has_sub = has_active_subscription(wallet)
+    allowance = get_remaining_practice_question_allowance(wallet) if has_sub else 0
+    is_covered_by_plan = has_sub and allowance >= fresh_needed
 
-    # Require a protected minimum before an uncached model generation.
-    required_balance = estimated_generation_credits(minimum=max(1, fresh_needed))
-    if fresh_needed > 0 and get_available_credits(wallet) < required_balance:
+    required_balance = 0 if is_covered_by_plan else estimated_generation_credits(minimum=max(1, fresh_needed))
+    if fresh_needed > 0 and not is_covered_by_plan and get_available_credits(wallet) < required_balance:
+        if wallet.current_plan == "freemium":
+            err_msg = f"Generating fresh practice questions requires at least {required_balance} credits on Freemium. Please top up your credits or subscribe to a plan."
+        else:
+            err_msg = f"You have used your monthly plan question allowance ({wallet.current_plan.title()}). At least {required_balance} credits are required to generate additional practice questions. Please top up credits or upgrade to Pro."
         return JsonResponse({
             "success": False,
-            "error": f"Insufficient credits. At least {required_balance} credits are required to generate fresh practice questions. Please subscribe or top up.",
+            "error": err_msg,
             "credits_balance": get_available_credits(wallet),
+            "upgrade_required": True,
         }, status=402)
 
     try:
@@ -3688,23 +3766,41 @@ def prep_generate_practice_api(request):
     credits_deducted = 0
 
     if fresh_count > 0:
-        credits_deducted = credits_for_usage(res.get("usage"), minimum=fresh_count)
-        try:
-            consume_credits(
-                wallet,
-                credits_deducted,
+        if is_covered_by_plan:
+            credits_deducted = 0
+            u_data = res.get("usage") if isinstance(res.get("usage"), dict) else {}
+            in_tok = int(u_data.get("prompt_tokens") or u_data.get("input_tokens") or 0)
+            out_tok = int(u_data.get("completion_tokens") or u_data.get("output_tokens") or 0)
+            tot_tok = int(u_data.get("total_tokens") or (in_tok + out_tok))
+            PrepTransaction.objects.create(
+                wallet=wallet,
+                amount=0,
                 action_type="ai_practice_gen",
-                description=f"Generated {fresh_count} Practice Questions: {course_code} - {topic_title}",
-                usage=res.get("usage"),
+                description=f"Generated {fresh_count} Practice Questions (Plan Allowance): {course_code} - {topic_title}",
+                input_tokens=in_tok or None,
+                output_tokens=out_tok or None,
+                total_tokens=tot_tok or None,
                 model_name=res.get("model", "deepseek-chat"),
-                metadata={"question_count": fresh_count},
+                metadata={"question_count": fresh_count, "covered_by_plan": True},
             )
-        except InsufficientCredits:
-            return JsonResponse({
-                "success": False,
-                "error": "The generated practice set requires more credits than are currently available. Please subscribe or top up, then try again.",
-                "credits_balance": get_available_credits(wallet),
-            }, status=402)
+        else:
+            credits_deducted = credits_for_usage(res.get("usage"), minimum=fresh_count)
+            try:
+                consume_credits(
+                    wallet,
+                    credits_deducted,
+                    action_type="ai_practice_gen",
+                    description=f"Generated {fresh_count} Practice Questions: {course_code} - {topic_title}",
+                    usage=res.get("usage"),
+                    model_name=res.get("model", "deepseek-chat"),
+                    metadata={"question_count": fresh_count},
+                )
+            except InsufficientCredits:
+                return JsonResponse({
+                    "success": False,
+                    "error": "The generated practice set requires more credits than are currently available. Please subscribe or top up, then try again.",
+                    "credits_balance": get_available_credits(wallet),
+                }, status=402)
 
         # Downgrade trial → freemium immediately if credits are now zero
         from services.credit_service import check_and_downgrade_trial

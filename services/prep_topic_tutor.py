@@ -25,6 +25,9 @@ from prep.models import (
 from services.credit_service import (
     InsufficientCredits,
     get_available_credits,
+    get_remaining_scanned_allowance,
+    has_active_subscription,
+    record_upload,
     release_credit_reservation,
     reserve_credits,
     settle_credit_reservation,
@@ -870,11 +873,15 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
         chat_model,
         output_token_cap=CHAT_MAX_OUTPUT_TOKENS,
     )
+    has_sub = has_active_subscription(wallet)
+    scanned_allowance = get_remaining_scanned_allowance(wallet) if has_sub else 0
+    ocr_covered_by_plan = has_sub and (scanned_allowance is None or scanned_allowance >= len(vision_images))
+
     ocr_per_page = max(
         1,
         int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", MIN_OCR_CREDITS)),
     )
-    ocr_reserve = ocr_per_page * len(vision_images)
+    ocr_reserve = 0 if ocr_covered_by_plan else (ocr_per_page * len(vision_images))
     try:
         reservation = reserve_credits(
             wallet,
@@ -912,52 +919,101 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 )
             except TopicTutorError as exc:
                 if vision_images and exc.usage:
-                    ocr_model = exc.model_name or str(
-                        getattr(settings, "TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
-                    )
-                    ocr_quote = calculate_provider_cost("together", ocr_model, exc.usage)
-                    ocr_credits = settle_credit_reservation(
-                        reservation,
-                        ocr_per_page * len(vision_images),
-                        release_reserved=ocr_reserve,
-                        action_type="topic_tutor_ocr",
-                        description=f"Topic tutor OCR ({len(vision_images)} image/page): {topic.title}",
-                        usage=exc.usage,
-                        model_name=ocr_model,
-                        metadata={
-                            "provider": "together",
-                            "pricing": quote_summary(
-                                ocr_quote,
-                                ocr_per_page * len(vision_images),
-                            ),
-                            "flat_credits_per_image_or_page": ocr_per_page,
-                            "image_or_page_count": len(vision_images),
-                            "topic_id": topic.pk,
-                            "session_id": session.pk if session else None,
-                        },
-                    )
-                    exc.credits_charged += ocr_credits
+                    if ocr_covered_by_plan:
+                        record_upload(wallet)
+                        u_data = exc.usage if isinstance(exc.usage, dict) else {}
+                        in_tok = int(u_data.get("prompt_tokens") or u_data.get("input_tokens") or 0)
+                        out_tok = int(u_data.get("completion_tokens") or u_data.get("output_tokens") or 0)
+                        tot_tok = int(u_data.get("total_tokens") or (in_tok + out_tok))
+                        PrepTransaction.objects.create(
+                            wallet=wallet,
+                            amount=0,
+                            action_type="topic_tutor_ocr",
+                            description=f"Topic tutor OCR ({len(vision_images)} image/page - Plan Allowance): {topic.title}",
+                            input_tokens=in_tok or None,
+                            output_tokens=out_tok or None,
+                            total_tokens=tot_tok or None,
+                            model_name=exc.model_name or "deepseek-ai/DeepSeek-V4.1-Flash",
+                            metadata={
+                                "provider": "together",
+                                "image_or_page_count": len(vision_images),
+                                "topic_id": topic.pk,
+                                "session_id": session.pk if session else None,
+                                "covered_by_plan": True,
+                            },
+                        )
+                    else:
+                        ocr_model = exc.model_name or str(
+                            getattr(settings, "TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
+                        )
+                        ocr_quote = calculate_provider_cost("together", ocr_model, exc.usage)
+                        ocr_credits = settle_credit_reservation(
+                            reservation,
+                            ocr_per_page * len(vision_images),
+                            release_reserved=ocr_reserve,
+                            action_type="topic_tutor_ocr",
+                            description=f"Topic tutor OCR ({len(vision_images)} image/page): {topic.title}",
+                            usage=exc.usage,
+                            model_name=ocr_model,
+                            metadata={
+                                "provider": "together",
+                                "pricing": quote_summary(
+                                    ocr_quote,
+                                    ocr_per_page * len(vision_images),
+                                ),
+                                "flat_credits_per_image_or_page": ocr_per_page,
+                                "image_or_page_count": len(vision_images),
+                                "topic_id": topic.pk,
+                                "session_id": session.pk if session else None,
+                            },
+                        )
+                        exc.credits_charged += ocr_credits
                 raise
 
         if vision_images:
-            ocr_quote = calculate_provider_cost("together", ocr_model, ocr_usage)
-            ocr_credits = settle_credit_reservation(
-                reservation,
-                ocr_per_page * len(vision_images),
-                release_reserved=ocr_reserve,
-                action_type="topic_tutor_ocr",
-                description=f"Topic tutor OCR ({len(vision_images)} image/page): {topic.title}",
-                usage=ocr_usage,
-                model_name=ocr_model,
-                metadata={
-                    "provider": "together",
-                    "pricing": quote_summary(ocr_quote, ocr_per_page * len(vision_images)),
-                    "flat_credits_per_image_or_page": ocr_per_page,
-                    "image_or_page_count": len(vision_images),
-                    "topic_id": topic.pk,
-                    "session_id": session.pk if session else None,
-                },
-            )
+            if ocr_covered_by_plan:
+                record_upload(wallet)
+                u_data = ocr_usage if isinstance(ocr_usage, dict) else {}
+                in_tok = int(u_data.get("prompt_tokens") or u_data.get("input_tokens") or 0)
+                out_tok = int(u_data.get("completion_tokens") or u_data.get("output_tokens") or 0)
+                tot_tok = int(u_data.get("total_tokens") or (in_tok + out_tok))
+                PrepTransaction.objects.create(
+                    wallet=wallet,
+                    amount=0,
+                    action_type="topic_tutor_ocr",
+                    description=f"Topic tutor OCR ({len(vision_images)} image/page - Plan Allowance): {topic.title}",
+                    input_tokens=in_tok or None,
+                    output_tokens=out_tok or None,
+                    total_tokens=tot_tok or None,
+                    model_name=ocr_model or "deepseek-ai/DeepSeek-V4.1-Flash",
+                    metadata={
+                        "provider": "together",
+                        "image_or_page_count": len(vision_images),
+                        "topic_id": topic.pk,
+                        "session_id": session.pk if session else None,
+                        "covered_by_plan": True,
+                    },
+                )
+                ocr_credits = 0
+            else:
+                ocr_quote = calculate_provider_cost("together", ocr_model, ocr_usage)
+                ocr_credits = settle_credit_reservation(
+                    reservation,
+                    ocr_per_page * len(vision_images),
+                    release_reserved=ocr_reserve,
+                    action_type="topic_tutor_ocr",
+                    description=f"Topic tutor OCR ({len(vision_images)} image/page): {topic.title}",
+                    usage=ocr_usage,
+                    model_name=ocr_model,
+                    metadata={
+                        "provider": "together",
+                        "pricing": quote_summary(ocr_quote, ocr_per_page * len(vision_images)),
+                        "flat_credits_per_image_or_page": ocr_per_page,
+                        "image_or_page_count": len(vision_images),
+                        "topic_id": topic.pk,
+                        "session_id": session.pk if session else None,
+                    },
+                )
             existing_upload_context = [
                 {"name": item.original_name, "text": item.extracted_text[:MAX_EXTRACTED_CHARS_PER_UPLOAD]}
                 for item in reversed(session_uploads)
