@@ -312,7 +312,7 @@ Important rules:
         logger.warning(
             f"[Topic Quiz] DeepSeek call failed for topic {topic.id}: {ai_response.get('error')}. Attempting Together AI fallback..."
         )
-        together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V3")
+        together_model = getattr(settings, "TOGETHER_CHAT_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
         if getattr(settings, "TOGETHERAI_API", ""):
             try:
                 ai_response = call_together_repair(
