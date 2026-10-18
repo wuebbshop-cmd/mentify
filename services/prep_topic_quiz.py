@@ -172,24 +172,27 @@ def generate_topic_quiz_questions(
             "DISCIPLINE GUIDELINES (Mathematics / Statistics / Physics):\n"
             "- Mathematical Formulation: Use standard LaTeX notation enclosed in $...$ for inline formulas (e.g., $x^2 + y^2 = r^2$, $\\int_0^1 x\\,dx$) or $$...$$ for block equations.\n"
             "- Escape Backslashes: In your JSON string values, ALWAYS double-escape LaTeX backslashes (e.g. write \\\\times, \\\\frac, \\\\sqrt, \\\\alpha, \\\\beta, \\\\sum, \\\\int) so the JSON parser does not fail on unescaped backslashes.\n"
+            "- Structured Multi-Line Derivations: In both 'summary' and 'why_others_wrong', NEVER write multi-step mathematical derivations in a single cramped sentence. Break steps onto separate lines using bullet points (e.g. '- Identify general formula: ...\\n- Substitute known values: ...\\n- Conclude result: ...') or block LaTeX ($$...$$), allowing students to visually scan each calculation step.\n"
             "- Code in Statistics / R: If referencing statistical commands, syntax, or output matrices, use code backticks (`...`) and use single quotes ('...') inside code strings."
         )
     elif discipline == "Computing":
         discipline_rules = (
             "DISCIPLINE GUIDELINES (Computing / Software / Programming / Databases):\n"
-            "- Code & Syntax Formatting: For any programming commands, functions, syntax, code snippets, database queries, or variables (e.g. in Python, R, C++, Java, SQL, bash), enclose them in backticks (`...`) or block code fences.\n"
-            "- Quotation Escaping: Inside code strings and values, use single quotes ('...') or properly escaped double quotes (\\\") so they do not break JSON string boundaries.\n"
-            "- Output & Tracing: When asking what code outputs or how an algorithm executes, provide clear, exact code representation."
+            "- Code & Syntax Formatting: For any programming commands, functions, syntax, code snippets, database queries, or variables (e.g. in Python, R, C++, Java, SQL, bash), enclose them in backticks (`...`) or block code fences with language tags (e.g. ```python\\n...\\n```).\n"
+            "- Multi-line Tracing & Output: Never squash multi-line code, algorithms, or execution traces into a single line. In 'summary' and 'why_others_wrong', use block code fences or distinct bulleted execution steps so code structure, indentation, and output are crystal clear.\n"
+            "- Quotation Escaping: Inside code strings and values, use single quotes ('...') or properly escaped double quotes (\\\") so they do not break JSON string boundaries."
         )
     elif discipline == "Chemistry":
         discipline_rules = (
             "DISCIPLINE GUIDELINES (Chemistry / Biochemistry):\n"
             "- Chemical Notation: Format chemical equations and formulas using LaTeX (e.g. $\\text{H}_2\\text{SO}_4$, $\\to$, $\\Delta H$) with properly double-escaped backslashes.\n"
+            "- Step-by-Step Mechanisms: Break reaction mechanisms, stoichiometry steps, and oxidation-state calculations into clear numbered or bulleted lines, rather than continuous run-on paragraphs.\n"
             "- Scientific Accuracy: Distractors must reflect plausible misconceptions about oxidation states, stoichiometry, mechanisms, or functional groups."
         )
     else:
         discipline_rules = (
             "DISCIPLINE GUIDELINES (Conceptual & Applied Domain):\n"
+            "- Clear Structural Formatting: Use paragraphs and bullet points for explanations with multiple points or comparative factors. Avoid dense monolithic walls of text.\n"
             "- Deep Understanding: Focus on applied scenarios, critical definitions, comparative principles, and real-world domain problems.\n"
             "- Clean JSON: Use single quotes ('...') inside question text when quoting phrases or titles."
         )
@@ -225,9 +228,9 @@ Required JSON schema:
     }},
     "correct_option": "A",
     "explanation": {{
-      "summary": "Detailed, step-by-step reasoning explaining why the correct option is right.",
+      "summary": "Detailed, step-by-step reasoning explaining why the correct option is right. Format math steps or code derivations across clear paragraphs or bullet points (- Step 1: ..., - Step 2: ...), never crammed into a single run-on sentence.",
       "why_others_wrong": {{
-        "B": "Specific explanation of the mistake or misconception in option B.",
+        "B": "Specific explanation of the mistake or misconception in option B. Use line breaks or bullet points if explaining a calculation error.",
         "C": "Specific explanation of why option C is invalid or incorrect.",
         "D": "Specific explanation of why option D is invalid or incorrect."
       }}
@@ -402,6 +405,35 @@ def get_or_create_topic_quiz(
     return []
 
 
+def format_explanation_for_display(text: str) -> str:
+    """
+    Ensures mathematical derivations, code executions, and step-by-step
+    reasoning are cleanly separated across multiple lines rather than crammed
+    into a single continuous line.
+    """
+    if not text or not isinstance(text, str):
+        return ""
+    cleaned = text.strip()
+    if "\n\n" in cleaned or "\n- " in cleaned or "\n* " in cleaned or "\n1. " in cleaned:
+        return cleaned
+
+    # Step indicators (e.g. "Step 1:", "Step 2:")
+    cleaned = re.sub(r'(?:^|\s*)(?:[-•*]\s*)?(Step\s*\d+[:.-]?)\s*', r'\n\n- **\1** ', cleaned, flags=re.IGNORECASE)
+
+    # Transition words after sentence-ending punctuation
+    cleaned = re.sub(
+        r'([.;])\s+(Here\b|Thus\b|Therefore\b|Hence\b|Substituting\b|Substitute\b|First\b|Next\b|Then\b|Finally\b|Solving\b|Recall that\b|Using the formula\b|By definition\b|In general\b|Note that\b)',
+        r'\1\n\n\2',
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+
+    # Code outputs after introductory colon
+    cleaned = re.sub(r':\s*(`[^`]+`)\s*\.?$', r':\n\n\1', cleaned)
+
+    return cleaned.strip()
+
+
 def evaluate_quiz_answer(
     quiz_question_id: int,
     selected_option: str,
@@ -452,11 +484,15 @@ def evaluate_quiz_answer(
             except Exception as exc:
                 logger.warning(f"[Topic Quiz] Could not update spaced card for user {user.id}: {exc}")
 
-    # Build response with rich explanation
+    # Build response with rich multi-line explanation
     explanation = question.explanation or {}
-    summary = explanation.get("summary") or "Correct answer verified."
+    summary = format_explanation_for_display(explanation.get("summary") or "Correct answer verified.")
     why_others = explanation.get("why_others_wrong") or {}
-    selected_why_wrong = why_others.get(clean_selected, "")
+    formatted_why_others = {}
+    if isinstance(why_others, dict):
+        for k, v in why_others.items():
+            formatted_why_others[k] = format_explanation_for_display(str(v or ""))
+    selected_why_wrong = formatted_why_others.get(clean_selected, "")
 
     return {
         "success": True,
@@ -465,5 +501,5 @@ def evaluate_quiz_answer(
         "correct_option": question.correct_option,
         "summary_explanation": summary,
         "why_selected_is_wrong": selected_why_wrong if not is_correct else "",
-        "why_others_wrong": why_others,
+        "why_others_wrong": formatted_why_others,
     }
