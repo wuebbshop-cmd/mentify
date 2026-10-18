@@ -694,6 +694,31 @@
   <form method="post" enctype="multipart/form-data" id="upload-doc-form" onsubmit="return validateForm()" style="display: {% if upload_tab == 'resource' %}none{% else %}block{% endif %};">
     {% csrf_token %}
 
+    <!-- Dedicated In-Page Success Message Banner -->
+    <div id="upload-success-card" style="display: none; margin-bottom: 24px; padding: 18px 22px; border-radius: 8px; border: 1px solid rgba(15, 118, 110, 0.4); background: rgba(15, 118, 110, 0.08); box-shadow: 0 4px 16px rgba(15, 118, 110, 0.08);">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;">
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div>
+            <h3 id="upload-success-card-title" style="margin: 0 0 4px 0; font-size: 1.05rem; color: var(--text); font-weight: 700;">Documents Uploaded Successfully!</h3>
+            <p id="upload-success-card-message" style="margin: 0 0 12px 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;"></p>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <a id="upload-success-course-link" href="#" style="display: inline-flex; align-items: center; gap: 6px; background: var(--green); color: #ffffff; padding: 7px 16px; border-radius: 6px; font-size: 0.84rem; font-weight: 600; text-decoration: none;">
+                <span>View Course Details</span>
+                <span>&rarr;</span>
+              </a>
+              <button type="button" onclick="dismissProgressPanel()" style="background: var(--white); border: 1px solid var(--border); color: var(--text); padding: 7px 14px; border-radius: 6px; font-size: 0.84rem; font-weight: 500; cursor: pointer;">
+                Upload More Files
+              </button>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="document.getElementById('upload-success-card').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 2px 6px;" title="Dismiss">&times;</button>
+      </div>
+    </div>
+
     <!-- Step 1: Course & Document Metadata Card -->
     <div class="upload-card">
       <span class="upload-card-section-label">Course</span>
@@ -1061,7 +1086,11 @@
       statusPollTimer = null;
     }
     activeUploadDocIds = [];
-    if (progressPanel) progressPanel.style.display = 'none';
+    if (progressPanel) {
+      progressPanel.style.display = 'none';
+      progressPanel.style.border = '1px solid var(--border)';
+      progressPanel.style.background = 'var(--surface)';
+    }
     if (progressBar) {
       progressBar.style.width = '0%';
       progressBar.style.background = 'var(--green)';
@@ -1072,6 +1101,8 @@
     if (courseLink) courseLink.style.display = 'none';
     const dismissBtn = document.getElementById('upload-dismiss-btn');
     if (dismissBtn) dismissBtn.style.display = 'none';
+    const successCard = document.getElementById('upload-success-card');
+    if (successCard) successCard.style.display = 'none';
   }
 
   function addFilesToSelection(incomingFiles) {
@@ -1161,20 +1192,23 @@
     if (!banner) {
       banner = document.createElement('div');
       banner.id = 'upload-validation-banner';
-      banner.style.cssText = 'position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:10000;padding:11px 20px;border-radius:10px;font-size:0.88rem;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.22);display:flex;align-items:center;gap:10px;max-width:92%;box-sizing:border-box;pointer-events:auto;transition:opacity 0.25s ease;';
+      banner.style.cssText = 'position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:10000;padding:12px 22px;border-radius:10px;font-size:0.88rem;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.22);display:flex;align-items:center;gap:10px;max-width:92%;box-sizing:border-box;pointer-events:auto;transition:opacity 0.25s ease;';
       document.body.appendChild(banner);
     }
     banner.style.background = isError ? '#dc2626' : 'var(--green)';
     banner.style.color = '#ffffff';
     banner.style.display = 'flex';
+    const icon = isError
+      ? `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`
+      : `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
     banner.innerHTML = `
-      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      ${icon}
       <span>${escapeHtml(message)}</span>
     `;
     clearTimeout(banner._dismissTimer);
     banner._dismissTimer = setTimeout(() => {
       if (banner) banner.style.display = 'none';
-    }, 4000);
+    }, isError ? 4500 : 5500);
   }
 
   function validateForm() {
@@ -1248,7 +1282,7 @@
         } else {
           activeUploadDocIds = [];
           if (progressPanel && progressPanel.style.display !== 'none') {
-            progressTitle.textContent = 'Processing complete';
+            progressTitle.innerHTML = `<span style="color: var(--green); font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Extraction &amp; Indexing Complete</span>`;
             progressSubtext.textContent = 'Your study materials have been extracted and queued for course indexing.';
             const dismissBtn = document.getElementById('upload-dismiss-btn');
             if (dismissBtn) dismissBtn.style.display = 'inline-block';
@@ -1312,6 +1346,7 @@
           progressSubtext.textContent = 'The server returned an unexpected response. Please try again.';
           const dismissBtn = document.getElementById('upload-dismiss-btn');
           if (dismissBtn) dismissBtn.style.display = 'inline-block';
+          showUploadNotice('Upload failed due to an unexpected server response.', true);
           return;
         }
 
@@ -1321,13 +1356,30 @@
         }
 
         if (xhr.status >= 200 && xhr.status < 300 && payload && payload.success) {
-          progressPct.textContent = 'Done';
+          progressPct.textContent = '100% Done';
           progressBar.style.width = '100%';
           progressBar.style.background = 'var(--green)';
-          progressTitle.textContent = payload.queued_count > 0
-            ? 'Upload complete — processing in background'
-            : 'Upload processed';
-          progressSubtext.textContent = payload.message || 'Your files are being processed in the background.';
+          progressTitle.innerHTML = `<span style="color: var(--green); font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> ${payload.queued_count > 0 ? 'Upload Complete — Processing in Background' : 'Upload Processed Successfully'}</span>`;
+          progressSubtext.textContent = payload.message || 'Your files were uploaded successfully and are being processed.';
+          progressPanel.style.border = '1px solid rgba(15, 118, 110, 0.4)';
+          progressPanel.style.background = 'rgba(15, 118, 110, 0.06)';
+
+          // Show in-page success card
+          const successCard = document.getElementById('upload-success-card');
+          const successCardMsg = document.getElementById('upload-success-card-message');
+          const successCardLink = document.getElementById('upload-success-course-link');
+          if (successCard && successCardMsg) {
+            successCardMsg.textContent = payload.message || 'Your study materials have been uploaded and background extraction & syllabus indexing has started.';
+            if (successCardLink && payload.course_url) {
+              successCardLink.href = payload.course_url;
+              successCardLink.style.display = 'inline-flex';
+            }
+            successCard.style.display = 'block';
+            successCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+
+          // Trigger top floating success notice banner
+          showUploadNotice(payload.message || 'Documents uploaded successfully!', false);
 
           if (payload.course_url) {
             courseLink.href = payload.course_url;
@@ -1365,6 +1417,7 @@
           progressSubtext.textContent = (payload && (payload.error || payload.message)) || 'Unable to process upload.';
           const dismissBtn = document.getElementById('upload-dismiss-btn');
           if (dismissBtn) dismissBtn.style.display = 'inline-block';
+          showUploadNotice((payload && (payload.error || payload.message)) || 'Upload could not be processed.', true);
         }
       };
 
