@@ -1852,6 +1852,10 @@
     <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
     Topic Notes &amp; Explanations
   </button>
+  <button type="button" data-study-tab="quiz" class="study-tab-btn {% if active_subtab == 'quiz' %}active{% endif %}" onclick="switchPillarTab('quiz')">
+    <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Active Recall Drill
+  </button>
   <button type="button" data-study-tab="assistant" class="study-tab-btn {% if active_subtab == 'assistant' %}active{% endif %}" onclick="switchPillarTab('assistant')">
     <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color:var(--danger);" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h8M8 14h5m-8 6 2.2-2.2A8 8 0 1 1 20 15"/></svg>
     Ask a Topic Tutor
@@ -2026,6 +2030,17 @@
         {% csrf_token %}
         <div id="topic-tutor-quote-container" style="display:none;margin:0 0 7px;"></div>
         <div id="topic-tutor-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px;"></div>
+        <div class="topic-tutor-quick-prompts" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+          <button type="button" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 10px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);" onclick="triggerTopicTutorPrompt('💡 Quiz me on this topic with a multiple-choice question')">
+            💡 Quiz me
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 10px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);" onclick="triggerTopicTutorPrompt('Explain the core concept of this topic simply')">
+            📖 Core concept
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 10px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);" onclick="triggerTopicTutorPrompt('Walk me through a past exam question on this topic')">
+            📝 Past exam question
+          </button>
+        </div>
         <div class="topic-tutor-composer-bar">
           <input type="file" id="topic-tutor-pdf-files" accept="application/pdf,.pdf" multiple hidden>
           <input type="file" id="topic-tutor-image-files" accept="image/png,image/jpeg,.png,.jpg,.jpeg" multiple hidden>
@@ -2473,6 +2488,65 @@
   {% endif %}
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════════════════
+     PILLAR 6: ACTIVE RECALL DRILL / MULTIPLE-CHOICE QUIZ
+     ══════════════════════════════════════════════════════════════════════════════ -->
+<div id="pillar-quiz" style="display: {% if active_subtab == 'quiz' %}block{% else %}none{% endif %};">
+  <!-- Quiz Header Bar -->
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+        <span style="background: rgba(15, 118, 110, 0.12); color: var(--green); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.04em;">
+          Active Recall Drill
+        </span>
+        <span id="quiz-question-badge" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+          Question 1 of 5
+        </span>
+      </div>
+      <h2 style="font-size: 1.22rem; font-weight: 700; margin: 0; color: var(--text);">
+        Test Your Understanding: {{ topic.title }}
+      </h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div id="quiz-score-pill" style="font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);">
+        Score: <span id="quiz-score-val" style="color: var(--green);">0</span> / <span id="quiz-answered-val">0</span>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="restartTopicQuiz(true)" title="Generate fresh questions">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        New Questions
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="quiz-loading-state" style="display: none; text-align: center; padding: 60px 20px;">
+    <div style="width: 40px; height: 40px; border: 3px solid rgba(15, 118, 110, 0.2); border-top-color: var(--green); border-radius: 50%; animation: notes-spin 0.8s linear infinite; margin: 0 auto 16px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Preparing active recall drill questions...</p>
+  </div>
+
+  <!-- Active Question Container Card -->
+  <div id="quiz-active-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+    <!-- Question Statement with KaTeX -->
+    <div id="quiz-question-text" class="markdown-rendered" style="font-size: 1.06rem; font-weight: 600; line-height: 1.6; color: var(--text); margin-bottom: 24px;"></div>
+
+    <!-- Options List (A, B, C, D) -->
+    <div id="quiz-options-grid" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;"></div>
+
+    <!-- Immediate Feedback Drawer -->
+    <div id="quiz-feedback-drawer" style="display: none; border-radius: 12px; padding: 20px; margin-top: 20px; transition: all 0.2s ease;"></div>
+
+    <!-- Navigation Action -->
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+      <button type="button" id="quiz-next-btn" class="btn btn-primary" style="display: none; background: var(--green); border-color: var(--green); font-weight: 600; padding: 8px 24px;" onclick="advanceQuizQuestion()">
+        Next Question &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Screen (Shown after finishing questions) -->
+  <div id="quiz-summary-card" style="display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 40px; text-align: center; margin-bottom: 24px;"></div>
+</div>
+
 <!-- Interactive Modal Player for Videos & PhET/HTML5 Simulations -->
 <div id="prep-video-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
   <div style="position: relative; width: 100%; max-width: 960px; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.5);">
@@ -2827,6 +2901,17 @@
     });
   }
 
+  window.triggerTopicTutorPrompt = function(promptText) {
+    const input = document.getElementById('topic-tutor-input');
+    if (!input) return;
+    input.value = promptText;
+    resizeTopicTutorInput(input);
+    const form = document.getElementById('topic-tutor-form');
+    if (form) {
+      submitTopicTutorMessage(new Event('submit', { cancelable: true }));
+    }
+  };
+
   async function submitTopicTutorMessage(event) {
     event.preventDefault();
     if (topicTutorSending) return;
@@ -3170,12 +3255,15 @@
 
   function switchPillarTab(tabName) {
     document.querySelectorAll('.study-tab-btn').forEach(btn => btn.classList.remove('active'));
-    ['notes', 'assistant', 'past_questions', 'practice', 'explore'].forEach(name => {
+    ['notes', 'quiz', 'assistant', 'past_questions', 'practice', 'explore'].forEach(name => {
       const panel = document.getElementById(`pillar-${name}`);
       if (panel) panel.style.display = name === tabName ? 'block' : 'none';
     });
     const activeButton = document.querySelector(`[data-study-tab="${tabName}"]`);
     if (activeButton) activeButton.classList.add('active');
+    if (tabName === 'quiz') {
+      loadTopicQuizLazy();
+    }
     if (tabName === 'assistant') {
       initializeTopicTutor();
       if (window.innerWidth <= 800) {
@@ -4185,5 +4273,299 @@
         .catch(() => {});
     }
   });
-</script>
+
+  // ─── Active Recall Drill / Topic Quiz Controller ───────────────────────────
+  let quizQuestions = [];
+  let currentQuizIndex = 0;
+  let quizScore = 0;
+  let quizAnsweredCount = 0;
+  let isQuizLoading = false;
+  let quizHasLoadedOnce = false;
+
+  function loadTopicQuizLazy() {
+    if (quizHasLoadedOnce && quizQuestions.length > 0) return;
+    restartTopicQuiz(false);
+  }
+
+  function restartTopicQuiz(forceRefresh = false) {
+    if (isQuizLoading) return;
+    isQuizLoading = true;
+    quizHasLoadedOnce = true;
+    currentQuizIndex = 0;
+    quizScore = 0;
+    quizAnsweredCount = 0;
+    updateQuizScoreboard();
+
+    const loadingEl = document.getElementById('quiz-loading-state');
+    const cardEl = document.getElementById('quiz-active-card');
+    const summaryEl = document.getElementById('quiz-summary-card');
+
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (cardEl) cardEl.style.display = 'none';
+    if (summaryEl) summaryEl.style.display = 'none';
+
+    const url = `/prep/api/topic/{{ topic.id }}/quiz/?count=5${forceRefresh ? '&fresh=1' : ''}`;
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+      .then(res => res.json())
+      .then(data => {
+        isQuizLoading = false;
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (data.success && data.questions && data.questions.length > 0) {
+          quizQuestions = data.questions;
+          renderQuizQuestion(0);
+        } else {
+          if (cardEl) {
+            cardEl.style.display = 'block';
+            cardEl.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">No drill questions available yet for this topic. Click "New Questions" above to generate a set.</p>`;
+          }
+        }
+      })
+      .catch(err => {
+        isQuizLoading = false;
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (cardEl) {
+          cardEl.style.display = 'block';
+          cardEl.innerHTML = `<p style="text-align: center; color: var(--danger); padding: 40px;">Failed to load questions. Please check your connection and retry.</p>`;
+        }
+      });
+  }
+
+  function updateQuizScoreboard() {
+    const scoreVal = document.getElementById('quiz-score-val');
+    const answeredVal = document.getElementById('quiz-answered-val');
+    if (scoreVal) scoreVal.textContent = quizScore;
+    if (answeredVal) answeredVal.textContent = quizAnsweredCount;
+  }
+
+  function renderQuizQuestion(index) {
+    if (index >= quizQuestions.length) {
+      renderQuizSummary();
+      return;
+    }
+    currentQuizIndex = index;
+    const q = quizQuestions[index];
+
+    const cardEl = document.getElementById('quiz-active-card');
+    const badgeEl = document.getElementById('quiz-question-badge');
+    const questionTextEl = document.getElementById('quiz-question-text');
+    const optionsGrid = document.getElementById('quiz-options-grid');
+    const feedbackDrawer = document.getElementById('quiz-feedback-drawer');
+    const nextBtn = document.getElementById('quiz-next-btn');
+
+    if (cardEl) cardEl.style.display = 'block';
+    if (badgeEl) badgeEl.textContent = `Question ${index + 1} of ${quizQuestions.length}`;
+    if (feedbackDrawer) {
+      feedbackDrawer.style.display = 'none';
+      feedbackDrawer.innerHTML = '';
+    }
+    if (nextBtn) nextBtn.style.display = 'none';
+
+    // Render question statement with KaTeX
+    if (questionTextEl) {
+      questionTextEl.innerHTML = '';
+      if (typeof window.renderMarkdownWithKaTeX === 'function') {
+        window.renderMarkdownWithKaTeX(q.question, questionTextEl);
+      } else {
+        questionTextEl.textContent = q.question;
+      }
+    }
+
+    // Render 4 options
+    if (optionsGrid) {
+      optionsGrid.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+      letters.forEach(letter => {
+        const optText = (q.options && q.options[letter]) || '';
+        const optBtn = document.createElement('button');
+        optBtn.type = 'button';
+        optBtn.className = 'quiz-option-item';
+        optBtn.dataset.option = letter;
+        optBtn.style.cssText = `
+          display: flex; align-items: flex-start; gap: 14px; width: 100%;
+          text-align: left; padding: 14px 18px; border-radius: 10px;
+          border: 1.5px solid var(--border); background: var(--surface);
+          color: var(--text); font-size: 0.96rem; cursor: pointer;
+          transition: all 0.15s ease;
+        `;
+        optBtn.innerHTML = `
+          <span class="quiz-opt-letter" style="
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 50%; font-weight: 700;
+            font-size: 0.85rem; background: var(--surface-2); border: 1px solid var(--border);
+            color: var(--text); flex-shrink: 0;
+          ">${letter}</span>
+          <span class="quiz-opt-text" style="flex: 1; padding-top: 2px;"></span>
+        `;
+        const textSpan = optBtn.querySelector('.quiz-opt-text');
+        if (typeof window.renderMarkdownWithKaTeX === 'function') {
+          window.renderMarkdownWithKaTeX(optText, textSpan);
+        } else {
+          textSpan.textContent = optText;
+        }
+
+        optBtn.addEventListener('click', () => submitQuizAnswer(q.id, letter));
+        optionsGrid.appendChild(optBtn);
+      });
+    }
+  }
+
+  function submitQuizAnswer(questionId, selectedOption) {
+    const optionsGrid = document.getElementById('quiz-options-grid');
+    if (!optionsGrid) return;
+    const buttons = optionsGrid.querySelectorAll('.quiz-option-item');
+    buttons.forEach(btn => {
+      btn.disabled = true;
+      btn.style.cursor = 'default';
+    });
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    fetch(`/prep/api/topic/{{ topic.id }}/quiz/submit/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify({ question_id: questionId, selected_option: selectedOption }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          alert(data.error || 'Evaluation failed.');
+          return;
+        }
+        quizAnsweredCount++;
+        if (data.is_correct) quizScore++;
+        updateQuizScoreboard();
+
+        // Highlight options
+        buttons.forEach(btn => {
+          const optLetter = btn.dataset.option;
+          const letterBadge = btn.querySelector('.quiz-opt-letter');
+          if (optLetter === data.correct_option) {
+            btn.style.borderColor = 'var(--green)';
+            btn.style.background = 'rgba(15, 118, 110, 0.08)';
+            if (letterBadge) {
+              letterBadge.style.background = 'var(--green)';
+              letterBadge.style.color = '#fff';
+              letterBadge.style.borderColor = 'var(--green)';
+            }
+          } else if (optLetter === data.selected_option && !data.is_correct) {
+            btn.style.borderColor = 'var(--danger)';
+            btn.style.background = 'rgba(239, 68, 68, 0.08)';
+            if (letterBadge) {
+              letterBadge.style.background = 'var(--danger)';
+              letterBadge.style.color = '#fff';
+              letterBadge.style.borderColor = 'var(--danger)';
+            }
+          } else {
+            btn.style.opacity = '0.6';
+          }
+        });
+
+        // Show Feedback Drawer
+        const feedbackDrawer = document.getElementById('quiz-feedback-drawer');
+        if (feedbackDrawer) {
+          feedbackDrawer.style.display = 'block';
+          const isCorrect = data.is_correct;
+          feedbackDrawer.style.border = `1.5px solid ${isCorrect ? 'var(--green)' : 'var(--danger)'}`;
+          feedbackDrawer.style.background = isCorrect ? 'rgba(15, 118, 110, 0.06)' : 'rgba(239, 68, 68, 0.05)';
+
+          let feedbackHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="font-size: 1.1rem;">${isCorrect ? '🎉' : '💡'}</span>
+              <h4 style="margin: 0; font-size: 1.02rem; font-weight: 700; color: ${isCorrect ? 'var(--green)' : 'var(--danger)'};">
+                ${isCorrect ? 'Correct! Well done.' : `Incorrect (You selected Option ${data.selected_option})`}
+              </h4>
+            </div>
+          `;
+
+          if (!isCorrect && data.why_selected_is_wrong) {
+            feedbackHTML += `
+              <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-size: 0.92rem; color: var(--text);">
+                <strong>Why Option ${data.selected_option} is incorrect:</strong>
+                <div class="quiz-why-wrong-box" style="margin-top: 4px;"></div>
+              </div>
+            `;
+          }
+
+          feedbackHTML += `
+            <div style="font-size: 0.94rem; color: var(--text); line-height: 1.6;">
+              <div class="quiz-summary-box"></div>
+            </div>
+          `;
+
+          feedbackDrawer.innerHTML = feedbackHTML;
+
+          // KaTeX render inside drawer
+          const whyWrongBox = feedbackDrawer.querySelector('.quiz-why-wrong-box');
+          if (whyWrongBox && data.why_selected_is_wrong) {
+            if (typeof window.renderMarkdownWithKaTeX === 'function') {
+              window.renderMarkdownWithKaTeX(data.why_selected_is_wrong, whyWrongBox);
+            } else {
+              whyWrongBox.textContent = data.why_selected_is_wrong;
+            }
+          }
+          const summaryBox = feedbackDrawer.querySelector('.quiz-summary-box');
+          if (summaryBox && data.summary_explanation) {
+            if (typeof window.renderMarkdownWithKaTeX === 'function') {
+              window.renderMarkdownWithKaTeX(data.summary_explanation, summaryBox);
+            } else {
+              summaryBox.textContent = data.summary_explanation;
+            }
+          }
+        }
+
+        // Show Next Button
+        const nextBtn = document.getElementById('quiz-next-btn');
+        if (nextBtn) {
+          nextBtn.style.display = 'inline-flex';
+          const isLast = currentQuizIndex + 1 >= quizQuestions.length;
+          nextBtn.innerHTML = isLast ? 'Finish Drill & View Results &rarr;' : 'Next Question &rarr;';
+        }
+      })
+      .catch(err => {
+        buttons.forEach(btn => { btn.disabled = false; btn.style.cursor = 'pointer'; });
+        alert('Network error while evaluating answer. Please retry.');
+      });
+  }
+
+  function advanceQuizQuestion() {
+    renderQuizQuestion(currentQuizIndex + 1);
+  }
+
+  function renderQuizSummary() {
+    const cardEl = document.getElementById('quiz-active-card');
+    const summaryEl = document.getElementById('quiz-summary-card');
+    if (cardEl) cardEl.style.display = 'none';
+    if (!summaryEl) return;
+
+    summaryEl.style.display = 'block';
+    const total = quizQuestions.length;
+    const pct = total > 0 ? Math.round((quizScore / total) * 100) : 0;
+    const isMastered = pct >= 80;
+
+    summaryEl.innerHTML = `
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 50%; background: ${isMastered ? 'rgba(15, 118, 110, 0.15)' : 'rgba(239, 68, 68, 0.15)'}; color: ${isMastered ? 'var(--green)' : 'var(--danger)'}; font-size: 2rem; margin-bottom: 16px;">
+        ${isMastered ? '🏆' : '📚'}
+      </div>
+      <h3 style="font-size: 1.4rem; font-weight: 700; margin: 0 0 8px; color: var(--text);">
+        ${isMastered ? 'Mastery Demonstrated!' : 'Good Effort! Keep Practicing'}
+      </h3>
+      <p style="font-size: 1.05rem; color: var(--text-muted); margin: 0 0 24px;">
+        You scored <strong>${quizScore} out of ${total}</strong> (${pct}% correct)
+      </p>
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-primary" style="background: var(--green); border-color: var(--green); font-weight: 600;" onclick="restartTopicQuiz(false)">
+          Retake Drill
+        </button>
+        <button type="button" class="btn btn-outline" onclick="restartTopicQuiz(true)">
+          Generate New Questions
+        </button>
+        <button type="button" class="btn btn-outline" onclick="switchPillarTab('notes')">
+          Review Topic Notes
+        </button>
+      </div>
+    `;
+  }
+
 {% endblock %}

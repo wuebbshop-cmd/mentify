@@ -1058,6 +1058,13 @@ class PrepStudentSpacedCard(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="spaced_cards", db_index=True)
     topic = models.ForeignKey(PrepTopic, on_delete=models.CASCADE, related_name="spaced_cards", db_index=True)
     question = models.ForeignKey(PrepQuestion, on_delete=models.CASCADE, null=True, blank=True, related_name="spaced_cards")
+    quiz_question = models.ForeignKey(
+        "PrepTopicQuizQuestion",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="spaced_cards",
+    )
     card_title = models.CharField(max_length=255, blank=True, default="")
     prompt_text = models.TextField(blank=True, default="")
     answer_text = models.TextField(blank=True, default="")
@@ -1086,6 +1093,70 @@ class PrepStudentSpacedCard(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.topic.title} (Due: {self.due_date.strftime('%Y-%m-%d')})"
+
+
+class PrepTopicQuizQuestion(models.Model):
+    """
+    Multiple-choice drill question with distractor explanations.
+    Used for topic study quizzes and interactive chatbot drills.
+    """
+    DIFFICULTY_CHOICES = [
+        ("easy", "Easy"),
+        ("medium", "Medium"),
+        ("hard", "Hard"),
+    ]
+
+    topic = models.ForeignKey(
+        PrepTopic,
+        on_delete=models.CASCADE,
+        related_name="quiz_questions",
+        db_index=True,
+    )
+    question_text = models.TextField(help_text="Markdown/LaTeX question prompt")
+    options = models.JSONField(help_text="Dict mapping 'A','B','C','D' to option text")
+    correct_option = models.CharField(max_length=2, help_text="'A', 'B', 'C', or 'D'")
+    explanation = models.JSONField(help_text="Dict with 'summary' and 'why_others_wrong'")
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default="medium", db_index=True)
+    source_signature = models.CharField(max_length=64, blank=True, db_index=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["topic", "id"]
+        verbose_name = "Prep Topic Quiz Question"
+        verbose_name_plural = "Prep Topic Quiz Questions"
+
+    def __str__(self):
+        return f"[{self.topic.course.code if self.topic and self.topic.course else 'Course'}] {self.topic.title} - Q{self.id} ({self.difficulty})"
+
+
+class PrepTopicQuizAttempt(models.Model):
+    """Tracks a student's answer to a quiz question for analytics and mastery scoring."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="prep_quiz_attempts",
+        db_index=True,
+    )
+    quiz_question = models.ForeignKey(
+        PrepTopicQuizQuestion,
+        on_delete=models.CASCADE,
+        related_name="attempts",
+        db_index=True,
+    )
+    selected_option = models.CharField(max_length=2)
+    is_correct = models.BooleanField(db_index=True)
+    answered_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-answered_at"]
+        verbose_name = "Prep Topic Quiz Attempt"
+        verbose_name_plural = "Prep Topic Quiz Attempts"
+
+    def __str__(self):
+        return f"{self.user} - Q{self.quiz_question_id}: {'Correct' if self.is_correct else 'Incorrect'} ({self.selected_option})"
+
 
 
 

@@ -41,6 +41,8 @@ from .models import (
     PrepTopicWikipedia,
     PrepTopicAcademicPaper,
     PrepStudentSpacedCard,
+    PrepTopicQuizQuestion,
+    PrepTopicQuizAttempt,
 )
 from services.credit_service import grant_credits, grant_subscription
 
@@ -1600,6 +1602,24 @@ class PrepStudentSpacedCardAdmin(admin.ModelAdmin):
         labels = {0: "New", 1: "Learning", 2: "Review", 3: "Relearning"}
         return labels.get(obj.state, "Unknown")
     state_label.short_description = "FSRS State"
+
+
+@admin.register(PrepTopicQuizQuestion)
+class PrepTopicQuizQuestionAdmin(admin.ModelAdmin):
+    list_display = ("id", "topic", "correct_option", "difficulty", "is_active", "created_at")
+    list_filter = ("difficulty", "is_active", "topic__course")
+    search_fields = ("question_text", "topic__title", "topic__course__code")
+    autocomplete_fields = ("topic",)
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(PrepTopicQuizAttempt)
+class PrepTopicQuizAttemptAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "quiz_question", "selected_option", "is_correct", "answered_at")
+    list_filter = ("is_correct", "answered_at")
+    search_fields = ("user__username", "user__email", "quiz_question__question_text")
+    readonly_fields = ("answered_at",)
+
 
 
 

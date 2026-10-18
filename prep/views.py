@@ -1401,6 +1401,102 @@ def prep_spaced_card_add_api(request):
     })
 
 
+@never_cache
+@require_http_methods(["GET"])
+def prep_topic_quiz_api(request, topic_id):
+    """
+    Returns 5 multiple-choice drill questions for the topic.
+    Withholds correct answers and explanations until submitted.
+    """
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    from services.prep_topic_quiz import get_or_create_topic_quiz
+    count = 5
+    try:
+        raw_count = int(request.GET.get("count", 5))
+        count = max(1, min(raw_count, 10))
+    except (ValueError, TypeError):
+        count = 5
+
+    questions = get_or_create_topic_quiz(topic, count=count, user=request.user if request.user.is_authenticated else None)
+    data = []
+    for q in questions:
+        data.append({
+            "id": q.id,
+            "question": q.question_text,
+            "options": q.options,
+            "difficulty": q.difficulty,
+        })
+    return JsonResponse({
+        "success": True,
+        "topic_id": topic.id,
+        "topic_title": topic.title,
+        "course_code": topic.course.code if topic.course else "",
+        "count": len(data),
+        "questions": data,
+    })
+
+
+@never_cache
+@require_http_methods(["POST"])
+def prep_topic_quiz_submit_api(request, topic_id):
+    """
+    Evaluates a user's chosen option for a quiz question.
+    Returns correct status, correct answer, and distractor explanations.
+    """
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    try:
+        import json
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        payload = request.POST
+
+    question_id = payload.get("question_id")
+    selected_option = payload.get("selected_option")
+    if not question_id or not selected_option:
+        return JsonResponse({"success": False, "error": "question_id and selected_option are required."}, status=400)
+
+    from services.prep_topic_quiz import evaluate_quiz_answer
+    res = evaluate_quiz_answer(
+        quiz_question_id=int(question_id),
+        selected_option=str(selected_option),
+        user=request.user if request.user.is_authenticated else None,
+    )
+    if not res.get("success"):
+        return JsonResponse(res, status=400)
+    return JsonResponse(res)
+
+
+@login_required
+@never_cache
+@require_http_methods(["POST"])
+def prep_topic_quiz_generate_api(request, topic_id):
+    """
+    Generates fresh multiple-choice drill questions for the topic.
+    """
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    try:
+        import json
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        payload = request.POST
+
+    count = 5
+    try:
+        count = max(1, min(int(payload.get("count", 5)), 10))
+    except (ValueError, TypeError):
+        count = 5
+
+    difficulty = str(payload.get("difficulty") or "medium").lower()
+    from services.prep_topic_quiz import generate_topic_quiz_questions
+    created = generate_topic_quiz_questions(topic, count=count, difficulty=difficulty)
+    return JsonResponse({
+        "success": True,
+        "count": len(created),
+        "message": f"Generated {len(created)} new drill questions for {topic.title}.",
+    })
+
+
+
 @login_required
 @never_cache
 @require_http_methods(["GET", "POST"])

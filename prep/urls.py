@@ -50,5 +50,9 @@ urlpatterns = [
     path("api/spaced-cards/due/", views.prep_spaced_cards_due_api, name="api_spaced_cards_due"),
     path("api/spaced-cards/add/", views.prep_spaced_card_add_api, name="api_spaced_card_add"),
     path("api/spaced-cards/<int:card_id>/review/", views.prep_spaced_card_review_api, name="api_spaced_card_review"),
+    # Topic Interactive Drill Quiz Endpoints
+    path("api/topic/<int:topic_id>/quiz/", views.prep_topic_quiz_api, name="api_topic_quiz"),
+    path("api/topic/<int:topic_id>/quiz/submit/", views.prep_topic_quiz_submit_api, name="api_topic_quiz_submit"),
+    path("api/topic/<int:topic_id>/quiz/generate/", views.prep_topic_quiz_generate_api, name="api_topic_quiz_generate"),
 ]
 
