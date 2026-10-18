@@ -1009,7 +1009,7 @@
     }
   }
 
-  function renderSelectedFiles() {
+  function renderSelectedFiles(isProcessing = false) {
     if (!selectedFilesPanel || !selectedFilesList) return;
     const count = stagedFiles.length;
     selectedFilesCount.textContent = String(count);
@@ -1019,7 +1019,7 @@
       selectedFilesPanel.classList.remove('is-visible');
       clearSelectionBtn.classList.remove('is-visible');
       selectedFilesList.innerHTML = '';
-      updateStepperState();
+      updateStepperState(isProcessing);
       return;
     }
 
@@ -1037,7 +1037,7 @@
         <button type="button" class="selected-file-remove" title="Remove file" onclick="removeStagedFile(${idx})">&times;</button>
       </div>
     `).join('');
-    updateStepperState();
+    updateStepperState(isProcessing);
   }
 
   function resetProgressPanel() {
@@ -1104,12 +1104,14 @@
     renderSelectedFiles();
   }
 
-  function clearSelectedFiles() {
+  function clearSelectedFiles(keepProgress = false) {
     stagedFiles = [];
     if (fileInput) fileInput.value = '';
     syncStagedFilesToInput();
-    renderSelectedFiles();
-    resetProgressPanel();
+    renderSelectedFiles(keepProgress);
+    if (!keepProgress) {
+      resetProgressPanel();
+    }
   }
 
   if (dropzone && fileInput) {
@@ -1288,7 +1290,13 @@
         try {
           payload = JSON.parse(xhr.responseText);
         } catch (err) {
-          uploadForm.submit();
+          progressBar.style.width = '100%';
+          progressBar.style.background = 'var(--danger)';
+          progressPct.textContent = 'Error';
+          progressTitle.textContent = 'Upload could not be processed';
+          progressSubtext.textContent = 'The server returned an unexpected response. Please try again.';
+          const dismissBtn = document.getElementById('upload-dismiss-btn');
+          if (dismissBtn) dismissBtn.style.display = 'inline-block';
           return;
         }
 
@@ -1300,6 +1308,7 @@
         if (xhr.status >= 200 && xhr.status < 300 && payload && payload.success) {
           progressPct.textContent = 'Done';
           progressBar.style.width = '100%';
+          progressBar.style.background = 'var(--green)';
           progressTitle.textContent = payload.queued_count > 0
             ? 'Upload complete — processing in background'
             : 'Upload processed';
@@ -1322,7 +1331,7 @@
             updateCourseInput();
           }
 
-          clearSelectedFiles();
+          clearSelectedFiles(true);
           updateStepperState(true);
 
           if (Array.isArray(payload.documents)) {
@@ -1347,7 +1356,9 @@
       xhr.onerror = function () {
         submitBtn.disabled = false;
         if (submitLabel) submitLabel.textContent = 'Process materials';
+        progressBar.style.width = '100%';
         progressBar.style.background = 'var(--danger)';
+        progressPct.textContent = 'Error';
         progressTitle.textContent = 'Network error during upload';
         progressSubtext.textContent = 'Please check your connection and try again.';
         const dismissBtn = document.getElementById('upload-dismiss-btn');
