@@ -888,6 +888,7 @@ class PrepTransaction(models.Model):
         ("upload_ocr", "Scanned Vision OCR Ingestion (5 credits)"),
         ("deep_reasoning", "Complex Proof / Derivation (5 credits)"),
         ("ai_practice_gen", "AI Practice Question Generation"),
+        ("active_recall_drill", "Active Recall Drill Questions"),
         ("topic_notes", "AI Topic Notes Generation"),
         ("topic_tutor", "Topic Tutor AI Reply"),
         ("topic_tutor_ocr", "Topic Tutor Upload OCR"),

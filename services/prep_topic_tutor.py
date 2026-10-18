@@ -872,7 +872,7 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
         past_questions=past_questions,
     )
     wallet = PrepWallet.get_or_create_wallet(user)
-    chat_model = str(getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-flash"))
+    chat_model = str(getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"))
     chat_reserve, chat_reserve_quote = estimate_chat_reservation(
         system_prompt,
         user_prompt,

@@ -173,6 +173,9 @@ class SecurityErrorMiddleware:
         # Safety catch: If an API endpoint returned an HTML 500 error page or raw string,
         # convert it into a clean, well-formatted JSON response.
         if response.status_code == 500 and is_ajax_or_api_request(request):
+            import sys
+            sys.stderr.write(f"\n[SecurityErrorMiddleware] Intercepted 500 on AJAX/API request: {request.path}\n")
+            sys.stderr.flush()
             content_type = response.headers.get("content-type", "")
             if "application/json" not in content_type:
                 return JsonResponse(
@@ -197,6 +200,10 @@ class SecurityErrorMiddleware:
 
         # Redact potentially sensitive query params or body in logging
         safe_path = request.path if request else "/"
+        import sys, traceback
+        sys.stderr.write(f"\n[SecurityErrorMiddleware] Unhandled exception in {safe_path}: {exception}\n")
+        traceback.print_exc(file=sys.stderr)
+        sys.stderr.flush()
         logger.error(
             "Unhandled exception in %s: %s",
             safe_path,

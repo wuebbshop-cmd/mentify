@@ -267,10 +267,10 @@ ADMIN_EMAILS_NOTIFICATIONS = [
 # ─── Mentify Prep & AI Configuration ─────────────────────────────────────────
 DEEPSEEK_API = os.environ.get("DEEPSEEK_API", "")
 DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-DEEPSEEK_CHAT_MODEL = os.environ.get("DEEPSEEK_CHAT_MODEL", "deepseek-flash")
-DEEPSEEK_REASONER_MODEL = os.environ.get("DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro")
+DEEPSEEK_CHAT_MODEL = os.environ.get("DEEPSEEK_CHAT_MODEL", "deepseek-chat")
+DEEPSEEK_REASONER_MODEL = os.environ.get("DEEPSEEK_REASONER_MODEL", "deepseek-reasoner")
 DEEPSEEK_ASSESSMENT_REVIEW_MODEL = os.environ.get("DEEPSEEK_ASSESSMENT_REVIEW_MODEL", "")
-DEEPSEEK_REPAIR_MODEL = os.environ.get("DEEPSEEK_REPAIR_MODEL", "deepseek-flash")
+DEEPSEEK_REPAIR_MODEL = os.environ.get("DEEPSEEK_REPAIR_MODEL", "deepseek-chat")
 MAX_TOKENS_EXPLANATION = int(os.environ.get("MAX_TOKENS_EXPLANATION", 3500))
 MAX_TOKENS_REASONING = int(os.environ.get("MAX_TOKENS_REASONING", 4000))
 PREP_CREDIT_TOKEN_UNIT = int(os.environ.get("PREP_CREDIT_TOKEN_UNIT", 1000))

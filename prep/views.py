@@ -1493,70 +1493,79 @@ def prep_topic_quiz_api(request, topic_id):
         }, status=402)
 
     fresh = request.GET.get("fresh") in {"1", "true", "True"}
-    from services.prep_topic_quiz import get_or_create_topic_quiz
-    questions = get_or_create_topic_quiz(
-        topic,
-        count=count,
-        user=request.user,
-        force_fresh=fresh,
-    )
-    if not questions:
+    try:
+        from services.prep_topic_quiz import get_or_create_topic_quiz
+        questions = get_or_create_topic_quiz(
+            topic,
+            count=count,
+            user=request.user,
+            force_fresh=fresh,
+        )
+        if not questions:
+            return JsonResponse({
+                "success": False,
+                "error": "Drill questions could not be prepared at this time. Please try again shortly.",
+                "credits_balance": get_available_credits(wallet),
+            }, status=503)
+
+        course_code = topic.course.code if topic.course else ""
+        if is_covered_by_plan:
+            credits_deducted = 0
+            PrepTransaction.objects.create(
+                wallet=wallet,
+                amount=0,
+                action_type="active_recall_drill",
+                description=f"Active Recall Drill ({len(questions)} Qs, Plan Allowance): {course_code} - {topic.title}",
+                metadata={"topic_id": topic.id, "count": len(questions), "covered_by_plan": True},
+            )
+        else:
+            credits_deducted = min(len(questions), cost_in_credits)
+            try:
+                consume_credits(
+                    wallet,
+                    amount=credits_deducted,
+                    action_type="active_recall_drill",
+                    description=f"Active Recall Drill ({len(questions)} Qs): {course_code} - {topic.title}",
+                    metadata={"topic_id": topic.id, "count": len(questions)},
+                )
+            except InsufficientCredits:
+                return JsonResponse({
+                    "success": False,
+                    "error": f"Active recall drill requires {credits_deducted} credits (available: {get_available_credits(wallet)}).",
+                    "credits_balance": get_available_credits(wallet),
+                }, status=402)
+
+        # Downgrade trial -> freemium immediately if trial credits hit zero
+        if wallet.current_plan == "trial" and get_available_credits(wallet) == 0:
+            wallet.current_plan = "freemium"
+            wallet.save(update_fields=["current_plan", "updated_at"])
+
+        data = []
+        for q in questions:
+            data.append({
+                "id": q.id,
+                "question": q.question_text,
+                "options": q.options,
+                "difficulty": q.difficulty,
+            })
+        return JsonResponse({
+            "success": True,
+            "topic_id": topic.id,
+            "topic_title": topic.title,
+            "course_code": course_code,
+            "count": len(data),
+            "questions": data,
+            "credits_deducted": credits_deducted,
+            "credits_balance": get_available_credits(wallet),
+        })
+    except Exception as exc:
+        logger.exception("[prep_topic_quiz_api] Failed to prepare quiz for topic %s: %s", topic.id, exc)
         return JsonResponse({
             "success": False,
             "error": "Drill questions could not be prepared at this time. Please try again shortly.",
             "credits_balance": get_available_credits(wallet),
         }, status=503)
 
-    course_code = topic.course.code if topic.course else ""
-    if is_covered_by_plan:
-        credits_deducted = 0
-        PrepTransaction.objects.create(
-            wallet=wallet,
-            amount=0,
-            action_type="active_recall_drill",
-            description=f"Active Recall Drill ({len(questions)} Qs, Plan Allowance): {course_code} - {topic.title}",
-            metadata={"topic_id": topic.id, "count": len(questions), "covered_by_plan": True},
-        )
-    else:
-        credits_deducted = min(len(questions), cost_in_credits)
-        try:
-            consume_credits(
-                wallet,
-                amount=credits_deducted,
-                action_type="active_recall_drill",
-                description=f"Active Recall Drill ({len(questions)} Qs): {course_code} - {topic.title}",
-                metadata={"topic_id": topic.id, "count": len(questions)},
-            )
-        except InsufficientCredits:
-            return JsonResponse({
-                "success": False,
-                "error": f"Active recall drill requires {credits_deducted} credits (available: {get_available_credits(wallet)}).",
-                "credits_balance": get_available_credits(wallet),
-            }, status=402)
-
-    # Downgrade trial -> freemium immediately if trial credits hit zero
-    if wallet.current_plan == "trial" and get_available_credits(wallet) == 0:
-        wallet.current_plan = "freemium"
-        wallet.save(update_fields=["current_plan", "updated_at"])
-
-    data = []
-    for q in questions:
-        data.append({
-            "id": q.id,
-            "question": q.question_text,
-            "options": q.options,
-            "difficulty": q.difficulty,
-        })
-    return JsonResponse({
-        "success": True,
-        "topic_id": topic.id,
-        "topic_title": topic.title,
-        "course_code": course_code,
-        "count": len(data),
-        "questions": data,
-        "credits_deducted": credits_deducted,
-        "credits_balance": get_available_credits(wallet),
-    })
 
 
 @never_cache

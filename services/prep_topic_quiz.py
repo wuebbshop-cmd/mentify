@@ -253,7 +253,7 @@ Important rules:
 6. Return ONLY a single raw JSON array of objects.
 """
 
-    model_name = getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-flash")
+    model_name = getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat")
     ai_response = call_deepseek(
         messages=[
             {"role": "system", "content": system_prompt},

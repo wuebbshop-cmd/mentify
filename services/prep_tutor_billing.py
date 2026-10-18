@@ -16,7 +16,15 @@ _DEEPSEEK_RATES_USD_PER_MILLION = {
         "off_peak": {"input": "0.15", "cached_input": "0.003", "output": "0.60"},
         "peak": {"input": "0.30", "cached_input": "0.006", "output": "1.20"},
     },
+    "deepseek-chat": {
+        "off_peak": {"input": "0.15", "cached_input": "0.003", "output": "0.60"},
+        "peak": {"input": "0.30", "cached_input": "0.006", "output": "1.20"},
+    },
     "deepseek-v4-pro": {
+        "off_peak": {"input": "0.66", "cached_input": "0.022", "output": "1.98"},
+        "peak": {"input": "1.32", "cached_input": "0.044", "output": "3.96"},
+    },
+    "deepseek-reasoner": {
         "off_peak": {"input": "0.66", "cached_input": "0.022", "output": "1.98"},
         "peak": {"input": "1.32", "cached_input": "0.044", "output": "3.96"},
     },

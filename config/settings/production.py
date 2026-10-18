@@ -82,3 +82,62 @@ CSRF_COOKIE_SAMESITE = "Lax"
 
 # Render uses dedicated worker services defined in render.yaml; disable in-process threads
 ENABLE_LOCAL_PREP_WORKERS = False
+
+# ─── Production Logging to stdout / stderr for Render ─────────────────────────
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[%(asctime)s] [%(levelname)s] [%(name)s:%(lineno)d] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "simple": {
+            "format": "%(levelname)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "config": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "prep": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "services": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+

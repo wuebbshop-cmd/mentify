@@ -2912,6 +2912,12 @@ def call_deepseek(
         logger.error("[DeepSeek] API key is not configured in settings or environment.")
         return {"success": False, "error": "The AI service is currently unavailable. Please try again shortly."}
 
+    # Normalize model names to valid DeepSeek endpoints
+    if model in {"deepseek-flash", "deepseek-chat-flash", "deepseek-v3"}:
+        model = "deepseek-chat"
+    elif model in {"deepseek-v4-pro", "deepseek-r1"}:
+        model = "deepseek-reasoner"
+
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
