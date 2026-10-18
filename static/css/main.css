@@ -1125,11 +1125,37 @@ html.sidebar-collapsed .prep-app .footer {
 .alert-info    { background: var(--blue-light); border-color: var(--blue); color: #0c4080; }
 
 /* ─── Tables ─────────────────────────────────────────────────── */
-.table-wrapper, .table-wrap {
+.table-wrapper, .table-wrap, .markdown-table-wrapper {
+  display: block;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  box-sizing: border-box;
+}
+.markdown-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.markdown-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--green, #0f766e);
+  border-radius: 4px;
+}
+.markdown-table-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+.markdown-table-wrapper table {
+  display: table;
+  width: 100%;
+  min-width: max-content;
+  border-collapse: collapse;
+  margin: 0;
+  box-sizing: border-box;
 }
 .table-wrapper table,
 .table-wrap table { margin: 0; }

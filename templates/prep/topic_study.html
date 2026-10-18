@@ -1076,36 +1076,115 @@
   .markdown-rendered .katex-display::-webkit-scrollbar-track {
     background: transparent;
   }
-  .markdown-rendered table {
+  /* ── Responsive Markdown Tables & Horizontal Scrolling ───────────────────
+     Wraps and formats tables in AI tutor, notes, past questions, and practice
+     variants so wide tables scroll smoothly horizontally on mobile without clipping. */
+  .markdown-table-wrapper {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+    margin: 16px 0;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    box-sizing: border-box;
+  }
+  .markdown-table-wrapper::-webkit-scrollbar,
+  .markdown-rendered table::-webkit-scrollbar {
+    height: 6px;
+  }
+  .markdown-table-wrapper::-webkit-scrollbar-thumb,
+  .markdown-rendered table::-webkit-scrollbar-thumb {
+    background: var(--green, #0f766e);
+    border-radius: 4px;
+  }
+  .markdown-table-wrapper::-webkit-scrollbar-track,
+  .markdown-rendered table::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+  .markdown-table-wrapper,
+  .markdown-rendered table {
+    scrollbar-width: thin;
+    scrollbar-color: var(--green, #0f766e) rgba(0, 0, 0, 0.05);
+  }
+
+  .markdown-table-wrapper table {
+    display: table;
+    width: 100%;
+    min-width: max-content;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.88rem;
+    box-sizing: border-box;
+    border: none;
+  }
+
+  /* Direct fallback if table has no wrapper */
+  .markdown-rendered table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
     border-collapse: collapse;
     margin: 16px 0;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--border);
+    box-sizing: border-box;
   }
-  .markdown-rendered th, .markdown-rendered td {
+
+  .markdown-rendered th,
+  .markdown-rendered td,
+  .markdown-table-wrapper th,
+  .markdown-table-wrapper td {
     padding: 10px 14px;
     border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
   }
-  .markdown-rendered th {
-    background: var(--surface);
+  .markdown-rendered th,
+  .markdown-table-wrapper th {
+    background: var(--surface-2, rgba(0, 0, 0, 0.03));
     font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
   }
-  /* ── Mobile horizontal scroll ─────────────────────────────────────────────
-     Allow notes body, question cards, and solution boxes to scroll sideways
-     so that wide tables, large images, and display-math don't get clipped.  */
+  body.dark-theme .markdown-rendered th,
+  body.dark-theme .markdown-table-wrapper th {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* ── Mobile horizontal scroll containers ─────────────────────────────────
+     Allow notes body, question cards, solution boxes, tutor messages, and practice
+     variants to scroll sideways so that wide tables and equations don't get cut off. */
   #notes-body,
   .exam-problem-box,
   .exam-solution-box,
-  #pillar-practice .markdown-rendered {
+  #pillar-practice .markdown-rendered,
+  .topic-tutor-message .markdown-rendered,
+  .quiz-why-wrong-box,
+  .quiz-summary-box {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
   }
+
   /* Tables inside these containers: let content width drive the table so the
-     outer scroll activates for very wide tables.                             */
+     outer or inner scroll activates for very wide tables on mobile screens.  */
   #notes-body table,
   .exam-problem-box table,
   .exam-solution-box table,
-  #pillar-practice .markdown-rendered table {
+  #pillar-practice .markdown-rendered table,
+  .topic-tutor-message .markdown-rendered table {
     width: auto;
     min-width: 520px;
   }
@@ -1266,6 +1345,8 @@
   }
   .topic-tutor-message {
     max-width: 90%;
+    min-width: 0;
+    box-sizing: border-box;
     margin: 0 0 32px;
     padding: 22px 26px;
     border: 1px solid var(--border);
@@ -1274,6 +1355,15 @@
     color: var(--text);
     overflow-wrap: anywhere;
     box-shadow: 0 3px 12px rgba(15, 23, 42, .04);
+  }
+  .topic-tutor-message.assistant {
+    overflow-x: visible;
+  }
+  .topic-tutor-message.assistant .markdown-rendered {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .topic-tutor-message.user {
     margin-left: auto;
@@ -1589,7 +1679,21 @@
       overflow-y: auto;
       padding: 16px 12px 14px;
     }
-    .topic-tutor-message { max-width: 96%; }
+    .topic-tutor-message {
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 14px 14px;
+    }
+    .topic-tutor-message.assistant {
+      max-width: 100%;
+    }
+    .topic-tutor-message.assistant .markdown-rendered {
+      min-width: 0;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     .topic-tutor-error {
       margin: 6px 10px 4px;
       padding: 9px 12px;
@@ -1792,11 +1896,19 @@
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.assistant {
       max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
       margin: 0 0 14px;
       padding: 13px 15px;
       font-size: 0.94rem;
       line-height: 1.6;
       border-radius: 14px;
+    }
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.assistant .markdown-rendered {
+      min-width: 0;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .topic-tutor-shell.topic-tutor-expanded .topic-tutor-message.user {
       max-width: 88%;

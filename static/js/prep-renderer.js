@@ -203,6 +203,21 @@
               '<img src="' + cleanHref + '" alt="' + cleanAlt + '"' + cleanTitle + ' loading="lazy">' +
               captionHtml +
               '</figure>';
+          },
+          table: function() {
+            var html = '';
+            if (arguments.length >= 2) {
+              html = '<table>\n<thead>\n' + arguments[0] + '</thead>\n<tbody>\n' + arguments[1] + '</tbody>\n</table>\n';
+            } else if (arguments.length === 1 && typeof arguments[0] === 'object' && arguments[0]) {
+              var token = arguments[0];
+              if (this && typeof this.constructor.prototype.table === 'function' && this.constructor.prototype.table !== this.table) {
+                html = this.constructor.prototype.table.call(this, token);
+              }
+            }
+            if (html) {
+              return '<div class="markdown-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">\n' + html + '</div>\n';
+            }
+            return false;
           }
         }
       });
@@ -733,6 +748,26 @@
     }
 
     containerElement.innerHTML = htmlOutput;
+
+    // Wrap any unwrapped table elements in .markdown-table-wrapper for responsive horizontal scrolling
+    try {
+      var tables = containerElement.querySelectorAll('table');
+      for (var ti = 0; ti < tables.length; ti++) {
+        var tbl = tables[ti];
+        if (tbl.parentElement && !tbl.parentElement.classList.contains('markdown-table-wrapper')) {
+          var wrapper = document.createElement('div');
+          wrapper.className = 'markdown-table-wrapper';
+          wrapper.setAttribute('tabindex', '0');
+          wrapper.setAttribute('role', 'region');
+          wrapper.setAttribute('aria-label', 'Scrollable table');
+          tbl.parentNode.insertBefore(wrapper, tbl);
+          wrapper.appendChild(tbl);
+        }
+      }
+    } catch (tblErr) {
+      // Non-blocking enhancement
+    }
+
     highlightCode(containerElement);
     return htmlOutput;
   }

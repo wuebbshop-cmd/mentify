@@ -59,6 +59,90 @@
     border-color: #2e2e2e;
     border-left-color: #2dd4bf;
   }
+  .exam-problem-box,
+  .exam-solution-box {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+  }
+  .markdown-table-wrapper {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+    margin: 16px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-sizing: border-box;
+  }
+  .markdown-table-wrapper::-webkit-scrollbar,
+  .markdown-rendered table::-webkit-scrollbar {
+    height: 6px;
+  }
+  .markdown-table-wrapper::-webkit-scrollbar-thumb,
+  .markdown-rendered table::-webkit-scrollbar-thumb {
+    background: var(--green, #0f766e);
+    border-radius: 4px;
+  }
+  .markdown-table-wrapper::-webkit-scrollbar-track,
+  .markdown-rendered table::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+  .markdown-table-wrapper,
+  .markdown-rendered table {
+    scrollbar-width: thin;
+    scrollbar-color: var(--green, #0f766e) rgba(0, 0, 0, 0.05);
+  }
+  .markdown-table-wrapper table {
+    display: table;
+    width: 100%;
+    min-width: max-content;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.88rem;
+    box-sizing: border-box;
+    border: none;
+  }
+  .markdown-rendered table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    box-sizing: border-box;
+  }
+  .markdown-rendered th,
+  .markdown-rendered td,
+  .markdown-table-wrapper th,
+  .markdown-table-wrapper td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+  }
+  .markdown-rendered th,
+  .markdown-table-wrapper th {
+    background: var(--surface-2, rgba(0, 0, 0, 0.03));
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  body.dark-theme .markdown-rendered th,
+  body.dark-theme .markdown-table-wrapper th {
+    background: rgba(255, 255, 255, 0.06);
+  }
   .markdown-rendered pre {
     background: #1e1e1e !important;
     color: #f3f4f6 !important;
