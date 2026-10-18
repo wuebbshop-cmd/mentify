@@ -1408,8 +1408,22 @@ def prep_topic_quiz_api(request, topic_id):
     Returns 5 multiple-choice drill questions for the topic.
     Withholds correct answers and explanations until submitted.
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            "success": False,
+            "error": "Please sign in or create an account to start active recall drills.",
+        }, status=401)
+
     topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
-    from services.prep_topic_quiz import get_or_create_topic_quiz
+    from services.credit_service import (
+        enforce_subscription_limit,
+        get_available_credits,
+        consume_credits,
+        InsufficientCredits,
+        PlanLimitExceeded,
+    )
+    from prep.models import PrepWallet
+
     count = 5
     try:
         raw_count = int(request.GET.get("count", 5))
@@ -1417,13 +1431,66 @@ def prep_topic_quiz_api(request, topic_id):
     except (ValueError, TypeError):
         count = 5
 
+    wallet = PrepWallet.get_or_create_wallet(request.user)
+
+    # 1. Enforce subscription usage limit for practice/drill questions
+    try:
+        enforce_subscription_limit(wallet, "practice_questions", count)
+    except PlanLimitExceeded as exc:
+        return JsonResponse({
+            "success": False,
+            "error": str(exc),
+            "credits_balance": get_available_credits(wallet),
+        }, status=403)
+
+    # 2. Check sufficient credit balance
+    available_credits = get_available_credits(wallet)
+    required_credits = count
+    if available_credits < required_credits:
+        return JsonResponse({
+            "success": False,
+            "error": f"Insufficient credits. At least {required_credits} credits are required to launch this active recall drill.",
+            "credits_balance": available_credits,
+        }, status=402)
+
     fresh = request.GET.get("fresh") in {"1", "true", "True"}
+    from services.prep_topic_quiz import get_or_create_topic_quiz
     questions = get_or_create_topic_quiz(
         topic,
         count=count,
-        user=request.user if request.user.is_authenticated else None,
+        user=request.user,
         force_fresh=fresh,
     )
+    if not questions:
+        return JsonResponse({
+            "success": False,
+            "error": "Drill questions could not be prepared at this time. Please try again shortly.",
+            "credits_balance": get_available_credits(wallet),
+        }, status=503)
+
+    # 3. Deduct credits for the delivered drill session
+    credits_deducted = min(len(questions), required_credits)
+    course_code = topic.course.code if topic.course else ""
+    try:
+        consume_credits(
+            wallet,
+            amount=credits_deducted,
+            action_type="active_recall_drill",
+            description=f"Active Recall Drill ({len(questions)} Qs): {course_code} - {topic.title}",
+            metadata={"topic_id": topic.id, "count": len(questions)},
+        )
+    except InsufficientCredits:
+        return JsonResponse({
+            "success": False,
+            "error": "Insufficient credits to start this drill session.",
+            "credits_balance": get_available_credits(wallet),
+        }, status=402)
+
+    # Downgrade trial -> freemium immediately if trial credits hit zero
+    if wallet.current_plan == "trial" and get_available_credits(wallet) == 0:
+        wallet.current_plan = "freemium"
+        wallet.save(update_fields=["current_plan", "updated_at"])
+
     data = []
     for q in questions:
         data.append({
@@ -1436,9 +1503,11 @@ def prep_topic_quiz_api(request, topic_id):
         "success": True,
         "topic_id": topic.id,
         "topic_title": topic.title,
-        "course_code": topic.course.code if topic.course else "",
+        "course_code": course_code,
         "count": len(data),
         "questions": data,
+        "credits_deducted": credits_deducted,
+        "credits_balance": get_available_credits(wallet),
     })
 
 

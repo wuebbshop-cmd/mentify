@@ -130,19 +130,49 @@ class PrepTopicQuizServiceTests(TestCase):
         self.assertFalse(result["success"])
         self.assertIn("Invalid option", result["error"])
 
-    def test_quiz_get_api_withholds_answers(self):
+    def test_quiz_get_api_withholds_answers_and_deducts_credits(self):
         self.client.force_login(self.user)
         resp = self.client.get(f"/prep/api/topic/{self.topic.id}/quiz/")
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertTrue(data["success"])
         self.assertGreaterEqual(len(data["questions"]), 2)
+        self.assertIn("credits_deducted", data)
+        self.assertGreater(data["credits_deducted"], 0)
+        self.assertIn("credits_balance", data)
         q = data["questions"][0]
         # Critical security check: answer & explanation MUST be withheld
         self.assertNotIn("correct_option", q)
         self.assertNotIn("explanation", q)
         self.assertIn("options", q)
         self.assertIn("A", q["options"])
+
+    def test_quiz_get_api_requires_authentication(self):
+        resp = self.client.get(f"/prep/api/topic/{self.topic.id}/quiz/")
+        self.assertEqual(resp.status_code, 401)
+        data = resp.json()
+        self.assertFalse(data["success"])
+        self.assertIn("Please sign in", data["error"])
+
+    def test_quiz_get_api_insufficient_credits(self):
+        # Create user with 0 credits
+        poor_user = User.objects.create_user(
+            username="broke_student",
+            email="broke_student@example.com",
+            password="secretpassword",
+        )
+        from prep.models import PrepWallet
+        wallet = PrepWallet.get_or_create_wallet(poor_user)
+        wallet.credits_balance = 0
+        wallet.credit_grants.all().update(remaining_credits=0)
+        wallet.save()
+
+        self.client.force_login(poor_user)
+        resp = self.client.get(f"/prep/api/topic/{self.topic.id}/quiz/")
+        self.assertEqual(resp.status_code, 402)
+        data = resp.json()
+        self.assertFalse(data["success"])
+        self.assertIn("Insufficient credits", data["error"])
 
     def test_quiz_submit_api(self):
         self.client.force_login(self.user)
