@@ -581,6 +581,24 @@ def evaluate_quiz_answer(
         # FSRS Spaced Repetition Integration:
         # If student got it wrong, schedule this question for spaced review!
         if not is_correct:
+            raw_expl = question.explanation
+            if isinstance(raw_expl, str) and raw_expl.strip().startswith("{"):
+                try:
+                    import json
+                    raw_expl = json.loads(raw_expl)
+                except Exception:
+                    pass
+
+            expl_summary = ""
+            if isinstance(raw_expl, dict):
+                expl_summary = str(raw_expl.get("summary") or "")
+            elif isinstance(raw_expl, str):
+                expl_summary = raw_expl
+
+            ans_text = f"Correct: Option {question.correct_option}"
+            if expl_summary.strip():
+                ans_text += f"\n{expl_summary.strip()}"
+
             spaced_card, _ = PrepStudentSpacedCard.objects.get_or_create(
                 user=user,
                 topic=question.topic,
@@ -588,7 +606,7 @@ def evaluate_quiz_answer(
                 defaults={
                     "card_title": f"Drill: {question.topic.title} (Q{question.id})",
                     "prompt_text": question.question_text,
-                    "answer_text": f"Correct: Option {question.correct_option}\n{question.explanation.get('summary', '')}",
+                    "answer_text": ans_text,
                     "due_date": timezone.now(),
                     "state": 0,
                 },
@@ -600,9 +618,26 @@ def evaluate_quiz_answer(
                 logger.warning(f"[Topic Quiz] Could not update spaced card for user {user.id}: {exc}")
 
     # Build response with rich multi-line explanation
-    explanation = question.explanation or {}
-    summary = format_explanation_for_display(explanation.get("summary") or "Correct answer verified.")
-    why_others = explanation.get("why_others_wrong") or {}
+    raw_expl = question.explanation
+    if isinstance(raw_expl, str) and raw_expl.strip().startswith("{"):
+        try:
+            import json
+            raw_expl = json.loads(raw_expl)
+        except Exception:
+            pass
+
+    if isinstance(raw_expl, dict):
+        explanation = raw_expl
+        summary_raw = explanation.get("summary") or "Correct answer verified."
+        why_others = explanation.get("why_others_wrong") or {}
+    elif isinstance(raw_expl, str) and raw_expl.strip():
+        summary_raw = raw_expl.strip()
+        why_others = {}
+    else:
+        summary_raw = "Correct answer verified."
+        why_others = {}
+
+    summary = format_explanation_for_display(summary_raw)
     formatted_why_others = {}
     if isinstance(why_others, dict):
         for k, v in why_others.items():

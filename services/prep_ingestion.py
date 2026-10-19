@@ -2568,21 +2568,44 @@ def process_prep_document(prep_document) -> dict:
         with prep_document.file.open("rb") as uploaded_file:
             file_content = uploaded_file.read()
     except (FileNotFoundError, OSError) as exc:
-        if prep_document.extracted_text and prep_document.extracted_text.strip():
-            logger.info(
-                f"[Prep Ingestion] Local file missing for doc {prep_document.id}, "
-                "retaining existing extracted text."
-            )
-            prep_document.stage = "stage_2"
-            prep_document.save(update_fields=["stage", "updated_at"])
-            return {
-                "success": True,
-                "stage": prep_document.stage,
-                "credits_deducted": 0,
-                "topics_indexed": 0,
-                "updates_proposed": 0,
-            }
-        return {"success": False, "error": f"Document file could not be read: {exc}"}
+        file_content = None
+        base_name = os.path.basename(prep_document.file.name)
+        clean_name = re.sub(r"^[a-f0-9]{8,16}-", "", base_name)
+        from django.conf import settings
+        media_root = getattr(settings, "MEDIA_ROOT", None)
+        if media_root and os.path.exists(media_root):
+            for root, _, files in os.walk(media_root):
+                candidate = None
+                if base_name in files:
+                    candidate = os.path.join(root, base_name)
+                elif clean_name in files:
+                    candidate = os.path.join(root, clean_name)
+                if candidate and os.path.exists(candidate):
+                    try:
+                        with open(candidate, "rb") as fallback_file:
+                            file_content = fallback_file.read()
+                        rel_name = os.path.relpath(candidate, media_root).replace("\\", "/")
+                        prep_document.file.name = rel_name
+                        prep_document.save(update_fields=["file", "updated_at"])
+                        break
+                    except Exception:
+                        pass
+        if file_content is None:
+            if prep_document.extracted_text and prep_document.extracted_text.strip():
+                logger.info(
+                    f"[Prep Ingestion] Local file missing for doc {prep_document.id}, "
+                    "retaining existing extracted text."
+                )
+                prep_document.stage = "stage_2"
+                prep_document.save(update_fields=["stage", "updated_at"])
+                return {
+                    "success": True,
+                    "stage": prep_document.stage,
+                    "credits_deducted": 0,
+                    "topics_indexed": 0,
+                    "updates_proposed": 0,
+                }
+            return {"success": False, "error": f"Document file could not be read: {exc}"}
 
     # Course Code Mismatch Safeguard: Ensure document belongs to the right course
     from prep.models import PrepCourse
@@ -2612,6 +2635,7 @@ def process_prep_document(prep_document) -> dict:
     duplicate = (
         PrepDocument.objects.filter(
             course=prep_document.course,
+            doc_type=prep_document.doc_type,
             file_sha256=prep_document.file_sha256,
         )
         .exclude(pk=prep_document.pk)
@@ -2706,6 +2730,7 @@ def process_prep_document(prep_document) -> dict:
         text_duplicate = (
             PrepDocument.objects.filter(
                 course=prep_document.course,
+                doc_type=prep_document.doc_type,
                 text_sha256=prep_document.text_sha256,
             )
             .exclude(pk=prep_document.pk)
@@ -2716,7 +2741,7 @@ def process_prep_document(prep_document) -> dict:
             # Older documents predate text fingerprints. Compare their stored
             # extraction lazily so they are still protected without a bulk rewrite.
             for existing in (
-                PrepDocument.objects.filter(course=prep_document.course)
+                PrepDocument.objects.filter(course=prep_document.course, doc_type=prep_document.doc_type)
                 .exclude(pk=prep_document.pk)
                 .exclude(extracted_text="")
                 .only("id", "extracted_text")
@@ -3055,7 +3080,7 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
             update.status = "approved"
             update.reviewed_by = reviewer
             update.reviewed_at = now
-            update.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
+            update.save(update_fields=["status", "reviewed_by", "reviewed_at"])
 
         # Fallback: If course still has 0 active topics, extract from document text immediately
         active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))

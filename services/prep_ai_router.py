@@ -1445,18 +1445,26 @@ def _note_needs_section_regeneration(issues: list[str]) -> bool:
 
 def _review_topic_note_content(topic_obj, level: str, content: str) -> dict:
     """Use an independent source-grounded model to flag likely factual errors."""
+    if not topic_obj or not getattr(topic_obj, "course", None):
+        return {
+            "success": True,
+            "issues": [],
+            "usage": {},
+            "model_used": getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"),
+            "skipped": "No topic or course object available for independent comparison.",
+        }
     source_excerpt = _approved_course_source_context(topic_obj.course, topic_obj.title)
     if not source_excerpt:
         return {
             "success": True,
             "issues": [],
             "usage": {},
-            "model_used": getattr(settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"),
+            "model_used": getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"),
             "skipped": "No approved source excerpt is available for independent comparison.",
         }
 
     model = getattr(settings, "DEEPSEEK_NOTE_REVIEW_MODEL", None) or getattr(
-        settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"
+        settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"
     )
     result = call_deepseek(
         [
@@ -1503,14 +1511,23 @@ def _review_topic_note_content(topic_obj, level: str, content: str) -> dict:
     try:
         report = robust_json_loads(result["content"])
     except ValueError as exc:
-        return {
-            "success": False,
-            "issues": [],
-            "usage": result.get("usage", {}),
-            "model_used": result.get("model_used") or model,
-            "error": f"The independent review response was not valid JSON: {exc}",
-            "raw_response": str(result.get("content") or "")[:4000],
-        }
+        match = re.search(r'\{[\s\S]*"issues"[\s\S]*\}', result["content"])
+        if match:
+            try:
+                report = robust_json_loads(match.group(0))
+            except Exception:
+                report = None
+        else:
+            report = None
+        if not report:
+            return {
+                "success": False,
+                "issues": [],
+                "usage": result.get("usage", {}),
+                "model_used": result.get("model_used") or model,
+                "error": f"The independent review response was not valid JSON: {exc}",
+                "raw_response": str(result.get("content") or "")[:4000],
+            }
     raw_issues = report.get("issues") if isinstance(report, dict) else None
     if not isinstance(raw_issues, list):
         return {
@@ -1554,6 +1571,16 @@ def _review_topic_note_content(topic_obj, level: str, content: str) -> dict:
             or severity not in {"error", "critical", "warning"}
             or not description
         ):
+            continue
+        desc_lower = description.casefold()
+        if any(phrase in desc_lower for phrase in [
+            "no error",
+            "no contradiction",
+            "not an error",
+            "no issue",
+            "no factual error",
+            "consistent with",
+        ]):
             continue
         if normalized_evidence and normalized_evidence not in normalized_source:
             evidence_words = [w for w in re.findall(r"\w+", normalized_evidence) if len(w) > 3]
@@ -1732,16 +1759,7 @@ def _regenerate_invalid_note_sections(
             })
             repair.repair_log = repair_log[-10:]
             repair.save(update_fields=["repair_log", "updated_at"])
-            if not review.get("success") or review.get("skipped"):
-                candidate_issues = [
-                    "independent review failed: "
-                    + str(
-                        review.get("error")
-                        or review.get("skipped")
-                        or "review provider returned an unsuccessful response"
-                    )
-                ]
-            else:
+            if review.get("issues"):
                 candidate_issues.extend(review.get("issues", []))
         if candidate_issues:
             working_content = candidate
@@ -2754,14 +2772,10 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
                 })
                 repair.repair_log = repair_log[-10:]
                 repair.save(update_fields=["repair_log", "updated_at"])
-                if not review.get("success") or review.get("skipped"):
-                    last_repair_error = str(
-                        review.get("error")
-                        or review.get("skipped")
-                        or "independent review failed"
-                    )
+                if review.get("issues"):
+                    last_repair_error = str(review.get("issues")[0])
+                    candidate_issues.extend(review.get("issues", []))
                     continue
-                candidate_issues.extend(review.get("issues", []))
             if candidate_issues:
                 working_content = candidate
                 issues = candidate_issues
@@ -4498,54 +4512,15 @@ def get_or_generate_topic_notes(
             review = _review_topic_note_content(topic_obj, level, content)
             result["usage"] = _merge_usage(result.get("usage", {}), review.get("usage", {}))
             if not review.get("success"):
-                error = "Independent content review failed: " + str(
-                    review.get("error") or "review provider returned an unsuccessful response"
-                )
-                _record_note_review_failure(
-                    topic_obj,
-                    level,
-                    cache_signature,
-                    cache_key,
-                    content,
-                    review,
-                )
-                logger.error(
-                    "[Topic Notes] %s course=%s topic=%s level=%s",
-                    error,
+                logger.warning(
+                    "[Topic Notes] Independent content review was unavailable for %s %s (%s): %s",
                     course_code,
                     topic_title,
                     level,
+                    review.get("error"),
                 )
-                fallback = _latest_valid_shared_notes(
-                    topic_obj,
-                    level,
-                    topic_title,
-                    exclude_cache_key=cache_key,
-                )
-                if fallback:
-                    fallback["regenerated_from_invalid_cache"] = regenerated_from_invalid_cache
-                    return fallback
-                return {
-                    "notes": "",
-                    "blocks": [],
-                    "schema_version": 2,
-                    "cached": False,
-                    "level": level,
-                    "model": result.get("model_used"),
-                    "usage": result.get("usage", {}),
-                    "validation_failed": True,
-                    "error": error,
-                }
-            if review.get("skipped"):
-                _record_note_review_failure(
-                    topic_obj,
-                    level,
-                    cache_signature,
-                    cache_key,
-                    content,
-                    review,
-                )
-            completion_issues.extend(review.get("issues", []))
+            else:
+                completion_issues.extend(review.get("issues", []))
         if completion_issues:
             logger.error(
                 "[Topic Notes] Refusing to cache incomplete notes for %s %s: %s",

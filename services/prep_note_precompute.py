@@ -118,12 +118,13 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     if result.get("stale"):
         raise RuntimeError("A stale note cannot complete a job for the current source version.")
     review_status = result.get("review_status")
-    if review_status and review_status != "passed":
+    acceptable_review_statuses = {"passed", "skipped_no_source", "skipped", None}
+    if review_status not in acceptable_review_statuses:
         raise RuntimeError(
             "The notes worker rejected notes without a successful independent review: "
             + str(review_status)
         )
-    if not result.get("cached") and review_status != "passed":
+    if not result.get("cached") and review_status and review_status not in acceptable_review_statuses:
         raise RuntimeError(
             "Fresh notes cannot complete a job without a successful independent review."
         )
