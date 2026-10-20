@@ -4767,16 +4767,30 @@
           <div class="quiz-opt-text" style="flex: 1; min-width: 0; padding-top: 2px;"></div>
         `;
         const textSpan = optBtn.querySelector('.quiz-opt-text');
+        const formattedOptText = formatQuizOptionText(optText);
         if (typeof window.renderMarkdownWithKaTeX === 'function') {
-          window.renderMarkdownWithKaTeX(optText, textSpan);
+          window.renderMarkdownWithKaTeX(formattedOptText, textSpan);
         } else {
-          textSpan.textContent = optText;
+          textSpan.textContent = formattedOptText;
         }
 
         optBtn.addEventListener('click', () => submitQuizAnswer(q.id, letter));
         optionsGrid.appendChild(optBtn);
       });
     }
+  }
+
+  function formatQuizOptionText(text) {
+    if (!text || typeof text !== 'string') return '';
+    let clean = text.trim();
+    // Upgrade inline math enclosing LaTeX environments ($... \begin{env} ... \end{env} ...$) to display math $$...$$
+    clean = clean.replace(
+      /(?<!\\)\$(?!\$)([^\$\n]*?\\begin\{(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}[\s\S]*?\\end\{(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}[^\$\n]*?)(?<!\\)\$/g,
+      function(match, inner) {
+        return '\n\n$$\n' + inner.trim() + '\n$$\n\n';
+      }
+    );
+    return clean;
   }
 
   function formatQuizExplanationText(text) {
