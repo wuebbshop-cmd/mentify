@@ -218,6 +218,29 @@
 
   /* Active Recall Drill Mobile Responsiveness */
   @media (max-width: 768px) {
+    /* Full mobile horizontal scrollability for wide tables */
+    .markdown-table-wrapper {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      margin: 12px 0 !important;
+      border-radius: 8px !important;
+    }
+    .markdown-rendered .markdown-table-wrapper table,
+    .markdown-table-wrapper table {
+      display: table !important;
+      width: max-content !important;
+      min-width: 100% !important;
+      max-width: none !important;
+      font-size: 0.82rem !important;
+    }
+    .markdown-table-wrapper th,
+    .markdown-table-wrapper td {
+      padding: 8px 10px !important;
+      white-space: nowrap !important;
+    }
     .quiz-header-bar {
       padding: 14px 16px !important;
       gap: 12px !important;
@@ -1083,10 +1106,8 @@
     display: block;
     width: 100%;
     max-width: 100%;
-    overflow-x: auto;
+    overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-    overscroll-behavior-x: contain;
     margin: 16px 0;
     border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border);
@@ -1114,26 +1135,27 @@
     scrollbar-color: var(--green, #0f766e) rgba(0, 0, 0, 0.05);
   }
 
+  /* Table inside .markdown-table-wrapper: must expand to content width so wrapper scrolls */
+  .markdown-rendered .markdown-table-wrapper table,
   .markdown-table-wrapper table {
-    display: table;
-    width: 100%;
-    min-width: max-content;
-    border-collapse: collapse;
-    margin: 0;
+    display: table !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
     font-size: 0.88rem;
     box-sizing: border-box;
-    border: none;
+    border: none !important;
   }
 
-  /* Direct fallback if table has no wrapper */
-  .markdown-rendered table {
+  /* Direct fallback only if table has no wrapper */
+  .markdown-rendered > table:not(.markdown-table-wrapper table) {
     display: block;
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-    overscroll-behavior-x: contain;
     border-collapse: collapse;
     margin: 16px 0;
     font-size: 0.88rem;
@@ -1150,6 +1172,7 @@
     border: 1px solid var(--border);
     text-align: left;
     vertical-align: middle;
+    white-space: nowrap; /* Prevent columns from crushing on narrow viewports */
   }
   .markdown-rendered th,
   .markdown-table-wrapper th {
@@ -1164,9 +1187,15 @@
   }
 
   /* ── Mobile horizontal scroll containers ─────────────────────────────────
-     Allow notes body, question cards, solution boxes, tutor messages, and practice
-     variants to scroll sideways so that wide tables and equations don't get cut off. */
-  #notes-body,
+     Allow question cards, solution boxes, tutor messages, and practice
+     variants to scroll sideways. Keep #notes-body overflow-x: hidden so the whole
+     reading container stays anchored while its inner tables and math scroll. */
+  #notes-body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
   .exam-problem-box,
   .exam-solution-box,
   #pillar-practice .markdown-rendered,
@@ -1175,18 +1204,15 @@
   .quiz-summary-box {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
   }
 
-  /* Tables inside these containers: let content width drive the table so the
-     outer or inner scroll activates for very wide tables on mobile screens.  */
-  #notes-body table,
+  /* Tables inside these containers: let content width drive the table so horizontal scroll activates */
+  .markdown-rendered table,
   .exam-problem-box table,
   .exam-solution-box table,
   #pillar-practice .markdown-rendered table,
   .topic-tutor-message .markdown-rendered table {
-    width: auto;
-    min-width: 520px;
+    min-width: 100%;
   }
   /* Images must never overflow their container and remain crisp in all themes */
   #notes-body img,
@@ -4742,7 +4768,7 @@
             font-size: 0.85rem; background: var(--surface-2); border: 1px solid var(--border);
             color: var(--text); flex-shrink: 0;
           ">${letter}</span>
-          <span class="quiz-opt-text" style="flex: 1; padding-top: 2px;"></span>
+          <div class="quiz-opt-text" style="flex: 1; min-width: 0; padding-top: 2px;"></div>
         `;
         const textSpan = optBtn.querySelector('.quiz-opt-text');
         if (typeof window.renderMarkdownWithKaTeX === 'function') {

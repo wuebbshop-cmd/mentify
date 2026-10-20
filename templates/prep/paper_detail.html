@@ -98,24 +98,24 @@
     scrollbar-width: thin;
     scrollbar-color: var(--green, #0f766e) rgba(0, 0, 0, 0.05);
   }
+  .markdown-rendered .markdown-table-wrapper table,
   .markdown-table-wrapper table {
-    display: table;
-    width: 100%;
-    min-width: max-content;
-    border-collapse: collapse;
-    margin: 0;
+    display: table !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
     font-size: 0.88rem;
     box-sizing: border-box;
-    border: none;
+    border: none !important;
   }
-  .markdown-rendered table {
+  .markdown-rendered > table:not(.markdown-table-wrapper table) {
     display: block;
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-    overscroll-behavior-x: contain;
     border-collapse: collapse;
     margin: 16px 0;
     font-size: 0.88rem;

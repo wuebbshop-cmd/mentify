@@ -678,13 +678,25 @@
       return m.replace(/\*/g, '\\ast');
     });
 
-    // Merge detached \[ lhs = \n\n$$\n\begin{cases}...\end{cases}\n$$
+    // Merge detached \[ lhs = \n\n$$\n\begin{cases}...\end{cases}\n$$ or $ lhs = \n\n$$\n...
     cleanText = cleanText.replace(
-      /(?:\\\[|\$\$)\s*([^\n$\\]+?=\s*)\s*\$\$\s*(\\begin\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\}[\s\S]*?\\end\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\})\s*\$\$\s*(?:\\\]|\$\$)?/g,
+      /(?:\\\[|\$\$|(?<!\\)\$)\s*([^\n$]+?=\s*)(?:\n\s*)*\$\$\s*(\\begin\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\}[\s\S]*?\\end\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\})\s*\$\$\s*(?:\\\]|(?<!\\)\$)?/g,
       function(full, lhs, envBlock) {
         return '\n\n$$\n' + lhs.trim() + ' ' + envBlock.trim() + '\n$$\n\n';
       }
     );
+
+    // Upgrade inline math enclosing environments ($... \begin{env} ... \end{env} ...$) to display math $$...$$
+    cleanText = cleanText.replace(
+      /(?<!\\)\$(?!\$)([^\$\n]*?\\begin\{(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}[\s\S]*?\\end\{(?:aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?)\}[^\$\n]*?)(?<!\\)\$/g,
+      function(match, inner) {
+        return '\n\n$$\n' + inner.trim() + '\n$$\n\n';
+      }
+    );
+
+    // Strip stray dollar signs immediately adjacent to $$ blocks (e.g. $ $$ or $$ $)
+    cleanText = cleanText.replace(/(?<!\\)\$[ \t]*(?:\r?\n[ \t]*)*\$\$/g, '\n\n$$');
+    cleanText = cleanText.replace(/\$\$[ \t]*(?:\r?\n[ \t]*)*(?<!\\)\$/g, '$$\n\n');
 
     // Collapse adjacent display delimiters on the same line only (never across newlines)
     cleanText = cleanText.replace(/(?:\\\[|\$\$)[ \t]*(?:\\\[|\$\$)/g, function() { return '$$'; });
@@ -702,6 +714,10 @@
       }
     }
     cleanText = envSegs.join('');
+
+    // Ensure display math blocks have blank lines before and after for clean Markdown parsing
+    cleanText = cleanText.replace(/([^\n])\s*\$\$/g, '$1\n\n$$');
+    cleanText = cleanText.replace(/\$\$\s*([^\n])/g, '$$\n\n$1');
 
     // Clean any outer \[ ... \] that wrapped an inner $$...$$
     cleanText = cleanText.replace(/\\\[\s*\$\$([\s\S]*?)\$\$\s*\\\]/g, function(full, inner) {
