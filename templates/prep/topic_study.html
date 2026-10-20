@@ -1187,15 +1187,9 @@
   }
 
   /* ── Mobile horizontal scroll containers ─────────────────────────────────
-     Allow question cards, solution boxes, tutor messages, and practice
-     variants to scroll sideways. Keep #notes-body overflow-x: hidden so the whole
-     reading container stays anchored while its inner tables and math scroll. */
-  #notes-body {
-    overflow-x: hidden;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
+     Allow notes body, question cards, solution boxes, tutor messages, and practice
+     variants to scroll sideways so that wide tables and equations don't get cut off. */
+  #notes-body,
   .exam-problem-box,
   .exam-solution-box,
   #pillar-practice .markdown-rendered,
@@ -1204,6 +1198,8 @@
   .quiz-summary-box {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
   }
 
   /* Tables inside these containers: let content width drive the table so horizontal scroll activates */

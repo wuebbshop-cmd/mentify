@@ -3599,23 +3599,12 @@ def normalize_math_delimiters(text: str) -> str:
     # Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     text = re.sub(r'\\\\([a-zA-Z]+)', r'\\\1', text)
 
-    # Merge detached '\[ lhs =' or '$ lhs =' followed by '$$ \begin{cases|...} ... $$' into a single $$ block
+    # Merge detached '\[ lhs =' followed by '$$ \begin{cases|...} ... $$' into a single $$ block
     text = re.sub(
-        r"(?:\\\[|\$\$|(?<!\\)\$)\s*([^\n$]+?=\s*)(?:\n\s*)*\$\$\s*\n*(\\begin\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\}[\s\S]*?\\end\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\})\s*\n*\$\$(?:\s*(?:\\\]|(?<!\\)\$))?",
+        r"\\\[\s*([^\n$]+?=\s*)\n+\$\$\s*\n(\\begin\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\}[\s\S]*?\\end\{(?:cases|aligned|matrix|pmatrix|bmatrix|vmatrix|array)\})\s*\n\$\$(?:\s*\\\])?",
         r"\n\n$$\n\1\2\n$$\n\n",
         text,
     )
-
-    # Upgrade inline math enclosing environments ($... \begin{env} ... \end{env} ...$) to display math $$...$$
-    env_names = r"aligned|cases|matrix|pmatrix|bmatrix|vmatrix|gather|split|array|align\*?"
-    env_inline_pattern = re.compile(
-        r"(?<!\\)\$(?!\$)([^\$\n]*?\\begin\{(?:" + env_names + r")\}[\s\S]*?\\end\{(?:" + env_names + r")\}[^\$\n]*?)(?<!\\)\$"
-    )
-    text = env_inline_pattern.sub(r"\n\n$$\n\1\n$$\n\n", text)
-
-    # Strip stray dollar signs immediately adjacent to $$ blocks (e.g. $ $$ or $$ $)
-    text = re.sub(r"(?<!\\)\$[ \t]*(?:\r?\n[ \t]*)*\$\$", "\n\n$$", text)
-    text = re.sub(r"\$\$[ \t]*(?:\r?\n[ \t]*)*(?<!\\)\$", "$$\n\n", text)
 
     # Collapse adjacent display delimiters on the same line (e.g. \[ $$ -> $$) without merging consecutive $$ blocks across lines
     text = re.sub(r'\\\[[ \t]*\$\$|\$\$[ \t]*\\\[', '$$', text)
@@ -3642,10 +3631,6 @@ def normalize_math_delimiters(text: str) -> str:
 
     # Clean any outer \[ ... \] into $$...$$
     text = re.sub(r'\\\[\s*([\s\S]*?)\s*\\\]', r'\n\n$$\n\1\n$$\n\n', text)
-
-    # Ensure display math blocks have blank lines before and after for clean Markdown parsing
-    text = re.sub(r'([^\n])\s*\$\$', r'\1\n\n$$', text)
-    text = re.sub(r'\$\$\s*([^\n])', r'$$\n\n\1', text)
 
     # Collapse internal blank lines within display math blocks
     def clean_display_math(match):
