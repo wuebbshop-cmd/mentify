@@ -303,5 +303,5 @@ ENABLE_LOCAL_PREP_WORKERS = os.environ.get("ENABLE_LOCAL_PREP_WORKERS", "true").
 # In local development, leaving WORKER_SERVICE_URL empty falls back to local threads.
 WORKER_SERVICE_URL = os.environ.get("WORKER_SERVICE_URL", "").rstrip("/")
 INTERNAL_WORKER_SECRET = os.environ.get("INTERNAL_WORKER_SECRET", "mentify-internal-worker-secret-key-change-in-prod")
-WORKER_REQUEST_TIMEOUT = float(os.environ.get("WORKER_REQUEST_TIMEOUT", "4.0"))
+WORKER_REQUEST_TIMEOUT = float(os.environ.get("WORKER_REQUEST_TIMEOUT", "30.0"))
 IS_WORKER_INSTANCE = os.environ.get("IS_WORKER_INSTANCE", "false").lower() in ("1", "true")

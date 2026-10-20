@@ -2231,7 +2231,7 @@ def prep_upload(request):
                 status=status_code,
             )
 
-        from services.prep_ingestion import process_prep_document
+        from services.prep_ingestion import enqueue_prep_document_ingestion
         succeeded = 0
         duplicates = 0
         failures = []
@@ -2261,17 +2261,8 @@ def prep_upload(request):
             )
 
             try:
-                result = process_prep_document(prep_doc)
-                if not result.get("success"):
-                    failure = result.get("error", "The document could not be processed.")
-                    failures.append(f"{uploaded_file.name}: {failure}")
-                    prep_doc.tutor_review_notes = f"Ingestion failed before review. {failure[:900]}"
-                    prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
-                    continue
-                if result.get("duplicate"):
-                    duplicates += 1
-                else:
-                    succeeded += 1
+                enqueue_prep_document_ingestion(prep_doc.pk)
+                succeeded += 1
 
                 course_slug = target_course.slug or target_course.code.replace(" ", "-")
                 PrepHistory.objects.create(
@@ -2282,12 +2273,12 @@ def prep_upload(request):
                     url=reverse("prep:course_detail", kwargs={"course_code": course_slug}),
                 )
             except Exception as exc:
-                failures.append(f"{uploaded_file.name}: ingestion failed")
-                prep_doc.tutor_review_notes = f"Ingestion failed before review: {str(exc)[:1000]}"
+                failures.append(f"{uploaded_file.name}: enqueue failed ({exc})")
+                prep_doc.tutor_review_notes = f"Ingestion queue failed: {str(exc)[:1000]}"
                 prep_doc.save(update_fields=["tutor_review_notes", "updated_at"])
 
         if succeeded:
-            messages.success(request, f"Processed {succeeded} document(s) for {course.code}; they are in the tutor review queue.")
+            messages.success(request, f"Uploaded {succeeded} document(s) for {course.code}. Background processing & syllabus indexing has started.")
         if duplicates:
             messages.info(request, f"{duplicates} duplicate document(s) were saved for audit and not re-indexed.")
         if failures:

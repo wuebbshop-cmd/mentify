@@ -2921,6 +2921,7 @@ def dispatch_to_remote_worker(document_id: str) -> bool:
     """
     Dispatch a document ingestion job to the dedicated Render worker web service (Option B).
     Returns True if successfully acknowledged by remote worker; False if local fallback is required.
+    Includes a retry loop to give cold-starting free worker containers time to wake up.
     """
     worker_url = getattr(settings, "WORKER_SERVICE_URL", "").strip().rstrip("/")
     if not worker_url:
@@ -2928,42 +2929,62 @@ def dispatch_to_remote_worker(document_id: str) -> bool:
 
     secret = getattr(settings, "INTERNAL_WORKER_SECRET", "").strip()
     target = f"{worker_url}/api/internal/ingest-document/"
-    timeout = getattr(settings, "WORKER_REQUEST_TIMEOUT", 4.0)
+    timeout = getattr(settings, "WORKER_REQUEST_TIMEOUT", 30.0)
 
-    try:
-        response = requests.post(
-            target,
-            json={"document_id": str(document_id)},
-            headers={
-                "X-Internal-Worker-Secret": secret,
-                "Content-Type": "application/json",
-                "User-Agent": "Mentify-Main-App/1.0",
-            },
-            timeout=timeout,
-        )
-        if response.status_code == 200:
-            logger.info("[Worker Dispatch] Successfully delegated document %s to remote worker %s", document_id, worker_url)
-            return True
-        logger.warning(
-            "[Worker Dispatch] Remote worker responded with status %s: %s. Falling back to local execution.",
-            response.status_code,
-            response.text[:200],
-        )
-        return False
-    except Exception as exc:
-        logger.warning(
-            "[Worker Dispatch] Could not connect to remote worker at %s (%s). Falling back to local execution.",
-            target,
-            exc,
-        )
-        return False
+    for attempt in range(1, 3):
+        try:
+            response = requests.post(
+                target,
+                json={"document_id": str(document_id)},
+                headers={
+                    "X-Internal-Worker-Secret": secret,
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mentify-Main-App/1.0",
+                },
+                timeout=timeout,
+            )
+            if response.status_code == 200:
+                logger.info("[Worker Dispatch] Successfully delegated document %s to remote worker %s (attempt %s)", document_id, worker_url, attempt)
+                return True
+            logger.warning(
+                "[Worker Dispatch] Remote worker responded with status %s: %s (attempt %s).",
+                response.status_code,
+                response.text[:200],
+                attempt,
+            )
+        except Exception as exc:
+            logger.warning(
+                "[Worker Dispatch] Attempt %s could not connect to remote worker at %s (%s).",
+                attempt,
+                target,
+                exc,
+            )
+        if attempt < 2:
+            import time
+            time.sleep(2.0)
+
+    return False
 
 
 def _dispatch_or_run_locally(document_id: str) -> dict:
-    """Attempt remote worker dispatch; if skipped or failed, run ingestion locally."""
+    """Attempt remote worker dispatch; if skipped or failed, run ingestion locally only if allowed."""
     dispatched = dispatch_to_remote_worker(document_id)
     if dispatched:
         return {"success": True, "delegated": True, "document_id": document_id}
+
+    allow_local = getattr(settings, "ENABLE_LOCAL_PREP_WORKERS", settings.DEBUG)
+    if not allow_local:
+        logger.error(
+            "[Prep Ingestion] Remote worker dispatch failed for document %s and local worker execution is disabled (ENABLE_LOCAL_PREP_WORKERS=False). "
+            "Skipping local execution to protect main web server memory.",
+            document_id,
+        )
+        from prep.models import PrepDocument
+        PrepDocument.objects.filter(pk=document_id, stage="stage_1").update(
+            tutor_review_notes="Queued for extraction. Awaiting dedicated background worker."
+        )
+        return {"success": False, "delegated": False, "document_id": document_id, "error": "Remote worker unavailable"}
+
     logger.info("[Prep Ingestion] Fallback executing document %s locally in thread pool.", document_id)
     return _run_queued_document_ingestion(document_id)
 
@@ -2972,10 +2993,11 @@ def enqueue_prep_document_ingestion(document_id):
     """
     Submit a saved Stage 1 PrepDocument for non-blocking background ingestion.
     If WORKER_SERVICE_URL is set (Option B), asynchronously delegates to the remote worker.
-    Falls back gracefully to local ThreadPoolExecutor if remote worker is unavailable or not configured.
+    Falls back to local execution only if ENABLE_LOCAL_PREP_WORKERS is True.
     """
     worker_url = getattr(settings, "WORKER_SERVICE_URL", "").strip().rstrip("/")
-    if worker_url:
+    allow_local = getattr(settings, "ENABLE_LOCAL_PREP_WORKERS", settings.DEBUG)
+    if worker_url or not allow_local:
         return _DOCUMENT_INGESTION_EXECUTOR.submit(_dispatch_or_run_locally, str(document_id))
     return _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(document_id))
 
@@ -3008,6 +3030,16 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
 
     # Ensure extracted text is present
     if not (doc.extracted_text and doc.extracted_text.strip()):
+        allow_local = getattr(settings, "ENABLE_LOCAL_PREP_WORKERS", settings.DEBUG)
+        worker_url = getattr(settings, "WORKER_SERVICE_URL", "").strip().rstrip("/")
+        if worker_url and not allow_local:
+            dispatched = dispatch_to_remote_worker(str(doc.pk))
+            if dispatched:
+                return {
+                    "success": False,
+                    "error": "Document extraction has been dispatched to the dedicated worker service. Please retry publishing once extraction completes.",
+                    "document": doc,
+                }
         try:
             ingestion_result = process_prep_document(doc)
         except Exception as exc:

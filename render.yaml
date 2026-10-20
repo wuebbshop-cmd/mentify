@@ -12,7 +12,7 @@ services:
     
     # ─── Start Command ───────────────────────────────────────────────
     # Runs database migrations on startup + starts Gunicorn
-    startCommand: python manage.py migrate --noinput && python manage.py reconcile_prep_course_costs --enqueue-published && gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 2 --threads 2 --worker-class sync --timeout 120
+    startCommand: python manage.py migrate --noinput && python manage.py reconcile_prep_course_costs --enqueue-published && gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 1 --threads 4 --worker-class gthread --timeout 120
     
     # ─── Environment Variables ───────────────────────────────────────
     # IMPORTANT: Set these in Render dashboard Environment section BEFORE deploy
@@ -76,7 +76,7 @@ services:
     buildCommand: >
       pip install -r requirements.txt &&
       python manage.py collectstatic --clear --noinput
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 2 --worker-class sync --timeout 120
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:10000 --workers 1 --threads 4 --worker-class gthread --timeout 120
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.production
