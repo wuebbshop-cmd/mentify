@@ -14,6 +14,11 @@ from django.utils.text import slugify
 from blog.models import Category, Post
 from services.prep_ai_router import call_deepseek
 
+try:
+    from googlenewsdecoder import gnewsdecoder
+except ImportError:
+    gnewsdecoder = None
+
 logger = logging.getLogger(__name__)
 
 CATEGORY_BEATS = {
@@ -143,6 +148,57 @@ UNSPLASH_FALLBACK_POOLS = {
 }
 
 
+# Topic and keyword specific Unsplash imagery for deterministic high-res matching
+KEYWORD_UNSPLASH_MAP = {
+    # Weather / Climate / Earth Observation / Atmospheric Science
+    ("weather", "forecast", "climate", "atmosphere", "meteorology", "precipitation"): "https://images.unsplash.com/photo-1592210454359-9043f067919b?auto=format&fit=crop&w=1200&q=80",
+    # Cybersecurity / Data Protection / Encryption / Indie Dev
+    ("cybersecurity", "security", "armor", "encryption", "hacker", "ransomware", "infosec", "indie"): "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
+    # Programming Languages: Rust, Go, Python, C++, Backend
+    ("rust", "golang", "go language", "programming language", "developer salary", "scarcity"): "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+    ("python", "django", "fastapi", "flask", "compiler"): "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+    # AI Agents / LLMs / MCP / Machine Learning
+    ("agent", "mcp", "llm", "foundation model", "deepseek", "openai", "claude"): "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
+    ("neural", "algorithm", "inference", "artificial intelligence", "shared memory"): "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+    # Datacenters, Cloud Infrastructure, Tech Hubs, BPO
+    ("technopolis", "konza", "datacenter", "data center", "bpo", "outsourcing", "fiber", "latency"): "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
+    ("cloud", "aws", "azure", "docker", "kubernetes", "infrastructure", "smartsheet"): "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+    # Academia / Universities / Student Funding / Scholarships / Campus News
+    ("hef", "student loan", "tertiary", "university bill", "funding", "tuition"): "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
+    ("student", "campus", "university", "tharaka", "moi university", "academic", "scholar", "mental health"): "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+    ("research", "laboratory", "science", "phd", "postgraduate"): "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
+    # Career / Remote Work / Employment
+    ("remote work", "freelance", "indie", "creator", "digital economy"): "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+    ("job", "career", "hiring", "workplace", "employment"): "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
+}
+
+
+def query_unsplash_by_keyword(query: str) -> str:
+    """
+    Search Unsplash API dynamically if an UNSPLASH_ACCESS_KEY is configured in settings or env.
+    """
+    access_key = getattr(settings, "UNSPLASH_ACCESS_KEY", None) or ""
+    if not access_key:
+        return ""
+    try:
+        url = f"https://api.unsplash.com/search/photos?query={urllib.parse.quote_plus(query)}&per_page=1&orientation=landscape"
+        req = urllib.request.Request(
+            url,
+            headers={
+                "Authorization": f"Client-ID {access_key}",
+                "User-Agent": "Mentify/1.0",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode())
+            results = data.get("results", [])
+            if results and results[0].get("urls", {}).get("regular"):
+                return results[0]["urls"]["regular"]
+    except Exception as e:
+        logger.warning(f"[Blog Generator] Unsplash API search failed for '{query}': {e}")
+    return ""
+
+
 def resolve_blog_preview_image(
     headline: dict,
     tags: str = "",
@@ -150,43 +206,70 @@ def resolve_blog_preview_image(
 ) -> str:
     """
     100% Zero-AI-Token Preview Image Resolution:
-    1. Try to extract authentic og:image from the source article URL if directly accessible.
-    2. Diverse, high-resolution human photography from curated category pools via title hashing.
+    1. Try to fetch authentic og:image from the primary news report (unshortening Google News links).
+    2. If unavailable, query Unsplash by the article's specific keywords.
+    3. Fallback to curated high-resolution category photography.
     """
     title = headline.get("title", "")
     link = headline.get("link", "")
 
-    # Tier 1: Authentic publisher og:image (if direct URL, avoiding Google consent walls)
-    if link and not ("google.com" in link and "rss/articles" in link):
+    # Tier 1: Authentic publisher og:image
+    resolved_link = link
+    if resolved_link and "google.com" in resolved_link and "articles" in resolved_link:
+        if gnewsdecoder:
+            try:
+                dec = gnewsdecoder(resolved_link)
+                if dec.get("success") and dec.get("decoded_url"):
+                    resolved_link = dec["decoded_url"]
+            except Exception as e:
+                logger.warning(f"[Blog Generator] Google News decode failed: {e}")
+
+    if resolved_link and resolved_link.startswith("http"):
         try:
             req = urllib.request.Request(
-                link,
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                resolved_link,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                },
             )
-            with urllib.request.urlopen(req, timeout=5) as resp:
+            with urllib.request.urlopen(req, timeout=6) as resp:
                 html = resp.read().decode("utf-8", errors="ignore")
-                m = re.search(
+                for pat in (
                     r'<meta[^>]+(?:property|name)=[\'"](?:og:image|twitter:image)[\'"][^>]+content=[\'"]([^\'"]+)[\'"]',
-                    html,
-                    re.I,
-                )
-                if not m:
-                    m = re.search(
-                        r'<meta[^>]+content=[\'"]([^\'"]+)[\'"][^>]+(?:property|name)=[\'"](?:og:image|twitter:image)[\'"]',
-                        html,
-                        re.I,
-                    )
-                if m:
-                    og_url = m.group(1).strip()
-                    if og_url.startswith("http") and not any(
-                        p in og_url.lower() for p in ("1x1", "favicon", "avatar", "icon", "placeholder")
-                    ):
-                        logger.info(f"[Blog Generator] Resolved authentic og:image for '{title[:40]}'")
-                        return og_url
-        except Exception:
-            pass
+                    r'<meta[^>]+content=[\'"]([^\'"]+)[\'"][^>]+(?:property|name)=[\'"](?:og:image|twitter:image)[\'"]',
+                ):
+                    m = re.search(pat, html, re.I)
+                    if m:
+                        og_url = m.group(1).strip()
+                        if og_url.startswith("//"):
+                            og_url = "https:" + og_url
+                        elif og_url.startswith("/"):
+                            parsed = urllib.parse.urlparse(resolved_link)
+                            og_url = f"{parsed.scheme}://{parsed.netloc}{og_url}"
+                        if og_url.startswith("http") and not any(
+                            p in og_url.lower() for p in ("1x1", "favicon", "avatar", "icon", "placeholder", "logo")
+                        ):
+                            logger.info(f"[Blog Generator] Resolved authentic og:image for '{title[:40]}'")
+                            return og_url
+        except Exception as e:
+            logger.debug(f"[Blog Generator] og:image extraction failed for {resolved_link[:40]}: {e}")
 
-    # Tier 2: Diverse high-res human photography pool (Zero AI tokens, distinct photo per post)
+    # Tier 2: Query Unsplash by the article's specific keywords
+    full_text = f"{title} {tags}".lower()
+
+    # Dynamic Unsplash search if access key configured
+    api_query = tags.split(",")[0].strip() if tags else title.split()[0]
+    api_img = query_unsplash_by_keyword(api_query)
+    if api_img:
+        return api_img
+
+    # Match specific technical/academic keywords against curated Unsplash collections
+    for keywords, img_url in KEYWORD_UNSPLASH_MAP.items():
+        if any(kw in full_text for kw in keywords):
+            return img_url
+
+    # Tier 3: Curated category photography pool via title hash
     pool = UNSPLASH_FALLBACK_POOLS.get(category_slug, UNSPLASH_FALLBACK_POOLS["ai-automation"])
     idx = int(hashlib.md5(title.encode()).hexdigest(), 16) % len(pool)
     return pool[idx]
