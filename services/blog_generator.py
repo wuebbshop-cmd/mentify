@@ -1,4 +1,5 @@
 import email.utils
+import hashlib
 import json
 import logging
 import re
@@ -104,6 +105,97 @@ def _sanitize_cliches(text: str) -> str:
     for pat, repl in patterns:
         cleaned = pat.sub(repl, cleaned)
     return cleaned
+
+
+UNSPLASH_FALLBACK_POOLS = {
+    "ai-automation": [
+        "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "programming-tech": [
+        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "career-industry": [
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "academia": [
+        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80",
+    ],
+}
+
+
+def resolve_blog_preview_image(
+    headline: dict,
+    tags: str = "",
+    category_slug: str = "ai-automation",
+    image_prompt: str = "",
+) -> str:
+    """
+    Hybrid preview image resolution:
+    1. Try to extract authentic og:image from the source article URL if directly accessible.
+    2. Generate a custom, story-specific AI editorial banner (Pollinations 1200x630) matching the exact headline.
+    3. Fallback to a diverse curated pool of high-res Unsplash photography per category.
+    """
+    title = headline.get("title", "")
+    link = headline.get("link", "")
+
+    # Tier 1: Authentic publisher og:image (if direct URL, avoiding Google consent walls)
+    if link and not ("google.com" in link and "rss/articles" in link):
+        try:
+            req = urllib.request.Request(
+                link,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                html = resp.read().decode("utf-8", errors="ignore")
+                m = re.search(
+                    r'<meta[^>]+(?:property|name)=[\'"](?:og:image|twitter:image)[\'"][^>]+content=[\'"]([^\'"]+)[\'"]',
+                    html,
+                    re.I,
+                )
+                if not m:
+                    m = re.search(
+                        r'<meta[^>]+content=[\'"]([^\'"]+)[\'"][^>]+(?:property|name)=[\'"](?:og:image|twitter:image)[\'"]',
+                        html,
+                        re.I,
+                    )
+                if m:
+                    og_url = m.group(1).strip()
+                    if og_url.startswith("http") and not any(
+                        p in og_url.lower() for p in ("1x1", "favicon", "avatar", "icon", "placeholder")
+                    ):
+                        logger.info(f"[Blog Generator] Resolved authentic og:image for '{title[:40]}'")
+                        return og_url
+        except Exception:
+            pass
+
+    # Tier 2: AI Editorial Banner generated specifically for this headline & topic
+    try:
+        seed = int(hashlib.md5(title.encode()).hexdigest(), 16) % 100000
+        subject = image_prompt or f"{title}, {tags}"
+        clean_subj = re.sub(r'["\'\(\)\{\}\[\]\n\r]', ' ', subject).strip()
+        visual_prompt = f"modern editorial tech journalism illustration, {clean_subj}, cinematic lighting, sleek 3d graphic, high resolution 8k"
+        encoded_prompt = urllib.parse.quote(visual_prompt[:180])
+        ai_banner_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1200&height=630&nologo=true&seed={seed}"
+        return ai_banner_url
+    except Exception as e:
+        logger.warning(f"[Blog Generator] AI banner generation failed: {e}")
+
+    # Tier 3: Curated diversified fallback photo pool
+    pool = UNSPLASH_FALLBACK_POOLS.get(category_slug, UNSPLASH_FALLBACK_POOLS["ai-automation"])
+    idx = int(hashlib.md5(title.encode()).hexdigest(), 16) % len(pool)
+    return pool[idx]
 
 
 def fetch_live_headlines(query: str, limit: int = 10) -> list[dict]:
@@ -265,7 +357,7 @@ def generate_single_blog_post(
         "'A testament to', 'Delve into', or 'Exciting times ahead'.\n"
         "7. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
         "8. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
-        "9. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
+        "9. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name', 'image_prompt'."
     )
 
     user_prompt = (
@@ -283,6 +375,7 @@ def generate_single_blog_post(
         '  "excerpt": "2-3 crisp sentences summarizing the technical breakthrough for social share cards",\n'
         '  "tags": "3 to 5 comma-separated tags (e.g. LLMs, Open Source, DeepSeek, Cloud)",\n'
         '  "author_name": "Author name matching the persona",\n'
+        '  "image_prompt": "10-15 word visual description of an editorial cover illustration depicting the technical core of this article",\n'
         '  "markdown_content": "Full article body in Markdown with custom H2/H3 headings, code/tables where relevant, and markdown citations."\n'
         "}\n\n"
         "Return ONLY the JSON object. Do not wrap in markdown fences or include explanations."
@@ -326,20 +419,18 @@ def generate_single_blog_post(
     markdown_content = _sanitize_cliches(str(data.get("markdown_content") or "").strip())
     tags = str(data.get("tags") or "").strip()[:240]
     author_name = str(data.get("author_name") or author_persona).strip()
+    image_prompt = str(data.get("image_prompt") or "").strip()
 
     if not markdown_content or len(markdown_content) < 400:
         logger.warning(f"[Blog Generator] Incomplete content returned for {title}")
         return None
 
-    featured_image = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
-    if "ai" in category_slug:
-        featured_image = "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80"
-    elif "programming" in category_slug:
-        featured_image = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80"
-    elif "career" in category_slug:
-        featured_image = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
-    elif "academia" in category_slug:
-        featured_image = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
+    featured_image = resolve_blog_preview_image(
+        headline=headline,
+        tags=tags,
+        category_slug=category_slug,
+        image_prompt=image_prompt,
+    )
 
     base_slug = slug
     counter = 1
