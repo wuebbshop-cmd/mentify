@@ -2982,7 +2982,11 @@ def call_deepseek(
         or os.environ.get("DEEPSEEK_API_KEY", "")
         or os.environ.get("DEEPSEEK_KEY", "")
     )
+    if api_key:
+        api_key = str(api_key).strip().replace("\r", "").replace("\n", "").replace("\\n", "").replace("\\r", "").strip(" '\"")
     base_url = getattr(settings, "DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "https://api.deepseek.com"
+    if base_url:
+        base_url = str(base_url).strip().replace("\r", "").replace("\n", "").rstrip("/")
 
     if not api_key:
         logger.error("[DeepSeek] API key is not configured in settings or environment.")

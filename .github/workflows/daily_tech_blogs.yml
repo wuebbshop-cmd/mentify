@@ -55,4 +55,5 @@ jobs:
           export SUB_DB_PORT=$(printf '%s' "$SUB_DB_PORT" | tr -d '\r\n' | sed -e 's/\\n//g' -e 's/\\r//g' -e 's/["'\'']//g')
           export SUB_DB_NAME=$(printf '%s' "$SUB_DB_NAME" | tr -d '\r\n' | sed -e 's/\\n//g' -e 's/\\r//g' -e 's/["'\'']//g')
           export SUB_DB_PASSWORD=$(printf '%s' "$SUB_DB_PASSWORD" | tr -d '\r\n' | sed -e 's/\\n$//' -e 's/\\r$//' -e 's/^[ "'\'']*//' -e 's/[ "'\'']*$//')
+          export DEEPSEEK_API=$(printf '%s' "$DEEPSEEK_API" | tr -d '\r\n' | sed -e 's/\\n$//' -e 's/\\r$//' -e 's/^[ "'\'']*//' -e 's/[ "'\'']*$//')
           python manage.py generate_daily_tech_blogs --count "$COUNT"
