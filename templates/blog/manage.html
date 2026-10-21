@@ -49,6 +49,7 @@
           <tr style="background: var(--bg-surface, #f9fafb); border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
             <th style="padding: 1rem 1.25rem;">Title</th>
             <th style="padding: 1rem 1.25rem;">Category</th>
+            <th style="padding: 1rem 1.25rem;">Author</th>
             <th style="padding: 1rem 1.25rem;">Status</th>
             <th style="padding: 1rem 1.25rem;">Views</th>
             <th style="padding: 1rem 1.25rem;">Read Time</th>
@@ -69,6 +70,13 @@
             </td>
             <td style="padding: 1rem 1.25rem;">
               {{ post.category.name|default:"General" }}
+            </td>
+            <td style="padding: 1rem 1.25rem; font-weight: 500;">
+              {% if post.author_id %}
+                <span style="color: var(--text);">{{ post.get_author_display_name }}</span>
+              {% else %}
+                <span class="badge" style="background: rgba(15, 118, 110, 0.1); color: #0f766e; font-size: 0.75rem; font-weight: 600;">By Mentify Desk</span>
+              {% endif %}
             </td>
             <td style="padding: 1rem 1.25rem;">
               {% if post.is_published %}
@@ -96,7 +104,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+            <td colspan="8" style="padding: 3rem; text-align: center; color: var(--text-muted);">
               No articles written yet. Click <strong>Write New Article</strong> above to start publishing!
             </td>
           </tr>

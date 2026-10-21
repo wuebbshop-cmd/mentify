@@ -117,8 +117,10 @@ class Post(models.Model):
         return [t.strip() for t in self.tags.split(",") if t.strip()]
 
     def get_author_display_name(self):
-        if self.author_display_name and self.author_display_name.strip():
-            return self.author_display_name.strip()
+        """
+        Returns author display name. Real tutor accounts return their full name/username.
+        AI generated posts (author_id is None) return 'Mentify Desk'.
+        """
         if self.author_id:
             try:
                 if self.author:
@@ -128,7 +130,19 @@ class Post(models.Model):
                     return self.author.username
             except Exception:
                 pass
-        return "Mentify Editorial"
+            return "Mentify Tutor"
+        return "Mentify Desk"
+
+    @property
+    def dashboard_author_display(self):
+        """
+        Dashboard display formatting:
+        For AI-generated posts -> 'By Mentify Desk'
+        For real tutors -> tutor full name
+        """
+        if not self.author_id:
+            return "By Mentify Desk"
+        return self.get_author_display_name()
 
     def __str__(self):
         return self.title

@@ -14,7 +14,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "category",
-        "author",
+        "author_display",
         "is_published",
         "is_featured",
         "views_count",
@@ -25,3 +25,7 @@ class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     raw_id_fields = ("author",)
     ordering = ("-published_at",)
+
+    @admin.display(description="Author")
+    def author_display(self, obj):
+        return obj.dashboard_author_display

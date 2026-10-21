@@ -1,3 +1,4 @@
+import email.utils
 import json
 import logging
 import re
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 CATEGORY_BEATS = {
     "ai-automation": {
         "name": "AI & Automation",
-        "query": "Artificial Intelligence OR open-source LLM OR AI agents OR DeepSeek OR Anthropic OR machine learning",
+        "query": "Artificial Intelligence OR open-source LLM OR AI agents OR DeepSeek OR Anthropic OR machine learning when:7d",
         "focus": "Global foundation models, open weights, AI agent frameworks, system architectures, and practical deployment.",
         "personas": [
             "Senior AI Systems Engineer",
@@ -29,7 +30,7 @@ CATEGORY_BEATS = {
     },
     "programming-tech": {
         "name": "Programming & Tech",
-        "query": "Python programming OR Rust language OR cloud architecture OR Kubernetes OR open source framework",
+        "query": "Python programming OR Rust language OR cloud architecture OR Kubernetes OR distributed systems when:7d",
         "focus": "Backend engineering, language performance, distributed systems, developer productivity, and cloud tooling.",
         "personas": [
             "Staff Backend Engineer",
@@ -41,7 +42,7 @@ CATEGORY_BEATS = {
     },
     "career-industry": {
         "name": "Career & Industry",
-        "query": "Africa software developers OR remote tech jobs EMEA OR fintech Kenya OR Nairobi tech startup",
+        "query": "remote tech jobs OR software developers Kenya OR fintech Africa OR tech careers when:7d",
         "focus": "Global remote software work realities, African tech ecosystem shifts, developer compensation, and fintech infrastructure.",
         "personas": [
             "Tech Career Strategist",
@@ -53,7 +54,7 @@ CATEGORY_BEATS = {
     },
     "academia": {
         "name": "Academia",
-        "query": "Kenya university funding OR HELB university students OR Kenya higher education OR international graduate scholarships",
+        "query": "Kenya university OR HELB university OR higher education OR graduate scholarships when:7d",
         "focus": "Kenyan university education dynamics, higher education financing (HEF/HELB), academic reforms, and global student scholarships.",
         "personas": [
             "Higher Education Policy Analyst",
@@ -65,9 +66,28 @@ CATEGORY_BEATS = {
     },
 }
 
+STOP_WORDS = {
+    "a", "an", "the", "and", "or", "in", "on", "at", "to", "for", "of", "with",
+    "by", "from", "up", "about", "into", "over", "after", "is", "are", "was", "were",
+    "be", "been", "being", "have", "has", "had", "do", "does", "did", "but", "if",
+    "because", "as", "until", "while", "how", "what", "which", "who", "when",
+    "where", "why", "new", "latest", "update", "updates", "report", "reports",
+    "says", "announces", "launches", "unveils", "reveals", "plans", "first",
+    "more", "than", "will", "would", "could", "should", "their", "there", "they"
+}
 
-def fetch_live_headlines(query: str, limit: int = 4) -> list[dict]:
-    """Fetch live, real-time news headlines with URLs from RSS feeds."""
+
+def _extract_keywords(text: str) -> set[str]:
+    """Extract normalized alphanumeric keyword tokens of length >= 3 excluding stop words."""
+    tokens = re.findall(r"[A-Za-z0-9]+", (text or "").lower())
+    return {t for t in tokens if len(t) >= 3 and t not in STOP_WORDS}
+
+
+def fetch_live_headlines(query: str, limit: int = 10) -> list[dict]:
+    """
+    Fetch live, real-time news headlines with URLs from RSS feeds.
+    Strictly filters out any articles older than 7 days.
+    """
     encoded_q = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded_q}&hl=en-US&gl=US&ceid=US:en"
     req = urllib.request.Request(
@@ -75,8 +95,11 @@ def fetch_live_headlines(query: str, limit: int = 4) -> list[dict]:
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
     )
     headlines = []
+    now = timezone.now()
+    seven_days_ago = now - timedelta(days=7)
+
     try:
-        with urllib.request.urlopen(req, timeout=12) as response:
+        with urllib.request.urlopen(req, timeout=15) as response:
             tree = ET.fromstring(response.read())
             for item in tree.findall(".//item"):
                 title_elem = item.find("title")
@@ -86,11 +109,21 @@ def fetch_live_headlines(query: str, limit: int = 4) -> list[dict]:
 
                 title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
                 link = link_elem.text.strip() if link_elem is not None and link_elem.text else ""
-                pub_date = date_elem.text.strip() if date_elem is not None and date_elem.text else ""
+                pub_date_str = date_elem.text.strip() if date_elem is not None and date_elem.text else ""
                 source_name = source_elem.text.strip() if source_elem is not None and source_elem.text else ""
 
                 if not title or len(title) < 15:
                     continue
+
+                # Strict freshness validation: reject items older than 7 days
+                if pub_date_str:
+                    try:
+                        pub_dt = email.utils.parsedate_to_datetime(pub_date_str)
+                        if pub_dt and pub_dt < seven_days_ago:
+                            logger.info(f"[Blog Generator] Skipping outdated headline '{title}' ({pub_date_str})")
+                            continue
+                    except Exception:
+                        pass
 
                 clean_title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
 
@@ -98,7 +131,7 @@ def fetch_live_headlines(query: str, limit: int = 4) -> list[dict]:
                     "title": clean_title,
                     "raw_title": title,
                     "link": link,
-                    "pub_date": pub_date,
+                    "pub_date": pub_date_str,
                     "source": source_name,
                 })
                 if len(headlines) >= limit:
@@ -112,21 +145,61 @@ def _get_target_db() -> str:
     return "substitute" if "substitute" in getattr(settings, "DATABASES", {}) else "default"
 
 
-def _is_headline_already_covered(headline_title: str, db_alias: str) -> bool:
-    """Check if the headline or a close variation has already been published recently."""
-    words = [w.lower() for w in re.findall(r"[A-Za-z0-9]+", headline_title) if len(w) > 3]
-    if len(words) < 2:
-        return False
+def _is_headline_already_covered(
+    headline: dict,
+    db_alias: str,
+    session_seen_keywords: list[set[str]] | None = None,
+    session_seen_links: set[str] | None = None,
+) -> bool:
+    """
+    Check if the headline or a close topical variation has already been published
+    in the database or within the current running batch.
+    """
+    title = headline.get("title", "").strip()
+    link = headline.get("link", "").strip()
 
-    recent_posts = Post.objects.using(db_alias).filter(
-        created_at__gte=timezone.now() - timedelta(days=14)
-    ).values_list("title", flat=True)
+    if session_seen_links and link and link in session_seen_links:
+        logger.info(f"[Blog Generator] Duplicate link in current batch: {link}")
+        return True
 
-    for post_title in recent_posts:
-        p_lower = post_title.lower()
-        matching_words = sum(1 for w in words if w in p_lower)
-        if matching_words >= min(4, len(words)):
+    cand_keywords = _extract_keywords(title)
+    if not cand_keywords:
+        return True
+
+    # Check against in-batch seen keywords
+    if session_seen_keywords:
+        for seen_kw in session_seen_keywords:
+            overlap = cand_keywords & seen_kw
+            if len(overlap) >= 3 or (len(overlap) >= 2 and len(overlap) / max(1, len(cand_keywords)) >= 0.4):
+                logger.info(f"[Blog Generator] Skipping '{title}' - overlaps with batch topic {overlap}")
+                return True
+
+    # Query all existing posts in db_alias (no time cutoff to prevent any duplicate ever)
+    existing_posts = list(Post.objects.using(db_alias).all().values("title", "slug", "markdown_content", "excerpt"))
+    cand_slug = slugify(title)
+
+    for p in existing_posts:
+        p_title = p["title"]
+        p_slug = p["slug"]
+
+        if cand_slug and (cand_slug == p_slug or (len(cand_slug) > 10 and (cand_slug in p_slug or p_slug in cand_slug))):
+            logger.info(f"[Blog Generator] Slug conflict for '{title}' vs '{p_title}'")
             return True
+
+        p_keywords = _extract_keywords(p_title)
+        overlap = cand_keywords & p_keywords
+        union = cand_keywords | p_keywords
+        jaccard = len(overlap) / max(1, len(union))
+
+        if len(overlap) >= 3 or jaccard >= 0.35:
+            logger.info(f"[Blog Generator] Skipping duplicate headline '{title}' - matches existing post '{p_title}' (overlap: {overlap})")
+            return True
+
+        # Check if source URL already cited in article body
+        if link and (link in (p.get("markdown_content") or "") or link in (p.get("excerpt") or "")):
+            logger.info(f"[Blog Generator] Source link already cited in post '{p_title}'")
+            return True
+
     return False
 
 
@@ -148,26 +221,30 @@ def generate_single_blog_post(
     if not category_obj:
         category_obj = Category.objects.using(db_alias).first()
 
+    current_date_str = timezone.now().strftime("%B %d, %Y")
+
     system_prompt = (
         "You are a distinguished technical staff engineer, investigative tech journalist, and lead architectural essayist "
         "writing for Mentify (https://mlaudit.info/blog/). Mentify is an engineering and academic tech hub.\n\n"
         "EDITORIAL & WRITING STANDARDS (MANDATORY FOR NATURAL HUMAN WRITING):\n"
-        "1. NEVER use repetitive, cookie-cutter section headings. STRICTLY FORBIDDEN: 'TL;DR', 'The Breakdown', 'Why It Matters', "
+        f"1. CURRENT CALENDAR DATE: {current_date_str}. All news context, timelines, and references must reflect developments "
+        f"from THIS CURRENT WEEK in October 2026. NEVER invent past dates or reference events as happening in past months like June.\n"
+        "2. NEVER use repetitive, cookie-cutter section headings. STRICTLY FORBIDDEN: 'TL;DR', 'The Breakdown', 'Why It Matters', "
         "'Conclusion', 'Summary', 'Deep Dive', or 'Looking Ahead' as section titles.\n"
-        "2. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
-        "3. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
+        "3. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
+        "4. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
         "'A testament to', 'Delve into', or 'Exciting times ahead'.\n"
-        "4. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
-        "5. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
-        "6. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
+        "5. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
+        "6. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
+        "7. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
     )
 
     user_prompt = (
-        f"Write an original, comprehensive technical article (1,200 to 1,800 words in Markdown) covering this live development:\n\n"
+        f"Write an original, comprehensive technical article (1,200 to 1,800 words in Markdown) covering this live development from {current_date_str}:\n\n"
         f"HEADLINE: {headline['title']}\n"
         f"PRIMARY SOURCE: {headline.get('source', 'Industry Report')}\n"
         f"SOURCE URL: {headline['link']}\n"
-        f"PUBLISHED DATE: {headline.get('pub_date', 'Recent')}\n"
+        f"PUBLISHED DATE: {headline.get('pub_date', current_date_str)}\n"
         f"CATEGORY BEAT: {beat['name']} - {beat['focus']}\n"
         f"AUTHOR PERSONA: {author_persona}\n\n"
         "JSON OUTPUT REQUIREMENTS:\n"
@@ -225,7 +302,7 @@ def generate_single_blog_post(
         logger.warning(f"[Blog Generator] Incomplete content returned for {title}")
         return None
 
-    featured_image = f"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+    featured_image = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
     if "ai" in category_slug:
         featured_image = "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80"
     elif "programming" in category_slug:
@@ -263,19 +340,24 @@ def run_daily_blog_batch(target_count: int = 4, db_alias: str | None = None) -> 
     """
     Execute daily batch to generate at least `target_count` articles across the active categories.
     If a category has no fresh headline, dynamically reallocates to another high-signal category.
+    Strictly avoids duplicates against the database and within the batch.
     """
     if db_alias is None:
         db_alias = _get_target_db()
 
     categories = ["ai-automation", "programming-tech", "career-industry", "academia"]
     created_posts = []
+    session_seen_keywords: list[set[str]] = []
+    session_seen_links: set[str] = set()
 
     candidates_by_category = {}
     for cat_slug in categories:
         beat = CATEGORY_BEATS[cat_slug]
-        headlines = fetch_live_headlines(beat["query"], limit=6)
+        headlines = fetch_live_headlines(beat["query"], limit=10)
         fresh_headlines = [
-            h for h in headlines if not _is_headline_already_covered(h["title"], db_alias)
+            h for h in headlines if not _is_headline_already_covered(
+                h, db_alias, session_seen_keywords, session_seen_links
+            )
         ]
         candidates_by_category[cat_slug] = fresh_headlines
 
@@ -284,28 +366,40 @@ def run_daily_blog_batch(target_count: int = 4, db_alias: str | None = None) -> 
         if len(created_posts) >= target_count:
             break
         fresh = candidates_by_category.get(cat_slug, [])
-        if fresh:
-            headline = fresh.pop(0)
+        while fresh:
+            candidate = fresh.pop(0)
+            if _is_headline_already_covered(candidate, db_alias, session_seen_keywords, session_seen_links):
+                continue
             persona = CATEGORY_BEATS[cat_slug]["personas"][len(created_posts) % len(CATEGORY_BEATS[cat_slug]["personas"])]
-            post = generate_single_blog_post(cat_slug, headline, persona, db_alias=db_alias)
+            post = generate_single_blog_post(cat_slug, candidate, persona, db_alias=db_alias)
             if post:
                 created_posts.append(post)
+                session_seen_keywords.append(_extract_keywords(post.title))
+                if candidate.get("link"):
+                    session_seen_links.add(candidate["link"])
+                break
 
-    # Pass 2: If we still need posts (e.g. a category was empty), dynamically reallocate to AI or Programming
+    # Pass 2: If we still need posts (e.g. a category was empty), dynamically reallocate
     fallback_priority = ["ai-automation", "programming-tech", "career-industry", "academia"]
     while len(created_posts) < target_count:
         made_progress = False
         for cat_slug in fallback_priority:
             fresh = candidates_by_category.get(cat_slug, [])
-            if fresh:
-                headline = fresh.pop(0)
+            while fresh and len(created_posts) < target_count:
+                candidate = fresh.pop(0)
+                if _is_headline_already_covered(candidate, db_alias, session_seen_keywords, session_seen_links):
+                    continue
                 persona = CATEGORY_BEATS[cat_slug]["personas"][(len(created_posts) + 1) % len(CATEGORY_BEATS[cat_slug]["personas"])]
-                post = generate_single_blog_post(cat_slug, headline, persona, db_alias=db_alias)
+                post = generate_single_blog_post(cat_slug, candidate, persona, db_alias=db_alias)
                 if post:
                     created_posts.append(post)
+                    session_seen_keywords.append(_extract_keywords(post.title))
+                    if candidate.get("link"):
+                        session_seen_links.add(candidate["link"])
                     made_progress = True
-                if len(created_posts) >= target_count:
                     break
+            if len(created_posts) >= target_count:
+                break
         if not made_progress:
             break
 
