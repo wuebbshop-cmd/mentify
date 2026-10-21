@@ -90,7 +90,19 @@ def _clean_db_env(key: str, default: str = "") -> str:
     val = os.environ.get(key)
     if val is None:
         return default
-    return str(val).strip()
+    cleaned = str(val).strip()
+    if "PASS" not in key.upper():
+        for seq in (r"\r", r"\n", "\r", "\n", "\r", "\n", '"', "'"):
+            cleaned = cleaned.replace(seq, "")
+        cleaned = cleaned.strip()
+    else:
+        cleaned = cleaned.strip(" \t\r\n")
+        while cleaned.endswith(r"\n") or cleaned.endswith(r"\r") or cleaned.endswith("\n") or cleaned.endswith("\r"):
+            for end in (r"\n", r"\r", "\n", "\r"):
+                if cleaned.endswith(end):
+                    cleaned = cleaned[:-len(end)]
+        cleaned = cleaned.strip(" '\"")
+    return cleaned if cleaned else default
 
 
 if _clean_db_env("DB_HOST"):
