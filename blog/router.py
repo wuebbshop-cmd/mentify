@@ -32,6 +32,5 @@ class BlogDatabaseRouter:
 
     def allow_migrate(self, db, app_label, **hints):
         if app_label in self.route_app_labels:
-            target = self._target_db()
-            return db == target
+            return db in ("default", "substitute")
         return db == "default"

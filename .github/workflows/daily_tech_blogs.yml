@@ -1,0 +1,59 @@
+name: Daily Tech Blog Generator
+
+on:
+  schedule:
+    # Runs every day at 06:00 UTC (09:00 East Africa Time)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      post_count:
+        description: 'Number of posts to generate'
+        required: false
+        default: '4'
+
+jobs:
+  generate-blogs:
+    name: Generate & Publish Daily Tech Articles
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Daily Blog Generator Batch
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.production
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY || 'gha-blog-runner-temporary-secret-key-xyz987' }}
+          ALLOWED_HOSTS: '*'
+          # Primary Database (for fallback or model validation)
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT || '3306' }}
+          DB_SSL: ${{ secrets.DB_SSL || 'True' }}
+          # Substitute Database (Aiven - where blogs are stored)
+          SUB_DB_HOST: ${{ secrets.SUB_DB_HOST }}
+          SUB_DB_NAME: ${{ secrets.SUB_DB_NAME || 'mentify' }}
+          SUB_DB_PORT: ${{ secrets.SUB_DB_PORT || '22887' }}
+          SUB_DB_USER: ${{ secrets.SUB_DB_USER || 'avnadmin' }}
+          SUB_DB_PASSWORD: ${{ secrets.SUB_DB_PASSWORD }}
+          SUB_DB_SSL: ${{ secrets.SUB_DB_SSL || 'True' }}
+          # DeepSeek API
+          DEEPSEEK_API: ${{ secrets.DEEPSEEK_API }}
+          DEEPSEEK_BASE_URL: https://api.deepseek.com
+        run: |
+          COUNT="${{ github.event.inputs.post_count || '4' }}"
+          python manage.py generate_daily_tech_blogs --count "$COUNT"

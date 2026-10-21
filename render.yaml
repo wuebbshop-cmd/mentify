@@ -36,6 +36,20 @@ services:
         value: main
       - key: GITHUB_UPLOAD_DIR
         value: mentify-uploads
+      # Substitute Database (Aiven - Blog Storage)
+      - key: SUB_DB_HOST
+        sync: false
+      - key: SUB_DB_NAME
+        value: mentify
+      - key: SUB_DB_PORT
+        value: "22887"
+      - key: SUB_DB_USER
+        sync: false
+      - key: SUB_DB_PASSWORD
+        sync: false
+      - key: SUB_DB_SSL
+        value: "True"
+
       # Required for password reset + notification emails (Resend.com)
       - key: RESEND_API_KEY
         sync: false
@@ -63,6 +77,20 @@ services:
         sync: false
       - key: TOGETHERAI_ID
         sync: false
+      # Substitute Database (Aiven - Blog Storage)
+      - key: SUB_DB_HOST
+        sync: false
+      - key: SUB_DB_NAME
+        value: mentify
+      - key: SUB_DB_PORT
+        value: "22887"
+      - key: SUB_DB_USER
+        sync: false
+      - key: SUB_DB_PASSWORD
+        sync: false
+      - key: SUB_DB_SSL
+        value: "True"
+
 
 
   # ─── Option B: Dedicated Worker Free Web Service ─────────────────────────
