@@ -84,9 +84,15 @@ def _extract_keywords(text: str) -> set[str]:
 
 
 def _sanitize_cliches(text: str) -> str:
-    """Sanitize and remove clichéd AI tropes, contrasting paradoxes, and gimmicky headings."""
+    """Sanitize and remove clichéd AI tropes, contrasting paradoxes, em-dashes, and gimmicky headings."""
     if not text:
         return text
+
+    # Remove em-dashes (\u2014) and en-dashes (\u2013)
+    text = re.sub(r"(\d)\s*[\u2013\u2014]\s*(\d)", r"\1-\2", text)
+    text = re.sub(r"\s*[\u2014]\s*", " - ", text)
+    text = re.sub(r"\s*[\u2013]\s*", " - ", text)
+
     patterns = [
         (re.compile(r"###?\s+Why (.*?) Is a Feature, Not a Bug", re.IGNORECASE), r"### Structural Dynamics of \1"),
         (re.compile(r"Is a Feature, Not a Bug", re.IGNORECASE), "Operates by Design"),
@@ -252,12 +258,14 @@ def generate_single_blog_post(
         "'X is not what you think', 'The [Noun] Paradox', 'It is not about X, it is about Y', 'Double-edged sword', "
         "or pseudo-philosophical antithesis statements in headings or body text. Headings must be grounded, authoritative, "
         "and descriptive technical statements (e.g. 'Market Saturation and Compensation Distribution in Python' or 'Memory Overhead in Hot Loop Transpilation').\n"
-        "4. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
-        "5. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
+        "4. STRICT PUNCTUATION RULE (ZERO EM DASHES): NEVER use em dashes (—) or en dashes (–) anywhere in the article. "
+        "Instead, use natural human punctuation: commas, parentheses, colons, semicolons, standard hyphens (-), or periods.\n"
+        "5. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
+        "6. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
         "'A testament to', 'Delve into', or 'Exciting times ahead'.\n"
-        "6. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
-        "7. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
-        "8. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
+        "7. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
+        "8. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
+        "9. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
     )
 
     user_prompt = (
