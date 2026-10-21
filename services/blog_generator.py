@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 CATEGORY_BEATS = {
     "ai-automation": {
         "name": "AI & Automation",
-        "query": "Artificial Intelligence OR open-source LLM OR AI agents OR DeepSeek OR Anthropic OR machine learning when:7d",
+        "query": "Artificial Intelligence OR open-source LLM OR AI agents OR DeepSeek OR Anthropic OR machine learning when:2d",
         "focus": "Global foundation models, open weights, AI agent frameworks, system architectures, and practical deployment.",
         "personas": [
             "Senior AI Systems Engineer",
@@ -30,7 +30,7 @@ CATEGORY_BEATS = {
     },
     "programming-tech": {
         "name": "Programming & Tech",
-        "query": "Python programming OR Rust language OR cloud architecture OR Kubernetes OR distributed systems when:7d",
+        "query": "Python programming OR Rust language OR cloud architecture OR Kubernetes OR distributed systems when:2d",
         "focus": "Backend engineering, language performance, distributed systems, developer productivity, and cloud tooling.",
         "personas": [
             "Staff Backend Engineer",
@@ -42,7 +42,7 @@ CATEGORY_BEATS = {
     },
     "career-industry": {
         "name": "Career & Industry",
-        "query": "remote tech jobs OR software developers Kenya OR fintech Africa OR tech careers when:7d",
+        "query": "remote tech jobs OR software developers Kenya OR fintech Africa OR tech careers when:2d",
         "focus": "Global remote software work realities, African tech ecosystem shifts, developer compensation, and fintech infrastructure.",
         "personas": [
             "Tech Career Strategist",
@@ -54,7 +54,7 @@ CATEGORY_BEATS = {
     },
     "academia": {
         "name": "Academia",
-        "query": "Kenya university OR HELB university OR higher education OR graduate scholarships when:7d",
+        "query": "Kenya university OR HELB university OR higher education OR graduate scholarships when:2d",
         "focus": "Kenyan university education dynamics, higher education financing (HEF/HELB), academic reforms, and global student scholarships.",
         "personas": [
             "Higher Education Policy Analyst",
@@ -86,7 +86,7 @@ def _extract_keywords(text: str) -> set[str]:
 def fetch_live_headlines(query: str, limit: int = 10) -> list[dict]:
     """
     Fetch live, real-time news headlines with URLs from RSS feeds.
-    Strictly filters out any articles older than 7 days.
+    Strictly filters out any articles older than 2 days (48 hours).
     """
     encoded_q = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded_q}&hl=en-US&gl=US&ceid=US:en"
@@ -96,7 +96,7 @@ def fetch_live_headlines(query: str, limit: int = 10) -> list[dict]:
     )
     headlines = []
     now = timezone.now()
-    seven_days_ago = now - timedelta(days=7)
+    two_days_ago = now - timedelta(days=2)
 
     try:
         with urllib.request.urlopen(req, timeout=15) as response:
@@ -115,12 +115,12 @@ def fetch_live_headlines(query: str, limit: int = 10) -> list[dict]:
                 if not title or len(title) < 15:
                     continue
 
-                # Strict freshness validation: reject items older than 7 days
+                # Strict freshness validation: reject items older than 2 days (48 hours)
                 if pub_date_str:
                     try:
                         pub_dt = email.utils.parsedate_to_datetime(pub_date_str)
-                        if pub_dt and pub_dt < seven_days_ago:
-                            logger.info(f"[Blog Generator] Skipping outdated headline '{title}' ({pub_date_str})")
+                        if pub_dt and pub_dt < two_days_ago:
+                            logger.info(f"[Blog Generator] Skipping headline older than 48h '{title}' ({pub_date_str})")
                             continue
                     except Exception:
                         pass
@@ -227,8 +227,8 @@ def generate_single_blog_post(
         "You are a distinguished technical staff engineer, investigative tech journalist, and lead architectural essayist "
         "writing for Mentify (https://mlaudit.info/blog/). Mentify is an engineering and academic tech hub.\n\n"
         "EDITORIAL & WRITING STANDARDS (MANDATORY FOR NATURAL HUMAN WRITING):\n"
-        f"1. CURRENT CALENDAR DATE: {current_date_str}. All news context, timelines, and references must reflect developments "
-        f"from THIS CURRENT WEEK in October 2026. NEVER invent past dates or reference events as happening in past months like June.\n"
+        f"1. CURRENT CALENDAR DATE: {current_date_str}. All news context, timelines, and references must reflect breaking developments "
+        f"from THE LAST 48 HOURS ({current_date_str}). NEVER invent past dates or reference events as happening in past months.\n"
         "2. NEVER use repetitive, cookie-cutter section headings. STRICTLY FORBIDDEN: 'TL;DR', 'The Breakdown', 'Why It Matters', "
         "'Conclusion', 'Summary', 'Deep Dive', or 'Looking Ahead' as section titles.\n"
         "3. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
@@ -240,7 +240,7 @@ def generate_single_blog_post(
     )
 
     user_prompt = (
-        f"Write an original, comprehensive technical article (1,200 to 1,800 words in Markdown) covering this live development from {current_date_str}:\n\n"
+        f"Write an original, comprehensive technical article (1,200 to 1,800 words in Markdown) covering this breaking development from the past 48 hours ({current_date_str}):\n\n"
         f"HEADLINE: {headline['title']}\n"
         f"PRIMARY SOURCE: {headline.get('source', 'Industry Report')}\n"
         f"SOURCE URL: {headline['link']}\n"
