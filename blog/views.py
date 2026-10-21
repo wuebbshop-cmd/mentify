@@ -27,7 +27,7 @@ def blog_index(request):
     q = request.GET.get("q", "").strip()
     category_slug = request.GET.get("category", "").strip()
 
-    posts = Post.objects.filter(is_published=True).select_related("author", "category")
+    posts = Post.objects.filter(is_published=True).select_related("category")
 
     if q:
         posts = posts.filter(
@@ -83,7 +83,7 @@ def post_detail(request, slug):
     related_posts = (
         Post.objects.filter(is_published=True)
         .exclude(pk=post.pk)
-        .select_related("category", "author")
+        .select_related("category")
     )
     if post.category:
         related_posts = related_posts.filter(category=post.category)[:3]
@@ -104,7 +104,7 @@ def post_detail(request, slug):
 def category_detail(request, slug):
     """Articles archive for a specific Category."""
     category = get_object_or_404(Category, slug=slug)
-    posts = Post.objects.filter(category=category, is_published=True).select_related("author")
+    posts = Post.objects.filter(category=category, is_published=True)
 
     paginator = Paginator(posts, 9)
     page_number = request.GET.get("page")
@@ -129,7 +129,7 @@ def tutor_blog_manage(request):
         return redirect("accounts:dashboard")
 
     if request.user.role == "admin" or request.user.is_staff or request.user.is_superuser:
-        posts = Post.objects.all().select_related("author", "category")
+        posts = Post.objects.all().select_related("category")
     else:
         posts = Post.objects.filter(author=request.user).select_related("category")
 

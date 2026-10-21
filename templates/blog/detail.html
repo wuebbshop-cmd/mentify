@@ -66,7 +66,7 @@
     <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(15,118,110,0.12); color: var(--green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; border: 2px solid var(--green);">
-          {{ post.author.first_name|default:post.author.username|slice:":1"|upper }}
+          {{ post.author.first_name|default:post.get_author_display_name|slice:":1"|upper }}
         </div>
         <div>
           <div style="font-weight: 700; font-size: 0.95rem; color: var(--text);">
@@ -164,7 +164,7 @@
   <!-- Author Bio (Unboxed) -->
   <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 1.25rem; align-items: flex-start;">
     <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; flex-shrink: 0;">
-      {{ post.author.first_name|default:post.author.username|slice:":1"|upper }}
+      {{ post.author.first_name|default:post.get_author_display_name|slice:":1"|upper }}
     </div>
     <div>
       <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 2px; color: var(--text);">

@@ -53,8 +53,17 @@ class Post(models.Model):
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="blog_posts",
+        db_constraint=False,
+    )
+    author_display_name = models.CharField(
+        max_length=100,
+        default="Mentify Editorial",
+        blank=True,
+        help_text="Byline author name displayed on the post",
     )
     category = models.ForeignKey(
         Category,
@@ -108,12 +117,18 @@ class Post(models.Model):
         return [t.strip() for t in self.tags.split(",") if t.strip()]
 
     def get_author_display_name(self):
-        if self.author:
-            full_name = f"{self.author.first_name} {self.author.last_name}".strip()
-            if full_name:
-                return full_name.title()
-            return self.author.username
-        return "Mentify Team"
+        if self.author_display_name and self.author_display_name.strip():
+            return self.author_display_name.strip()
+        if self.author_id:
+            try:
+                if self.author:
+                    full_name = f"{self.author.first_name} {self.author.last_name}".strip()
+                    if full_name:
+                        return full_name.title()
+                    return self.author.username
+            except Exception:
+                pass
+        return "Mentify Editorial"
 
     def __str__(self):
         return self.title

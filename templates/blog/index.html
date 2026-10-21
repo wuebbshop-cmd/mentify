@@ -73,7 +73,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(15,118,110,0.1); color: var(--green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
-              {{ featured_post.author.first_name|default:featured_post.author.username|slice:":1"|upper }}
+              {{ featured_post.author.first_name|default:featured_post.get_author_display_name|slice:":1"|upper }}
             </div>
             <div>
               <div style="font-weight: 600; font-size: 0.85rem; color: var(--text);">{{ featured_post.get_author_display_name }}</div>

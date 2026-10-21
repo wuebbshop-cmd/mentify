@@ -104,6 +104,25 @@ DATABASES = {
     }
 }
 
+if os.environ.get("SUB_DB_HOST"):
+    DATABASES["substitute"] = {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("SUB_DB_NAME", "mentify"),
+        "USER": os.environ.get("SUB_DB_USER", "root"),
+        "PASSWORD": os.environ.get("SUB_DB_PASSWORD", ""),
+        "HOST": os.environ.get("SUB_DB_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("SUB_DB_PORT", "3306"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            **({"ssl": {}} if os.environ.get("SUB_DB_SSL", "").lower() in ("true", "1", "yes") else {}),
+        },
+        "CONN_MAX_AGE": int(os.environ.get("SUB_DB_CONN_MAX_AGE", "60")),
+        "CONN_HEALTH_CHECKS": True,
+    }
+
+DATABASE_ROUTERS = ["blog.router.BlogDatabaseRouter"]
+
 
 # ─── Custom User Model ────────────────────────────────────────────────────────
 AUTH_USER_MODEL = "accounts.User"

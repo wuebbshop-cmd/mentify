@@ -1,0 +1,312 @@
+import json
+import logging
+import re
+import urllib.parse
+import urllib.request
+import xml.etree.ElementTree as ET
+from datetime import timedelta
+from django.conf import settings
+from django.utils import timezone
+from django.utils.text import slugify
+
+from blog.models import Category, Post
+from services.prep_ai_router import call_deepseek
+
+logger = logging.getLogger(__name__)
+
+CATEGORY_BEATS = {
+    "ai-automation": {
+        "name": "AI & Automation",
+        "query": "Artificial Intelligence OR open-source LLM OR AI agents OR DeepSeek OR Anthropic OR machine learning",
+        "focus": "Global foundation models, open weights, AI agent frameworks, system architectures, and practical deployment.",
+        "personas": [
+            "Senior AI Systems Engineer",
+            "Machine Learning Infrastructure Architect",
+            "Open-Source AI Contributor",
+            "Mentify AI Research Desk",
+        ],
+        "image_keywords": "artificial-intelligence,neural-network,server-code",
+    },
+    "programming-tech": {
+        "name": "Programming & Tech",
+        "query": "Python programming OR Rust language OR cloud architecture OR Kubernetes OR open source framework",
+        "focus": "Backend engineering, language performance, distributed systems, developer productivity, and cloud tooling.",
+        "personas": [
+            "Staff Backend Engineer",
+            "Cloud Infrastructure Architect",
+            "Systems Programmer",
+            "Mentify Dev Lab",
+        ],
+        "image_keywords": "coding,programming,technology,data-center",
+    },
+    "career-industry": {
+        "name": "Career & Industry",
+        "query": "Africa software developers OR remote tech jobs EMEA OR fintech Kenya OR Nairobi tech startup",
+        "focus": "Global remote software work realities, African tech ecosystem shifts, developer compensation, and fintech infrastructure.",
+        "personas": [
+            "Tech Career Strategist",
+            "Remote Engineering Consultant",
+            "African Tech Ecosystem Analyst",
+            "Mentify Career Insights",
+        ],
+        "image_keywords": "modern-office,tech-workspace,entrepreneur,laptop",
+    },
+    "academia": {
+        "name": "Academia",
+        "query": "Kenya university funding OR HELB university students OR Kenya higher education OR international graduate scholarships",
+        "focus": "Kenyan university education dynamics, higher education financing (HEF/HELB), academic reforms, and global student scholarships.",
+        "personas": [
+            "Higher Education Policy Analyst",
+            "Academic Research Fellow",
+            "Scholarship & Graduate Advisor",
+            "Mentify Academic Desk",
+        ],
+        "image_keywords": "university,graduation,library,academic-books",
+    },
+}
+
+
+def fetch_live_headlines(query: str, limit: int = 4) -> list[dict]:
+    """Fetch live, real-time news headlines with URLs from RSS feeds."""
+    encoded_q = urllib.parse.quote(query)
+    url = f"https://news.google.com/rss/search?q={encoded_q}&hl=en-US&gl=US&ceid=US:en"
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+    )
+    headlines = []
+    try:
+        with urllib.request.urlopen(req, timeout=12) as response:
+            tree = ET.fromstring(response.read())
+            for item in tree.findall(".//item"):
+                title_elem = item.find("title")
+                link_elem = item.find("link")
+                date_elem = item.find("pubDate")
+                source_elem = item.find("source")
+
+                title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
+                link = link_elem.text.strip() if link_elem is not None and link_elem.text else ""
+                pub_date = date_elem.text.strip() if date_elem is not None and date_elem.text else ""
+                source_name = source_elem.text.strip() if source_elem is not None and source_elem.text else ""
+
+                if not title or len(title) < 15:
+                    continue
+
+                clean_title = re.sub(r"\s+-\s+[^-]+$", "", title).strip()
+
+                headlines.append({
+                    "title": clean_title,
+                    "raw_title": title,
+                    "link": link,
+                    "pub_date": pub_date,
+                    "source": source_name,
+                })
+                if len(headlines) >= limit:
+                    break
+    except Exception as exc:
+        logger.warning(f"[Blog Generator] Failed fetching live headlines for '{query}': {exc}")
+    return headlines
+
+
+def _get_target_db() -> str:
+    return "substitute" if "substitute" in getattr(settings, "DATABASES", {}) else "default"
+
+
+def _is_headline_already_covered(headline_title: str, db_alias: str) -> bool:
+    """Check if the headline or a close variation has already been published recently."""
+    words = [w.lower() for w in re.findall(r"[A-Za-z0-9]+", headline_title) if len(w) > 3]
+    if len(words) < 2:
+        return False
+
+    recent_posts = Post.objects.using(db_alias).filter(
+        created_at__gte=timezone.now() - timedelta(days=14)
+    ).values_list("title", flat=True)
+
+    for post_title in recent_posts:
+        p_lower = post_title.lower()
+        matching_words = sum(1 for w in words if w in p_lower)
+        if matching_words >= min(4, len(words)):
+            return True
+    return False
+
+
+def generate_single_blog_post(
+    category_slug: str,
+    headline: dict,
+    author_persona: str,
+    db_alias: str | None = None,
+) -> Post | None:
+    """
+    Generate an authentic, highly technical, and human-style blog post for a headline
+    and persist it to the substitute database.
+    """
+    if db_alias is None:
+        db_alias = _get_target_db()
+
+    beat = CATEGORY_BEATS.get(category_slug, CATEGORY_BEATS["ai-automation"])
+    category_obj = Category.objects.using(db_alias).filter(slug=category_slug).first()
+    if not category_obj:
+        category_obj = Category.objects.using(db_alias).first()
+
+    system_prompt = (
+        "You are a distinguished technical staff engineer, investigative tech journalist, and lead architectural essayist "
+        "writing for Mentify (https://mlaudit.info/blog/). Mentify is an engineering and academic tech hub.\n\n"
+        "EDITORIAL & WRITING STANDARDS (MANDATORY FOR NATURAL HUMAN WRITING):\n"
+        "1. NEVER use repetitive, cookie-cutter section headings. STRICTLY FORBIDDEN: 'TL;DR', 'The Breakdown', 'Why It Matters', "
+        "'Conclusion', 'Summary', 'Deep Dive', or 'Looking Ahead' as section titles.\n"
+        "2. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
+        "3. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
+        "'A testament to', 'Delve into', or 'Exciting times ahead'.\n"
+        "4. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
+        "5. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
+        "6. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
+    )
+
+    user_prompt = (
+        f"Write an original, comprehensive technical article (1,200 to 1,800 words in Markdown) covering this live development:\n\n"
+        f"HEADLINE: {headline['title']}\n"
+        f"PRIMARY SOURCE: {headline.get('source', 'Industry Report')}\n"
+        f"SOURCE URL: {headline['link']}\n"
+        f"PUBLISHED DATE: {headline.get('pub_date', 'Recent')}\n"
+        f"CATEGORY BEAT: {beat['name']} - {beat['focus']}\n"
+        f"AUTHOR PERSONA: {author_persona}\n\n"
+        "JSON OUTPUT REQUIREMENTS:\n"
+        "{\n"
+        '  "title": "Punchy, authoritative, non-clickbait title",\n'
+        '  "slug": "url-friendly-lowercase-slug-without-trailing-punctuation",\n'
+        '  "excerpt": "2-3 crisp sentences summarizing the technical breakthrough for social share cards",\n'
+        '  "tags": "3 to 5 comma-separated tags (e.g. LLMs, Open Source, DeepSeek, Cloud)",\n'
+        '  "author_name": "Author name matching the persona",\n'
+        '  "markdown_content": "Full article body in Markdown with custom H2/H3 headings, code/tables where relevant, and markdown citations."\n'
+        "}\n\n"
+        "Return ONLY the JSON object. Do not wrap in markdown fences or include explanations."
+    )
+
+    result = call_deepseek(
+        [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        model="deepseek-chat",
+        max_tokens=3500,
+        temperature=0.35,
+        thinking_enabled=False,
+    )
+
+    if not result.get("success") or not result.get("content"):
+        logger.error(f"[Blog Generator] DeepSeek call failed for {headline['title']}: {result.get('error')}")
+        return None
+
+    raw_text = str(result["content"]).strip()
+    raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text, flags=re.IGNORECASE)
+    raw_text = re.sub(r"\s*```$", "", raw_text)
+
+    try:
+        data = json.loads(raw_text)
+    except Exception:
+        match = re.search(r"\{[\s\S]*\}", raw_text)
+        if match:
+            try:
+                data = json.loads(match.group(0))
+            except Exception as e:
+                logger.error(f"[Blog Generator] Failed parsing JSON payload: {e}")
+                return None
+        else:
+            return None
+
+    title = str(data.get("title") or headline["title"]).strip()
+    slug = slugify(str(data.get("slug") or title))[:220]
+    excerpt = str(data.get("excerpt") or "").strip()[:480]
+    markdown_content = str(data.get("markdown_content") or "").strip()
+    tags = str(data.get("tags") or "").strip()[:240]
+    author_name = str(data.get("author_name") or author_persona).strip()
+
+    if not markdown_content or len(markdown_content) < 400:
+        logger.warning(f"[Blog Generator] Incomplete content returned for {title}")
+        return None
+
+    featured_image = f"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+    if "ai" in category_slug:
+        featured_image = "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80"
+    elif "programming" in category_slug:
+        featured_image = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80"
+    elif "career" in category_slug:
+        featured_image = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
+    elif "academia" in category_slug:
+        featured_image = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
+
+    base_slug = slug
+    counter = 1
+    while Post.objects.using(db_alias).filter(slug=slug).exists():
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+    post = Post.objects.using(db_alias).create(
+        title=title,
+        slug=slug,
+        excerpt=excerpt,
+        markdown_content=markdown_content,
+        featured_image_url=featured_image,
+        author=None,
+        author_display_name=author_name,
+        category=category_obj,
+        tags=tags,
+        is_published=True,
+        is_featured=False,
+        published_at=timezone.now(),
+    )
+    logger.info(f"[Blog Generator] Published new post: '{post.title}' ({post.slug}) in {category_obj.name} on {db_alias}")
+    return post
+
+
+def run_daily_blog_batch(target_count: int = 4, db_alias: str | None = None) -> list[Post]:
+    """
+    Execute daily batch to generate at least `target_count` articles across the active categories.
+    If a category has no fresh headline, dynamically reallocates to another high-signal category.
+    """
+    if db_alias is None:
+        db_alias = _get_target_db()
+
+    categories = ["ai-automation", "programming-tech", "career-industry", "academia"]
+    created_posts = []
+
+    candidates_by_category = {}
+    for cat_slug in categories:
+        beat = CATEGORY_BEATS[cat_slug]
+        headlines = fetch_live_headlines(beat["query"], limit=6)
+        fresh_headlines = [
+            h for h in headlines if not _is_headline_already_covered(h["title"], db_alias)
+        ]
+        candidates_by_category[cat_slug] = fresh_headlines
+
+    # Pass 1: Try to publish 1 post per category
+    for cat_slug in categories:
+        if len(created_posts) >= target_count:
+            break
+        fresh = candidates_by_category.get(cat_slug, [])
+        if fresh:
+            headline = fresh.pop(0)
+            persona = CATEGORY_BEATS[cat_slug]["personas"][len(created_posts) % len(CATEGORY_BEATS[cat_slug]["personas"])]
+            post = generate_single_blog_post(cat_slug, headline, persona, db_alias=db_alias)
+            if post:
+                created_posts.append(post)
+
+    # Pass 2: If we still need posts (e.g. a category was empty), dynamically reallocate to AI or Programming
+    fallback_priority = ["ai-automation", "programming-tech", "career-industry", "academia"]
+    while len(created_posts) < target_count:
+        made_progress = False
+        for cat_slug in fallback_priority:
+            fresh = candidates_by_category.get(cat_slug, [])
+            if fresh:
+                headline = fresh.pop(0)
+                persona = CATEGORY_BEATS[cat_slug]["personas"][(len(created_posts) + 1) % len(CATEGORY_BEATS[cat_slug]["personas"])]
+                post = generate_single_blog_post(cat_slug, headline, persona, db_alias=db_alias)
+                if post:
+                    created_posts.append(post)
+                    made_progress = True
+                if len(created_posts) >= target_count:
+                    break
+        if not made_progress:
+            break
+
+    return created_posts
