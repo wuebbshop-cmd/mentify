@@ -385,6 +385,7 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
     topic_words = [word for word in re.findall(r"[A-Za-z0-9]+", topic_title.lower()) if len(word) > 3]
     selected = []
     seen_hashes = set()
+    requested_topic = " ".join(str(topic_title or "").casefold().split())
     for document in documents:
         text = str(document.extracted_text or "").strip()
         if not text:
@@ -393,7 +394,6 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
         if text_hash in seen_hashes:
             continue
         document_topic = " ".join(str(document.topic_name or "").casefold().split())
-        requested_topic = " ".join(str(topic_title or "").casefold().split())
         has_assigned_visual = any(
             " ".join(str((content or {}).get("auto_topic") or "").casefold().split())
             == requested_topic
@@ -410,7 +410,59 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
             continue
         seen_hashes.add(text_hash)
         selected.append((document, is_topic_document))
+
+    def _doc_priority(item):
+        doc, is_top = item
+        txt = (doc.extracted_text or "")
+        has_direct_topic = bool(requested_topic and requested_topic in txt.lower())
+        is_full_notes = (doc.doc_type == "Lecture Notes" and len(txt) > 5000)
+        return (
+            1 if has_direct_topic else 0,
+            1 if is_top else 0,
+            1 if is_full_notes else 0,
+            len(txt),
+        )
+
+    selected.sort(key=_doc_priority, reverse=True)
     return selected
+
+
+def _find_topic_anchor_offset(text: str, topic_title: str) -> int:
+    """Find character offset where topic begins in text, aligning to page or section header."""
+    if not text or not topic_title:
+        return 0
+    text_lower = text.lower()
+    title_lower = " ".join(topic_title.strip().lower().split())
+    if not title_lower:
+        return 0
+
+    idx = text_lower.find(title_lower)
+    if idx == -1:
+        words = [w for w in re.findall(r"[a-z0-9]+", title_lower) if len(w) > 3]
+        if len(words) >= 2:
+            pattern = re.compile(
+                r"\b" + r"\b[\s\S]{1,80}\b".join(map(re.escape, words[:3])) + r"\b",
+                re.IGNORECASE,
+            )
+            m = pattern.search(text)
+            if m:
+                idx = m.start()
+        elif len(words) == 1:
+            idx = text_lower.find(words[0])
+
+    if idx == -1:
+        return 0
+
+    lookback_window = text[max(0, idx - 1500):idx]
+    page_matches = list(re.finditer(r"(?m)^--- Page \d+(?:\s+\([^\n]*\))? ---\s*", lookback_window))
+    if page_matches:
+        return max(0, idx - 1500) + page_matches[-1].start()
+
+    para_idx = text.rfind("\n\n", max(0, idx - 400), idx)
+    if para_idx != -1:
+        return para_idx + 2
+
+    return max(0, idx - 100)
 
 
 def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
@@ -425,11 +477,15 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
     for document, is_topic_document in selected:
         text = _strip_course_administrative_front_matter(str(document.extracted_text or "")).strip()
         text = purge_institutional_metadata(text)
-        excerpt_limit = min(limit - total_length, limit if is_topic_document else 5000)
-        if excerpt_limit <= 0:
+        offset = _find_topic_anchor_offset(text, topic_title)
+        remaining = limit - total_length
+        if remaining <= 0:
             break
-        excerpts.append(text[:excerpt_limit])
-        total_length += excerpt_limit
+        excerpt_limit = min(remaining, limit if is_topic_document else 5000)
+        excerpt = text[offset:offset + excerpt_limit].strip()
+        if excerpt:
+            excerpts.append(excerpt)
+            total_length += len(excerpt)
         if total_length >= limit:
             break
     return "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(excerpts)[:limit]
@@ -4122,11 +4178,12 @@ def get_or_generate_topic_notes(
         if allows_code:
             coverage_requirements.append("code examples where present in the approved notes")
         subtopic_coverage_block = (
-            "MANDATORY EXHAUSTIVE SUBTOPIC COVERAGE:\n"
+            "MANDATORY EXHAUSTIVE SUBTOPIC & CALCULATION COVERAGE:\n"
             "The course syllabus explicitly defines the following subtopics for this unit:\n"
             f"{subtopic_items}\n"
             "- Cover EVERY listed subtopic using " + ", ".join(coverage_requirements) + ".\n"
-            "- Do NOT omit, skip, merge, or gloss over any subtopic in the list; ensure complete exhaustive coverage.\n\n"
+            "- Thoroughly explain all calculation methods, formulas, shortcut/coding techniques, and mathematical derivations present in the approved coursework excerpt for these subtopics (e.g., standard definitions, assumed mean / shift of origin, coding / change of scale, geometric and harmonic means, grouped vs ungrouped data, and related variations).\n"
+            "- Do NOT omit, skip, merge, or gloss over any subtopic or method detailed in the source material; ensure complete, rigorous coverage.\n\n"
         )
 
     approved_context_block = ""
@@ -4152,8 +4209,8 @@ def get_or_generate_topic_notes(
     source_excerpt = _approved_course_source_context(course_obj, topic_title)
     source_context_block = (
         "APPROVED COURSEWORK SOURCE EXCERPTS:\n"
-        "Use these excerpts as the authoritative source for terminology, examples, equations, and code. "
-        "Do not invent a different subject scope. Preserve relevant code when the source contains code and the code policy permits it.\n"
+        "Use these excerpts as the authoritative source for definitions, theorems, calculation techniques, shortcut methods, examples, equations, and code. "
+        "Ensure all specific formulas, calculation methods, derivations, and variations explicitly detailed in these excerpts are fully explained in the notes.\n"
         f"{source_excerpt}\n\n"
         if source_excerpt
         else ""
