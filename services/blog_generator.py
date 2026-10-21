@@ -83,6 +83,23 @@ def _extract_keywords(text: str) -> set[str]:
     return {t for t in tokens if len(t) >= 3 and t not in STOP_WORDS}
 
 
+def _sanitize_cliches(text: str) -> str:
+    """Sanitize and remove clichéd AI tropes, contrasting paradoxes, and gimmicky headings."""
+    if not text:
+        return text
+    patterns = [
+        (re.compile(r"###?\s+Why (.*?) Is a Feature, Not a Bug", re.IGNORECASE), r"### Structural Dynamics of \1"),
+        (re.compile(r"Is a Feature, Not a Bug", re.IGNORECASE), "Operates by Design"),
+        (re.compile(r"A Feature, Not a Bug", re.IGNORECASE), "An Architectural Trade-Off"),
+        (re.compile(r"###?\s+The (.*?) Paradox: Why (.*)", re.IGNORECASE), r"### Architectural Trade-offs in \1"),
+        (re.compile(r"It('?s| is) not about ([^,;]+)[,;]\s*it('?s| is) about", re.IGNORECASE), r"Beyond \2, the focus centers on"),
+    ]
+    cleaned = text
+    for pat, repl in patterns:
+        cleaned = pat.sub(repl, cleaned)
+    return cleaned
+
+
 def fetch_live_headlines(query: str, limit: int = 10) -> list[dict]:
     """
     Fetch live, real-time news headlines with URLs from RSS feeds.
@@ -231,12 +248,16 @@ def generate_single_blog_post(
         f"from THE LAST 48 HOURS ({current_date_str}). NEVER invent past dates or reference events as happening in past months.\n"
         "2. NEVER use repetitive, cookie-cutter section headings. STRICTLY FORBIDDEN: 'TL;DR', 'The Breakdown', 'Why It Matters', "
         "'Conclusion', 'Summary', 'Deep Dive', or 'Looking Ahead' as section titles.\n"
-        "3. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
-        "4. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
+        "3. NO CONTRASTING OR PARADOXICAL AI CLICHÉS. STRICTLY FORBIDDEN: Tropes like 'Why X is a feature, not a bug', "
+        "'X is not what you think', 'The [Noun] Paradox', 'It is not about X, it is about Y', 'Double-edged sword', "
+        "or pseudo-philosophical antithesis statements in headings or body text. Headings must be grounded, authoritative, "
+        "and descriptive technical statements (e.g. 'Market Saturation and Compensation Distribution in Python' or 'Memory Overhead in Hot Loop Transpilation').\n"
+        "4. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
+        "5. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
         "'A testament to', 'Delve into', or 'Exciting times ahead'.\n"
-        "5. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
-        "6. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
-        "7. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
+        "6. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
+        "7. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
+        "8. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
     )
 
     user_prompt = (
@@ -291,10 +312,10 @@ def generate_single_blog_post(
         else:
             return None
 
-    title = str(data.get("title") or headline["title"]).strip()
+    title = _sanitize_cliches(str(data.get("title") or headline["title"]).strip())
     slug = slugify(str(data.get("slug") or title))[:220]
-    excerpt = str(data.get("excerpt") or "").strip()[:480]
-    markdown_content = str(data.get("markdown_content") or "").strip()
+    excerpt = _sanitize_cliches(str(data.get("excerpt") or "").strip()[:480])
+    markdown_content = _sanitize_cliches(str(data.get("markdown_content") or "").strip())
     tags = str(data.get("tags") or "").strip()[:240]
     author_name = str(data.get("author_name") or author_persona).strip()
 
