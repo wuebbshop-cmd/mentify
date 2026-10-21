@@ -37,13 +37,6 @@ jobs:
           DJANGO_SETTINGS_MODULE: config.settings.production
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY || 'gha-blog-runner-temporary-secret-key-xyz987' }}
           ALLOWED_HOSTS: '*'
-          # Primary Database (for fallback or model validation)
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_PORT: ${{ secrets.DB_PORT || '3306' }}
-          DB_SSL: ${{ secrets.DB_SSL || 'True' }}
           # Substitute Database (Aiven - where blogs are stored)
           SUB_DB_HOST: ${{ secrets.SUB_DB_HOST }}
           SUB_DB_NAME: ${{ secrets.SUB_DB_NAME || 'mentify' }}

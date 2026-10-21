@@ -86,38 +86,53 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 # --- Database - MySQL (mysqlclient, utf8mb4) -------------------------------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get("DB_NAME", "Mentify"),
-        "USER": os.environ.get("DB_USER", "root"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DB_PORT", "3306"),
-        "OPTIONS": {
-            "charset": "utf8mb4",
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            **({"ssl": {}} if os.environ.get("DB_SSL", "").lower() in ("true", "1", "yes") else {}),
-        },
-        "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
-        "CONN_HEALTH_CHECKS": True,
-    }
-}
+def _clean_db_env(key: str, default: str = "") -> str:
+    val = os.environ.get(key)
+    if val is None:
+        return default
+    return str(val).strip()
 
-if os.environ.get("SUB_DB_HOST"):
+
+if _clean_db_env("DB_HOST"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": _clean_db_env("DB_NAME", "Mentify"),
+            "USER": _clean_db_env("DB_USER", "root"),
+            "PASSWORD": _clean_db_env("DB_PASSWORD", ""),
+            "HOST": _clean_db_env("DB_HOST", "127.0.0.1"),
+            "PORT": _clean_db_env("DB_PORT", "3306"),
+            "OPTIONS": {
+                "charset": "utf8mb4",
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                **({"ssl": {}} if _clean_db_env("DB_SSL").lower() in ("true", "1", "yes") else {}),
+            },
+            "CONN_MAX_AGE": int(_clean_db_env("DB_CONN_MAX_AGE", "60") or 60),
+            "CONN_HEALTH_CHECKS": True,
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+
+if _clean_db_env("SUB_DB_HOST"):
     DATABASES["substitute"] = {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get("SUB_DB_NAME", "mentify"),
-        "USER": os.environ.get("SUB_DB_USER", "root"),
-        "PASSWORD": os.environ.get("SUB_DB_PASSWORD", ""),
-        "HOST": os.environ.get("SUB_DB_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("SUB_DB_PORT", "3306"),
+        "NAME": _clean_db_env("SUB_DB_NAME", "mentify"),
+        "USER": _clean_db_env("SUB_DB_USER", "root"),
+        "PASSWORD": _clean_db_env("SUB_DB_PASSWORD", ""),
+        "HOST": _clean_db_env("SUB_DB_HOST", "127.0.0.1"),
+        "PORT": _clean_db_env("SUB_DB_PORT", "3306"),
         "OPTIONS": {
             "charset": "utf8mb4",
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            **({"ssl": {}} if os.environ.get("SUB_DB_SSL", "").lower() in ("true", "1", "yes") else {}),
+            **({"ssl": {}} if _clean_db_env("SUB_DB_SSL").lower() in ("true", "1", "yes") else {}),
         },
-        "CONN_MAX_AGE": int(os.environ.get("SUB_DB_CONN_MAX_AGE", "60")),
+        "CONN_MAX_AGE": int(_clean_db_env("SUB_DB_CONN_MAX_AGE", "60") or 60),
         "CONN_HEALTH_CHECKS": True,
     }
 
