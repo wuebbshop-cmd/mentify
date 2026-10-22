@@ -44,8 +44,8 @@ def blog_index(request):
 
     featured_post = None
     if not q and not category_slug:
-        # Only pin a post explicitly marked is_featured=True -- never fall back to newest post
-        featured_post = Post.objects.filter(is_published=True, is_featured=True).select_related("category").first()
+        # Hero = the most recently published post (rotates daily with new AI content)
+        featured_post = posts.first()
         if featured_post:
             posts = posts.exclude(pk=featured_post.pk)
 
