@@ -27,7 +27,7 @@ def blog_index(request):
     q = request.GET.get("q", "").strip()
     category_slug = request.GET.get("category", "").strip()
 
-    posts = Post.objects.filter(is_published=True).select_related("category")
+    posts = Post.objects.filter(is_published=True).select_related("category").order_by("-published_at")
 
     if q:
         posts = posts.filter(
@@ -44,15 +44,14 @@ def blog_index(request):
 
     featured_post = None
     if not q and not category_slug:
-        featured_post = posts.filter(is_featured=True).first()
-        if not featured_post and posts.exists():
-            featured_post = posts.first()
+        # Only pin a post explicitly marked is_featured=True -- never fall back to newest post
+        featured_post = Post.objects.filter(is_published=True, is_featured=True).select_related("category").first()
         if featured_post:
             posts = posts.exclude(pk=featured_post.pk)
 
     categories = Category.objects.all()
 
-    paginator = Paginator(posts, 9)
+    paginator = Paginator(posts, 4)  # 4 posts per page; hero excluded and floats above
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -104,9 +103,9 @@ def post_detail(request, slug):
 def category_detail(request, slug):
     """Articles archive for a specific Category."""
     category = get_object_or_404(Category, slug=slug)
-    posts = Post.objects.filter(category=category, is_published=True)
+    posts = Post.objects.filter(category=category, is_published=True).order_by("-published_at")
 
-    paginator = Paginator(posts, 9)
+    paginator = Paginator(posts, 4)  # 4 posts per page
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
