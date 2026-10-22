@@ -6,29 +6,29 @@
 {% block meta_description %}Read articles and tutorials on {{ category.name }} from {{ PLATFORM_NAME }}.{% endblock %}
 
 {% block content %}
-<div class="container py-8">
+<div class="container py-8" style="box-sizing: border-box; max-width: 1240px; margin: 0 auto; padding-left: clamp(12px, 3vw, 24px); padding-right: clamp(12px, 3vw, 24px);">
   <!-- Category Header -->
-  <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
+  <div style="text-align: center; max-width: 700px; margin: 0 auto 2.25rem;">
     <span class="badge badge-green" style="margin-bottom: 0.75rem; display: inline-flex; align-items: center; gap: 6px;">
       Topic Category
     </span>
-    <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; color: var(--text);">
+    <h1 style="font-size: clamp(1.65rem, 5vw, 2.25rem); font-weight: 800; margin-bottom: 0.75rem; color: var(--text);">
       {{ category.name }}
     </h1>
     {% if category.description %}
-    <p style="color: var(--text-muted); font-size: 1.05rem; margin: 0;">
+    <p style="color: var(--text-muted); font-size: clamp(0.95rem, 2.5vw, 1.05rem); margin: 0; line-height: 1.5;">
       {{ category.description }}
     </p>
     {% endif %}
   </div>
 
   <!-- Category Filter Bar -->
-  <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem;">
-    <a href="{% url 'blog:index' %}" class="badge badge-gray" style="text-decoration: none; padding: 6px 14px; font-size: 0.85rem;">
+  <div class="blog-category-chips" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;">
+    <a href="{% url 'blog:index' %}" class="badge badge-gray" style="text-decoration: none; padding: 6px 14px; font-size: 0.85rem; white-space: nowrap;">
       All Topics
     </a>
     {% for cat in categories %}
-      <a href="{% url 'blog:category_detail' cat.slug %}" class="badge {% if cat.slug == category.slug %}badge-green{% else %}badge-gray{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 0.85rem;">
+      <a href="{% url 'blog:category_detail' cat.slug %}" class="badge {% if cat.slug == category.slug %}badge-green{% else %}badge-gray{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 0.85rem; white-space: nowrap;">
         {{ cat.name }}
       </a>
     {% endfor %}
@@ -36,24 +36,22 @@
 
   <!-- Articles Grid -->
   {% if page_obj %}
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+  <div class="blog-card-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
     {% for post in page_obj %}
-    <div class="card" style="display: flex; flex-direction: column; padding: 0; overflow: hidden; height: 100%; border-radius: var(--radius-md);">
+    <div class="card" style="display: flex; flex-direction: column; padding: 0; overflow: hidden; height: 100%; border-radius: var(--radius-md); transition: transform 0.2s, box-shadow 0.2s;">
       <a href="{% url 'blog:detail' post.slug %}" style="text-decoration: none; display: block; aspect-ratio: 16/9; width: 100%; background: var(--bg-surface); border-bottom: 1px solid var(--border); overflow: hidden;">
         {% if post.featured_image_url %}
-          <img src="{{ post.featured_image_url }}" alt="{{ post.title }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <img src="{{ post.featured_image_url }}" alt="{{ post.title }}" loading="lazy" referrerpolicy="no-referrer" onerror="handleBlogImageError(this, '{{ category.slug }}')" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         {% else %}
-          <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, rgba(15,118,110,0.8), rgba(13,35,64,0.9)); color:#fff; font-weight:800; font-size:1.5rem;">
-            {{ PLATFORM_NAME }}
-          </div>
+          <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" alt="{{ post.title }}" loading="lazy" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         {% endif %}
       </a>
       <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; flex-wrap: wrap;">
           <span class="badge badge-green" style="font-size: 0.7rem; padding: 2px 8px;">{{ category.name }}</span>
           <span>{{ post.reading_time_minutes }} min read</span>
         </div>
-        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4;">
+        <h3 style="font-size: 1.12rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4; overflow-wrap: break-word; word-break: break-word;">
           <a href="{% url 'blog:detail' post.slug %}" style="text-decoration: none; color: var(--text);">
             {{ post.title }}
           </a>
@@ -61,7 +59,7 @@
         <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem; line-height: 1.5; flex: 1;">
           {{ post.excerpt|default:post.markdown_content|truncatewords:22 }}
         </p>
-        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 6px;">
           <span>By {{ post.get_author_display_name }}</span>
           <span>{{ post.published_at|date:"M d, Y" }}</span>
         </div>
@@ -72,17 +70,17 @@
 
   <!-- Pagination Controls -->
   {% if page_obj.has_other_pages %}
-  <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 3rem;">
+  <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 3rem; flex-wrap: wrap;">
     {% if page_obj.has_previous %}
-      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline" style="padding: 6px 14px;">&laquo; Previous</a>
+      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem;">&laquo; Previous</a>
     {% endif %}
     
-    <span class="btn btn-outline" style="padding: 6px 14px; opacity: 0.7; pointer-events: none;">
+    <span class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem; opacity: 0.7; pointer-events: none;">
       Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
     </span>
 
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline" style="padding: 6px 14px;">Next &raquo;</a>
+      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem;">Next &raquo;</a>
     {% endif %}
   </div>
   {% endif %}
@@ -97,4 +95,17 @@
   </div>
   {% endif %}
 </div>
+
+<script>
+function handleBlogImageError(img, category) {
+  img.onerror = null;
+  var fallbacks = {
+    'ai-automation': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80',
+    'programming-tech': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80',
+    'career-industry': 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
+    'academia': 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80'
+  };
+  img.src = fallbacks[category] || fallbacks['ai-automation'];
+}
+</script>
 {% endblock %}

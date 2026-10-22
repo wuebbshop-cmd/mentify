@@ -250,8 +250,21 @@ def resolve_blog_preview_image(
                         if og_url.startswith("http") and not any(
                             p in og_url.lower() for p in ("1x1", "favicon", "avatar", "icon", "placeholder", "logo")
                         ):
-                            logger.info(f"[Blog Generator] Resolved authentic og:image for '{title[:40]}'")
-                            return og_url
+                            # Verify that og:image is actually publicly accessible without 403/404/SSL errors
+                            try:
+                                check_req = urllib.request.Request(
+                                    og_url,
+                                    headers={
+                                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                                        "Accept": "image/avif,image/webp,image/*,*/*;q=0.8",
+                                    },
+                                )
+                                with urllib.request.urlopen(check_req, timeout=4) as check_resp:
+                                    if check_resp.status == 200:
+                                        logger.info(f"[Blog Generator] Resolved and verified authentic og:image for '{title[:40]}'")
+                                        return og_url
+                            except Exception as ver_err:
+                                logger.warning(f"[Blog Generator] og:image inaccessible ({ver_err}) for {og_url[:50]}, falling back to keyword Unsplash")
         except Exception as e:
             logger.debug(f"[Blog Generator] og:image extraction failed for {resolved_link[:40]}: {e}")
 

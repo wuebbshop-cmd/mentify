@@ -2843,21 +2843,148 @@ body.dark-theme input[type="file"]::-webkit-file-upload-button:hover {
   box-shadow: var(--shadow-md);
 }
 
-.blog-article-content table {
+/* ── Responsive Markdown Tables & Horizontal Scrolling (Identical to Mentify Prep Notes) ── */
+.markdown-table-wrapper {
+  display: block;
   width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border);
+  background: var(--bg-surface, var(--surface, #fff));
+  position: relative;
+  box-sizing: border-box;
+}
+
+.markdown-table-wrapper::-webkit-scrollbar,
+.blog-article-content table::-webkit-scrollbar {
+  height: 6px;
+}
+
+.markdown-table-wrapper::-webkit-scrollbar-thumb,
+.blog-article-content table::-webkit-scrollbar-thumb {
+  background: var(--green, #0f766e);
+  border-radius: 4px;
+}
+
+.markdown-table-wrapper::-webkit-scrollbar-track,
+.blog-article-content table::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.markdown-table-wrapper,
+.blog-article-content table {
+  scrollbar-width: thin;
+  scrollbar-color: var(--green, #0f766e) rgba(0, 0, 0, 0.05);
+}
+
+/* Table inside .markdown-table-wrapper: expands to content width so wrapper scrolls horizontally */
+.markdown-table-wrapper table,
+.blog-article-content .markdown-table-wrapper table {
+  display: table !important;
+  width: max-content !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  border-collapse: collapse !important;
+  margin: 0 !important;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  border: none !important;
+}
+
+/* Direct fallback if table has no wrapper: display block with overflow-x auto */
+.blog-article-content table:not(.markdown-table-wrapper table) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   border-collapse: collapse;
   margin: 1.5rem 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
 }
 
 .blog-article-content th,
-.blog-article-content td {
-  padding: 0.75rem 1rem;
+.blog-article-content td,
+.markdown-table-wrapper th,
+.markdown-table-wrapper td {
+  padding: 10px 16px;
   border: 1px solid var(--border);
   text-align: left;
+  vertical-align: middle;
+  white-space: nowrap; /* Crucial: stops narrow crushing on mobile */
 }
 
-.blog-article-content th {
-  background: var(--bg-surface, #f9fafb);
+.blog-article-content th,
+.markdown-table-wrapper th {
+  background: rgba(15, 118, 110, 0.08);
   font-weight: 700;
+  color: var(--text);
+}
+
+/* ── Mobile Layout Adjustments for Blog ────────────────────────────── */
+@media (max-width: 768px) {
+  .blog-article-content {
+    font-size: 1rem;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .blog-article-content h1 {
+    font-size: 1.6rem;
+    margin-top: 1.75rem;
+  }
+
+  .blog-article-content h2 {
+    font-size: 1.35rem;
+    margin-top: 1.5rem;
+  }
+
+  .blog-article-content h3 {
+    font-size: 1.15rem;
+    margin-top: 1.25rem;
+  }
+
+  .blog-article-content pre {
+    padding: 1rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 6px !important;
+    max-width: 100%;
+  }
+
+  .blog-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .blog-hero-image-wrap {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+
+  .blog-hero-body {
+    padding: 1.25rem !important;
+  }
+
+  .blog-card-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .blog-category-chips {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .blog-category-chips::-webkit-scrollbar {
+    height: 4px;
+  }
 }
