@@ -112,6 +112,24 @@ def _sanitize_cliches(text: str) -> str:
     return cleaned
 
 
+def _strip_code_blocks(text: str) -> str:
+    """Strip fenced code blocks and dangling lead-in sentences from blog articles.
+    Readers visit the blog for information and analysis, not coding tutorials.
+    """
+    if not text:
+        return text
+    # Remove lead-in sentences ending with a colon immediately followed by a code block
+    lead_in_pattern = re.compile(
+        r"(?:^|\n)[^\n]{1,160}:\s*\n+```[\s\S]*?```",
+        re.IGNORECASE
+    )
+    cleaned = lead_in_pattern.sub("", text)
+    cleaned = re.sub(r"```[a-zA-Z0-9_-]*\n[\s\S]*?\n```", "", cleaned)
+    cleaned = re.sub(r"```[\s\S]*?```", "", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
 UNSPLASH_FALLBACK_POOLS = {
     "ai-automation": [
         "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
@@ -445,7 +463,7 @@ def generate_single_blog_post(
         "5. Invent STORY-SPECIFIC, insightful Markdown subheadings (H2, H3) that describe the actual mechanics, trade-offs, and technical specifics.\n"
         "6. Write with depth, voice, and narrative rhythm. Vary sentence length and structure. Avoid AI clichés like 'In this fast-paced world', "
         "'A testament to', 'Delve into', or 'Exciting times ahead'.\n"
-        "7. Include concrete technical context: architectures, memory trade-offs, latency numbers, benchmarks, or command-line/code snippets where appropriate.\n"
+        "7. STRICT PROSE ONLY (NO CODE SNIPPETS): Readers visit the blog for information, industry insights, and high-level analysis, NOT for coding tutorials. NEVER include code snippets, scripts, terminal commands, or fenced code blocks (```python, ```bash, etc.). Present technical context through narrative prose, metrics, memory/latency benchmarks, or Markdown comparison tables instead.\n"
         "8. Naturally integrate verified external references to the primary news source and related documentation using Markdown hyperlinks.\n"
         "9. Return strictly valid JSON containing: 'title', 'slug', 'excerpt', 'markdown_content', 'tags', 'author_name'."
     )
@@ -465,7 +483,7 @@ def generate_single_blog_post(
         '  "excerpt": "2-3 crisp sentences summarizing the technical breakthrough for social share cards",\n'
         '  "tags": "3 to 5 comma-separated tags (e.g. LLMs, Open Source, DeepSeek, Cloud)",\n'
         '  "author_name": "Author name matching the persona",\n'
-        '  "markdown_content": "Full article body in Markdown with custom H2/H3 headings, code/tables where relevant, and markdown citations."\n'
+        '  "markdown_content": "Full article body in Markdown with custom H2/H3 headings, comparison tables where relevant, and markdown citations. ZERO CODE BLOCKS OR SNIPPETS ALLOWED (purely informative narrative prose)."\n'
         "}\n\n"
         "Return ONLY the JSON object. Do not wrap in markdown fences or include explanations."
     )
@@ -505,7 +523,7 @@ def generate_single_blog_post(
     title = _sanitize_cliches(str(data.get("title") or headline["title"]).strip())
     slug = slugify(str(data.get("slug") or title))[:220]
     excerpt = _sanitize_cliches(str(data.get("excerpt") or "").strip()[:480])
-    markdown_content = _sanitize_cliches(str(data.get("markdown_content") or "").strip())
+    markdown_content = _strip_code_blocks(_sanitize_cliches(str(data.get("markdown_content") or "").strip()))
     tags = str(data.get("tags") or "").strip()[:240]
     author_name = str(data.get("author_name") or author_persona).strip()
 
