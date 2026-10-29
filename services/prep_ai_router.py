@@ -2417,18 +2417,21 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             continue
         payload_signature = str(payload.get("source_signature") or "")
         payload_validation_state = str(payload.get("validation_state") or "")
-        is_exact_signature = (payload_signature == source_signature)
+
+        matches_profile = (
+            int(payload.get("study_profile_version", 0) or 0) == _course_study_profile_version(topic_obj.course)
+            and int(payload.get("topic_content_rules_version", 0) or 0) == _topic_content_rules_version(topic_obj)
+        )
+        is_exact_signature = (payload_signature == source_signature) and matches_profile
+
         if payload_validation_state:
-            if payload_validation_state != NOTE_VALIDATION_STATE:
+            if payload_validation_state != NOTE_VALIDATION_STATE and validated_only:
                 continue
             if not is_exact_signature and (level in levels or level in fallback_levels):
                 continue
         elif validated_only:
             continue
-        if int(payload.get("study_profile_version", 0) or 0) != _course_study_profile_version(topic_obj.course):
-            continue
-        if int(payload.get("topic_content_rules_version", 0) or 0) != _topic_content_rules_version(topic_obj):
-            continue
+
         validation_options = _note_validation_options(
             topic_obj.course,
             topic_obj.title,
@@ -2450,12 +2453,13 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
-        content = _rewrite_embedded_visual_urls(content, validation_options["source_references"])
-        content_issues = _note_completion_issues(content, topic_obj.title, **validation_options)
-        if content_issues:
-            # A new policy can invalidate an older published row without
-            # changing the underlying syllabus source.
+        if not content:
             continue
+        content = _rewrite_embedded_visual_urls(content, validation_options["source_references"])
+        if is_exact_signature:
+            content_issues = _note_completion_issues(content, topic_obj.title, **validation_options)
+            if content_issues:
+                continue
         if is_exact_signature:
             if content != payload.get("content"):
                 payload = dict(payload)
