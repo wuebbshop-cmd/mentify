@@ -324,24 +324,43 @@ def _render_artifact(payload: dict) -> bytes:
 
 
 def _upload_artifact(topic: PrepTopic, artifact_type: str, level: str, signature: str, pdf_bytes: bytes) -> str:
-    from services.github_service import GitHubService
+    """
+    Upload a rendered PDF artifact.
+    Prefers Cloudflare R2 when credentials are present; falls back to GitHub.
+    Returns the storage key saved in PrepTopicPdfArtifact.github_path.
+    """
+    from services.cloudflare_storage import is_cloudflare_r2_configured, CloudflareR2MediaStorage
 
+    storage_dir = getattr(settings, "PREP_PDF_STORAGE_DIR", "prep-pdfs").strip("/")
+    course_slug = slugify(topic.course.code) or f"course-{topic.course_id}"
+    topic_slug = slugify(topic.title)[:80] or f"topic-{topic.pk}"
+    filename = f"{artifact_type}-{level or 'all'}-{signature[:24]}.pdf"
+    key = f"{storage_dir}/{course_slug}/{topic.pk}-{topic_slug}/{filename}"
+
+    if is_cloudflare_r2_configured():
+        storage = CloudflareR2MediaStorage()
+        storage.save_existing(key, pdf_bytes, content_type="application/pdf")
+        logger.info("PDF artifact uploaded to Cloudflare R2: %s", key)
+        return key
+
+    # Fallback: GitHub
+    from services.github_service import GitHubService
     token = getattr(settings, "GITHUB_TOKEN", "").strip()
     repo = getattr(settings, "GITHUB_REPO", "").strip()
     branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
     upload_dir = getattr(settings, "GITHUB_UPLOAD_DIR", "uploads").strip("/")
-    storage_dir = getattr(settings, "PREP_PDF_STORAGE_DIR", "prep-pdfs").strip("/")
     if not token or not repo:
-        raise RuntimeError("GITHUB_TOKEN and GITHUB_REPO are required to publish PDF artifacts.")
-    course_slug = slugify(topic.course.code) or f"course-{topic.course_id}"
-    topic_slug = slugify(topic.title)[:80] or f"topic-{topic.pk}"
-    filename = f"{artifact_type}-{level or 'all'}-{signature[:24]}.pdf"
-    repo_path = f"{upload_dir}/{storage_dir}/{course_slug}/{topic.pk}-{topic_slug}/{filename}"
+        raise RuntimeError(
+            "No PDF storage configured: set Cloudflare R2 credentials "
+            "(CF_Access_Key_ID / CF_Secret_Access_Key / CF_Endpoint) or GitHub credentials."
+        )
+    repo_path = f"{upload_dir}/{key}"
     GitHubService(token=token, repo_name=repo, branch=branch, upload_dir=upload_dir).upload_bytes(
         repo_path,
         pdf_bytes,
         f"[Mentify] Publish {artifact_type} PDF for topic {topic.pk} ({signature[:12]})",
     )
+    logger.info("PDF artifact uploaded to GitHub: %s", repo_path)
     return repo_path
 
 
@@ -441,13 +460,31 @@ def process_next_pdf_artifact() -> bool:
 
 
 def github_pdf_bytes(repo_path: str) -> bytes:
-    """Read a ready PDF through the configured authenticated GitHub repository."""
-    from services.github_service import GitHubService
+    """
+    Download a stored PDF artifact.
+    Checks Cloudflare R2 first (O(1) GET), then falls back to GitHub for legacy paths.
+    The field name is kept as `github_path` for database compatibility.
+    """
+    from services.cloudflare_storage import is_cloudflare_r2_configured, CloudflareR2MediaStorage
 
+    clean = repo_path.lstrip("/")
+
+    # Try R2 first — fast, zero egress fee
+    if is_cloudflare_r2_configured():
+        try:
+            storage = CloudflareR2MediaStorage()
+            data = storage.download_bytes(clean)
+            if data and data[:4] == b"%PDF":
+                return data
+        except Exception:
+            pass  # fall through to GitHub
+
+    # Fallback: GitHub (legacy or not-yet-migrated artifacts)
+    from services.github_service import GitHubService
     token = getattr(settings, "GITHUB_TOKEN", "").strip()
     repo = getattr(settings, "GITHUB_REPO", "").strip()
     branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
     if not token or not repo:
-        raise RuntimeError("GitHub PDF storage is not configured.")
-    stored_path = f"github://{repo}/{branch}/{repo_path.lstrip('/')}"
+        raise RuntimeError("PDF artifact not found in Cloudflare R2 and GitHub credentials are not configured.")
+    stored_path = f"github://{repo}/{branch}/{clean}"
     return GitHubService(token=token, repo_name=repo, branch=branch).download_file(stored_path)

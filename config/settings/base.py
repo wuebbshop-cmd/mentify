@@ -193,6 +193,47 @@ STORAGES = {
     },
 }
 
+# ─── Cloudflare R2 Object Storage ─────────────────────────────────────────────
+CF_ACCESS_KEY_ID = (
+    os.environ.get("CF_Access_Key_ID")
+    or os.environ.get("CF_ACCESS_KEY_ID")
+    or os.environ.get("CD_Access_Key_ID")
+    or os.environ.get("CD_ACCESS_KEY_ID")
+    or ""
+).strip()
+CF_SECRET_ACCESS_KEY = (
+    os.environ.get("CF_Secret_Access_Key")
+    or os.environ.get("CF_SECRET_ACCESS_KEY")
+    or os.environ.get("CD_Secret_Access_Key")
+    or os.environ.get("CD_SECRET_ACCESS_KEY")
+    or ""
+).strip()
+CF_ENDPOINT = (
+    os.environ.get("CF_Endpoint")
+    or os.environ.get("CF_ENDPOINT")
+    or os.environ.get("CD_Endpoint")
+    or os.environ.get("CD_ENDPOINT")
+    or ""
+).strip()
+CF_BUCKET_NAME = (
+    os.environ.get("CF_BUCKET_NAME")
+    or os.environ.get("CF_Bucket")
+    or os.environ.get("CD_BUCKET_NAME")
+    or os.environ.get("CD_Bucket")
+    or ""
+).strip()
+CF_PUBLIC_URL = (
+    os.environ.get("CF_PUBLIC_URL")
+    or os.environ.get("CD_PUBLIC_URL")
+    or ""
+).strip().rstrip("/")
+USE_CLOUDFLARE_R2 = bool(CF_ACCESS_KEY_ID and CF_SECRET_ACCESS_KEY and CF_ENDPOINT)
+
+if USE_CLOUDFLARE_R2:
+    STORAGES["default"] = {
+        "BACKEND": "services.cloudflare_storage.CloudflareR2MediaStorage",
+    }
+
 
 # --- Caching -------------------------------------------------------------------------------
 CACHES = {

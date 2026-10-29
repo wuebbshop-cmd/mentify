@@ -38,14 +38,22 @@ ALLOWED_HOSTS = list(set(
 
 # Database: production uses MySQL from DB_* environment variables in base.py.
 
-# Render's local filesystem is ephemeral. Keep uploaded PDFs and generated
-# visual crops on the configured durable GitHub media store instead.
-STORAGES = {
-    **STORAGES,
-    "default": {
-        "BACKEND": "services.github_media_storage.GitHubMediaStorage",
-    },
-}
+# Render's local filesystem is ephemeral.
+# Cloudflare R2 is the primary object storage for uploaded PDFs, visual crops, and notes PDFs.
+if USE_CLOUDFLARE_R2:
+    STORAGES = {
+        **STORAGES,
+        "default": {
+            "BACKEND": "services.cloudflare_storage.CloudflareR2MediaStorage",
+        },
+    }
+else:
+    STORAGES = {
+        **STORAGES,
+        "default": {
+            "BACKEND": "services.github_media_storage.GitHubMediaStorage",
+        },
+    }
 
 # Security: HTTPS and HSTS.
 SECURE_SSL_REDIRECT = True

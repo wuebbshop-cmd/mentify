@@ -10,6 +10,7 @@ from django.contrib.staticfiles import finders
 from django.http import FileResponse, Http404
 from accounts.sitemap_views import sitemap, robots_txt, llms_txt
 from services.cdn_views import assets_proxy, github_asset_proxy
+from services.cloudflare_views import cloudflare_asset_proxy
 from services.chat_views import chatbot_api_view
 from accounts.views import contact_page, privacy_policy, terms_of_service, cookie_policy
 from prep.internal_views import internal_ingest_document_api, internal_worker_health_api
@@ -48,9 +49,22 @@ def static_fallback_serve(request, path):
 
 def media_fallback_serve(request, path):
     """
-    Serve media files from local disk if present; otherwise stream from GitHub storage proxy
-    and cache locally so subsequent loads are instant.
+    Serve media files from Cloudflare R2 if configured, local disk, or GitHub storage proxy.
     """
+    clean_path = str(path or "").lstrip("/")
+
+    # 1. Check Cloudflare R2
+    try:
+        from services.cloudflare_storage import is_cloudflare_r2_configured
+        if is_cloudflare_r2_configured():
+            try:
+                return cloudflare_asset_proxy(request, clean_path)
+            except Http404:
+                pass
+    except Exception:
+        pass
+
+    # 2. Check local MEDIA_ROOT
     try:
         return static_serve(
             request,
@@ -60,7 +74,7 @@ def media_fallback_serve(request, path):
     except Http404:
         pass
 
-    clean_path = str(path or "").lstrip("/")
+    # 3. Fallback to GitHub for legacy assets
     candidates = [
         clean_path,
         f"mentify-uploads/{clean_path}".replace("mentify-uploads/mentify-uploads/", "mentify-uploads/"),
@@ -81,7 +95,7 @@ def media_fallback_serve(request, path):
         except Exception:
             continue
 
-    raise Http404(f"Media file '{path}' not found locally or on GitHub.")
+    raise Http404(f"Media file '{path}' not found in Cloudflare R2, locally, or on GitHub.")
 
 
 def favicon(request):
@@ -127,6 +141,13 @@ urlpatterns = [
     
     # SEO: Google Search Console verification
     path('google20c3024f708d9e69.html', lambda request: static_serve(request, 'google20c3024f708d9e69.html', document_root=settings.BASE_DIR)),
+
+    # Cloudflare R2 asset proxy (uploaded PDFs, visual crops, notes PDFs)
+    path(
+        "cdn/cloudflare/<path:filepath>",
+        cloudflare_asset_proxy,
+        name="cloudflare_asset_proxy",
+    ),
 
     # GitHub asset proxy (course banners, avatars, etc.)
     path(
