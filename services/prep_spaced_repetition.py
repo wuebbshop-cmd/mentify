@@ -55,8 +55,16 @@ def get_due_spaced_cards(user, topic=None, limit: int = 10):
     """
     from prep.models import PrepStudentSpacedCard
     now = timezone.now()
+    # STRICT: Only show topic-level cards manually added from the notes page via "Add to Daily Revision Deck".
+    # Exclude any cards originating from drills or exam questions.
     qs = (
-        PrepStudentSpacedCard.objects.filter(user=user, due_date__lte=now, question__isnull=True)
+        PrepStudentSpacedCard.objects.filter(
+            user=user,
+            due_date__lte=now,
+            question__isnull=True,
+            quiz_question__isnull=True,
+        )
+        .exclude(card_title__startswith="Drill:")
         .select_related("topic", "topic__course")
     )
     if topic:

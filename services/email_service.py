@@ -72,16 +72,12 @@ def send_email_notification(
 
 
 def send_welcome_email(user) -> bool:
-    platform = getattr(settings, "PLATFORM_NAME", "Mentify")
-    subject = f"Welcome to {platform}"
-    body = (
-        f"Hello {user.first_name or 'there'},\n\n"
-        f"Thank you for joining {platform}. Your account is ready and you can now "
-        f"sign in with your email address.\n\n"
-        "If you did not create this account, you can ignore this email.\n\n"
-        f"Welcome aboard,\nThe {platform} Team"
-    )
-    return send_email_notification(subject, user.email, body)
+    """
+    Suppressed to preserve Resend free-tier API quota for essential transactional emails.
+    Account readiness is already confirmed on screen after signup.
+    """
+    logger.info("Welcome email suppressed for %s to preserve Resend free-tier quota.", getattr(user, "email", "user"))
+    return True
 
 
 def send_email_verification_email(user, verification_url: str) -> bool:
@@ -107,34 +103,18 @@ def send_email_verification_email(user, verification_url: str) -> bool:
 
 
 def send_prep_note_generation_failure_email(guard) -> bool:
-    """Alert configured notification recipients when a topic requires review."""
-    recipients = list(dict.fromkeys(
-        email.strip().lower()
-        for email in getattr(settings, "ADMIN_EMAILS_NOTIFICATIONS", [])
-        if email and email.strip()
-    ))
-    if not recipients:
-        logger.warning("No ADMIN_EMAILS_NOTIFICATIONS configured for Prep note-generation failure alerts.")
-        return False
-
-    from django.urls import reverse
-
-    topic = guard.topic
-    course = topic.course
-    base_url = getattr(settings, "BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-    review_url = base_url + reverse("admin:prep_prepnotegenerationguard_change", args=[guard.pk])
-    subject = f"[Mentify Prep] Notes need review: {course.code} - {topic.title} ({guard.level})"
-    body = (
-        "Validated notes could not be generated after the configured retry limit.\n\n"
-        f"Course: {course.code} - {course.title}\n"
-        f"Topic: {topic.title}\n"
-        f"Level: {guard.level}\n"
-        f"Failed cycles: {guard.failed_attempts}\n"
-        f"Last error: {guard.last_error or 'No error details recorded.'}\n\n"
-        f"Review or reset the generation guard here:\n{review_url}\n"
+    """
+    Suppressed to preserve admin Resend free-tier quota.
+    Generation failures are already recorded in PrepNoteGenerationGuard in the database
+    and visible in the Django Admin review queue without wasting email API credits.
+    """
+    logger.info(
+        "Note generation review needed for guard %s (%s - %s). Logged to database; email suppressed to preserve quota.",
+        getattr(guard, "pk", None),
+        getattr(getattr(guard, "topic", None), "title", "Unknown"),
+        getattr(guard, "level", "unknown"),
     )
-    results = [send_email_notification(subject, recipient, body) for recipient in recipients]
-    return all(results)
+    return True
 
 
 def send_payment_confirmation_email(payment) -> bool:
@@ -304,25 +284,8 @@ def send_prep_credit_topup_email(wallet, credits_added: int, amount_kes: int, re
 
 def send_prep_low_credits_email(wallet) -> bool:
     """
-    Send a low credit reminder when balance drops to 10 or below.
+    Suppressed to preserve Resend free-tier quota.
+    Low credit state is already prominently indicated in the in-app UI / credit pill.
     """
-    user = wallet.user
-    if not user or not user.email:
-        return False
-
-    platform = "Mentify Prep"
-    subject = f"[{platform}] Low Credit Reminder: {wallet.credits_balance} Credits Remaining"
-    base_url = getattr(settings, "BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-    billing_url = f"{base_url}/prep/billing/"
-
-    body = (
-        f"Hello {user.first_name or 'there'},\n\n"
-        f"You have {wallet.credits_balance} credits remaining in your Mentify Prep wallet.\n\n"
-        f"Remember: All past examination questions, verified proofs, and cached lecture notes in our database "
-        f"are 100% FREE (0 credits).\n\n"
-        f"If you need step-by-step mathematical derivations or new scanned exam uploads, "
-        f"you can top up instantly via M-Pesa (KES 150 for 100 credits):\n{billing_url}\n\n"
-        f"Best regards,\nThe {platform} Team"
-    )
-
-    return send_email_notification(subject, user.email, body)
+    logger.info("Low credit reminder email suppressed for user %s to preserve Resend quota.", getattr(wallet, "user_id", "unknown"))
+    return True

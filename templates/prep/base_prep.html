@@ -516,6 +516,30 @@
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div class="mobile-drawer-content">
+      {% if user.is_authenticated %}
+      <!-- Mobile User Profile & Subscription Plan Badge -->
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; margin-bottom: 8px; background: rgba(15, 118, 110, 0.06); border: 1px solid var(--border); border-radius: var(--radius, 8px);">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <div class="nav-avatar{% if user.avatar_url %} has-image{% endif %}" style="width: 34px; height: 34px; font-size: 0.82rem; flex-shrink: 0;">
+            {% if user.avatar_url %}
+            <img src="{{ user.avatar_url|public_asset_url }}" alt="{{ user.get_full_name }}">
+            {% else %}
+            {{ user.first_name|default:'P'|first|upper }}{{ user.last_name|default:''|first|upper }}
+            {% endif %}
+          </div>
+          <div style="min-width: 0;">
+            <div style="font-weight: 700; font-size: 0.88rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ user.first_name|default:'Student' }} {{ user.last_name|default:'' }}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ user.email }}</div>
+          </div>
+        </div>
+        {% if user_plan_badge %}
+        <span class="badge" style="font-size: 0.7rem; font-weight: 700; padding: 3px 9px; border-radius: 9999px; color: {{ user_plan_badge.color }}; background: {{ user_plan_badge.bg }}; border: 1px solid {{ user_plan_badge.border }}; flex-shrink: 0;" title="Current Mentify Prep Plan">
+          {{ user_plan_badge.label }}
+        </span>
+        {% endif %}
+      </div>
+      {% endif %}
+
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; margin-bottom: 8px;">
         <span style="font-size: .95rem; font-weight: 500; color: var(--text-muted);">Theme</span>
         <button id="theme-toggle-mobile" type="button" class="theme-toggle" title="Switch to Dark Mode" aria-label="Switch to dark mode">
@@ -540,9 +564,16 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
         Upload Material
       </a>
-      <a href="{% url 'prep:billing' %}" class="mobile-drawer-link {% if active_tab == 'billing' %}active{% endif %}">
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-        Credits &amp; Plans
+      <a href="{% url 'prep:billing' %}" class="mobile-drawer-link {% if active_tab == 'billing' %}active{% endif %}" style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          Credits &amp; Plans
+        </span>
+        {% if user_plan_badge %}
+        <span class="badge" style="font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px; color: {{ user_plan_badge.color }}; background: {{ user_plan_badge.bg }}; border: 1px solid {{ user_plan_badge.border }};">
+          {{ user_plan_badge.label }}
+        </span>
+        {% endif %}
       </a>
       <a href="{% url 'prep:metrics' %}" class="mobile-drawer-link {% if active_tab == 'metrics' %}active{% endif %}">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>

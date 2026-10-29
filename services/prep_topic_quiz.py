@@ -599,23 +599,7 @@ def evaluate_quiz_answer(
             if expl_summary.strip():
                 ans_text += f"\n{expl_summary.strip()}"
 
-            spaced_card, _ = PrepStudentSpacedCard.objects.get_or_create(
-                user=user,
-                topic=question.topic,
-                quiz_question=question,
-                defaults={
-                    "card_title": f"Drill: {question.topic.title} (Q{question.id})",
-                    "prompt_text": question.question_text,
-                    "answer_text": ans_text,
-                    "due_date": timezone.now(),
-                    "state": 0,
-                },
-            )
-            # Grade as "again" (lapse)
-            try:
-                review_spaced_card(spaced_card.id, user, "again")
-            except Exception as exc:
-                logger.warning(f"[Topic Quiz] Could not update spaced card for user {user.id}: {exc}")
+            # Drill questions are excluded from Daily Revision Deck by policy (notes only)
 
     # Build response with rich multi-line explanation
     raw_expl = question.explanation
