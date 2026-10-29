@@ -102,9 +102,11 @@ def settle_existing_course_costs(user, course) -> None:
 
 
 def is_trial_exempt_for_course_cost(wallet, cost_type: str, level: str = "") -> bool:
+    # Level 2 notes are 100% free for all students on all plans
+    if cost_type == "topic_notes" and level == "level_2":
+        return True
     return (
         cost_type in {"upload", "topic_notes"}
-        and (cost_type != "topic_notes" or level == "level_2")
         and wallet.current_plan in {"trial", "freemium"}
         and wallet.plan_expires_at is not None
         and wallet.plan_expires_at > timezone.now()

@@ -147,25 +147,9 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
             + "; ".join(validation_issues)
         )
 
-    if not result.get("cached") and job.level == "level_2":
-        signature = _topic_notes_cache_signature(
-            topic.course,
-            topic,
-            topic.title,
-            topic.subtopics,
-        )
-        cost = create_shared_course_cost(
-            course=topic.course,
-            cost_type="topic_notes",
-            total_credits=credits_for_usage(usage, minimum=1),
-            source_key=f"topic-notes:{topic.pk}:{job.level}:{signature}",
-            topic=topic,
-            level=job.level,
-            usage=usage,
-            model_name=model_name or "deepseek-chat",
-        )
-        for share in cost.shares.select_related("user", "cost").all():
-            settle_course_cost_share(share)
+    # Level 2 (Core Concepts) notes are 100% free for all students.
+    # Level 1 and Level 3 are charged flat on-demand token spending upon note fetch.
+    # Background worker precompute costs are absorbed by the platform.
 
     job.status = "complete"
     job.completed_at = timezone.now()

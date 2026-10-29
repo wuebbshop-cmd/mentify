@@ -40,6 +40,17 @@ SUBSCRIPTION_USAGE_LIMITS = {
     "pro":   {"document_uploads": None, "scanned_uploads": 30, "practice_questions": 350},
 }
 
+# Topic Notes Credit Consumption Rules:
+# - Level 2 (Core Concepts): 100% Free for all students on any plan.
+# - Level 1 (Foundation & Intuition): 2 credits flat token fee (one-time unlock per topic).
+# - Level 3 (Exam Focus & Worked Traps): 4 credits flat token fee (one-time unlock per topic).
+# Deducted ONLY and ONLY IF the notes are present and delivered from cache.
+NOTE_LEVEL_CREDIT_COSTS = {
+    "level_1": 2,
+    "level_2": 0,
+    "level_3": 4,
+}
+
 
 # ─── Exceptions ────────────────────────────────────────────────────────────────
 
