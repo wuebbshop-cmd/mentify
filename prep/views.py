@@ -3323,11 +3323,21 @@ def prep_topic_notes_api(request):
     if not note_content:
         # Notes are absent / awaiting background preparation
         if topic_obj:
-            PrepTopicNotesJob.objects.get_or_create(
+            from services.prep_ai_router import _topic_notes_cache_signature
+            sig = _topic_notes_cache_signature(
+                topic_obj.course, topic_obj, topic_obj.title, subtopics
+            )
+            job = PrepTopicNotesJob.objects.filter(
                 topic=topic_obj,
                 level=level,
-                defaults={"status": "pending", "course": topic_obj.course},
-            )
+            ).order_by("-queued_at", "-id").first()
+            if not job:
+                PrepTopicNotesJob.objects.create(
+                    topic=topic_obj,
+                    level=level,
+                    source_signature=sig,
+                    status="pending",
+                )
         label = NOTE_LEVEL_LABELS.get(level, level)
         return JsonResponse({
             "success": False,
