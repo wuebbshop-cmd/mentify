@@ -337,7 +337,28 @@
     }
   }
 
-  /* ── Quiz Feedback Drawer Math & Code Derivation Styles ───────────────────── */
+  @keyframes quizSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .quiz-spin {
+    animation: quizSpin 0.9s linear infinite;
+    transform-origin: center;
+    display: inline-block;
+  }
+  .quiz-option-item {
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease !important;
+  }
+  .quiz-option-item:hover:not(:disabled) {
+    border-color: #2563eb !important;
+    background: rgba(37, 99, 235, 0.04) !important;
+  }
+  body.dark-theme .quiz-option-item:hover:not(:disabled) {
+    border-color: #60a5fa !important;
+    background: rgba(96, 165, 250, 0.08) !important;
+  }
+
+  /* ── Quiz Feedback Drawer Math & Code Styles ────────────────────────────── */
   .quiz-feedback-drawer .quiz-summary-box p,
   .quiz-feedback-drawer .quiz-why-wrong-box p {
     margin-bottom: 10px;
@@ -4814,9 +4835,10 @@
             display: inline-flex; align-items: center; justify-content: center;
             width: 28px; height: 28px; border-radius: 50%; font-weight: 700;
             font-size: 0.85rem; background: var(--surface-2); border: 1px solid var(--border);
-            color: var(--text); flex-shrink: 0;
+            color: var(--text); flex-shrink: 0; transition: all 0.18s ease;
           ">${letter}</span>
           <div class="quiz-opt-text" style="flex: 1; min-width: 0; padding-top: 2px;"></div>
+          <span class="quiz-opt-status" style="display: none; align-items: center; margin-left: auto; flex-shrink: 0;"></span>
         `;
         const textSpan = optBtn.querySelector('.quiz-opt-text');
         const formattedOptText = formatQuizOptionText(optText);
@@ -4870,10 +4892,56 @@
     const optionsGrid = document.getElementById('quiz-options-grid');
     if (!optionsGrid) return;
     const buttons = optionsGrid.querySelectorAll('.quiz-option-item');
+    const selectedBtn = optionsGrid.querySelector(`.quiz-option-item[data-option="${selectedOption}"]`);
+
+    // 1. Immediate visual responsiveness: mark selected answer & display checking spinner
     buttons.forEach(btn => {
       btn.disabled = true;
       btn.style.cursor = 'default';
+      if (btn !== selectedBtn) {
+        btn.style.opacity = '0.5';
+      }
     });
+
+    if (selectedBtn) {
+      selectedBtn.style.borderColor = '#2563eb';
+      selectedBtn.style.background = 'rgba(37, 99, 235, 0.08)';
+      selectedBtn.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.2)';
+      const letterBadge = selectedBtn.querySelector('.quiz-opt-letter');
+      if (letterBadge) {
+        letterBadge.style.background = '#2563eb';
+        letterBadge.style.color = '#fff';
+        letterBadge.style.borderColor = '#2563eb';
+      }
+      const statusEl = selectedBtn.querySelector('.quiz-opt-status');
+      if (statusEl) {
+        statusEl.style.display = 'inline-flex';
+        statusEl.innerHTML = `
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #2563eb; background: rgba(37, 99, 235, 0.12); padding: 4px 10px; border-radius: 9999px;">
+            <svg class="quiz-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+            Checking...
+          </span>
+        `;
+      }
+    }
+
+    // Evaluating indicator banner
+    let evalBar = document.getElementById('quiz-evaluating-bar');
+    if (!evalBar) {
+      evalBar = document.createElement('div');
+      evalBar.id = 'quiz-evaluating-bar';
+      evalBar.style.cssText = `
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 10px 16px; margin-top: 14px; border-radius: 8px;
+        background: rgba(37, 99, 235, 0.08); color: #2563eb; font-size: 0.88rem;
+        font-weight: 600; border: 1px dashed rgba(37, 99, 235, 0.35);
+      `;
+      evalBar.innerHTML = `
+        <svg class="quiz-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        <span>Evaluating answer &amp; fetching explanation...</span>
+      `;
+      optionsGrid.parentNode.insertBefore(evalBar, optionsGrid.nextSibling);
+    }
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     fetch(`/prep/api/topic/{{ topic.id }}/quiz/submit/`, {
@@ -4886,6 +4954,8 @@
     })
       .then(res => res.json())
       .then(data => {
+        if (evalBar) evalBar.remove();
+
         if (!data.success) {
           alert(data.error || 'Evaluation failed.');
           return;
@@ -4894,32 +4964,58 @@
         if (data.is_correct) quizScore++;
         updateQuizScoreboard();
 
-        // Highlight options
+        // 2. Highlight options based on result
         buttons.forEach(btn => {
+          btn.style.boxShadow = 'none';
           const optLetter = btn.dataset.option;
           const letterBadge = btn.querySelector('.quiz-opt-letter');
+          const statusEl = btn.querySelector('.quiz-opt-status');
+
           if (optLetter === data.correct_option) {
+            btn.style.opacity = '1';
             btn.style.borderColor = 'var(--green)';
-            btn.style.background = 'rgba(15, 118, 110, 0.08)';
+            btn.style.background = 'rgba(15, 118, 110, 0.09)';
+            btn.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.25)';
             if (letterBadge) {
               letterBadge.style.background = 'var(--green)';
               letterBadge.style.color = '#fff';
               letterBadge.style.borderColor = 'var(--green)';
             }
+            if (statusEl) {
+              statusEl.style.display = 'inline-flex';
+              statusEl.innerHTML = `
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 3px 9px; border-radius: 9999px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  Correct
+                </span>
+              `;
+            }
           } else if (optLetter === data.selected_option && !data.is_correct) {
+            btn.style.opacity = '1';
             btn.style.borderColor = 'var(--danger)';
             btn.style.background = 'rgba(239, 68, 68, 0.08)';
+            btn.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
             if (letterBadge) {
               letterBadge.style.background = 'var(--danger)';
               letterBadge.style.color = '#fff';
               letterBadge.style.borderColor = 'var(--danger)';
             }
+            if (statusEl) {
+              statusEl.style.display = 'inline-flex';
+              statusEl.innerHTML = `
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 700; color: #b91c1c; background: #fee2e2; padding: 3px 9px; border-radius: 9999px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  Your Choice
+                </span>
+              `;
+            }
           } else {
-            btn.style.opacity = '0.6';
+            btn.style.opacity = '0.45';
+            if (statusEl) statusEl.style.display = 'none';
           }
         });
 
-        // Show Feedback Drawer
+        // 3. Show Feedback Drawer (with "Derivation" removed from all course headers)
         const feedbackDrawer = document.getElementById('quiz-feedback-drawer');
         if (feedbackDrawer) {
           feedbackDrawer.style.display = 'block';
@@ -4949,7 +5045,7 @@
             <div class="quiz-solution-breakdown" style="margin-top: ${!isCorrect && data.why_selected_is_wrong ? '14px' : '4px'}; ${!isCorrect && data.why_selected_is_wrong ? 'border-top: 1px dashed var(--border); padding-top: 14px;' : ''}">
               <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--green); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>${isCorrect ? 'Worked Explanation & Derivation:' : 'Correct Solution & Derivation:'}</span>
+                <span>${isCorrect ? 'Worked Explanation:' : 'Correct Solution:'}</span>
               </div>
               <div class="quiz-summary-box markdown-rendered" style="font-size: 0.94rem; color: var(--text); line-height: 1.7;"></div>
             </div>
@@ -4987,7 +5083,15 @@
         }
       })
       .catch(err => {
-        buttons.forEach(btn => { btn.disabled = false; btn.style.cursor = 'pointer'; });
+        if (evalBar) evalBar.remove();
+        buttons.forEach(btn => {
+          btn.disabled = false;
+          btn.style.cursor = 'pointer';
+          btn.style.opacity = '1';
+          btn.style.boxShadow = 'none';
+          const statusEl = btn.querySelector('.quiz-opt-status');
+          if (statusEl) statusEl.style.display = 'none';
+        });
         alert('Network error while evaluating answer. Please retry.');
       });
   }
