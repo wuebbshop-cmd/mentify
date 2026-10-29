@@ -1,4 +1,4 @@
-{% extends 'prep/base_prep.html' %}
+﻿{% extends 'prep/base_prep.html' %}
 
 {% block title %}{{ topic.title }} — Study & Practice | Mentify Prep{% endblock %}
 
@@ -2139,7 +2139,11 @@
         </div>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_1" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
           <span style="font-weight: 600;">Foundation &amp; Intuition</span>
-          <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+          {% if unlocked_levels.level_1 %}
+            <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+          {% else %}
+            <span style="font-size: 0.72rem; color: var(--danger); background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;">&#x1F512; Unlock first</span>
+          {% endif %}
         </a>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_2" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
           <span style="font-weight: 600;">Core Concepts</span>
@@ -2147,7 +2151,11 @@
         </a>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_3" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
           <span style="font-weight: 600;">Exam Focus</span>
-          <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+          {% if unlocked_levels.level_3 %}
+            <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+          {% else %}
+            <span style="font-size: 0.72rem; color: var(--danger); background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;">&#x1F512; Unlock first</span>
+          {% endif %}
         </a>
         <div style="height: 1px; margin: 4px 0; background: var(--border);"></div>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?section=questions_answers" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">

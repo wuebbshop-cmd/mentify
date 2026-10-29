@@ -1,4 +1,4 @@
-import os
+﻿import os
 import re
 import json
 import datetime
@@ -4096,6 +4096,25 @@ def prep_export_topic(request, topic_id, fmt="pdf"):
     if fmt.lower() == "pdf":
         if not topic:
             return HttpResponse("The requested syllabus topic was not found.", status=404)
+        # Gate Level 1 and Level 3 PDF downloads behind note unlock check.
+        # Level 2 is always free. Staff / superusers bypass the gate.
+        if level in {"level_1", "level_3"} and not (
+            request.user.is_staff or request.user.is_superuser
+        ):
+            from services.prep_note_access import is_topic_note_unlocked
+            if not is_topic_note_unlocked(request.user, topic, level):
+                level_label = {
+                    "level_1": "Foundation & Intuition",
+                    "level_3": "Exam Focus",
+                }.get(level, level)
+                messages.warning(
+                    request,
+                    f"Please open the {level_label} notes on the study page first to unlock this PDF download.",
+                )
+                return redirect(
+                    reverse("prep:topic_study", kwargs={"topic_id": topic_id})
+                    + f"?tab=notes&level={level}"
+                )
         return _download_topic_pdf_artifact(
             request,
             topic,

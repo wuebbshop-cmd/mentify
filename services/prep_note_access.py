@@ -41,6 +41,8 @@ def is_topic_note_unlocked(user, topic, level: str) -> bool:
         return True
     if not user or not getattr(user, "is_authenticated", False):
         return False
+    if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
     from prep.models import PrepTransaction
     return PrepTransaction.objects.filter(
         wallet__user=user,
@@ -58,6 +60,8 @@ def get_unlocked_topic_note_levels(user, topic) -> Set[str]:
     unlocked = {"level_2"}
     if not user or not getattr(user, "is_authenticated", False):
         return unlocked
+    if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return {"level_1", "level_2", "level_3"}
     from prep.models import PrepTransaction
     unlocked_levels = PrepTransaction.objects.filter(
         wallet__user=user,
