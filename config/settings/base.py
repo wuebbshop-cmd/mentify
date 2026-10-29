@@ -119,7 +119,7 @@ if _clean_db_env("DB_HOST"):
                 "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
                 **({"ssl": {}} if _clean_db_env("DB_SSL").lower() in ("true", "1", "yes") else {}),
             },
-            "CONN_MAX_AGE": int(_clean_db_env("DB_CONN_MAX_AGE", "60") or 60),
+            "CONN_MAX_AGE": int(_clean_db_env("DB_CONN_MAX_AGE", "300") or 300),
             "CONN_HEALTH_CHECKS": True,
         }
     }
@@ -144,7 +144,7 @@ if _clean_db_env("SUB_DB_HOST"):
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             **({"ssl": {}} if _clean_db_env("SUB_DB_SSL").lower() in ("true", "1", "yes") else {}),
         },
-        "CONN_MAX_AGE": int(_clean_db_env("SUB_DB_CONN_MAX_AGE", "60") or 60),
+        "CONN_MAX_AGE": int(_clean_db_env("SUB_DB_CONN_MAX_AGE", "300") or 300),
         "CONN_HEALTH_CHECKS": True,
     }
 
