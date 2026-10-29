@@ -1904,14 +1904,19 @@ def learner_visible_assessment_questions(question_records, deduplicate: bool = T
         reverse=True,
     )
 
+    from services.prep_ai_router import normalize_math_delimiters
     seen_texts = set()
+    seen_prefixes = set()
     final_questions = []
     for q in candidates:
-        norm = _normalise_document_text(q.question_latex or "")
+        norm = _normalise_document_text(normalize_math_delimiters(q.question_latex or ""))
         if norm and len(norm) > 25:
-            if norm in seen_texts:
+            prefix = norm[:60]
+            if norm in seen_texts or (len(prefix) >= 50 and prefix in seen_prefixes):
                 continue
             seen_texts.add(norm)
+            if len(prefix) >= 50:
+                seen_prefixes.add(prefix)
         final_questions.append(q)
 
     final_questions.sort(
@@ -2158,6 +2163,12 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("unclosed inline-math delimiter")
     if len(re.findall(r"\\begin\{([^{}]+)\}", source)) != len(re.findall(r"\\end\{([^{}]+)\}", source)):
         issues.append("unclosed LaTeX environment")
+    if re.search(r"(?:=|\+|-|\*|/)\s*O\b|\bO\s*(?:=|\+|-|\*|/)", source):
+        issues.append("question text contains OCR replacement of zero with capital O")
+    if re.search(r"\b\d+[A-Z]\d+\b", source):
+        issues.append("question text contains corrupted variable exponent notation")
+    if re.search(r"(?:\+|-|\b)\s*i\s*[-+]\s*\d+[a-z]", source):
+        issues.append("question text contains corrupted variable OCR artifact")
     if re.search(
         r"(?im)^\s*(?:\*\*|\\textbf\{\s*)?question\s+"
         r"(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b",

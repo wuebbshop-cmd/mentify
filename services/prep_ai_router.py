@@ -3662,6 +3662,28 @@ def normalize_math_delimiters(text: str) -> str:
 
     # Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     text = re.sub(r'\\\\([a-zA-Z]+)', r'\\\1', text)
+    # Normalize stray \text{[...marks]} or [... \text{marks}] both inside and outside math
+    text = re.sub(r'\\text\{\s*\[?\s*(\d+)\s*(?:marks?|mks?)\s*\]?\s*\}', r'[\1 marks]', text, flags=re.IGNORECASE)
+    text = re.sub(r'\[\s*(\d+)\s*\\text\{(?:marks?|mks?)\}\s*\]', r'[\1 marks]', text, flags=re.IGNORECASE)
+    text = re.sub(r'\[\s*\\text\{(\d+)\s*(?:marks?|mks?)\}\s*\]', r'[\1 marks]', text, flags=re.IGNORECASE)
+
+    # Strip stray \text{...} occurring in Markdown prose outside math delimiters
+    math_or_code_capturing = re.compile(r"(" + math_or_code.pattern + r")")
+    parts = math_or_code_capturing.split(text)
+    for i in range(0, len(parts), 2):
+        parts[i] = re.sub(r'(?<!\\)\\text\{([^{}\n]+)\}', r'\1', parts[i])
+    text = "".join(parts)
+
+    # Extract marks that got bundled inside $$...$$ at the end of display equations
+    def _extract_display_math_marks(m: re.Match[str]) -> str:
+        body = m.group(1).rstrip()
+        mark_match = re.search(r'\s*(\[(?:\d+)\s*(?:marks?|mks?)\])\s*$', body, flags=re.IGNORECASE)
+        if mark_match:
+            clean_body = body[:mark_match.start()].rstrip()
+            return f"\n\n$$\n{clean_body}\n$$\n\n{mark_match.group(1)}\n\n"
+        return m.group(0)
+
+    text = re.sub(r'\$\$([\s\S]*?)\$\$', _extract_display_math_marks, text)
 
     # Merge detached '\[ lhs =' followed by '$$ \begin{cases|...} ... $$' into a single $$ block
     text = re.sub(

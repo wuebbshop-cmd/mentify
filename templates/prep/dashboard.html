@@ -579,8 +579,8 @@
   <section>
     <div class="ws-section-header">
       <div class="ws-section-title-group">
-        <h2 class="ws-section-title">My Courses</h2>
-        <span class="ws-count-text">({{ recent_courses|length }})</span>
+        <h2 class="ws-section-title">{% if request.user.is_authenticated %}My Courses{% else %}Enrolled Courses{% endif %}</h2>
+        {% if request.user.is_authenticated %}<span class="ws-count-text">({{ recent_courses|length }})</span>{% endif %}
       </div>
       <a href="{% url 'prep:courses' %}" class="ws-section-link">{% if request.user.is_authenticated %}Manage courses{% else %}Browse courses{% endif %} &rarr;</a>
     </div>

@@ -671,6 +671,30 @@
 
     // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     cleanText = cleanText.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+    // Normalize stray \text{[...marks]} or [... \text{marks}] both inside and outside math
+    cleanText = cleanText.replace(/\\text\{\s*\[?\s*(\d+)\s*(?:marks?|mks?)\s*\]?\s*\}/gi, '[$1 marks]');
+    cleanText = cleanText.replace(/\[\s*(\d+)\s*\\text\{(?:marks?|mks?)\}\s*\]/gi, '[$1 marks]');
+    cleanText = cleanText.replace(/\[\s*\\text\{(\d+)\s*(?:marks?|mks?)\}\s*\]/gi, '[$1 marks]');
+
+    // Strip stray \text{...} occurring in Markdown prose outside math delimiters
+    var proseOrMath = /(```[\s\S]*?```|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g;
+    var pmParts = cleanText.split(proseOrMath);
+    for (var pmi = 0; pmi < pmParts.length; pmi += 2) {
+      if (pmParts[pmi]) {
+        pmParts[pmi] = pmParts[pmi].replace(/(?<!\\)\\text\{([^{}\n]+)\}/g, '$1');
+      }
+    }
+    cleanText = pmParts.join('');
+
+    // Extract marks that got bundled inside $$...$$ at the end of display equations
+    cleanText = cleanText.replace(/\$\$([\s\S]*?)\$\$/g, function(full, body) {
+      var markMatch = body.match(/\s*(\[(?:\d+)\s*(?:marks?|mks?)\])\s*$/i);
+      if (markMatch) {
+        var cleanBody = body.substring(0, markMatch.index).trim();
+        return '\n\n$$\n' + cleanBody + '\n$$\n\n' + markMatch[1] + '\n\n';
+      }
+      return full;
+    });
 
     // In math blocks, replace literal '*' with '\ast' so Markdown's bold/italic parser
     // never confuses math superscripts (e.g. p^* or Q_1^*) with Markdown asterisks.
