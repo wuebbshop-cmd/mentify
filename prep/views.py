@@ -712,11 +712,6 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
 @never_cache
 def prep_dashboard(request):
     """Mentify Prep Hub Main Landing Page with real database metrics."""
-    courses_qs = PrepCourse.objects.filter(is_active=True).annotate(
-        topics_count=Count("topics", filter=Q(topics__is_active=True), distinct=True),
-        papers_count=Count("papers", distinct=True),
-    )
-
     today_credits_used = 0
     week_credits_used = 0
     if request.user.is_authenticated:
@@ -745,8 +740,10 @@ def prep_dashboard(request):
         recent_credit_transactions = []
         enrolled_courses = PrepCourse.objects.none()
         history_qs = PrepHistory.objects.none()
-        # For public/crawler visitors, showcase active courses
-        display_courses = courses_qs.order_by("-created_at")[:6]
+        # Signed-out visitors are not enrolled in anything. We previously listed 6
+        # unrelated active courses here, which read as a broken enrolment list.
+        # The template now renders a sign-in prompt instead.
+        display_courses = PrepCourse.objects.none()
 
     recent_courses = []
     for c in display_courses:

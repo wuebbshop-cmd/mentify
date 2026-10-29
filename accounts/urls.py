@@ -19,6 +19,8 @@ urlpatterns = [
     path("register/tutor/", views.register_tutor, name="register_tutor"),
     path("google/", views.google_login, name="google_login"),
     path("google/callback/", views.google_callback, name="google_callback"),
+    # Native app hand-off: completes Google sign-in inside the Android WebView.
+    path("google/mobile/exchange/", views.google_mobile_exchange, name="google_mobile_exchange"),
     path("verify-email/pending/", views.verify_email_pending, name="verify_email_pending"),
     path("verify-email/resend/", views.resend_email_verification, name="resend_email_verification"),
     path("verify-email/<uidb64>/<token>/", views.verify_email, name="verify_email"),

@@ -1096,6 +1096,38 @@ def public_profile(request, user_id):
 
 
 
+# ─── Google OAuth: native-app hand-off ───────────────────────────────────────
+# The Android wrapper loads this site inside a WebView. Google refuses to run its
+# consent screen in an embedded WebView, so Capacitor hands the URL to the system
+# browser — which has a *different* cookie jar. The session-based `oauth_state`
+# therefore always fails to match on the way back.
+#
+# The app identifies itself with a User-Agent marker and the flow switches to:
+#   1. a signed (stateless) `state`      - survives the cookie-jar hand-off
+#   2. a one-time login token            - returned via mentifyprep://oauth
+#   3. /accounts/google/mobile/exchange/ - creates the session inside the WebView
+MOBILE_APP_UA_MARKER = "MentifyPrepApp"
+MOBILE_OAUTH_STATE_SALT = "accounts.google.mobile_oauth_state"
+MOBILE_OAUTH_TOKEN_SALT = "accounts.google.mobile_login_token"
+MOBILE_OAUTH_REDIRECT = "mentifyprep://oauth"
+MOBILE_OAUTH_STATE_MAX_AGE = 900
+MOBILE_OAUTH_TOKEN_TTL = 300
+
+
+def is_mobile_app_request(request) -> bool:
+    """True when the request originates from the Mentify Prep Android WebView."""
+    user_agent = request.META.get("HTTP_USER_AGENT") or ""
+    return MOBILE_APP_UA_MARKER in user_agent
+
+
+def _mobile_redirect(url):
+    """302 to a non-HTTP scheme (Django's redirect() rejects custom schemes)."""
+    response = HttpResponse(status=302)
+    response["Location"] = url
+    response["Cache-Control"] = "no-store"
+    return response
+
+
 def google_login(request):
     """Initiates Google OAuth2 login flow."""
     import secrets
@@ -1109,12 +1141,23 @@ def google_login(request):
         messages.error(request, "Google sign-in is not configured yet.")
         return redirect("accounts:login")
 
-    state = secrets.token_urlsafe(16)
-    request.session["oauth_state"] = state
-    request.session["pending_action"] = action
-    request.session["pending_role"] = role
-    if next_param:
-        request.session["oauth_next"] = next_param
+    if is_mobile_app_request(request) or request.GET.get("platform") == "app":
+        # Stateless, expiring state: the callback arrives from the system browser,
+        # where our session cookie does not exist. Nothing to look up server-side.
+        from django.core import signing
+
+        state = signing.dumps(
+            {"a": action, "r": role, "n": next_param or "", "m": 1},
+            salt=MOBILE_OAUTH_STATE_SALT,
+            compress=True,
+        )
+    else:
+        state = secrets.token_urlsafe(16)
+        request.session["oauth_state"] = state
+        request.session["pending_action"] = action
+        request.session["pending_role"] = role
+        if next_param:
+            request.session["oauth_next"] = next_param
 
     # Resolve redirect URL
     redirect_uri = settings.GOOGLE_REDIRECT_URI or request.build_absolute_uri(reverse("accounts:google_callback"))
@@ -1136,15 +1179,33 @@ def google_callback(request):
     from django.contrib.auth import get_user_model
     User = get_user_model()
 
+    from django.core import signing
+
     state = request.GET.get("state")
     session_state = request.session.pop("oauth_state", None)
 
-    if not state or state != session_state:
+    mobile_flow = False
+    signed_state = None
+
+    if state and session_state is None:
+        # Mobile hand-off: validate the state cryptographically instead of
+        # against a session that lives in a different cookie jar.
+        try:
+            signed_state = signing.loads(state, salt=MOBILE_OAUTH_STATE_SALT, max_age=MOBILE_OAUTH_STATE_MAX_AGE)
+        except signing.BadSignature:
+            signed_state = None
+
+    if signed_state:
+        mobile_flow = True
+        action = signed_state.get("a") or "login"
+        role = signed_state.get("r") or "learner"
+    elif not state or state != session_state:
         messages.error(request, "Google sign-in security check failed.")
         return redirect("accounts:login")
+    else:
+        action = request.session.pop("pending_action", "login")
+        role = request.session.pop("pending_role", "learner")
 
-    action = request.session.pop("pending_action", "login")
-    role = request.session.pop("pending_role", "learner")
     code = request.GET.get("code")
 
     if not code:
@@ -1240,10 +1301,68 @@ def google_callback(request):
             user.save(update_fields=["is_email_verified"])
         messages.success(request, f"Welcome back, {user.first_name}!")
 
-    login(request, user)
     promote_if_admin_email(user)  # auto-promote whitelisted admins
+
+    if mobile_flow:
+        # A session created here would be useless: this request came from the
+        # system browser. Hand a single-use token back to the app instead; the
+        # WebView then logs itself in via google_mobile_exchange.
+        from urllib.parse import quote
+
+        token = _issue_mobile_login_token(user)
+        return _mobile_redirect(f"{MOBILE_OAUTH_REDIRECT}?token={quote(token, safe='')}")
+
+    login(request, user)
     next_url = request.session.pop("oauth_next", None) or user.get_dashboard_url()
     return redirect(next_url)
+
+
+def _issue_mobile_login_token(user) -> str:
+    """Short-lived, single-use proof that Google authenticated `user`."""
+    import secrets
+
+    from django.core import signing
+    from django.core.cache import cache
+
+    nonce = secrets.token_urlsafe(24)
+    cache.set(f"google-mobile-login:{nonce}", user.pk, timeout=MOBILE_OAUTH_TOKEN_TTL)
+    return signing.dumps({"u": user.pk, "j": nonce}, salt=MOBILE_OAUTH_TOKEN_SALT, compress=True)
+
+
+def google_mobile_exchange(request):
+    """Creates the app's session after Google sign-in completed in the browser."""
+    from django.contrib.auth import get_user_model
+    from django.core import signing
+    from django.core.cache import cache
+
+    token = request.GET.get("token", "")
+    if not token:
+        messages.error(request, "Google sign-in could not be completed.")
+        return redirect("accounts:login")
+
+    try:
+        payload = signing.loads(token, salt=MOBILE_OAUTH_TOKEN_SALT, max_age=MOBILE_OAUTH_TOKEN_TTL)
+    except signing.BadSignature:
+        messages.error(request, "This Google sign-in link has expired. Please try again.")
+        return redirect("accounts:login")
+
+    nonce = payload.get("j") or ""
+    cache_key = f"google-mobile-login:{nonce}"
+    cached_user_id = cache.get(cache_key)
+    if not cached_user_id:
+        messages.error(request, "This Google sign-in link has already been used. Please try again.")
+        return redirect("accounts:login")
+    cache.delete(cache_key)  # single use
+
+    User = get_user_model()
+    user = User.objects.filter(pk=payload.get("u"), is_active=True).first()
+    if not user or user.pk != cached_user_id:
+        messages.error(request, "We could not find your account. Please try again.")
+        return redirect("accounts:login")
+
+    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    messages.success(request, f"Welcome back, {user.first_name or user.username}!")
+    return redirect(user.get_dashboard_url())
 
 
 # ─── Custom HTTP Error Handlers ───────────────────────────────────────────────

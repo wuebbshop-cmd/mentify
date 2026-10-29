@@ -582,7 +582,7 @@
         <h2 class="ws-section-title">My Courses</h2>
         <span class="ws-count-text">({{ recent_courses|length }})</span>
       </div>
-      <a href="{% url 'prep:courses' %}" class="ws-section-link">Manage courses &rarr;</a>
+      <a href="{% url 'prep:courses' %}" class="ws-section-link">{% if request.user.is_authenticated %}Manage courses{% else %}Browse courses{% endif %} &rarr;</a>
     </div>
 
     {% if recent_courses %}
@@ -622,9 +622,18 @@
     </div>
     {% else %}
     <div style="padding: 36px 20px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 10px;">
+      {% if request.user.is_authenticated %}
       <p style="margin: 0 0 6px; font-weight: 600; color: var(--text);">No courses enrolled yet</p>
       <p style="font-size: 0.85rem; margin: 0 0 14px;">Upload your lecture notes, CATs, or past examination papers to build your course workspace.</p>
       <a href="{% url 'prep:upload' %}" class="ws-upload-btn">Upload Material</a>
+      {% else %}
+      <p style="margin: 0 0 6px; font-weight: 600; color: var(--text);">Sign in to see your courses</p>
+      <p style="font-size: 0.85rem; margin: 0 0 14px;">Your enrolled courses, syllabus topics and past papers appear here once you sign in.</p>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'accounts:login' %}" class="ws-upload-btn">Sign In</a>
+        <a href="{% url 'accounts:register' %}" class="ws-upload-btn">Join Free</a>
+      </div>
+      {% endif %}
     </div>
     {% endif %}
   </section>
