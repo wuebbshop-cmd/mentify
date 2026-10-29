@@ -427,7 +427,7 @@ def _inline_media_images(markdown_text: str) -> str:
     from services.cdn_views import _fetch_github_asset
 
     # Match ![alt](url)
-    pattern = re.compile(r"!\[(.*?)\]\((\s*/(?:media|cdn/assets)/[^\s\)]+)\)")
+    pattern = re.compile(r"!\[(.*?)\]\((\s*/(?:media|cdn/assets|cdn/cloudflare)/[^\s\)]+)\)")
 
     def replace_image(match):
         alt = match.group(1)
@@ -441,8 +441,22 @@ def _inline_media_images(markdown_text: str) -> str:
             rel_path = raw_url[len("/media/"):].lstrip("/")
         elif raw_url.startswith("/cdn/assets/"):
             rel_path = raw_url[len("/cdn/assets/"):].lstrip("/")
+        elif raw_url.startswith("/cdn/cloudflare/"):
+            rel_path = raw_url[len("/cdn/cloudflare/"):].lstrip("/")
         else:
             rel_path = raw_url.lstrip("/")
+
+        # Try Cloudflare R2
+        from services.cloudflare_storage import is_cloudflare_r2_configured, CloudflareR2MediaStorage
+        if is_cloudflare_r2_configured():
+            try:
+                storage = CloudflareR2MediaStorage()
+                content_bytes = storage.download_bytes(rel_path)
+                guessed, _ = mimetypes.guess_type(rel_path)
+                if guessed:
+                    mime_type = guessed
+            except Exception:
+                pass
 
         # 1. Try local disk cache under MEDIA_ROOT
         candidates = [
