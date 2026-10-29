@@ -364,10 +364,30 @@ def guardian_link_confirm(request, token):
     return render(request, "accounts/guardian_link_confirm.html", {"request_obj": request_obj})
 
 
+PREP_HOME_PATH = "/prep/"
+
+
+def _post_login_redirect(request, user, next_url=None):
+    """
+    Where a freshly signed-in user lands.
+
+    The Android wrapper is a Prep-only app: it must never drop the user on the
+    main Mentify dashboard, which serves a different purpose. Requests carrying
+    the app User-Agent therefore always go to /prep/, honouring a `next` target
+    only when that target is itself inside Prep.
+    """
+    if is_mobile_app_request(request):
+        if next_url and next_url.startswith("/prep/"):
+            return redirect(next_url)
+        return redirect(PREP_HOME_PATH)
+
+    return redirect(next_url or user.get_dashboard_url())
+
+
 def login_view(request):
     """Custom login using email."""
     if request.user.is_authenticated:
-        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
+        return _post_login_redirect(request, request.user, request.GET.get("next"))
 
     if request.method == "POST":
         form = MentifyLoginForm(request, data=request.POST)
@@ -379,9 +399,9 @@ def login_view(request):
                 return redirect("accounts:verify_email_pending")
             promote_if_admin_email(user)  # auto-promote whitelisted admins
             login(request, user)
-            next_url = request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
+            next_url = request.POST.get("next") or request.GET.get("next")
             messages.success(request, f"Welcome back, {user.first_name}!")
-            return redirect(next_url)
+            return _post_login_redirect(request, user, next_url)
         messages.error(request, _form_error_message(form, "Invalid email or password. Please try again."))
     else:
         form = MentifyLoginForm(request)
@@ -1362,7 +1382,8 @@ def google_mobile_exchange(request):
 
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     messages.success(request, f"Welcome back, {user.first_name or user.username}!")
-    return redirect(user.get_dashboard_url())
+    # The app is Prep-only, so never hand control back to the main dashboard.
+    return redirect(PREP_HOME_PATH)
 
 
 # ─── Custom HTTP Error Handlers ───────────────────────────────────────────────
