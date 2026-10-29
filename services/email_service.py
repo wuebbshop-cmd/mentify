@@ -139,76 +139,15 @@ def send_payment_confirmation_email(payment) -> bool:
 
 def send_prep_review_completed_email(prep_doc) -> bool:
     """
-    Alert a student when their uploaded document or CAT paper has completed Stage 2 Tutor Review
-    and is officially verified and published to Stage 3 in the canonical course graph.
+    Suppressed to preserve email quota.
+    Users check review & publication alerts directly on their dashboard via in-app PrepNotification.
     """
-    if not prep_doc.user or not prep_doc.user.email:
-        return False
-
-    platform = "Mentify Prep"
-    course_name = f"{prep_doc.course.code} - {prep_doc.course.title}"
-    doc_type = prep_doc.doc_type
-    base_url = getattr(settings, "BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-    catalog_url = f"{base_url}/prep/papers/" if "CAT" in doc_type or "Exam" in doc_type else f"{base_url}/prep/courses/"
-
-    is_published = prep_doc.stage == "stage_3"
-    status_label = "Verified & Published to Course Catalog" if is_published else "Tutor Review Completed (Feedback Provided)"
-
-    subject = f"[{platform}] Document Verification Update: {prep_doc.course.code} {doc_type}"
-
-    body = (
-        f"Hello {prep_doc.user.first_name or 'there'},\n\n"
-        f"Your uploaded document for {course_name} has completed Stage 2 Tutor Review.\n\n"
-        f"Document: {doc_type} ({prep_doc.academic_year or 'Current Session'})\n"
-        f"Status: {status_label}\n"
-        f"Tutor Notes: {prep_doc.tutor_review_notes or 'All formulas and questions verified.'}\n\n"
-        f"You can view your verified study resources and CAT papers here:\n{catalog_url}\n\n"
-        f"Happy studying,\nThe {platform} Academic Team"
+    logger.info(
+        "Tutor review completed for document %s (%s). Logged to database; email suppressed (in-app dashboard notification used).",
+        getattr(prep_doc, "pk", None),
+        getattr(getattr(prep_doc, "course", None), "code", "Unknown"),
     )
-
-    badge_color = "#16a34a" if is_published else "#dc2626"
-    html_body = f"""
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; max-width:600px; margin:0 auto; padding:24px; color:#1e293b; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px;">
-      <div style="border-bottom:2px solid #0f766e; padding-bottom:12px; margin-bottom:20px;">
-        <h2 style="color:#0f766e; margin:0; font-size:1.4rem;">{platform}</h2>
-        <span style="font-size:0.85rem; color:#64748b;">Course Knowledge Graph & Examination Prep</span>
-      </div>
-
-      <p style="font-size:1rem; line-height:1.6;">Hello <strong>{prep_doc.user.first_name or 'Student'}</strong>,</p>
-      <p style="font-size:0.95rem; line-height:1.6;">
-        Your uploaded document for <strong>{course_name}</strong> has passed through our <strong>Stage 2 Tutor Review Gate</strong>.
-      </p>
-
-      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:16px; margin:20px 0;">
-        <div style="margin-bottom:8px;">
-          <span style="font-size:0.8rem; text-transform:uppercase; color:#64748b; font-weight:600;">Status</span><br>
-          <span style="display:inline-block; font-size:0.85rem; font-weight:700; color:{badge_color}; margin-top:2px;">
-            {status_label}
-          </span>
-        </div>
-        <div style="margin-bottom:8px;">
-          <span style="font-size:0.8rem; text-transform:uppercase; color:#64748b; font-weight:600;">Document Type</span><br>
-          <span style="font-size:0.9rem; font-weight:600; color:#1e293b;">{doc_type} ({prep_doc.academic_year or 'Current Session'})</span>
-        </div>
-        <div>
-          <span style="font-size:0.8rem; text-transform:uppercase; color:#64748b; font-weight:600;">Tutor Review Notes</span><br>
-          <span style="font-size:0.9rem; color:#334155;">{prep_doc.tutor_review_notes or 'All formulas and questions verified.'}</span>
-        </div>
-      </div>
-
-      <div style="margin:24px 0; text-align:center;">
-        <a href="{catalog_url}" style="background:#0f766e; color:#ffffff; font-weight:600; padding:12px 24px; text-decoration:none; border-radius:6px; display:inline-block;">
-          Open Live Course Hub
-        </a>
-      </div>
-
-      <p style="font-size:0.85rem; color:#64748b; line-height:1.5; margin-top:32px; border-top:1px solid #e2e8f0; padding-top:16px;">
-        Mentify Prep &bull; High-accuracy syllabus readiness for universities and academic programs.
-      </p>
-    </div>
-    """
-
-    return send_email_notification(subject, prep_doc.user.email, body, html_body=html_body)
+    return True
 
 
 def send_prep_credit_topup_email(wallet, credits_added: int, amount_kes: int, reference: str, package_name: str) -> bool:

@@ -627,6 +627,32 @@
     border-color: var(--green) !important;
     font-weight: 600;
   }
+  .level-cost-pill {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    vertical-align: middle;
+  }
+  .level-cost-pill.free {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  .level-btn.active .level-cost-pill {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+  }
+  body.dark-theme .level-cost-pill {
+    background: rgba(255, 255, 255, 0.14);
+  }
+  body.dark-theme .level-cost-pill.free {
+    background: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+  }
   body.dark-theme .level-btn {
     background: #1e1e1e;
     color: #e4e4e4;
@@ -2170,12 +2196,19 @@
       </span>
       <button type="button" class="level-btn {% if initial_level == 'level_1' %}active{% endif %}" id="btn-lvl-1" onclick="loadNotesLevel('level_1')">
         Foundation &amp; Intuition
+        <span class="level-cost-pill" id="badge-lvl-1">
+          {% if unlocked_levels.level_1 %}Unlocked{% else %}2 Credits{% endif %}
+        </span>
       </button>
       <button type="button" class="level-btn {% if not initial_level or initial_level == 'level_2' %}active{% endif %}" id="btn-lvl-2" onclick="loadNotesLevel('level_2')">
         Core Concepts
+        <span class="level-cost-pill free">Free</span>
       </button>
       <button type="button" class="level-btn {% if initial_level == 'level_3' %}active{% endif %}" id="btn-lvl-3" onclick="loadNotesLevel('level_3')">
         Exam Focus
+        <span class="level-cost-pill" id="badge-lvl-3">
+          {% if unlocked_levels.level_3 %}Unlocked{% else %}4 Credits{% endif %}
+        </span>
       </button>
     </div>
 
@@ -3796,9 +3829,21 @@
         try {
           sessionStorage.setItem(notesStorageKey, JSON.stringify(data.notes));
         } catch (storageErr) {}
+        
+        // Update badge to Unlocked
+        const badgeEl = document.getElementById('badge-lvl-' + level.replace('level_', ''));
+        if (badgeEl && level !== 'level_2') { badgeEl.textContent = 'Unlocked'; }
+
+        // Update credit counters if credits were deducted
+        if (data.credits_balance !== undefined) {
+          document.querySelectorAll('#prep-navbar-credit-count .credit-num, #wallet-balance-indicator, .topic-tutor-balance-val').forEach(el => {
+            el.textContent = data.credits_balance;
+          });
+        }
         setupNotesPagination(data.notes);
       } else {
         alert(data.error || 'Failed to load notes for this level.');
+        loadNotesLevel('level_2');
       }
     })
     .catch(err => {
@@ -3806,7 +3851,14 @@
       if (loadingEl) loadingEl.style.display = 'none';
       if (bodyEl) bodyEl.style.opacity = '1';
       console.error(err);
-      alert(err.message || 'Unable to load notes. Please try again.');
+      if (err.message && err.message.toLowerCase().includes('credit')) {
+        if (confirm(err.message + '\n\nWould you like to top up credits on the billing page?')) {
+          window.location.href = "{% url 'prep:billing' %}";
+        }
+      } else {
+        alert(err.message || 'Unable to load notes. Please try again.');
+      }
+      loadNotesLevel('level_2');
     });
   }
 

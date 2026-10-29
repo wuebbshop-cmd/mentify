@@ -1206,34 +1206,53 @@ def prep_topic_study(request, topic_id):
                 "is_adapted": False,
             })
 
-    # 3. Preload every already-published level. This is a read-only database
-    # lookup, so opening a topic and switching levels never triggers AI work,
-    # repeat validation, or a synthesis screen for shared verified notes.
+    # 3. Preload notes with tiered access:
+    # Level 2 (Core Concepts) is free for all students.
+    # Level 1 (Foundation: 2 credits) and Level 3 (Exam Focus: 4 credits) are charged
+    # only upon fetch/unlock, and only if notes exist in cache.
     from services.prep_ai_router import get_published_topic_note_levels
-    published_notes_by_level = get_published_topic_note_levels(topic)
+    from services.prep_note_access import (
+        get_unlocked_topic_note_levels,
+        unlock_topic_note_level,
+        NOTE_LEVEL_CREDIT_COSTS,
+        NOTE_LEVEL_LABELS,
+    )
+    all_published_notes = get_published_topic_note_levels(topic)
+    unlocked_levels = get_unlocked_topic_note_levels(request.user, topic)
     from services.prep_topic_tutor import list_topic_conversations, serialize_topic_conversation
     assistant_conversations = list_topic_conversations(request.user, topic)
     latest_session = topic.chat_sessions.filter(user=request.user).order_by("-updated_at", "-id").first()
     initial_assistant_conversation = serialize_topic_conversation(latest_session) if latest_session else None
+    
     requested_level = request.GET.get("level", "").strip().lower()
-    if requested_level in ("level_1", "level_2", "level_3") and published_notes_by_level.get(requested_level, "").strip():
-        initial_level = requested_level
-        initial_notes = published_notes_by_level[requested_level]
-    elif "level_2" in published_notes_by_level and published_notes_by_level["level_2"].strip():
-        initial_level = "level_2"
-        initial_notes = published_notes_by_level["level_2"]
-    elif "level_1" in published_notes_by_level and published_notes_by_level["level_1"].strip():
-        initial_level = "level_1"
-        initial_notes = published_notes_by_level["level_1"]
-    elif "level_3" in published_notes_by_level and published_notes_by_level["level_3"].strip():
-        initial_level = "level_3"
-        initial_notes = published_notes_by_level["level_3"]
-    else:
-        initial_level = requested_level if requested_level in ("level_1", "level_2", "level_3") else "level_2"
-        initial_notes = ""
     initial_notes_error = ""
+
+    if requested_level in ("level_1", "level_3"):
+        note_candidate = all_published_notes.get(requested_level, "")
+        success, deducted, err = unlock_topic_note_level(
+            request.user, topic, requested_level, note_candidate
+        )
+        if success:
+            initial_level = requested_level
+            initial_notes = note_candidate
+            unlocked_levels.add(requested_level)
+        else:
+            initial_level = "level_2"
+            initial_notes = all_published_notes.get("level_2", "")
+            initial_notes_error = err
+    else:
+        initial_level = "level_2"
+        initial_notes = all_published_notes.get("level_2", "")
+
     if not initial_notes:
-        initial_notes_error = "No validated notes are available for this topic yet."
+        initial_notes_error = initial_notes_error or "No validated notes are available for this topic yet."
+
+    # Filter published_notes_by_level so only unlocked levels (level_2 is always unlocked)
+    # are sent in the initial HTML to prevent free unauthorized scraping.
+    published_notes_by_level = {
+        lvl: c for lvl, c in all_published_notes.items()
+        if lvl in unlocked_levels
+    }
 
     course_id_val = str(topic.course_id) if (topic and getattr(topic, "course_id", None)) else ""
 
@@ -1263,6 +1282,13 @@ def prep_topic_study(request, topic_id):
         "initial_level": initial_level,
         "initial_notes": initial_notes,
         "published_notes_by_level": published_notes_by_level,
+        "unlocked_levels": {
+            "level_1": "level_1" in unlocked_levels,
+            "level_2": True,
+            "level_3": "level_3" in unlocked_levels,
+        },
+        "level_costs": NOTE_LEVEL_CREDIT_COSTS,
+        "level_labels": NOTE_LEVEL_LABELS,
         "initial_notes_error": initial_notes_error,
         "initial_notes_stale": False,
         "authentic_questions": authentic_qs,
@@ -3270,18 +3296,77 @@ def prep_topic_notes_api(request):
 
     subtopics = topic_obj.subtopics if (topic_obj and isinstance(topic_obj.subtopics, list)) else []
 
-    from services.prep_course_billing import ensure_note_access
-    if topic_obj:
-        allowed, available_credits = ensure_note_access(request.user, topic_obj, level)
-        credits_deducted = max(0, balance_before_notes - available_credits)
-        if not allowed:
-            return JsonResponse({
-                "success": False,
-                "error": "Your course share for this topic is not covered by your current credits. Top up to unlock this and later topics.",
-                "level": level,
-                "credits_balance": available_credits,
-                "credits_deducted": credits_deducted,
-            }, status=402)
+    # Note Access & Spending:
+    # Level 2 (Core Concepts) is free for all students.
+    # Level 1 (2 credits) and Level 3 (4 credits) are charged ONLY IF notes are present in cache.
+    from services.prep_ai_router import get_published_topic_note_levels
+    from services.prep_note_access import (
+        unlock_topic_note_level,
+        is_topic_note_unlocked,
+        NOTE_LEVEL_CREDIT_COSTS,
+        NOTE_LEVEL_LABELS,
+    )
+
+    published_notes = get_published_topic_note_levels(topic_obj, validated_only=False) if topic_obj else {}
+    note_content = published_notes.get(level, "")
+
+    if not note_content:
+        # Check cache directly
+        cached_res = get_or_generate_topic_notes(
+            course_code=course_code or "Course",
+            topic_title=topic_title,
+            subtopics=subtopics,
+            level=level,
+            course_obj=topic_obj.course if topic_obj else None,
+            topic_obj=topic_obj,
+            generate_if_missing=False,
+        )
+        if cached_res.get("notes") or cached_res.get("content"):
+            note_content = cached_res.get("notes", "") or cached_res.get("content", "")
+
+    if not note_content:
+        # Notes are absent / awaiting background preparation
+        if topic_obj:
+            PrepTopicNotesJob.objects.get_or_create(
+                topic=topic_obj,
+                level=level,
+                defaults={"status": "pending", "course": topic_obj.course},
+            )
+        label = NOTE_LEVEL_LABELS.get(level, level)
+        return JsonResponse({
+            "success": False,
+            "error": f"{label} notes are currently being prepared in the background or awaiting review. No credits were deducted.",
+            "level": level,
+            "credits_deducted": 0,
+            "credits_balance": get_available_credits(wallet),
+        }, status=200)
+
+    # Notes ARE present! Attempt to unlock / deliver
+    success, credits_deducted, error_msg = unlock_topic_note_level(
+        request.user, topic_obj, level, note_content
+    )
+
+    if not success:
+        return JsonResponse({
+            "success": False,
+            "error": error_msg,
+            "level": level,
+            "credits_deducted": 0,
+            "credits_required": NOTE_LEVEL_CREDIT_COSTS.get(level, 0),
+            "credits_balance": get_available_credits(wallet),
+        }, status=402)
+
+    wallet.refresh_from_db()
+    return JsonResponse({
+        "success": True,
+        "notes": note_content,
+        "level": level,
+        "cached": True,
+        "credits_deducted": credits_deducted,
+        "credits_balance": get_available_credits(wallet),
+        "already_unlocked": (credits_deducted == 0 and level != "level_2"),
+        "model": "Published Shared Notes",
+    })
 
     job_id = data.get("job_id")
     if job_id:
