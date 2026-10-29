@@ -1,4 +1,4 @@
-"""
+﻿"""
 Management command: migrate_prep_media_to_r2
 
 Migrates all existing Prep uploaded PDFs, visual crops, and PDF artifacts
@@ -69,17 +69,33 @@ class Command(BaseCommand):
                 continue
 
             local_path = Path(settings.MEDIA_ROOT) / old_name
-            if not local_path.is_file():
+            raw_bytes = None
+            if local_path.is_file():
+                raw_bytes = local_path.read_bytes()
+            else:
+                try:
+                    from services.github_service import GitHubService
+                    token = getattr(settings, "GITHUB_TOKEN", "").strip()
+                    repo = getattr(settings, "GITHUB_REPO", "").strip()
+                    branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
+                    if token and repo:
+                        stored_path = f"github://{repo}/{branch}/{old_name.lstrip('/')}"
+                        raw_bytes = GitHubService(token=token, repo_name=repo, branch=branch).download_file(stored_path)
+                except Exception:
+                    pass
+
+            if not raw_bytes:
                 self.stderr.write(f"  Skipping missing doc file: {old_name}")
                 errors += 1
                 continue
 
-            safe_name = f"prep-media/{hashlib.sha256(local_path.read_bytes()).hexdigest()[:16]}-{local_path.name}"
+            base_name = Path(old_name).name
+            safe_name = f"prep-media/{hashlib.sha256(raw_bytes).hexdigest()[:16]}-{base_name}"
             self.stdout.write(f"  Document {doc_id}: {old_name} -> {safe_name}")
 
             if not dry_run:
                 try:
-                    storage.save_existing(safe_name, local_path.read_bytes())
+                    storage.save_existing(safe_name, raw_bytes)
                     old_url = f"{settings.MEDIA_URL}{old_name}"
                     replacements[old_url] = storage.url(safe_name)
                     doc.file.name = safe_name
@@ -108,18 +124,33 @@ class Command(BaseCommand):
                     continue
 
                 local_path = Path(settings.MEDIA_ROOT) / old_name
-                if not local_path.is_file():
+                raw_bytes = None
+                if local_path.is_file():
+                    raw_bytes = local_path.read_bytes()
+                else:
+                    try:
+                        from services.github_service import GitHubService
+                        token = getattr(settings, "GITHUB_TOKEN", "").strip()
+                        repo = getattr(settings, "GITHUB_REPO", "").strip()
+                        branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
+                        if token and repo:
+                            stored_path = f"github://{repo}/{branch}/{old_name.lstrip('/')}"
+                            raw_bytes = GitHubService(token=token, repo_name=repo, branch=branch).download_file(stored_path)
+                    except Exception:
+                        pass
+
+                if not raw_bytes:
                     self.stderr.write(f"  Skipping missing visual file: {old_name}")
                     errors += 1
                     continue
 
-                ext = local_path.suffix or ".jpg"
-                safe_name = f"prep-media/{hashlib.sha256(local_path.read_bytes()).hexdigest()[:16]}-visual-{visual_id}-{field_name}{ext}"
+                ext = Path(old_name).suffix or ".jpg"
+                safe_name = f"prep-media/{hashlib.sha256(raw_bytes).hexdigest()[:16]}-visual-{visual_id}-{field_name}{ext}"
                 self.stdout.write(f"  Visual {visual_id} ({field_name}): {old_name} -> {safe_name}")
 
                 if not dry_run:
                     try:
-                        storage.save_existing(safe_name, local_path.read_bytes())
+                        storage.save_existing(safe_name, raw_bytes)
                         old_url = f"{settings.MEDIA_URL}{old_name}"
                         replacements[old_url] = storage.url(safe_name)
                         field.name = safe_name

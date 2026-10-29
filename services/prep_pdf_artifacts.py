@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import hashlib
 import json
@@ -337,31 +337,16 @@ def _upload_artifact(topic: PrepTopic, artifact_type: str, level: str, signature
     filename = f"{artifact_type}-{level or 'all'}-{signature[:24]}.pdf"
     key = f"{storage_dir}/{course_slug}/{topic.pk}-{topic_slug}/{filename}"
 
-    if is_cloudflare_r2_configured():
-        storage = CloudflareR2MediaStorage()
-        storage.save_existing(key, pdf_bytes, content_type="application/pdf")
-        logger.info("PDF artifact uploaded to Cloudflare R2: %s", key)
-        return key
-
-    # Fallback: GitHub
-    from services.github_service import GitHubService
-    token = getattr(settings, "GITHUB_TOKEN", "").strip()
-    repo = getattr(settings, "GITHUB_REPO", "").strip()
-    branch = getattr(settings, "GITHUB_BRANCH", "main").strip() or "main"
-    upload_dir = getattr(settings, "GITHUB_UPLOAD_DIR", "uploads").strip("/")
-    if not token or not repo:
+    if not is_cloudflare_r2_configured():
         raise RuntimeError(
-            "No PDF storage configured: set Cloudflare R2 credentials "
-            "(CF_Access_Key_ID / CF_Secret_Access_Key / CF_Endpoint) or GitHub credentials."
+            "Cloudflare R2 is required for PDF artifact uploads. "
+            "Please ensure CF_Access_Key_ID, CF_Secret_Access_Key, and CF_Endpoint are configured."
         )
-    repo_path = f"{upload_dir}/{key}"
-    GitHubService(token=token, repo_name=repo, branch=branch, upload_dir=upload_dir).upload_bytes(
-        repo_path,
-        pdf_bytes,
-        f"[Mentify] Publish {artifact_type} PDF for topic {topic.pk} ({signature[:12]})",
-    )
-    logger.info("PDF artifact uploaded to GitHub: %s", repo_path)
-    return repo_path
+
+    storage = CloudflareR2MediaStorage()
+    storage.save_existing(key, pdf_bytes, content_type="application/pdf")
+    logger.info("PDF artifact uploaded directly to Cloudflare R2: %s", key)
+    return key
 
 
 def _process_artifact(claim: tuple[int, int]) -> None:

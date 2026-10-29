@@ -1,4 +1,4 @@
-"""
+﻿"""
 Service for managing Mentify Prep topic note tiers and token/credit spending.
 
 Tiers:
@@ -43,12 +43,17 @@ def is_topic_note_unlocked(user, topic, level: str) -> bool:
         return False
     if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
         return True
+    if not topic:
+        return False
+    topic_id_val = int(getattr(topic, "id", None) or getattr(topic, "pk", None) or topic)
+    from django.db.models import Q
     from prep.models import PrepTransaction
     return PrepTransaction.objects.filter(
         wallet__user=user,
         action_type="topic_notes",
-        metadata__topic_id=int(topic.id),
         metadata__level=level,
+    ).filter(
+        Q(metadata__topic_id=topic_id_val) | Q(metadata__topic_id=str(topic_id_val))
     ).exists()
 
 
@@ -62,11 +67,16 @@ def get_unlocked_topic_note_levels(user, topic) -> Set[str]:
         return unlocked
     if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
         return {"level_1", "level_2", "level_3"}
+    if not topic:
+        return unlocked
+    topic_id_val = int(getattr(topic, "id", None) or getattr(topic, "pk", None) or topic)
+    from django.db.models import Q
     from prep.models import PrepTransaction
     unlocked_levels = PrepTransaction.objects.filter(
         wallet__user=user,
         action_type="topic_notes",
-        metadata__topic_id=int(topic.id),
+    ).filter(
+        Q(metadata__topic_id=topic_id_val) | Q(metadata__topic_id=str(topic_id_val))
     ).values_list("metadata__level", flat=True)
     for lvl in unlocked_levels:
         if lvl and str(lvl) in NOTE_LEVEL_CREDIT_COSTS:

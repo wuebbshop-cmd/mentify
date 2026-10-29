@@ -1228,18 +1228,14 @@ def prep_topic_study(request, topic_id):
     initial_notes_error = ""
 
     if requested_level in ("level_1", "level_3"):
-        note_candidate = all_published_notes.get(requested_level, "")
-        success, deducted, err = unlock_topic_note_level(
-            request.user, topic, requested_level, note_candidate
-        )
-        if success:
+        if requested_level in unlocked_levels:
             initial_level = requested_level
-            initial_notes = note_candidate
-            unlocked_levels.add(requested_level)
+            initial_notes = all_published_notes.get(requested_level, "")
         else:
+            # Never deduct credits on a GET request; load free Level 2 as initial
+            # and let the student explicitly unlock Level 1/3 via POST in the UI.
             initial_level = "level_2"
             initial_notes = all_published_notes.get("level_2", "")
-            initial_notes_error = err
     else:
         initial_level = "level_2"
         initial_notes = all_published_notes.get("level_2", "")

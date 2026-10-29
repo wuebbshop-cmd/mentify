@@ -2139,11 +2139,13 @@
         </div>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_1" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
           <span style="font-weight: 600;">Foundation &amp; Intuition</span>
-          {% if unlocked_levels.level_1 %}
-            <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
-          {% else %}
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; color: var(--danger); background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Unlock first</span></span>
-          {% endif %}
+          <span id="export-pdf-badge-level_1">
+            {% if unlocked_levels.level_1 %}
+              <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+            {% else %}
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; color: var(--danger); background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Unlock first</span></span>
+            {% endif %}
+          </span>
         </a>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_2" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
           <span style="font-weight: 600;">Core Concepts</span>
@@ -2151,11 +2153,13 @@
         </a>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?level=level_3" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
           <span style="font-weight: 600;">Exam Focus</span>
-          {% if unlocked_levels.level_3 %}
-            <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
-          {% else %}
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; color: var(--danger); background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Unlock first</span></span>
-          {% endif %}
+          <span id="export-pdf-badge-level_3">
+            {% if unlocked_levels.level_3 %}
+              <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>
+            {% else %}
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 600; color: var(--danger); background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Unlock first</span></span>
+            {% endif %}
+          </span>
         </a>
         <div style="height: 1px; margin: 4px 0; background: var(--border);"></div>
         <a href="{% url 'prep:export_topic' topic_id=topic.id fmt='pdf' %}?section=questions_answers" class="dropdown-level-item" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; font-size: 0.84rem; color: var(--text); text-decoration: none;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
@@ -3785,6 +3789,13 @@
   // ─── Level Notes Loader ───────────────────────────────────────────────────
   function loadNotesLevel(level) {
     updateExportPdfButton(level);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set('tab', 'notes');
+      u.searchParams.set('level', level);
+      window.history.replaceState({}, '', u.toString());
+    } catch (e) {}
+
     document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById('btn-lvl-' + level.replace('level_', ''));
     if (activeBtn) activeBtn.classList.add('active');
@@ -3796,7 +3807,7 @@
     const notesStorageKey = `prep_notes_${topicId}_${level}`;
     if (!publishedNotesByLevel[level]) {
       try {
-        const stored = sessionStorage.getItem(notesStorageKey);
+        const stored = localStorage.getItem(notesStorageKey) || sessionStorage.getItem(notesStorageKey);
         if (stored) {
           publishedNotesByLevel[level] = JSON.parse(stored);
         }
@@ -3856,12 +3867,19 @@
         if (statusBadge) { statusBadge.textContent = ''; }
         publishedNotesByLevel[level] = data.notes;
         try {
+          localStorage.setItem(notesStorageKey, JSON.stringify(data.notes));
           sessionStorage.setItem(notesStorageKey, JSON.stringify(data.notes));
         } catch (storageErr) {}
         
         // Update badge to Unlocked
         const badgeEl = document.getElementById('badge-lvl-' + level.replace('level_', ''));
         if (badgeEl && level !== 'level_2') { badgeEl.textContent = 'Unlocked'; }
+
+        // Update PDF export dropdown badge to allow immediate download
+        const pdfBadgeEl = document.getElementById('export-pdf-badge-' + level);
+        if (pdfBadgeEl) {
+          pdfBadgeEl.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); background: var(--hover); padding: 2px 6px; border-radius: 4px;">PDF</span>';
+        }
 
         // Update credit counters if credits were deducted
         if (data.credits_balance !== undefined) {
@@ -4406,6 +4424,11 @@
       try {
         const initialNotes = JSON.parse(rawNotesDataEl.textContent);
         if (typeof initialNotes === 'string' && initialNotes.trim()) {
+          publishedNotesByLevel[initialSelectedLevel] = initialNotes;
+          try {
+            localStorage.setItem(`prep_notes_${topicId}_${initialSelectedLevel}`, JSON.stringify(initialNotes));
+            sessionStorage.setItem(`prep_notes_${topicId}_${initialSelectedLevel}`, JSON.stringify(initialNotes));
+          } catch (e) {}
           setupNotesPagination(initialNotes);
         } else if (document.getElementById('pillar-notes').style.display !== 'none') {
           const notesBody = document.getElementById('notes-body');
