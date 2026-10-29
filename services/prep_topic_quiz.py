@@ -183,6 +183,66 @@ def parse_quiz_json_response(raw_text: str) -> list[dict]:
     return []
 
 
+def shuffle_quiz_question_options(
+    options: dict[str, str],
+    correct_option: str,
+    explanation: dict | str,
+) -> tuple[dict[str, str], str, dict]:
+    """
+    Randomize option positions across A, B, C, D to eliminate position bias.
+    Accurately remaps the correct option letter and the 'why_others_wrong' explanation dictionary.
+    """
+    letters = ["A", "B", "C", "D"]
+    clean_correct = str(correct_option or "").strip().upper()
+    if not isinstance(options, dict) or clean_correct not in letters:
+        return options, correct_option, explanation if isinstance(explanation, dict) else {"summary": str(explanation)}
+
+    for letter in letters:
+        if letter not in options and letter.lower() in options:
+            options[letter] = options[letter.lower()]
+    if not all(letter in options for letter in letters):
+        return options, correct_option, explanation if isinstance(explanation, dict) else {"summary": str(explanation)}
+
+    if isinstance(explanation, str):
+        expl_dict = {"summary": explanation, "why_others_wrong": {}}
+    elif isinstance(explanation, dict):
+        expl_dict = dict(explanation)
+        if "why_others_wrong" not in expl_dict or not isinstance(expl_dict["why_others_wrong"], dict):
+            expl_dict["why_others_wrong"] = {}
+        else:
+            expl_dict["why_others_wrong"] = dict(expl_dict["why_others_wrong"])
+    else:
+        expl_dict = {"summary": "Correct answer verified.", "why_others_wrong": {}}
+
+    old_why = expl_dict.get("why_others_wrong", {})
+
+    items = []
+    for letter in letters:
+        items.append({
+            "orig_letter": letter,
+            "text": options[letter],
+            "is_correct": (letter == clean_correct),
+            "why_wrong": old_why.get(letter, ""),
+        })
+
+    random.shuffle(items)
+
+    new_options = {}
+    new_correct_letter = "A"
+    new_why_others = {}
+
+    for new_letter, item in zip(letters, items):
+        new_options[new_letter] = item["text"]
+        if item["is_correct"]:
+            new_correct_letter = new_letter
+        else:
+            if item["why_wrong"]:
+                new_why_others[new_letter] = item["why_wrong"]
+
+    expl_dict["why_others_wrong"] = new_why_others
+    return new_options, new_correct_letter, expl_dict
+
+
 def generate_topic_quiz_questions(
     topic: PrepTopic,
     count: int = 5,
@@ -290,7 +350,7 @@ Required JSON schema:
 
 Important rules:
 1. Every question must have exactly 4 choices: A, B, C, and D.
-2. The correct_option must be exactly one uppercase letter ('A', 'B', 'C', or 'D').
+2. The correct_option must be randomly distributed across 'A', 'B', 'C', or 'D' (do NOT always place the correct answer at option A; ensure roughly equal distribution).
 3. Distractors (incorrect options) must represent authentic, common misconceptions rather than absurd choices.
 4. Follow the DISCIPLINE GUIDELINES above for math formulas vs code syntax.
 5. STRICT INSTITUTIONAL ANONYMITY: Do NOT mention any specific university, college, or lecturer name. Generalize any institutional examples to 'a higher education institution' or 'an academic institution'.
@@ -405,6 +465,13 @@ Important rules:
         if existing:
             created_questions.append(existing)
             continue
+
+        # Randomize choice positions across A, B, C, D to eliminate position bias
+        clean_options, correct_letter, clean_explanation = shuffle_quiz_question_options(
+            clean_options,
+            correct_letter,
+            clean_explanation,
+        )
 
         question_obj = PrepTopicQuizQuestion.objects.create(
             topic=topic,
