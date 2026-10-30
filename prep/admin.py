@@ -19,6 +19,7 @@ from django.db.models import Count
 from .models import (
     PrepCourse,
     PrepCourseEnrollment,
+    PrepCourseRequest,
     PrepTopic,
     PrepDocument,
     PrepDocumentVisual,
@@ -1094,6 +1095,43 @@ class PrepCourseEnrollmentAdmin(admin.ModelAdmin):
     list_display = ("user", "course", "source", "created_at")
     list_filter = ("source", "created_at")
     search_fields = ("user__email", "course__code", "course__title")
+
+
+@admin.register(PrepCourseRequest)
+class PrepCourseRequestAdmin(admin.ModelAdmin):
+    """Student requests for catalogue units that have no material yet."""
+
+    list_display = ("course_code", "course_title", "status", "requester", "created_at")
+    list_filter = ("status", "course__category", "created_at")
+    search_fields = ("course__code", "course__title", "email", "user__email", "user__username", "note")
+    readonly_fields = ("course", "user", "email", "note", "created_at")
+    date_hierarchy = "created_at"
+    list_per_page = 50
+    actions = ("mark_fulfilled", "mark_declined")
+
+    @admin.display(description="Course", ordering="course__code")
+    def course_code(self, obj):
+        return obj.course.code
+
+    @admin.display(description="Unit title", ordering="course__title")
+    def course_title(self, obj):
+        return obj.course.title
+
+    @admin.display(description="Requested by")
+    def requester(self, obj):
+        if obj.user:
+            return obj.user.get_full_name() or obj.user.username
+        return obj.email or "anonymous visitor"
+
+    @admin.action(description="Mark selected requests as fulfilled")
+    def mark_fulfilled(self, request, queryset):
+        updated = queryset.update(status=PrepCourseRequest.STATUS_FULFILLED)
+        self.message_user(request, f"{updated} request(s) marked as fulfilled.")
+
+    @admin.action(description="Mark selected requests as declined")
+    def mark_declined(self, request, queryset):
+        updated = queryset.update(status=PrepCourseRequest.STATUS_DECLINED)
+        self.message_user(request, f"{updated} request(s) marked as declined.")
 
 
 @admin.register(PrepTopic)

@@ -43,42 +43,183 @@ VALID_CATEGORIES = {
     "Other",
 }
 
-# Fallback when the code prefix is not recognised by infer_course_category().
-# Matched as lowercase substrings against the department/school name.
-DEPARTMENT_KEYWORDS = (
+CODE_RE = re.compile(r"^[A-Z]{2,6}\s?\d{2,4}[A-Z]?$")
+LEVEL_RE = re.compile(r"level\s*(\d{3})", re.IGNORECASE)
+
+
+# Department/school name -> discipline category. Ordered: the first match wins,
+# so specific departments must precede generic words ("management", "education").
+# The workbook's Department column is the authoritative signal; the code prefix is
+# only consulted when a department is unrecognised.
+DEPARTMENT_RULES = (
     ("actuarial", "Statistics"),
     ("statistic", "Statistics"),
+    ("mathematic", "Mathematics"),
+    ("computing", "Computing"),
+    ("computer science", "Computing"),
+    ("information and communication technology", "Computing"),
+    ("library", "Social Sciences"),
+    ("engineering", "Engineering"),
+    ("energy", "Engineering"),
+    ("chemistry", "Chemistry"),
+    ("physics", "Physics"),
+    # Health and life sciences
+    ("medical laboratory", "General Sciences"),
+    ("medical physiology", "General Sciences"),
+    ("medical", "General Sciences"),
+    ("pathology", "General Sciences"),
+    ("pharmac", "General Sciences"),
+    ("complementary", "General Sciences"),
+    ("nursing", "General Sciences"),
+    ("public health", "General Sciences"),
+    ("biochem", "General Sciences"),
+    ("biotechnology", "General Sciences"),
+    ("plant and microbial", "General Sciences"),
+    ("zoolog", "General Sciences"),
+    ("biological", "General Sciences"),
+    ("foods, nutrition", "General Sciences"),
+    ("nutrition", "General Sciences"),
+    ("agriculture science", "General Sciences"),
+    ("exercise", "General Sciences"),
+    ("sport", "General Sciences"),
+    ("environmental education", "Social Sciences"),
+    ("environmental", "General Sciences"),
+    # Business and economics
+    ("agricultural economics", "Business & Economics"),
+    ("agribusiness", "Business & Economics"),
+    # Agricultural, animal and plant sciences are applied sciences
+    ("agricultural", "General Sciences"),
+    ("agriculture", "General Sciences"),
+    ("animal", "General Sciences"),
+    ("plant", "General Sciences"),
+    ("dry-land", "General Sciences"),
+    ("dryland", "General Sciences"),
+    ("rangeland", "General Sciences"),
+    ("crop", "General Sciences"),
+    ("soil", "General Sciences"),
+    ("horticultur", "General Sciences"),
+    ("forest", "General Sciences"),
+    ("fisher", "General Sciences"),
+    ("genetic", "General Sciences"),
+    ("embryolog", "General Sciences"),
+    ("histolog", "General Sciences"),
     ("economic", "Business & Economics"),
-    ("accounting", "Business & Economics"),
+    ("account", "Business & Economics"),
     ("finance", "Business & Economics"),
+    ("banking", "Business & Economics"),
+    ("management science", "Business & Economics"),
     ("business", "Business & Economics"),
     ("commerce", "Business & Economics"),
     ("hospitality", "Business & Economics"),
     ("tourism", "Business & Economics"),
-    ("agricultur", "Business & Economics"),
-    ("enterprise", "Business & Economics"),
-    ("engineer", "Engineering"),
-    ("computing", "Computing"),
-    ("computer", "Computing"),
-    ("information technology", "Computing"),
-    ("health", "General Sciences"),
-    ("medical", "General Sciences"),
-    ("nursing", "General Sciences"),
-    ("pharmac", "General Sciences"),
-    ("pure & applied", "General Sciences"),
-    ("physical science", "General Sciences"),
-    ("biological", "General Sciences"),
-    ("environment", "General Sciences"),
-    ("law", "Humanities"),
+    ("marketing", "Business & Economics"),
+    ("procurement", "Business & Economics"),
+    # Social sciences
+    ("psycholog", "Social Sciences"),
+    ("sociolog", "Social Sciences"),
+    ("gender", "Social Sciences"),
+    ("development studies", "Social Sciences"),
+    ("public policy", "Social Sciences"),
+    ("community resource", "Social Sciences"),
     ("education", "Social Sciences"),
-    ("applied human", "Social Sciences"),
-    ("humanities", "Humanities"),
-    ("social science", "Humanities"),
-    ("arts", "Humanities"),
+    ("curriculum", "Social Sciences"),
+    ("early childhood", "Social Sciences"),
+    ("special education", "Social Sciences"),
+    ("geography", "Social Sciences"),
+    ("anthropolog", "Social Sciences"),
+    # Law and humanities
+    ("law", "Humanities"),
+    ("theatre", "Humanities"),
+    ("film", "Humanities"),
+    ("literature", "Humanities"),
+    ("english", "Humanities"),
+    ("linguistic", "Humanities"),
+    ("language", "Humanities"),
+    ("kiswahili", "Humanities"),
+    ("philosophy", "Humanities"),
+    ("religio", "Humanities"),
+    ("history", "Humanities"),
+    ("archeolog", "Humanities"),
+    ("political studies", "Humanities"),
+    ("fine art", "Humanities"),
+    ("music", "Humanities"),
+    ("dance", "Humanities"),
+    ("fashion", "Humanities"),
+    ("design", "Humanities"),
+    ("communication", "Humanities"),
 )
 
-CODE_RE = re.compile(r"^[A-Z]{2,6}\s?\d{2,4}[A-Z]?$")
-LEVEL_RE = re.compile(r"level\s*(\d{3})", re.IGNORECASE)
+# Fallback for unrecognised departments, keyed on the unit-code prefix.
+PREFIX_CATEGORY = {
+    "SMA": "Mathematics",
+    "BMS": "Mathematics",
+    "EES": "Mathematics",
+    "SST": "Statistics",
+    "STA": "Statistics",
+    "SCH": "Chemistry",
+    "SPH": "Physics",
+    "SZL": "General Sciences",
+    "SBT": "General Sciences",
+    "SBC": "General Sciences",
+    "SML": "General Sciences",
+    "SCO": "Computing",
+    "SCS": "Computing",
+    "SCU": "Computing",
+    "SCT": "Computing",
+    "SSE": "Computing",
+    "SET": "Engineering",
+    "ECE": "Engineering",
+    "BAC": "Business & Economics",
+    "BBA": "Business & Economics",
+    "EET": "Business & Economics",
+    "AEC": "Business & Economics",
+    "APP": "Business & Economics",
+    "HTM": "Business & Economics",
+    "BTM": "Business & Economics",
+    "KRM": "Business & Economics",
+    "ASC": "Social Sciences",
+    "PSY": "Social Sciences",
+    "APS": "Social Sciences",
+    "ECD": "Social Sciences",
+    "PSE": "Social Sciences",
+    "AGD": "Social Sciences",
+    "UCU": "Humanities",
+    "ALT": "Humanities",
+    "AEN": "Humanities",
+    "AHT": "Humanities",
+    "ARE": "Humanities",
+    "APH": "Humanities",
+    "AKS": "Humanities",
+    "MPE": "Humanities",
+    "MAE": "Humanities",
+    "MHC": "Humanities",
+    "VTF": "Humanities",
+    "ADT": "Humanities",
+    "AAD": "Humanities",
+    "LPR": "Humanities",
+    "LPL": "Humanities",
+    "LCC": "Humanities",
+    "LIL": "Humanities",
+}
+
+
+def category_for(code: str, title: str, department: str) -> str:
+    """Discipline category: department first, then code prefix, then the title."""
+    dept = (department or "").lower()
+    for needle, category in DEPARTMENT_RULES:
+        if needle in dept:
+            return category
+
+    prefix = str(code or "").split(" ")[0]
+    if prefix in PREFIX_CATEGORY:
+        return PREFIX_CATEGORY[prefix]
+
+    title_lower = (title or "").lower()
+    for needle, category in DEPARTMENT_RULES:
+        if needle in title_lower:
+            return category
+
+    return "Other"
 
 
 def normalise_code(value) -> str:
@@ -115,22 +256,6 @@ def truncate_title(title: str) -> str:
     return clipped.rstrip(" ,.;:-–—")
 
 
-def category_for(code: str, title: str, department: str) -> str:
-    """Discipline category: code/title inference first, department name second."""
-    from prep.views import infer_course_category
-
-    inferred = infer_course_category(code, title)
-    if inferred in VALID_CATEGORIES and inferred != "Other":
-        return inferred
-
-    dept = (department or "").lower()
-    for needle, category in DEPARTMENT_KEYWORDS:
-        if needle in dept:
-            return category
-
-    return inferred if inferred in VALID_CATEGORIES else "Other"
-
-
 def level_for(year_value) -> str:
     match = LEVEL_RE.search(str(year_value or ""))
     return f"Level {match.group(1)}" if match else "Standard"
@@ -142,6 +267,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--source", default=str(DEFAULT_SOURCE), help="Path to the workbook.")
         parser.add_argument("--dry-run", action="store_true", help="Report what would be created, write nothing.")
+        parser.add_argument(
+            "--recategorise",
+            action="store_true",
+            help="Re-apply the department rules to courses that already exist.",
+        )
 
     def handle(self, *args, **options):
         import openpyxl
@@ -224,6 +354,27 @@ class Command(BaseCommand):
                     f"    e.g. {unit['code']:<10} {unit['title'][:50]:<52} {unit['category']:<20} {unit['level']}"
                 )
             return
+
+        # Correct the category of units that were imported with the old rules.
+        if options["recategorise"]:
+            existing_courses = {
+                c.code: c for c in PrepCourse.objects.filter(code__in=list(collected))
+            }
+            changed = []
+            changes = []
+            for code, unit in collected.items():
+                course = existing_courses.get(code)
+                if course and course.category != unit["category"]:
+                    changes.append((code, course.category, unit["category"]))
+                    course.category = unit["category"]
+                    changed.append(course)
+            if changed:
+                PrepCourse.objects.bulk_update(changed, ["category"], batch_size=500)
+                for key in ("prep_pub_lib_courses_v3", "prep_pub_lib_courses"):
+                    cache.delete(key)
+            self.stdout.write(self.style.SUCCESS(f"recategorised {len(changed)} courses"))
+            for code, old, new in changes[:15]:
+                self.stdout.write(f"    {code:<10} {old:<22} -> {new}")
 
         # Bulk insert: one round-trip per batch instead of one per unit.
         rows = [

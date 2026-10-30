@@ -26,6 +26,7 @@ from .models import (
     PrepContentCache,
     PrepWallet,
     PrepCourseEnrollment,
+    PrepCourseRequest,
     PrepTopicNotesJob,
     PrepTransaction,
     PrepHistory,
@@ -616,12 +617,24 @@ def prep_request_course(request, course_slug):
         messages.error(request, "Please enter a valid email address.")
         return back
 
-    identity = request.user.pk if request.user.is_authenticated else (request.META.get("REMOTE_ADDR") or "anon")
-    throttle_key = f"prep_course_request:{course.pk}:{identity}"
-    if cache.get(throttle_key):
-        messages.info(request, f"We already have your request for {course.code}.")
+    # One open request per requester per course; the admin list is the queue.
+    existing = PrepCourseRequest.objects.filter(
+        course=course, status=PrepCourseRequest.STATUS_OPEN
+    )
+    if request.user.is_authenticated:
+        existing = existing.filter(user=request.user)
+    else:
+        existing = existing.filter(user__isnull=True, email__iexact=requester_email)
+    if existing.exists():
+        messages.info(request, f"Your request for {course.code} is already with our team.")
         return back
-    cache.set(throttle_key, 1, 60 * 60 * 12)
+
+    PrepCourseRequest.objects.create(
+        course=course,
+        user=request.user if request.user.is_authenticated else None,
+        email=requester_email,
+        note=(request.POST.get("note") or "").strip()[:300],
+    )
 
     page_url = request.build_absolute_uri(
         reverse("prep:public_course", kwargs={"course_slug": course.slug})

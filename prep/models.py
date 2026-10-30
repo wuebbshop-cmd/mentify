@@ -385,6 +385,51 @@ class PrepTopicChatUpload(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class PrepCourseRequest(models.Model):
+    """
+    A student asking for notes/past papers on a catalogue unit that has none yet.
+
+    Surfaces in Django admin so the request can be worked through: upload material
+    via /prep/upload/ and then mark the request fulfilled.
+    """
+
+    STATUS_OPEN = "open"
+    STATUS_FULFILLED = "fulfilled"
+    STATUS_DECLINED = "declined"
+    STATUS_CHOICES = [
+        (STATUS_OPEN, "Open"),
+        (STATUS_FULFILLED, "Fulfilled"),
+        (STATUS_DECLINED, "Declined"),
+    ]
+
+    course = models.ForeignKey(PrepCourse, on_delete=models.CASCADE, related_name="requests")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="prep_course_requests",
+    )
+    email = models.EmailField(blank=True)
+    note = models.CharField(max_length=300, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPEN, db_index=True)
+    resolution_note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Prep Course Request"
+        verbose_name_plural = "Prep Course Requests"
+        indexes = [
+            models.Index(fields=["status", "created_at"]),
+            models.Index(fields=["course", "status"]),
+        ]
+
+    def __str__(self):
+        who = self.email or (self.user.email if self.user else "anonymous")
+        return f"{self.course.code} — {who}"
+
+
 class PrepDocument(models.Model):
     """Raw uploaded document (notes or CAT papers) progressing through the 3-stage pipeline."""
     DOC_TYPES = [

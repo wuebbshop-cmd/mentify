@@ -592,6 +592,14 @@
         + Upload Material
       </a>
       {% endif %}
+      {% if not topics %}
+      <form method="post" action="{% url 'prep:request_course' course.slug %}" style="margin: 0; display: inline-flex;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline btn-sm" title="No material for this unit yet — ask for it to be added">
+          Request This Course
+        </button>
+      </form>
+      {% endif %}
       {% if request.user.is_authenticated and course.id %}
         {% if course.is_enrolled %}
         <form method="post" action="{% url 'prep:remove_course' course_id=course.id %}" style="margin: 0;">
