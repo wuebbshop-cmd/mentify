@@ -3,6 +3,8 @@
 from .base import *  # noqa: F401,F403
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 DEBUG = False
 
 # Background email jobs have no request object from which to infer a host.
@@ -38,22 +40,23 @@ ALLOWED_HOSTS = list(set(
 
 # Database: production uses MySQL from DB_* environment variables in base.py.
 
-# Render's local filesystem is ephemeral.
-# Cloudflare R2 is the primary object storage for uploaded PDFs, visual crops, and notes PDFs.
-if USE_CLOUDFLARE_R2:
-    STORAGES = {
-        **STORAGES,
-        "default": {
-            "BACKEND": "services.cloudflare_storage.CloudflareR2MediaStorage",
-        },
-    }
-else:
-    STORAGES = {
-        **STORAGES,
-        "default": {
-            "BACKEND": "services.github_media_storage.GitHubMediaStorage",
-        },
-    }
+# Render's local filesystem is ephemeral, and Cloudflare R2 is the only supported
+# object store for uploaded PDFs, visual crops and notes PDFs. The GitHub storage
+# fallback was retired: it silently duplicated every upload into another product's
+# repository. Missing R2 configuration now fails loudly at startup instead of
+# writing uploads somewhere unintended.
+if not USE_CLOUDFLARE_R2:
+    raise ImproperlyConfigured(
+        "Cloudflare R2 is not configured. Set CF_Access_Key_ID, "
+        "CF_Secret_Access_Key and CF_Endpoint in the environment."
+    )
+
+STORAGES = {
+    **STORAGES,
+    "default": {
+        "BACKEND": "services.cloudflare_storage.CloudflareR2MediaStorage",
+    },
+}
 
 # Security: HTTPS and HSTS.
 SECURE_SSL_REDIRECT = True
