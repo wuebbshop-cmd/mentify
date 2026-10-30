@@ -2120,6 +2120,15 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("unreadable private-use glyphs from source extraction")
     if "\ufffd" in source:
         issues.append("unreadable replacement character from source extraction")
+    # Mojibake: a UTF-8 integral or minus sign decoded as Windows-1252 leaves runs
+    # like "Γê½" or "ΓêÆ". They read as gibberish and mean the notation is lost.
+    if re.search(r"[Γ╧╬╢╡╕╛╝╜╙]", source):
+        issues.append("question text contains mojibake from a broken text-encoding conversion")
+    # OCR damage inside a marks annotation, e.g. "(20 Marlcs)", "[Smarks]", "(4 mks)".
+    if re.search(r"(?i)\b(?:marlcs|smarlcs|markss|mks)\b|\[\s*s\s*marks\s*\]|\(\s*\d+\s*marlcs\s*\)", source):
+        issues.append("question text contains OCR damage inside a marks annotation")
+    if re.match(r"^\s*[.:;,]\s*[A-Z]", source):
+        issues.append("question text begins with detached page-header punctuation")
     if re.search(r"(?i)\(\s*(?:cid|glyph|char)\s*:\s*\d+\s*\)", source):
         issues.append("unreadable PDF character-map placeholder")
     if len(re.sub(r"\s+", " ", source).strip()) < 18:
