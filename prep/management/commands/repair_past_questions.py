@@ -110,6 +110,15 @@ class Command(BaseCommand):
             action="store_true",
             help="Remove only unambiguous extraction debris and flag other invalid visible rows; never call AI.",
         )
+        parser.add_argument(
+            "--require-source",
+            action="store_true",
+            help=(
+                "Skip questions that have no attached source document with extracted text. "
+                "Their reconstruction can never pass the independent source review, so "
+                "reconstructing them only spends credits."
+            ),
+        )
 
     def handle(self, *args, **options):
         deterministic_only = options["deterministic_only"]
@@ -128,12 +137,22 @@ class Command(BaseCommand):
             questions = questions.filter(pk=question_id)
 
         candidates = []
+        skipped_without_source = 0
+        require_source = options.get("require_source", False)
         for question in questions.iterator():
             if deterministic_only and question.verification_status not in PrepQuestion.LEARNER_VISIBLE_STATUSES:
                 continue
             issues = assessment_question_rendering_issues(question.question_latex)
             if question.verification_status != "flagged" and not issues:
                 continue
+            if require_source:
+                source_document = question.source_document or (
+                    question.paper.source_document if question.paper_id else None
+                )
+                if source_document is None or not (source_document.extracted_text or "").strip():
+                    # No source to review against: the reconstruction would be held forever.
+                    skipped_without_source += 1
+                    continue
             course = question.paper.course if question.paper_id else (
                 question.topic.course if question.topic_id else None
             )
@@ -385,6 +404,7 @@ class Command(BaseCommand):
                 f"already_repaired={already_repaired}, failed={failed}, "
                 f"awaiting_review={awaiting_review}, "
                 f"covered_by_clean_duplicate={covered_by_clean_duplicate}, "
-                f"skipped_without_context={skipped_without_context}."
+                f"skipped_without_context={skipped_without_context}, "
+                f"skipped_without_source={skipped_without_source}."
             )
         )
