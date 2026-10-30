@@ -5937,6 +5937,55 @@ def _strip_question_number_heading(question_text: str) -> str:
     ).strip()
 
 
+def _question_source_window(document_text: str, question_text: str, *, window: int = 1600) -> str:
+    """
+    Locate a question inside its source document and return the surrounding text.
+
+    Documents extracted without page markers have no '--- Page N ---' headers, so the
+    page lookup returned nothing and the independent review then held every
+    reconstruction with 'no extracted source-page text'. The damaged transcription came
+    from this same document, so a window around it is real evidence to review against.
+    """
+    haystack = re.sub(r"\s+", " ", str(document_text or "")).strip()
+    needle_source = re.sub(r"\s+", " ", str(question_text or "")).strip()
+    if len(haystack) < 200 or len(needle_source) < 12:
+        return ""
+    for size in (140, 90, 50, 28):
+        needle = needle_source[:size].strip()
+        if len(needle) < 12:
+            continue
+        index = haystack.find(needle)
+        if index == -1:
+            continue
+        start = max(0, index - window // 3)
+        return haystack[start:start + window].strip()
+
+    # Second pass: the stored transcription may differ from the document in punctuation,
+    # spacing or mojibake glyphs. Match on letters and digits only, keeping a map back to
+    # the original offsets so the returned window is real document text.
+    normalised_chars = []
+    origin_index = []
+    for position, char in enumerate(haystack):
+        lowered = char.lower()
+        if lowered.isalnum():
+            normalised_chars.append(lowered)
+            origin_index.append(position)
+    normalised_haystack = "".join(normalised_chars)
+    normalised_needle = re.sub(r"[^0-9a-z]+", "", needle_source.lower())
+    if len(normalised_needle) < 20 or not normalised_haystack:
+        return ""
+    probe = normalised_needle[:80]
+    found = normalised_haystack.find(probe)
+    if found == -1:
+        probe = normalised_needle[:40]
+        found = normalised_haystack.find(probe)
+    if found == -1:
+        return ""
+    original_position = origin_index[found]
+    start = max(0, original_position - window // 3)
+    return haystack[start:start + window].strip()
+
+
 def _review_adapted_question_against_source(
     question_obj,
     adapted_item: dict,
@@ -6097,6 +6146,13 @@ def generate_adapted_past_question(question_obj) -> dict:
             end = page_headers[index + 1].start() if index + 1 < len(page_headers) else len(source_document.extracted_text)
             source_page_context = str(source_document.extracted_text)[header.end():end].strip()[:2000]
             break
+    if source_document and not source_page_context.strip():
+        # No usable page markers: fall back to the region around the original question so
+        # the independent review still has verbatim evidence instead of holding.
+        source_page_context = _question_source_window(
+            str(source_document.extracted_text or ""),
+            str(question_obj.question_latex or ""),
+        )
     from services.prep_sanitizer import purge_institutional_metadata
     question_text = purge_institutional_metadata(question_text)
     source_page_context = purge_institutional_metadata(source_page_context)
