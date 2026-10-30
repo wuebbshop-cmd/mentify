@@ -592,14 +592,6 @@
         + Upload Material
       </a>
       {% endif %}
-      {% if not topics and course.slug %}
-      <form method="post" action="{% url 'prep:request_course' course.slug %}" style="margin: 0; display: inline-flex;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-outline btn-sm" title="No material for this unit yet — ask for it to be added">
-          Request This Course
-        </button>
-      </form>
-      {% endif %}
       {% if request.user.is_authenticated and course.id %}
         {% if course.is_enrolled %}
         <form method="post" action="{% url 'prep:remove_course' course_id=course.id %}" style="margin: 0;">
@@ -771,11 +763,21 @@
             Upload course lecture notes or a syllabus outline to automatically extract and index syllabus units.
           {% endif %}
         </p>
-        {% if course.id %}
-        <a href="{% url 'prep:upload' %}?course_id={{ course.id }}" class="btn btn-primary btn-sm">
-          + Upload Course Material
-        </a>
-        {% endif %}
+        <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+          {% if course.id %}
+          <a href="{% url 'prep:upload' %}?course_id={{ course.id }}" class="btn btn-primary btn-sm">
+            + Upload Course Material
+          </a>
+          {% endif %}
+          {% if course.slug %}
+          <form method="post" action="{% url 'prep:request_course' course.slug %}" style="margin: 0; display: inline-flex;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline btn-sm" title="Ask us to add material for this unit">
+              Request This Course
+            </button>
+          </form>
+          {% endif %}
+        </div>
       </div>
     </div>
     {% endfor %}

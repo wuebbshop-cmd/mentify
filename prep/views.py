@@ -1,6 +1,7 @@
 ﻿import os
 import re
 import json
+import unicodedata
 import datetime
 import logging
 from functools import wraps
@@ -344,9 +345,54 @@ def _public_topic_questions(topic):
 PREP_LIBRARY_PAGE_SIZE = 48
 
 
+_SEARCH_WORD_SPLIT_RE = re.compile(r"[^0-9a-z]+")
+
+
+def _search_words(*parts):
+    """
+    Split text into lowercase, accent-free, punctuation-free words.
+
+    Word boundaries are kept on purpose: stripping them entirely makes
+    "economic**s** **st**ructured" contain the fake token "sst" and floods the
+    results with every unit in the catalogue.
+    """
+    text = " ".join("" if part is None else str(part) for part in parts)
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    return tuple(word for word in _SEARCH_WORD_SPLIT_RE.split(text.lower()) if word)
+
+
+def _search_flat(*parts):
+    """Joined form with no separators, so "sst100" can match the code "SST 100"."""
+    return "".join(_search_words(*parts))
+
+
+def _matches_tokens(tokens, words):
+    """Every query token must appear inside at least one haystack word."""
+    return all(any(token in word for word in words) for token in tokens)
+
+
+def _search_rank(course, needle, tokens):
+    """Lower is better: exact code, code words, code prefix, then title/category."""
+    code_flat = course.get("code_flat") or ""
+    code_words = course.get("code_words") or ()
+    words = course.get("search_words") or ()
+    if code_flat == needle:
+        return 0
+    if tokens and _matches_tokens(tokens, code_words):
+        return 1
+    if needle and code_flat.startswith(needle):
+        return 2
+    if needle and needle in code_flat:
+        return 3
+    if tokens and _matches_tokens(tokens, words):
+        return 4
+    return 5
+
+
 def prep_public_library(request):
     """Public catalogue for search visitors and crawlers, branded as Mentify."""
-    cache_key = "prep_pub_lib_courses_v3"
+    cache_key = "prep_pub_lib_courses_v5"
     bundle = cache.get(cache_key)
     if bundle is None:
         raw_courses = list(
@@ -399,6 +445,15 @@ def prep_public_library(request):
                 "description": desc,
                 "topic_count": c.topic_count,
                 "paper_count": c.paper_count,
+                # Pre-normalised haystacks. Codes, titles and disciplines only:
+                # the placeholder blurb is identical on thousands of units and
+                # would otherwise match any word in it.
+                "code_words": _search_words(c.code),
+                "code_flat": _search_flat(c.code),
+                "title_flat": _search_flat(c.code, display_title, c.title),
+                "search_words": _search_words(
+                    c.code, display_title, c.title, cat_name
+                ),
             })
 
         bundle = {
@@ -419,12 +474,19 @@ def prep_public_library(request):
 
     courses = bundle["courses"]
     if query:
-        needle = query.lower()
-        courses = [
-            c for c in courses
-            if needle in f"{c['code']} {c['title']} {c['category']}".lower()
-            or needle in (c.get("description") or "").lower()
-        ]
+        tokens = _search_words(query)
+        needle = "".join(tokens)
+        if tokens:
+            def _matches(course):
+                if _matches_tokens(tokens, course.get("search_words") or ()):
+                    return True
+                # Joined forms like "sst100" or "introductionstatistics": only
+                # trust a long needle against code+title, because short needles
+                # match across word joins in the flattened text.
+                return len(needle) >= 4 and needle in (course.get("title_flat") or "")
+
+            courses = [c for c in courses if _matches(c)]
+            courses.sort(key=lambda c: (_search_rank(c, needle, tokens), c["code"]))
     if selected_category and selected_category.lower() != "all":
         courses = [c for c in courses if c["category"].lower() == selected_category.lower()]
 

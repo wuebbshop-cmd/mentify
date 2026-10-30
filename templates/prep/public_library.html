@@ -537,70 +537,56 @@
   {% endif %}
 
   <!-- Empty Filter State -->
-  <div id="libFilterEmpty" style="display: none; padding: 40px 20px; text-align: center; border: 1px dashed var(--border); border-radius: 12px; margin-top: 16px; background: var(--surface);">
-    <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">No matching courses found</h3>
-    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 14px;">Try searching with another keyword or select All Disciplines.</p>
-    <button type="button" id="libResetFiltersBtn" class="btn btn-outline btn-sm">Reset Filters</button>
-  </div>
 </div>
 
 <script>
   (function () {
     const searchInput = document.getElementById('libSearchInput');
     const searchClear = document.getElementById('libSearchClear');
-    const badge = document.getElementById('libResultsBadge');
-    const cards = Array.from(document.querySelectorAll('#libCoursesGrid .lib-course-card'));
-    const emptyState = document.getElementById('libFilterEmpty');
-    const resetBtn = document.getElementById('libResetFiltersBtn');
+    if (!searchInput) return;
 
-    if (!cards.length) return;
-    const total = cards.length;
-    let selectedCategory = 'all';
+    // Search runs on the server so it covers the whole catalogue (3,600+ units).
+    // This script used to hide cards locally with a raw substring check, which
+    // blanked the page for terms like "sst100" even when matches existed.
+    // It also never parsed (unbalanced braces), so the clear button was dead.
+    const initialValue = searchInput.value.trim();
+    let submitTimer = null;
 
-    function applyFilter() {
-      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
-      if (searchClear) searchClear.style.display = q ? 'block' : 'none';
-
-      let count = 0;
-      cards.forEach(function (card) {
-        const text = card.getAttribute('data-search-text') || '';
-        const cat = card.getAttribute('data-category') || '';
-
-        const matchesText = !q || text.indexOf(q) !== -1;
-        const matchesCategory = (selectedCategory === 'all') || (cat === selectedCategory);
-        const visible = matchesText && matchesCategory;
-
-        card.style.display = visible ? '' : 'none';
-        if (visible) count += 1;
-      });
-
-      if (badge) {
-        badge.textContent = (count === total && !q && selectedCategory === 'all')
-          ? total + ' Courses Available'
-          : count + ' of ' + total + ' Courses';
-      }
-
-      if (emptyState) {
-        emptyState.style.display = (count === 0 && total > 0) ? 'block' : 'none';
+    function syncClearButton() {
+      if (searchClear) {
+        searchClear.style.display = searchInput.value.trim() ? 'block' : 'none';
       }
     }
 
-    if (searchInput) {
-      searchInput.addEventListener('input', applyFilter);
+    function submitSearch() {
+      if (searchInput.form) searchInput.form.submit();
     }
+
+    syncClearButton();
+
+    searchInput.addEventListener('input', function () {
+      syncClearButton();
+      clearTimeout(submitTimer);
+      submitTimer = setTimeout(function () {
+        if (searchInput.value.trim() === initialValue) return;
+        submitSearch();
+      }, 450);
+    });
+
+    searchInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        clearTimeout(submitTimer);
+        submitSearch();
+      }
+    });
 
     if (searchClear) {
       searchClear.addEventListener('click', function () {
         searchInput.value = '';
-        applyFilter();
-        searchInput.form.submit();
+        syncClearButton();
+        submitSearch();
       });
-    }
-
-    if (resetBtn) {
-      resetBtn.addEventListener('click', function () {
-        if (searchInput) searchInput.value = '';
-        if (searchInput && searchInput.form) searchInput.form.submit
     }
   })();
 </script>
