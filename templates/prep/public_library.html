@@ -412,39 +412,46 @@
     </div>
   </div>
 
-  <!-- Search & Discipline Filters -->
+  <!-- Search & Discipline Filters (server-side: search covers the whole catalogue) -->
   <div class="lib-toolbar">
-    <div class="lib-search-row">
+    <form method="get" action="{% url 'prep:public_library' %}" class="lib-search-row">
       <div class="lib-search-box">
         <svg class="lib-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <input
-          type="text"
+          type="search"
           id="libSearchInput"
+          name="q"
+          value="{{ search_query }}"
           class="lib-search-input"
           placeholder="Search course code, title, or discipline..."
           autocomplete="off"
         >
+        {% if selected_category != 'all' %}
+        <input type="hidden" name="category" value="{{ selected_category }}">
+        {% endif %}
         <button type="button" id="libSearchClear" class="lib-search-clear" aria-label="Clear search">&times;</button>
       </div>
 
       <span class="lib-results-badge" id="libResultsBadge">
-        {{ courses|length }} Courses Available
+        {% if search_query or selected_category != 'all' %}{{ filtered_total }} of {{ total_courses }} Courses{% else %}{{ total_courses }} Courses Available{% endif %}
       </span>
-    </div>
+    </form>
 
     <!-- Category Filter Pills -->
     {% if categories %}
     <div class="lib-pills-row" id="libCategoryPills">
-      <button type="button" class="lib-pill is-active" data-category="all">
-        All Disciplines ({{ courses|length }})
-      </button>
+      <a class="lib-pill {% if selected_category == 'all' %}is-active{% endif %}"
+         href="{% url 'prep:public_library' %}{% if search_query %}?q={{ search_query|urlencode }}{% endif %}">
+        All Disciplines ({{ total_courses }})
+      </a>
       {% for cat in categories %}
-      <button type="button" class="lib-pill" data-category="{{ cat|lower }}">
+      <a class="lib-pill {% if selected_category == cat|lower %}is-active{% endif %}"
+         href="{% url 'prep:public_library' %}?category={{ cat|lower|urlencode }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}">
         {{ cat }}
-      </button>
+      </a>
       {% endfor %}
     </div>
     {% endif %}
@@ -506,6 +513,26 @@
     {% endfor %}
   </div>
 
+  {% if not courses %}
+  <div style="padding: 40px 20px; text-align: center; border: 1px dashed var(--border); border-radius: 12px; background: var(--surface); margin-top: 16px;">
+    <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 0 0 6px;">No matching courses found</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 14px;">Try another keyword or browse all disciplines.</p>
+    <a href="{% url 'prep:public_library' %}" class="btn btn-outline btn-sm">Reset filters</a>
+  </div>
+  {% endif %}
+
+  {% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <nav class="lib-pagination" aria-label="Catalogue pages" style="display: flex; gap: 10px; justify-content: center; align-items: center; margin: 26px 0 6px; flex-wrap: wrap;">
+    {% if page_obj.has_previous %}
+    <a class="btn btn-outline btn-sm" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}{% if selected_category != 'all' %}&category={{ selected_category }}{% endif %}">&larr; Previous</a>
+    {% endif %}
+    <span style="font-size: 0.84rem; color: var(--text-muted);">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a class="btn btn-outline btn-sm" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}{% if selected_category != 'all' %}&category={{ selected_category }}{% endif %}">Next &rarr;</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
   <!-- Empty Filter State -->
   <div id="libFilterEmpty" style="display: none; padding: 40px 20px; text-align: center; border: 1px dashed var(--border); border-radius: 12px; margin-top: 16px; background: var(--surface);">
     <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">No matching courses found</h3>
@@ -520,7 +547,6 @@
     const searchClear = document.getElementById('libSearchClear');
     const badge = document.getElementById('libResultsBadge');
     const cards = Array.from(document.querySelectorAll('#libCoursesGrid .lib-course-card'));
-    const pillButtons = Array.from(document.querySelectorAll('#libCategoryPills .lib-pill'));
     const emptyState = document.getElementById('libFilterEmpty');
     const resetBtn = document.getElementById('libResetFiltersBtn');
 
@@ -564,29 +590,14 @@
       searchClear.addEventListener('click', function () {
         searchInput.value = '';
         applyFilter();
-        searchInput.focus();
+        searchInput.form.submit();
       });
     }
-
-    pillButtons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        pillButtons.forEach(function (b) { b.classList.remove('is-active'); });
-        btn.classList.add('is-active');
-        selectedCategory = btn.getAttribute('data-category') || 'all';
-        applyFilter();
-      });
-    });
 
     if (resetBtn) {
       resetBtn.addEventListener('click', function () {
         if (searchInput) searchInput.value = '';
-        selectedCategory = 'all';
-        pillButtons.forEach(function (b) {
-          if (b.getAttribute('data-category') === 'all') b.classList.add('is-active');
-          else b.classList.remove('is-active');
-        });
-        applyFilter();
-      });
+        if (searchInput && searchInput.form) searchInput.form.submit
     }
   })();
 </script>

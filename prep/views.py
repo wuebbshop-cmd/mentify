@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.views.decorators.cache import never_cache
 from django.utils.cache import patch_vary_headers
 from django.contrib.auth.decorators import login_required
@@ -337,6 +338,11 @@ def _public_topic_questions(topic):
     return res
 
 
+# Catalogue cards rendered per page. The full catalogue is 3,600+ units, so the
+# whole list cannot be rendered in one response.
+PREP_LIBRARY_PAGE_SIZE = 48
+
+
 def prep_public_library(request):
     """Public catalogue for search visitors and crawlers, branded as Mentify."""
     cache_key = "prep_pub_lib_courses_v3"
@@ -404,8 +410,33 @@ def prep_public_library(request):
         }
         cache.set(cache_key, bundle, 900)
 
+    # Server-side search + pagination. Rendering the whole catalogue (3,600+ units)
+    # produced a ~7 MB page and a ~14s TTFB; a page slice keeps the payload small
+    # while search still spans every unit.
+    query = (request.GET.get("q") or "").strip()
+    selected_category = (request.GET.get("category") or "").strip()
+
+    courses = bundle["courses"]
+    if query:
+        needle = query.lower()
+        courses = [
+            c for c in courses
+            if needle in f"{c['code']} {c['title']} {c['category']}".lower()
+            or needle in (c.get("description") or "").lower()
+        ]
+    if selected_category and selected_category.lower() != "all":
+        courses = [c for c in courses if c["category"].lower() == selected_category.lower()]
+
+    page_obj = Paginator(courses, PREP_LIBRARY_PAGE_SIZE).get_page(request.GET.get("page"))
+
     context = {
         **bundle,
+        "courses": page_obj.object_list,
+        "page_obj": page_obj,
+        "filtered_total": len(courses),
+        "search_query": query,
+        "selected_category": selected_category.lower() or "all",
+        "page_size": PREP_LIBRARY_PAGE_SIZE,
         "active_tab": "library",
     }
     resp = render(request, "prep/public_library.html", context)
