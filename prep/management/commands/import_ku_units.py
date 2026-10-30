@@ -99,6 +99,22 @@ def normalise_title(value) -> str:
     return re.sub(r"\s+", " ", str(value)).strip()
 
 
+# PrepCourse.title is CharField(max_length=200); a handful of rows in the
+# workbook are longer (up to 342 chars) and would raise DataError on insert.
+MAX_TITLE_LEN = 200
+
+
+def truncate_title(title: str) -> str:
+    """Clip to the column width at a word boundary rather than mid-word."""
+    if len(title) <= MAX_TITLE_LEN:
+        return title
+    clipped = title[:MAX_TITLE_LEN]
+    cut = clipped.rfind(" ")
+    if cut > MAX_TITLE_LEN * 0.6:
+        clipped = clipped[:cut]
+    return clipped.rstrip(" ,.;:-–—")
+
+
 def category_for(code: str, title: str, department: str) -> str:
     """Discipline category: code/title inference first, department name second."""
     from prep.views import infer_course_category
@@ -141,6 +157,7 @@ class Command(BaseCommand):
         collected: dict[str, dict] = {}
         duplicates = 0
         rejected = 0
+        truncated = 0
 
         for sheet_name in SHEETS:
             if sheet_name not in workbook.sheetnames:
@@ -175,6 +192,9 @@ class Command(BaseCommand):
                 department = " ".join(
                     part for part in (cell(i_dept), cell(i_school)) if part
                 ).strip()
+                if len(title) > MAX_TITLE_LEN:
+                    truncated += 1
+                    title = truncate_title(title)
                 collected[code] = {
                     "code": code,
                     "title": title,
@@ -187,7 +207,8 @@ class Command(BaseCommand):
 
         self.stdout.write(
             f"workbook rows parsed by code: {len(collected)} "
-            f"(duplicates skipped: {duplicates}, rejected: {rejected})"
+            f"(duplicates skipped: {duplicates}, rejected: {rejected}, "
+            f"titles truncated to {MAX_TITLE_LEN}: {truncated})"
         )
         self.stdout.write(f"already in catalogue: {len(collected) - len(new_units)}")
         self.stdout.write(f"to create: {len(new_units)}")
@@ -204,21 +225,26 @@ class Command(BaseCommand):
                 )
             return
 
-        created = 0
-        for unit in new_units:
-            _, was_created = PrepCourse.objects.get_or_create(
+        # Bulk insert: one round-trip per batch instead of one per unit.
+        rows = [
+            PrepCourse(
                 code=unit["code"],
-                defaults={
-                    "title": unit["title"],
-                    "slug": slugify(unit["code"]),
-                    "category": unit["category"],
-                    "level": unit["level"],
-                },
+                title=unit["title"],
+                slug=slugify(unit["code"]),
+                category=unit["category"],
+                level=unit["level"],
             )
-            created += int(was_created)
+            for unit in new_units
+        ]
+        PrepCourse.objects.bulk_create(rows, batch_size=500, ignore_conflicts=True)
 
         # The library view caches its catalogue bundle; drop it so new units appear.
         for key in ("prep_pub_lib_courses_v3", "prep_pub_lib_courses"):
             cache.delete(key)
 
-        self.stdout.write(self.style.SUCCESS(f"created {created} new prep courses"))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"catalogue now holds {PrepCourse.objects.count()} courses "
+                f"(attempted {len(rows)})"
+            )
+        )
