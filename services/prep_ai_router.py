@@ -2967,6 +2967,45 @@ def evaluate_symbolic_math(expr_str: str, operation: str = "simplify") -> dict:
 
 # ─── 2. Dual-Model AI Router (DeepSeek V3 / R1) ──────────────────────────────
 
+# Aliases accepted in settings and env vars, mapped onto the two endpoints the
+# DeepSeek API actually serves.
+_DEEPSEEK_MODEL_ALIASES = {
+    "deepseek-chat": "deepseek-chat",
+    "deepseek-flash": "deepseek-chat",
+    "deepseek-chat-flash": "deepseek-chat",
+    "deepseek-v3": "deepseek-chat",
+    "deepseek-reasoner": "deepseek-reasoner",
+    "deepseek-v4-pro": "deepseek-reasoner",
+    "deepseek-r1": "deepseek-reasoner",
+}
+
+
+def _normalise_deepseek_model(model) -> str:
+    """
+    Map any configured model identifier onto a DeepSeek endpoint name.
+
+    Together.ai identifiers such as "deepseek-ai/DeepSeek-V4.1-Flash" share the
+    "deepseek" name but are not valid here; sending one produced
+    HTTP 400 invalid_request_error. Returns "" when the name cannot be mapped,
+    so the caller can fall back to the configured chat model.
+    """
+    name = str(model or "").strip()
+    if not name:
+        return ""
+    key = name.lower()
+    if key in _DEEPSEEK_MODEL_ALIASES:
+        return _DEEPSEEK_MODEL_ALIASES[key]
+    # Provider-prefixed vendor identifiers: "deepseek-ai/DeepSeek-V4.1-Flash".
+    tail = key.rsplit("/", 1)[-1].strip()
+    if tail in _DEEPSEEK_MODEL_ALIASES:
+        return _DEEPSEEK_MODEL_ALIASES[tail]
+    if "reason" in tail or "v4-pro" in tail or tail.endswith("r1"):
+        return "deepseek-reasoner"
+    if "flash" in tail or "chat" in tail or "v3" in tail:
+        return "deepseek-chat"
+    return ""
+
+
 def call_deepseek(
     messages: list[dict],
     model: str = "deepseek-chat",
@@ -2996,11 +3035,23 @@ def call_deepseek(
         logger.error("[DeepSeek] API key is not configured in settings or environment.")
         return {"success": False, "error": "The AI service is currently unavailable. Please try again shortly."}
 
-    # Normalize model names to valid DeepSeek endpoints
-    if model in {"deepseek-flash", "deepseek-chat-flash", "deepseek-v3"}:
-        model = "deepseek-chat"
-    elif model in {"deepseek-v4-pro", "deepseek-r1"}:
-        model = "deepseek-reasoner"
+    # Normalise model names to valid DeepSeek endpoints. Unrecognised identifiers
+    # are replaced rather than sent, because the API answers HTTP 400 and the call
+    # then has to be re-run on the fallback provider.
+    requested_model = model
+    resolved_model = _normalise_deepseek_model(model)
+    if resolved_model:
+        model = resolved_model
+    else:
+        model = (
+            _normalise_deepseek_model(getattr(settings, "DEEPSEEK_CHAT_MODEL", ""))
+            or "deepseek-chat"
+        )
+        logger.warning(
+            "[DeepSeek] Unsupported model %r requested; using %r instead.",
+            requested_model,
+            model,
+        )
 
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -3069,6 +3120,45 @@ def call_deepseek(
                                 content = content + "\n\n" + cont_content
                 except Exception as cont_err:
                     logger.warning(f"[DeepSeek] Auto-continuation failed: {cont_err}")
+
+            if not content and finish_reason == "length":
+                # A reasoning model can spend the entire budget on hidden thoughts and
+                # return no answer at all (reasoning_tokens == max_tokens). Ask the
+                # non-reasoning model for the answer instead of failing the job after
+                # paying for 6k reasoning tokens.
+                answer_model = (
+                    _normalise_deepseek_model(getattr(settings, "DEEPSEEK_CHAT_MODEL", ""))
+                    or "deepseek-chat"
+                )
+                if answer_model != model:
+                    try:
+                        ans_resp = requests.post(
+                            f"{base_url}/chat/completions",
+                            headers=headers,
+                            json={
+                                "model": answer_model,
+                                "messages": messages,
+                                "max_tokens": max_tokens,
+                                "temperature": temperature,
+                            },
+                            timeout=timeout_val,
+                        )
+                        if ans_resp.status_code == 200:
+                            ans_data = ans_resp.json()
+                            ans_choice = (ans_data.get("choices") or [{}])[0]
+                            ans_content = (
+                                (ans_choice.get("message") or {}).get("content") or ""
+                            ).strip()
+                            if ans_content:
+                                content = ans_content
+                                reasoning = ""
+                                usage = _merge_usage(usage, ans_data.get("usage", {}))
+                                logger.info(
+                                    "[DeepSeek] Recovered an empty reasoning response using %s.",
+                                    answer_model,
+                                )
+                    except Exception as ans_err:
+                        logger.warning("[DeepSeek] Answer recovery failed: %s", ans_err)
 
             if not content and reasoning:
                 # Attempt recovery of JSON or output from reasoning_content
