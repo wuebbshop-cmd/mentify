@@ -760,8 +760,7 @@ class PdfVisualStorageTests(TestCase):
             self.assertEqual(rejected_visual.reviewed_by, reviewer)
             self.assertEqual(rejected_visual.extracted_content["auto_decision"], "tutor_rejected")
 
-    @patch("services.prep_ingestion.upload_to_github_storage", return_value="")
-    def test_document_ingestion_keeps_text_and_persists_visual_candidates_without_vision(self, _upload):
+    def test_document_ingestion_keeps_text_and_persists_visual_candidates_without_vision(self):
         with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
             pdf_bytes = build_pdf(
                 text=("Selectable lecture text remains available for local extraction. " * 8),
@@ -792,9 +791,8 @@ class PdfVisualStorageTests(TestCase):
                 issue["code"] for issue in document.validation_report["issues"]
             })
 
-    @patch("services.prep_ingestion.upload_to_github_storage", return_value="")
     @patch("services.prep_ingestion.extract_scanned_ocr_together")
-    def test_ingestion_persists_disallowed_graph_issue_with_page_provenance(self, ocr, _upload):
+    def test_ingestion_persists_disallowed_graph_issue_with_page_provenance(self, ocr):
         with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
             course = PrepCourse.objects.create(
                 code="VIS 105",

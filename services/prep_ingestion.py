@@ -4,7 +4,7 @@ services/prep_ingestion.py
 Mentify Prep Ingestion Pipeline & Storage Engine:
 1. Local Digital Text PDF Extraction via `pdfplumber` ($0 LLM Token Cost).
 2. Together.ai Vision OCR for Scanned / Handwritten CAT Examination Papers.
-3. GitHub Permanent Storage Integration via GitHubService.
+3. Document storage via the default backend (Cloudflare R2 in production).
 4. Stage 1 -> Stage 2 Tutor Review Gate automatic promotion and credit accounting.
 """
 from __future__ import annotations
@@ -32,7 +32,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.urls import reverse
 
-from services.github_service import GitHubService
 from prep.visual_matching import map_pdf_topic_sections, score_topic_context
 
 logger = logging.getLogger(__name__)
@@ -1083,34 +1082,6 @@ def merge_local_and_ocr_pages(local_text: str, ocr_text: str, *, minimum_local_w
         if page_content:
             merged.append(f"--- Page {page_number} ({source_label}) ---\n{page_content}")
     return "\n\n".join(merged)
-
-
-def upload_to_github_storage(file_obj, course_code: str) -> str:
-    """
-    Store uploaded document permanently in the configured GitHub repository.
-    Returns the permanent raw reference or stored GitHub URL.
-    """
-    token = getattr(settings, "GITHUB_TOKEN", "") or os.environ.get("GITHUB_TOKEN", "")
-    repo = getattr(settings, "GITHUB_REPO", "") or os.environ.get("GITHUB_REPO", "")
-    branch = getattr(settings, "GITHUB_BRANCH", "main") or os.environ.get("GITHUB_BRANCH", "main")
-    upload_dir = getattr(settings, "GITHUB_UPLOAD_DIR", "mentify-uploads")
-
-    if not token or not repo:
-        logger.warning("[GitHub Storage] GITHUB_TOKEN or GITHUB_REPO missing. Skipping GitHub upload.")
-        return ""
-
-    try:
-        svc = GitHubService(token=token, repo_name=repo, branch=branch, upload_dir=upload_dir)
-        clean_code = course_code.replace(" ", "_").upper()
-        result = svc.upload_file(file_obj, subdir=f"prep-docs/{clean_code}")
-        if result:
-            # Build standard raw GitHub user content URL
-            raw_url = f"https://raw.githubusercontent.com/{repo}/{branch}/{result.repo_path}"
-            return raw_url
-    except Exception as e:
-        logger.error(f"[GitHub Storage] Upload failed: {e}")
-
-    return ""
 
 
 _WORD_TO_NUM = {
@@ -2712,16 +2683,9 @@ def process_prep_document(prep_document) -> dict:
             if get_available_credits(wallet) < credit_cost:
                 return {"success": False, "error": str(exc), "credits_balance": get_available_credits(wallet)}
 
-    # 2. Permanent GitHub Storage only after the request is eligible to run.
-    # The FieldFile still caches the handle read at the top of this function and
-    # that handle is now closed. Re-assigning the stored name clears the cached
-    # handle, so open() goes back through storage instead of raising
-    # "ValueError: The file cannot be reopened."
-    prep_document.file = prep_document.file.name
-    with prep_document.file.open("rb") as uploaded_file:
-        github_url = upload_to_github_storage(uploaded_file, prep_document.course.code)
-    if github_url:
-        prep_document.github_raw_url = github_url
+    # Uploads live in Cloudflare R2 through the default storage backend
+    # (config/settings/production.py -> CloudflareR2MediaStorage). No secondary
+    # copy is written to GitHub.
 
     if action_type == "upload_ocr":
         logger.info(f"[Prep Ingestion] Low digital text detected for doc {prep_document.id}. Invoking Together Vision OCR...")
