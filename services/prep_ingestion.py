@@ -2713,6 +2713,11 @@ def process_prep_document(prep_document) -> dict:
                 return {"success": False, "error": str(exc), "credits_balance": get_available_credits(wallet)}
 
     # 2. Permanent GitHub Storage only after the request is eligible to run.
+    # The FieldFile still caches the handle read at the top of this function and
+    # that handle is now closed. Re-assigning the stored name clears the cached
+    # handle, so open() goes back through storage instead of raising
+    # "ValueError: The file cannot be reopened."
+    prep_document.file = prep_document.file.name
     with prep_document.file.open("rb") as uploaded_file:
         github_url = upload_to_github_storage(uploaded_file, prep_document.course.code)
     if github_url:
