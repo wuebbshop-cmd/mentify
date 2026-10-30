@@ -2557,7 +2557,9 @@ def process_prep_document(prep_document) -> dict:
         file_content = None
         base_name = os.path.basename(prep_document.file.name)
         clean_name = re.sub(r"^[a-f0-9]{8,16}-", "", base_name)
-        from django.conf import settings
+        # NOTE: never re-import settings here. A function-local import shadows the
+        # module-level one for the whole function body, so every later reference
+        # raised UnboundLocalError and killed ingestion for any OCR/exam document.
         media_root = getattr(settings, "MEDIA_ROOT", None)
         if media_root and os.path.exists(media_root):
             for root, _, files in os.walk(media_root):

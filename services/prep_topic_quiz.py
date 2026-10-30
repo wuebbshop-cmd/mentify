@@ -274,6 +274,30 @@ def generate_topic_quiz_questions(
     from services.prep_sanitizer import purge_institutional_metadata
     source_context = purge_institutional_metadata(source_context)
 
+    # Authentic past-paper questions from this course, used as a format template only.
+    # Without this the examiner's wording and structure are never visible to the model.
+    exam_style_reference = ""
+    try:
+        from services.prep_ai_router import _course_exam_style_reference
+
+        exam_style_reference = _course_exam_style_reference(course, topic_title)
+    except Exception as exc:
+        logger.warning(f"[Topic Quiz] Exam format reference unavailable for {topic_title}: {exc}")
+
+    exam_style_block = ""
+    if exam_style_reference:
+        exam_style_block = (
+            "AUTHENTIC EXAM FORMAT REFERENCE - real past-paper questions from this course "
+            "(they may come from other topics when this topic has none of its own):\n"
+            '\"\"\"\n'
+            f"{exam_style_reference}\n"
+            '\"\"\"\n'
+            "Use this ONLY as a style template. Mirror the examiner's command verbs, wording patterns, "
+            "sub-question structure, mark weighting and difficulty progression. Do NOT reuse their content, "
+            "topics, numbers or scenarios - every question you write must test "
+            f'\"{topic_title}\".\n'
+        )
+
     discipline = _detect_course_discipline(course)
     if discipline in {"Mathematics", "Statistics", "Physics"}:
         discipline_rules = (
@@ -325,6 +349,7 @@ Available Syllabus / Topic Material:
 
 {discipline_rules}
 
+{exam_style_block}
 Required JSON schema:
 [
   {{
@@ -355,6 +380,7 @@ Important rules:
 4. Follow the DISCIPLINE GUIDELINES above for math formulas vs code syntax.
 5. STRICT INSTITUTIONAL ANONYMITY: Do NOT mention any specific university, college, or lecturer name. Generalize any institutional examples to 'a higher education institution' or 'an academic institution'.
 6. Return ONLY a single raw JSON array of objects.
+7. If an AUTHENTIC EXAM FORMAT REFERENCE is present, match its examination style while testing only the requested topic.
 """
 
     model_name = getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat")

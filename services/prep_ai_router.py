@@ -465,6 +465,76 @@ def _find_topic_anchor_offset(text: str, topic_title: str) -> int:
     return max(0, idx - 100)
 
 
+def _course_exam_style_reference(
+    course_obj, topic_title: str, *, limit: int = 6, max_chars: int = 2800
+) -> str:
+    """
+    Real past-paper questions from the same course, returned as a style template.
+
+    Generation previously only read Lecture Notes and Revision Sheets, so a topic with
+    no authentic past-paper questions of its own was written from the notes alone and
+    could miss how this course is actually examined. Authentic questions from the same
+    course (the topic's own first, then other topics) supply the examiner's command
+    verbs, sub-question structure and mark weighting.
+    """
+    if not course_obj:
+        return ""
+    from prep.models import PrepQuestion
+    from services.prep_sanitizer import purge_institutional_metadata
+
+    try:
+        candidates = list(
+            PrepQuestion.objects.filter(
+                paper__course=course_obj,
+                paper__is_published=True,
+                question_type="authentic",
+                verification_status__in=PrepQuestion.LEARNER_VISIBLE_STATUSES,
+            )
+            .exclude(question_latex="")
+            .select_related("paper")
+            .order_by("-paper__year", "number")[:400]
+        )
+    except Exception as exc:  # never block generation on exemplar lookup
+        logger.warning(
+            "[Exam Style] could not load authentic questions for %s: %s",
+            getattr(course_obj, "code", "?"),
+            exc,
+        )
+        return ""
+
+    requested_topic = " ".join(str(topic_title or "").casefold().split())
+    own, others = [], []
+    for question in candidates:
+        if not (question.question_latex or "").strip():
+            continue
+        label = " ".join(str(question.topic_label or "").casefold().split())
+        if requested_topic and label == requested_topic:
+            own.append(question)
+        else:
+            others.append(question)
+
+    entries: list[str] = []
+    used = 0
+    for question in [*own, *others]:
+        snippet = re.sub(r"\s+", " ", question.question_latex or "").strip()
+        snippet = purge_institutional_metadata(snippet)[:420].strip()
+        if not snippet:
+            continue
+        label = (question.topic_label or "unlabelled topic").strip()
+        entry = f"- ({question.marks} marks | topic: {label}) {snippet}"
+        if used + len(entry) > max_chars:
+            break
+        entries.append(entry)
+        used += len(entry)
+        if len(entries) >= limit:
+            break
+
+    # A single question is not a pattern; require at least two before claiming a style.
+    if len(entries) < 2:
+        return ""
+    return "\n".join(entries)
+
+
 def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
     """Return bounded excerpts from approved coursework for grounded generation."""
     from services.prep_sanitizer import purge_institutional_metadata
@@ -5056,6 +5126,16 @@ def generate_similar_practice_questions(
                 break
     authentic_samples = verified_samples
 
+    # A topic with no authentic questions of its own still has to be written the way
+    # this course is actually examined, so borrow the format of the course's real past
+    # papers (usually other topics). Style only - never their content.
+    used_course_format_reference = False
+    if len(authentic_samples) < 2 and course_obj is not None:
+        course_format_reference = _course_exam_style_reference(course_obj, topic_title)
+        if course_format_reference:
+            authentic_samples = [*authentic_samples, course_format_reference]
+            used_course_format_reference = True
+
     # Enforce syllabus sequence constraints (prohibiting future topics)
     prev_topics = []
     future_topics = []
@@ -5114,11 +5194,22 @@ def generate_similar_practice_questions(
         from services.prep_sanitizer import purge_institutional_metadata
         sanitized_samples = [purge_institutional_metadata(s) for s in authentic_samples[:5]]
         samples_formatted = "\n---\n".join(sanitized_samples)
-        samples_context = (
-            f"Here are authentic historical examination questions for this topic:\n"
-            f"{samples_formatted}\n\n"
-            f"Create {needed} NEW, original question variants with similar difficulty, style, and marks allocation."
-        )
+        if used_course_format_reference and not verified_samples:
+            samples_context = (
+                "AUTHENTIC EXAM FORMAT REFERENCE - this course's real past-paper questions, "
+                "taken from other topics because this topic has none of its own:\n"
+                f"{samples_formatted}\n\n"
+                "Use them ONLY as a style template: mirror the examiner's command verbs, wording "
+                "patterns, sub-question structure, mark weighting and difficulty progression. "
+                "Do NOT reuse their content, numbers or scenarios. "
+                f"Create {needed} NEW, original questions that test '{topic_title}'."
+            )
+        else:
+            samples_context = (
+                f"Here are authentic historical examination questions for this topic:\n"
+                f"{samples_formatted}\n\n"
+                f"Create {needed} NEW, original question variants with similar difficulty, style, and marks allocation."
+            )
     else:
         samples_context = (
             f"Create {needed} original examination-style questions for {course_code}: {topic_title}."
