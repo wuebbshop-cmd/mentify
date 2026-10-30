@@ -1168,6 +1168,7 @@ def prep_course_detail(request, course_code):
     course_obj = {
         "id": course.id,
         "code": course.code,
+        "slug": course.slug,
         "title": display_title,
         "level": course.level,
         "category": cat_meta["category"],

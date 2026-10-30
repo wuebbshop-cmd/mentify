@@ -592,7 +592,7 @@
         + Upload Material
       </a>
       {% endif %}
-      {% if not topics %}
+      {% if not topics and course.slug %}
       <form method="post" action="{% url 'prep:request_course' course.slug %}" style="margin: 0; display: inline-flex;">
         {% csrf_token %}
         <button type="submit" class="btn btn-outline btn-sm" title="No material for this unit yet — ask for it to be added">
