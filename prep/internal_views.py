@@ -104,8 +104,13 @@ def internal_ingest_document_api(request: HttpRequest) -> JsonResponse:
             status=404,
         )
 
-    # Submit to local thread pool for background extraction (PyMuPDF, OCR, GitHub sync)
-    _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(doc_uuid))
+    # Submit to local thread pool for background extraction (PyMuPDF, OCR)
+    try:
+        _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(doc_uuid))
+    except RuntimeError as exc:
+        # Raised once the interpreter is tearing down. The document row is already
+        # queued, so the worker picks it up on the next run instead of 500-ing here.
+        logger.warning("[Worker Ingest] could not schedule ingestion for %s: %s", doc_uuid, exc)
     logger.info("[Worker Ingest] Document %s queued for background processing on worker instance.", doc_uuid)
 
     return JsonResponse(

@@ -3131,9 +3131,19 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
             if other_doc.visual_candidates.filter(status__in=["candidate", "needs_review"]).exists():
                 assign_visuals_to_topics(other_doc, active_topics, allow_auto_approval=True)
 
-        # Enqueue note precomputation
+        # Enqueue note precomputation. Publishing must not fail because background
+        # scheduling is unavailable (shutdown, full pool, missing cache backend):
+        # the published document is the user-visible result, notes can catch up later.
         from services.prep_note_precompute import enqueue_course_note_precompute
-        _, queued = enqueue_course_note_precompute(doc.course)
+        try:
+            _, queued = enqueue_course_note_precompute(doc.course)
+        except Exception as exc:  # noqa: BLE001 - never abort a publish for this
+            logger.warning(
+                "[Prep Publish] note precompute not enqueued for course %s: %s",
+                doc.course_id,
+                exc,
+            )
+            queued = False
         queued_note_jobs += int(queued)
 
     # CAT / Final Exam
