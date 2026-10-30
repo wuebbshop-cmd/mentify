@@ -2617,6 +2617,9 @@ def process_prep_document(prep_document) -> dict:
             prep_document.save(update_fields=["course", "updated_at"])
 
     # Stop exact duplicates before storage, OCR, AI extraction, or credit use.
+    # Only a document that actually produced text counts as an original: matching a
+    # previous upload that failed to extract made both copies permanently unusable,
+    # because each one deferred to the other and neither was ever processed.
     prep_document.file_sha256 = hashlib.sha256(file_content).hexdigest()
     duplicate = (
         PrepDocument.objects.filter(
@@ -2625,6 +2628,8 @@ def process_prep_document(prep_document) -> dict:
             file_sha256=prep_document.file_sha256,
         )
         .exclude(pk=prep_document.pk)
+        .exclude(extracted_text__isnull=True)
+        .exclude(extracted_text="")
         .order_by("created_at")
         .first()
     )
@@ -2632,7 +2637,25 @@ def process_prep_document(prep_document) -> dict:
         prep_document.is_duplicate = True
         prep_document.duplicate_of = duplicate
         prep_document.stage = "stage_2"
-        prep_document.save(update_fields=["file_sha256", "is_duplicate", "duplicate_of", "stage", "updated_at"])
+        update_fields = ["file_sha256", "is_duplicate", "duplicate_of", "stage", "updated_at"]
+        # Short-circuiting here used to leave extracted_text empty, which later read as
+        # "scanned image or empty PDF" at publish time even though the original had text.
+        if (duplicate.extracted_text or "").strip() and not (prep_document.extracted_text or "").strip():
+            prep_document.extracted_text = duplicate.extracted_text
+            prep_document.text_sha256 = duplicate.text_sha256 or prep_document.text_sha256
+            update_fields.extend(["extracted_text", "text_sha256"])
+        prep_document.tutor_review_notes = (
+            "Flagged as a duplicate upload: identical file already stored for this course "
+            f"and document type (original {duplicate.pk}). "
+            + (
+                "Text was copied from the original; publishing will be refused while the "
+                "original is published - delete this copy instead."
+                if duplicate.stage == "stage_3"
+                else "Delete this copy, or unmark the duplicate flag to process it independently."
+            )
+        )[:2000]
+        update_fields.append("tutor_review_notes")
+        prep_document.save(update_fields=update_fields)
         return {
             "success": True,
             "duplicate": True,
@@ -3015,6 +3038,36 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
     doc = prep_document
 
     if doc.is_duplicate:
+        original = doc.duplicate_of
+        if original and original.stage == "stage_3":
+            # Publishing a second copy would duplicate every topic, paper and question
+            # in the course graph, so refuse it with an instruction instead of an
+            # opaque "no readable text" later on.
+            original_name = os.path.basename(original.file.name) if original.file else "document"
+            doc.tutor_review_notes = (
+                f"Publication blocked: this upload duplicates {original.course.code} "
+                f"'{original_name}', which is already published. Delete this copy."
+            )[:2000]
+            doc.save(update_fields=["tutor_review_notes", "updated_at"])
+            return {
+                "success": False,
+                "duplicate": True,
+                "error": (
+                    f"Duplicate of the already-published {original.course.code} "
+                    f"'{original_name}'. Delete this copy instead of publishing it."
+                ),
+                "document": doc,
+            }
+        # Inherit the original's text when available so no paid re-extraction is needed.
+        if original and (original.extracted_text or "").strip() and not (doc.extracted_text or "").strip():
+            doc.extracted_text = original.extracted_text
+            doc.text_sha256 = original.text_sha256 or doc.text_sha256
+            doc.save(update_fields=["extracted_text", "text_sha256", "updated_at"])
+            logger.info(
+                "[Prep Publish] %s reused extracted text from its duplicate original %s",
+                doc.pk,
+                original.pk,
+            )
         doc.is_duplicate = False
         doc.duplicate_of = None
         doc.save(update_fields=["is_duplicate", "duplicate_of"])
@@ -3037,7 +3090,14 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
             ingestion_result = {"success": False, "error": str(exc)}
         doc.refresh_from_db()
         if not ingestion_result.get("success") or not (doc.extracted_text and doc.extracted_text.strip()):
-            err_msg = ingestion_result.get("error") or "No readable text was extracted (scanned image or empty PDF)."
+            if ingestion_result.get("duplicate"):
+                err_msg = (
+                    "This file is already stored with extracted text as document "
+                    f"{ingestion_result.get('duplicate_of')}, so there is nothing new to extract. "
+                    "Delete this copy instead of publishing it."
+                )
+            else:
+                err_msg = ingestion_result.get("error") or "No readable text was extracted (scanned image or empty PDF)."
             doc.tutor_review_notes = f"Publication blocked: ingestion produced no text. {err_msg[:500]}"
             doc.save(update_fields=["tutor_review_notes", "updated_at"])
             return {"success": False, "error": err_msg, "document": doc}
@@ -3060,8 +3120,13 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
     if reviewer:
         doc.reviewed_by = reviewer
     doc.reviewed_at = now
-    if not doc.tutor_review_notes:
-        reviewer_name = (reviewer.get_full_name() or reviewer.email) if reviewer else "System Verification"
+    # A note left over from an earlier failed attempt must not survive a successful
+    # publish, or the changelist keeps telling admins the document is still blocked.
+    reviewer_name = (reviewer.get_full_name() or reviewer.email) if reviewer else "System Verification"
+    stale_note = (doc.tutor_review_notes or "").startswith(
+        ("Publication blocked", "Flagged as a duplicate")
+    )
+    if not doc.tutor_review_notes or stale_note:
         doc.tutor_review_notes = f"Approved and verified for syllabus inclusion by {reviewer_name}."
     doc.save(update_fields=["stage", "reviewed_by", "reviewed_at", "tutor_review_notes", "updated_at"])
 

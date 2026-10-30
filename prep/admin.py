@@ -301,9 +301,33 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         "propose_course_study_profile",
         "index_assessment_questions",
         "unmark_duplicate_action",
+        "discard_duplicate_uploads",
         "reject_document",
         "delete_selected",
     ]
+
+    @admin.action(description="🗑 Discard duplicate uploads (keeps the original document)")
+    def discard_duplicate_uploads(self, request, queryset):
+        """Delete uploads that duplicate a document which is already usable."""
+        discarded = 0
+        kept = 0
+        for doc in queryset.filter(is_duplicate=True).select_related("duplicate_of"):
+            original = doc.duplicate_of
+            if original is None:
+                kept += 1
+                continue
+            usable = original.stage == "stage_3" or bool((original.extracted_text or "").strip())
+            if not usable:
+                kept += 1
+                continue
+            doc.delete()
+            discarded += 1
+        self.message_user(
+            request,
+            f"Discarded {discarded} duplicate upload(s). Kept {kept} because their original "
+            "document still has no extracted text and has not been published yet - publish or "
+            "re-extract those first.",
+        )
 
     @admin.action(description="🔓 Unmark duplicate flag (allow independent processing)")
     def unmark_duplicate_action(self, request, queryset):
@@ -449,6 +473,7 @@ class PrepDocumentAdmin(admin.ModelAdmin):
         queued_assessment_jobs = 0
         queued_note_jobs = 0
         failures = 0
+        first_failure = ""
         now = timezone.now()
 
         for doc in queryset:
@@ -462,6 +487,14 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                 queued_note_jobs += result.get("queued_note_jobs", 0)
             else:
                 failures += 1
+                reason = str(result.get("error") or "Unspecified publication error").strip()
+                if not first_failure:
+                    first_failure = reason
+                # Guarantee the blocking reason is visible in the changelist even for
+                # failure paths that do not write it themselves (e.g. worker dispatch).
+                if not (doc.tutor_review_notes or "").strip():
+                    doc.tutor_review_notes = f"Publication blocked: {reason}"[:2000]
+                    doc.save(update_fields=["tutor_review_notes", "updated_at"])
 
         msg_parts = []
         if published_documents_count > 0:
@@ -472,7 +505,9 @@ class PrepDocumentAdmin(admin.ModelAdmin):
                 f"Queued {queued_assessment_jobs} assessment indexing job(s)."
             )
         if failures > 0:
-            msg_parts.append(f"Blocked {failures} document(s). Check the Tutor Review Notes column for details.")
+            msg_parts.append(
+                f"Blocked {failures} document(s). First reason: {first_failure[:300]}"
+            )
 
         if not msg_parts:
             msg_parts.append("No selected documents were published. Check the Tutor Review Notes column for details.")
