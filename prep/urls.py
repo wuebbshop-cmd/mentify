@@ -9,6 +9,11 @@ urlpatterns = [
     path("library/", views.prep_public_library, name="public_library"),
     path("library/<slug:course_slug>/", views.prep_public_course, name="public_course"),
     path(
+        "library/<slug:course_slug>/request/",
+        views.prep_request_course,
+        name="request_course",
+    ),
+    path(
         "library/<slug:course_slug>/<int:topic_id>-<slug:topic_slug>/",
         views.prep_public_topic,
         name="public_topic",

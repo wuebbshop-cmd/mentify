@@ -560,6 +560,76 @@ def prep_public_course(request, course_slug):
     )
 
 
+@require_POST
+def prep_request_course(request, course_slug):
+    """
+    Marketing/retention loop for catalogue units that have no published material.
+
+    A visitor (signed in or not) can ask for a unit to be covered. The request is
+    emailed to ADMIN_EMAILS_NOTIFICATIONS so notes and past papers can be uploaded
+    through /prep/upload/ like any other course.
+    """
+    from services.email_service import send_email_notification
+
+    course = get_object_or_404(PrepCourse, slug=course_slug, is_active=True)
+    back = redirect("prep:public_course", course_slug=course.slug)
+
+    if course.topics.filter(is_active=True).exists() or course.papers.filter(is_published=True).exists():
+        messages.info(request, f"{course.code} already has study material.")
+        return back
+
+    requester_email = (request.POST.get("email") or "").strip()
+    if request.user.is_authenticated and not requester_email:
+        requester_email = (request.user.email or "").strip()
+    if requester_email and ("@" not in requester_email or len(requester_email) > 254):
+        messages.error(request, "Please enter a valid email address.")
+        return back
+
+    identity = request.user.pk if request.user.is_authenticated else (request.META.get("REMOTE_ADDR") or "anon")
+    throttle_key = f"prep_course_request:{course.pk}:{identity}"
+    if cache.get(throttle_key):
+        messages.info(request, f"We already have your request for {course.code}.")
+        return back
+    cache.set(throttle_key, 1, 60 * 60 * 12)
+
+    page_url = request.build_absolute_uri(
+        reverse("prep:public_course", kwargs={"course_slug": course.slug})
+    )
+    subject = f"Prep course request: {course.code} — {course.title}"
+    body = (
+        "A visitor requested study material for a unit with no published notes.\n\n"
+        f"Course:   {course.code} — {course.title}\n"
+        f"Category: {course.category}\n"
+        f"Page:     {page_url}\n"
+        f"From:     {requester_email or 'anonymous visitor'}\n"
+        f"When:     {timezone.now():%Y-%m-%d %H:%M:%S %Z}\n\n"
+        "Upload notes and past papers from /prep/upload/ to publish this unit.\n"
+    )
+
+    recipients = list(getattr(settings, "ADMIN_EMAILS_NOTIFICATIONS", []) or [])
+    if not recipients:
+        recipients = list(getattr(settings, "ADMIN_EMAILS", []) or [])
+    sent = sum(
+        1
+        for recipient in recipients
+        if send_email_notification(
+            subject=subject,
+            recipient=recipient,
+            body=body,
+            reply_to=requester_email or None,
+        )
+    )
+
+    logger.info(
+        "[Prep] course request for %s from %s (notifications sent: %s)",
+        course.slug,
+        requester_email or "anonymous",
+        sent,
+    )
+    messages.success(request, f"Request sent. We will add notes and past papers for {course.code}.")
+    return back
+
+
 def _prepare_public_topic_preview(notes: str, questions: list) -> dict:
     """
     Split topic notes and examination questions into an SEO-optimized preview.
