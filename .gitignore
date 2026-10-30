@@ -45,3 +45,6 @@ Thumbs.db
 # Certs
 *.pem
 *.key
+
+# Local standalone helper tooling, not part of the Django project
+search_assistant/
