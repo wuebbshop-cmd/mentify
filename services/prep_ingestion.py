@@ -2981,9 +2981,16 @@ def enqueue_prep_document_ingestion(document_id):
     """
     worker_url = getattr(settings, "WORKER_SERVICE_URL", "").strip().rstrip("/")
     allow_local = getattr(settings, "ENABLE_LOCAL_PREP_WORKERS", settings.DEBUG)
-    if worker_url or not allow_local:
-        return _DOCUMENT_INGESTION_EXECUTOR.submit(_dispatch_or_run_locally, str(document_id))
-    return _DOCUMENT_INGESTION_EXECUTOR.submit(_run_queued_document_ingestion, str(document_id))
+    target = _dispatch_or_run_locally if (worker_url or not allow_local) else _run_queued_document_ingestion
+    try:
+        return _DOCUMENT_INGESTION_EXECUTOR.submit(target, str(document_id))
+    except RuntimeError as exc:
+        # The interpreter is shutting down (dev autoreload, worker restart); the
+        # document stays queued rather than 500-ing the request that saved it.
+        logger.warning(
+            "[Prep Ingestion] could not schedule ingestion for %s: %s", document_id, exc
+        )
+        return None
 
 
 def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:

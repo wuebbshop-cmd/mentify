@@ -41,7 +41,15 @@ def enqueue_course_note_precompute(course, *, auto_run: bool = True):
 
     # Automatically process in background thread
     if auto_run:
-        _NOTE_PRECOMPUTE_EXECUTOR.submit(process_course_notes_in_background, course.id)
+        try:
+            _NOTE_PRECOMPUTE_EXECUTOR.submit(process_course_notes_in_background, course.id)
+        except RuntimeError as exc:
+            # Raised when the interpreter is already shutting down (dev autoreload,
+            # worker restart). The durable job rows above are already queued, so the
+            # work is picked up later instead of 500-ing the request that triggered it.
+            logger.warning(
+                "[Prep] note precompute not scheduled for course %s: %s", course.id, exc
+            )
 
     return job, should_run
 
