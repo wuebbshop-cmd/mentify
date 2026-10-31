@@ -2397,6 +2397,10 @@
           <input type="file" id="topic-tutor-pdf-files" accept="application/pdf,.pdf" multiple hidden>
           <input type="file" id="topic-tutor-image-files" accept="image/png,image/jpeg,.png,.jpg,.jpeg" multiple hidden>
           <input type="file" id="topic-tutor-camera-file" accept="image/*" capture="environment" hidden>
+          <label class="topic-tutor-deep-toggle" title="Use the deeper reasoning model for proofs and long derivations. Slower and costs more credits." style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-muted);white-space:nowrap;">
+            <input type="checkbox" id="topic-tutor-deep" name="deep" value="1" style="width:13px;height:13px;margin:0;accent-color:var(--green);">
+            <span>Deep</span>
+          </label>
           <div class="topic-tutor-attach-wrap">
             <button type="button" id="topic-tutor-attach" class="topic-tutor-icon-button" aria-label="Choose files to attach" title="Choose files to attach" aria-haspopup="true" aria-expanded="false">
               <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>
@@ -2961,6 +2965,7 @@
   const courseCode = JSON.parse(document.getElementById('topic-tutor-course-code-data').textContent);
   const topicTitle = JSON.parse(document.getElementById('topic-tutor-topic-title-data').textContent);
   const topicTutorApiUrl = "{% url 'prep:api_topic_tutor' topic_id=topic.id %}";
+  const topicTutorStreamUrl = "{% url 'prep:api_topic_tutor_stream' topic_id=topic.id %}";
   let topicTutorSessionId = null;
   let topicTutorInitialized = false;
   let topicTutorSending = false;
@@ -3290,6 +3295,77 @@
     }
   };
 
+  async function streamTopicTutorAnswer(formData, loading) {
+    // Text questions stream token by token so the student sees the answer being written
+    // instead of waiting for the whole completion.
+    const messages = document.getElementById('topic-tutor-messages');
+    const bubble = document.createElement('div');
+    bubble.className = 'topic-tutor-message assistant';
+    const body = document.createElement('div');
+    bubble.appendChild(body);
+    messages.appendChild(bubble);
+    if (loading) loading.remove();
+
+    const response = await fetch(topicTutorStreamUrl, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'text/event-stream' },
+      credentials: 'same-origin'
+    });
+    if (!response.ok || !response.body) {
+      bubble.remove();
+      let detail = 'The tutor could not answer this question.';
+      try { const data = await response.json(); detail = data.error || detail; } catch (err) {}
+      throw new Error(detail);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let streamed = '';
+    let finalEvent = null;
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      let boundary = buffer.indexOf('\n\n');
+      while (boundary !== -1) {
+        const rawEvent = buffer.slice(0, boundary).trim();
+        buffer = buffer.slice(boundary + 2);
+        boundary = buffer.indexOf('\n\n');
+        if (!rawEvent.startsWith('data:')) continue;
+        let payload = null;
+        try { payload = JSON.parse(rawEvent.slice(5).trim()); } catch (err) { continue; }
+        if (payload.delta) {
+          streamed += payload.delta;
+          body.textContent = streamed;
+          messages.scrollTop = messages.scrollHeight;
+        }
+        if (payload.failed) {
+          bubble.remove();
+          throw new Error(payload.error || 'The tutor could not answer this question.');
+        }
+        if (payload.done) finalEvent = payload;
+      }
+    }
+    if (!finalEvent) {
+      if (!streamed) {
+        bubble.remove();
+        throw new Error('The tutor did not return an answer. Please retry your question.');
+      }
+      return null;
+    }
+    if (finalEvent.credits_balance !== undefined) updateTopicTutorBalance(finalEvent.credits_balance);
+    if (finalEvent.session_id) topicTutorSessionId = finalEvent.session_id;
+    const answer = finalEvent.answer || streamed;
+    if (finalEvent.conversation) {
+      renderTopicTutorConversation(finalEvent.conversation);
+    } else {
+      body.textContent = answer;
+    }
+    return finalEvent;
+  }
+
   async function submitTopicTutorMessage(event) {
     event.preventDefault();
     if (topicTutorSending) return;
@@ -3364,6 +3440,13 @@
     messages.appendChild(loading);
     messages.scrollTop = messages.scrollHeight;
     try {
+      if (files.length === 0) {
+        formData.delete('files');
+        await streamTopicTutorAnswer(formData, loading);
+        topicTutorSelectedFiles = [];
+        renderTopicTutorSelectedFiles();
+        return;
+      }
       const response = await fetch(topicTutorApiUrl, {
         method: 'POST',
         body: formData,

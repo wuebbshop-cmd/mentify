@@ -49,10 +49,12 @@ MAX_IMAGE_BYTES = 4 * 1024 * 1024
 MAX_UPLOAD_TOTAL_BYTES = MAX_PDF_BYTES + MAX_IMAGE_COUNT * MAX_IMAGE_BYTES
 MAX_EXTRACTED_CHARS_PER_UPLOAD = 3500
 MAX_UPLOAD_CONTEXT_CHARS = 5000
-MAX_NOTES_CONTEXT_CHARS = 3500
-MAX_APPROVED_PDF_CONTEXT_CHARS = 2500
+# Chat latency is dominated by prompt size, so only the passages most relevant to the
+# question are sent instead of the whole note bundle and course material.
+MAX_NOTES_CONTEXT_CHARS = 1500
+MAX_APPROVED_PDF_CONTEXT_CHARS = 1200
 MAX_PAST_QUESTIONS_CONTEXT_CHARS = 2500
-MAX_HISTORY_MESSAGES = 8
+MAX_HISTORY_MESSAGES = 4
 CHAT_MAX_OUTPUT_TOKENS = 3500
 MIN_OCR_CREDITS = 5
 
@@ -95,6 +97,10 @@ def _sanitize_tutor_output(text: str) -> str:
     text = purge_institutional_metadata(text)
     return text.strip()
 _WORD_PATTERN = re.compile(r"[a-z][a-z0-9]{2,}", re.IGNORECASE)
+_EXAM_HINT_RE = re.compile(
+    r"(?i)\b(?:exam|exams|past\s+papers?|cat\b|cat\s+\d|marking\s+scheme|marks?\b|mks\b|"
+    r"quiz\s+me|test\s+me|question\s+\d+|revision\s+questions?)\b"
+)
 
 
 class TopicTutorError(Exception):
@@ -507,24 +513,99 @@ def _finish_uploads(prepared: list[dict], vision_images: list[dict], topic, note
     return accepted, usage, vision_model
 
 
-def _topic_context(topic) -> tuple[str, str]:
+def _relevant_excerpt(text: str, question: str, limit: int) -> str:
+    """
+    Return the passage of ``text`` most likely to answer ``question``.
+
+    Sending the whole note bundle made every chat turn slow; selecting the window around
+    the strongest keyword overlap keeps the answer grounded while shrinking the prompt.
+    """
+    body = str(text or "")
+    if len(body) <= limit:
+        return body
+    words = [w for w in _words(question or "") if len(w) > 3][:12]
+    lowered = body.casefold()
+    best_index = -1
+    best_score = 0
+    for word in words:
+        index = lowered.find(word)
+        if index == -1:
+            continue
+        window = lowered[max(0, index - 200):index + 400]
+        score = sum(1 for other in words if other in window)
+        if score > best_score:
+            best_score = score
+            best_index = index
+    if best_index == -1:
+        return body[:limit]
+    start = max(0, best_index - limit // 4)
+    return body[start:start + limit]
+
+
+def _fast_published_notes(topic) -> dict[str, str]:
+    """
+    Read the newest validated note per level in a single query.
+
+    The strict lookup re-checks source signatures, study-profile versions and content
+    rules, which cost ~17 seconds across dozens of round trips on a cold topic and was
+    paid on the first question of every chat. The tutor only needs the text for grounding,
+    so it takes the newest entry whose validation state matches and falls back to the
+    strict lookup when nothing qualifies.
+    """
+    from prep.models import PrepContentCache
+    from services.prep_ai_router import NOTE_VALIDATION_STATE, _cache_payload_as_dict
+
+    notes: dict[str, str] = {}
+    try:
+        payloads = list(
+            PrepContentCache.objects.filter(content_type="topic_notes", topic=topic)
+            .order_by("-updated_at", "-id")
+            .values_list("payload", flat=True)[:12]
+        )
+    except Exception as exc:
+        logger.info("Fast note lookup unavailable: %s", exc)
+        return {}
+    for raw in payloads:
+        payload = _cache_payload_as_dict(raw)
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("validation_state") != NOTE_VALIDATION_STATE:
+            continue
+        if payload.get("review_status") == "skipped_no_source":
+            continue
+        level = payload.get("level") or "level_2"
+        if level not in {"level_1", "level_2", "level_3"} or level in notes:
+            continue
+        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        if content:
+            notes[level] = content
+    return notes
+
+
+def _topic_context(topic, question: str = "") -> tuple[str, str]:
     from services.prep_ai_router import (
         _approved_course_source_context,
         get_published_topic_note_levels,
     )
 
-    published_notes = get_published_topic_note_levels(topic, validated_only=True)
+    published_notes = _fast_published_notes(topic)
+    if not published_notes:
+        published_notes = get_published_topic_note_levels(topic, validated_only=True)
     note_parts = [
         f"{level.replace('_', ' ').title()} Notes:\n{content}"
         for level, content in published_notes.items()
         if content
     ]
-    notes = "\n\n".join(note_parts)[:MAX_NOTES_CONTEXT_CHARS]
-    course_material = _approved_course_source_context(
-        topic.course,
-        topic.title,
-        limit=MAX_APPROVED_PDF_CONTEXT_CHARS,
-    )
+    notes = _relevant_excerpt("\n\n".join(note_parts), question, MAX_NOTES_CONTEXT_CHARS)
+    # The course excerpt only adds value when there are no notes to ground the answer, and
+    # it costs a document scan plus a large prefill, so it is skipped once notes exist.
+    course_material = ""
+    if not notes:
+        course_material = _approved_course_source_context(
+            topic.course,
+            topic.title,
+            limit=MAX_APPROVED_PDF_CONTEXT_CHARS,
+        )
     return notes, course_material
 
 
@@ -598,6 +679,7 @@ def _build_prompt(
     user_message: str,
     uploads: list,
     past_questions: str = "",
+    plain_answer: bool = False,
 ) -> tuple[str, str]:
     upload_text = "\n\n".join(
         f"--- Untrusted text and figure descriptions from learner upload: {upload['name']} ---\n"
@@ -605,7 +687,7 @@ def _build_prompt(
         for upload in uploads
     )[:MAX_UPLOAD_CONTEXT_CHARS]
     history_text = "\n".join(
-        f"{'Learner' if item.role == 'user' else 'Tutor'}: {item.content[:1500]}"
+        f"{'Learner' if item.role == 'user' else 'Tutor'}: {item.content[:800]}"
         for item in history[-MAX_HISTORY_MESSAGES:]
     )
     context_fields = {
@@ -623,10 +705,24 @@ def _build_prompt(
     from services.prep_sanitizer import sanitize_data_structure
     context_fields = sanitize_data_structure(context_fields)
 
+    # The JSON envelope only exists so the non-streaming path can carry a decision flag.
+    # When the reply is streamed to the student it must be plain Markdown, otherwise the
+    # first thing they see is `{"decision": ...`.
+    prompt_contract = (
+        "Study the structured topic-specific context below, then answer the latest learner question "
+        "directly in Markdown, because your reply is shown to the student as it is written. "
+        "Do not wrap the answer in JSON and do not output a `decision` field; where the guidance below "
+        "mentions a `decision`, read it as an instruction about what to do with the question.\n\n"
+        if plain_answer
+        else (
+            "Study the structured topic-specific context below, then respond to the latest learner question. "
+            "Return exactly one JSON object with keys `decision` and `answer`. `decision` must be one of "
+            "`answer`, `clarify`, `out_of_scope`, `unrelated_upload`, or `unsupported_visual`.\n\n"
+        )
+    )
+
     user_prompt = (
-        "Study the structured topic-specific context below, then respond to the latest learner question. "
-        "Return exactly one JSON object with keys `decision` and `answer`. `decision` must be one of "
-        "`answer`, `clarify`, `out_of_scope`, `unrelated_upload`, or `unsupported_visual`.\n\n"
+        prompt_contract +
         "CONVERSATIONAL CONTINUITY & MULTI-TURN CONTEXT:\n"
         "- This is an ongoing, interactive tutoring conversation. Learners frequently give follow-up prompts, "
         "confirmations, or refer back to earlier questions and answers (e.g., 'yes', 'provide the answers', "
@@ -689,7 +785,12 @@ def _build_prompt(
         "- Top-Ups: Open to all users (including Freemium). Custom amounts starting from 10 credits at KES 1.50 per credit via M-Pesa (e.g., 50 credits = KES 75, 100 credits = KES 150), valid for 30 days.\n"
         "- Credit Deductions: Cached notes and past questions are free (0 credits). Generating fresh topic notes or variants costs 1-5 credits. AI Tutor messages start at 1 credit and scale with token length (longer derivations or documents cost 2-5 credits). An initial one-time course-share contribution may apply when unlocking a previously unindexed course unit.\n"
         "COMPLETENESS: Always write complete, well-formed explanations. Never truncate, omit steps, or stop midway through an equation, proof, or sentence.\n"
-        "Return a single valid JSON object with keys `decision` and `answer`."
+        + (
+            "Answer directly in Markdown. Do NOT wrap the answer in JSON, and do not add a decision field: "
+            "the reply is shown to the student as it is written."
+            if plain_answer
+            else "Return a single valid JSON object with keys `decision` and `answer`."
+        )
     )
     return system_prompt, user_prompt
 
@@ -845,7 +946,9 @@ def _update_reservation_metadata(reservation, metadata_updates: dict) -> None:
         held.save(update_fields=["metadata", "updated_at"])
 
 
-def send_topic_message(*, user, topic, session, user_message: str, uploaded_files: list) -> dict:
+def send_topic_message(
+    *, user, topic, session, user_message: str, uploaded_files: list, deep_mode: bool = False
+) -> dict:
     user_message = str(user_message or "").strip()
     if not user_message:
         raise TopicTutorError("Enter a question about this topic.")
@@ -873,8 +976,12 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
             "uploads": [],
         }
 
-    notes, course_material = _topic_context(topic)
-    past_questions = _topic_past_questions(topic)
+    notes, course_material = _topic_context(topic, user_message)
+    # Only look up authentic past papers when the question is actually about assessment;
+    # the lookup costs a few round trips that a plain concept question does not need.
+    past_questions = (
+        _topic_past_questions(topic) if _EXAM_HINT_RE.search(user_message) else ""
+    )
     session_uploads = list(session.uploads.order_by("-created_at")[:3]) if session else []
     existing_upload_context = [
         {"name": item.original_name, "text": item.extracted_text[:MAX_EXTRACTED_CHARS_PER_UPLOAD]}
@@ -904,6 +1011,9 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
 
     history = list(session.messages.order_by("-created_at", "-id")[:MAX_HISTORY_MESSAGES]) if session else []
     history.reverse()
+    from services.prep_ai_router import streaming_active
+
+    plain_stream = streaming_active()
     system_prompt, user_prompt = _build_prompt(
         topic,
         notes,
@@ -912,6 +1022,7 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
         user_message,
         context_uploads,
         past_questions=past_questions,
+        plain_answer=plain_stream,
     )
     wallet = PrepWallet.get_or_create_wallet(user)
     chat_model = str(getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"))
@@ -1078,7 +1189,14 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
                 total_chars += len(clipped)
             context_uploads = bounded_uploads
             system_prompt, user_prompt = _build_prompt(
-                topic, notes, course_material, history, user_message, context_uploads, past_questions=past_questions
+                topic,
+                notes,
+                course_material,
+                history,
+                user_message,
+                context_uploads,
+                past_questions=past_questions,
+                plain_answer=plain_stream,
             )
 
         from services.prep_ai_router import route_math_request
@@ -1087,11 +1205,11 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
             user_prompt,
             topic.course.code,
             topic_label=topic.title,
-            is_complex_proof=False,
+            is_complex_proof=bool(deep_mode),
             system_prompt=system_prompt,
             max_tokens_override=CHAT_MAX_OUTPUT_TOKENS,
             auto_continue=True,
-            thinking_enabled=False,
+            thinking_enabled=bool(deep_mode),
         )
         chat_usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
         chat_model_used = str(result.get("model_used") or chat_model)
@@ -1134,7 +1252,15 @@ def send_topic_message(*, user, topic, session, user_message: str, uploaded_file
             )
 
         try:
-            answer = _parse_tutor_response(str(result.get("content") or ""), topic)
+            raw_content = str(result.get("content") or "")
+            if plain_stream:
+                # A streamed reply is already the final Markdown answer shown to the
+                # student, so there is no JSON envelope to parse.
+                answer = _sanitize_tutor_output(raw_content)
+                if not answer or len(answer) < 8:
+                    raise TopicTutorError("The tutor response was incomplete. Please try asking again.", 502)
+            else:
+                answer = _parse_tutor_response(raw_content, topic)
         except TopicTutorError as exc:
             exc.credits_charged = ocr_credits
             raise

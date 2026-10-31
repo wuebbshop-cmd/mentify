@@ -11,6 +11,7 @@ Mentify Prep AI Model Router & Zero-Cost Content Cache:
 """
 from __future__ import annotations
 
+import contextvars
 import hashlib
 import json
 import logging
@@ -260,6 +261,16 @@ def _note_validation_options(
     *,
     topic_obj=None,
 ) -> dict:
+    from django.core.cache import cache as _cache
+
+    topic_pk = getattr(topic_obj, "pk", None)
+    cache_key = None
+    if topic_pk:
+        cache_key = f"prep_note_val_opts_{topic_pk}_{_topic_content_rules_version(topic_obj)}"
+        cached = _cache.get(cache_key)
+        if cached is not None:
+            return cached
+
     content_rules, content_rule_issues = _resolved_note_content_rules(course_obj, topic_obj)
     allow_code = _note_allows_code(course_obj, topic_title, summary, subtopics)
     allow_math = _note_allows_math(course_obj)
@@ -283,7 +294,7 @@ def _note_validation_options(
             allow_code = allow_code and code_policy != "disallowed"
             if equation_policy == "disallowed" and chemical_policy == "disallowed":
                 allow_math = False
-    return {
+    result = {
         "allow_code": allow_code,
         "allow_math": allow_math,
         "allow_chemical_equations": (
@@ -295,6 +306,9 @@ def _note_validation_options(
         "content_rule_issues": content_rule_issues,
         "source_references": _approved_course_source_references(course_obj, topic_title),
     }
+    if cache_key:
+        _cache.set(cache_key, result, 300)
+    return result
 
 
 def _note_modalities(content: str) -> set[str]:
@@ -382,6 +396,18 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
         stage="stage_3",
         doc_type__in=["Lecture Notes", "Revision Sheet"],
     ).exclude(extracted_text="").order_by("-updated_at", "-id")
+    # One query for every approved visual of the course instead of one query per document:
+    # each round trip to the database costs ~0.25s, and this ran inside every cold chat turn.
+    visuals_by_document: dict = {}
+    try:
+        from prep.models import PrepDocumentVisual
+
+        for doc_id, content in PrepDocumentVisual.objects.filter(
+            document__course=course_obj, status="approved"
+        ).values_list("document_id", "extracted_content"):
+            visuals_by_document.setdefault(doc_id, []).append(content)
+    except Exception as exc:  # never fail topic selection because of a visual prefetch
+        logger.info("[Prep Source] visual prefetch unavailable: %s", exc)
     topic_words = [word for word in re.findall(r"[A-Za-z0-9]+", topic_title.lower()) if len(word) > 3]
     selected = []
     seen_hashes = set()
@@ -397,7 +423,7 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
         has_assigned_visual = any(
             " ".join(str((content or {}).get("auto_topic") or "").casefold().split())
             == requested_topic
-            for content in document.visual_candidates.filter(status="approved").values_list("extracted_content", flat=True)
+            for content in visuals_by_document.get(document.pk, ())
             if isinstance(content, dict)
         )
         is_topic_document = (
@@ -536,11 +562,32 @@ def _course_exam_style_reference(
 
 
 def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8000) -> str:
-    """Return bounded excerpts from approved coursework for grounded generation."""
+    """Return bounded excerpts from approved coursework for grounded generation.
+
+    Building this excerpt scans every approved document for the course (and each
+    document's approved visuals), which cost around 25 seconds cold. That work was
+    repeated on every chat turn through the notes signature, so the result is cached
+    per course/topic/limit for a few minutes.
+    """
+    from django.core.cache import cache as _cache
+
+    cache_key = None
+    course_pk = getattr(course_obj, "pk", None)
+    if course_pk:
+        digest = hashlib.sha256(
+            f"{course_pk}:{limit}:{' '.join(str(topic_title or '').casefold().split())}".encode("utf-8")
+        ).hexdigest()[:20]
+        cache_key = f"prep_src_ctx_{digest}"
+        cached = _cache.get(cache_key)
+        if cached is not None:
+            return cached
+
     from services.prep_sanitizer import purge_institutional_metadata
 
     selected = _approved_course_source_documents(course_obj, topic_title)
     if not selected:
+        if cache_key:
+            _cache.set(cache_key, "", 300)
         return ""
     total_length = 0
     excerpts = []
@@ -558,7 +605,10 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
             total_length += len(excerpt)
         if total_length >= limit:
             break
-    return "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(excerpts)[:limit]
+    result = "\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n".join(excerpts)[:limit]
+    if cache_key:
+        _cache.set(cache_key, result, 300)
+    return result
 
 
 def _strip_course_administrative_front_matter(text: str) -> str:
@@ -651,6 +701,19 @@ def _scope_numbered_sibling_figure_contexts(visuals: list[dict]) -> None:
 
 def _approved_course_source_references(course_obj, topic_title: str, *, limit: int = 40) -> list[dict]:
     """Return page and approved-figure references for the source excerpts used in notes."""
+    from django.core.cache import cache as _cache
+
+    cache_key = None
+    course_pk = getattr(course_obj, "pk", None)
+    if course_pk:
+        digest = hashlib.sha256(
+            f"{course_pk}:{limit}:{' '.join(str(topic_title or '').casefold().split())}".encode("utf-8")
+        ).hexdigest()[:20]
+        cache_key = f"prep_src_refs_{digest}"
+        cached = _cache.get(cache_key)
+        if cached is not None:
+            return cached
+
     page_header = re.compile(r"(?m)^--- Page (\d+)(?:\s+\([^\n]*\))? ---\s*$")
     references = []
     topics = list(course_obj.topics.filter(is_active=True).order_by("order", "id")) if course_obj else []
@@ -778,6 +841,8 @@ def _approved_course_source_references(course_obj, topic_title: str, *, limit: i
                 "page_number": page_number,
                 "visuals": assigned_visuals.get(page_number, []),
             })
+    if cache_key:
+        _cache.set(cache_key, references, 300)
     return references
 
 
@@ -2474,6 +2539,15 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         content_type="topic_notes",
         topic=topic_obj,
     ).order_by("-updated_at", "-id")
+    # Computed once: it depends on the topic, not on the cache entry, and rebuilding it
+    # per entry cost ~40s on a cold topic.
+    validation_options = _note_validation_options(
+        topic_obj.course,
+        topic_obj.title,
+        topic_obj.summary,
+        topic_obj.subtopics,
+        topic_obj=topic_obj,
+    )
     for entry in entries:
         payload = _cache_payload_as_dict(entry.payload)
         if not payload:
@@ -2502,13 +2576,6 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         elif validated_only:
             continue
 
-        validation_options = _note_validation_options(
-            topic_obj.course,
-            topic_obj.title,
-            topic_obj.summary,
-            topic_obj.subtopics,
-            topic_obj=topic_obj,
-        )
         if validated_only and payload.get("validation_state") != NOTE_VALIDATION_STATE:
             continue
         if payload.get("validation_state") != NOTE_VALIDATION_STATE:
@@ -3050,6 +3117,136 @@ _DEEPSEEK_MODEL_ALIASES = {
 }
 
 
+# When set, call_deepseek streams the answer through this callback instead of waiting
+# for the whole completion. It is set per request (the tutor's streaming view runs it in
+# a worker thread), so no other caller is affected.
+_STREAM_CALLBACK = contextvars.ContextVar("prep_deepseek_stream_callback", default=None)
+
+
+def set_stream_callback(callback):
+    """Attach a token callback for the current context. Returns a reset token."""
+    return _STREAM_CALLBACK.set(callback)
+
+
+def clear_stream_callback(token) -> None:
+    try:
+        _STREAM_CALLBACK.reset(token)
+    except (ValueError, RuntimeError):
+        _STREAM_CALLBACK.set(None)
+
+
+def streaming_active() -> bool:
+    """True when the current call is streaming, so callers can adapt their prompt."""
+    return _STREAM_CALLBACK.get(None) is not None
+
+
+def _call_deepseek_streaming(
+    *,
+    messages: list[dict],
+    model: str,
+    max_tokens: int,
+    temperature: float,
+    base_url: str,
+    headers: dict,
+    timeout_val: int,
+    callback,
+    auto_continue: bool,
+) -> dict:
+    """Stream deltas through ``callback`` while still accumulating the full answer."""
+    usage: dict = {}
+    content = ""
+    finish_reason = "stop"
+    try:
+        for attempt in range(2 if auto_continue else 1):
+            continuation: list[dict] = []
+            if attempt:
+                continuation = [
+                    {"role": "assistant", "content": content},
+                    {
+                        "role": "user",
+                        "content": (
+                            "Continue directly from where you stopped. Do not repeat any "
+                            "preceding text, and complete all remaining sections."
+                        ),
+                    },
+                ]
+            payload = {
+                "model": model,
+                "messages": [*messages, *continuation],
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "stream": True,
+                "stream_options": {"include_usage": True},
+            }
+            with requests.post(
+                f"{base_url}/chat/completions",
+                headers=headers,
+                json=payload,
+                stream=True,
+                timeout=timeout_val,
+            ) as response:
+                if response.status_code >= 400:
+                    logger.warning(
+                        "[DeepSeek Stream] HTTP %s: %s", response.status_code, response.text[:200]
+                    )
+                    return {
+                        "success": False,
+                        "error": "The AI service is temporarily unavailable. Please try again shortly.",
+                    }
+                chunk_text = ""
+                chunk_finish = "stop"
+                for raw_line in response.iter_lines(decode_unicode=True):
+                    if not raw_line:
+                        continue
+                    line = (
+                        raw_line.decode("utf-8", "ignore")
+                        if isinstance(raw_line, bytes)
+                        else raw_line
+                    )
+                    if not line.startswith("data:"):
+                        continue
+                    data = line[5:].strip()
+                    if data == "[DONE]":
+                        break
+                    try:
+                        event = json.loads(data)
+                    except ValueError:
+                        continue
+                    if isinstance(event.get("usage"), dict):
+                        usage = _merge_usage(usage, event["usage"])
+                    for choice in event.get("choices") or []:
+                        delta = (choice.get("delta") or {}).get("content") or ""
+                        if delta:
+                            chunk_text += delta
+                            callback(delta)
+                        if choice.get("finish_reason"):
+                            chunk_finish = choice["finish_reason"]
+            if not content:
+                content = chunk_text
+            elif chunk_text:
+                if content.endswith(("\n", " ", ".", ":", "$", "`")):
+                    content = f"{content}\n\n{chunk_text}"
+                else:
+                    content = content + chunk_text
+            finish_reason = chunk_finish
+            if finish_reason != "length" or not content:
+                break
+            callback("\n\n")
+        return {
+            "success": True,
+            "content": content,
+            "model_used": model,
+            "usage": usage,
+            "finish_reason": finish_reason,
+        }
+    except Exception as exc:  # network, timeout or malformed stream
+        logger.warning("[DeepSeek Stream] failed: %s", exc)
+        return {
+            "success": False,
+            "error": "The AI service is temporarily unreachable. Please try again shortly.",
+        }
+
+
 def _normalise_deepseek_model(model) -> str:
     """
     Map any configured model identifier onto a DeepSeek endpoint name.
@@ -3127,6 +3324,20 @@ def call_deepseek(
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
+
+    stream_callback = _STREAM_CALLBACK.get(None)
+    if stream_callback is not None:
+        return _call_deepseek_streaming(
+            messages=messages,
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            base_url=base_url,
+            headers=headers,
+            timeout_val=int(getattr(settings, "DEEPSEEK_TIMEOUT", None) or 90),
+            callback=stream_callback,
+            auto_continue=auto_continue,
+        )
 
     payload = {
         "model": model,

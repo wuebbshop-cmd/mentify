@@ -1913,6 +1913,7 @@ def prep_topic_tutor_api(request, topic_id):
             session=session,
             user_message=request.POST.get("message", ""),
             uploaded_files=request.FILES.getlist("files"),
+            deep_mode=str(request.POST.get("deep", "")).strip().lower() in {"1", "true", "yes", "on"},
         )
     except TopicTutorError as exc:
         wallet = PrepWallet.get_or_create_wallet(request.user)
@@ -1949,6 +1950,165 @@ def prep_topic_tutor_api(request, topic_id):
         "credits_balance": get_available_credits(wallet),
         "uploads": result.get("uploads", []),
     })
+
+
+@login_required
+@require_POST
+def prep_topic_tutor_stream_api(request, topic_id):
+    """
+    Server-sent events for the topic tutor.
+
+    The answer used to arrive only after the whole completion finished, so a student
+    stared at a blank panel for 15-25 seconds. Tokens are now pushed as they are
+    generated, and a repeat of the same question for the same topic is served from
+    cache at zero credits.
+    """
+    import hashlib as _hashlib
+    import json as _json
+    import queue
+    import threading
+
+    from django.core.cache import cache
+    from django.db import close_old_connections
+    from django.http import StreamingHttpResponse
+
+    from services.prep_ai_router import clear_stream_callback, set_stream_callback
+    from services.prep_topic_tutor import (
+        MAX_MESSAGE_CHARS,
+        TopicTutorError,
+        send_topic_message,
+        serialize_topic_conversation,
+    )
+
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    if not (
+        request.user.is_staff
+        or request.user.is_superuser
+        or PrepCourseEnrollment.objects.filter(user=request.user, course=topic.course).exists()
+    ):
+        PrepCourseEnrollment.objects.get_or_create(
+            user=request.user, course=topic.course, defaults={"source": "topic_tutor"}
+        )
+
+    message_text = request.POST.get("message", "").strip()
+    if not message_text:
+        return JsonResponse({"success": False, "error": "Enter a question about this topic."}, status=400)
+    if len(message_text) > MAX_MESSAGE_CHARS:
+        return JsonResponse(
+            {"success": False, "error": f"Keep each message under {MAX_MESSAGE_CHARS} characters."},
+            status=400,
+        )
+
+    wallet = PrepWallet.get_or_create_wallet(request.user)
+    available_credits = get_available_credits(wallet)
+    if available_credits < 1:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "You need at least 1 credit to ask the AI Tutor. Please top up your wallet to continue.",
+                "credits_balance": available_credits,
+            },
+            status=402,
+        )
+
+    session = None
+    session_id = request.POST.get("session_id", "").strip()
+    if session_id:
+        try:
+            session = topic.chat_sessions.get(pk=int(session_id), user=request.user)
+        except (ValueError, PrepTopicChatSession.DoesNotExist):
+            session = None
+
+    deep_mode = str(request.POST.get("deep", "")).strip().lower() in {"1", "true", "yes", "on"}
+    fingerprint = _hashlib.sha256(
+        f"{topic.pk}:{int(deep_mode)}:{' '.join(message_text.casefold().split())}".encode("utf-8")
+    ).hexdigest()[:32]
+    cache_key = f"prep_tutor_answer_v1:{request.user.pk}:{fingerprint}"
+
+    def sse(payload: dict) -> str:
+        return f"data: {_json.dumps(payload, ensure_ascii=False)}\n\n"
+
+    cached_answer = cache.get(cache_key)
+    if cached_answer:
+        def cached_events():
+            yield sse({"delta": cached_answer})
+            yield sse({
+                "done": True,
+                "answer": cached_answer,
+                "cached": True,
+                "credits_charged": 0,
+                "credits_balance": available_credits,
+                "session_id": session.pk if session else None,
+                "conversation": serialize_topic_conversation(session) if session else None,
+            })
+
+        response = StreamingHttpResponse(cached_events(), content_type="text/event-stream")
+        response["Cache-Control"] = "no-cache, no-store"
+        response["X-Accel-Buffering"] = "no"
+        return response
+
+    events: "queue.Queue" = queue.Queue()
+    state: dict = {}
+
+    def worker() -> None:
+        close_old_connections()
+        token = set_stream_callback(lambda delta: events.put(("delta", delta)))
+        try:
+            state["result"] = send_topic_message(
+                user=request.user,
+                topic=topic,
+                session=session,
+                user_message=message_text,
+                uploaded_files=[],
+                deep_mode=deep_mode,
+            )
+            state["balance"] = get_available_credits(PrepWallet.get_or_create_wallet(request.user))
+        except TopicTutorError as exc:
+            state["error"] = str(exc)
+            state["credits_charged"] = exc.credits_charged
+        except Exception:
+            logger.exception("Streaming topic tutor failed for topic %s user %s", topic.pk, request.user.pk)
+            state["error"] = "The topic tutor could not complete this request. Please try again."
+        finally:
+            clear_stream_callback(token)
+            close_old_connections()
+            events.put(("done", None))
+
+    threading.Thread(target=worker, daemon=True).start()
+
+    def event_stream():
+        while True:
+            kind, payload = events.get()
+            if kind == "done":
+                break
+            if payload:
+                yield sse({"delta": payload})
+        result = state.get("result")
+        if not result:
+            yield sse({
+                "failed": True,
+                "error": state.get("error") or "The topic tutor could not complete this request.",
+                "credits_charged": state.get("credits_charged", 0),
+            })
+            return
+        answer = str(result.get("answer") or "")
+        if answer:
+            cache.set(cache_key, answer, 3600)
+        result_session = result.get("session")
+        yield sse({
+            "done": True,
+            "answer": answer,
+            "session_id": result_session.pk if result_session else None,
+            "conversation": serialize_topic_conversation(result_session) if result_session else None,
+            "credits_charged": result.get("credits_charged", 0),
+            "ocr_credits": result.get("ocr_credits", 0),
+            "credits_balance": state.get("balance", available_credits),
+        })
+
+    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+    response["Cache-Control"] = "no-cache, no-store"
+    response["X-Accel-Buffering"] = "no"
+    return response
 
 
 @login_required
