@@ -6000,111 +6000,151 @@ def _review_adapted_question_against_source(
             "usage": {},
         }
 
-    model = getattr(settings, "DEEPSEEK_ASSESSMENT_REVIEW_MODEL", None) or getattr(
-        settings, "DEEPSEEK_REASONER_MODEL", "deepseek-v4-pro"
+    # The review is a JSON classification task, not a derivation. Running it on the
+    # reasoning model with max_tokens=1000 burned the whole budget on hidden thoughts
+    # and returned empty content (14 held rows) or malformed quotes (27 held rows).
+    model = (
+        getattr(settings, "DEEPSEEK_ASSESSMENT_REVIEW_MODEL", None)
+        or getattr(settings, "DEEPSEEK_CHAT_MODEL", None)
+        or "deepseek-chat"
     )
-    try:
-        result = call_deepseek(
-            [
-                {
-                    "role": "system",
-                    "content": (
-                        "You are an independent reviewer. Compare an AI-adapted exam question "
-                        "with the supplied source-page text and damaged transcription. Decide whether "
-                        "it is a reasonable equivalent: same clearly supported skill/topic, same explicit "
-                        "values and conditions where readable, and marks consistent with the source. "
-                        "Do not approve details that are guessed or contradicted by the source. If OCR "
-                        "damage makes equivalence uncertain, hold it for a person. Also check that the "
-                        "provided solution answers the adapted question. Return exactly one JSON object: "
-                        '{"decision":"pass"|"hold","reason":"short explanation",'
-                        '"source_evidence":"exact short quote from source page, or empty if none"}. '
-                        "Do not rewrite the question."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"Paper question number: {question_obj.number}\n"
-                        f"Source marks: {question_obj.marks}\n"
-                        "SOURCE PAGE TEXT (extracted from the uploaded paper):\n"
-                        f"{source_page_context[:6000]}\n\n"
-                        "DAMAGED SOURCE TRANSCRIPTION:\n"
-                        f"{str(question_obj.question_latex or '')[:4000]}\n\n"
-                        "ADAPTED QUESTION:\n"
-                        f"{str(adapted_item.get('question_latex') or '')[:4000]}\n\n"
-                        "PROPOSED SOLUTION:\n"
-                        f"{str(adapted_item.get('solution_latex') or '')[:6000]}"
-                    ),
-                },
-            ],
-            model=model,
-            max_tokens=1000,
-            auto_continue=False,
-            thinking_enabled=False,
-        )
-    except Exception as exc:
-        logger.exception("[Question Source Review] Independent review request failed.")
-        return {
-            "success": False,
-            "status": "hold",
-            "error": str(exc)[:1000],
-            "usage": {},
-            "model": model,
+    review_messages_base = [
+        {
+            "role": "system",
+            "content": (
+                "You are an independent reviewer. Compare an AI-adapted exam question "
+                "with the supplied source-page text and damaged transcription. Decide whether "
+                "it is a reasonable equivalent: same clearly supported skill/topic, same explicit "
+                "values and conditions where readable, and marks consistent with the source. "
+                "Do not approve details that are guessed or contradicted by the source. If OCR "
+                "damage makes equivalence uncertain, hold it for a person. Also check that the "
+                "provided solution answers the adapted question. Return exactly one JSON object: "
+                '{"decision":"pass"|"hold","reason":"short explanation",'
+                '"source_evidence":"exact short quote from source page, or empty if none"}. '
+                "source_evidence must be copied character-for-character from the source page text, "
+                "with no paraphrase and no added punctuation. Do not rewrite the question."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Paper question number: {question_obj.number}\n"
+                f"Source marks: {question_obj.marks}\n"
+                "SOURCE PAGE TEXT (extracted from the uploaded paper):\n"
+                f"{source_page_context[:6000]}\n\n"
+                "DAMAGED SOURCE TRANSCRIPTION:\n"
+                f"{str(question_obj.question_latex or '')[:4000]}\n\n"
+                "ADAPTED QUESTION:\n"
+                f"{str(adapted_item.get('question_latex') or '')[:4000]}\n\n"
+                "PROPOSED SOLUTION:\n"
+                f"{str(adapted_item.get('solution_latex') or '')[:6000]}"
+            ),
+        },
+    ]
+    usage = {}
+    model_used = model
+    last_failure = None
+    for attempt in range(2):
+        messages = list(review_messages_base)
+        if attempt:
+            messages.append({
+                "role": "user",
+                "content": (
+                    "Your previous reply was rejected: the quoted source_evidence did not appear "
+                    "verbatim in the source page text, or the JSON was invalid. Reply again with one "
+                    "JSON object and copy one short contiguous phrase from the source page text exactly."
+                ),
+            })
+        try:
+            result = call_deepseek(
+                messages,
+                model=model,
+                max_tokens=1600,
+                auto_continue=False,
+                thinking_enabled=False,
+            )
+        except Exception as exc:
+            logger.exception("[Question Source Review] Independent review request failed.")
+            return {
+                "success": False,
+                "status": "hold",
+                "error": str(exc)[:1000],
+                "usage": usage,
+                "model": model,
+            }
+        usage = _merge_usage(usage, result.get("usage", {}))
+        model_used = result.get("model_used") or model_used
+        base = {
+            "usage": usage,
+            "model": model_used,
+            "raw_response": str(result.get("content") or "")[:2000],
         }
-    base = {
-        "usage": result.get("usage", {}),
-        "model": result.get("model_used") or model,
-        "raw_response": str(result.get("content") or "")[:2000],
-    }
-    if not result.get("success") or not result.get("content"):
+        if not result.get("success") or not result.get("content"):
+            last_failure = {
+                **base,
+                "success": False,
+                "status": "hold",
+                "error": result.get("error") or "The independent source check returned no result.",
+            }
+            continue
+        try:
+            report = robust_json_loads(result["content"])
+        except ValueError as exc:
+            last_failure = {
+                **base,
+                "success": False,
+                "status": "hold",
+                "error": f"The independent source check was not valid JSON: {exc}",
+            }
+            continue
+        if not isinstance(report, dict):
+            last_failure = {
+                **base,
+                "success": False,
+                "status": "hold",
+                "error": "The independent source check did not return a JSON object.",
+            }
+            continue
+        decision = str(report.get("decision") or "").strip().lower()
+        reason = str(report.get("reason") or "").strip()
+        evidence = str(report.get("source_evidence") or "").strip()
+        normalized_source = re.sub(r"\s+", " ", source_page_context).casefold()
+        normalized_evidence = re.sub(r"\s+", " ", evidence).casefold()
+        quote_ok = bool(normalized_evidence) and normalized_evidence in normalized_source
+        if decision == "pass" and evidence and not quote_ok:
+            # Tolerate a truncated tail: keep the longest matching lead-in.
+            words = normalized_evidence.split(" ")
+            for length in range(len(words) - 1, 2, -1):
+                if " ".join(words[:length]) in normalized_source:
+                    quote_ok = True
+                    break
+        if (
+            decision not in {"pass", "hold"}
+            or not reason
+            or (decision == "pass" and not quote_ok)
+        ):
+            last_failure = {
+                **base,
+                "success": False,
+                "status": "hold",
+                "error": "The independent source check returned an invalid decision or source quote.",
+                "report": report,
+            }
+            continue
         return {
             **base,
-            "success": False,
-            "status": "hold",
-            "error": result.get("error") or "The independent source check returned no result.",
-        }
-    try:
-        report = robust_json_loads(result["content"])
-    except ValueError as exc:
-        return {
-            **base,
-            "success": False,
-            "status": "hold",
-            "error": f"The independent source check was not valid JSON: {exc}",
-        }
-    if not isinstance(report, dict):
-        return {
-            **base,
-            "success": False,
-            "status": "hold",
-            "error": "The independent source check did not return a JSON object.",
-        }
-    decision = str(report.get("decision") or "").strip().lower()
-    reason = str(report.get("reason") or "").strip()
-    evidence = str(report.get("source_evidence") or "").strip()
-    normalized_source = re.sub(r"\s+", " ", source_page_context).casefold()
-    normalized_evidence = re.sub(r"\s+", " ", evidence).casefold()
-    if (
-        decision not in {"pass", "hold"}
-        or not reason
-        or (decision == "pass" and (
-            not normalized_evidence or normalized_evidence not in normalized_source
-        ))
-    ):
-        return {
-            **base,
-            "success": False,
-            "status": "hold",
-            "error": "The independent source check returned an invalid decision or source quote.",
+            "success": True,
+            "status": decision,
+            "reason": reason[:1000],
+            "source_evidence": evidence[:1000],
             "report": report,
         }
-    return {
-        **base,
-        "success": True,
-        "status": decision,
-        "reason": reason[:1000],
-        "source_evidence": evidence[:1000],
-        "report": report,
+    return last_failure or {
+        "success": False,
+        "status": "hold",
+        "error": "The independent source check could not be completed.",
+        "usage": usage,
+        "model": model_used,
     }
 
 
