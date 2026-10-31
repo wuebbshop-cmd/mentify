@@ -7,6 +7,8 @@ Mentify Prep workers:
 2. Past Paper Questions & Assessment Worker (run_prep_assessment_worker)
 3. Downloadable PDF Artifacts Worker (run_prep_pdf_worker)
 """
+import sys
+import threading
 import time
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -19,9 +21,100 @@ from prep.models import (
     PrepTopicPdfArtifact,
 )
 
+ACTIVE_STATUSES = ["pending", "processing", "queued"]
+
 
 class Command(BaseCommand):
     help = "One-stop command to resume and complete all unfinished notes, past papers, and PDF worker jobs."
+
+    # Job identities are printed before each step so the terminal shows what is being
+    # worked on, and a heartbeat keeps printing while a worker call is in flight.
+    def _queue_counts(self) -> dict:
+        return {
+            "notes": PrepTopicNotesJob.objects.filter(status__in=ACTIVE_STATUSES).count(),
+            "precompute": PrepNotePrecomputeJob.objects.filter(status__in=ACTIVE_STATUSES).count(),
+            "assessments": PrepAssessmentIndexJob.objects.filter(status__in=ACTIVE_STATUSES).count(),
+            "pdfs": PrepTopicPdfArtifact.objects.filter(status__in=ACTIVE_STATUSES).count(),
+        }
+
+    def _counts_text(self, counts: dict) -> str:
+        return (
+            f"Notes={counts['notes'] + counts['precompute']} | "
+            f"Past Papers={counts['assessments']} | "
+            f"PDFs={counts['pdfs']}"
+        )
+
+    def _describe_queue(self, limit: int = 8) -> None:
+        """Print one line per queued job so progress is identifiable, not just a count."""
+        self.stdout.write("    queued work:")
+        shown = 0
+        try:
+            for job in (
+                PrepTopicNotesJob.objects.filter(status__in=ACTIVE_STATUSES)
+                .select_related("topic", "topic__course")[:limit]
+            ):
+                topic = getattr(job, "topic", None)
+                course = getattr(topic, "course", None)
+                label = f"{getattr(course, 'code', '?')} | {str(getattr(topic, 'title', ''))[:38]}"
+                self.stdout.write(
+                    f"      - notes      job {job.pk}  {label}  "
+                    f"level={getattr(job, 'level', '?')}  status={job.status}  "
+                    f"attempts={getattr(job, 'attempts', 0)}"
+                )
+                shown += 1
+            for job in (
+                PrepNotePrecomputeJob.objects.filter(status__in=ACTIVE_STATUSES)
+                .select_related("course")[: max(0, limit - shown)]
+            ):
+                self.stdout.write(
+                    f"      - precompute job {job.pk}  course={getattr(job.course, 'code', '?')}  "
+                    f"status={job.status}  attempts={getattr(job, 'attempts', 0)}"
+                )
+                shown += 1
+            for job in (
+                PrepAssessmentIndexJob.objects.filter(status__in=ACTIVE_STATUSES)[: max(0, limit - shown)]
+            ):
+                self.stdout.write(
+                    f"      - past paper job {job.pk}  status={job.status}  "
+                    f"attempts={getattr(job, 'attempts', 0)}"
+                )
+                shown += 1
+            for job in (
+                PrepTopicPdfArtifact.objects.filter(status__in=ACTIVE_STATUSES)[: max(0, limit - shown)]
+            ):
+                self.stdout.write(
+                    f"      - pdf        job {job.pk}  status={job.status}  "
+                    f"attempts={getattr(job, 'attempts', 0)}"
+                )
+                shown += 1
+        except Exception as exc:  # never let reporting break the worker run
+            self.stdout.write(f"      (queue detail unavailable: {exc})")
+        remaining = sum(self._queue_counts().values()) - shown
+        if remaining > 0:
+            self.stdout.write(f"      ... and {remaining} more")
+
+    def _run_step(self, label: str, command_name: str, poll_seconds: float) -> None:
+        """Run one worker command, printing a heartbeat until it returns."""
+        started = time.monotonic()
+        stop = threading.Event()
+
+        def heartbeat() -> None:
+            while not stop.wait(max(5.0, poll_seconds)):
+                elapsed = int(time.monotonic() - started)
+                sys.stdout.write(f"      ... {label} worker still running ({elapsed}s elapsed)\n")
+                sys.stdout.flush()
+
+        thread = threading.Thread(target=heartbeat, daemon=True)
+        thread.start()
+        try:
+            call_command(command_name, once=True)
+        except Exception as exc:
+            self.stderr.write(self.style.ERROR(f"    {label} worker error: {exc}"))
+        finally:
+            stop.set()
+            thread.join(timeout=1)
+            self.stdout.write(f"    {label} step finished in {int(time.monotonic() - started)}s")
+            sys.stdout.flush()
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -43,64 +136,61 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("=" * 70))
         self.stdout.write(self.style.SUCCESS("  MENTIFY PREP MASTER WORKER RESUME"))
         self.stdout.write(self.style.SUCCESS("=" * 70))
+        self.stdout.flush()
 
+        cycle = 0
         while True:
+            cycle += 1
             close_old_connections()
 
-            # Check queue counts
-            pending_notes = PrepTopicNotesJob.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            pending_precompute = PrepNotePrecomputeJob.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            pending_assessments = PrepAssessmentIndexJob.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            pending_pdfs = PrepTopicPdfArtifact.objects.filter(status__in=["pending", "processing", "queued"]).count()
-
-            total_pending = pending_notes + pending_precompute + pending_assessments + pending_pdfs
-
+            counts = self._queue_counts()
+            total_pending = sum(counts.values())
+            self.stdout.write("")
             self.stdout.write(
-                f"\n[Status] Current Pending Jobs: "
-                f"Notes={pending_notes + pending_precompute} | "
-                f"Past Papers={pending_assessments} | "
-                f"PDFs={pending_pdfs}"
+                self.style.HTTP_INFO(
+                    f"[Cycle {cycle}] {time.strftime('%H:%M:%S')} - pending: {self._counts_text(counts)}"
+                )
+            )
+            if total_pending:
+                self._describe_queue()
+            self.stdout.flush()
+
+            steps = (
+                (1, "Notes", ("notes", "precompute"), "run_prep_note_worker", "Processing Notes Queue"),
+                (2, "Past Papers", ("assessments",), "run_prep_assessment_worker", "Processing Past Paper Questions Queue"),
+                (3, "PDFs", ("pdfs",), "run_prep_pdf_worker", "Processing PDF Artifacts Queue"),
+            )
+            for index, label, keys, command_name, description in steps:
+                pending = sum(counts[key] for key in keys)
+                if pending == 0 and not watch:
+                    self.stdout.write(
+                        self.style.WARNING(f"--> [{index}/3] {description}: queue empty, skipped")
+                    )
+                    continue
+                self.stdout.write(
+                    self.style.WARNING(f"--> [{index}/3] {description} ({pending} pending)")
+                )
+                self.stdout.flush()
+                self._run_step(label, command_name, poll_seconds)
+
+            close_old_connections()
+            remaining = self._queue_counts()
+            rem_total = sum(remaining.values())
+            finished = max(0, total_pending - rem_total)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"    cycle {cycle} complete: {finished} job(s) finished, {rem_total} still queued "
+                    f"({self._counts_text(remaining)})"
+                )
             )
 
-            # Step 1: Resume and process Topic Notes
-            if pending_notes + pending_precompute > 0 or watch:
-                self.stdout.write(self.style.WARNING("--> [1/3] Processing Notes Queue..."))
-                try:
-                    call_command("run_prep_note_worker", once=True)
-                except Exception as e:
-                    self.stderr.write(self.style.ERROR(f"Notes worker error: {e}"))
-
-            # Step 2: Resume and process Past Paper Assessment Questions
-            if pending_assessments > 0 or watch:
-                self.stdout.write(self.style.WARNING("--> [2/3] Processing Past Paper Questions Queue..."))
-                try:
-                    call_command("run_prep_assessment_worker", once=True)
-                except Exception as e:
-                    self.stderr.write(self.style.ERROR(f"Assessment worker error: {e}"))
-
-            # Step 3: Resume and process PDF Artifacts
-            if pending_pdfs > 0 or watch:
-                self.stdout.write(self.style.WARNING("--> [3/3] Processing PDF Artifacts Queue..."))
-                try:
-                    call_command("run_prep_pdf_worker", once=True)
-                except Exception as e:
-                    self.stderr.write(self.style.ERROR(f"PDF worker error: {e}"))
-
-            close_old_connections()
-            rem_notes = PrepTopicNotesJob.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            rem_precompute = PrepNotePrecomputeJob.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            rem_assessments = PrepAssessmentIndexJob.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            rem_pdfs = PrepTopicPdfArtifact.objects.filter(status__in=["pending", "processing", "queued"]).count()
-            rem_total = rem_notes + rem_precompute + rem_assessments + rem_pdfs
-
             if not watch:
-                self.stdout.write(self.style.SUCCESS("\n" + "=" * 70))
+                self.stdout.write(self.style.SUCCESS("=" * 70))
                 self.stdout.write(
-                    self.style.SUCCESS(
-                        f"  COMPLETED BATCH: Finished {max(0, total_pending - rem_total)} job(s). Remaining: {rem_total}"
-                    )
+                    self.style.SUCCESS(f"  COMPLETED BATCH: Finished {finished} job(s). Remaining: {rem_total}")
                 )
                 self.stdout.write(self.style.SUCCESS("=" * 70))
+                self.stdout.flush()
                 break
 
             time.sleep(poll_seconds)
