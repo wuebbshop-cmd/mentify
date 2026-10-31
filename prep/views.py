@@ -1177,6 +1177,16 @@ def prep_course_detail(request, course_code):
         # Codes are stored both with and without the space ("SST 404" vs "SST404").
         course = PrepCourse.objects.filter(code__iexact=compact_code).first()
     if not course:
+        # Fallback in both directions: strip spaces from the stored code and compare.
+        from django.db.models import Value
+        from django.db.models.functions import Replace
+
+        course = (
+            PrepCourse.objects.annotate(code_compact=Replace("code", Value(" "), Value("")))
+            .filter(code_compact__iexact=compact_code)
+            .first()
+        )
+    if not course:
         course = PrepCourse.objects.filter(slug__iexact=course_code).first()
     if not course:
         # Only accept a shortened match when it is unambiguous. A loose prefix match used
