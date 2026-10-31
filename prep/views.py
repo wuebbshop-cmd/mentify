@@ -1169,14 +1169,21 @@ def prep_remove_course(request, course_id):
 def prep_course_detail(request, course_code):
     """Syllabus Topics & Paper Breakdown for a Course."""
     clean_code = course_code.replace("-", " ").strip().upper()
+    compact_code = clean_code.replace(" ", "")
     wallet = PrepWallet.get_or_create_wallet(request.user)
 
     course = PrepCourse.objects.filter(code__iexact=clean_code).first()
+    if not course and compact_code != clean_code:
+        # Codes are stored both with and without the space ("SST 404" vs "SST404").
+        course = PrepCourse.objects.filter(code__iexact=compact_code).first()
     if not course:
         course = PrepCourse.objects.filter(slug__iexact=course_code).first()
     if not course:
-        # Try finding by slug or code starts
-        course = PrepCourse.objects.filter(code__icontains=clean_code.split()[0]).first()
+        # Only accept a shortened match when it is unambiguous. A loose prefix match used
+        # to send an unknown code such as "SST 404" to whichever "SST" course came first.
+        matches = list(PrepCourse.objects.filter(code__icontains=clean_code.split()[0])[:2])
+        if len(matches) == 1:
+            course = matches[0]
 
     if not course:
         messages.info(request, f"Course '{clean_code}' has not been added yet. Upload documents to index this course.")
