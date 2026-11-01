@@ -108,6 +108,20 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     from services.prep_pdf_artifacts import enqueue_topic_pdf_artifact
 
     topic = job.topic
+    topic.refresh_from_db(fields=["title", "summary", "subtopics", "content_rules", "content_rules_version"])
+    topic.course.refresh_from_db(fields=["study_profile", "study_profile_version"])
+    if _supersede_stale_topic_notes_job(
+        job,
+        topic,
+        _topic_notes_cache_signature(
+            topic.course,
+            topic,
+            topic.title,
+            topic.subtopics if isinstance(topic.subtopics, list) else [],
+        ),
+    ):
+        return False
+
     result = get_or_generate_topic_notes(
         topic.course.code,
         topic.title,
@@ -116,6 +130,20 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
         course_obj=topic.course,
         topic_obj=topic,
     )
+    topic.refresh_from_db(fields=["title", "summary", "subtopics", "content_rules", "content_rules_version"])
+    topic.course.refresh_from_db(fields=["study_profile", "study_profile_version"])
+    if _supersede_stale_topic_notes_job(
+        job,
+        topic,
+        _topic_notes_cache_signature(
+            topic.course,
+            topic,
+            topic.title,
+            topic.subtopics if isinstance(topic.subtopics, list) else [],
+        ),
+    ):
+        return False
+
     notes = str(result.get("notes") or result.get("content") or "").strip()
     usage = result.get("usage") if isinstance(result.get("usage"), dict) else {}
     model_name = str(result.get("model") or result.get("model_used") or "")
@@ -126,7 +154,7 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     if result.get("stale"):
         raise RuntimeError("A stale note cannot complete a job for the current source version.")
     review_status = result.get("review_status")
-    acceptable_review_statuses = {"passed", "skipped_no_source", "skipped", None}
+    acceptable_review_statuses = {"passed", "skipped", None}
     if review_status not in acceptable_review_statuses:
         raise RuntimeError(
             "The notes worker rejected notes without a successful independent review: "
@@ -185,6 +213,17 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     return True
 
 
+def _supersede_stale_topic_notes_job(job: PrepTopicNotesJob, topic: PrepTopic, current_signature: str) -> bool:
+    if current_signature == job.source_signature:
+        return False
+    job.status = "failed"
+    job.completed_at = timezone.now()
+    job.last_error = "Superseded because the approved topic source changed during note preparation."
+    job.save(update_fields=["status", "completed_at", "last_error"])
+    enqueue_course_topic_note_jobs(topic.course)
+    return True
+
+
 def process_course_notes_in_background(course_id: int):
     """Background worker thread function that runs through all pending jobs for a course."""
     if not connection.in_atomic_block:
@@ -215,8 +254,11 @@ def process_course_notes_in_background(course_id: int):
             job.started_at = timezone.now()
             job.save(update_fields=["status", "attempts", "started_at"])
             try:
-                process_single_topic_notes_job(job)
-                logger.info("Auto-worker generated %s notes for topic %s (%s)", job.level, job.topic_id, job.topic.title)
+                completed = process_single_topic_notes_job(job)
+                if completed:
+                    logger.info("Auto-worker generated %s notes for topic %s (%s)", job.level, job.topic_id, job.topic.title)
+                else:
+                    logger.info("Auto-worker superseded stale %s note job for topic %s", job.level, job.topic_id)
             except Exception as exc:
                 logger.warning("Auto-worker error for note job %s topic %s: %s", job.id, job.topic_id, exc)
                 job.status = "pending" if job.attempts < 3 else "failed"

@@ -177,10 +177,13 @@ class Command(BaseCommand):
         from services.prep_note_precompute import process_single_topic_notes_job
 
         try:
-            process_single_topic_notes_job(job)
-            self.stdout.write(
-                self.style.SUCCESS(f"Prepared {job.level} notes for topic {job.topic_id}.")
+            completed = process_single_topic_notes_job(job)
+            message = (
+                f"Prepared {job.level} notes for topic {job.topic_id}."
+                if completed
+                else f"Superseded stale {job.level} note job for topic {job.topic_id}."
             )
+            self.stdout.write(self.style.SUCCESS(message))
         except Exception as exc:
             job.status = "pending" if job.attempts < 3 else "failed"
             job.last_error = str(exc)[:4000]

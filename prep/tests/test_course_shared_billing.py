@@ -19,7 +19,7 @@ from prep.models import (
 )
 from services.credit_service import get_available_credits, grant_credits
 from services.prep_course_billing import create_shared_course_cost, ensure_note_access, settle_course_cost_share
-from services.prep_note_precompute import enqueue_course_level_two_precompute
+from services.prep_note_precompute import enqueue_course_level_two_precompute, process_single_topic_notes_job
 
 
 class CourseSharedBillingTests(TestCase):
@@ -252,8 +252,10 @@ class CourseSharedBillingTests(TestCase):
 
     @patch("services.prep_ai_router._note_completion_issues", return_value=[])
     @patch("services.prep_ai_router.get_or_generate_topic_notes")
+    @patch("services.prep_ai_router._topic_notes_cache_signature", return_value="b" * 64)
     def test_worker_generates_level_one_only_after_level_two_is_complete(
         self,
+        note_signature,
         generate_notes,
         validate_notes,
     ):
@@ -290,9 +292,77 @@ class CourseSharedBillingTests(TestCase):
         self.assertEqual(generate_notes.call_args.kwargs["level"], "level_1")
         self.assertFalse(PrepCourseSharedCost.objects.filter(topic=topic, level="level_1").exists())
 
+    @patch("services.prep_note_precompute.enqueue_course_topic_note_jobs")
+    @patch("services.prep_ai_router.get_or_generate_topic_notes")
+    @patch("services.prep_ai_router._topic_notes_cache_signature", return_value="b" * 64)
+    def test_stale_note_job_is_superseded_without_generation(
+        self,
+        note_signature,
+        generate_notes,
+        enqueue_current_jobs,
+    ):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Demand",
+            slug="demand-stale-note-test",
+        )
+        job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="a" * 64,
+            status="running",
+        )
+
+        completed = process_single_topic_notes_job(job)
+
+        job.refresh_from_db()
+        self.assertFalse(completed)
+        self.assertEqual(job.status, "failed")
+        self.assertIn("Superseded", job.last_error)
+        generate_notes.assert_not_called()
+        enqueue_current_jobs.assert_called_once_with(topic.course)
+
+    @patch("services.prep_note_precompute.enqueue_course_topic_note_jobs")
+    @patch("services.prep_ai_router.get_or_generate_topic_notes")
+    @patch("services.prep_ai_router._topic_notes_cache_signature", side_effect=["a" * 64, "b" * 64])
+    def test_topic_change_during_generation_supersedes_result(
+        self,
+        note_signature,
+        generate_notes,
+        enqueue_current_jobs,
+    ):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Demand",
+            slug="demand-change-during-notes-test",
+        )
+        job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="a" * 64,
+            status="running",
+        )
+        generate_notes.return_value = {
+            "notes": "Generated note content.",
+            "cached": False,
+            "review_status": "passed",
+        }
+
+        completed = process_single_topic_notes_job(job)
+
+        job.refresh_from_db()
+        self.assertFalse(completed)
+        self.assertEqual(job.status, "failed")
+        self.assertIn("Superseded", job.last_error)
+        generate_notes.assert_called_once()
+        enqueue_current_jobs.assert_called_once_with(topic.course)
+
     @patch("services.prep_ai_router._note_completion_issues", return_value=[])
     @patch("services.prep_ai_router.get_or_generate_topic_notes")
-    def test_worker_does_not_mark_unreviewed_notes_complete(self, generate_notes, validate_notes):
+    @patch("services.prep_ai_router._topic_notes_cache_signature", return_value="c" * 64)
+    def test_worker_does_not_mark_unreviewed_notes_complete(self, note_signature, generate_notes, validate_notes):
         topic = PrepTopic.objects.create(
             course=self.course,
             order=1,

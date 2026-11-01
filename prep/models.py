@@ -335,6 +335,7 @@ class PrepTopic(models.Model):
             cache.delete(f"prep_pub_levels_{self.pk}_True")
             cache.delete(f"prep_pub_levels_{self.pk}_False")
             cache.delete(f"prep_topic_sig_{self.pk}")
+            cache.delete(f"prep_topic_sig_v3_{self.pk}")
         if self.course_id:
             cache.delete(f"prep_pub_course_page_{self.course_id}")
             cache.delete(f"prep_course_detail_topics_{self.course_id}")
@@ -732,6 +733,7 @@ class PrepContentCache(models.Model):
             cache.delete(f"prep_pub_levels_{self.topic_id}_True")
             cache.delete(f"prep_pub_levels_{self.topic_id}_False")
             cache.delete(f"prep_topic_sig_{self.topic_id}")
+            cache.delete(f"prep_topic_sig_v3_{self.topic_id}")
         if self.course_id:
             cache.delete(f"prep_pub_course_page_{self.course_id}")
             cache.delete(f"prep_course_detail_topics_{self.course_id}")
