@@ -208,12 +208,14 @@ class CourseSharedBillingTests(TestCase):
         grant_credits(wallet, 2, source="purchased", description="Unlock next topic")
         self.assertTrue(ensure_note_access(self.first_user, topics[1], "level_2")[0])
 
+    @patch("services.prep_note_precompute._has_current_topic_note_cache", return_value=True)
     @patch("services.prep_ai_router._note_completion_issues", return_value=[])
     @patch("services.prep_ai_router.get_or_generate_topic_notes")
     def test_worker_fans_out_all_levels_and_records_level_two_bundle_cost(
         self,
         generate_notes,
         validate_notes,
+        note_cache_exists,
     ):
         PrepCourseEnrollment.objects.create(user=self.first_user, course=self.course)
         topic = PrepTopic.objects.create(
@@ -250,6 +252,7 @@ class CourseSharedBillingTests(TestCase):
         self.assertEqual(level_two_job.provider_usage["total_tokens"], 2500)
         self.assertEqual(level_two_job.model_name, "test-notes-model")
 
+    @patch("services.prep_note_precompute._has_current_topic_note_cache", return_value=True)
     @patch("services.prep_ai_router._note_completion_issues", return_value=[])
     @patch("services.prep_ai_router.get_or_generate_topic_notes")
     @patch("services.prep_ai_router._topic_notes_cache_signature", return_value="b" * 64)
@@ -258,6 +261,7 @@ class CourseSharedBillingTests(TestCase):
         note_signature,
         generate_notes,
         validate_notes,
+        note_cache_exists,
     ):
         PrepCourseEnrollment.objects.create(user=self.first_user, course=self.course)
         topic = PrepTopic.objects.create(
@@ -291,6 +295,42 @@ class CourseSharedBillingTests(TestCase):
         self.assertEqual(job.status, "complete")
         self.assertEqual(generate_notes.call_args.kwargs["level"], "level_1")
         self.assertFalse(PrepCourseSharedCost.objects.filter(topic=topic, level="level_1").exists())
+
+    @patch("services.prep_note_precompute._has_current_topic_note_cache", return_value=False)
+    @patch("services.prep_ai_router._note_completion_issues", return_value=[])
+    @patch("services.prep_ai_router.get_or_generate_topic_notes")
+    @patch("services.prep_ai_router._topic_notes_cache_signature", return_value="d" * 64)
+    def test_worker_does_not_complete_without_persisted_current_note_cache(
+        self,
+        note_signature,
+        generate_notes,
+        validate_notes,
+        note_cache_exists,
+    ):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Elasticity",
+            slug="elasticity-no-note-cache",
+        )
+        job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="d" * 64,
+        )
+        generate_notes.return_value = {
+            "notes": "Structurally valid but not persisted notes.",
+            "cached": False,
+            "review_status": "passed",
+            "usage": {"total_tokens": 100},
+            "model": "test-notes-model",
+        }
+
+        call_command("run_prep_note_worker", "--once")
+
+        job.refresh_from_db()
+        self.assertEqual(job.status, "failed")
+        self.assertIn("validated cache entry", job.last_error)
 
     @patch("services.prep_note_precompute.enqueue_course_topic_note_jobs")
     @patch("services.prep_ai_router.get_or_generate_topic_notes")

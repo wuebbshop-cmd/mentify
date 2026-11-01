@@ -182,6 +182,10 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
             "The notes worker rejected unvalidated content: "
             + "; ".join(validation_issues)
         )
+    if not _has_current_topic_note_cache(topic, job.level, job.source_signature):
+        raise RuntimeError(
+            "The notes worker did not find a validated cache entry for the current topic source."
+        )
 
     # Level 2 (Core Concepts) notes are 100% free for all students.
     # Level 1 and Level 3 are charged flat on-demand token spending upon note fetch.
@@ -211,6 +215,29 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     except Exception:
         pass
     return True
+
+
+def _has_current_topic_note_cache(topic: PrepTopic, level: str, source_signature: str) -> bool:
+    from prep.models import PrepContentCache
+    from services.prep_ai_router import _cache_payload_as_dict, NOTE_VALIDATION_STATE
+
+    entries = PrepContentCache.objects.filter(
+        topic=topic,
+        content_type="topic_notes",
+    ).order_by("-updated_at", "-id")
+    for entry in entries:
+        payload = _cache_payload_as_dict(entry.payload)
+        if not payload:
+            continue
+        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        if (
+            payload.get("level", "level_2") == level
+            and payload.get("source_signature") == source_signature
+            and payload.get("validation_state") == NOTE_VALIDATION_STATE
+            and content
+        ):
+            return True
+    return False
 
 
 def _supersede_stale_topic_notes_job(job: PrepTopicNotesJob, topic: PrepTopic, current_signature: str) -> bool:
