@@ -18,6 +18,7 @@ from accounts.models import User
 from prep.admin import PrepDocumentVisualAdmin
 from prep.models import PrepCourse, PrepDocument, PrepDocumentVisual, PrepTopic
 from services.prep_ingestion import (
+    _clean_topic_summary,
     inspect_pdf_visual_candidates,
     inspect_visual_candidate_with_vision,
     _visual_source_conflicts,
@@ -186,6 +187,14 @@ Contents
         anchor = _find_topic_anchor_offset(text, "Random Phenomena")
 
         self.assertEqual(anchor, text.index("--- Page 5 ---"))
+
+    def test_topic_summary_rejects_pdf_page_and_cover_metadata(self):
+        self.assertEqual(
+            _clean_topic_summary("--- Page 1 --- SST 404 - ECONOMETRICS II",),
+            "",
+        )
+        self.assertEqual(_clean_topic_summary("STA 2305 / SST 409: Stochastic Processes"), "")
+        self.assertEqual(_clean_topic_summary("A topic summary about probability."), "A topic summary about probability.")
 
     def test_visual_topic_matching_uses_specific_syllabus_evidence(self):
         topics = [

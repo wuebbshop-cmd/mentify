@@ -1132,6 +1132,17 @@ def _looks_like_syllabus_item(title: str) -> bool:
     return True
 
 
+def _clean_topic_summary(summary: str) -> str:
+    value = str(summary or "").strip()
+    if re.search(r"(?im)^\s*--- Page \d+(?:\s+\([^\n]*\))? ---", value):
+        return ""
+    if re.match(r"(?i)^\s*(?:STA|SST|SMA|SCS|EET|ASC|UCU)\s*\d{3,4}\b", value):
+        return ""
+    if re.match(r"(?i)^\s*\d{1,2}/\d{1,2}/\d{2,4},?\s+\d{1,2}:\d{2}", value):
+        return ""
+    return value
+
+
 def _parse_order_number(val) -> int | None:
     if not val:
         return None
@@ -1532,7 +1543,9 @@ def extract_topic_candidates(text: str, *, allow_llm_fallback: bool = False) -> 
         ):
             continue
         raw_title = re.sub(r"(?i)\b(?:university|college|polytechnic|school\s+of|department\s+of)\b.*", "", raw_title).strip(" ,.;:-")
-        raw_summary = purge_institutional_metadata(str(t.get("summary") or "").strip())
+        raw_summary = _clean_topic_summary(
+            purge_institutional_metadata(str(t.get("summary") or "").strip())
+        )
         if _inst_re.search(raw_summary):
             raw_summary = _inst_re.sub("", raw_summary).strip(" ,.;:-")
             if len(raw_summary) < 20 or re.match(r"(?i)^an?\s+(?:introductory\s+)?course\b", raw_summary):
