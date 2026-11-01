@@ -2608,7 +2608,7 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         if payload_validation_state:
             if payload_validation_state != NOTE_VALIDATION_STATE and validated_only:
                 continue
-            if not is_exact_signature and (level in levels or level in fallback_levels):
+            if not is_exact_signature:
                 continue
         elif validated_only:
             continue
