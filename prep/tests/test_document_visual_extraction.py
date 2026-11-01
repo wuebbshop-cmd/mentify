@@ -29,6 +29,7 @@ from services.prep_ingestion import (
     store_pdf_visual_candidates,
     assign_visuals_to_topics,
 )
+from services.prep_ai_router import _find_topic_anchor_offset
 from prep.visual_matching import map_pdf_topic_sections, score_topic_context
 
 
@@ -124,6 +125,67 @@ Topic 5: Market structures
         ])
         self.assertEqual(topics[0]["subtopics"], ["Meaning of economics", "Scarcity and choice"])
         self.assertEqual(topics[-1]["subtopics"], ["Monopoly", "Oligopoly"])
+
+    def test_topic_extraction_reads_numbered_contents_with_page_numbers(self):
+        text = """
+Table of Contents
+1. Course Outline 4
+1.1 Course description 4
+1.2 Learning outcomes 4
+2. Introduction: Random Phenomena and Stochastic Processes 5
+2.1 Random phenomena 5
+3. Generating Functions 6
+4. Probability Generating Function (p.g.f.) 8
+"""
+
+        topics = extract_topic_candidates(text)
+
+        self.assertEqual([topic["title"] for topic in topics], [
+            "Introduction: Random Phenomena And Stochastic Processes",
+            "Generating Functions",
+            "Probability Generating Function (Pgf)",
+        ])
+
+    def test_topic_extraction_uses_numbered_sections_when_no_top_level_entries_exist(self):
+        text = """
+Contents
+1.1 DEFINITIONS 3
+1.2 SEQUENCES AND LIMITS 4
+1.3 FIELDS 5
+1.4 APPROACHES TO PROBABILITY 8
+1.4.1 Classical concept 8
+1.5 MOMENTS 10
+"""
+
+        topics = extract_topic_candidates(text)
+
+        self.assertEqual([topic["title"] for topic in topics], [
+            "Definitions",
+            "Sequences And Limits",
+            "Fields",
+            "Approaches To Probability",
+            "Moments",
+        ])
+
+    def test_topic_source_anchor_skips_contents_page_occurrence(self):
+        text = (
+            "--- Page 2 ---\nContents\n2. Distribution Functions 5\n"
+            "--- Page 3 ---\nDistribution Functions\nA distribution function assigns probabilities to intervals."
+        )
+
+        anchor = _find_topic_anchor_offset(text, "Distribution Functions")
+
+        self.assertEqual(anchor, text.index("--- Page 3 ---"))
+
+    def test_topic_source_anchor_uses_printed_page_when_body_heading_is_missing(self):
+        text = (
+            "--- Page 2 ---\nContents\n2. Random Phenomena 5\n"
+            "--- Page 5 ---\nA random phenomenon obeys probabilistic laws."
+        )
+
+        anchor = _find_topic_anchor_offset(text, "Random Phenomena")
+
+        self.assertEqual(anchor, text.index("--- Page 5 ---"))
 
     def test_visual_topic_matching_uses_specific_syllabus_evidence(self):
         topics = [

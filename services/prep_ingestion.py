@@ -1098,11 +1098,38 @@ _WORD_TO_NUM = {
 _EXCLUDED_TOPIC_NAMES = {
     "table of content", "table of contents", "content", "contents",
     "introduction", "purpose of the module", "module learning outcomes",
+    "learning outcome", "learning outcomes", "expected learning outcomes",
+    "learning objective", "learning objectives", "course objectives",
+    "answers to assessment questions", "assessment questions and answers",
+    "course information", "course content", "purpose", "mode of delivery",
+    "core reading materials", "recommended reading materials", "journals",
     "course requirements", "references", "assessment questions",
     "examination", "overview of the course", "forward", "foreword",
     "course outline", "syllabus", "course description", "preface",
     "acknowledgements", "grading policy", "instructor information"
 }
+
+
+def _is_excluded_topic_title(title: str) -> bool:
+    normalized = re.sub(r"\s+", " ", (title or "").strip().lower())
+    return normalized in _EXCLUDED_TOPIC_NAMES
+
+
+def _looks_like_syllabus_item(title: str) -> bool:
+    cleaned = (title or "").strip()
+    if not cleaned or re.match(r"^\d+\b", cleaned):
+        return False
+    if re.match(
+        r"(?i)^(?:describe|specify|make|work|use|apply|identify|explain|calculate|determine|analyse|analyze|"
+        r"demonstrate|state|list|discuss|understand|find|consider|assume|look)\b",
+        cleaned,
+    ):
+        return False
+    if re.search(r"(?i)\b(?:isbn|publisher|press|edition|retrieved|copyright)\b|\b(?:19|20)\d{2}\b", cleaned):
+        return False
+    if re.search(r"(?i)\b(?:of|in|to|on|for|and|with|from|by|as|at|the|which|that)$", cleaned):
+        return False
+    return True
 
 
 def _parse_order_number(val) -> int | None:
@@ -1117,7 +1144,7 @@ def _parse_order_number(val) -> int | None:
     return _WORD_TO_NUM.get(cleaned)
 
 
-def extract_topic_candidates(text: str) -> list[dict]:
+def extract_topic_candidates(text: str, *, allow_llm_fallback: bool = False) -> list[dict]:
     """
     Extract candidate syllabus units/topics by analyzing the full text across all pages.
     Supports Table of Contents, course outlines, lessons, weeks, units, modules, and chapters.
@@ -1128,27 +1155,124 @@ def extract_topic_candidates(text: str) -> list[dict]:
     # 1. Search across the entire document for Table of Contents, Flowchart, or Syllabus Outline
     toc_topics = {}
     toc_match = re.search(
-        r"(?i)\b(?:TABLE\s+OF\s+CONTENTS?|TABLE\s+OF\s+CONTENT|COURSE\s+OUTLINE|SYLLABUS\s+OUTLINE|FLOW\s*CHART|COURSE\s+SCHEDULE|MODULE\s+OUTLINE)\b",
+        r"(?i)\b(?:TABLE\s+OF\s+CONTENTS?|CONTENTS|COURSE\s+OUTLINE|SYLLABUS\s+OUTLINE|FLOW\s*CHART|COURSE\s+SCHEDULE|MODULE\s+OUTLINE)\b",
         text,
     )
     if toc_match:
         # Scan up to 25,000 characters from the outline start (covers multi-page TOCs)
         toc_window = text[toc_match.start():toc_match.start() + 25000]
+        outline_topics = {}
+        section_topics = []
+        numbered_line = re.compile(
+            r"^\s*(\d{1,2}(?:\.\d{1,2})*)\.?\s+([A-Za-z][^\r\n]{2,140}?)\s*$"
+        )
+        for line in toc_window.splitlines():
+            match = numbered_line.match(line)
+            if not match:
+                continue
+            number, raw_title = match.groups()
+            title = re.sub(r"\s+\d{1,3}\s*$", "", raw_title).strip()
+            title = re.sub(r"(?<=[A-Za-z])\d{2,4}$", "", title).strip()
+            title = re.sub(r"[.·\s]+$", "", title).strip()
+            title = re.sub(r"^[#*\s\-–—:]+|[#*\s\-–—:]+$", "", title).strip()
+            title = re.sub(r"[^\w\s,&/\-():'’]+", "", title).strip()
+            words = title.split()
+            if (
+                len(title) < 4
+                or len(title) > 120
+                or len(words) > 16
+                or title.endswith((",", ";", ":"))
+                or not _looks_like_syllabus_item(title)
+                or _is_excluded_topic_title(title)
+            ):
+                continue
+            if "." in number:
+                if number.count(".") == 1:
+                    section_topics.append((number, title))
+            else:
+                outline_topics.setdefault(int(number), title.title())
+
+        section_prefixes = {
+            int(number.split(".", 1)[0])
+            for number, _ in section_topics
+        }
+        nested_enumeration = (
+            bool(section_topics)
+            and len(section_prefixes) == 1
+            and len(outline_topics) <= len(section_topics)
+        )
+        if nested_enumeration:
+            toc_topics = {
+                order: title.title()
+                for order, title in enumerate(
+                    dict.fromkeys(title for _, title in section_topics),
+                    start=1,
+                )
+            }
+        elif len(outline_topics) >= 2:
+            toc_topics = outline_topics
+        elif len(section_topics) >= 2 and len(toc_topics) < 2:
+            toc_topics = {
+                order: title.title()
+                for order, title in enumerate(
+                    dict.fromkeys(title for _, title in section_topics),
+                    start=1,
+                )
+            }
+
+        lesson_headers = list(re.finditer(
+            r"(?im)^\s*LESSON\s+([A-Za-z]+|\d+)\b[^\r\n]*$",
+            toc_window,
+        ))
+        if len(lesson_headers) >= 2:
+            lesson_topics = {}
+            for index, header in enumerate(lesson_headers):
+                order = _parse_order_number(header.group(1))
+                if not order:
+                    continue
+                end = lesson_headers[index + 1].start() if index + 1 < len(lesson_headers) else len(toc_window)
+                section = toc_window[header.end():end]
+                for line in section.splitlines():
+                    section_match = re.match(
+                        r"^\s*\d{1,2}\.\d{1,2}\s+([A-Za-z][^\r\n]{2,120}?)\s*$",
+                        line,
+                    )
+                    if not section_match:
+                        continue
+                    title = re.sub(r"\s+\d{1,3}\s*$", "", section_match.group(1)).strip()
+                    if (
+                        _is_excluded_topic_title(title)
+                        or re.match(r"(?i)^(?:learning outcomes?|examples?|assessments?)\b", title)
+                        or not _looks_like_syllabus_item(title)
+                    ):
+                        continue
+                    lesson_topics[order] = title.title()
+                    break
+            if len(lesson_topics) >= 2:
+                toc_topics = lesson_topics
+
         # Match LESSON/WEEK/UNIT/MODULE/CHAPTER/TOPIC <NUMBER/WORD> \n <TITLE>
         toc_pattern = re.compile(
             r"(?i)(?:LESSON|WEEK|UNIT|MODULE|CHAPTER|TOPIC|LECTURE|PART|SECTION)\s+([A-Za-z0-9]+(?:\s*(?:&|-|to|and)\s*[A-Za-z0-9]+)?)\s*[\.\s\d]*\n+([^\n\r]+)",
             re.MULTILINE,
         )
-        for m in toc_pattern.finditer(toc_window):
+        for m in (() if len(toc_topics) >= 2 else toc_pattern.finditer(toc_window)):
             num = _parse_order_number(m.group(1))
             raw_title = m.group(2).strip()
             clean_title = re.sub(r"[\.·\s\d]+$", "", raw_title).strip()
             clean_title = re.sub(r"^[#*\s\-\–—:]+|[#*\s\-\–—:]+$", "", clean_title).strip()
             clean_title = re.sub(r"[^\w\s,&/\-()]+", "", clean_title).strip()
             clean_title = re.sub(r"(?i)\b(?:assessment\s+questions|learning\s+outcomes|references)\b.*", "", clean_title).strip()
-            if not num or len(clean_title) < 4:
+            if (
+                not num
+                or len(clean_title) < 4
+                or len(clean_title) > 120
+                or len(clean_title.split()) > 16
+                or clean_title.endswith((",", ";", ":"))
+                or not _looks_like_syllabus_item(clean_title)
+            ):
                 continue
-            if any(ex in clean_title.lower() for ex in _EXCLUDED_TOPIC_NAMES):
+            if _is_excluded_topic_title(clean_title):
                 continue
             if num not in toc_topics:
                 toc_topics[num] = clean_title.title()
@@ -1182,12 +1306,12 @@ def extract_topic_candidates(text: str) -> list[dict]:
                 sub_m = re.match(r"^\s*\d+\.\d+(?:\.\d+)?\s+([A-Za-z][^\n\r\.\:]{3,60})", line_s)
                 if sub_m:
                     sub_title = sub_m.group(1).strip()
-                    if not any(ex in sub_title.lower() for ex in _EXCLUDED_TOPIC_NAMES) and sub_title not in subtopics:
+                    if not _is_excluded_topic_title(sub_title) and sub_title not in subtopics:
                         subtopics.append(sub_title)
                 bullet_m = re.match(r"^(?:[\*\-•])\s+(?:\*\*)?([A-Za-z][^*:\n]{3,60}?)(?:\*\*)?\s*$", line_s)
                 if bullet_m:
                     b_title = bullet_m.group(1).strip()
-                    if not any(ex in b_title.lower() for ex in _EXCLUDED_TOPIC_NAMES) and b_title not in subtopics:
+                    if not _is_excluded_topic_title(b_title) and b_title not in subtopics:
                         subtopics.append(b_title)
 
             summary = ""
@@ -1230,7 +1354,7 @@ def extract_topic_candidates(text: str) -> list[dict]:
                 if unit_match:
                     num = _parse_order_number(unit_match.group(1))
                     title = unit_match.group(2).strip()
-                    if num and len(title) > 2 and not any(ex in title.lower() for ex in _EXCLUDED_TOPIC_NAMES):
+                    if num and len(title) > 2 and not _is_excluded_topic_title(title):
                         current_topic = {
                             "order": num,
                             "title": title.title(),
@@ -1265,9 +1389,16 @@ def extract_topic_candidates(text: str) -> list[dict]:
                 continue
             title = m.group(2).strip().strip("#* ").strip()
             title = re.sub(r'^[#*\s\-\–—:]+|[#*\s\-\–—:]+$', '', title).strip()
-            if any(ex in title.lower() for ex in _EXCLUDED_TOPIC_NAMES):
+            if _is_excluded_topic_title(title):
                 continue
-            if len(title) > 2 and num not in heading_topics:
+            if (
+                len(title) > 2
+                and len(title) <= 120
+                and len(title.split()) <= 16
+                and not title.endswith((",", ";", ":"))
+                and _looks_like_syllabus_item(title)
+                and num not in heading_topics
+            ):
                 start_pos = m.end()
                 end_pos = matches[i + 1].start() if i + 1 < len(matches) else len(text)
                 section_text = text[start_pos:end_pos]
@@ -1279,7 +1410,7 @@ def extract_topic_candidates(text: str) -> list[dict]:
                     sub_m = re.match(r"^\s*\d+\.\d+(?:\.\d+)?\s+([A-Za-z][^\n\r\.\:]{3,60})", clean_line)
                     if sub_m:
                         sub_t = sub_m.group(1).strip()
-                        if not any(ex in sub_t.lower() for ex in _EXCLUDED_TOPIC_NAMES) and sub_t not in subtopics:
+                        if not _is_excluded_topic_title(sub_t) and sub_t not in subtopics:
                             subtopics.append(sub_t)
                     bullet_match = re.match(
                         r'^(?:[\*\-•])\s+(?:\*\*)?([^*:\n]+?)(?:\*\*)?\s*$',
@@ -1316,7 +1447,7 @@ def extract_topic_candidates(text: str) -> list[dict]:
             topics = sorted(heading_topics.values(), key=lambda t: t["order"])
 
     # 4. If still fewer than 2 topics and text is rich, call DeepSeek with a full-document outline skeleton
-    if len(topics) < 2 and len(text) > 300:
+    if allow_llm_fallback and len(topics) < 2 and len(text) > 300:
         try:
             api_key = getattr(settings, "DEEPSEEK_API", "") or getattr(settings, "DEEPSEEK_API_KEY", "") or os.environ.get("DEEPSEEK_API", "") or os.environ.get("DEEPSEEK_API_KEY", "")
             base_url = (getattr(settings, "DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "https://api.deepseek.com").rstrip("/")
@@ -1392,6 +1523,14 @@ def extract_topic_candidates(text: str) -> list[dict]:
         if not isinstance(t, dict):
             continue
         raw_title = purge_institutional_metadata(str(t.get("title") or "").strip())
+        if (
+            not raw_title
+            or len(raw_title) > 120
+            or len(raw_title.split()) > 16
+            or not _looks_like_syllabus_item(raw_title)
+            or raw_title.rstrip().endswith((",", ";", ":"))
+        ):
+            continue
         raw_title = re.sub(r"(?i)\b(?:university|college|polytechnic|school\s+of|department\s+of)\b.*", "", raw_title).strip(" ,.;:-")
         raw_summary = purge_institutional_metadata(str(t.get("summary") or "").strip())
         if _inst_re.search(raw_summary):

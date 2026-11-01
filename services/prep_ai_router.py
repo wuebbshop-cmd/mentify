@@ -116,10 +116,11 @@ def _normalize_source_references_for_signature(references: list[dict] | None) ->
 
 def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtopics: list | None) -> str:
     """Fingerprint the approved syllabus inputs that determine generated notes."""
+    source_excerpt_routing_version = "body-page-anchor-v3"
     topic_pk = getattr(topic_obj, "pk", None)
     if topic_pk:
         from django.core.cache import cache
-        sig_cache_key = f"prep_topic_sig_{topic_pk}"
+        sig_cache_key = f"prep_topic_sig_v3_{topic_pk}"
         cached_sig = cache.get(sig_cache_key)
         if cached_sig:
             return cached_sig
@@ -133,6 +134,7 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
         topic_summary,
         json.dumps(topic_rules or {}, ensure_ascii=True, sort_keys=True),
         _topic_content_rules_version(topic_obj),
+        source_excerpt_routing_version,
         json.dumps(subtopics or [], ensure_ascii=True, sort_keys=True),
         json.dumps(_course_study_profile(course_obj), ensure_ascii=True, sort_keys=True),
         _VISUAL_NOTE_ROUTING_VERSION,
@@ -145,11 +147,11 @@ def _topic_notes_cache_signature(course_obj, topic_obj, topic_title: str, subtop
     )[:16]
     if topic_pk:
         from django.core.cache import cache
-        cache.set(f"prep_topic_sig_{topic_pk}", sig, 900)
+        cache.set(f"prep_topic_sig_v3_{topic_pk}", sig, 900)
     return sig
 
 
-NOTES_CACHE_VERSION = "markdown-katex-v16-numbered-figure-context"
+NOTES_CACHE_VERSION = "markdown-katex-v18-body-page-source-context"
 NOTE_VALIDATION_STATE = "validated-v11-numbered-figure-context"
 ANSWER_VALIDATION_VERSION = "answer-validation-v2-approved-sources"
 NOTE_MAX_FAILED_GENERATION_CYCLES = 2
@@ -395,6 +397,7 @@ def _approved_course_source_documents(course_obj, topic_title: str) -> list[tupl
         course=course_obj,
         stage="stage_3",
         doc_type__in=["Lecture Notes", "Revision Sheet"],
+        is_duplicate=False,
     ).exclude(extracted_text="").order_by("-updated_at", "-id")
     # One query for every approved visual of the course instead of one query per document:
     # each round trip to the database costs ~0.25s, and this ran inside every cold chat turn.
@@ -462,7 +465,41 @@ def _find_topic_anchor_offset(text: str, topic_title: str) -> int:
     if not title_lower:
         return 0
 
-    idx = text_lower.find(title_lower)
+    contents_match = re.search(
+        r"(?im)^\s*(?:table\s+of\s+contents?|contents)\s*$",
+        text,
+    )
+    contents_offset = contents_match.start() if contents_match else -1
+
+    def _body_occurrence(matches):
+        for match in matches:
+            line_end = text.find("\n", match.end())
+            if line_end == -1:
+                line_end = len(text)
+            suffix = text[match.end():line_end]
+            page_number = re.fullmatch(r"\s+(\d{1,3})\s*", suffix)
+            if page_number:
+                page_header = re.search(
+                    rf"(?m)^--- Page {int(page_number.group(1))}(?:\s+\([^\n]*\))? ---\s*$",
+                    text,
+                )
+                if page_header and page_header.start() > match.start():
+                    return page_header.end()
+                continue
+            if contents_offset >= 0 and match.start() < contents_offset:
+                continue
+            return match.start()
+        if contents_offset >= 0:
+            after_contents = next(
+                (match.start() for match in matches if match.start() > contents_offset),
+                None,
+            )
+            if after_contents is not None:
+                return after_contents
+        return matches[1].start() if len(matches) > 1 else (matches[0].start() if matches else -1)
+
+    title_matches = list(re.finditer(re.escape(title_lower), text_lower))
+    idx = _body_occurrence(title_matches)
     if idx == -1:
         words = [w for w in re.findall(r"[a-z0-9]+", title_lower) if len(w) > 3]
         if len(words) >= 2:
@@ -470,11 +507,11 @@ def _find_topic_anchor_offset(text: str, topic_title: str) -> int:
                 r"\b" + r"\b[\s\S]{1,80}\b".join(map(re.escape, words[:3])) + r"\b",
                 re.IGNORECASE,
             )
-            m = pattern.search(text)
-            if m:
-                idx = m.start()
+            matches = list(pattern.finditer(text))
+            idx = _body_occurrence(matches)
         elif len(words) == 1:
-            idx = text_lower.find(words[0])
+            matches = list(re.finditer(re.escape(words[0]), text_lower))
+            idx = _body_occurrence(matches)
 
     if idx == -1:
         return 0
@@ -577,7 +614,7 @@ def _approved_course_source_context(course_obj, topic_title: str, limit: int = 8
         digest = hashlib.sha256(
             f"{course_pk}:{limit}:{' '.join(str(topic_title or '').casefold().split())}".encode("utf-8")
         ).hexdigest()[:20]
-        cache_key = f"prep_src_ctx_{digest}"
+        cache_key = f"prep_src_ctx_v3_{digest}"
         cached = _cache.get(cache_key)
         if cached is not None:
             return cached

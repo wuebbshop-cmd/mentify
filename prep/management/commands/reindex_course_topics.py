@@ -56,6 +56,7 @@ class Command(BaseCommand):
                 course=course,
                 stage="stage_3",
                 doc_type__in=["Lecture Notes", "Revision Sheet"],
+                is_duplicate=False,
             ).exclude(extracted_text="").order_by("-updated_at", "-id")
         )
 
@@ -101,9 +102,11 @@ class Command(BaseCommand):
             "source_bytes": source_bytes,
             "existing_topics": course.topics.count(),
             "candidates": sorted(unique_candidates.values(), key=lambda item: (item.get("order", 0), item.get("title", ""))),
-            "risks": [] if documents and unique_candidates else [
-                "no usable stage_3 lecture-note topic candidates were extracted"
-            ],
+            "risks": (
+                []
+                if documents and len(unique_candidates) >= 2
+                else ["fewer than two usable stage_3 lecture-note topic candidates were extracted"]
+            ),
         }
 
     def _validate_levels(self, topic):
