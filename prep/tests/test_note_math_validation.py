@@ -1,6 +1,6 @@
 import json
 import tempfile
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -8,6 +8,9 @@ from django.urls import reverse
 
 from accounts.models import User
 from prep.management.commands.reindex_course_topics import Command as ReindexCourseTopicsCommand
+from prep.management.commands.revalidate_topic_note_cache import (
+    Command as RevalidateTopicNoteCacheCommand,
+)
 from prep.models import (
     PrepContentCache,
     PrepCourse,
@@ -31,11 +34,14 @@ from services.prep_ai_router import (
     _latex_syntax_issues,
     _markdown_table_issues,
     _markdown_theorem_issues,
+    _note_format_issues,
     _note_repair_scope,
+    _note_validation_options,
     _parse_topic_note_repair_patch,
     _review_topic_note_content,
     _note_allows_code,
     _note_completion_issues,
+    _note_section_titles,
     call_deepseek,
     call_together_repair,
     _course_administrative_metadata_issues,
@@ -43,6 +49,7 @@ from services.prep_ai_router import (
     _approved_course_source_context,
     _approved_course_source_references,
     _approved_visual_manifest,
+    _backfill_validated_note_cache_metadata,
     _dedupe_approved_visual_images,
     _insert_required_visual_markers,
     _normalize_approved_visual_captions,
@@ -61,7 +68,7 @@ from services.prep_ai_router import (
     route_math_request,
     store_cached_content,
 )
-from services.prep_blocks import parse_markdown_to_blocks
+from services.prep_blocks import parse_markdown_to_blocks, validate_structured_blocks
 
 
 class ReindexCourseTopicReportTests(SimpleTestCase):
@@ -75,6 +82,172 @@ class ReindexCourseTopicReportTests(SimpleTestCase):
             ReindexCourseTopicsCommand._heading_issues("## 1. Concepts\n## Appendix"),
             ["unrelated heading: ## Appendix"],
         )
+
+
+class NoteBlueprintValidationTests(SimpleTestCase):
+    def test_default_blueprints_are_distinct_by_level(self):
+        level_1 = _note_section_titles("Generating Functions", {}, "level_1")
+        level_2 = _note_section_titles("Generating Functions", {}, "level_2")
+        level_3 = _note_section_titles("Generating Functions", {}, "level_3")
+
+        self.assertNotEqual(level_1, level_2)
+        self.assertNotEqual(level_2, level_3)
+        self.assertIn("Everyday Analogy", level_1[0])
+        self.assertIn("Exam", level_3[0])
+
+    def test_level_validation_rejects_heading_from_another_level(self):
+        content = "\n\n".join(
+            [
+                "## 1. Conceptual Overview & Motivation\nText.",
+                "## 2. Core Concepts, Definitions & Assumptions\nText.",
+                "## 3. Methods, Derivations & Interpretation\nText.",
+                "## 4. Worked Applications\nText.",
+                "## 5. Summary, Limitations & Common Errors\n" + "Useful final content. " * 20,
+            ]
+        )
+
+        issues = _note_completion_issues(content, "Generating Functions", level="level_1")
+
+        self.assertTrue(any(issue.startswith("missing section ## 1.") for issue in issues))
+
+    def test_legacy_default_headings_remain_valid_without_custom_profile(self):
+        legacy = "\n\n".join(
+            [
+                "## 1. Core Concept Overview & Intuition\nText.",
+                "## 2. Mathematical Formalization & Core Definitions\nText.",
+                "## 3. Key Theorems & Essential Results\nText.",
+                "## 4. Worked Exemplar Problem with Step-by-Step Solution\nText.",
+                "## 5. High-Yield Exam Takeaways & Common Pitfalls\n" + "Useful final content. " * 20,
+            ]
+        )
+
+        issues = _note_completion_issues(legacy, "Generating Functions", level="level_1")
+
+        self.assertNotIn("missing section ## 1. Core Intuition & Everyday Analogy", issues)
+
+    def test_custom_profile_headings_do_not_accept_legacy_fallback(self):
+        profile = {"note_structure": ["One", "Two", "Three", "Four", "Five"]}
+        legacy = "\n\n".join(
+            [
+                "## 1. Core Concept Overview & Intuition\nText.",
+                "## 2. Mathematical Formalization & Core Definitions\nText.",
+                "## 3. Key Theorems & Essential Results\nText.",
+                "## 4. Worked Exemplar Problem with Step-by-Step Solution\nText.",
+                "## 5. High-Yield Exam Takeaways & Common Pitfalls\n" + "Useful final content. " * 20,
+            ]
+        )
+
+        issues = _note_completion_issues(legacy, "Generating Functions", level="level_2", study_profile=profile)
+
+        self.assertIn("missing section ## 1. One", issues)
+
+    def test_meta_language_and_level_one_math_order_are_rejected(self):
+        meta = "## 1. Core Intuition & Everyday Analogy\nAccording to the source, this is important."
+        self.assertIn(
+            "notes contain source-document meta-language instead of direct teaching",
+            _note_completion_issues(meta, "Generating Functions", level="level_1"),
+        )
+
+        math_first = "## 1. Core Intuition & Everyday Analogy\n$$x^2+y^2=z^2$$"
+        self.assertIn(
+            "level_1 notes introduce mathematical notation before an everyday analogy",
+            _note_completion_issues(math_first, "Generating Functions", level="level_1"),
+        )
+
+
+class TopicNoteJobRecoveryTests(SimpleTestCase):
+    @patch("services.prep_note_precompute._has_current_topic_note_cache", return_value=True)
+    @patch("services.prep_note_precompute.PrepTopicNotesJob.objects.filter")
+    def test_stale_job_with_current_valid_cache_is_recovered_as_complete(self, filter_mock, has_cache):
+        from types import SimpleNamespace
+
+        from services.prep_note_precompute import _recover_valid_cached_topic_notes_job
+
+        filter_mock.return_value.exclude.return_value.exists.return_value = False
+
+        job = SimpleNamespace(
+            pk=42,
+            topic=object(),
+            source_signature="old-signature",
+            level="level_2",
+            status="failed",
+            completed_at=None,
+            last_error="Superseded because the approved topic source changed during note preparation.",
+            save=lambda **kwargs: None,
+        )
+        topic = object()
+
+        recovered = _recover_valid_cached_topic_notes_job(job, topic, "new-signature")
+
+        self.assertTrue(recovered)
+        self.assertEqual(job.source_signature, "new-signature")
+        self.assertEqual(job.status, "complete")
+        self.assertNotEqual(job.last_error, "Superseded because the approved topic source changed during note preparation.")
+        self.assertTrue(has_cache.called)
+
+
+class ValidatedNoteCacheMetadataTests(SimpleTestCase):
+    @patch("services.prep_ai_router._topic_content_rules_version", return_value=3)
+    @patch("services.prep_ai_router._course_study_profile_version", return_value=4)
+    @patch("prep.models.PrepContentCache.objects.filter")
+    @patch("prep.models.PrepNoteRepair.objects.filter")
+    def test_exact_validated_repair_backfills_only_cache_metadata(
+        self,
+        repair_filter,
+        cache_filter,
+        profile_version,
+        rules_version,
+    ):
+        from types import SimpleNamespace
+
+        content = "Validated note content."
+        topic = SimpleNamespace(course=object())
+        entry = SimpleNamespace(
+            payload={
+                "content": content,
+                "validation_state": NOTE_VALIDATION_STATE,
+            },
+            save=Mock(),
+        )
+        repair_filter.return_value.first.return_value = SimpleNamespace(
+            status="validated",
+            validation_issues=[],
+            current_content=content,
+        )
+        cache_filter.return_value.first.return_value = entry
+
+        backfilled = _backfill_validated_note_cache_metadata(
+            topic,
+            "level_1",
+            "current-signature",
+            "current-cache-key",
+            content,
+            {"source_references": ["approved-source"]},
+        )
+
+        self.assertTrue(backfilled)
+        self.assertEqual(entry.payload["source_signature"], "current-signature")
+        self.assertEqual(entry.payload["study_profile_version"], 4)
+        self.assertEqual(entry.payload["topic_content_rules_version"], 3)
+        self.assertEqual(entry.payload["content"], content)
+        entry.save.assert_called_once_with(update_fields=["payload", "updated_at"])
+
+    @patch("prep.models.PrepContentCache.objects.filter")
+    @patch("prep.models.PrepNoteRepair.objects.filter")
+    def test_unmatched_repair_does_not_backfill_cache_metadata(self, repair_filter, cache_filter):
+        repair_filter.return_value.first.return_value = None
+
+        backfilled = _backfill_validated_note_cache_metadata(
+            object(),
+            "level_1",
+            "current-signature",
+            "current-cache-key",
+            "content",
+            {"source_references": []},
+        )
+
+        self.assertFalse(backfilled)
+        cache_filter.assert_not_called()
 
 
 class TopicNoteReviewTests(SimpleTestCase):
@@ -286,6 +459,18 @@ class MockIndependentNoteReviewer:
 
 
 class NoteMathValidationTests(MockIndependentNoteReviewer, TestCase):
+    def test_latex_text_commands_inside_math_are_not_flagged_as_source_styling(self):
+        math_expression = "$$\n\\texttt{html} = \\text{protocol}\n$$"
+
+        self.assertNotIn(
+            "unconverted LaTeX text styling command in markdown source",
+            _note_format_issues(math_expression),
+        )
+        self.assertIn(
+            "unconverted LaTeX text styling command in markdown source",
+            _note_format_issues(r"\\texttt{html}"),
+        )
+
     def test_normalization_separates_greek_command_from_following_identifier(self):
         malformed = r"The characteristic equation is $|A-\lambdaI|=0$."
 
@@ -694,6 +879,24 @@ $$ not mathematical output
         self.assertEqual(blocks[0]["headers"], ["Expression", "Meaning"])
         self.assertEqual(blocks[0]["rows"], [["$a \\| b$", "One expression cell"]])
 
+    def test_callout_does_not_absorb_following_display_math_or_empty_quote(self):
+        markdown = (
+            "> **Definition (Range)**\n"
+            "> The range is the difference between the greatest and least values.\n"
+            "\n"
+            ">\n"
+            "\n"
+            "$$\nR=x_g-x_l.\n$$"
+        )
+
+        blocks = parse_markdown_to_blocks(markdown)
+        is_valid, error = validate_structured_blocks(blocks)
+
+        self.assertTrue(is_valid, error)
+        self.assertEqual([block["type"] for block in blocks], ["callout", "math"])
+        self.assertEqual(blocks[0]["title"], "Definition (Range)")
+        self.assertEqual(blocks[1]["latex"], "R=x_g-x_l.")
+
     def test_json_parser_preserves_square_brackets_inside_latex_strings(self):
         repair = {
             "old_block": r"\\begin{cases} [a_k, c_k] \\end{cases}",
@@ -995,6 +1198,21 @@ $$
             order=1,
             title="Sequences",
             slug="sequences",
+        )
+
+    def _validation_options_for_legacy_fixture(self):
+        original_options = _note_validation_options
+
+        def options_with_legacy_headings(*args, **kwargs):
+            options = original_options(*args, **kwargs)
+            profile = dict(options.get("study_profile") or {})
+            profile["note_structure"] = ["One", "Two", "Three", "Four", "Five"]
+            options["study_profile"] = profile
+            return options
+
+        return patch(
+            "services.prep_ai_router._note_validation_options",
+            side_effect=options_with_legacy_headings,
         )
 
     @patch("services.prep_ai_router._approved_course_source_context", return_value="Approved source evidence.")
@@ -2079,7 +2297,7 @@ $$
                 cache.payload["source_references"][0]["visuals"][0]["visual_id"],
             )
 
-    def test_topic_rule_change_unpublishes_notes_from_the_previous_rule_version(self):
+    def test_topic_rule_change_revalidates_compatible_notes_from_the_previous_rule_version(self):
         PrepContentCache.objects.create(
             cache_key="notes:published:validation-testing:sequences:topic-rules-v0",
             content_type="topic_notes",
@@ -2100,7 +2318,8 @@ $$
             course=self.course,
             topic=self.topic,
         )
-        self.assertIn("level_2", get_published_topic_note_levels(self.topic, validated_only=True))
+        with self._validation_options_for_legacy_fixture():
+            self.assertIn("level_2", get_published_topic_note_levels(self.topic, validated_only=True))
 
         self.topic.content_rules = {
             "schema_version": 1,
@@ -2115,7 +2334,67 @@ $$
         self.topic.refresh_from_db()
 
         self.assertEqual(self.topic.content_rules_version, 1)
-        self.assertEqual(get_published_topic_note_levels(self.topic, validated_only=True), {})
+        with self._validation_options_for_legacy_fixture():
+            self.assertIn("level_2", get_published_topic_note_levels(self.topic, validated_only=True))
+
+    def test_stale_signature_is_revalidated_and_refreshed_before_publication(self):
+        cache = PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:old-source",
+            content_type="topic_notes",
+            prompt_hash="old-source",
+            payload={
+                "content": self.valid_notes,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": "old-source-signature",
+                "study_profile_version": self.course.study_profile_version,
+                "topic_content_rules_version": self.topic.content_rules_version,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+
+        with self._validation_options_for_legacy_fixture():
+            published = get_published_topic_note_levels(self.topic, validated_only=True)
+
+        cache.refresh_from_db()
+        self.assertEqual(
+            published["level_2"],
+            normalize_math_delimiters(self.valid_notes).strip(),
+        )
+        self.assertEqual(
+            cache.payload["source_signature"],
+            _topic_notes_cache_signature(
+                self.course,
+                self.topic,
+                self.topic.title,
+                self.topic.subtopics,
+            ),
+        )
+        self.assertEqual(cache.payload["validation_state"], NOTE_VALIDATION_STATE)
+
+    def test_stale_signature_with_current_validation_failure_stays_unpublished(self):
+        invalid_notes = self.valid_notes + "\n\nThe course syllabus lists topics and outcomes."
+        cache = PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:stale-invalid",
+            content_type="topic_notes",
+            prompt_hash="stale-invalid",
+            payload={
+                "content": invalid_notes,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": "old-source-signature",
+                "study_profile_version": self.course.study_profile_version,
+                "topic_content_rules_version": self.topic.content_rules_version,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+
+        with self._validation_options_for_legacy_fixture():
+            self.assertEqual(get_published_topic_note_levels(self.topic, validated_only=True), {})
+        cache.refresh_from_db()
+        self.assertEqual(cache.payload["source_signature"], "old-source-signature")
 
     def test_old_validated_visual_routing_cache_is_not_published(self):
         for version, signature in (
@@ -2138,7 +2417,50 @@ $$
                 topic=self.topic,
             )
 
-        self.assertEqual(get_published_topic_note_levels(self.topic), {})
+        with self._validation_options_for_legacy_fixture():
+            self.assertIn("level_2", get_published_topic_note_levels(self.topic))
+
+    def test_note_cache_migration_dry_run_does_not_change_records_or_queue_jobs(self):
+        cache = PrepContentCache.objects.create(
+            cache_key="notes:published:validation-testing:sequences:migration-dry-run",
+            content_type="topic_notes",
+            prompt_hash="old-source",
+            payload={
+                "content": self.valid_notes,
+                "level": "level_2",
+                "validation_state": NOTE_VALIDATION_STATE,
+                "source_signature": "old-source-signature",
+                "study_profile_version": self.course.study_profile_version,
+                "topic_content_rules_version": self.topic.content_rules_version,
+            },
+            course=self.course,
+            topic=self.topic,
+        )
+        with (
+            patch(
+                "prep.management.commands.revalidate_topic_note_cache._topic_notes_cache_signature",
+                return_value="current-signature",
+            ),
+            patch(
+                "prep.management.commands.revalidate_topic_note_cache._note_validation_options",
+                return_value={},
+            ),
+            patch(
+                "prep.management.commands.revalidate_topic_note_cache._revalidate_topic_note_cache_entry",
+                return_value=(dict(cache.payload), []),
+            ) as revalidate,
+        ):
+            RevalidateTopicNoteCacheCommand().handle(
+                course=str(self.course.pk),
+                dry_run=True,
+                no_queue_invalid=False,
+                workers=1,
+            )
+
+        cache.refresh_from_db()
+        self.assertEqual(cache.payload["source_signature"], "old-source-signature")
+        self.assertFalse(PrepTopicNotesJob.objects.filter(topic=self.topic).exists())
+        self.assertFalse(revalidate.call_args.kwargs["persist"])
 
     def test_currently_marked_cache_with_blank_figure_map_is_not_published(self):
         malformed = (

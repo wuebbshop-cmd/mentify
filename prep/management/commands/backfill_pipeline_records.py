@@ -129,6 +129,7 @@ class Command(BaseCommand):
                     issues = _note_completion_issues(
                         str(payload.get("content") or ""),
                         cache.topic.title,
+                        level=payload.get("level"),
                         **options,
                     )
                     updated = dict(payload)

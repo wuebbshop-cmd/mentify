@@ -1,8 +1,9 @@
 from datetime import timedelta
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import timezone
 
 from accounts.models import User
@@ -19,7 +20,45 @@ from prep.models import (
 )
 from services.credit_service import get_available_credits, grant_credits
 from services.prep_course_billing import create_shared_course_cost, ensure_note_access, settle_course_cost_share
-from services.prep_note_precompute import enqueue_course_level_two_precompute, process_single_topic_notes_job
+from services.prep_note_precompute import (
+    enqueue_course_level_two_precompute,
+    enqueue_topic_note_job,
+    process_course_notes_in_background,
+    process_single_topic_notes_job,
+)
+
+
+class NoteWorkerQueueStatusTests(SimpleTestCase):
+    def test_course_precompute_stays_pending_while_topic_notes_are_pending(self):
+        from prep.management.commands.run_prep_note_worker import Command
+
+        child_jobs = Mock()
+        pending_jobs = Mock()
+        pending_jobs.exists.return_value = True
+        child_jobs.filter.side_effect = [pending_jobs]
+        job = SimpleNamespace(
+            course=SimpleNamespace(code="ECO 101"),
+            status="running",
+            completed_at=timezone.now(),
+            started_at=timezone.now(),
+            last_error="old error",
+        )
+
+        with (
+            patch("services.prep_note_precompute.enqueue_course_topic_note_jobs", return_value=3),
+            patch("prep.models.PrepTopicNotesJob.objects.filter", return_value=child_jobs),
+            patch.object(Command, "_save_job_resilient") as save_job,
+        ):
+            Command()._process_job(job)
+
+        self.assertEqual(job.status, "pending")
+        self.assertIsNone(job.started_at)
+        self.assertIsNone(job.completed_at)
+        self.assertEqual(job.last_error, "")
+        self.assertEqual(
+            save_job.call_args.kwargs["update_fields"],
+            ["status", "started_at", "completed_at", "last_error"],
+        )
 
 
 class CourseSharedBillingTests(TestCase):
@@ -49,6 +88,51 @@ class CourseSharedBillingTests(TestCase):
         wallet.save(update_fields=["current_plan", "plan_expires_at", "credits_balance"])
         grant_credits(wallet, credits, source="purchased", description="Test top-up")
         return wallet
+
+    def test_request_queues_current_signature_even_when_old_job_is_complete(self):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Demand",
+            slug="demand",
+        )
+        old_job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="old-signature",
+            status="complete",
+        )
+
+        current_job = enqueue_topic_note_job(topic, "level_2", "current-signature")
+
+        self.assertEqual(current_job.status, "pending")
+        self.assertNotEqual(current_job.pk, old_job.pk)
+        old_job.refresh_from_db()
+        self.assertEqual(old_job.status, "complete")
+
+    @patch("services.prep_note_precompute._has_current_topic_note_cache", return_value=False)
+    def test_request_requeues_completed_current_job_without_publishable_cache(self, _has_cache):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Supply",
+            slug="supply",
+        )
+        job = PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="current-signature",
+            status="complete",
+            attempts=2,
+            last_error="stale result",
+        )
+
+        queued = enqueue_topic_note_job(topic, "level_2", "current-signature")
+
+        self.assertEqual(queued.pk, job.pk)
+        self.assertEqual(queued.status, "pending")
+        self.assertEqual(queued.attempts, 0)
+        self.assertEqual(queued.last_error, "")
 
     def test_full_cost_is_charged_once_to_each_catalog_member(self):
         PrepCourseEnrollment.objects.create(user=self.first_user, course=self.course)
@@ -448,6 +532,29 @@ class CourseSharedBillingTests(TestCase):
         self.assertEqual(duplicate_job.pk, job.pk)
         self.assertEqual(requeued_job.status, "pending")
         self.assertEqual(requeued_job.attempts, 0)
+
+    def test_course_precompute_stays_open_when_topic_job_failed(self):
+        topic = PrepTopic.objects.create(
+            course=self.course,
+            order=1,
+            title="Demand",
+            slug="demand-failed-precompute",
+        )
+        precompute_job = PrepNotePrecomputeJob.objects.create(
+            course=self.course,
+            status="pending",
+        )
+        PrepTopicNotesJob.objects.create(
+            topic=topic,
+            level="level_2",
+            source_signature="e" * 64,
+            status="failed",
+        )
+
+        process_course_notes_in_background(self.course.pk)
+
+        precompute_job.refresh_from_db()
+        self.assertEqual(precompute_job.status, "pending")
 
     def test_reconcile_existing_note_cost_preserves_payer_and_charges_catalog_members(self):
         PrepCourseEnrollment.objects.create(user=self.first_user, course=self.course)

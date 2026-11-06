@@ -253,8 +253,28 @@
     {% if search_query %}
       <div style="margin-top: 20px;">
         <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Search Results</div>
-        {% if search_results %}
+        {% if search_results or already_added_matches %}
           <div class="cs-courses-grid">
+            {% for course in already_added_matches %}
+              <div class="cs-course-cell" style="border: 1.5px solid rgba(15, 118, 110, 0.45);">
+                <div class="cs-course-top">
+                  <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                    {% include 'prep/includes/course_type_icon.html' with subject_key=course.subject_key category=course.category %}
+                    <span class="cs-course-code">{{ course.code }}</span>
+                  </div>
+                  <span style="font-size: 0.68rem; font-weight: 700; color: var(--green); background: rgba(15,118,110,0.1); padding: 2px 7px; border-radius: 4px;">In My Courses</span>
+                </div>
+                <div style="display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 14px;">
+                  <h3 class="cs-course-title">
+                    {% if course.title and course.title != course.code %}{{ course.title }}{% else %}{{ course.code }}{% endif %}
+                  </h3>
+                  <div class="cs-course-footer">
+                    <span>{{ course.topics }} topics &middot; {{ course.papers }} past papers</span>
+                    <a href="{% url 'prep:course_detail' course_code=course.code %}" class="btn btn-outline btn-sm" style="padding: 5px 14px; font-size: 0.78rem;">View Course &rarr;</a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
             {% for course in search_results %}
               <div class="cs-course-cell">
                 <div class="cs-course-top">
@@ -279,10 +299,6 @@
                 </div>
               </div>
             {% endfor %}
-          </div>
-        {% elif already_added_matches %}
-          <div style="padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text-muted); font-size: 0.88rem;">
-            This course is already in <strong>My Courses</strong> below.
           </div>
         {% else %}
           <div style="padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text-muted); font-size: 0.88rem;">
@@ -339,4 +355,18 @@
     {% endif %}
   </section>
 </div>
+
+<script>
+  (function () {
+    const searchInput = document.getElementById('course-search');
+    if (!searchInput) return;
+    let timer = null;
+    searchInput.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        if (searchInput.form) searchInput.form.submit();
+      }, 500);
+    });
+  })();
+</script>
 {% endblock %}

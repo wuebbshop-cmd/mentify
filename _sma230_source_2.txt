@@ -1,0 +1,5098 @@
+--- Page 1 ---
+
+SMASMA 230230 -- VectorVector AnalysisAnalysis PremiumPremium NotesNotes -- elabelab notesnotes
+ librarylibrary 6e06186566e0618656 f0cc0a1afaf588c77767f0cc0a1afaf588c77767 c46c46
+
+ StatisticsStatistics && ProgrammingProgramming (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+ elab notes library
+
+ a higher education institution
+
+ INSTITUTE OF OPEN LEARNING
+
+ SMA 230: VECTOR ANALYSIS
+
+ IYAYA WANJALA
+ 
+
+ 1
+
+Website: maktaba.elab.co.ke DownloadedWhatsApp:by Ambrose +254Mweu (ambrosehmweu@gmail.com)704 986 447 Email: info@elab.co.ke
+
+--- Page 3 ---
+
+ PREFACE
+
+This module is designed to be used either as a text book for a formal course in
+vector analysis or as a very useful supplement to all current standard texts.
+
+Topics covered include the algebra and the differential and integral calculus of
+vectors, Stokes’ theorem, the divergence theorem and other integral theorems
+together with many applications drawn from various fields. Added is a chapter on
+curvilinear coordinates which is extremely useful in the study of advanced
+engineering, physics and mathematics.
+
+ 2
+
+ 
+
+--- Page 4 ---
+
+ TABLE OF CONTENTS
+
+CONTENTS PAGE
+
+PREFACE. 1
+
+CHAPTER 1 VECTORS AND SCALARS:. 1
+
+ Vector Representation, Addition of Vectors, Vector Algebra,
+
+ Direction Cosines, Scalar Field, Vector Field, Further Examples,
+
+ Intersection of Two Planes
+
+CHAPTER 2 THE DOT AND VECTOR PRODUCTS:. 16
+
+ The Dot Product, The Cross Product, Triple Products, Coplanar
+
+ Vectors, Vector Triple Products of Three Vectors
+
+CHAPTER 3 DIFFERENTIATION OF VECTORS:. 30
+
+ Differentiation of Vectors, Sums and Products, Unit Tangent
+
+ Vectors, Partial Differentiation of Vectors, Elements of Differential
+
+ Geometry
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL:. 42
+
+ Gradient, Divergence And Curl
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS:. 54
+
+ Line Integrals, Surface Integrals, Volume Integrals, Divergence
+
+ Theorem, Green’s Theorem, Stokes’ Theorem
+CHAPTER 6
+ CURVILINEAR COORDINATES:. 83
+ Cylindrical Polar Coordinates ρ,φz,, Spherical Polar Coordinates,rθ,φ, Scale Factors, Rectangular Coordinate System, Cylindrical
+
+ Coordinate System, General Curvilinear Coordinates System,
+
+ Transformation of Coordinates, Arc Lengths Ds and Volume
+
+ Element Dv, Grad, Divergence and Curl in Orthogonal Curvilinear
+
+ Coordinates.
+
+ 0
+
+ 
+
+--- Page 5 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+ 1
+
+ 
+
+--- Page 6 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+Introduction:
+
+This is an introductory chapter that gives the overview of the course. The definitions
+
+of scalar and vector quantities are given.
+
+ 2
+
+ 
+
+--- Page 7 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+Physical quantities can be divided into two main groups, scalar quantities and vector
+quantities.
+Definition: A vector is a quantity having both magnitude and direction, such as
+
+ displacement, velocity, force, and acceleration.
+
+Definition: A scalar is a quantity having magnitude but no direction, e.g. mass,
+
+ length, time, temperature and any real number.
+
+VECTOR REPRESENTATION
+
+A vector quantity can be represented graphically by a line, drawn so that:
+
+  The length of the line denotes the magnitude of the quantity, according to
+
+ some stated vector scale.
+
+  The direction of the line denotes the direction in which the vector quantity
+
+ acts. An arrow head indicates the sense of the direction, e.g.
+
+ P
+
+ A
+
+ O
+
+the vector OP has as initial point O and final point P and is analytically represented
+
+by a letter with an arrow over it, as A. The magnitude of the vector quantity
+
+denoted by OP or A.
+
+PO would represent a vector quantity of the same magnitude but with opposite
+
+sense.
+
+ P O
+
+ A − A
+
+ O P
+
+ 3
+
+ 
+
+--- Page 8 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+Two vectors A and B are said to be equal if they have the same magnitude and
+
+direction regardless of the position of their initial points.
+
+ A B
+
+Thus A = B
+
+ADDITION OF VECTORS
+
+The sum of two vectors AB and BC is defined as the single or equivalent or
+
+resultant vector AC.
+ i.e. AB + BC = AC C
+ or a + b = c
+ c
+ b
+
+ A B
+ a
+
+To find the sum of two vectors a and b, we draw them as a chain, starting the
+
+second where the first ends; the sum c is then given by the single vector joining the
+
+start of the first to the end of the second.
+
+Example 1.1
+
+Let P ≡ a force of 5N acting in the direction due East and Q ≡ a force of 12N acting
+
+in the direction due North, then the magnitude of the vector sum r of these two
+
+forces will be r=13N.
+
+ For by Pythagorean
+ theorem
+ p 2 + q 2 = r 2
+ 25 + 144 = 169 r q
+ ∴ r = 169 = 13 N
+
+ p
+
+ 4
+
+ 
+
+--- Page 9 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+The sum of a number of vectors a + b + c + d + L
+
+ (i) Draw the vectors as a chain.
+
+ E
+ d
+ D
+
+ c
+ A
+
+ C a
+ b B
+ (ii) Then:
+
+ a + b = AC
+ AC + c = AD
+ ∴a + b + c = AD
+ AD + d = AE
+ ∴ a + b + c + d = AE
+
+Thus the sum of all vectors a, b, c, d is given by the single vector joining the start of
+
+the first to the end of the last – in this case, AE. If the vector diagram is a closed
+
+figure e.g.
+
+ ~e E
+ F ~d
+
+ f D
+ ~
+ ~c
+ A C
+ ~a ~b B
+
+the end of the last vector coincides with the beginning of the first, the resultant sum
+is a vector with no magnitude.
+
+ 5
+
+ 
+
+--- Page 10 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+Example 1.2
+
+Find the sum or resultant of the following displacements:
+
+A:10m Northwest; B: 20m 300 north of east; C:35m due south.
+
+ N
+ Q
+ B
+
+ 30 0
+ C
+ A 0
+ W 45 0 E
+ O 60
+
+ D R
+
+ Scale:5m
+ S
+
+The resultant D is formed by joining the initial part of A to the terminal part of C,
+
+i.e. D = A + B + C. Graphically, the resultant is measured to have magnitude of 4.1
+
+units=20.5m and direction 600 south of E.
+
+VECTOR ALGEBRA
+
+If A, B and C are vectors and m and n are scalars, then
+
+ 1. A + B = B + A Commutative law of addition. Example;
+
+ B
+ P Q
+ C = A+ B
+ A
+ A
+
+ C = B+ A
+ O R
+ B
+
+ We note that OP + PQ = OQ or A + B = C
+ and OR + RQ = OQ or B + A = C
+ then A + B = B + A
+
+ 2. A + (B + C ) = (A + B ) + C Associative law of addition. As an
+
+ illustration, we show that addition of vectors is associative, i.e.
+ A + (B + C ) = (A + B ) + C
+
+ 6
+
+ 
+
+--- Page 11 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+ P B Q
+
+ A C
+
+ A+ B B + C
+ O R
+ D
+
+ OP + PQ = OQ = A + B
+ and PQ + QR = PR = B + C
+ OP + PR = OR = D i.e. A + (B + C ) = D
+ OQ + QR = OR = D i.e. (A + B ) + C = D
+ then A + (B + C ) = (A + B ) + C
+
+ Thus the order of addition of any number of vectors is immaterial.
+
+COMPONENTS OF A VECTOR
+
+Any vector A in 3-dimensions can be represented with initial point at the origin O of a
+
+rectangular coordinate system.
+ Z
+
+ Y A iˆ 1 A kˆ O 3
+ A ˆj
+ X 2
+
+Let (A1, A2, A3) be the rectangular coordinates of the terminal point of vector A with
+initial point at O. The vectors A1 i,ˆ A2 ˆj and A3 kˆ are called the component vectors of
+
+A in the x, y and z directions respectively. The resultant of A1 i,ˆ A2 ˆj and A3 kˆ is the
+
+vector A so that A = A1 iˆ + A2 ˆj + A3 kˆ
+
+The magnitude of A is A = A12 + A22 + A32. In particular, the position vector or radius
+
+vector r from O to the point (x, y, z) is written as
+
+ r = ixˆ + jyˆ + z kˆ
+
+ 7
+
+ 
+
+--- Page 12 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+and has magnitude
+
+ r = r = x 2 + y 2 + z 2
+
+Definition: A unit vector is a vector having unit magnitude. If A is a vector with
+
+ magnitude A ≠ 0 then, A A = aˆ is a unit vector having the same
+
+ direction as A.
+
+Example 1.3
+
+Find the unit vector paralleled to the resultant of vectors:
+
+ r1 = 2iˆ + 4 ˆj − 5 kˆ, r2 = iˆ + 2 ˆj + 3kˆ
+
+Resultant
+
+ ˆ + 6 ˆj − 2 kˆ R = r 1 + r 2 = (2i ˆ + 4 ˆj − 5 kˆ )+ (i ˆ + 2 ˆj + 3kˆ ) = 3i
+ 2 = 7 R = R = 3iˆ + 6 ˆj − 2 kˆ = (3) 2 + (6 ) 2 + (− 2 )
+ ˆ + 6 ˆj − 2 kˆ ). Verify that rˆ hasThen a unit vector parallel to R is rˆ = R R = 17 (3i
+
+magnitude 1.
+
+Example 1.4
+
+Determine the vector having initial point P (x1, x1, x1) and terminal point Q (x2, y2,z2)
+
+and find its magnitude.
+
+ P(X,Y,Z111 Z
+
+ Q(X,Y,Z222
+ r 1
+ r 2
+ Y
+ O
+ X
+
+The position vector of P is r 1 = x1iˆ + y1 ˆj + z1 kˆ
+
+The position vector of Q is r 2 = x 2 iˆ + y 2 ˆj + z 2 kˆ
+
+ r1 + PQ = r2
+
+ ˆor PQ = r2 − r1 = ( x 2 − x1 )i ˆ + ( y 2 − y1 ) ˆj + ( z 2 − z 1 )k
+
+ 8
+
+ 
+
+--- Page 13 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+ 2 Which is the distanceMagnitude of PQ = PQ = ( x 2 − x1 ) 2 + ( y 2 − y1 ) 2 + ( z 2 − z1 )
+
+between P and Q.
+
+DIRECTION COSINES:
+
+The direction of a vector in three dimensions is determined by the angles that the
+vector makes with the three axes of reference.
+ Z
+ P
+
+ r
+ β Y
+ b
+ X
+ Let OP = r = iaˆ + jbˆ + ckˆ
+ Then a r = cosα ⇒ a = r cosα
+
+ b r = cos β ⇒ a = r cos β
+
+ c r = cosγ ⇒ a = r cosγ
+
+ Also a 2 + b 2 + c 2 = r 2
+ ∴ r 2 cos 2 α+ r 2 cos 2 β+ r 2 cos 2 γ = r 2
+ ∴ cos 2 α+ cos 2 β+ cos 2 γ = 1
+
+ If l = cosα, m = cos β, n = cosγ;
+ Then l 2 + m 2 + n 2 = 1
+
+Note: [l,m,n] written in square brackets are called the direction cosines of the
+
+ vector OP and are the values of the cosines of the angles which the vector
+
+ makes with the three axes of reference.
+
+So for the vector r = iaˆ + jbˆ + ckˆ
+
+ a b cl = r; m = r; n = r and of course r = a 2 + b 2 + c 2
+
+Example 1.5
+
+Find the direction cosines [l,m,n] of the vector r = 3iˆ − 2 ˆj + 6 kˆ
+
+ Here a=3, b=-2, c=6;
+
+ r = 9 + 4 + 36 = 7
+
+ 3 6 2∴ l = 7 7, m = − 7, n =
+
+ 9
+
+ 
+
+--- Page 14 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+SCALAR FIELD
+
+If to each point (x,y,z) of a region R in space there corresponds a number or
+scalarφ( x, y, z ), then φ is called a scalar function of position and we say that a scalar
+
+field φ has been defined in R.
+
+Example 1.6 The temperature at any point within or on the earth’s surface at
+
+ a certain time defines a scalar field.
+
+Example 1.7 φ( x, y, z ) = x 3 y − z 2 defines a scalar field.
+
+Example 1.8 Given the scalar field defined by φ( x, y, z ) = 3 x 2 z − xy 3 + 5, find
+
+ φ at the point (-1,-2,-3).
+
+ φ( −,1 −,2 − 3) = (3 − )1 2 ( −3) − ( −1)( − 2) 3 + 5 = − 12
+
+VECTOR FIELD
+
+If to each point (x,y,z) of a region R in space there corresponds a vector V ( x, y, z ),
+
+then V is called a vector function of position and we say that a vector field V has
+
+been defined in R.
+
+Example 1.9 If the velocity at any point (x,y,z) within a moving fluid is known
+ at a certain time, then a vector field is defined.
+Example 1.10 V ( x, y, z ) = xy 2 iˆ − 2 yz 3 ˆj + x 2 z kˆ defines a vector field. A vector
+
+ field that is independent of time is called a steady-state vector
+
+ field.
+
+FURTHER EXAMPLES
+
+Example 1.11
+
+Given two non-collinear vectors a and b, find an expression for any vector r lying
+
+in the plane determined by a and b. R
+Non-collinear vectors are vectors that are not parallel to D
+ A
+the same line. Thus when their initial points coincide, r
+ a
+they determine a plane. Let r be any vector lying in
+ O B
+the plane of a and b and having its initial point b C
+
+coincident with the in itial points of a and b at O.
+
+ 10
+
+ 
+
+--- Page 15 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+From the adjoining figure;
+
+ OD = x ( OA ) = x a, where x is a scalar
+ OC = y ( OB ) = y b, where y is a scalar
+
+ But OR = OD + OC (parallelo gram law of vector addition)
+ or r = x a + y b
+
+Which is the required expression. Similar treatment for three non-coplanar vectors
+
+a, b and c results into the expression:
+
+ r = x a + y b + z c
+
+in three dimensional space where x, y and z are scalars.
+
+Example 1.12
+
+Prove that the diagonals of a parallelogram bisect each other.
+
+We have AC = a + b − a ) )and BD = (b ~( ~ ~ ~
+
+ B ~b C
+
+ ~a ~a P
+
+ A D
+ b
+ ~
+
+ AP = x AC; BP = y BD
+ But AB + BP = AP ⇒ a + y (b − a ) = x (a + b ) ~ ~ ~ ~
+
+ 1Comparing coeffi cient s of a and of b on left and right we find that x = y = 2
+
+and P is the midpoint of the diagonals.
+
+ 11
+
+ 
+
+--- Page 16 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+Example 1.13
+
+Find the equation of a straight line that passes through two given points A and B
+
+having position vectors a and b with respect to an origin O.
+
+ A
+
+ P a
+ r
+
+ O B
+ b
+
+Let r be the position vector of any point P on the line through A and B. Then,
+
+ OA + AB = OB
+ OA + AP = OP
+ But AP = t AB; t − scalar
+ Thus OP = OA + t AB
+ i. e. r = a + t ( b − a )
+ ~
+If the equation is written ( A − t ) a − t b − r = 0, the sum of the coefficients of
+
+a, b and r is 1-t+t-1=0. Alternatively, since AP and PB are collinear, we have
+
+for some scalars m and n
+
+ m AP = n PB or m ( r − a ) = n ( b − r )
+ so that
+ m a + n b r =
+ m + n
+
+which we call the symmetric form.
+
+Example 1.14
+
+A t noon, two boats P and Q are at points whose position vectors are 4 iˆ + 8 ˆj and
+
+4 iˆ + 3 ˆj respectively. Both boats are moving at constant velocity; the velocity of P is
+
+4 iˆ + ˆj and the velocity of Q is 2 iˆ + 5 ˆj (all distances are in kilometers and the
+
+time is measured in hours). Find the positi on vectors of P and Q, an d PQ after t
+
+hours, and hence express the distance PQ between the boats in terms of t. Show
+
+that the least distance between the boats is 5 km.
+
+ 12
+
+ 
+
+--- Page 17 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+After t hours the displacement of P from its starting point is t (4 i ˆ + ˆj ), hence
+ ˆ + (8 + t )ˆj P = (4 i ˆ + 8 ˆj ) + t (4 i ˆ + ˆj ) = (4 + 4 t )i
+
+Similarly
+
+ ˆ q = (4 + 2t )i ˆ + (3 + 5t )j
+
+Hence
+
+ ˆj PQ = q − p = −2itˆ + (− 5 + 4t )
+ 2 = 20t 2 − 40t + 25 PQ 2 = (− 2t ) 2 + (− 5 + 4t )
+
+Hence the distance between the boats is given by
+ PQ = (20t 2 − 40t + 25 )km
+
+To find the least distance, we consider
+
+ PQ 2 = 20t 2 − 40t + 25 = 20(t − )1 2 + 5
+
+ 2 is alwaysLeast value is obtained if t-1=0, since for any other value of t ≠,1 (t − 1)
+
+positive. Hence least distance PQ = 5.
+
+Example 1.15
+
+Given that A,B,C are the points (1,1,1), (5,0,0) and (3,2,1) respectively, find the
+
+equation which must be satisfied by the coordinates (x,y,z) of any point P in the
+
+plane ABC.
+
+As P lies in the plane ABC, we may write AP = m AB + n AC. Then, since
+
+  4   2   x − 1 
+      
+ AB = − 1; A C =  1  and AP =  y − 1
+       − 1 0 z − 1      
+  x − 1   4   2  
+  y − 1 = m − 1 + n 1 
+       z − 1 − 1 0      
+
+Thus
+
+ x = 1 + 4 m + 2 n 
+ 
+ y = 1 − m + n 
+ z = 1 − m 
+
+ 13
+
+ 
+
+--- Page 18 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+Eliminating n, x-2y=-1+6m
+
+And eliminating m, x-2y+6z=5
+
+This is the equation of the plane ABC.
+
+INTERSECTION OF TWO PLANES
+
+Two no n-parallel planes will always meet in a straight line. If we are given the
+
+e quations of two such planes, say, 3x-5y+z=8 and 2x-3y+z=3, the equation of the
+
+line of intersection can be found as follows:
+
+For any point (x,y,z) which lies in both planes, the values of x, y and z fit both
+
+e quations simultaneously. Hence eliminating z from both equations (in this case by
+
+subtracting the second equation from th e first), we obtain
+
+ x-2y=5
+
+There are infinitely many points of values of x and y which satisfy this equation, but
+
+if we choose a value for x then the value of y is fixed and vice-versa. Let y=t, then
+
+x=5+2t and substituting these expressions for x and y into the first of the original
+
+e quations, we obtain
+ 3(5 + 2t ) − 5t + z = 8
+∴ z = − 7 − t
+  x   5   2 
+Thus  y  =  0  + t  1 
+ z       − 7  − 1 
+
+this is the equation of the line parallel to the vector
+
+  2 
+  
+  1 
+   −1  
+
+and it passes through the point (5,0,-7). A typical point on the line can be written
+
+(5+2t, t, -7-t) and it can easily be verified that, for all values of t, this point lies in
+
+both o f the planes. If we substitute its coordinates into the first equation, we obtain:
+ 3 x − 5 y + z = (35 + 2t ) − 5t + ( − 7 − t ) = 8
+
+a nd substituting in the second equation gives:
+ 2 x − 3 y + z = 2(5 + 2t ) − 3t + ( − 7 − t ) = 3
+
+ 14
+
+ 
+
+--- Page 19 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+ QUESTIONS FOR DISCUSSION
+
+ 1. If a and b are non-collinear vectors and
+ ~ ~
+ A = ( x + 4 y ) a + (2 x + y ) b and B = ( y − 2 x + 2 ) a + (2 x − 3 y − 1 ) b
+ ~ ~ ~ ~
+ find x and y such that 3 A = 2 B
+
+ Ans. x = 5643, y = − 4322
+
+ 2. Prove that if a and b are non-collinear, then x a + y b = 0 implies that
+ ~ ~ ~ ~
+
+ x=y=0.
+
+ 3. If x 1 a + y 1 b = x 2 a + y 2 b, where a and b are non-collinear then x1=x2
+ ~ ~ ~ ~ ~ ~
+
+ and y1=y 2.
+
+ 4. If ~a, ~b, ~c are non-coplanar vectors determine whether the vectors
+
+ r 1 = 2 a − 3 b + c, r 2 = 3 a − 5 b + 2 c and r 3 = 4 a − 5 b + c are
+ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+ linearly independent or dependent.
+
+ 5. Prove that the medians of a triangle meet in a common point that is a point of
+
+ trisection of the medians.
+
+ 6. Find the resultant of the following displacements: A, 20 km300 South of East;
+
+ B, 50 km due West; C, 40 km Northeast; D, 30 km 600 South of West.
+
+ Ans. Magnitude 20.9 km, direction 21039ˈSouth of West
+
+ 7. A 100 kg mass is suspended from the
+ 60 0 60 0
+ center of a rope as shown in th e adjoining figure. T T
+ Determine the tension T in the rope.
+ Ans. 100kg. 100kg
+
+ 15
+
+ 
+
+--- Page 20 ---
+
+CHAPTER 1
+ VECTOR AND SCALARS
+
+ 8. In the adjoining figure, ABCD is a
+ A B
+ parallelogram with P and Q the midpoints of
+ F
+ sides BC and CD respectively. Prove that AP
+ P
+ E and AQ trisect diagonal BD at the points E
+ D C
+ and F. Q
+
+ 9. a) Prove that the vectors A = 3iˆ + ˆj − 2 k,ˆ B = −iˆ + 3 ˆj + 4 k,ˆ C = 4iˆ − 2 ˆj − 6 kˆ
+
+ can form the sides of a triangle.
+
+ 9. b) Find th e length s of the medians of the tri angle.
+
+ An s. (b), 6; 12 114; 12 150
+
+ 10. Determine the vector equation of the ce ntroid o f an equilateral triangle.
+ Ans. 13 (a+ b+ c )
+ ~ ~ ~
+
+ 11. Find the equation of the line of intersection of the planes:
+
+ 4x+3y+z=10
+
+ x+y+z=6
+
+ 16
+
+ 
+
+--- Page 21 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+Introduction:
+
+The product of two vectors, which yield a scalar, is called the dot or scalar product
+
+and th e product of two vectors, which yield a v ector, is called a vector or cross
+
+product. These products are useful in discussing the properties of vectors.
+
+Obj ective s:
+
+We discuss v arious properties of vectors and p hysical situations using properties of
+
+the two types of products.
+
+ 17
+
+ 
+
+--- Page 22 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+THE DOT OR SCALAR PRODUCT:
+
+If A and B are two vectors, the scalar product of A and B is defined as AB cosθ,
+
+where A and B are the magnitudes of the vectors A and B, and θ is the angle
+
+between them.
+
+ A
+ The scalar (dot) product is denoted by A.B
+
+ θ
+
+ B
+
+∴ A.B = AB cosθ = A × projection of B on A In either case, the result is a scalar quantity
+ or B × projection of A on B 
+
+Example 2.1
+
+ B
+
+ 7
+ A
+
+ 0 5 70
+ O 25 0 X
+
+OAo OB = OA.OB. cosθ = 7.5 cos 45 = 35. 22
+
+Example 2.2
+
+The scalar product of ~a and ~b,
+
+a. b = ab cos 90 0 = ab0. = 0.
+ ~ ~
+ b
+
+ 0Thus the scalar product of any two vectors at right 90
+
+angles to each other is always zero and we say that
+ a
+the two vectors are orthogonal or perpendicular to one
+
+another.
+
+ 18
+
+ 
+
+--- Page 23 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+In the case where two vectors are in the same direction, the angle between them is
+
+zero.
+ a
+
+ So a. b = ab cos 0 = ab
+ ~ ~
+ b
+On writing the two vectors A and B in their component form, i.e.
+
+ A = A1 iˆ + A2 ˆj + A3 kˆ
+ B = B1 iˆ + B 2 ˆj + B3 kˆ
+Then A ⋅ B = (A1 i ˆ + A2 ˆj + A3 kˆ ) ⋅ (B1 i ˆ + B 2 ˆj + B3 kˆ )
+ = A1 B1 iˆ ⋅ iˆ + A1 B 2 iˆ ⋅ ˆj + A1 B3 iˆ ⋅ kˆ
+ + A2 B1 ˆj ⋅ iˆ + A2 B 2 ˆj ⋅ ˆj + A2 B3 ˆj ⋅ kˆ
+ + A3 B1 kˆ ⋅ iˆ + A3 B 2 kˆ ⋅ ˆj + A3 B3 kˆ ⋅ kˆ
+
+Now iˆ ⋅ iˆ = ˆj ⋅ ˆj = kˆ ⋅ kˆ = 1 ⋅ 1 cos 0 = 1
+ Also iˆ ⋅ ˆj = iˆ ⋅ kˆ = ˆj ⋅ kˆ = 1 ⋅ 1 cos 90 = 0
+
+We are left with
+
+ A ⋅ B = A1 B1 + A2 B 2 + A3 B3
+
+Example 2.3
+
+ If A = 2iˆ + 2 ˆj − kˆ and B = 6iˆ − 3 ˆj + 2 kˆ
+Then A ⋅ B = AB cosθ = A1 B1 + A2 B 2 + A3 B3
+ = 7.3 cosθ = 12 − 6 − 2 = 4
+Thus A ⋅ B = 4 and the angle between A and B is cosθ = 214
+ ⇒ θ ≈ 79 0
+
+Example 2.4
+
+Determine the values of a so that A = iaˆ − 2 ˆj + kˆ and B = 2 iaˆ + jaˆ − 4 kˆ are
+
+perpendicular (⊥). A and B are ⊥if their dot product is zero.
+
+Thus
+
+ 2 − 2 a − 4 = 0 (ia ˆ − 2 ˆj + kˆ )⋅ (2 ia ˆ + jaˆ − 4 kˆ ) = 2 a
+ or a 2 − a − 2 = 0
+
+from which we obtain a=2, or –1.
+
+ 19
+
+ 
+
+--- Page 24 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+Example 2.5
+
+Show that the vectors A = 3iˆ − 2 ˆj + k,ˆ B = iˆ − 3 ˆj + 5 k,ˆ C = 2iˆ + ˆj − 4 kˆ form a right-
+
+angled triangle. Th is can be shown in two ways. Either we show th at the sum of two
+
+vectors equals the third or the sum of the three vectors is identically zero. By trial
+
+and error we find that A = B + C, so that the vectors do form a triangle.
+
+On determining the dot products of the vectors in turn we discover that A ⋅C = 0.
+
+Thus A and C are ⊥and the triangle is a right-angled triangle.
+
+Example 2.6
+
+Find the angles that the vector A = 3iˆ − 6 ˆj + 2 kˆ makes with the coordinate axis. We
+
+let the angles be α, β,γ that A mak es with the positive x,y,z axes respectively.
+
+ 2 + 2 2 cosα = 7 cosα then A ⋅ iˆ = A cosα = 3 2 + (− 6 )
+ and A ⋅ iˆ = (3i ˆ − 6 ˆj + 2 kˆ ) ⋅ i = 3
+
+ 0 3 ) ≈ 646. Thus cosα = 73 ⇒ α = cos −1 ( 7
+
+ Similarly
+
+ 0 6 ) ≈ 149 cos β = − 76 ⇒ β = cos −1 (− 7
+
+ 0 2 ) ≈ 73 4. and cos γ = 72 ⇒ λ= cos −1 ( 7
+
+Example 2.7
+
+Find the projection of the vector A = iˆ − 2 ˆj + kˆ on the vector B = 4iˆ − 4 ˆj + 7 kˆ.
+
+ A
+ P θ Q
+
+ B
+ R S
+
+ ˆProjection of A on B = RS = PQ = A cos Q = A ⋅ b where bˆ is the unit vector in the
+
+direction of B.
+
+ 20
+
+ 
+
+--- Page 25 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+ B 4iˆ − 4 ˆj + 7 kˆ 4 4 7
+ Thus b ˆ = = = iˆ − ˆj + kˆ
+ B 2 + 7 2 9 9 9 4 2 + (− 4 )
+  4 4 7  19 ˆ − ˆj + kˆ  = and A ⋅ bˆ = (i ˆ − 2 ˆj + kˆ ) ⋅  i
+  9 9 9  9
+
+Example 2.8
+
+Prove that C 2 = A 2 + B 2 − 2 AB cosθ where A, B, C are the three sides of a triangle
+
+w ith θ the angle between the vectors A and B.
+
+ C
+ B
+
+ θ
+
+ A
+
+From the diagram we have A = B + C or C = A − B
+Thus C ⋅ C = (A − B ) ⋅ (A − B )
+ = A ⋅ A − 2 A ⋅ B + B ⋅ B
+Hence C 2 = A 2 + B 2 − 2 AB cosθ
+
+We call C 2 = A 2 + B 2 − 2 AB cosθ the Cosine rule for plane triangles.
+
+Example 2.9
+
+Find an equation for the plane perpendicular to the vector A = 2iˆ + 3 ˆj + 6 kˆ and
+
+passing through the terminal point of the vector B = iˆ + 5 ˆj + 3kˆ. Also find the
+
+distance from the origin to the plane.
+
+ Z
+
+ P(x,y,z)
+
+ Q
+
+ r
+ A
+
+ B
+
+ Y
+ O
+
+ X
+
+ 21
+
+ 
+
+--- Page 26 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+We let r be the position vector of point P and Q, the terminal point of B. Since
+PQ = B − r is perpendicular to A, (B − r ) ⋅ A = 0 or r ⋅ A = B ⋅ A gives the equation of
+
+the plane. In rectangular coordinates, we have
+ (ix ˆ + jyˆ + z kˆ ) ⋅ (2i ˆ + 3 ˆj + 6 kˆ ) = (i ˆ + 5 ˆj + 3kˆ ) ⋅ (2i ˆ + 3 ˆj + 6 kˆ )
+ or 2 x + 3 y + 6 z = 35
+
+The distance from the origin to the plane is the projection of B on A. Thus, a unit
+
+vector aˆ in the direction of A is AA = 72 iˆ + 73 ˆj + 76 kˆ.
+Then the projection of B on A = B ⋅ aˆ = (i ˆ + 5 ˆj + 3kˆ ) ⋅ (7 2 iˆ + 73 ˆj + 76 kˆ ) = 5.
+
+Example 2.10
+
+Given that A = 3iˆ + ˆj + 2 kˆ and B = iˆ − 2 ˆj − 4 kˆ are position vectors of points P and Q
+
+respectively,
+
+ a) Find an equation for the plane passing through Q and perpendicular to
+
+ line PQ.
+
+ Z
+
+ P R
+
+ Q
+
+ A r
+
+ B
+ Y
+ O
+
+ X
+
+ Let position vector of some point R on the plane be r.
+
+ Then PQ = OQ − OP = − 2iˆ − 3 ˆj − 6 kˆ
+
+ Since the plane is perpendicular to PQ
+
+ Then PQ ⋅QR = 0
+
+ ˆ QR = OR − OQ = ( x − 1)i ˆ + ( y + 2 ) ˆj + ( z + 4 )k
+
+ 22
+
+ 
+
+--- Page 27 ---
+
+ CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+ Hence
+
+ ˆ ˆ + ( y + 2 ) ˆj + ( z + 4 )k (− 2i ˆ − 3 ˆj − 6 kˆ ) ⋅ [( x − 1)i ] = 0
+ ⇒ 2 x + 3 y + 6 z + 28 = 0
+
+ b) What is the distance from the point (-1,1,1) to the plane?
+
+ The distance from the point (x1,y1,z1) to the plane is given by:
+ ax1 + by1 + cz1 − d distance =
+ a 2 + b 2 + c 2
+
+ Where ax+by+cz=d is the equation of the plane. Thus the distance
+
+ from (-1,1,1) to the plane is
+
+ 2 ⋅ (− 1) + 3 ⋅ 1 + 6 ⋅ 1 + 28 35
+ = = 5 Z
+ 2 2 + 3 2 + 6 2 7
+
+ THE CROSS PRODUCT
+
+ For vectors in space, we normally define axes of
+
+ reference by the ‘right-hand rule’.
+
+ OX, OY, OZ form a right-handed set if rotation
+
+ from OX to OY takes a right-handed corkscrew
+
+ y action along the positive direction of OZ. Similarly,
+
+ rotation from OY to OZ gives right-hand corkscrew
+ X
+ action along the positive direction of OX etc.
+
+ Definition: The cross or vector product of A and B written A× B and read as ‘ A
+
+ cross B ’ is defined as a vector having the magnitude AB sin θ, where
+ θ is the angle between the two vectors. The product vector acts in a
+
+ direction perpendicular to A and B in such a sense that A, B, and
+ (A× B ) form a right-handed system-in that order.
+
+ A× B = AB sin θ
+ A × B
+ B × A reverses the direction of rotation and the product
+ vector would now act downward i.e. (B × A ) = − (A × B ). B
+ θ
+
+ A
+B × A
+
+ 23
+
+ 
+
+--- Page 28 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+ I f θ = 0 0; then A × B = AB sin 0 0 = 0
+
+ and if θ = 90 0; then A × B = AB sin 90 0 = AB
+
+if A and B are given in terms of position vectors, then A = A1 iˆ + A2 ˆj + A3 kˆ and
+
+B = B1 iˆ + B 2 ˆj + B3 kˆ
+
+Then
+ A × B = (A1 i ˆ + A2 ˆj + A3 kˆ )× (B1 i ˆ + B 2 ˆj + B3 kˆ )
+ = A1 B1 iˆ × iˆ + A1 B 2 iˆ × ˆj + A1 B3 iˆ × kˆ
+ + A2 B1 ˆj × iˆ + A2 B 2 ˆj × ˆj + A2 B3 ˆj × kˆ
+ + A3 B1 kˆ × iˆ + A3 B 2 kˆ × ˆj + A3 B3 kˆ × kˆ
+
+Now, since iˆ ×iˆ = 1 ⋅ 1 ⋅ sin 0 = 0, we have iˆ × iˆ = ˆj × ˆj = kˆ × kˆ = 0. Also iˆ × ˆj = 1 ⋅ 1 ⋅ sin 90 0 = 1 in
+
+direction OZ, i.e. iˆ × ˆj = kˆ
+
+ iˆ
+ iˆ × ˆj = kˆ; ˆj × iˆ = − kˆ jˆ
+ kˆ
+ ˆj × kˆ = iˆ; kˆ × ˆj = −iˆ
+
+ k ˆ × iˆ = ˆj; iˆ × kˆ = − ˆj
+
+ Thus A × B = (b1 c 2 − b 2 c1 ) i ˆ + (a 2 c1 − a1 c 2 ) ˆj + (a1 b 2 − a 2 b1 ) kˆ
+ or = (b1 c 2 − b 2 c1 ) i ˆ − (a1 c 2 − a 2 c1 ) ˆj + (a1 b 2 − a 2 b1 ) kˆ
+
+Which we may recognize as the expansion of the determinant
+
+ iˆ ˆj kˆ
+ A × B = A1 A2 A3
+ B1 B 2 B 3
+
+Example 2.11
+
+If A = 3iˆ − 2 ˆj + 4 kˆ and B = 2iˆ − 3 ˆj − 2 kˆ then
+
+ iˆ ˆj kˆ
+ A × B = 3 − 2 4 = 16iˆ + 14 ˆj − 5 kˆ
+ 2 − 3 − 2
+
+We note that the scalar product of two vectors is a scalar but the vector product of
+
+two vectors is again a vector.
+
+ 24
+
+ 
+
+--- Page 29 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+To determine the angle θ between the vectors A and B; we have
+
+ A × B = AB sin θ
+
+Now A × B = 16 2 + 14 2 + 5 2 = 477
+
+ A = A = 3 2 + 2 2 + 4 2 = 29
+
+ B = B = 2 2 + 3 2 + 2 2 = 17
+
+∴ 477 = 129 17 sin θ
+
+ 477
+or sin θ =
+ 29 × 17
+ −1 477  0 79 40 ′∴ θ = sin  29 × 17  ≈  
+
+Example 2.12
+
+If A = 3iˆ − ˆj + 2 kˆ, B = 2iˆ − + ˆj − kˆ and C = iˆ − 2 ˆj + 2 kˆ
+Find (a) (A × B )× C,
+ (b) A × (B × C ).
+
+ A × B = − iˆ + 7 ˆj + 5kˆ
+ ˆ + 7 ˆj − 5kˆ ˆ + 7 ˆj + 5kˆ )× (i ˆ − 2 ˆj + 2 kˆ ) = 24i(a) (A × B )× C = (− i
+
+ ˆ − 5 ˆj − 5 kˆ B × C = (2i ˆ + ˆj − kˆ )× (i ˆ − 2 ˆj + 2 kˆ ) = 0i(b)
+ ˆ + 15 ˆj − 15kˆ ˆ − ˆj + 2 kˆ )× (0i ˆ − 5 ˆj − 5kˆ ) = 15i A × (B × C ) = (3i
+
+Thus (A × B )× C ≠ A × (B × C ), showing the need for parentheses in A × B × C to avoid
+
+ambiguity.
+
+Example 2.13
+
+The area of a parallelogram with sides A and B is A× B
+
+i.e. area of parallelogram
+
+ = h B A h
+ θwhere h = A sin θ
+ B
+
+ 25
+
+ 
+
+--- Page 30 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+Thus area = A sin θB
+
+ = A × B
+
+We can also deduce from this that the area of a triangle is half the area of a
+
+parallelogram. Hence area of a triangle is 1 A× B. 2
+
+Example 2.14
+
+Find the area of the triangle having vertices at P(1,3,2), Q(2,-1,1), R(-1,2,3). We
+
+have PQ = iˆ − 4 ˆj − k;ˆ PR = −2iˆ − ˆj + kˆ, and
+
+area of triangle
+ = 1 PQ × PR
+ 2
+ = 1 (i ˆ − 4 ˆj − kˆ ) × (− 2i ˆ − ˆj + kˆ )
+ 2
+ = 1 107
+ 2
+
+TRIPLE PRODUCTS
+
+Scalar Triple Product: If A, B, C are three vectors, the scalar formed by the product
+A ⋅ (B × C ) is called the scalar triple product.
+
+If A = A iˆ + A ˆj + A kˆ, B = B iˆ + B ˆj + B kˆ and C = C iˆ + C ˆj + C kˆ.
+ 1 2 3 1 2 3 1 2 3
+
+ iˆ ˆj kˆ
+Then B × C = B1 B 2 B 3
+ C1 C 2 C 3
+
+ A1 A2 A3
+ A ⋅ (B × C ) = B1 B 2 B 3
+ C1 C 2 C 3
+
+ 26
+
+ 
+
+--- Page 31 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+Example 2.15
+
+If A = 2iˆ − 3 ˆj + 4 kˆ, B = iˆ − 2 ˆj − 3kˆ and C = 2iˆ + ˆj + 2 kˆ.
+
+ iˆ ˆj kˆ
+Then B × C = 1 − 2 − 3
+ 2 1 2
+
+ ˆj + 5 kˆ = −iˆ − (8 )
+ = −iˆ − 8 ˆj + 5 kˆ
+ ˆ − 3 ˆj + 4 kˆ ) ⋅ (− i ˆ − 8 ˆj + 5 kˆ ) A ⋅ (B × C ) = (2i
+ = −2 + 24 + 2 0
+ = 42
+
+Scalar triple products satisfy the following properties:
+
+ B B B A A A A A A
+ 1 2 3 1 2 3 1 2 3 B ⋅ (C × A ) = C C C = − C C C = B B B(i) 1 2 3 1 2 3 1 2 3
+ A A A B B B C C C
+ 1 2 3 1 2 3 1 2 3
+ = A ⋅ ( B × C )
+
+Since interchan ging two rows in a determinant reverses the sign.
+T hen A ⋅ (B × C ) = B ⋅ (C × A ) = C ⋅ (A × B )
+
+ A A A
+ 1 2 3(ii) A ⋅ (B × A ) = B B B = 0 since two rows are identical 1 2 3
+ A A A
+ 1 2 3
+
+The scalar triple product in absolute represents the volume of a parallelepiped with
+
+sides A, B and C.
+
+COPLANAR VECTORS
+
+The scalar triple product provides a test to show whether three given vectors lie in
+
+the same plane.
+ B × C B × C is a vector product of B and C of magnitude
+
+ C B C acting in a direction perpendicular to the plane
+
+A of B and C and forming a right-handed set.
+
+ B
+
+ 27
+
+ 
+
+--- Page 32 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+If A happens to be in the same plane as B and C, then A will be perpendicular to
+B × C. Hence A ⋅ (B × C ) = A B × C cos 90 = 0.
+Therefore, three vectors A, B and C are coplanar if A ⋅ (B × C ) = 0.
+
+Example 2.16
+
+The vectors A = iˆ + 2 ˆj − 3kˆ, B = 2iˆ − ˆj + 2 kˆ and C = 3iˆ + ˆj − kˆ are coplanar since
+
+ 1 2 − 3
+ A ⋅ (B × C ) = 2 − 1 2 = 0
+ 3 1 − 1
+
+Example 2.17
+
+Find the volume of a parallelepiped whose edges are represented by
+
+A = 2iˆ − 3 ˆj + 4 kˆ, B = iˆ + 2 ˆj − kˆ and C = 3iˆ − ˆj + 2 kˆ
+
+ 2 − 3 4
+Volume of parallelepiped is A ⋅ (B × C ) = 1 2 − 1 = 7
+ 3 − 1 2
+
+Example 2.18
+
+Find the constant a such that the vectors 2iˆ − ˆj + kˆ ˆ,i + 2 ˆj − 3kˆ and 3iˆ + jaˆ + 5 kˆ are
+
+coplanar.
+
+Solution:
+If coplanar then (2i ˆ + 2 ˆj − 3kˆ ) × (3i ˆ − ˆj + kˆ ) ⋅ [(i ˆ + jaˆ + 5 kˆ )] = 0
+
+ 2 − 1 1
+i.e. 1 2 − 3 = 0
+ 3 a 5
+
+from which we obtain a=-4.
+
+Example 2.19
+
+Find an equation for the plane determined by the points P1(2,-1,1), P2(3,2,-1) and
+
+P3(-1,3,2).
+
+The position vectors of P1, P2, P3 and any point P(x,y,z) are respectively
+
+r 1 = 2iˆ − ˆj + k,ˆ r 2 = 3iˆ + 2 ˆj − k,ˆ r 3 = −iˆ + 3 ˆj + 2 kˆ and r = ixˆ + jyˆ + z kˆ.
+
+ 28
+
+ 
+
+--- Page 33 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+Then PP 1 = r − r1, P2 P 1 = r2 − r1, PP3 = r3 − r1 all lie in the required plane, so that
+ (r − r1 ) o (r2 − r1 ) × (r3 − r1 ) = 0
+
+ ˆ ˆ − ( y + 1) ˆj + ( z − 1)ki.e [( x − 2 )i ] o [i ˆ + 3 ˆj − 2 kˆ ]× [− 3i ˆ + 4 ˆj + kˆ ] = 0
+or 11x + 5 y + 13 z = 30
+
+VECTOR TRIPLE PRODUCTS OF THREE VECTORS
+If A, B and C are three vectors, then A × (B × C ) and (A × B ) × C are called vector
+
+triple products.
+
+ iˆ ˆj kˆ
+ ˆ + A2 ˆj + A3 kˆ ) × B1 B 2 B 3A × (B × C ) = (A1 i
+ C1 C 2 C 3
+
+ ˆ = (A1 i ˆ − ( B1 C 3 − B 3 C1 ) ˆj + ( B1 C 2 − B 2 C1 )k ˆ + A2 ˆj + A3 kˆ ) × [( B 2 C 3 − B 3 C 2 )i ]
+ iˆ ˆj kˆ
+ = A1 A2 A3
+ B 2 C 3 − B 3 C 2 B 3 C1 − B1 C 3 B1 C 2 − B 2 C1
+
+ ˆj = [ A2 ( B1 C 2 − B 2 C1 ) − A3 ( B 3 C1 − B1 C 3 )]i ˆ − [ A1 ( B1 C 2 − B 2 C1 ) − A3 ( B 2 C 3 − B 3 C 2 )]
+ ˆ + A1 ( B 3 C1 − B1 C 3 ) − A2 ( B 2 C 3 − B 3 C 2 )k
+
+Also we h ave
+
+ ˆB (A o C ) − C (A o B ) = ( A2 B1 C 2 + A3 B1 C 3 − A2 C1 B 2 − A3 C1 B 3 )i
+ ˆ + ( B 2 A1 C1 + B 2 A3 C 3 − C 2 A1 B1 − C 2 A3 B 3 )j
+ ˆ + ( B 3 A1 C1 + B 3 A2 C 2 − C 3 A1 B1 − C 3 A2 B 2 )k
+
+and so we have shown that
+ A × (B × C ) = B (A o C ) − C (A o B ).
+Now since ( A × B ) × C = − C × ( A × B ) we interchange the roles of A, B and C in the
+
+above argument and have
+ ( A × B ) × C = − C × ( A × B )
+ = − [A(C o B ) − B (C o A )]
+ = B (A o C ) − A(B o C )
+
+and as such we use the above rela tions to easily show that
+ A × (B × C ) + B × (C × A ) + C × (A × B ) = 0
+
+ 29
+
+ 
+
+--- Page 34 ---
+
+CHAPTER 2
+ THE DOT AND CROSS PRODUCTS
+
+ QUES TIONS
+
+1. If A = 5iˆ − 2 ˆj + 3kˆ; B = 3iˆ + ˆj − 2 kˆ; C = iˆ − 3 ˆj + 4 kˆ; determine
+ a) The scalar triple product A o (B × C ) Ans. -12
+
+ ˆ + 44 ˆj − 74 kˆ b) The vector triple products i.) A × (B × C ) Ans. 62i
+
+ ˆ + 7 ˆj − 22 kˆ ii.) (A × B ) × C Ans. 109i
+
+2. Determine the value of p such that the vectors A, B and C are coplanar when
+
+ A = 2iˆ + ˆj + 4 kˆ; B = 3iˆ + 2 ˆj + pkˆ; C = iˆ + 4 ˆj + 2 kˆ;
+
+ Ans. P=6
+
+3. Find the area of a parallelogram having diagonals
+
+ A = 3iˆ + ˆj − 2 kˆ and B = iˆ − 3 ˆj + 4 kˆ.
+
+ Ans. 5 3
+
+4. Find the shortest distance from (6,-4,4) to the line joining (2,1,2) and
+
+ (3,-1,4).
+
+ Ans. 3
+
+5. A fo rce given by F = 3iˆ + 2 ˆj − 4 kˆ is applied at the point (1,-1,2). Find the
+
+ moment of F about the point (2,-1,3).
+
+ Ans. 2iˆ − 7 ˆj − 2 kˆ
+
+ 30
+
+ 
+
+--- Page 35 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+Introduction:
+
+W e discuss ordinary and partial differentiation of vectors. Some elements of
+
+differential geometry are also discussed.
+
+Objectives:
+
+We show that ordinary rules of differentiation in differential calculus are also
+
+applicable to vector calculus, where dot and vector products retain their nature. We
+
+shall also committee ourselves to the study of space curves and surfaces in the
+
+name of differential geometry.
+
+ 31
+
+ 
+
+--- Page 36 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+If a vector A depends on a scalar variable t, then A can be represented as A()t and
+
+A is then said to be a function of t and t is called a parameter. In the component
+
+form we write
+ A = A1 (t )i ˆ + A2 (t ) ˆj + A3 (t )k;ˆ
+
+Differe ntia ting w ⋅ r ⋅ t ⋅ t, we get
+
+ d d d d ˆ ˆ ( A1 (t )) − ˆj ( A2 (t )) + k ( A3 (t )) {A(t )}= i
+ dt dt dt dt
+
+ dSince A(t ) is itself a vector depending on t, we can consider its derivative
+ dt
+
+ d 2w ⋅ r ⋅ t ⋅ t. If this derivative exists it is denoted by A()t. In like manner higher
+ dt 2
+
+order derivatives are described.
+
+Example 3.1
+
+ ˆj + 4u 3 k,ˆ find ˆ + (2u − 5 )If A(u ) = (3u 2 + 4 )i
+
+ d A d 2 A;
+ du du 2
+
+ d A = 6iuˆ + 2 ˆj + 12u 2 kˆ
+ du
+ d 2 A = 6iˆ + 24u kˆ
+ du 2
+
+If we wanted these derivatives at u=2, then we would have obtained
+
+ d A
+ u = 2 = 12iˆ + 2 ˆj + 48 kˆ and
+ du
+
+ d 2 A = 6iˆ + 48 kˆ 2 u = 2
+ du
+
+Example 3.2
+
+ ˆj − tan t kˆ, findIf A = e − t iˆ + In (t 2 + 1)
+
+ d A d 2 A d A d 2 A, 2,, 2 at t = 0
+ dt dt dt dt
+
+ d A t 2
+ = e − t iˆ + ˆj − sec 2 t kˆ t = 0 = −iˆ + 0 ˆj − kˆ 2
+ dt t
+
+ 32
+
+ 
+
+--- Page 37 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ d A 2 2 2 = (− 1) + (0 ) + (− 1)
+ dt
+
+Differentiating the second time w ⋅ r ⋅ t ⋅ t;
+
+ d 2 A 2 − 2t 2 = e − t iˆ + ˆj − 2 sec 2 t tan t kˆ t = 0 2 2 2 dt (t + 1)
+ = iˆ + 2 ˆj + 0 kˆ
+
+ and
+
+ d 2 A 2 2 2 = 1 + 2 + 0 = 5
+ dt 2
+
+Example 3.3
+
+A particle moves along a curve whose parametric equations are
+
+x = e − t, y = 2 cos 3t,, z = 2 sin 3t, where t is the time.
+
+ a) Determine its velocity and acceleration at any time.
+
+ The position vector r of the particle is
+
+ r = ixˆ + jyˆ + zkˆ = e − t iˆ + 2 cos 3jtˆ + 2 sin 3ktˆ
+
+ d r = − e − t iˆ − 6 sin 3jtˆ + 6 cos 3ktˆ r =
+ dt
+
+ and
+
+ d 2 r = e − t iˆ − 18 cos 3jtˆ − 18 sin 3ktˆ a =
+ dt 2
+
+ b) Find the magnitudes of the velocity and acceleration at t=0.
+
+ d r d 2 r At t=0, = −iˆ + 6 kˆ and = iˆ − 18.ˆj
+ dt dt 2
+
+ d r 2 2 Then t = 0 = (− 1) + (6 ) = 37
+ dt
+
+ d 2 r 2 2
+ and = (1) + (− 18 ) = 325 2 t = 0
+ dt
+
+ 33
+
+ 
+
+--- Page 38 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+The following formulae are useful for the differentiation of sums and products of
+
+vectors:
+If A = A()t and B = B ()t, then
+
+ d d A a) (c A ) = c
+ dt dt
+
+ d d A d B b) (A + B ) = +
+ dt dt dt
+
+ d d B d A c) (A o B ) = A o + o B
+ dt dt dt
+
+ d d B d A d) (A × B ) = A × + × B
+ dt dt dt
+
+Example 3.4
+
+ ˆ ˆ + ˆj − ktˆ, findIf A = t 2 iˆ − jtˆ + (2t + 1)k and B = (2t − 3 )i
+
+ d d d  d B   A ×  at t=1a) (A o B ) b) (A × B ) c) dt dt dt  dt   
+
+a ) A o B = t 2 (2t − 3 ) − t − t (2t + 1)
+ = 2t 3 − 5t 2 − 2t
+
+ d d 3 2 (A o B ) t =1 = (2t − 5t − 2t ) t =1
+ dt dt
+ = 6t 2 − 10t − 2 t =1 = −6
+
+ d d B d A or apply (A o B ) = A o + o B
+ dt dt dt
+
+ iˆ ˆj kˆ
+b ) A × B = t 2 − t 2t + 1
+ 2t − 3 1 − t
+ = (t 2 − 2t − 1)i ˆ + (t 3 + 4t 2 − 4t − 3) ˆj + (3t 2 − 3t )ˆk
+ d ˆ ˆj + (6t − 3)k ˆ + (3t 2 + 8t − 4 ) t =1 (A × B ) t =1 = (2t − 2 )i
+ dt
+ = 0iˆ + 7 ˆj + 3kˆ
+
+ 34
+
+ 
+
+--- Page 39 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ d Bc ) = 2iˆ − kˆ
+ dt
+ iˆ ˆj kˆ
+ d B ˆj + 2ktˆ A × = t 2 − t 2t + 1 = itˆ + (t 2 + 4t + 2 )
+ dt
+ 2 0 − 1
+
+   d  d B  ˆ + 6 ˆj + 2 kˆ A × ˆ + (2t + 4 ) t =1 = [i ˆj + 2 kˆ ] = i dt  dt   
+
+UNIT TANGENT VECTORS:
+
+ dIf OP is a position vector A()t in space, then the direction vector denoting (A(t )) is
+ dt
+
+parallel to the tangent to the curve at P. The unit tangent vector T at P can be found
+
+ d (A(t ))
+from Tˆ = dt T
+ d (A(t ))
+ dt
+
+ P
+ O A()t
+
+Example 3.5
+
+Find a unit tangent vector to any point on the curve
+
+x = a cos wt, y = a sin wt, z = bt where a, b, w are constants. The vector equation of the
+
+curve is
+
+ r = a cos wt iˆ + a sin wtˆj + bt kˆ
+
+ d r = − aw sin wt iˆ + aw cos wtˆj + bkˆ
+ dt
+
+ d r ds 2 2 2 = = a w + b
+ dt dt
+
+ d r d r − aw sin wt iˆ + aw cos wtˆj + bkˆ ˆ = = Thus T
+ dt dt a 2 w 2 + b 2
+
+ 35
+
+ 
+
+--- Page 40 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+Example 3.6
+Show that r = e − t (C1 cos 2t + C 2 sin 2)t satisfies the differential equation
+
+ d 2 r d r
+ + 2 + 5 r = 0 where C1 and C2 are constants. 2 dt dt
+
+ d r − t − t = e (− C1 cos 2t − C 2 sin 2t ) + e (− 2C1 sin 2t + 2C 2 cos 2t )
+ dt
+ d 2 r − t − t = − e [− C1 (cos 2t + 2 sin 2t ) + C 2 (2 cos 2t − sin 2t )] + e [C1 (2 sin 2t − 4 cos 2t ) − C 2 (4 sin 2t + 2 cos 2t )] 2
+ dt
+On substituting these derivatives; on the left, the claim follows
+
+PARTIAL DIFFERENTIATION OF VECTORS:
+
+If a vector A is dependent on more than one scalar variable i.e. A=A(x1,y2,z3) say,
+
+then we differentiate A with respect to each independent variable partially denoted
+by ∂A ∂x (i =,1,2 3 )
+
+For A = A1 iˆ + A2 ˆj + A3 kˆ, the partial derivative of A w.r. t x1 is
+
+ ∂ A ∂A3 ∂A2 ∂A1 ˆ = ˆj + iˆ + k etc
+ ∂x1 ∂x1 ∂x1 ∂x1
+
+Similarly, the second partial derivative w.r. t x1 is
+
+ ∂ 2 A ∂ 2 A3 ∂ 2 A1 ∂ 2 A2 ˆ = iˆ + ˆj + k
+ ∂x1 2 ∂x1 2 ∂x1 2 ∂x1 2
+
+Example 3.7
+
+ ∂2If A = x 2 yziˆ − 2 xz 3 ˆj + xz 2 kˆ and B = 2 izˆ + jyˆ − x 2 kˆ, find (A × B ) at (1,0, -2). ∂x∂y
+
+ iˆ ˆj kˆ
+We have A × B = x 2 yz − 2 xz 3 xz 2
+ 2 z y − x 2
+
+ ˆ = (2 x 3 z 3 − xyz 2 )i ˆ + (x 4 yz + 2 xz 3 ) ˆj + (x 2 y 2 z + 4 xz 4 )k
+
+ ∂ ˆ 2 z 3 − yz 2 )i ˆ + (4 x 3 yz + 2 z 3 ) ˆj + (2 xy 2 z + 4 z 4 )k (A × B ) = (6 x ∂x
+ ∂ 2 2 ˆ + 4 x 3 jzˆ + 4 xyzkˆ )i (A × B ) = (− z ∂x∂y
+ ∂ 2
+ ˆ − 8 ˆj (A × B ) (,0,1 −2 ) = −4i ∂x∂y
+
+ 36
+
+ 
+
+--- Page 41 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ELEMENTS OF DIFFERENTIAL GEOMETRY
+
+Differential Geometry involves a study of space curves and surfaces. If C is a space
+curve defined by the function r ( )s where s is arc length, then we have
+
+ d r which is a unit tangent vector to C denoted by Tˆ.
+ ds
+Suppose r = r ()t is an arbitrary representation of the curve C with the same
+orientation as r = r ()s, then we find
+
+ o
+ d r d r ds
+ r = = ⋅
+ dt ds dt
+
+ o
+ ds d r d r d r d r r d r dtthe quantity =. We thus find that Tˆ = = = =
+ dt dt ds dt dt o dt ds
+ r
+
+Example 3.8
+
+Find the unit tangent vector along the helix
+
+ r = a cos itˆ + a sin jtˆ + bt kˆ
+
+where a and b are non-zero.
+
+Solution:
+
+ d r = − a sin itˆ + a cos jtˆ + bkˆ
+ dt
+
+ 1 d r ds 2 2 2 = = (a + b )
+ dt dt
+
+ d r ds − 1 2Thus Tˆ = = (a 2 + b 2 ) {− a sin it ˆ + a cos jtˆ + bkˆ }.
+ dt dt
+
+Definition: The rate at which Tˆ changes with respect to S is a Z
+
+ ˆ dT Nˆ
+ measure of the curvature of C and is given by.
+ C ds
+ ˆ 2 Tˆ d T d r
+The direction of = at any given point on C is normal to
+ ds ds 2 Bˆ
+the curve at that point. (See adjoining figure). If Nˆ is a unit y
+ O
+vector in this normal direction, it is called the principal normal to
+
+the curve.
+ X
+
+ 37
+
+ 
+
+--- Page 42 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ ˆ dT
+Then = kNˆ, where k is called the curvature of C at the specified point. The
+ ds
+
+quality P = 1 k is called the radius of the curvature.
+
+Example 3.9
+
+Find Tˆ, k and Nˆ for the curve
+
+ ˆj r = − (3 sin 2t )i ˆ − (3 cos t )
+We have
+
+ d r
+ ˆj = − (6 cos 2t )i ˆ + (6 sin 2t )
+ dt
+
+ d r 2 2 = 36 cos 2t + 36 sin 2t = 6
+ dt
+
+ d r d r ˆ Tˆ = = − (cos 2t )i ˆ + (sin 2t )j
+ dt dt
+
+ Next
+ d Tˆ = (2 sin 2t )i ˆ + (2 cos 2t )ˆj
+ dt
+ d Tˆ dTˆ ds 1 ˆ = ⋅ = ((2 sin 2t )i ˆ + (2 cos 2t ) ˆj ) = K N
+ ds dt dt 3
+ dTˆ 1 = K Nˆ = K =
+ ds 3
+
+And
+ 1 dTˆ
+ N = = 2 sin 2itˆ + 2 cos 2jtˆ ∏
+ K ds
+
+Example 3.10
+
+Find the curvature of the helix
+
+ ˆ + a sin wtˆj + bt kˆ r (t ) = a cos wt i
+
+We have
+
+ d r = − aw sin wt iˆ + aw cos wtˆj + b kˆ
+ dt
+
+ d r 2 2 2 2 2 2 2 2 2 2 = a w sin wt + a w cos wt + b = a w + b
+ dt
+
+ ˆ d r d r aw(− sin wt i ˆ + cos wtˆj ) + bkThus Tˆ = =
+ dt dt a 2 w 2 + b 2
+
+ 38
+
+ 
+
+--- Page 43 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ d Tˆ dTˆ dt − aw 2
+And = = cos wt iˆ + sin wtˆj ) 2 2 2 ( ds ds dt a w + b
+
+ ˆ 2 d T aw
+So that K = = *) 2 2 2 ( ds a w + b
+
+Two limiting cases of (*) are worth noting. First if b=0, then z=0, and the helix
+
+reduces to a circle of radius a in the xy-plane, while equation (*) reduces to K = 1.
+ a
+
+Secondly, if a=0, then x=y=0 and z=bt. This tells us that the point moves along the
+
+z-axis. In this case the curvature k=0 i.e. a straight line (see following figure)
+
+ Z
+
+ y
+
+ X
+
+Definition: We defined a vector Bˆ perpendicular to both Tˆ and Nˆ by the formula
+
+ B ˆ = Tˆ × Nˆ
+
+ This vector is called the binormal vector of the curve. The three vectors
+
+ Tˆ Nˆ and Bˆ (in this order) define a moving right-handed coordinate
+
+ system at any specified point of C.
+
+Definition: A plane to a curve at a point P containing the tangent and principal
+
+ normal at P is called an osculating plane.
+
+Definition: The normal plane is the plane through P perpendicular to the tangent.
+
+Definition: The rectifying plane is the plane through P which is perpendicular to
+
+ the principal normal.
+
+ d Bˆ
+Definition: The arc of rotation of the binormal vector (i.e. ) is called the torsion
+ ds
+
+ 1 is called vector of the curve and its magnitude is denoted by τ. σ = τ
+
+ the radius of torsion.
+
+ 39
+
+ 
+
+--- Page 44 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+A set of relations involving derivatives of the fundamental vectors Tˆ Nˆ and Bˆ is
+
+known collectively as the Frenet-Serret formulae given by
+
+ d Tˆ d Nˆ d Bˆ = k Nˆ, = τBˆ − K Tˆ, = −τNˆ
+ ds ds ds
+
+Or in matrix form as
+
+ ˆ d T  ˆ      T ds      0 K 0 ˆ    Nˆ τ    =  d N ds -K 0     ˆ   ˆ −τ d B     B   0 0 ds  
+
+and they obey the cyclic vector multiplication in an anticlockwise sense:
+
+ Tˆ
+
+ Nˆ Bˆ
+
+So that Tˆ × Nˆ = Bˆ; Nˆ × Bˆ = Tˆ and Bˆ × Tˆ = Nˆ
+
+Clockwise move gives the negatives.
+
+Example 3.11
+Prove that the curvature of the space curve r = r ()t is given numerically by
+
+ o o o
+ r × r
+ K = 3, where dots denote differentiation with respect to t o
+ r
+
+We have
+
+ o o
+ d r d r ds r = = = Tˆ r
+ dt ds dt
+ o o 2  o  o ˆ o d r d d dT ˆ ˆ = r = T r T r + r  = dt  dt dt dt 2  
+
+ 2 2
+ o ˆ o o o d dT d = Tˆ r + r = Tˆ r + K Nˆ r
+ dt ds dt
+
+ o o o o  o o 2  o o o 3 o 3
+ ˆ  ˆ d ˆ  ˆ ˆ d ˆ ˆ ˆ r × r = T r × T r + K N r = T × T r r + K T × N r = K B r   dt dt
+  
+
+ 40
+
+ 
+
+--- Page 45 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ o o o
+ o o o r × r
+ r × r
+Thus K Bˆ = 3 and K = 3 o o
+ r r
+
+Example 3.12
+
+ o o o o o o
+ r o r × r for the space curve r = r (t ).Prove that τ = 2 o o o
+ r× r
+
+Given curve is r = r ()t
+
+ o
+ d r d r dt dt
+ T ˆ = = = r
+ ds dt ds ds
+ ˆ d T d  o dt  dt
+ r = K Nˆ =   ds dt  ds  ds
+ o o  dt  2 o d 2 t
+ = r   + r 2
+  ds  ds
+
+  o o o 2 t o d 3 t  dt  dt  2 o o d 3 t  o o d K (τB ˆ − K Tˆ ) =  r   + r 3  + r 2 + r 3
+ ds   ds  ds  ds ds 
+ o o o  dt  3 o o d 2 t dt o d 3 t dt
+ = r   + 3 r 2 + r 3
+  ds  ds ds ds ds
+ ˆ d N where = τBˆ − K Tˆ
+ ds
+
+ 2
+K N ˆ × K (τB ˆ − K Tˆ ) = K (τT ˆ + K Bˆ )
+ o o o o o 5 o o o 2 2 o o o o 2 3 o o o 2 2
+ dt dt d t d t dt d t dt
+ + 3 r × r = r × r   + r × r   2 + r × r 2    2   ds   ds  ds ds  ds   ds  ds
+
+Taking dot product with Tˆ; we obtain
+
+ o
+ 2 dt K τ = r [ ]
+ ds
+ 2 t o o o o o d 2 t  dt 4 o o o o d 2 t  dt  2 o o o o o o  dt  6 o  o o o   dt  3 d = r o r × r   + r o r r   2 + r o r × r 2   + 3 r × r × r 2   ×   ds   ds  ds ds  ds  ds  ds   
+
+ 41
+
+ 
+
+--- Page 46 ---
+
+CHAPTER 3
+ DIFFERENTIATION OF VECTORS
+
+ o o o o o o
+ o o o o o o  dt  6 r o r × r dt 1 1 1 = = = = = r o r × r   6; since o o ds ds  ds  d r dt dt r r
+
+ o o o o o o o o o o o o o o o o o o
+ 6
+ r o r × r r o r × r o r o r × r = × r =Thus τ = 6 2 2 6 o o o o o o o o
+ K 2 r r × r r r × r
+
+ QUESTIONS
+
+ θ. 1. Find Tˆ and k for the space curve x = θ− sin θ, y = 1 − cos θ, z = 4 sin ( 2 )
+
+ θ θ (3 + cos θ) cos ( + 2 sin θsin ( 2 ) 2 ) 1 Ans. K = 6 − 2 cos θ, T =
+ 8 12 cos θ− 4
+
+ 2t + 1 t 2
+ 2. Find the torsion of the curve x =, y =, z = t + 2. Explain your answer.
+ t − 1 t − 1
+
+ Ans. T=0. The curve lies on the plane x-3y+3z=5
+
+ 3. Show that the equation of the tangent line, principal normal and bi-normal to
+ the space curve r = r ()t at the po int t=to can be written respectively
+
+ r = r o + t Tˆo, r = r o + t Nˆ o, r = r o + t Bˆ o, where t is a parameter.
+
+ 4. Find equations for (a) tangent, (b) principal normal and (c) bi-normal to the
+
+ curve x=3cos t, y=3sin t, z=4t at the point where T = ∏.
+
+ 3 ˆj + 4 kˆ ). Ans. (a) Tangent: r = −3iˆ + 4 ∏ kˆ + t (− 5 5
+
+ (b) Normal: r = −3iˆ + 4 ∏ ˆj + itˆ.
+
+ 4 ˆj + 3 kˆ ) (c) Bi-normal: r = −3iˆ + 4 ∏ ˆj + t ( 5 5
+
+ 42
+
+ 
+
+--- Page 47 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Introduction:
+
+In this chapter, scalar and vector fields are defined. Gradient, divergence and curl
+
+are also discussed.
+
+Objectives:
+
+We show that gradient is a vector differentiation that results into a vector,
+
+d ivergence is equivalent to the dot product of the dot operator with a differentiable
+
+field and the curl of a vector field is a vector. Various identities are also discussed.
+
+ 43
+
+ 
+
+--- Page 48 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+If every point P(x,y,z) of a region R of space has associated with it a scalar quantity
+φ( x, y, )z, then φ( x, y, )z is a scalar function and a scalar field is said to exist in the
+
+region R.
+ Z
+ φ x, y, z
+ P (x, y, z )
+
+ Z
+
+ y
+ O y X
+
+ X
+
+Once again, if every point P(x,y,z) of a region R has associated with it a vector
+quantity F ( x, y, )z, then F ( x, y, z ) is a vector function and a vector field is said to
+
+exist in the region R.
+ Z
+ F (x, y, z )
+
+ P x, y, z
+
+ Z
+
+ y
+ O y X
+
+ X
+
+Definition: If a scalar φ( x, y, )z is continuously differentiable with respect to its
+
+ variables x,y,z throughout the region, then we denote the gradient of
+ φ by grad φ and define as the vector
+
+ ∂ ∂ ∂ ˆ iˆ + ˆj + k )φ grad φ= (∂ ∂ ∂ x y z
+ = ∇φ
+
+ where the operator ∇(del) is given as
+
+ ∇ = ∂ iˆ + ∂ ˆj + ∂ kˆ. ∂x ∂y ∂z
+
+ 44
+
+ 
+
+--- Page 49 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.1
+
+The gradient of θ = 2 x 2 yz 3 is
+ ∇θ = ∇ (2 x 2 yz 3 )
+ = 4 xyz 3 iˆ + 2 x 2 z 3 ˆj + 6 x 2 yz 2 kˆ
+Now given that φ= φ( x, y, )z is continuously differentiable with respect to its
+
+variables x,y,z, then if we let x=x(t), y=y(t), z=z(t) where t is a parameter, we have
+ φ(t ) = φ( x (t ) ), y (t ), z (t )
+
+On differentiating with respect to t, we obtain
+ dφ ∂φ dx ∂φ dy ∂φ dz
+ = + +
+ dt ∂x dt ∂y dt ∂z dt
+ ∂φ ∂φ ∂φ
+ or dφ = dx + dy + dz
+ ∂x ∂y ∂z
+  ∂φ ∂φ ∂φ  o (dxi ˆ + dyˆj + dz kˆ ) = ∇φ⋅ d r iˆ + ˆj + kˆ  =   ∂x ∂y ∂z 
+ where r = ixˆ + jyˆ + z kˆ
+
+Hence total differential dφ of φ is given by
+
+ dφ = gradφo d r
+
+If ds is a small element of an arc, then
+
+ dφ d r
+ = o gradφ
+ ds ds
+
+ d r d r ds d r drNow if we take r = rˆ ()t, then = =
+ dt ds dt ds dt
+
+ d r d r dr
+Meaning that =, a unit vector in the direction of d r.
+ ds dt dt
+
+ d r dφ
+If we denote this unit vector by αˆ i.e. = αˆ, the result becomes = αˆ o gradφ
+ ds ds
+dφ
+ is called the directional derivative of φ in the direction of αˆ.
+ ds
+dφ
+ will be maximum if αˆ and gradφ have the same direction, emanating from the
+ ds
+
+definition of the dot product.
+
+ 45
+
+ 
+
+--- Page 50 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.2
+
+Find the directio nal der ivative of φ= x 2 yz + 4xz 2 at (1,-2,-1) in the direction
+
+2iˆ − ˆj − 2 kˆ.
+
+ 2 2 ∇φ= ∇ ( x yz + 4 xz )
+ 2 ˆ 2 y + 8 zx )k = (2 xyz + 4 z )i ˆ + x 2 jzˆ + ( x
+ = 8iˆ − ˆj − 10 kˆ at,1( −)1,2
+
+U nit vector in the direction of 2iˆ − ˆj − 2 kˆ is
+
+ 2iˆ − ˆj − 2 kˆ
+ αˆ =
+ 3
+
+Required directional derivative is
+ ˆ − ˆj − 10 kˆ ) ⋅ (2i ˆ − ˆj − 2 kˆ ) ∇φ⋅αˆ = 13 (8i
+ = 163 + 13 + 203 = 373
+If φ( x, y, z ) = constant, this relationship represents a surface in space, depending on
+
+the value ascribed to the constant. If d r is the displacement in this surface, then
+dφ= 0 since φ is constant over the surface.
+
+T hus from
+
+ gradφo d r = dφ
+
+we have
+
+ dφ= gradφo d r = 0 ∀ such small displacements d r in the surface.
+
+But
+
+ gradφo d r = gradφ d r cosθ = 0
+
+ ∴ θ = Π2
+ ∴ gradφis perpendicular to d r
+
+The unit vector Nˆ i n the direction of gradφ is called the unit normal vector at P.
+
+ ∇φ
+ ∴ Unit No rmal Vector Nˆ =
+ ∇φ
+
+ 46
+
+ 
+
+--- Page 51 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.3
+
+Find the unit normal to the surface x 2 y + 2 xz = 4 at the point (2,-2,3)
+ ∇ (x 2 y + 2 xz − 4 )
+ ˆ + x 2 ˆj + 2 xkˆ = (2 xy + 2 z )i
+ = −2iˆ + 4 ˆj + 4 kˆ at (,2 −3,2)
+
+Unit normal to the surface
+ ∇φ
+ =
+ ∇φ
+ = − 13 iˆ + 23 ˆj + 23 kˆ
+
+If φand ψare differentiable scalars, then we have;
+ 1.) ∇ (φ+ψ) = ∇φ+ ∇ψ
+ 2.) ∇ (φψ) = φ(∇ψ) +ψ(∇φ)
+
+Example 4.4
+If φ= x 2 yz + xz 2 and ψ = xy 2 z − z 3, evaluate ∇ (φψ) at the point (2,1,3).
+∇ (φψ) = φ(ψ∇ ) +ψ(∇φ)
+ ˆ = (x 2 izˆ + 2 xyzˆj + (xy 2 − 3 z 2 )k 2 yz + xz 2 )[y ]
+
+ 2 ˆ + (xy )i ˆ + x 2 jzˆ + (x 2 y + 2 xz )k 2 z − z 3 )([ 2 xyz + z ]
+ = 30 (3i ˆ + 12 ˆj − 25kˆ ) − 21(21i ˆ + 12 ˆj + 16 kˆ )
+ = 3(− 117i ˆ + 36 ˆj − 3 62 kˆ )
+
+Example 4.5
+
+ 3
+Find ∇ r
+
+ 1 3 3
+ 2 = r 3 r = ixˆ + jyˆ + z k,ˆ r = (x 2 + y 2 + z 2 ) 2 = r, r = (x 2 + y 2 + z 2 )
+
+ 2 ∂ ∇ r 3 = ∇ (x 3 3 2 + y 2 + z 2 ) 2 + y 2 + z 2 ) 2 = (∂ x iˆ + ∂∂y ˆj + ∂∂z kˆ )(x
+
+ 2 3 = 1 1 1 2 + y 2 + z 2 ) 2 2 ixˆ + 2 jyˆ (x 2 + y 2 + z 2 ) 2 + 2 z kˆ (x 2 + y 2 + z 2 ) 2 [(x ]
+
+ 2 = 3(x 1 2 + y 2 + z 2 ) (ix ˆ + jyˆ + z kˆ ) = 3rr
+
+ 47
+
+ 
+
+--- Page 52 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.6
+ f ′(rProve that ∇ f (r ) = )r
+ r
+
+ 1  ∂ ∂ ∂  2 2 2 2 ∇ f (r ) = f ((x + y + z ) )  iˆ + ˆj + kˆ   ∂x ∂y ∂z 
+
+ − 1 2 f ′(r )r 2 + y 2 + z 2 ) [2 ix ˆ + 2 jyˆ + 2 z kˆ ] = = 12 f ′(x
+ r
+
+Example 4.7
+ 2 + y 2 + z 2 ).Find ∇φ if φ= In r = 12 In (x
+
+ 1 ∇φ= ∇ In ( x 2 + y 2 + z 2 )
+ 2
+ 1  ∂ ∂ ∂  = iˆ + ˆj + kˆ In ( x 2 + y 2 + z 2 )   2  ∂x ∂y ∂z 
+ 1 r
+ = 2 2 2 [ 2 ixˆ + 2 jyˆ + 2 zk]ˆ = 2 2( x + y + z ) r
+
+Example 4.8
+
+Show that ∇φ is a vector perpendicular to the surface φ( x, y, z ) = c where c is a
+
+constant.
+
+Let r = ixˆ + jyˆ + zkˆ be the position vector to any point P(x,y,z) on the surface. Then
+
+d r = dxiˆ + dyˆj + dzkˆ lies in the tangent plane to the surface at P.
+
+But
+
+ ∂φ ∂φ ∂φ
+ dφ= dx + dy + dz = 0
+ ∂x ∂y ∂z
+or
+
+ iˆ + ˆj + kˆ o (dxi ˆ + dyˆj + dz kˆ ) = 0   ∂φ ∂φ ∂φ  ∂x ∂y ∂z 
+
+i.e. ∇φo d r = 0 so that ∇φ is perpendicular to d r and therefore to the surface.
+
+E xample 4.9
+
+ ˆ. Show that V can be expressed asLet V = ( x + 2 y + 4 z )i ˆ + (2 x − 3 y − z ) ˆj + (4 x − y + 2 z )k
+
+the gradient of a scalar function.
+
+ ∂φ ∂φ ∂φAssume V = ∇φ= iˆ + ˆj + kˆ
+ ∂x ∂y ∂z
+
+ 48
+
+ 
+
+--- Page 53 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+ ∂φ 1 2So that = x + 2 y + 4 z ⇒ φ= x + 2 xy + 4 xz + f ( y, )z on integrating partially w.r.t. x,
+ ∂x 2
+
+holding y and z constant.
+
+Similarly,
+ ∂φ 3 2 = 2 x − 3 y − z ⇒ φ= 2 xy − 2 y − yz + g ( x, z ) ∂y
+ ∂φ 2 = 4 x − y + 2 z ⇒ φ= 4 xz − yz + z + h ( x, y )
+ ∂z
+Comparing the three eq uations, we have a common value of φ if we choose
+
+ 3 y 2 2 x 2 2 f ( y, z ) = − + z, g ( x, z ) = + z, h ( x, y )
+ 2 2
+ x 2 3 y 2 = −
+ 2 2
+ x 2 3 y 2 2 So that φ= − + z + 2 xy + 4 xz − yz
+ 2 2
+
+DIVERGENCE:
+Let A( x, y, z ) = A1 i ˆ + A2 ˆj + A3 kˆ be defined and differentiable at every point (x,y,z) in a
+
+specified region. Then the divergence of A, written ∇ o A or div A is defined by
+
+  ∂ ∂ ∂  A1 iˆ + A2 ˆj + A3 kˆ ) ∇ o A =  iˆ + ˆj + kˆ  o (  ∂x ∂y ∂z 
+ ∂A1 ∂A2 ∂A3 = + +
+ ∂x ∂y ∂z
+
+We note that the gradient operator ∇acts on a scalar and gives a vector while
+
+divergence operation ∇ acts on a vector and gives a scalar.
+
+Example 4.10
+
+ ˆj + 3 y 2 z 2 kˆ, determine ∇ o A.If A = 2 x 2 iyˆ − 2 (xy 2 + y 3 z )
+
+   ∂ ∂ ∂ ˆ ∇ o A = iˆ + ˆj + k 2 x 2 iyˆ − 2 (xy 2 + y 3 z ) ˆj + 3 y 2 z 2 kˆ )  o (   ∂ x ∂ y ∂ z 
+ = 4 xy − 4 xy − 6 y 2 z + 6 y 2 z = 0
+
+Definition A vector whose divergence is zero at all points i.e. for all values of x,y,z
+
+ is called a solenoid vector.
+
+ 49
+
+ 
+
+--- Page 54 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.11
+Find ∇o (∇φ) where φ= φ( x, y, z ) is a differentiable scalar function.
+
+  ∂φ ∂φ ∂φ
+ ∇φ=  iˆ + ˆj + kˆ   ∂ x ∂ y ∂ z 
+  ∂ ∂ ∂   ∂φ ∂φ ∂φ ∇ o (∇φ) = i  ˆ + ˆj + kˆ  o  iˆ + ˆj + kˆ   ∂ x ∂ y ∂ z   ∂ x ∂ y ∂ z 
+ ∂  ∂φ ∂  ∂φ ∂  ∂φ
+ =   +   +   ∂ x  ∂ x  ∂ y  ∂ y  ∂ z  ∂ z 
+ ∂ 2φ ∂ 2φ ∂ 2φ 2 = + + = ∇ φ
+ ∂ x 2 ∂ y 2 ∂ z 2
+
+ 2 ∂ 2 ∂ 2 ∂ 2The operator ∇ = + + is called the Laplacian operator.
+ ∂x 2 ∂y 2 ∂z 2
+
+Example 4.12
+Evaluate ∇ o (r 3 r ).
+
+ 3  ∂ ∂ ∂   2  iˆ + ˆj + kˆ 2 + y 2 + z 2 ) (ix ˆ + jyˆ + z kˆ )(x ∇ o (r 3 r ) =   o  ∂ x ∂ y ∂ z   
+
+ 3 3 3 ∂  2 2 2 2  ∂  2 2 2 2  ∂  2 2 2 2  = x (x + y + z ) + y (x + y + z ) + z (x + y + z ) ∂ x   ∂ y   ∂ z  
+
+ 3 1
+ 2 = 3(x 2 + y 2 + z 2 ) 2 + 3(x 2 + y 2 + z 2 )(x 2 + y 2 + z 2 )
+
+ 3
+ 2 = 6 r 3 = 6 (x 2 + y 2 + z 2 )
+
+Example 4.13
+
+ rEvalu ate ∇ (∇ o ( r ))
+
+   − 1 2   r∇ o 2 + y 2 + z 2 )  = ∇ o  (ix ˆ + jyˆ + z kˆ )(x  r     
+
+ − 1 − 1 ∂  2 2 2 − 12  ∂  2 2 2 2  ∂  2 2 2 2  = x (x + y + z ) + y (x + y + z ) + z (x + y + z ) ∂x   ∂y   ∂z  
+
+ 3 − 1 −
+ 2 2 = 3(x 2 + y 2 + z 2 ) − (x 2 + y 2 + z 2 )(x 2 + y 2 + z 2 )
+
+ − 1
+ 2 = 2 (x 2 + y 2 + z 2 )
+
+ r 2 2 2 − 12       ∇ ∇ o = ∇ 2 (x + y + z )  r      
+
+ − 1 ∂ ∂ 2 ˆ iˆ + ˆj + k = 2 x 2 + y 2 + z 2 )  ∂  (  ∂ x ∂ y ∂ z 
+ − 3
+ 2 = − 2 r 3 r 2 + y 2 + z 2 ) = − 2 (ix ˆ + jyˆ + z kˆ )(x
+
+ 50
+
+ 
+
+--- Page 55 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.14
+Evaluate ∇ 2 ( In r )
+ ∇ 2 ( In r ) = ∇ o (∇ ( In r ))
+     ∂ ∂ ∂ ∂ ∂ ∂ 2 ˆ ˆ = 1 iˆ + ˆj + k iˆ + ˆj + k In (x 2 + y 2 + z 2 )    o   ∂ x ∂ y ∂ z   ∂ x ∂ y ∂ z 
+
+ − 1   ∂ ∂ ∂ ˆ = iˆ + ˆj + k 2 + y 2 + z 2 ) ixˆ + jyˆ + z kˆ )(x )   o ((  ∂ x ∂ y ∂ z 
+ − 1  − 1  ∂  2 2 2 ∂ 2 2 2 − 1 ∂  2 2 2 = [x (x + y + z ) ] + y (x + y + z ) + z (x + y + z ) ∂ x ∂ y   ∂ z  
+ 2 2 2 − 1 2 2 2 2 2 2 − 2 2 2 2 − 1 1
+ 2 = 3(x + y + z ) − 2 (x + y + z )(x + y + z ) = (x + y + z ) = r
+
+CURL
+If A ( x, y, z ) is a differentiable vector field, then the curl or rotation of A, written
+
+∇ × A, curl A is defined by
+
+  ∂ ∂ ∂  A1iˆ + A2 ˆj + A3 kˆ ) iˆ + ˆj + kˆ  × ( ∇ × A =   ∂ x ∂ y ∂ z 
+ iˆ ˆj kˆ
+ ∂ ∂ ∂ ∂ A3  A2 A3 A1 ˆ = =  ∂ − − − ∂ A1  k  ˆj +  ∂ ∂ A2  iˆ +  ∂
+ ∂ x ∂ y ∂ z  ∂ y ∂ z   ∂ z ∂ x   ∂ x ∂ y 
+ A1 A2 A3
+
+Curl A is a vector function.
+
+Example 4.15
+
+ ˆj − x 2 yz kˆ, determine curl A at the point (1,3,-2).If A = ( y 2 − x 2 z 2 )i ˆ + (x 2 + y 2 )
+
+ iˆ ˆj kˆ
+ Curl A = ∇ × A = ∂∂x ∂∂y ∂∂z
+ y 2 − x 2 z 2 x 2 + y 2 − x 2 yz
+
+ 3 ˆ = 2 iˆ − 8 ˆj − 106 kˆ at (,3,1 − 2 ) = − x 2 izˆ + (2 xyz − 2 x 2 z ) ˆj + (2 x − 4 y )k
+
+ 51
+
+ 
+
+--- Page 56 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.16
+Evalu ate ∇ × (∇ × A ) if A is a dif ferentiable vector field.
+
+ iˆ ˆj kˆ
+ ∂ ∂ ∂   ∂ A3 ∂ A2  ∂ A1 ∂ A3   ∂ A2 ∂ A1  − − = − ∇ × A = iˆ + k   ˆj +     ˆ ∂ x ∂ y ∂ z  ∂ y ∂ z   ∂ z ∂ x   ∂ x ∂ y 
+ A1 A2 A3
+
+ iˆ ˆj kˆ
+ ∂ ∂ ∂∇ × (∇ × A ) = ∂ x ∂ y ∂ z
+ ∂ A3 ∂ A2 ∂ A1 ∂ A3 ∂ A2 ∂ A1 − − −
+ ∂ y ∂ z ∂ z ∂ x ∂ x ∂ y
+
+  ∂  ∂A2 ∂A1  ∂  ∂A1 ∂A3    ∂  ∂A3 ∂A2  ∂  ∂A2 ∂A1   j=   −  −  −   iˆ +   −  −  −   ˆ
+  ∂y  ∂x ∂y  ∂z  ∂z ∂x    ∂z  ∂y ∂z  ∂x  ∂x ∂y  
+  ∂  ∂A1 ∂A3  ∂  ∂A3 ∂A2   ˆ k +   −  −  −  
+  ∂x  ∂z ∂x  ∂y  ∂y ∂z  
+  ∂ 2 ∂ 2 ∂ 2  A1iˆ + A2 ˆj + A3 kˆ )= −  2 + 2 + 2  ( ∂x ∂y ∂z  
+ ∂  ∂A1 ∂A2 ∂A3  ∂  ∂A1 ∂A2 ∂A3  ∂  ∂A1 ∂A2 ∂A3  + + + + + + + iˆ + ˆj + k       ˆ ∂x  ∂x ∂y ∂z  ∂y  ∂x ∂y ∂z  ∂z  ∂x ∂y ∂z 
+ 2  ∂A1 ∂A2 ∂A3  2 A + ∇ (∇ o A )= −∇ A + ∇  + +  = −∇  ∂x ∂y ∂z 
+
+Example 4.17
+Evaluate ∇o (∇φ) where φ is a scalar field.
+
+ iˆ ˆj kˆ
+    ∂ 2φ  ∂ 2φ ∂ 2φ  ∂ 2φ ∂ 2φ  ∂ 2φ ∂ ∂ ∂ − − − iˆ + j + k ˆ = 0∇ o (∇φ) = ∂ x ∂ y ∂ z =    ˆ    ∂ϕ ∂ϕ ∂ϕ  ∂ y ∂ z ∂ z ∂ y   ∂ z ∂ x ∂ x ∂ z   ∂ x ∂ y ∂ y ∂ x 
+ ∂ x ∂ y ∂ z
+
+Provided φ has continuous second partial derivatives so that the order of
+
+differentiation is immaterial.
+Thus ∇ o (∇φ) = 0
+
+ 52
+
+ 
+
+--- Page 57 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+Example 4.18
+Evaluate ∇o (∇ × A )
+
+ iˆ ˆj kˆ
+ ∂ ∂ ∂ ∇ o (∇ × A ) = ∇ o ∂ x ∂ y ∂ z
+ A1 A 2 A3
+
+   ∂ A3 ∂ A3  ∂ A 2  ∂ A1  ∂ A 2 ∂ A1  = ∇ o − − − iˆ + k  ˆj +      ˆ  ∂ y ∂ z   ∂ z ∂ x   ∂ x ∂ y 
+ ∂  ∂ A3 ∂ A 2  ∂  ∂ A1 ∂ A3  ∂  ∂ A2 ∂ A1 
+ 0 =  −  +  −  +  −  = ∂ x  ∂ y ∂ z  ∂ y  ∂ z ∂ x  ∂ z  ∂ x ∂ y 
+Thus ∇ o (∇ × A ) = 0
+
+Definition: A vector F is called irrotational if curl F = 0
+
+Example 4.19
+
+Show that the vector r 2 is irrotational. r
+
+ i j k
+  r  ∂ ∂ ∂
+ ∂ x ∂ y ∂ z 2 ∇ ×   =  r  2 2 2 −1 2 2 2 −1 2 2 2 −1 x (x + y + z ) y (x + y + z ) z (x + y + z )
+ − 2 ˆ ˆ + [ ] ˆj + [ ]k 2 + y 2 + z 2 ) − 2 + 2 yz (x 2 + y 2 + z 2 ) = [− 2 yz (x ]i
+ = 0 iˆ + 0 ˆj + 0 kˆ = 0
+
+Hence irrotational.
+
+ 53
+
+ 
+
+--- Page 58 ---
+
+CHAPTER 4
+ GRADIENT, DIVERGENCE AND CURL
+
+ QUESTIONS
+
+ 1) Find the angle between the surfaces x 2 + y 2 + z 2 = 9 and z = x 2 + y 2 − 3 at
+
+ the point (2,-1,2)
+
+ Ans. 54 0 2 5 ′
+
+ 2) Let R be the distance from a fixed point A(a,b,c) to any point P(x,y,z).
+
+ Show that ∇ R is a unit vector in the direction AP = R.
+
+ r 3 3) Prove that ∇ o ( ) = 0 r
+
+ 4) Evaluate ∇ × (r f (r ))
+
+ Ans. 0
+
+ 5) Evaluate ∇ 2 f (r )
+
+ d 2 f 2 df Ans. +
+ dr 2 r dr
+
+ 3 ˆ is irrotational. 6) Show that A = (6 xy + z )i ˆ + (3 x 2 − z ) ˆj + (3 xz 2 − y )k
+
+ 7) If A an d B are irrotational, prove that A × B is solenoidal.
+
+ 54
+
+ 
+
+--- Page 59 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Introduction:
+
+In this chapter of the Riemann Integral of a function of a single real variable is
+
+extended to functions of three variables. Line, surface and volume integrals are
+
+treated.
+
+In chapter 4, scalar and vector fields we defined and the properties of gradient,
+
+divergence and curl were discussed; preparing the ground for the three central
+
+theorems in vector analysis:
+
+ (i) The divergence theorem (also the Gauss’ Theorem), which relates the
+
+ integral of a vector field F over a closed surface S to the volume
+
+ integral of div F over the region bounded by S.
+
+ (ii) Stokes’ The orem which relates the integral of a vector field F around
+
+ a closed curve C to the integral of curl F over any open surface S
+
+ bounded by C, and
+
+ (iii) The Green’s Theorem.
+
+Objectives:
+
+We address properties of line integrals. Double and triple integrals have to be
+
+evaluated by expressing them as repeated integrals. We also wish to show that
+
+Green’s Theorem in the plane is a special case of Stokes’ Theorem.
+
+Also, it is of interest to notice that Gauss’ divergence theorem is a generalization of
+
+Green’s theorem in the plane where the region R and its closed boundary C are
+
+replaced by a (space) region V and its closed boundary (surface) S. hence the
+
+divergence theorem is often called Green’s theorem in space.
+
+ 55
+
+ 
+
+--- Page 60 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+LINE INTEGRALS
+Let r (t ) = x (t )i ˆ + y (t ) ˆj + z (t )k ˆ where r ()t is the position vector of (x,y,z,) define a curve
+
+C joining points P1 and P2 where t=t1 and t=t2 respectively.
+
+The curve C is composed of a finite number of curves (see figure) for each of which
+r ()t has a contin uous derivative.
+
+ P 2
+
+ r+ d r
+ d r
+
+ C
+ O r P1
+
+Let F ( x, y, z ) = F1 i ˆ + F2 ˆj + F3 kˆ be a vector function of P2 d r n
+
+position defined and continuous along C. Then the d r n −1
+
+in te gral of the tang ential component of F along C from
+ dr2 C
+ dr1 P1
+P1 t o P2
+
+ 2 F o d r = ∫C F o d r ∫PP1
+
+is an example of a line integral. If F is a force on a particle moving along C, this line
+
+integral represents the work done by the force. If C is a simple closed curve, the
+
+integral around C is of ten denoted by
+
+ ∫ F o d r
+
+In general, any inte gral, which is to be evaluate d alo ng a curve is called a line
+
+in tegral.
+
+If φ is a scalar field, then the line integral of V along the curve C from P1 to P2 is
+
+ ∫C φd r
+
+ 56
+
+ 
+
+--- Page 61 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.1
+
+If φ= xy 2 z evaluate ∫C φd r along the curve C having parametric equations
+
+x = 3t, y = 2t 2, z = t 3 between P1 (0,0,0) and P2 (3,2,1).
+
+ 2 3 8 φ= xy 2 z = (3t )(2t )(t ) = 12t
+ r = ixˆ + jyˆ + zkˆ = 3itˆ + 2t 2 ˆj + t 3 kˆ
+ d r = dxiˆ + dyˆj + dzkˆ = (3i ˆ + 4jtˆ + 3t 2 kˆ )dt
+
+ 2 ˆ + 4jtˆ + 3t 2 kˆ )dt φd r = ∫01 12t 8 (3iThen ∫PP1
+ 8 iˆ + 4t 9 ˆj + 3t 10 kˆ )dt = 12 ∫01 (3t
+ 24 36 = 4iˆ + ˆj + kˆ
+ 5 11
+
+Example 5.2
+
+If φ= xy + y 2 z evaluate ∫C φd r along the curve C defined by x = t 2, y = 2t, z = t + 5
+
+between P1 (0,0,5) and P2 (4,4,7).
+ 6t 3 + 20t 2 kˆ )(2it ˆ + 2 ˆj + kˆ )dt ∫φC d r = ∫02 (
+ 8 = (444i ˆ + 290 ˆj + 145 kˆ )
+ 15
+
+Example 5.3
+
+Find the total work done in moving a particle in a force field given by
+
+F = 3 xyiˆ − 5 jzˆ + 10 xkˆ along the curve x = t 2 +,1 y = 2t 2, z = t 2 from t=1 to t=2.
+ ˆ − 5 jzˆ + 10 xkˆ ) o (dxi ˆ + dyˆj + dz kˆ )Total Work = ∫C F o d r = ∫C (3 xyi
+ = ∫C 3 xydx − 5 zdy + 10 xdz
+ 5 + 10t 4 + 12t 3 + 30t 2 ) dt = 303 = ∫12 (12t
+
+Example 5.4
+
+If F = 3 xyiˆ − y 2 ˆj, evaluate ∫ F o d r where C is the curve in the xy plane, y = 2x 2, from
+
+(0,0) to (1,2).
+For x =,0 y = 0 and x =,1 y = 2
+
+Thus ∫C F o d r = ∫C 3 xydx − y 2 dy
+
+ 57
+
+ 
+
+--- Page 62 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Since y = 2 x 2 ⇒ dy = 4 xdx
+
+and hence we have
+
+ 1  2 2 2  − (2 x ) (4 x ) dx ∫=x 0 3 x (2 x )  
+
+ 7 3 − 16 x 5 ) dx = − 6 ∫=x1 0 (6 x
+
+Example 5.5
+
+Find the work done in moving a particle once around a circle C in the xy plane, if the
+
+circle has center at the origin and radius 3 and if the force field is given by
+
+ 2 ˆ F = (2 x − y + z )i ˆj + (3 x − 2 y + 4 z )k ˆ + (x + y − z )
+
+In the plane z = 0 So that d r = dxiˆ + dyˆj where x = 3 cosθ, y = 3 sin θ where 0 ≤ θ≤ 2 Π
+ ˆ − y )i ˆ + ( x + y ) ˆj + (3 x − 2 y )k ˆ + dyˆj ] ] o [dxiThen ∫C F o d r = ∫C [(2 x
+ − y )dx + ( x + y )dy = ∫C (2 x
+ θ − 3 sin θ)(− 3 sin θ)dθ + (3 cosθ + 3 sin θ)(3 cosθ)dθ] = ∫02 Π [2(3 cos
+ − 9 sin θcosθ)dθ = ∫02 Π (9
+ 2 Π
+  9  =  9θ+ cos 2θ
+  4  0
+ 1 1 = 9 2Π + − 0 − 
+  4 4 
+ = 18Π
+
+Theorem: If F = ∇φ everywhere in a region R of space, where φ( x, y, )z is single-
+
+ valued and has continuous derivatives in R, then:
+
+ 2 F o d r is independent of the path C in R joining P1 and P2. 1) ∫PP1
+
+ 2) ∫C F o d r = 0 around any closed curve C in R. In such a case F is called a
+
+ conservative vector field and φ is its scalar potential. A vector field F is
+
+ conservative if and only if ∇ × F = 0 or F = ∇φ so that
+
+ F o d r = F1 dx + F2 dy + F3 dz = dφ, an exact differential.
+
+ 58
+
+ 
+
+--- Page 63 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.6
+
+ 3 ˆ + x 2 ˆj + 3 xz 2 kˆ is a conservative force field.a) Show that F = (2 xy + z )i
+
+b) Find the scalar potential.
+
+c) Find the work done in moving an object in this field from (1,-2,1) to (3,1,4).
+
+a) F is conservative if ∇ × F = 0
+
+ i j k
+ ∇ × F = ∂∂x ∂∂y ∂∂z = 0
+ 2 xy + z 3 x 2 3 xz 2
+
+ Hence F is conservative.
+
+b)
+
+ ∂φ ∂φ ∂φ F = ∇φ= iˆ + ˆj + kˆ
+ ∂x ∂y ∂z
+ ∂φ ∂φ ∂φ
+ F o d r = dx + dy + dz = dφ
+ ∂x ∂y ∂z
+ 2 dy + 3 xz 2 dz + const. 2 xy + z 3 )dx + x ∴ ∫C F o d r = ∫C (
+ + x 2 dy ) + (z 3 dx + 3 xz 2 dz ) + const. ∴ = ∫C (2 xydx
+
+ 3 2 y ) + d (xz ) + c onst. = ∫C d (x
+ 2 y + xz 3 + const. ∴ φ( x, y, z ) = x
+
+c)
+
+ P2
+ Work done = ∫C F o d r = φ( x, y, z ) P1
+ 2 3 (,1,3 4 ) = [(x y + xz )+ co nst.],1 −1,2
+ = 202
+
+ 59
+
+ 
+
+--- Page 64 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.7
+
+ 2 ˆ + (3 y − 4 x )jIf F = (2 x + y )i ˆ, evaluate ∫C F o d r around the triangle (i) in the indicated
+
+direction.
+
+ Y Y
+ (2,1) (1,1)
+ y 2 = x
+
+ x = y 2
+
+ X X O O (2,0)
+
+ (I) (II)
+
+ ∫C F o d r = ∫C1 + ∫C 2 + ∫C 3
+
+Where C1 is from (0,0) to (2,0) where y is constant.
+
+Where C2 is from (2,0) to (2,1) where x is constant.
+
+Where C3 is from (2,1) to (0,0) where x=2y.
+ + y 2 )dx + (3 y − 4 x )dyHence ∫C F o d r = ∫C (2 x
+
+ 0 1 + y 2 ) + (3 y − 8 y )]dy + 0 )dx + ∫ =1 [2 (4 yand ∫C F o d r = ∫x2= 0 (2 x y = 0 (3 y − 4(2 ))dy + ∫y
+
+ 2
+ 2 3 2 1 3 2 2 3 0 = x y + y ) 3 + ( 2 + ( 2 y − 8 y ) 0 0 1
+ = 4 + 32 − 8 − 32 − 23 = − 143
+
+ 14
+Traversing in the opposite direction gives.
+ 3
+
+Example 5.8
+
+ ˆj. − y ) i ˆ + ( x + y )Evaluate ∫C F o d r around the closed curve C (fig (ii) above), if F = ( x
+ ∫C F o d r = ∫C ( x − y ) dx + ( x + y ) dy = ∫C1 + ∫C 2
+
+Where C1 is curve y=x2 and C2 is y2=x.
+
+ 2 2 x − x 2 ) dx + (x + x )o 2 xdx whe re y = xThus ∫C1 F o d r =∫x1 = 0 (
+
+ 1 = 1 2 x 4 + 13 x 3 + 12 x 2 0 = 43
+ 2 y ( y 2 − y ) + ( y 2 + y )]dy ∫C 2 F o d r = ∫1y =1 [
+
+ 0
+ y = 12 4 1 3 1 2 1 1 1 2 y + 3 y + 2 = − 2 + 3 − 3 = − 3 1
+∴ ∫C 2 F o d r = 43 − 23 = 23
+
+ 60
+
+ 
+
+--- Page 65 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+SURFACE INTEGRALS
+
+If P(x,y) is a po int in the xy-plane, the element of area dxdy Z
+
+has a vector area
+
+ ˆ dxdy dx dynˆ d S = (i ˆdx ) × ( ˆj dy ) = k
+
+ O Y
+ dx p
+ ds
+ X dy
+
+Where kˆ is a vector normal to the plane made by iˆ and jˆ directions.
+
+Thus we write d S = dxdynˆ. On writing dS = dxdynˆ we have d S = ds nˆ dSˆn
+
+where S is a general surface in space, and ds is an element of S
+ ds
+surface.
+
+We also know from the previous chapter that the unit normal nˆ to a surface S is
+
+given by
+
+ grad S ∇ S
+ nˆ = =
+ grad S ∇ S
+
+ ∇ S
+Hence d S = ds
+ ∇ S
+
+For F a vector field and φ a scalar field, the integrals
+
+ ∇S
+ F o ds, ds, n ds, F × d S ∫∫F o d S = ∫∫ F o n ds = ∫∫ ∫∫φ ∫∫φ ∫∫ S S S ∇ S S S S
+
+are examples of surface integrals.
+
+To evaluate surface integrals, it is convenient to
+
+express them as double integrals taken over the Z
+ nˆ
+projected area of the surface S on one of the nˆ
+ ∇ Fcoordinate planes.
+
+The adjacent figure shows a piece S of the surface
+ r
+ ∆ S kF(x,y,z)=C lying above its “shadow” R on ground
+
+plane directly beneath it. We show how to define
+ O Y
+and determine the area of such a surface from the
+
+formula for F as an integral over R when F and its R ∆ A k X
+first partial derivatives are continuous.
+
+ 61
+
+ 
+
+--- Page 66 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+We first define the area of S by dividing the region R into small rectangles ∆Ak.
+
+Directly above each ∆Ak there lies a patch of surface ∆S k that we may approximate
+
+with a port ion of ∆kP of the tangent plane since F(x,y,z)=C may not be a plane. The
+
+vector u and v l ie along the edges of the patch ∆kP in the tangent plane. Both u × v
+and ∇F are normal to ∆kP. Now (u × v ) o nˆ is the area of the orthogonal projection of
+
+the parallelo gram determined by u and v onto a plane wh ose normal is nˆ.
+
+This translates into the statement
+ (u × v ) o nˆ = ∆Ak. ( A)
+
+Now u × v is the area ∆kP. Hence (A) becomes u × v n cos γ = ∆Ak where γ is the
+
+angle between u × v and nˆ.
+
+∴ ∆Pk cos γ = ∆Ak so that
+
+ ∆Ak ∆Pk = provided that cos γ ≠ 0. cos γ
+
+On summing;
+ ∆Ak ∑ ∆Pk = ∑ cosγ
+
+ dA
+or ∑ ∆Pk = ∫∫ R cosγ
+
+We therefore define the area of S to be the value of this integral whenever the
+
+integral exists. For any particular surface F(x,y,z)=C we have
+
+ ∇ F o nˆ = ∇ F n cos γ
+ 1 ∇ F nˆ ∇ F
+or = =
+ cos γ ∇ F o nˆ ∇ F o nˆ
+
+which results into
+
+ ∇ F
+Surface area = ∫∫∇R F o uˆ dA
+
+provided ∇ F o nˆ ≠ 0.
+
+ 62
+
+ 
+
+--- Page 67 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+In case of a smooth surface S given by an equation Z=f(x,y) defined over a region
+
+Rxy in the xy- plane, we write
+
+ F(x,y,z)=f(x,y)-z=0
+
+and consider S as the level surface
+
+ F(x,y,z)=0
+
+of the function F. Taking the normal to be nˆ = kˆ to Rxy we have
+
+ ∇ F = f x iˆ + f y ˆj − kˆ = f x 2 + f y 2 + 1
+
+ ∇ F o nˆ = − kˆ o k = 1
+ ∇ F 2 2
+∴ S = ∫∫ dA = ∫∫ f x + f y + 1 dxdy
+ R xy ∇ F o nˆ R xy
+
+Similarly, formulations are easily given for the area of smooth surface x=f(y,z) over
+
+a region Ryz and y=f(x,z) over region Rxz.
+
+Example 5.9
+
+Find the area of the upper cap cut from the sphere x 2 + y 2 + z 2 = 2 by the cylinder
+
+x 2 + y 2 = 1.
+
+ Z
+ x 2 + y 2 + z 2 = 2
+
+ x 2 + y 2 = 1
+
+ 1 Y
+ 1
+
+ X
+
+ 2 + y 2 + z 2 = 2, projects onto the discThe cap part of the surface F ( x, y, z ) = x
+
+R: x 2 + y 2 = 1 in the xy- plan e. At any point (x,y,z) in the space we have
+
+ F = x 2 + y 2 + z 2
+ ∇ F = 2 ixˆ + 2 jyˆ + 2 zkˆ
+
+ ∇ F = 2 x 2 + y 2 + z 2
+
+On the level surface F = x 2 + y 2 + z 2 = 2
+
+ ∇F = 2 2
+
+ 63
+
+ 
+
+--- Page 68 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Taking nˆ = kˆ;
+
+ ˆ = 2 z ∇ F o nˆ = (2 ix ˆ + 2 jyˆ + 2 zkˆ ) o k
+
+Then
+ ∇ F 2 2 dA
+ S = ∫∫∇R F o nˆ dA = ∫∫R 2 z d∆ = 2 ∫∫R z
+
+Now since we are in the xy- plane, we have from
+
+ x 2 + y 2 + z 2 = 2 that z = 2 − x 2 − y 2
+
+Hence
+
+ dxdy
+ S = 2 ∫∫
+ x 2 + y 2 ≤ 1 2 − x 2 − y 2
+
+We let x = r cosθ, y = r sin θ, 0∠r ∠,1 0 ∠θ∠ 2 Π then, dxdy = Jdrd θ, where J is the
+Jacobian of (x,y) with respect to (,rθ), i.e.
+
+ ∂x ∂y
+ cosθ sin θ ∂r ∂r J = = = r
+ ∂x ∂y − r sin θ r cosθ
+ ∂θ ∂θ
+
+Hence dxdy = rdrd θ
+
+ 1 2 Π
+ rdrd θ 2 ΠThen S = 2 = 2 ( 2 − 1)dθ = 2 Π (2 − 2 ) ∫∫ 2 ∫0 r = 0 θ= 0 2 − r
+
+Example 5.10
+
+Find the area of the surface cut from the bottom of the parabo loid z = x 2 + y 2 by the
+
+plane z = 1.
+
+The surface projects onto the disk R: x 2 + y 2 = 1 in the xy- plane. We apply
+
+ 2 + y 2 to get z = f ( x, y ) = x
+
+ 4 x 2 + 4 y 2 + 1 dxdy ZArea = ∫∫ fx 2 + fy 2 + 1 dxdy = ∫∫
+ Rxy x 2 + y 2 ≤ 1
+ z = 1 2 2 2 Π 1 z = x + y
+ 2 Π S = 4 r + 1 drd θ= (5 5 − )1 ∫∫ R = 0 r = 0 6
+ Y
+ O
+
+ X
+
+ 64
+
+ 
+
+--- Page 69 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.11
+
+E v aluate ∫∫ F o nˆ dS, where F = 18 izˆ − 12 ˆj + 3 ykˆ and S is that part of the plane
+ S
+2 x + 3 y + 6 z = 12 which is located in the first octant.
+
+If S is part of the level surface G(x,y,z)=C then nˆ may be taken to be one of the two
+vectors
+ ∇ G ∇ G
+ nˆ = + or nˆ = −
+ ∇ G ∇ G
+
+depending on which vector gives the preferred direction. Thus let
+ G = 2 x + 3 y + 6 z
+ ∇ G 2iˆ + 3 ˆj + 6 kˆ
+ nˆ = + =
+ ∇ G 7
+ ∇ G 7
+ dS = dA = dA
+ ∇ G o kˆ 6
+
+On the surface S, the value F o nˆ is given by the formula
+ (18 iz  2iˆ + 3 ˆj + 6 kˆ  36 z − 36 + 18 y ˆ − 12 ˆj + 3 ykˆ ) o =    7  7
+Thus the flux of F outward through S is
+ 36 z − 36 + 18 y 7 3 − x ) dxdy where 6 z = 12 − 2 x − 3 y ∫∫ F o nˆ dS = ∫∫ o dA = ∫∫ ( S S 7 6 R xy
+Now, along the x-axis; y=0, z=0 and we integrate from 0 to 6. From the given
+surface on the xy-plane, z=0 so that along the y-axis, we integrate from 0 to
+12 − 2 x.
+ 3
+ (12 − 2 x ) 2 6 3 6  4 x  ∫x = 0 ∫y = 0 (6 − 2 x ) dydx = ∫x = 0 24  − 12 x + 3  dx = 24
+
+Example 5.12
+
+A vector field F = iyˆ + 2 ˆj + kˆ exists over a surface S defined by x 2 + y 2 + z 2 = 9
+
+bounded by x =,0 y =,0 z = 0 in the first octant. Z
+
+Evaluate ∫F o d S over the indicated surface. nˆ
+ p
+ ∇ S θ d S = nˆdS; nˆ =;
+ ∇ S
+ 3 Y φ
+ 3
+ S: x 2 + y 2 + z 2 − 9 = 0 X x 2 + y 2 = 9, z = 0
+
+ ∇ S = 2 ixˆ + 2 jyˆ + 2 zkˆ
+
+ ∇ S = 4 x 2 + 4 y 2 + 4 z 2 = 2 x 2 + y 2 + z 2 = 2 9 = 6
+
+ 65
+
+ 
+
+--- Page 70 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ 1 nˆ = (ix ˆ + jyˆ + z kˆ )
+ 3
+ ∇ S 6
+∴ dS = dA = dA for z ≥ 0
+ ∇ S 2 z
+
+ ( xy + 2 y + z ) 1 F o nˆ = ( iy ˆ + 2 ˆj + kˆ ) o ˆ + jyˆ + z kˆ ) = 3 (ix 3
+ ( xy + 2 y + z ) 3 ( xy + 2 y + z )∴ ∫∫ F o nˆ dS = ∫∫ 3 o z dA = ∫∫ z dA
+ S S S
+
+The projection of S on the xy- plane is the region R bounded by the circle
+
+x 2 + y 2 =,9 z = 0. Then
+
+ ( xy + 2 y + z )
+ ∫∫ F o nˆ dS = ∫∫ z dxdy
+ S R
+
+Converting to spherical polar c oordinates;
+ x = 3 sin θcosφ, y = 3 sin θsin φ, z = 3 cosθ 0 ≤ θ≤ Π2; 0 ≤ φ≤ Π2
+
+So that
+
+  x, y 
+ dθdφ= 9 sinθdθdφ dS = J    θ,φ
+
+and we have
+
+ Π Π
+ 2 2
+ 1 2 θsinφcosφ+ 6 sinθsinφ+ 3 cosθ)9 sinθdθdφ 3 (9 sin ∫∫
+ 0 0
+
+ Π
+ 2 Π
+ 2 φ Π 3 Π 2 = 9 (1 + ) 4 φ− 2 co sφ+ sinφcosφ+ Π2 sin φ+ 12 ) dφ= 9 [sin 2 ]0 = 9 ∫ (
+ 0
+
+Example 5.13
+
+Evaluate ∫∫ F o nˆ dS where F = izˆ + jxˆ − 3 y 2 z + kˆ
+ S
+ Z
+and S is the surface of the cylinder x 2 + y 2 = 16
+ z = 5
+included in the first octan t between
+ z = 0 and z = 5
+
+ ∇ S 2 ixˆ + 2 jyˆ ixˆ + jyˆ
+ nˆ = = =
+ ∇ S 2 2 4 5 4 (x + y )
+ z = 0
+ ∇ S 4 0 dS = dA = dA Y 4 ∇ S o ˆj y
+
+ X
+
+ 66
+
+ 
+
+--- Page 71 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Here projection is upon the xz- plane. We could also have projected on the yz-plane
+
+but not on the xy since the surface x 2 + y 2 = 16 has no z component.
+
+ xz + xy ixˆ + jyˆ  =Thus F o nˆ = (iz ˆ + jxˆ − 3 x 2 z kˆ ) o 
+ 4 4  
+
+ 4 5  xz  5 xz + xy 4Hence x 4 z + 8 ) dz = 90  ∫∫ F o nˆ dS = ∫∫ 4 o y dA = ∫∫  2 + dzdx = ∫ ( S S x = 0 z = 0  16 − x  z = 0
+
+Example 5.14 Z
+
+Evaluate ∫∫ F o nˆ dS where S is the surface of the nˆ dS
+ S
+
+sphere x 2 + y 2 + z 2 = a 2 above the xy- plane and S
+ Y
+F = ixˆ + jyˆ − 2 zkˆ. x 2 + y 2 = a 2, z = 0
+ X
+
+Projection of S on the xy- plane is the region R bounded by the circle
+
+x 2 + y 2 = a 2, z = 0.
+
+ ∇ S 2 ixˆ + 2 jyˆ + 2 zkˆ ixˆ + jyˆ + zkˆ
+ nˆ = = =
+ ∇ S 2 2 2 a 4 (x + y + z )
+ ∇ S a
+ dS = dA = a dA = dz
+ ∇ S o ˆj z
+
+  ixˆ + jyˆ + zkˆ  x 2 + y 2 − 2 z 2 F o nˆ = (ix ˆ + jyˆ − 2 z kˆ ) o =    a  a
+
+ x 2 + y 2 − 2 z 2 a x 2 + y 2 − 2 z 2
+ dA ∫∫ F o nˆ dS = ∫∫ o dA = ∫∫ S S a z S z
+
+In spherical polar coordinates
+
+x = a sin θcos φ, y = a sin θsin φ, z = a cosθ and dA = a 2 sin θdθdφ 0 ≤ θ≤ 2 Π, 0 ≤ φ≤ Π
+
+ 2 Π Π
+ a 2 sinθcos 2 φ+ a 2 sin 2 θsin 2 φ− 2 a 2 cos 2 θ 2 o a sinθdθdφ∫∫ F o nˆ dS = ∫∫ S θ= 0 φ= 0 a cosθ
+ 2 Π Π
+ = a 2 [sin 2 φ− 2 cos 2 θ]tanθdθdφ ∫∫
+ θ= 0 φ= 0
+
+ 67
+
+ 
+
+--- Page 72 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ 2 Π Π
+ = a 3 (sin 2 φtanθ− 2 sinθcosθ)dθdφ ∫∫
+ θ= 0 φ= 0
+ 2 Π Π
+ = a 3 (sin 2 φtanθ− sin 2θ)dθdφ ∫∫
+ θ= 0 φ= 0
+ Π 2 Π Π = a 3 ∫ [− In cosθ sin 2 φ+ 12 cos 2θ]0 dφ = a 3 ∫ 0 dφ = 0 φ= 0 φ= 0
+
+VOLUME INTEGR ALS
+
+If V is a closed region bounded by a surface S and F is a vector field at each point
+
+of V and on its boundary surface S, then
+ ∫VF dV = ∫∫∫ F dV
+ V
+
+is the volume integral of F throughout the region. In most standard texts, triple
+
+integrals are used as notation for volume integral.
+
+ Z
+
+Example 5.15
+ 4
+Evaluate V∫ F dV where V is the region bounded by the
+
+planes x=0, x=2, y=0, y=3, z=0, z=4, and F = xyiˆ + jzˆ − x 2 kˆ dV
+
+F = xyiˆ + jzˆ − x 2 k;ˆ dV = dxdydz
+ O Y
+ 3
+∴ F dV = 4 3 2 (xyi ˆ + jzˆ − x 2 kˆ )dxdydz 2 ∫V ∫∫∫0 0 0
+
+ X
+
+ 4 3 8 4=  2 iy ˆ + 2 jzˆ − kˆ  dydz = (9i ˆ − 6 jzˆ − 8 kˆ )dz = 4 (9i ˆ + 12 ˆj − 8 kˆ ) ∫∫0 0 ∫0  3 
+
+Example 5.16
+
+Evaluate V∫ F dV where F = 2iˆ + 2 jzˆ + ykˆ and V is the region bounded by the planes z=0,
+
+z=4 and the surface x 2 + y 2 = 9.
+
+ 68
+
+ 
+
+--- Page 73 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ Z
+Since we have a cylinder, we convert our coordinate system
+ 4
+into the cylindrical one.
+
+ dV
+
+Thus we have x = ρcosφ, y = ρsin φ, z = z where
+
+0 ≤ φ≤ 2 Π, 0 ≤ ρ≤,3 0 ≤ z ≤ 4 O Y
+ φ 3
+
+ 3
+Hence X
+ F dV = (2i ˆ + 2 jzˆ + ykˆ )dxdydz∫V ∫∫∫
+ V
+
+ 2 Π 3 4 2 Π 3 4
+ ρdρdφ (2i ˆ + 2 jzˆ + ρs in φkˆ )ρdρdφdz == ∫∫φ= 0 ρ= 0 ∫z = 0 ∫∫φ= 0 ρ= 0 [2 iz ˆ + z 2 ˆj + ρsin φkˆ ]0
+
+ 2 Π 3 2 Π  2 2 ρ3  2 dφ (8ρi ˆ + 16ρ ˆj + 4ρ sin φkˆ )dρdφ= 4 iˆ + 2ρ ˆj + sin φkˆ = ∫∫0 0 ∫0  ρ  3 
+
+ 2 Π ˆ + 2 ˆ)j= 36 (i ˆ + 2 ˆj + si nφkˆ )dφ= 72 Π (i ∫0
+
+Example 5.17
+ + y )dV where V is the closed region bounded by the cylinder and theEvaluate V∫ (2 x
+
+planes x=0, y=0, y=z and z=0
+
+We have
+
+ 2 2 4 − x 2 2 2 − x )(2 x + y ) dxdy ∫x = 0 ∫y = 0 ∫z = 0 (2 x 2 + y ) dxdydz = ∫x = 0 ∫y = 0 (4
+
+ 80 + 16 x − 2 x 2 − 4 x 3 ) dx = ∫x2= 0 (8 3
+
+Example 5.18
+
+Evaluate x 2 + y 2 dxdydz, where V is the region bounded by z=x2+y2 and V∫∫∫
+
+z=8-(x2+y2).
+
+ 69
+
+ 
+
+--- Page 74 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ Z
+For this case we use cylindrical coordinates.
+ Z = 8
+ x = ρcosφ, y = ρsin φ, z = z
+ x 2 + y 2 = z ⇔ ρ2 cos 2 φ+ ρ2 sin 2 φ= z
+ ⇒ ρ2 = z or ρ= ± z s aid region
+
+ 2 Π 4 z
+ ∫∫∫ x 2 + y 2 dxdydz = ∫∫∫φ= 0 z = 0 ρ= − z ρ2 dρdzdφ Z = 4
+ V
+ 2 Π 4 3
+ z 2 dzdφHence = 23 ∫∫φ= 0 z = 0
+
+ 4 2 2 2 Π 5
+ 4 2 256 Z = 8 − x + y dφ= Π = 15 ∫φ= 0 z 0 15
+ Y
+ P = 2 2
+ XEXERCISE
+
+Q1. If F = ∇φ, where φis single-valued and has continuous partial derivatives,
+ show that the work done in moving a particle from one point P1 ≡ ( x, y, )z in
+ this field to another point P2 ≡ ( x 2, y 2, z 2 ) is independent of the path joining the
+
+ two points.
+Q2. Show ( y 2 z 3 cos x − 4 x 3 z ) dx + 2 z 3 y sin xdy + (3 y 2 z 2 sin x − x 4 )dz is an exact differential
+
+ of a fu nction φand find φ.
+
+ Ans. φ= y 2 z 3 sin x − x 4 z + const.
+ Y
+ (1,1)
+ y 2 = xQ3. Evaluate ∫C F o d r around the closed curve of figure
+
+ ˆj. y = x 2 adjacent if F = ( x − y )i ˆ + ( x + y )
+ X
+ Ans. 2 O
+ 3
+
+ ˆj, compute the circulation of F about a circle C in theQ4. If F = ( y − 2 x )i ˆ + (3 x + 2 y )
+
+ xy- plane with center at origin and radius 2, if C is traversed in the positive
+
+ direction
+
+ An s. 8Π
+
+ ˆ is a conservativeQ5. a) Prove that F = ( y 2 cos x + z 3 )i ˆ + (2 y sin x − 4 ) ˆj + (3 xz 2 + 2 )k
+
+ force field.
+
+ b) Find the scalar potential for F.
+
+ 70
+
+ 
+
+--- Page 75 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ c) Find the work done in moving an object in this field from (0, 1, -1) to
+ ( Π,−2,1 ). 2
+
+ Ans. b) φ= y 2 sin x + xz 3 − 4 y + 2 z + const. c) 15 + 4Π.
+
+Q6. Evaluate ∫∫ F o nˆ dS for each of the following cases;
+ S
+
+ a) F = iyˆ + 2 jxˆ − zkˆ and S is the surface of the plane 2x+y=6 in the first octant
+
+ cut off by the plane z=4.
+
+ 2 ˆ − 2 jxˆ + 2 yzkˆ and S is the surface of the plane 2x+y+2z=6 in the b) F = ( x + y )i
+
+ first octant.
+
+ Ans. a) 108 b) 81
+Q7. Evaluate R∫∫ x 2 + y 2 dxdy over the region in the xy- plane bounded by the plane
+
+ x 2 + y 2 = 36.
+
+ Ans. 144 Π
+
+ ˆ − 2 xyˆj − 4 xkˆQ8. If F = (2 x 2 − 3 z )i
+
+ Evaluate a) V∫∇o F dV
+
+ b) ∫V ∇ × F dV
+
+ where V is the closed region bounded by the planes x=0, y=0, z=0 and
+
+ 2x+2y+z=4
+ Ans. a) 8 b) 8 ( ˆj − kˆ ) 3 3
+
+DIVERGENCE THEOREM (GAUSS’ THEOREM) Z
+
+For a closed surface S, enclosing a region V in a vector
+
+field F V S
+
+ ∫∫∫ ∇ o F dV = ∫∫ F o nˆ dS = ∫∫ F o d S
+ V S S
+
+In general, this means that the volume integral on the left- O Y
+
+hand side can be expressed as a surface integral on the
+
+ X
+right-hand surface.
+
+ 71
+
+ 
+
+--- Page 76 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.19
+
+Evaluate ∫∫ F o nˆ dS over the entire surface of the region bounded by the cylinder
+ S
+x2+z2=9, x=0, y=0, z=0 and y=8, if F = 6 iˆz + (2 x + y )jˆ − xkˆ.
+
+Apply divergence theorem
+
+ ∫∫ F o nˆ dS = ∫∫∫ ∇ o F dV
+ S V
+
+ 3 8 9 − x 2  ∂ ∂ ∂  o (6 iˆz + (2 x + y ) jˆ − xkˆ )dxdydz = ∫x =0 ∫y =0 ∫z =0  iˆ + jˆ + kˆ   ∂x ∂y ∂z 
+
+ = ∫x3=0 ∫y8=0 ∫z =90− x 2 dxdydz = ∫x3=0 ∫y8=0 9 − x 8 2 dydx = ∫x =0 9 − x 2 dx
+
+On letting x = 3 cosθ, dx = −3 sinθdθ, Π ≤ θ≤ 0
+ 2
+
+ 2 θ o −3 sinθdθ = 8 ∫θ0=Π 9 − 9 cos
+ 2
+
+ Π
+
+ 0 2 θ sin 2θ 2 − 72 ∫Π sin θdθ = 72 − = 18Π
+ 2  2 4  0
+
+Example 5.20
+
+Evaluate ∫∫ F o nˆ dS over the entire surface of the region above the xy- plane bounded
+ S
+
+by the cone z2=x2+y2 an d the plane z=4, if F = 4 xzˆi + xyz 2 ˆj + 3 z kˆ.
+
+ Z
+ z = 4
+By divergence theorem;
+ x 2 + y 2 = z 2
+ o F dV ∫∫ F o nˆ dS = ∫∫∫ ∇
+ S V Y
+
+ 2 2 X 4 z z − x 2 + 3 )dydxdz = 2 2 (4 z + xz ∫∫z = 0 x = − z ∫y = − z − x
+
+ = 2 4 z (4 z + xz 2 + 3 ) z ∫∫z = 0 x = − z 2 − x 2 dxdz
+
+With x = z sinθ; dx = z cosθdθ; − Π ≤ θ≤ Π
+ 2 2
+
+ 72
+
+ 
+
+--- Page 77 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+So that we have
+
+ 4 Π
+ 2 2 cos 2 θdθdz 3 sinθ+ 3 )z Π (4 z + z = 2 ∫z =0 ∫θ= −
+ 2
+ 3 + 3 z 2 ) dz Π∫04(4 z
+ = 320Π
+
+Example 5.21
+
+Verify the divergence theorem for F = 4 ixˆ − 2 y 2 ˆj + z 2 kˆ taken over the region
+
+bounded by x2+y2=4, z=0 and z=3
+ Z
+
+Volume Integral S: z = 3
+ 2
+ o F dV S 3 ∫∫∫ ∇
+ r
+
+ O Y
+
+ 2 4 − x 2 3
+
+ 1 4 − 4 y + 2 z ) dzdydx 2 X = ∫x = −2 ∫y = − 4 − x S: z = 0 ∫z = 0 (
+
+ = 84Π
+
+The surface S of the cylinder consists of a base S1(z=0), the top S2(z=3) and the
+convex portion S3(x2+y2=4). Then
+
+Surface Integral
+
+ F o nˆ dS 3 ∫∫ F o nˆ dS = ∫∫ F o nˆ dS1 = ∫∫ F o nˆ dS 2 = ∫∫
+ S S1 S 2 S 3
+
+ On S 1 ( z = 0 ); nˆ = − k;ˆ F = 4 xi F o nˆ dS 1 = 0 ˆ − 2 y 2;ˆj F o nˆ =,0 so that ∫∫
+ S1
+
+ On S 2 ( z = 3 ); nˆ = k;ˆ F = 4 ix dS 2 ˆ − 2 y 2 ˆj + 9 k;ˆ and F o nˆ =,9 so that ∫∫ F o nˆ dS 2 =9 ∫∫
+ S 2 S 2
+ = 36 Π sin ce area of S 2 = 4Π
+ 2 + y 2 = 4 ); On S 3 ( x
+A perpendicular to x 2 + y 2 = 4 has the direction ∇ ( x 2 + y 2 ) = 2 iˆx + 2 jˆy.
+
+ 73
+
+ 
+
+--- Page 78 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ ∇ S iˆx + jˆy
+Then a un it normal is n = =.
+ ∇ S 2
+
+  iˆx + jˆy 
+ = 2 x 2 − y 3 F o nˆ = (4 iˆx − 2 y 2 jˆ + z 2 kˆ ) o  
+  2 
+ 2 − y 3 )dS 3 ∴ ∫∫ F o nˆ dS 3 = ∫∫ (2 x
+ S 3 S 3
+
+Now since the radius of the cylinder 2; in cylindrical polar coordinates; we have
+ x = 2 cosθ, y = 2 sinθ, z = z so that dS 3 = 2 dθdz
+ θ− 48 sin θ)dθ = 48Π ∴ ∫∫ F o nˆ dS 3 = ∫θ2=Π0 ∫t3=0 [2 (2 cos 2 3 2Π 2 3 θ) − (2 sinθ) ]2 dzdθ = ∫θ=0 (48 cos
+ S 3
+
+Then the surface integral = 0 + 36 Π + 48Π = 84Π. Hence verified.
+
+NB: Evalu ation of the surface integral over S could also have been done by projection of
+
+ S3 on the xz or yz coordinate planes.
+
+QUESTIONS:
+
+Q1. Verify the Gauss divergence theorem for the vector field F = ixˆ + 2 ˆj + z 2 kˆ
+
+ taken over the region bounded by the planes z=0, z=4, x=0, y=0 and the
+
+ surface x2+y2=4 in the first octant.
+
+ An s. 20Π
+
+ 2 jˆ + yzkˆ and S is the surface of the cubeQ2. Evaluate ∫∫ F o nˆ dS where F = 4 xziˆ − y
+ S
+
+ bounded by x=0, x=1, y=0, y=1, z=0, z=1.
+
+ Ans. 3
+ 2
+
+Q3. Evaluate ∫∫ r o nˆ dS, where S is a closed surface.
+ S
+
+ Ans. 3V
+
+ 2 2 ϕ− ϕ∇Q4. Prove that ∫∫∫ (φ∇ φ)dV = ∫∫ (φ∇ϕ− ϕ∇φ) o d S.
+ V S
+
+Q5. Let S be a closed surface and let r denote the position vector of any point (x,y,z)
+
+ measured from an origin O. prove that:
+
+ nˆ o r 0 if 0 lies outside S. d S = ∫∫ 4Πif 0 lies inside S. S r 3
+
+ 74
+
+ 
+
+--- Page 79 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Q6. Evaluate ∫∫ F o d S over the hemisphere defined by x2+y2+z2=25 with z ≥ 0,
+ S
+ where F = ( x + y )iˆ − 2 jˆz + ykˆ
+
+G REEN’S THEOREM:
+
+Let C be a simple closed curve in the xy- plane such that a line parallel to either axis
+
+cuts C in at most two points. Let M, N and ∂N and ∂M be continuous functions ∂x ∂y
+
+of (x,y) inside and on C. let R be the region inside C.
+
+  ∂M ∂N 
+ dxdyThen ∫ Mdx + Ndy = − ∫∫  −  R  ∂y ∂x 
+
+where C is traversed in the positive (counter clockwise) sense.
+
+PROOF
+ Y
+Let the equations of the curves AEB and AFB (see
+ F
+ f
+adjoining figure) be y=Y1(x) and y=Y2(x) respectively. If
+ R BR is the region bounded by C, A
+
+ E
+we have
+ X
+ ∂M b  Y2 ( x ) ∂M  b Y2 ( x ) O b
+ M dx ( x, y ) a∫∫ dxdy = ∫∫a y =Y1 ( x ) y =Y1 ( x ) ∂y R ∂y  dy  dx = ∫
+
+= ∫ab[M ( x, y 2 ) − M ( x, y1 )]dx = − ∫ab M ( x, y1 ) dx − ∫ M ( x, y 2 ) dx = − ∫CMdx
+
+Then
+
+ ∂M
+ ∫ Mdx = − ∫∫ dxdy i( )
+ M ∂y
+
+ 75
+
+ 
+
+--- Page 80 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Similarly let the equations of curves EAF and EBF be x=X1(y) and x=X2(y)
+
+respectively. Then
+
+ f ∂N f  X 2 ( y ) ∂N 
+
+ e ∫∫ dxdy = dy = [N ( X 2, y ) − N ( X 1, y )] dy ∫y = e  ∫x = X 1 ( y ) ∂x  ∫ R ∂x
+
+ = ∫e f N ( X 1, y ) dy + ∫e f N ( X 2, y ) dy = ∫C Ndy (ii )
+
+From (i) and (ii) we have
+
+  ∂M ∂N 
+ ∫C Mdx + Ndy = − ∫∫  −  dxdy. R  ∂y dx 
+
+Example 5.22
+
+ 2 + 9 y 2 = 16, − y ) dx + (2 y + x ) dy around the boundary C of the ellipse xEvaluate ∫C (2 x
+
+ ∂M ∂N
+M = 2 x − y, = −1, N = 2 y + x, = 1
+ ∂y ∂x
+ ∫C (2 x − y ) dx + (2 y + x ) dy = − ∫∫ (− 1 − 1)dxdy = 2 ∫∫ dxdy
+ R R
+
+But ∫∫dxdy is the area of the ellipse x 2 + 9 y 2 = 16, i.e.
+ R
+
+ x 2 9 y 2 4 16 Π
+ + = 1 ∴ a = 4, b = A =
+ 16 16 3 3
+
+ 32Π − y ) dx + (2 y + x ) dy = 2 ∫∫ dxdy =Hence ∫C (2 x
+ R 3
+
+Example 5.23
+
+Using Green’s Theorem, find the area enclosed by the ellipse
+
+ x = a cosθ, y = b sinθ0, ≤ θ≤ 2Π.
+
+If we take M=-y, N=x and apply Green’s Theorem, we obtain
+
+ 2Π 2Π θ = 2Πab ∫ Mdx + Ndy = ∫ − ydx + xdy = ∫0 ab (sin 2 θ + cos 2 θ) dθ = ∫a abd
+
+  x  2  y  2where we have   +   = 1 as equation of an ellipse.
+  a   b 
+
+ 76
+
+ 
+
+--- Page 81 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.24
+
+ 2 )dx + x 2 dy YVerify Green’s Theorem in the plane for ∫ ( xy + y (1,1)
+where C is the closed curve of the region bounded by y=x y x
+and y=x2. y = x 2
+Along y=x2, the line integral equals X O
+
+ 1 1
+ 2 4 (( x )(x ) + x )dx = (3 x 3 + x 4 )dx = 19 ∫0 ∫0 20
+
+Along y=x from (1,1) to (0,0), the line integral equals
+
+ 0 0
+ 2 (( x )( x ) + x )dx + x ∫1 2 dx = ∫1 3 x 2 dx = −1
+
+ 19 1
+The required line integral − 1 = −.
+ 20 20
+
+Apply Green’s Theorem,
+
+ ∂M ∂N  ∂ ∂  2 − + y 2 ) − ( x dxdy = − ∫∫  ( xy ) dxdy − ∫∫   R  ∂y ∂x  R  ∂y ∂x 
+ 2 dx ) − 2 y ) dxdy = ∫x = 0 ( xy − y ∫∫ ( x − 2 y ) dxdy = ∫x1= 0 ∫ yx= x 2 ( x 1 x x 2
+ R
+
+ 1 1 4 − x 3 ) dx = −. ∫x= 0 ( x
+ 20
+
+So that the theorem is verified.
+
+Green’s theorem can in fact, be applied to a region that is not simply connected by
+
+arranging a link between outer and inner boundaries, provided the path of
+
+integration is such that the region is kept on the left-hand side.
+
+ YThe shaded region R, shown in the figure H
+
+adjacent, is multiply connected since not every
+ C B G
+closed curve lying in R can be shrunk to a point A R
+
+ D
+without leaving R, as is observed by considering a E
+ F
+curve surrounding BCDB for example. X O
+
+The boundary AHGFEA and the interior boundary BCDB; is to be traversed in the
+
+counter-clockwise sense, so that the region is kept on the left-hand side. The
+
+positive directions are those indicated in the adjoining figure. We construct the
+
+ 77
+
+ 
+
+--- Page 82 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+cross-cut AB connecting the exterior and interior boundaries. The region bounded by
+
+ABCDBAEFGHA is simply-connected, and so Green’s theorem is valid. Then
+
+  ∂M ∂N 
+ dxdy. ∫ Mdx + Ndy = − ∫∫  −  ABCDBAEFGHA R  ∂y ∂x 
+
+But the integral on the left, leaving out the integrand is equal to
+ ∫AB + ∫BCDB + ∫ + ∫AEFGHA = ∫BCDB + ∫AEFGHA
+Since ∫AB = − ∫. Thus, if C1 is the curve AEFGHA, C2 is the curve BCDB and C is the
+
+boundary of R consisting of C1 and C2 traversed in the positive sense, then
+ ∫C 1 + ∫C 2 = ∫C so that
+
+  ∂N ∂M 
+ C∫ Mdx + Nd y = ∫∫  −  dxdy R  ∂x ∂y 
+
+Example 5.25
+
+Express Green’s theorem in the plane in vector notation. We have
+Mdx + Ndy = (Miˆ + Njˆ ) o (dxiˆ + dyjˆ ) = F o d r where F = Miˆ + Njˆ and r = iˆx + jˆy so that
+
+d r = dxiˆ + dyjˆ
+
+Also if F = Miˆ + Njˆ then,
+
+ iˆ jˆ kˆ
+ ∂ ∂ ∂ ∂N ∂M  ∂N ∂M∇ × F = = − iˆ + jˆ +  −  kˆ ∂x ∂y ∂z ∂x ∂y  ∂x ∂y 
+ M N O
+
+ ∂N ∂MSo that (∇ × F ) o kˆ = − ∂x ∂y
+
+The Green’s theorem in the plane can be written
+ ∇ × F ) o kˆdR ∫C F o d r = ∫∫ (
+ R
+
+where dR=dxdy
+
+A generalization of this to surface S in space having a curve C as boundary leads
+
+quite naturally to Stokes’ theorem which is treated later.
+
+ 78
+
+ 
+
+--- Page 83 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Example 5.26
+Evaluate the line integral ∫ xydx + (2 x − y ) dy round the region bounded by the curve
+
+y=x2 and x=y2 by use of Green’s theorem.
+
+Points of intersection are O(0,0) and A(1,1).
+ Y
+ (1,1)
+  ∂ ∂  y 2 = x − (2 x − y ) dxdy ∫C Mdx + Ndy = − ∫∫ ( xy ) R  ∂y ∂x 
+ y = x 2
+ 1 x − 2 ) dxdy = − ∫∫ ( x − 2 ) dxdy = − ∫∫0 y = x 2 ( x R X O
+
+ 3 2 − x 3 − 2 x 1 2 + 2 x 2 ) dx = 31 = − ∫01 ( x
+ 60
+
+In the special case when M=y and N=-x
+
+ ∂M ∂N
+ = 1 and = −1
+ ∂y ∂x
+
+Green’s theorem then states
+ ∫∫1 − (− 1) dxdy = − ∫C ( Mdx + Ndy )
+ R
+
+ i.e. 2 dxdy ∫∫
+ R
+ = − ∫C ydx − xdy = ∫C xdy − ydx
+
+Therefore the area of the closed region
+
+ 1 − ydx ). A = ∫∫ dxdy = ∫C ( xdy
+ R 2
+
+QUESTIONS
+ + 4 y ) dx + (2 x − 3 y ) dy where C, a circle of radius 2 with center atQ1. Evaluate ∫C (3 x
+
+ the origin of the xy- plane, is traversed in the positive sense.
+
+ Ans. − 8Π
+ 2 − 2 xy ) dx + ( x 2 y + 3 ) dy around the boundary of the region definedQ2. Evaluate ∫C ( x
+
+ by y2=8x and x=2.
+
+ a) directly
+
+ b) by using Green’s theorem
+
+ 128
+ Ans. 5
+
+ 79
+
+ 
+
+--- Page 84 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+ (Π 2, ) 2 2 6 xy − y ) dx + (3 x − 2 xy ) dy along the cycloidQ3. Evaluate ∫(0 0, ) (
+
+ x = θ − sinθ, y = 1 − cos θ
+
+ Ans. 6 Π 2 − 4Π.
+Q4. Evaluate (3 x 2 + 2 y )dx − ( x + 3 cos y ) dy around the parallelogram having ∫
+
+ vertices at (0,0), (2,0), (3,1) and (1,1).
+
+ Ans. –6.
+
+Q5. Determine the area of the adjacent figure enclosed by y=3x2 and y=6x.
+
+ Ans. 4
+ Y
+
+ 12 A(2,12)
+Q6. Determine the area bounded by the curve y=2x3, y = 6 x
+ y=x3+1 and the axis x=o for x ≥ 0
+
+ Ans. 34 2 y = 3x
+
+ X
+ O 2
+
+STOKES' THEOREM
+
+States that if S is an open, two-sided surface bounded by a closed, non-intersecting
+ r
+curve C, then if F has co ntinuous derivatives
+ r r r r r
+ ∫c F o dr = ∫∫ (∇ × F ).nˆ ds = ∫∫ (∇ × F ).ds
+ S S
+
+where C is traversed in the positive direction. We omit the proof for it is long and
+
+winding.
+
+Example 5.26
+ r
+ ˆ 2 2Verify Stokes’ theorem for F = ( 2 x − y ) l − y z j − y z,ˆK
+
+where S is the upper half surface of the sphere x 2 + y 2 + z 2 = 1 and C is its boundary.
+
+The boundary C o f S is a circle in the xy plane of radius one and centre at the origin.
+
+ 80
+
+ 
+
+--- Page 85 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+Let x=cos t, y = sin t, z = 0, 0 ≤ t ≤ 2 Π be parametric equations of C. Then
+
+ 2 Π r r 2 2
+ ∫C F o d r = ∫C ( 2 x − y ) dx − yz dy − y zdz = ∫o ( 2 cos t − sin t )( − sin t ) dt = Π
+
+ i j k
+ r ∂ ∂ ∂ ˆAlso, ∇ × F = = k
+ ∂x ∂y ∂z
+ 2 x − y − yz − y 2 z
+ r
+ ˆThen dxdy ∫∫ (∇ × F ) o nˆ ds = ∫∫ k o nˆ ds = ∫∫
+ s s R
+
+since nˆ o kˆds = dxdy and R is the projection of S on the xy- plane. This last integral
+
+equals
+
+ 1 1− x 2 2 1 1− x 1
+ ∫ ∫ dydx = 4 ∫∫0 0 dydx = 4 ∫0 1 − x 2 dx = Π
+ x = −1 y = − 1− x 2
+
+And the Stokes’ theorem is verified.
+
+Example 5.27
+
+A surface S consists of that part of the cylinder x 2 + y 2 = 9 between z = 0 and z=4
+
+for y≥0 and the two semicircles of radius 3 in the planes z = 0 and z = 4. If
+ r
+F = izˆ + xyˆj + xzkˆ evaluate
+ r r
+ curl F o d s over the surface.∫∫
+ S
+
+The surface S consists of three sections
+
+ a. the curved surface of the cylinder
+
+ b. the top and bottom semicircles.
+
+We therefore evaluate
+ r r
+ curl F o d s over each of these separately. ∫∫
+ S
+
+ 81
+
+ 
+
+--- Page 86 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+By Stokes’ theorem, we know that
+ r r r
+ F o d r, where C is the boundary of S.∫∫ curl F o ds = ∫
+ s C
+ r r
+ ( izˆ + xyˆj + xzk)ˆ o ˆ(i dx + ˆj dy + kˆdz ) ∴∫ F o dr = ∫
+ c c
+ zdx + xydy + xzdz = ∫
+
+Taking C1, C2, C3, C4 in turn, and summing the results, given:
+
+ (i) C1: y = 0, z= 0, dy = 0, dz = 0
+ r
+ F o drr = ( 0 + 0 + 0 ) = 0 ∫C1 ∫C1
+
+ (ii) C2; x=-3; y = 0; dx = 0; dy = 0
+
+ r r 3 2  4 F o d r = ( 0 + 0 − 3 zdz ) = − z = − 24 ∫C 2 ∫C 2  2  0
+
+ (iii) C3: y = 0, z= 4; dy = 0; dz = 0
+ r r 3
+ ∫C 3 F o dr = ∫C 3 ( 4 dx + 0 + 0) = ∫− 3 4 dx = 24
+
+ (iv) C4: x =3; y = 0; dx = 0; dy = 0
+
+ r 0 r  3 z 2 
+  ∫C 4 F o d r = ∫C 4 ( 0 + 0 + 3 z ) dz = = − 24  2  4
+
+Totalling up these four results, we have
+ r r
+ ∫CF o d r = 0 − 24 + 24 − 24 = −24
+ r r
+This working is a good deal easier than calculating curl F o d s over the three ∫S
+
+separate surfaces direct.
+
+Example 5.28
+ r
+Evaluate (∇ × F) o nˆ ds, where ∫∫ Z
+ kˆ r nˆ
+F = ( x 2 + y − 4 ˆ)i + 3 xyˆj + ( 2 xz + z 2 ) kˆ and S is the surface
+
+ 2 2 2 dShemisphere x + y + z = 16 above the xy- plane.
+
+Stokes’ theorem states that 4 Y
+ r r r X 4 F o dr ∫∫ C (∇ × F ) o nˆ ds = ∫
+ S C
+
+ 82
+
+ 
+
+--- Page 87 ---
+
+CHAPTER 5
+ VECTOR INTEGRATION AND INTEGRAL THEOREMS
+
+On the boundary which is on xy- plane, z= 0 and dz = 0,
+
+In polar coordinates
+x=4 cos θ, y =4 sin θ, dx =-4 sin θ dθ, dy =4 cos θ dθ limits θ = 0 to 2Α
+
+Thus
+ r r 2 Π 2 2
+ ∫ C F o dr = ∫0 (16 cos θ+ 4 sin θ− 4)( − 4 sin θdθ) + 192 sin θcos θdθ
+ 2 Π
+ = ∫ 0 ( − 48 sin θcos 2 θ− 16 sin 2 θ+ 16 sin θ+ 192 sin θcos 2 θ) dθ
+ 2 Π
+ = ∫ 0 (144 sin θcos 2 θ− 16 sin 2 θ+ 16 sin θ) dθ
+ 2 Π = − 16Π = [48 cos 3 θ− 8θ+ 4 sin 2θ− 16 cosθ]0
+
+QUESTIONS
+ r
+Q1. Verify Stokes’ theorem for F = ( y − z + 2ˆ)i + ( yz + 4) ˆj − xzkˆ, where S is the
+
+ surface of the cube x = 0, y = 0, z= 0, x = 2, y = 2, z= 2 above the xy-
+
+ plane.
+
+ Ans. Common value = -4.
+ r r
+Q2. (∇ × F ) o nˆ dS, where F = ( x 2 + y − 4ˆ)i + 3 x jyˆ + ( 2 xz + z 2 ) kˆ and S is Evaluate∫∫
+ S
+
+ the surface of the paraboloid z = 4 − ( x 2 + y 2 ) above the xy- plane.
+
+ Ans. -4Α.
+ r r
+Q3. (∇ × F ) o nˆ dS, where F = 2 iyˆ − jxˆ + xzkˆ and S is the surface of the Evaluate∫∫
+ S
+
+ hemisphere x 3 + y 2 + z 2 = 4 above the xy- plane.
+
+ Ans. -12Α
+
+ 83
+
+ 
+
+--- Page 88 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Introduction:
+
+In the theory developed so far, we have worked entirely with rectangular Cartesian
+
+coordinates with some elements of plane polar, cylindrical polar and spherical polar
+
+coordinates appearing. In practice, cylindrical and spherical polar coordinates are
+
+especially important.
+
+Objectives:
+
+We develop the coordinate system that is capable of taking care of the curved
+
+surface of objects I terms of determining their surface area, volume etc. rectangular
+
+plane coordinate system fails where objects dealt with posse ss curved surfaces.
+
+ 84
+
+ 
+
+--- Page 89 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+The surfaces U1 = C1, U2 = C2, U3 = C3, where Z
+C1, C2, C3 are constants, are called coordinate U3 Curve
+
+surfaces and each pair of these surfaces u2 =c 2 U1=c 1
+ P
+intersect in curves called coordinate curves or U2 Curve
+ U1 Curve U 3=c 3 Olines. If the coordinate surfaces intersect at Y
+
+right angles the curvilinear coordinate system is X
+
+called orthogonal. The U1, U2 and U3 coordinate
+
+curves of curvilinear system are analogous to the x, y and z coordinate axes of a
+
+rectangular system. We consider two cases of curved surfaces.
+
+ Z
+1. Cylindrical Polar Coordinates P,θ, z A 3ˆe
+ Let P be a point with cylindrical coordinates (P, θ,z). The 2ˆe
+ position of P is a function of th e three variables P, θ,z. 1ˆe
+ a) If φand z remain constants and ρ varies, then P will move
+ ∂rr r
+ out along AP by an amount and the unit vector 1ˆe in this ∂ρ
+ O Y
+ φ
+ direction will be given by
+ r r
+ X ∂r ∂r
+ e1ˆ = ∂ρ ∂ρ
+
+ b) If, instead ρ and z remain constant and φ varies, P will move round the
+ ∂rr
+ circle with AP as radius. is therefore a vector along the tangent to the
+ ∂φ
+
+ circle at P and the unit vector 2ˆe at P will be given by
+ r r
+ ∂r ∂r
+ eˆ 2 = ∂φ ∂φ
+ ∂rr c) Finally, if ρ and φ remain constant and z increases, the vector will be
+ ∂z
+
+ parallel to th e Z-axi s and the unit vector 3ˆe in this direction will be given by
+ r r
+ ∂r ∂r
+ e3ˆ =
+ ∂z ∂z
+
+ 85
+
+ 
+
+--- Page 90 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+ The vectors eˆ1, eˆ 2 and 3ˆe are mutually orthogonal and form a right-handed
+
+ system.
+
+ ˆ Note that unlike the unit vectors i,ˆ,ˆj k in the Cartesian system, the unit vectors
+
+ eˆ1, eˆ 2, ˆe 3 or base vectors as they are called are not fixed in directions, but change
+
+ as the position of P changes.
+ r r
+ If F (r ) is a vector associated with P, then
+ r r
+ F ( r ) = Fρ eˆ1 + Fθeˆ2 + Fz eˆ3
+ r
+ where Fρ, Fθ, Fz are the components of F in the directions of the unit base
+
+ vectors eˆ1, eˆ 2 and 3ˆe.
+
+2. Spherical Polar Coordinates
+ Here P is a function of three variables r, θ, φ. Z
+ 1ˆe a) If θ and φ remain constant and r increases, P moves
+ 3ˆe
+ θ p( r, θ, φ) ∂rr r
+ outwards in the direction OP. is thus a vector O Y
+ ∂r φ
+ 2ˆe
+ normal to the surface of the sphere at P and the unit
+ X
+ vector eˆ, in that direction is therefore
+ r r
+ ∂r ∂r
+ e1ˆ =
+ ∂r ∂r
+
+ b) If r and φ remain constant and θ increases, P will move along the ‘meridian”
+ ∂rr
+ throughout P, i.e. is a tangent vector to this circle at P and the unit vector
+ ∂θ
+ r r
+ ∂r ∂r
+ e2ˆ = ∂θ ∂θ
+
+ c) If r and θ remain constant and φ increases, P will more along the circle
+
+ through P perpendicular to the z-axis.
+ ∂rr
+ is therefore a tangent vector at P and the unit vector ˆl 3 in this direction is ∂φ
+ r r
+ ∂r ∂r
+ given by e3ˆ = ∂φ ∂φ
+
+ 86
+
+ 
+
+--- Page 91 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+ r r
+A vector F (r ) associated with P can therefore be expressed as
+ r r r
+F ( r ) = Fr eˆ1 + Fθeˆ 2 + Fφeˆ 3 where Fr, Fθ, Fφ are the components of F in the directions of
+
+the base vectors eˆ1, eˆ 2, eˆ 3. Both cylindrical and spherical polar coordinates are
+
+orthogonal.
+
+Scale Factors:
+
+ 1. For cylindrical polar coordinates, the unit base vectors are
+ r r r r
+ ∂r ∂r 1 ∂r ∂r
+ eˆ1 = =; hρ =
+ ∂ρ ∂ρ hρ ∂ρ ∂ρ
+ r r r r
+ ∂r ∂r 1 ∂r ∂r
+ eˆ2 = =; hφ =
+ ∂ρ ∂φ hρ ∂φ ∂φ
+ r r r r
+ ∂r ∂r 1 ∂r ∂r
+ eˆ 3 = =; h z =
+ ∂z ∂z hρ ∂z ∂z
+
+ 2. For spherical polar coordinates, th e unit base vectors are
+ r r r
+ ∂r ∂r ∂r
+ hr =; hθ =; hφ =
+ ∂r ∂θ ∂φ
+
+In each case, h is called the scale factor.
+
+If U1, U2, U3 represent the coordinates in any coordinate system, we may obtain the
+
+scale factors as
+
+ r 2 r 2 r 2
+ d r d r  d r
+ +; (i = 3,2,1 ) hUi =     +  
+  dU 1   dU 2   dU 3 
+
+1. Rectangular Coordinate System
+In rectangular coordinate system; (U 1, U 2, U 3 ) = ( x, y, )z
+
+ r
+ r = ixˆ + jyˆ + z kˆ
+
+Then hU 1 = h x =,1 hU 2 = h y =,1 hU 3 = h z = 1
+2. Cylindrical Coordinate System (U 1, U 2, U 3 ) = (ρ,φ, )z
+ r
+ r = x iˆ + jyˆ + z kˆ = ρcosφiˆ + ρsin φˆj + z kˆ Z
+ where x = ρcosφ, y = ρsi n φ, z = z P ( ρ, φ, z )
+ r r
+ ∂r ∂r 2 2 = cosφiˆ + sin φ ˆj; = cos φ+ sin φ = 1 r
+ ∂ρ ∂ρ
+
+ O Y
+ x φ
+
+ y
+ 87 X
+
+ 
+
+--- Page 92 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Thus eˆρ = eˆ1 = cosφiˆ + sin φ ˆj
+
+Similarly eˆφ = eˆ2 = sin φiˆ + cosφ ˆj; eˆ z = kˆ
+
+3. Spherical Coordinate System Z
+ P ( r, θ, φ )(U 1, U 2, U 3 ) = (,rθ,φ)
+ x = r sin θcosφ, y = r sin θsin φ, z = r cosθ r
+ r Z r = r sin θcosφiˆ + r sin θsin φ ˆj + r cosθkˆ
+ O Y
+ and x φ
+ h r =,1 hθ = r, hφ = r sin θ y r
+ X
+
+General Curvilinear Coordinate System (U1, U2, U3)
+
+Any system of coordinates can be treated in like manner to obtain expressions for
+
+the appropriate units vectors eˆ1, eˆ 2, eˆ 3.
+ r r r r r r
+ ∂r ∂r ∂r ∂r ∂r ∂r
+ eˆ1 =; eˆ 2 =; eˆ 3 =;
+ ∂U 1 ∂U 1 ∂U 2 ∂U 2 ∂U 3 ∂U 3
+
+These unit vectors are not always at right angles to each other. If they are mutually
+
+perpendicular, the coordinate system is orthogonal.
+The unit vectors are orthogonal if eˆ1 o eˆ 2 = eˆ1 o eˆ 3 = eˆ.2 o eˆ 3 =.0
+
+Example 6.1
+
+For the vectors
+
+ iˆ − 2 ˆj + 4 kˆ; 2iˆ + 3 ˆj + k,ˆ − 2iˆ + ˆj + k,ˆ
+ 1 1 1
+ 1eˆ = ˆ(i − 2 ˆj + 4 kˆ ); eˆ 2 = ( 2iˆ + 3 ˆj + kˆ ); eˆ 3 = ( −2iˆ + ˆj + k)ˆ
+ 21 14 6
+
+Then
+
+ 1
+ eˆ1 o eˆ 2 = ( 2 − 6 + 4) = 0
+ 7 6
+ 1
+ eˆ1. o eˆ 3 = ( −2 − 2 + 4) = 0
+ 3 14
+ 1
+ eˆ 2 o eˆ 3 = ( − 4 + 3 + )1 = 0
+ 2 21
+
+Hence the three vectors are orthogonal.
+
+ 88
+
+ 
+
+--- Page 93 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Example 6.2
+
+Prove that a spherical coordinate system is orthogonal.
+
+The position vector of any point in spherical coordinates is
+ r
+ r = ixˆ + jyˆ + z kˆ = r sinθcosφiˆ + r sinθsin φ ˆj + r cosθkˆ
+ eˆr = sinθcosφiˆ + sinθsin φ ˆj + cosθkˆ
+ eˆθ = cosθcosφiˆ + cosθsin φ ˆj − sinθkˆ
+ eˆφ = − sin φiˆ + cosφ ˆj
+
+ eˆr o eˆθ = sinθcosθcos 2 φ+ sinθcosθsin 2 φ− cosθsinθ = 0
+ eˆr o eˆφ = − sinθcosφsinφ+ sinθcosφsin φ = 0
+ eˆr o eˆθ = − cosθcosφsin φ+ cosθcosφsi n φ = 0
+
+Hence orthogonal.
+
+Example 6.3
+ r
+Represent F = z iˆ − 2 jxˆ + ykˆ in cylindrical coordinates. Thus determine Fρ, Fφ, Fz
+
+ r
+ r = ixˆ + jyˆ + z kˆ = ρcosφiˆ + ρsin φ ˆj + z kˆ
+ r r
+ ∂r ∂r
+ eˆρ = = cosθiˆ + sin φ ˆj
+ ∂ρ ∂ρ
+ r r
+ ∂r ∂r
+ eˆφ = = −ρsin φiˆ + ρcosφ ˆj
+ ∂φ ∂φ
+ r r
+ ∂r ∂r
+ eˆ z = = kˆ
+ ∂z ∂z
+
+ ˆWe then solve simultaneously for i,ˆ,ˆj k to obtain
+
+ iˆ = cosφeˆρ − sin φeˆφ, ˆj = sin φeˆρ + cosφeˆφ, kˆ = zeˆ
+
+Now
+ r
+ F = izˆ − 2 jxˆ + 2 ykˆ
+ = z (cosφeˆρ − sin φeˆφ) − 2ρcosφ(sin φeˆρ + cosφeˆφ) + 2ρsin φeˆ z
+ = ( z cosφ− 2ρcosφsin φ) eˆρ − ( z sin φ+ 2ρcos 2 φ) eˆφ + ρsin φeˆ z
+ and
+ Fρ = z cosφ− 2ρcosφsin φ, Fφ = − z sin φ− 2ρcos 2 φ, Fz = ρsin θ
+
+ 89
+
+ 
+
+--- Page 94 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Transformation of Coordinates
+
+In general coordinates, the transformation equations of the form
+x = f (U 1, U 2, U 3 ); y = g (U 1, U 2, U 3 ); z = h (U 1, U 2, U 3 )
+
+where the functions f, g, h are continuous and single valued and whose partial
+
+derivatives are continuous.
+
+Then
+ r r
+ r = ixˆ + jyˆ + z kˆ = f (U 1, U 2, U 3 ˆ)i + g (U 1, U 2, U 3 ) ˆj + h (U 1, U 2, U 3 ) kˆ = r (U 1, U 2, U 3 )
+
+and coordinate curves can be formed by keeping two of the three variable constant.
+
+Now
+ r r r
+ r r r ∂r ∂r ∂r r = r (U 1, U 2, U 3 ) ⇒ dr = dU 1 + dU 2 + dU 3. (*)
+ ∂U 1 ∂U 2 ∂U 3
+ r
+ ∂r
+ is a tangent vector to the U1 – coordinate curve at P
+ ∂U 1
+ ∂rr
+ is a tangent vector to the U2 – coordinate curve at P
+ ∂U 2
+ ∂rr
+ is a tangent vector to the U3 – coordinate curve at P
+ ∂U 3
+ r r r
+ ∂r ∂r ∂r
+ eˆ1 = ⇒ = hU 1eˆ1 ∂U 1 ∂U 1 ∂U 1
+ r r r
+ ∂r ∂r ∂r
+ eˆ 2 = ⇒ = hU 2 eˆ 2 ∂U 2 ∂U 2 ∂U 2
+ r r r
+ ∂r ∂r ∂r
+ eˆ 3 = ⇒ = hU 3 eˆ 3 ∂U 3 ∂U 3 ∂U 3
+
+Then Eqn. (*) above becomes
+ drr = hU 1 dU 1 eˆ1 + hU 2 dU 2 eˆ 2 + hU 3 dU 3 eˆ 3
+
+Where hU 1, hU 2, hU 3 are the scale factors.
+
+ 90
+
+ 
+
+--- Page 95 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Arc Lengths ds and Volume Element dv
+
+ Q
+
+ u 3 h3 du 3 ˆe3
+ d r u 2
+
+ O
+ h1 du1 ˆe1 h2 du 2 ˆe 2
+
+ u1
+ Fig (A )
+
+ a) Element of arc dS
+
+ Element of arc dS from o to Q given by
+ r r 2
+ dr o dr = dS = ( hU 1 dU 1 eˆ1 + hU 2 dU 2 eˆ 2 + hU 3 dU 3 eˆ 3 ) o ( hU 1 dU 1 eˆ1 + hU 2 dU 2 eˆ 2 + hU 3 dU 3 eˆ 3 )
+ = hU 1 2 dU 12 + hU 2 2 dU 2 2 + hU 3 2 dU 3 2
+ and dS = hU 1 2 dU 12 + hU 2 2 dU 2 2 + hU 3 2 dU 3 2
+
+ Example 6.4
+
+ Find the square of the element of arc length in cylindrical coordinates and
+
+ determine the corresponding scale factors.
+
+ r = ixˆ + jyˆ + z kˆ
+ We have
+ = ρcosφiˆ + ρsin φ ˆj + z kˆ
+
+ r
+ dr = (cosφdρ− ρsin φdφ) iˆ + (sin φdρ+ ρcosφdφ) ˆj + dz kˆ
+ 2 r r 2 2 2 2 2 dS = dr o dr = cos φdρ − 2ρcosφsin φdρdφ+ ρ cos φdφ
+ + sin 2 φdρ2 + 2ρsin φcosφdρdφ+ ρ2 cos 2 φdφ2 + dz 2
+ = dρ2 + ρ2 dφ2 + dz 2 = hU 1 2 dρ2 + hU 2 2 dφ2 + hU 3 2 dz 2
+ and hU 1 =,1 hU 2 = ρ, hU 3 = 1 are the scale factors.
+
+ 91
+
+ 
+
+--- Page 96 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+ b) Element of volume dV
+ dV = ( hU 1 dU 1 eˆ1 ) o ( hU 2 dU 2 eˆ 2 × hU 3 dU 3 eˆ 3 )
+ = hU 1 hU 2 hU 3 dU 1 dU 2 dU 3
+ r r r
+ ∂r ∂r ∂r
+ = o ( × ) dU 1 dU 2 dU 3
+ ∂U 1 ∂U 2 ∂U 3
+ ∂ ( x y z )
+ = dU 1 dU 2 dU 3 = JdU 1 dU 2 dU 3
+ ∂ (U 1 U 2 U 3 )
+
+ where J is called the Jacobian of the transformation and is given by
+
+ xU 1 y U 1 z U 1 ∂ ( x y z )
+ J = = xU 2 y U 2 z U 2 ∂ (U 1 U 2 U 3 )
+ xU 3 yU 3 z U 3
+
+ ∂x
+ where xU 1 = etc. ∂U 1
+
+ c) Element of Area dA
+
+ The area element is given by
+ fig. A ) dA1 = hU 2 dU 2 eˆ 2 × hU 3 dU 3 eˆ 3 from (
+ = hU 2 hU 3 eˆ 2 × eˆ 3 dU 2 dU 3 = hU 2 hU 3 dU 2 dU 3
+
+since eˆ 2 × eˆ 3 = eˆ1 = 1
+
+similarly dA2 = hU 1 hU 3 dU 1 dU 3 and dA3 = hU 1 hU 2 dU 1 dU 2
+
+Example 6.5
+
+Evaluate ( x 2 + y 2 + z 2 ) dxdydz where V is a sphere having centre at the origin and ∫∫∫
+ V
+
+radius equal to a.
+
+We may consider the portion in the first octant and in spherical coordinates we have
+
+dxdydz = r 2 sin θdrdθdφ
+
+ 92
+
+ 
+
+--- Page 97 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Thus we have
+
+ Π Π a Z
+ ( x 2 + y 2 + z 2 ) dxdydz = 8 ∫∫∫ ∫φ2= 0 ∫θ2= 0 ∫r = 0 r 2.r 2 sin θdrdθdφ
+ v 2 2 2 2 x + y + z = a
+ Π Π
+ 8 5 2 2 = a ∫0 ∫0 sin θdθdφ dV = dxdydz 5
+ Π Y
+ 8 5 2 = a ∫0 dφ x 2 + y 2 = a 2; z = 0 5 X
+ 4Π 5 = a.
+ 5
+
+Grad, div and Curl in Orthogonal Curvilinear Coordinates
+(a) Grad V ( ∇V )
+
+Let a scalar field φ exist in space and let dφ be the u 3
+ Q
+change in φ from a point p to Q say. If the position vector
+ ∂ r
+ r r ∂u3 du 3of p is rr then that of Q is r + d r
+ ∂ r
+ ∂φ ∂φ ∂φ P ∂ r ∂u1 du1
+ du 2 ∂u 2Then dφ= dU 1 + dU 2 + dU 3 kˆ jˆ u 2
+ ∂U 1 ∂U 2 ∂U 3
+ u1
+ Let grad φ = ∇φ O iˆ
+ = (∇φ) U 1 eˆ1 + (∇φ) U 2 eˆ 2 + (∇φ) U 3 eˆ 3
+Where (∇φ) U 1, U 2, U 3 are the components of grad φ in the U1, U2, U3 directions.
+
+Also
+ r r r
+ r ∂r ∂r ∂r
+ dr = dU 1 + dU 2 + dU 3
+ ∂U 1 ∂U 2 ∂U 3
+ = hU 1 dU 1 eˆ1 + hU 2 dU 2 eˆ 2 + hU 3 dU 3 eˆ 3
+
+Now since
+ ∂φ ∂φ ∂φ
+ dφ= dU + dU 2 + dU 3
+ ∂U 1 ∂U 2 ∂U 3
+ r
+ = ∇φo d r
+ = {(∇φ)U 1 eˆ1 + (∇φ)U 2 eˆ2 + (∇φ)U 3 eˆ3 } o {hU 1 dU 1eˆ1 + hU 2 dU 2 eˆ2 + hU 3 dU 3 eˆ3 }
+ hU 1 dU 1 + ( hU 2 dU 2 + ( hU 3 dU 3 = (∇φ)U 1 ∇φ)U 2 ∇φ)U 3
+
+Comparing the coefficients, we obtain
+ 1 ∂φ 1 ∂φ 1 ∂φ
+ (∇φ) U 1 =; (∇φ) U 2 =; (∇φ) U 3 =
+ hU 1 ∂U 1 hU 2 ∂U 2 hU 3 ∂U 3
+
+ 93
+
+ 
+
+--- Page 98 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+So that
+ 1 ∂φ 1 ∂φ 1 ∂φ
+ grad φ= ∇φ= eˆ1 + eˆ 2 + eˆ 3
+ hU 1 ∂U 1 hU 2 ∂U 2 hU 3 ∂U 3
+
+and
+ eˆ1 ∂ eˆ 2 ∂ eˆ 3 ∂ ∇ = + +
+ hU 1 ∂U 1 hU 2 ∂U 2 hU 3 ∂U 3
+ r r
+(b) DivF (∇ o F )
+
+ r r r r eˆ1 ∂ eˆ 2 ∂ =  + + div F = ∇ o F eˆ1 + F eˆ 2 + F eˆ 3 ) eˆ 3 ∂  o (FrU 1 U 2 U 3  hU 1 ∂U 1 hU 2 ∂U 2 hU 3 ∂U 3 
+ 1 ∂FU 1 1 ∂FU 2 1 ∂FU 3 = + +
+ hU 1 ∂U 1 hU 2 ∂U 2 hU 3 ∂U 3
+ 1  ∂ ∂ ∂  =  (hU 2 hU 3 FU 1 ) + (hU 1 hU 3 FU 2 ) + (hU 1 hU 1 FU 3 )
+ hU 1 hU 2 hU 3  ∂U 1 ∂U 2 ∂U 3 
+
+(c)
+ r
+ Curl F = ∇ × (FU 1 eˆ1 + FU 2 eˆ 2 + FU 3 eˆ 3 )
+ eˆ 3 ) = ∇ × (FU 1 eˆ1 ) + ∇ × (FU 2 eˆ 2 ) + ∇ × (FU 3
+ eˆ 2 ∂ eˆ 3 ∂ = (FU 1 hU 1 ) − (FU 1 hU 1 )
+ hU 3 hU 1 ∂U 3 hU 1 hU 2 ∂U 3
+ eˆ 3 ∂ eˆ1 ∂ + (FU 2 hU 2 ) − (FU 2 hU 2 )
+ hU 1 hU 2 ∂U 1 hU 2 hU 3 ∂U 3
+ eˆ1 ∂ eˆ 2 ∂ + (FU 3 hU 3 ) − (FU 3 hU 3 )
+ hU 2 hU 3 ∂U 2 hU 3 hU 1 ∂U 1
+
+ eˆ1  ∂ ∂  ˆe 2  ∂ ∂  =. (FU 3 hU 3 ) − (FU 3 hU 3 ) + (FU 1 hU 1 ) − (FU 3 hU 3 ) ∂U 3 ∂U 1  ∂U 2 ∂U 3  hU 3 hU 1  hU 2 hU 3 
+ eˆ 3  ∂ ∂ + (FU 2 hU 2 ) − (FU 1 hU 2 ) ∂U 1 ∂U 2  hU 1 hU 2 
+
+which is written in compact form as
+
+ hU 1 eˆ1 hU 2 eˆ 2 hU 3 eˆ 3
+ 1 ∂ ∂ ∂
+ ∇ × F =
+ hU 1 hU 2 hU 3 ∂U 1 ∂U 2 ∂U 3
+ FU 1 hU 1 FU 2 hU 2 FU 3 hU 3
+
+ 94
+
+ 
+
+--- Page 99 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Example 6.6
+
+Express ∇ 2ψin orthogonal curvilinear coordinates.
+
+ eˆ1 ∂ψ eˆ 2 ∂ψ eˆ 3 ∂ψ ∇ψ = + +
+ hU 1 ∂U 1 hU 2 ∂U 2 hU 3 ∂U 3
+
+ 2  eˆ1 ∂ eˆ 2 ∂ eˆ 3 ∂   eˆ1 ∂ψ eˆ 2 ∂ψ eˆ 3 ∂ψ  o + + + + ∇ ψ = ∇ o ∇ψ =     hU 2 ∂U 1 hU 3 ∂U 1 hU 2 ∂U 1 hU 3 ∂U 1  hU 1 ∂U 1   hU 1 ∂U 1 
+  1 ∂  hU 2 hU 3 ∂ψ  ∂  hU 1 hU 3 ∂ψ  ∂  hU 1 hU 2 ∂ψ   =  + +       
+ 1 ∂U 2 ∂U 3    hU 2 ∂U 2  hU 1 ∂U 1  hU 3 ∂U 3 hU 1 hU 2 hU 3  ∂U  
+
+Example 6.7
+
+If φ(U 1, U,2 U 3 ) = U 1 + U 2 2 + U 3 3 with scale factors hU 1 =,2 hU 2 =,1 and hU 3 = 1, find
+
+∇ 2φ at the point (5, 4, 3).
+
+ ∂φ ∂φ ∂φ 2
+ =,1 = 2U 2, = 3U 3
+ ∂U 1 ∂U 2 ∂U 3
+ hU 1 =,2 hU 2 =,1 hU 3 = 1
+
+ 2 1  ∂ 1 ∂ ∂ 2  ∇ φ= 2  ( 2 ) + ( 4U 2 ) + (6U 3 )
+  ∂U 1 ∂U 2 ∂U 3 
+ = 12 {0 + 4 + 12U 3 } = 26 at U 3 = 4
+
+Example 6.8
+Express the heat equation ut = k∇ 2 u in spherical coordinates.
+
+We have
+
+  ∂u k ∂  hθhφ ∂u  ∂  h r hφ ∂u  ∂  hr hθ ∂u  
+ =    +   +    r ∂r  ∂θ hθ ∂θ ∂φ hφ ∂φ  ∂t h r hθ hφ  ∂r  h
+ k  ∂  2 ∂u  ∂  ∂u  1 ∂ 2 u  = 2 sin θ  r  +  sin θ  + 2 r sin θ  ∂r  ∂r  ∂θ ∂θ sin θ ∂ φ
+  1 ∂  2 ∂u  1 ∂  ∂u  1 ∂ 2 u  = k 2  r  + 2  sin θ  + 2 2 2  r ∂r  ∂r  r sin θ ∂θ ∂θ r sin θ ∂φ 
+
+ 95
+
+ 
+
+--- Page 100 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+If u is independent of φ; we have
+
+∂u  1 ∂  2 ∂u  1 ∂  ∂u   = k 2  r  + 2  sin θ  etc t∂  r ∂r  ∂r  r sin θ ∂θ ∂θ 
+
+QUESTIONS
+
+Q1. Determine the unit vectors in the directions of the following three vectors and
+
+ test whether they form an orthogonal set
+
+ 3iˆ − 2 ˆj + k,ˆ iˆ + 2 ˆj + k,ˆ − 2iˆ − ˆj + 4 k.ˆ
+
+ Ans. Yes, an orthogonal set
+ r
+Q2. If r = u sin 2θiˆ + u cos 2θ ˆj + V 2k,ˆ determine the scale factors hu, hv, hθ.
+
+ Ans. hu = 1, hv = 2V, hθ = 2u.
+ r
+Q3. A vector field F is given in cylindrical coordinates by
+ r
+ F = ρcosφiˆ + ρsin 2φ ˆj + z kˆ
+ r r
+ Determine (a) ∇ o F (b) ∇ × F
+
+ A ns. (a) ( 2 cos φ+ 2 cos 2φ+ )1 (b) ( 2 sin 2φ+ si nφ) kˆ
+ r
+Q4. Represent the vector F = 2 iyˆ − jzˆ + 3 xkˆ in spherical coordinates and determine
+
+ Fr, Fθ and Fφ.
+
+ Hint: You determine erˆ, eˆθ, eˆφ in terms of i,ˆ ˆj and k.ˆ Use Cramer’s rule to
+ r
+ solve the system of equations for i,ˆ ˆj and kˆ and use them in F = 2 iyˆ − jzˆ + 3 xkˆ
+
+ Ans.
+ r r
+ F = Fr eˆ r + Fθeˆθ + Fφeˆφ where
+ Fr = 2 r sin 2 θsin φcosφ− r sin θcosθsin φ+ 3r sin θcosθcosφ
+ Fθ = 2 r sin θcosθsin φ− r cos 2 θsin φ− 3r sin 2 θcosφ
+ Fφ = − 2 r sin θsin 2 φ− r cosθcosφ
+
+Q5. Find the element of arc length on a sphere of radius a.
+ Ans. dS 2 = a 2 [dθ 2 + sin 2 θdφ2 ]
+
+ 96
+
+ 
+
+--- Page 101 ---
+
+CHAPTER 6
+ CURVILINEAR COORDINATES
+
+Q6. Given the coordinate transformation U 1 = xy, 2U 2 = x 2 + y 2, U 3 = z
+
+ (a) Show that the coordinate system is not orthogonal
+
+  x, y, z 
+ (b) Find J  
+  U 1, U 2, U 3 
+
+ (c) Find dS2
+
+ 1
+ Ans. (b) (c)
+ y 2 − x 2
+
+ 2 ( x 2 − y 2 )( dU 12 + dU 22 ) − 4 xydU 1 dU 2 2 ds = + dU 3 2 2 2 ( x − y )
+ U 2 ( dU 12 + dU 22 ) − 2U 1 dU 1 dU 2 2 = + dU 3 2 2
+ 2(U 2 + U 1 )
+
+ 97

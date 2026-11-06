@@ -1,0 +1,414 @@
+LESSON THREE
+
+ MEASURES OF CENTRAL TENDENCY
+
+3.1: Introduction
+
+In this lesson will discuss the other measures of location or measures of central
+tendency namely geometric mean, harmonic mean, median and mode of given
+data.
+
+3.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. Compute geometric mean, harmonic mean, median and mode of given
+ data
+ ii. Determine median and mode using graphical method.
+
+3.3: Geometric Mean
+
+The Geometric mean G of a set of 𝑛 non-zero positive numbers 𝑥1, 𝑥2, … , 𝑥𝑛 is
+the nth root of the product of the numbers. i.e.
+
+ 𝐺= 𝑛√𝑥1𝑥2 … 𝑥𝑛
+
+Example 3.1 Compute the geometric mean of the following numbers 3,9,27.
+
+ Solution
+
+ 3
+ G = √3 × 9 × 27 = 9
+
+If the k non-zero positive variate-values 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies
+𝑓1, 𝑓2, … , 𝑓𝑘 respectively, then geometric mean G, is given by
+
+ 𝑛 𝑓2 𝑓𝑘 𝑘 𝐺= √𝑥1𝑓1𝑥2 … 𝑥𝑘 , where 𝑛= ∑ 𝑖=1 𝑓𝑖
+
+ 𝟏
+ 𝑓2 𝒏 = … 𝑓𝑘] [𝑥1𝑓1𝑥2 𝑥𝑘
+
+Therefore,
+
+ 15
+
+--- Page 17 ---
+1 𝑓2 log 𝐺= 𝑓𝑘] 𝑓1𝑥2 … 𝑥𝑘 𝑛[𝑥1
+
+ 1
+ = 𝑛[𝑓1 log 𝑥1 + 𝑓2 log 𝑥2 + ⋯+ 𝑓𝑘log 𝑥𝑘]
+
+Example 3.2
+
+Compute the geometric mean of the following numbers
+
+ X 3 9 27
+ f 2 2 2
+
+ Solution
+
+ 6
+ G = √32 × 92 × 272 = 9 or
+
+ 1
+ 𝐺= [2 log 3 + 2 log 9 + 2 log 27]
+ 6
+
+ 1 1
+ = [2 log 3 + 4 log 3 + 6 log 3] = [12 log 3]
+ 6 6
+
+ = 2log3
+
+ = log32
+
+ ⇒𝐺= 32 = 9.
+
+3.4: Harmonic Mean
+
+The harmonic mean of the variate-values is the reciprocal of their arithmetic
+mean of their reciprocals. That is the harmonic mean, H, of a set of n numbers
+
+𝑥1, 𝑥2, … , 𝑥𝑛 is given by
+
+ 1
+ 𝐻= 1 𝑛 1
+ 𝑛∑ 𝑖=1 𝑥𝑖
+
+ 𝒏
+ = 𝑛 1 ∑
+ 𝑖=1 𝑥𝑖
+
+Example 3.3
+
+Compute the harmonic mean of the following numbers 3, 9, 27
+
+ Solution
+
+ 16
+
+--- Page 18 ---
+3
+ 𝐻= = 6.23
+ 1 1 1
+ + +
+ 3 9 27
+
+The harmonic mean, H, of k non-zero different variate-values
+𝑥1, 𝑥2, … , 𝑥𝑘 occurring with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively is given by
+
+ ∑ 𝑘𝑖=1 𝑓𝑖 𝐻= 𝑘 𝑓𝑖 ∑
+ 𝑖=1 𝑥𝑖
+
+NB: The relation between arithmetic mean 𝑥̅, geometric mean 𝐺 and the
+harmonic mean 𝐻 is
+
+ 𝐻≤𝐺≤ 𝑥̅
+
+The equality signs hold only if all the numbers 𝑥1, 𝑥2, … , 𝑥𝑛 are identical.
+
+Example 3.4
+
+The set of numbers 3, 9, 27 has 𝑥̅ = 13.0, 𝐺= 9.0, 𝐻= 6.23.
+
+ ∴𝐻< 𝐺< 𝑥̅
+
+3.5: Median, Quartiles, Deciles and Percentiles
+
+3.5.1: Median
+
+The median of a set of n numbers arranged in order of magnitude is the middle
+value if n is odd or the arithmetic mean of the two middle values if n is even. For
+example, the set
+
+ i. 4,7,7,7,9,10,10,12,15 has median 9
+ 8+10
+ ii. 6,7,8,10,11,12 has median 9 i.e. ( ) = 9
+ 2
+
+If the data is grouped then the median is obtained by interpolation given by
+
+ 𝑛
+ 2 −(∑𝑓)1
+ Median= 𝐿1 + ( 𝑓𝑚𝑒𝑑𝑖𝑎𝑛) 𝑐
+
+Where,
+
+ 𝐿1 =lower class boundary of the median class (the class containing the
+
+ Median)
+
+ 17
+
+--- Page 19 ---
+n=number of items in the data (total frequency)
+
+ (∑𝑓)1 = sum of frequencies of all classes lower than the median class
+
+ 𝑓𝑚𝑒𝑑𝑖𝑎𝑛=frequency of median class
+
+ C= size of median class interval
+
+Example 3.5 Calculate the median for the following frequency distribution of the
+number of marks obtained by 49 students in a class.
+
+ Marks 5 - 10 10 - 15 15 - 20 20 - 25 25 - 30 30 - 35 35 - 40 40 - 45
+ group
+ No. of 5 6 25 10 5 4 2 2
+ students
+
+ Solution
+
+ Class Frequency Cumulative frequency
+ (f) (cf)
+ 5 – 10 5 5
+ 10 – 15 6 11
+ 15 – 20 15 26
+ 20 – 25 10 36
+ 25 – 30 5 41
+ 30 – 35 4 45
+ 35 – 40 2 47
+ 40 – 45 2 49
+
+ n 49 1
+ = = 24
+ 2 2 2
+
+Therefore, the median class is 15 – 20
+
+Thus, 𝐿1 = 15, (∑𝑓)1 = 11 (i.e. 5+6=11), 𝑓𝑚𝑒𝑑𝑖𝑎𝑛= 15, c=5.
+
+ 𝑛 49
+ 2 −(∑𝑓)1 2 −11
+ Median= 𝐿1 + ( 𝑓𝑚𝑒𝑑𝑖𝑎𝑛) 𝑐= 15 + ( 15 ) 5 = 19.5 marks
+
+ 18
+
+--- Page 20 ---
+3.5.2: Quartiles, Deciles and Percentiles
+
+Quartiles are those values which divide the total frequency into four equal parts;
+deciles and percentiles divide into ten and one hundred equal parts respectively.
+
+Quartiles are denoted by 𝑄1, 𝑄2 and 𝑄3, that is the first, second and third
+quartiles respectively, the value 𝑄2 being equal to the median. The first quartile
+𝑄1 is often referred to as the lower quartile and the third quartile 𝑄3 is referred to
+as the upper quartile.
+
+Example 3.6
+
+The set 2,3,3,4,4,4,5,5,6,7,7,8 has
+
+ 4+5 3+4 6+7
+ 𝑄2 = = 4.5 , 𝑄1 = = 3.5, 𝑄3 = = 6.5 2 2 2
+
+The formulae for computing the lower and upper quartiles of grouped data is the
+ n n 3n
+same as that of median except instead of we have and for the lower and
+ 2 4 4
+upper quartiles respectively. Thus
+
+ 𝑛
+ −(∑𝑓)𝑄1 4
+ 𝑄1 = 𝐿𝑄1 + ( ) 𝑐1
+ 𝑓𝑄1
+
+and
+
+ 3𝑛
+ −(∑𝑓)𝑄3 4
+ 𝑄3 = 𝐿𝑄3 + ( ) 𝑐3
+ 𝑓𝑄3
+
+Where 𝐿𝑄1 =lower class boundary of the class containing the first quartile,
+
+ 𝑛= total frequency,
+
+ (∑𝑓)𝑄1 =sum of frequencies of all classes lower than the first quartile class,
+
+ 𝑓𝑄1 =frequency of the first quartile class,
+
+ 𝑐1 =size of first quartile class interval,
+
+ 𝐿𝑄3 = lower class boundary of the class containing the third quartile,
+
+ 19
+
+--- Page 21 ---
+(∑𝑓)𝑄3 =sum of frequencies of all classes lower than the third quartile class,
+
+ 𝑓𝑄3 =frequency of the third quartile class,
+
+ 𝑐3 =size of third quartile class interval.
+
+Example 3.7
+
+Compute the lower and upper quartiles for the following frequency distribution.
+
+ Class 5.5- 10.5- 15.5- 20.5- 25.5- 30.5- 35.5- 40.5-
+ 9.5 14.5 19.5 24.5 29.5 34.5 39.5 44.5
+ Frequency 5 6 15 10 5 4 2 2
+
+ Solution
+
+ Class Frequency (f) Cumulative frequency(cf)
+ 5.5 – 9.5 5 5
+ 10.5 – 14.5 6 11
+ 15.5 – 19.5 15 26
+ 20.5 – 24.5 10 36
+ 25.5 – 29.5 5 41
+ 30.5 – 34.5 4 45
+ 35.5 – 39.5 2 47
+ 40.5 – 44.5 2 49
+ Total 49
+
+ 𝑛 49 1
+To compute 𝑄1 we have = = 12 . Thus 𝑄1 lies in the class 15.5 – 19.5. 4 4 4
+Therefore, 𝐿𝑄1 = 15, 𝑛= 49, (∑𝑓)𝑄1 = 11, 𝑓𝑄1 = 15, 𝑐1 = 5.
+
+Hence
+ 𝑛
+ −(∑𝑓)𝑄1 4
+ 𝑄1 = 𝐿𝑄1 + ( ) 𝑐1
+ 𝑓𝑄1
+
+ 49
+ −11
+ 4 = 15 + ( ) 5 = 15.41
+ 15
+
+ 20
+
+--- Page 22 ---
+3𝑛 3(49) 3
+To compute 𝑄3 we have = = 36 . Thus 𝑄3 lies in the class 25.5 – 29.5. 4 4 4
+Therefore, 𝐿𝑄3 = 25, 𝑛= 49, (∑𝑓)𝑄3 = 36, 𝑓𝑄1 = 5, 𝑐1 = 5.
+
+Hence
+ 3𝑛
+ −(∑𝑓)𝑄3 4
+ 𝑄3 = 𝐿𝑄3 + ( ) 𝑐3
+ 𝑓𝑄1
+
+ 3(49)
+ −36
+ 4 = 25 + ( ) 5 = 25.75.
+ 5
+
+Deciles are denoted 𝐷1, 𝐷2, … , 𝐷8, 𝐷9 and percentiles are denoted by
+
+𝑃1, 𝑃2, … , 𝑃98, 𝑃99 . For grouped data we compute deciles and percentiles using
+the following formulae:
+
+ 𝑖𝑛
+ −(∑𝑓)𝐷𝑖 10
+ 𝐷𝑖= 𝐿𝐷𝑖+ ( ) 𝑐𝐷𝑖 , 𝑖= 1,2, … , 9
+ 𝑓𝐷𝑖
+
+and
+
+ 𝑖𝑛
+ −(∑𝑓)𝑃𝑖 100
+ 𝑃𝑖= 𝐿𝑃𝑖+ ( ) 𝑐𝑃𝑖 , 𝑖= 1,2, … ,99
+ 𝑓𝑃𝑖
+
+Quartiles, Deciles and Percentiles for grouped data can be obtained using
+graphical method.
+
+3.6: Mode
+
+The mode or modal value of the distribution is that value of the variable for which
+the frequency is maximum.
+
+Example 3.8
+
+The set
+
+ i. 2, 2, 5, 8, 8, 8 has mode 8,
+
+ 21
+
+--- Page 23 ---
+ii. 3, 5, 6, 8, 9, 10 has no mode,
+ iii. 14, 16, 12.2, 12.2, 12, 17, 17, 18, 20 has two modes 12.2 and 17 and is
+ known as bimodal.
+
+For a frequency distribution, the mode is computed by the following formula:
+
+ 𝑓𝑚−𝑓1
+ Mode= 𝐿+ (2𝑓𝑚−𝑓1−𝑓2) 𝑐 ,
+
+Where, 𝐿=lower class boundary of the modal class (the class interval having
+
+ Maximum frequency),
+
+ 𝑓𝑚= the maximum frequency (frequency of the modal class),
+
+ 𝑓1 = the frequency of the class preceding the modal class,
+
+ 𝑓2 = the frequency of the class following the modal class,
+
+ 𝑐= size of the modal class interval.
+
+Example 3.9
+
+Find the mode of the distribution given below:
+
+ Marks 5 - 10 10 - 15 15 – 20 - 25 25 - 30 30 - 35 35 - 40 40 - 45
+ group 20
+ No. of 5 6 15 10 5 4 2 2
+ students
+
+ Solution
+
+Clearly the class interval 15 – 20 has maximum frequency, hence it is the modal
+class.
+
+Therefore, 𝐿= 15, 𝑓1 = 6, 𝑓2 = 10, 𝑓𝑚=15, 𝑐= 5. Hence
+
+ 𝑓𝑚−𝑓1
+ Mode= 𝐿+ (2𝑓𝑚−𝑓1−𝑓2) 𝑐
+
+ 15−6
+ = 15 + (2(10)−6−10) 5 = 18.21
+
+ 22
+
+--- Page 24 ---
+3.7: Assessment
+
+1. Marks obtained by 80 students are given below:
+
+ Marks 0 - 10 10 – 20 20 - 30 30 - 40 40 - 50 50 - 60
+ Frequency 3 9 15 30 18 5
+ a) Compute the median, quartiles and mode for the above frequency
+ distribution.
+ b) Draw a cumulative frequency curve, hence determine the median and
+ quartiles.
+
+ 3. The median and mode of the following wage distribution are known to be
+ $ 33.5 and $ 34 respectively. Three frequency values from the table are
+ however missing. Find these missing values.
+ Wages 0 - 10 10 -20 20-30 30-40 40-50 50-60 60-70 Total
+ ($)
+ No. of 4 16 ? ? ? 6 4 230
+ Workers
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 23
+
+--- Page 25 ---

@@ -1106,7 +1106,9 @@ _EXCLUDED_TOPIC_NAMES = {
     "course requirements", "references", "assessment questions",
     "examination", "overview of the course", "forward", "foreword",
     "course outline", "syllabus", "course description", "preface",
-    "acknowledgements", "grading policy", "instructor information"
+    "acknowledgements", "grading policy", "instructor information",
+    "note", "noted", "summary", "in short", "conclusion", "free graphics",
+    "clipart", "beautiful flowers clipart"
 }
 
 
@@ -1153,6 +1155,128 @@ def _parse_order_number(val) -> int | None:
     if first_num:
         return int(first_num.group(1))
     return _WORD_TO_NUM.get(cleaned)
+
+
+def _extract_lesson_topic_candidates(text: str) -> list[dict]:
+    lines = text.splitlines()
+    lesson_pattern = re.compile(r"^\s*LESSON\s+(\d+)\s*$", re.IGNORECASE)
+    occurrences = []
+    for line_index, line in enumerate(lines):
+        match = lesson_pattern.match(line)
+        if match:
+            occurrences.append((line_index, int(match.group(1))))
+
+    if len(occurrences) < 2:
+        return []
+
+    candidates_by_order = {}
+    for occurrence_index, (line_index, order) in enumerate(occurrences):
+        next_line = occurrences[occurrence_index + 1][0] if occurrence_index + 1 < len(occurrences) else len(lines)
+        section_prefix = re.compile(rf"^\s*{order}\s*\.\s*\d+(?:\.\d+)*\.?\s*")
+        section_count = sum(bool(section_prefix.match(line)) for line in lines[line_index + 1:next_line])
+        current = candidates_by_order.get(order)
+        if current and current[0] >= section_count:
+            continue
+        candidates_by_order[order] = (section_count, line_index, next_line)
+
+    selected = sorted(
+        ((order, line_index, next_line) for order, (_, line_index, next_line) in candidates_by_order.items()),
+        key=lambda item: item[1],
+    )
+    if len(selected) < 2 or any(
+        selected[index][0] >= selected[index + 1][0]
+        for index in range(len(selected) - 1)
+    ):
+        return []
+
+    topics = []
+    for order, line_index, _ in selected:
+        next_order_line = next(
+            (next_line for next_order, next_line, _ in selected if next_line > line_index),
+            len(lines),
+        )
+        section_lines = lines[line_index + 1:next_order_line]
+        content_lines = [
+            line.strip()
+            for line in section_lines
+            if line.strip() and not re.match(r"^---\s*Page\s+\d+", line.strip(), re.IGNORECASE)
+        ]
+        if not content_lines:
+            continue
+
+        title_parts = [content_lines[0]]
+        for line in content_lines[1:3]:
+            last_part = title_parts[-1].rstrip()
+            last_word = re.sub(r"[^\w]+$", "", last_part).split()[-1].casefold() if last_part.split() else ""
+            if (
+                line.startswith("(")
+                or line[:1].islower()
+                or last_word in {"a", "an", "and", "by", "for", "from", "in", "n", "of", "on", "the", "to", "with"}
+            ):
+                title_parts.append(line)
+            else:
+                break
+        title = re.sub(r"\s+", " ", " ".join(title_parts)).strip(" .:-")
+        if not title or len(title) > 180:
+            continue
+        if len(title.split()) > 16:
+            first_clause = re.split(r"\s+and\s+", title, maxsplit=1)[0].strip(" .,:-")
+            title = (
+                first_clause
+                if len(first_clause.split()) > 2 and len(first_clause.split()) <= 16
+                else " ".join(title.split()[:16]).rstrip(" ,.;:-")
+            )
+        if not title or not _looks_like_syllabus_item(title):
+            continue
+        if re.search(rf"(?i)\border\s+{order}\b", title) and re.search(r"(?i)\bnth[- ]order\b", "\n".join(section_lines)):
+            title = re.sub(rf"(?i)\border\s+{order}\b", "order n", title)
+
+        subtopics = []
+        section_heading = re.compile(r"^\s*(\d{1,2})\s*\.\s*\d+(?:\.\d+)*\.?\s*(.+?)\s*$")
+        for line_index, line in enumerate(section_lines):
+            match = section_heading.match(line)
+            if not match:
+                continue
+            subtopic = re.sub(r"\s+", " ", match.group(2)).strip(" .:-")
+            next_line = section_lines[line_index + 1].strip() if line_index + 1 < len(section_lines) else ""
+            last_word = subtopic.rstrip(".").split()[-1].casefold() if subtopic.split() else ""
+            if (
+                next_line
+                and not section_heading.match(next_line)
+                and (
+                    next_line[:1].islower()
+                    or last_word in {"a", "an", "and", "by", "for", "from", "in", "of", "on", "the", "to", "with"}
+                )
+                and re.match(r"[A-Za-z]", next_line)
+                and re.search(r"[A-Za-z]{4,}", next_line)
+                and not re.search(r"[\d=∫∑√<>]", next_line)
+            ):
+                subtopic = f"{subtopic} {next_line}"
+            if (
+                len(subtopic) < 4
+                or len(subtopic) > 140
+                or not re.search(r"[A-Za-z]{3,}", subtopic)
+                or re.search(r"[=∫∑√<>]", subtopic)
+                or re.search(r"\b\d+\s+[a-z]\b", subtopic, re.IGNORECASE)
+                or re.search(r"(?i)\bd[xy]\b|\bd\s+\d+\s+[a-z]", subtopic)
+                or subtopic.casefold().endswith((" and", " for", " from", " of", " to", " with"))
+                or re.match(r"(?i)^(?:introduction|objectives?|summary|exercise|further reading|references)\b", subtopic)
+                or _is_excluded_topic_title(subtopic)
+            ):
+                continue
+            if subtopic.casefold() not in {item.casefold() for item in subtopics}:
+                subtopics.append(subtopic)
+
+        if not subtopics:
+            continue
+        topics.append({
+            "order": order,
+            "title": title[0].upper() + title[1:],
+            "subtopics": subtopics,
+            "summary": f"Source-aligned lesson covering {', '.join(subtopics[:5])}.",
+        })
+
+    return topics if len(topics) >= 2 else []
 
 
 def extract_topic_candidates(text: str, *, allow_llm_fallback: bool = False) -> list[dict]:
@@ -1289,8 +1413,13 @@ def extract_topic_candidates(text: str, *, allow_llm_fallback: bool = False) -> 
                 toc_topics[num] = clean_title.title()
 
     topics = []
+    # A numbered LESSON sequence is authoritative: it is the document's own module order,
+    # whereas TOC and heading scans can mistake cover rows or examples for units.
+    lesson_topics = _extract_lesson_topic_candidates(text)
+    if len(lesson_topics) >= 2:
+        topics = lesson_topics
     # If TOC yielded at least 2 structured topics, populate them with subtopics from the body
-    if len(toc_topics) >= 2:
+    if len(toc_topics) >= 2 and not topics:
         for num in sorted(toc_topics.keys()):
             title = toc_topics[num]
             subtopics = []
@@ -1456,6 +1585,101 @@ def extract_topic_candidates(text: str, *, allow_llm_fallback: bool = False) -> 
                 }
         if heading_topics:
             topics = sorted(heading_topics.values(), key=lambda t: t["order"])
+
+    # 3b. Sectional and category-heading extraction for unnumbered syllabi/lecture notes
+    if len(topics) < 2:
+        cat_pattern = re.compile(
+            r"^\s*([A-Za-z0-9\s]{2,30})\s*[-–—]\s*([A-Za-z0-9\s&/(),]{3,50})\s*$"
+        )
+        _admin_strip_re = re.compile(
+            r"(?i)\b(?:studocu|university|college|polytechnic|lecturer|professor|dr\.|prof\.|"
+            r"scan to open|downloaded by|sponsored|all rights reserved|page \d+|table of contents|"
+            r"contents|course outline|module outline|references|bibliography|recommended by|noted?)\b"
+        )
+        doc_lines = text.splitlines()
+        matched_headings = []
+        for line_idx, raw_line in enumerate(doc_lines):
+            line_str = raw_line.strip()
+            if not line_str or len(line_str) < 4 or len(line_str) > 80:
+                continue
+            if line_str.startswith("--- Page") or _admin_strip_re.search(line_str) or line_str.endswith((",", ";")):
+                continue
+            words_list = line_str.split()
+            if len(words_list) > 10:
+                continue
+
+            prev_empty = (line_idx == 0 or not doc_lines[line_idx - 1].strip() or doc_lines[line_idx - 1].strip().startswith("--- Page"))
+            next_empty = (line_idx + 1 == len(doc_lines) or not doc_lines[line_idx + 1].strip())
+
+            m_cat = cat_pattern.match(line_str)
+            if m_cat:
+                pfx, spec = m_cat.groups()
+                clean_t = f"{pfx.strip()} - {spec.strip()}".title()
+                if not _is_excluded_topic_title(clean_t) and _looks_like_syllabus_item(clean_t):
+                    matched_headings.append((line_idx, clean_t, "category"))
+                    continue
+
+            if prev_empty and (next_empty or doc_lines[line_idx + 1].strip().startswith(("•", "*", "-", "1.", "The ", "A ", "An "))):
+                if (line_str.isupper() and 2 <= len(words_list) <= 7) or (re.match(r"^[A-Z][A-Za-z0-9\s&/\-()]+[?:]?$", line_str) and 2 <= len(words_list) <= 7):
+                    clean_t = line_str.rstrip("?:").strip().title()
+                    if not _is_excluded_topic_title(clean_t) and _looks_like_syllabus_item(clean_t):
+                        matched_headings.append((line_idx, clean_t, "standalone"))
+
+        cat_headings = [h for h in matched_headings if h[2] == "category"]
+        active_headings = cat_headings if len(cat_headings) >= 2 else matched_headings
+
+        if len(active_headings) >= 2:
+            step3b_topics = []
+            seen_titles = set()
+            for h_pos, (line_no, h_title, _) in enumerate(active_headings):
+                norm = _normalise_for_comparison(h_title)
+                if norm in seen_titles:
+                    continue
+
+                next_line_no = active_headings[h_pos + 1][0] if h_pos + 1 < len(active_headings) else len(doc_lines)
+                sec_lines = doc_lines[line_no + 1 : next_line_no]
+                sec_text = "\n".join(sec_lines).strip()
+                min_chars = 400 if len(active_headings) <= 15 else 800
+                if len(sec_text) < min_chars:
+                    continue
+
+                subtopics = []
+                started_bullets = False
+                for sl in sec_lines:
+                    sl_s = sl.strip()
+                    bullet_m = re.match(r"^(?:[•*\-]|(?:\d+\.))\s+([A-Za-z][^:\n\r]{3,70})", sl_s)
+                    if bullet_m:
+                        started_bullets = True
+                        st = bullet_m.group(1).strip()
+                        if not _is_excluded_topic_title(st) and st not in subtopics:
+                            subtopics.append(st)
+                    elif started_bullets and sl_s:
+                        if len(subtopics) >= 8:
+                            break
+                    elif not started_bullets:
+                        if sl_s.startswith(("What is ", "What are ", "How to ", "How ", "Types of ")) or sl_s.endswith(":"):
+                            sub_t = sl_s.rstrip(":?").strip()
+                            if 4 <= len(sub_t) <= 60 and not _is_excluded_topic_title(sub_t) and sub_t not in subtopics:
+                                subtopics.append(sub_t)
+
+                summary = ""
+                for p in sec_text.split("\n\n"):
+                    cp = " ".join(p.split()).strip()
+                    if len(cp) >= 30 and not _admin_strip_re.search(cp):
+                        summary = cp[:300]
+                        break
+                summary = summary or f"Foundational concepts, theoretical principles, and core technical methods for {h_title}."
+
+                seen_titles.add(norm)
+                step3b_topics.append({
+                    "order": len(step3b_topics) + 1,
+                    "title": h_title,
+                    "subtopics": subtopics[:8],
+                    "summary": summary,
+                })
+
+            if len(step3b_topics) >= 2:
+                topics = step3b_topics
 
     # 4. If still fewer than 2 topics and text is rich, call DeepSeek with a full-document outline skeleton
     if allow_llm_fallback and len(topics) < 2 and len(text) > 300:
@@ -2608,17 +2832,33 @@ def create_content_update_proposals(
         ]
         candidate_summary = str(candidate.get("summary") or "").strip()
 
-        topic = PrepTopic.objects.filter(course=course, order=order).first()
-        if not topic:
-            topic = PrepTopic.objects.filter(course=course, title__iexact=title).first()
+        # Match by title first across existing course topics to prevent multi-document order collision
+        existing_course_topics = list(course.topics.all())
+        topic = next(
+            (t for t in existing_course_topics if _normalise_for_comparison(t.title) == _normalise_for_comparison(title)),
+            None,
+        )
 
         if not topic:
+            # Topic does not exist in the course graph: propose as a new topic.
+            # Avoid order collision with existing topics or previously proposed topics in this batch.
+            existing_orders = {t.order for t in existing_course_topics}
+            proposed_orders = {
+                int(p.proposed_data.get("order", 0))
+                for p in proposals
+                if getattr(p, "update_type", "") == "new_topic" and isinstance(getattr(p, "proposed_data", None), dict)
+            }
+            taken_orders = existing_orders | proposed_orders
+            resolved_order = order
+            if resolved_order in taken_orders:
+                resolved_order = (max(taken_orders) if taken_orders else 0) + 1
+
             proposal = PrepContentUpdate.objects.create(
                 document=prep_document,
                 topic=None,
                 update_type="new_topic",
                 proposed_data={
-                    "order": order,
+                    "order": resolved_order,
                     "title": title,
                     "subtopics": candidate_subtopics,
                     "summary": candidate_summary,
@@ -2626,20 +2866,6 @@ def create_content_update_proposals(
                 rationale="The uploaded material contains a syllabus topic not present in the shared course graph.",
             )
             proposals.append(proposal)
-            continue
-
-        if _normalise_for_comparison(topic.title) != _normalise_for_comparison(title):
-            proposal, created = PrepContentUpdate.objects.get_or_create(
-                document=prep_document,
-                topic=topic,
-                update_type="topic_conflict",
-                defaults={
-                    "proposed_data": {"order": order, "title": title, "subtopics": candidate_subtopics, "summary": candidate_summary},
-                    "rationale": "The uploaded material uses a different title for an existing unit number. No content was merged automatically.",
-                },
-            )
-            if created:
-                proposals.append(proposal)
             continue
 
         existing_subtopics = topic.subtopics if isinstance(topic.subtopics, list) else []
@@ -3307,16 +3533,23 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
                 order = int(data.get("order") or 1)
                 title = str(data.get("title") or "").strip()
                 if title:
-                    topic, created = PrepTopic.objects.get_or_create(
-                        course=doc.course,
-                        order=order,
-                        defaults={
-                            "title": title,
-                            "subtopics": data.get("subtopics") if isinstance(data.get("subtopics"), list) else [],
-                            "summary": str(data.get("summary") or "").strip(),
-                        },
-                    )
-                    applied_updates_count += 1
+                    # Prevent clobbering or duplicate creation across documents
+                    existing_by_title = doc.course.topics.filter(title__iexact=title).first()
+                    if not existing_by_title:
+                        existing_at_order = doc.course.topics.filter(order=order).first()
+                        if existing_at_order:
+                            max_order = doc.course.topics.aggregate(models.Max("order"))["order__max"] or 0
+                            order = max_order + 1
+                        topic, created = PrepTopic.objects.get_or_create(
+                            course=doc.course,
+                            order=order,
+                            defaults={
+                                "title": title,
+                                "subtopics": data.get("subtopics") if isinstance(data.get("subtopics"), list) else [],
+                                "summary": str(data.get("summary") or "").strip(),
+                            },
+                        )
+                        applied_updates_count += 1
             elif update.update_type == "add_subtopics" and update.topic:
                 existing = update.topic.subtopics if isinstance(update.topic.subtopics, list) else []
                 existing_keys = {str(item).strip().casefold() for item in existing}
@@ -3333,22 +3566,30 @@ def publish_prep_document(prep_document, reviewer=None, now=None) -> dict:
             update.reviewed_at = now
             update.save(update_fields=["status", "reviewed_by", "reviewed_at"])
 
-        # Fallback: If course still has 0 active topics, extract from document text immediately
+        # Ensure course graph includes all topics evidenced in published lecture notes
         active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))
-        if not active_topics and doc.extracted_text:
+        if doc.extracted_text and doc.doc_type in {"Lecture Notes", "Revision Sheet"}:
             extracted_cands = extract_topic_candidates(doc.extracted_text)
             if extracted_cands:
+                existing_titles = {_normalise_for_comparison(t.title) for t in active_topics}
+                max_order = max((t.order for t in active_topics), default=0)
+                new_topics_created = False
                 for cand in extracted_cands:
-                    PrepTopic.objects.get_or_create(
+                    cand_title = str(cand.get("title") or "").strip()
+                    if not cand_title or _normalise_for_comparison(cand_title) in existing_titles:
+                        continue
+                    max_order += 1
+                    PrepTopic.objects.create(
                         course=doc.course,
-                        order=cand.get("order") or 1,
-                        defaults={
-                            "title": str(cand.get("title") or "").strip(),
-                            "subtopics": cand.get("subtopics") if isinstance(cand.get("subtopics"), list) else [],
-                            "summary": str(cand.get("summary") or "").strip(),
-                        },
+                        order=max_order,
+                        title=cand_title,
+                        subtopics=cand.get("subtopics") if isinstance(cand.get("subtopics"), list) else [],
+                        summary=str(cand.get("summary") or "").strip(),
                     )
-                active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))
+                    existing_titles.add(_normalise_for_comparison(cand_title))
+                    new_topics_created = True
+                if new_topics_created:
+                    active_topics = list(doc.course.topics.filter(is_active=True).order_by("order", "id"))
 
         # Map and auto-approve visuals
         if active_topics and doc.visual_candidates.exists():

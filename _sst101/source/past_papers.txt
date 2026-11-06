@@ -1,0 +1,1942 @@
+
+
+===== SOURCE: 362fe550dc805b5a-SST_101_CAT_2_2024.pdf (1292 chars) =====
+--- Page 1 ---
+
+ SSTSST 101101 catcat 22 20242024 practicepractice questionsquestions
+
+introductionintroduction toto probabilityprobability andand statisticsstatistics (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS
+
+Cat 2 9th November 2024
+
+Question One
+
+A random sample of 100 is drawn from a database. The distribution of the lengths of European names is
+as follows:
+
+ Number of letters 3 4 5 6 7 8 9 10 11 12
+ Frequency 3 10 18 20 18 12 8 4 5 2
+
+ a) Calculate the first four moments about the mean
+ b) Calculate the coefficient of skewnes and comment
+ c) Calculate the coefficient of kurtosis and comment.
+
+Question Two
+
+The age, x years and heights, y cm of 10 boys were as follows:
+
+ Age (x) 6.6 6.8 6.9 7.8 7.8 8.2 10. 11.4 12. 13.5
+ 1 8
+ Height(y 119 116 11 124 12 123 135 151 141 140
+ ) 6 2
+
+ i. Calculate the regression equation of y on x.
+ ii. Estimate the height of a boy of 9.0 years.
+
+Question Three
+
+Using the data in question two above calculate
+
+ i. Product moment rank correlation between X and Y
+ ii. Rank correlation coefficient
+
+===== SOURCE: 44d49a5bf1189d84-SST_101_GROUP_CAT.pdf (1387 chars) =====
+--- Page 1 ---
+
+SSTSST 101101 JanJan 20252025 AssignmentAssignment (( GroupGroup WORK)WORK)
+
+ ActuarialActuarial sciencescience (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+SST101:INTRODUCTIONTOPROBABILITYANDSTATISTICS.
+
+JANUARY-APRIL2025
+
+CONTINUOUSASSESSMENTTESTII(GROUPWORK,GROUPSOFTENSTUDENTS)
+
+INSTRUCTIONS:ANSWERALLQUESTIONS(SUBMISSIONDATE:28/3/2025)
+
+Q1 Obtaintheequationofthelineofbestfitbyleastsquaresmethodforthefollowingdate:
+
+ X 0 1 2 3 4 5 6
+
+ Y 2 1 3 2 4 3 5
+
+Q2 Thefollowingtableshowsclassesandfrequencies.
+
+ Class 5–7 8–10 11–13 14–16 17–19 20–22 23–25
+
+ Frequenc 2 4 8 7 5 3 1
+ y
+
+ Calculate:
+
+ (a) Themedianandmode.
+ (b) TheFirstandthirdquartiles.
+ (c) 7thand84thpercentiles
+ (d) meanandstandarddeviationusingassumedmeanA=12
+ (e) BothPearson’scoefficientsofskewness
+
+ (f) Bowley’scoefficientofskewness.
+
+Q3 Fourcompanies,A,B,C,andDdelivercalculatorstoasupermarketforsale.23%comefromA,
+ 36%fromB,14%fromCandtherestfromD.Frompastexperience,6%fromAareusually
+ defective.Similarly,3%fromB,11%fromCand17%fromDareusuallydefective.Ifa
+ calculatorselectedatrandomisfoundtobedefective,findtheprobabilityitcamefrom
+
+ (a) CompanyA
+
+ (b) CompanyB
+
+ (c) CompanyC
+
+ 
+
+--- Page 3 ---
+
+ END
+
+===== SOURCE: 6dd14c9b0141215f-SST_101_CAT_1_EXAM_REVIEW.pdf (3086 chars) =====
+--- Page 1 ---
+
+SST101SST101 QuestionsQuestions -- CatCat 11 examsexams
+
+ StatisticsStatistics && ProgrammingProgramming (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+ SST101 QUESTIONS ON DISPLAYING DATA
+
+1. Distinguish between a bar chart and a histogram in terms of the type of data represented,
+spacing between bars, and the interpretation of bar heights. Why is a bar chart more suitable
+for qualitative data?
+
+2. A bar chart shows the distribution of students’ favorite programming languages in a class:
+Python (45%), R (25%), Java (20%), and C++ (10%). Draw a vertical bar chart for this data.
+
+3. A bar chart is used to summarize survey results on students’ preferred study times: Morning,
+Afternoon, Evening, and Night. Discuss two possible misrepresentations that could occur if the
+chart is poorly constructed (e.g., unequal bar widths, non-zero baseline). Explain why these
+issues affect the interpretation of data.
+
+4. Two bar charts represent student club membership in different faculties. In the , the numbers are: Debate (40), Music (35), Sports (50). In the , the
+numbers are: Debate (60), Music (70), Sports (55). Draw side-by-side bar charts to compare the
+distributions. Comment on the similarities and differences in club popularity between the two
+faculties.
+
+5. The marks obtained by 40 students in a mathematics test are grouped as follows.
+
+ Marks Frequency
+ 0 – 10 3
+ 10 – 20 7
+ 20 – 30 10
+ 30 – 40 8
+ 40 – 50 12
+
+Construct a histogram to represent the data.
+
+6. The daily wages (in shillings) of 50 workers are given below.
+
+ Wages (Ksh) Number of workers
+ 200 – 300 6
+ 300 – 400 10
+ 400 – 500 12
+ 500 – 600 15
+ 600 – 700 7
+
+Draw a histogram for the data.
+
+ Page 1 of 3
+
+ 
+
+--- Page 3 ---
+
+7. The following are the marks (out of 50) scored by 30 students in a test:
+12, 25, 28, 15, 19, 35, 22, 18, 27, 32, 40, 21, 20, 26, 29, 34, 30, 16, 23, 33, 38, 24, 31, 36, 14, 17,
+37, 39, 13, 41.
+Using class boundaries of width 10, construct a histogram.
+
+8. The table below shows the distribution of the daily time (in minutes) that 50 individuals
+spend on physical exercise.
+
+ Time (minutes) Frequency
+ 0 – 9 4
+ 10 – 19 7
+ 20 – 29 13
+ 30 – 39 15
+ 40 – 49 8
+ 50 – 59 3
+
+Draw a histogram of the data.
+
+9. A university surveyed 120 students about their preferred mode of transport to campus. The
+results were as follows.
+
+ Mode of Transport Frequency
+ Walking 30
+ Bicycle 20
+ Public Bus 40
+ Private Car 25
+ Motorcycle 5
+
+Construct a pie chart to represent the data. Show clearly the calculation of the angles for each
+category.
+
+10. The table below shows the distribution of marks scored by 50 students in a Statistics test.
+
+ Marks 0 – 9 10 – 19 20 – 29 30 – 39 40 – 49 50 – 59 60 – 69 70 – 79
+ Frequency 3 7 12 9 8 6 4 1
+
+ Page 2 of 3
+
+ 
+
+--- Page 4 ---
+
+(a) Construct a cumulative frequency table.
+(b) Draw a cumulative frequency curve (ogive) on graph paper.
+
+ Page 3 of 3
+
+===== SOURCE: 9a5070d7b3c71a7d-SST_101_EXAM_PAPERS.pdf (10326 chars) =====
+--- Page 1 (Local extraction) ---
+
+ SSTSST 101101 PapersPapers -- EstherEsther OYOOOYOO
+
+MathematicsMathematics andand computercomputer sciencescience (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 (Vision OCR supplement) ---
+**SST 101; ESTHER**
+**079102904** **0700**
+
+**a higher education institution**
+**
+**SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+**1ST SEMESTER 2022/2023** **TIME: 2 HOURS**
+
+**INSTRUCTIONS:**
+Answer Question ONE and any other TWO questions
+
+1. (a) Given that the mean of 20 numbers is 15 and $\sum x^2 = 4820$. Find the variance. **(2 marks)**
+
+(b) Two groups X and Y sat for the SST 101 examination and the following table shows the outcome.
+
+| | Number of students | Mean | Standard Deviation |
+|---|---|---|---|
+| X | 12 | 100 | 5 |
+| Y | 18 | 80 | 4 |
+
+(i) Find the overall mean **(4 marks)**
+(ii) Find the overall variance **(4 marks)**
+
+(c) The table below contains a grouped data obtained from a certain experiment
+
+| Class Boundaries | Number of students |
+|---|---|
+| 3 – 6 | 2 |
+| 6 – 9 | 5 |
+| 9 – 12 | 10 |
+| 12 – 15 | 25 |
+| 15 – 18 | 30 |
+| 18 – 21 | 5 |
+| 21 – 24 | 1 |
+
+**Page 1 of 4**
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 3 (Vision OCR supplement) ---
+Find **(4 marks)**
+(i) The arithmetic mean **(4 marks)**
+(ii) The median **(4 marks)**
+(iii) The mode **(4 marks)**
+(iv) The standard deviation **(2 marks)**
+
+(d) Write the sample space for flipping a fair coin three times. **(2 marks)**
+(e) Two dice are rolled at once, what is the probability of obtaining a total of 10? **(2 marks)**
+
+2. During the last year entrance examination into a certain university in the United States, students were graded scored between 0 and 100. The scores of the candidates are recorded in the table below:
+
+| **Class Boundaries** | **Number of students** |
+| --- | --- |
+| 0 -- 10 | 10 |
+| 10 -- 20 | 15 |
+| 20 -- 30 | 10 |
+| 30 -- 40 | 21 |
+| 40 -- 50 | 33 |
+| 50 -- 60 | 40 |
+| 60 -- 70 | 25 |
+| 70 -- 80 | 12 |
+| 80 -- 90 | 8 |
+| 90 -- 100 | 1 |
+
+(a) Calculate the arithmetic mean using
+(i) The direct method **(4 marks)**
+(ii) An assumed mean of 40 **(4 marks)**
+(iii) The coding method **(4 marks)**
+(b) Calculate $Q_1, Q_2, Q_3$ **(6 marks)**
+(c) Calculate the semi-interquartile range **(2 marks)**
+
+ 
+
+INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION Page 2 of 4 
+
+ CS CamScanner
+
+--- Page 4 (Vision OCR supplement) ---
+**QUESTION FOUR (20 MARKS)**
+
+(a) The data given below represents the frequency distribution of the marks obtained by candidates in an examination
+
+| Marks | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| No. of Students | 10 | 20 | 30 | 50 | 40 | 30 |
+
+Estimate the coefficient of Skewness and interpret the value obtained. Show your calculations correct to two decimal places. (9 marks)
+
+(b) A manufacturing firm produces steel pipes in three plants with daily production of 500, 1000 and 2000 units respectively. According to past experience, it is known that the fraction of defective output produced by the three planets are respectively $0.005, 0.008, 0.010$. if a pipe is selected from a day's total production and found to be defective, find the probability that is has come from the first plant (6 marks)
+
+(c) Measures of central tendency are dependent of origin while measures of deviation are independent of origin. Account for this statement. (5 marks)
+
+**QUESTION FIVE (20 MARKS)**
+
+(a) Differentiate between categorical data and numerical data, illustrating with relevant examples from a real-life situation. (4 marks)
+
+(b) Define the following terms
+(i) Stochastically independent events (2 marks)
+(ii) Mutually exclusive events (2 marks)
+
+(c) The first four moments of a distribution about a value 5 of a variable are 2, 20, 40 and 50.
+(i) Show that the mean is 7. (3 marks)
+(ii) Find the third moment (3 marks)
+
+INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION
+Page 3 of 4
+
+--- Page 5 (Vision OCR supplement) ---
+(d) A University student studying the employment situation in a certain town found out the probabilities of males and females who are employed is as shown in the table below.
+
+| | Employment | Unemployment |
+| :--- | :---: | :---: |
+| Males | 0.40 | 0.10 |
+| Females | 0.475 | 0.025 |
+
+Suppose an unemployed person is chosen at random. Find the probability that the person selected is
+(i) Male **(3 marks)**
+(ii) Female **(3 marks)**
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** 
+
+ Page 4 of 4
+
+--- Page 6 (Vision OCR supplement) ---
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+ **a higher education institution**
+
+ **
+
+ **SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+ \textbf{2\textsuperscript{ND} SEMESTER 2024/2025} **TIME: 2 HOURS**
+
+**INSTRUCTIONS:** Answer Question ONE and any other TWO Questions.
+
+**QUESTION ONE (30 MARKS)**
+
+(a) The following are the marks (out of 100) of 60 students in mathematics.
+ 
+ 16, 13, 5, 80, 86, 7, 51, 48, 24, 56, 70, 19, 61, 17, 16, 36, 34, 42, 34, 35, 72, 55, 75, 31,
+
+ 52, 28, 72, 97, 74, 45, 62, 68, 86, 35, 85, 36, 81, 75, 55, 26, 95, 31, 7, 78, 92, 62, 52, 56,
+
+ 15, 63, 25, 36, 54, 44, 47, 27, 72, 17, 4, 30.
+ 
+ 
+
+(i) Using class interval of 10 i.e 0-9, 10-19 ..., construct a grouped frequency distribution table **(3 marks)**
+(ii) Construct a cumulative frequency curve for the data **(3 marks)**
+(b) For 5 pairs of observations the following results were obtained
+ 
+
+$$
+\sum x = 50, \sum y = 40, \sum x^2 = 524, \sum y^2 = 524, \sum xy = 364, n = 8
+$$
+
+ 
+
+(i) Find the equation of the regression of Y on X **(5 marks)**
+(ii) Calculate the coefficient of correlation between X and Y **(4 marks)**
+(c) A bag contains 5 red balls and 3 black balls. If 3 balls are drawn without replacement, what is the probability that:
+ 
+
+(i) no black ball will be selected, **(1 mark)**
+(ii) exactly one red ball will be selected, **(3 marks)**
+(d) Compute the mean, range, variance and standard deviation of the following set of numbers: 6, 10, 15, 25, 30, 32, 40, 46. **(5 marks)**
+(e) Distinguish the following terms as used in statistics
+ 
+
+(i) A population and a sample
+
+ *INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+ **-Page 1 of 4**
+
+\end{document}
+
+--- Page 7 (Vision OCR supplement) ---
+(ii) Parameter and a Statistic
+(iii) Continuous and a discrete variable
+
+**QUESTION TWO (20 MARKS)**
+
+(a) Differentiate between each of the following terms as used in Statistics:
+(i) Positive skewness and negative skewness. **(2 marks)**
+(ii) Positive correlation and negative correlation. **(2 marks)**
+
+(b) Consider the following two sets of variables
+
+$$
+\begin{array}{ccccccccc}
+X & 10 & 6 & 9 & 10 & 12 & 13 & 11 & 9 \\
+Y & 9 & 4 & 6 & 9 & 11 & 13 & 8 & 4
+\end{array}
+$$
+
+(i) It is believed that there is a relationship between the two variables ($Y$ and $X$). Construct a scatter diagram and discuss the type of relationship that exists. Assume that the dependent variable is $Y$, is the dependent variable. **(5 marks)**
+(ii) Calculate the spearman's rank correlation coefficient to measure the linear strength of the relationship between the variables $Y$ and $X$ and comment on the linear strength. **(11 marks)**
+
+**QUESTION THREE (20 MARKS)**
+
+The data given below represents the frequency distribution of the marks obtained by candidates in an examination
+
+| Marks | 20-29 | 30-39 | 40-49 | 50-59 | 60-69 | 70-79 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| Number of candidates | 4 | 10 | 16 | 19 | 8 | 3 |
+
+(a) Plot a histogram and a frequency polygon to depict that data. **(3 marks)**
+(b) Calculate
+(i) Arithmetic mean **(3 marks)**
+(ii) Median **(4 marks)**
+(iii) Mode **(3 marks)**
+(iv) Standard deviation of the distribution. **(3 marks)**
+(v) Bowleys coefficient of skewness **(4marks)**
+
+INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION
+Page 2 of 4
+
+--- Page 8 (Vision OCR supplement) ---
+Two students were graded in 11 subjects and the results are recorded in the table below
+
+| **SUBJECTS** | \multicolumn{2}{c|}{**SCORES**} | |
+| --- | --- | --- |
+| | **Benny** | **Flora** |
+| 1 | 3 | 6 |
+| 2 | 11 | 10 |
+| 3 | 12 | 10 |
+| 4 | 10 | 4 |
+| 5 | 12 | 4 |
+| 6 | 10 | 5 |
+| 7 | 4 | 8 |
+| 8 | 10 | 9 |
+| 9 | 2 | 1 |
+| 10 | 0 | 6 |
+| 11 | 4 | 5 |
+
+(a) Calculate the coefficient of variation for Benny **(4 marks)**
+
+(b) Calculate the coefficient of variation for Flora. **(4 marks)**
+
+(c) Which of the two teams is least consistent? **(4 marks)**
+
+(d) Calculate the second moment about the mean for Benny **(4 marks)**
+
+(e) Calculate the second moment about the mean for Flora. **(4 marks)**
+
+4. The results from two judges are recorded in the table below:
+
+| X | 3 | 11 | 12 | 9 | 8 | 14 | 1 | 10 | 2 | 0 | 4 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Y | 6 | 10 | 5 | 12 | 13 | 11 | 8 | 9 | 1 | 2 | 3 |
+
+(a) Find the regression line of X on Y **(5 marks)**
+
+(b) Find the regression line of Y on X **(5 marks)**
+
+(c) Find the Pearson's coefficient of correlation **(5 marks)**
+
+(d) Find the Spearman's rank correlation **(5 marks)**
+
+5. (a) In a random experiment, two fair dice are rolled once.
+
+(i) Write out the sample space. **(4 marks)**
+
+(ii) What is the probability that the two dice will show the same face? **(4 marks)**
+
+(iii) What is the probability of having a sum greater than 9. **(4 marks)**
+
+Page 3 of 4
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 9 (Vision OCR supplement) ---
+(b) A box contains 25 identical balls, out of which 12 are red and 13 are green. Ten balls are to be picked from the box, what is the probability that there are exactly 6 red balls and 4 green balls if:
+ (4 marks)
+(i) The balls are picked with replacement.
+ (4 marks)
+(ii) The balls are picked without replacement.
+
+**ESTHER OYOO**
+
+**0791029014**
+
+\vfill
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+Page 4 of 4
+
+ **CS** CamScanner
+
+===== SOURCE: ac9b98b7fe1dacc3-SST_101_Past_Papers.pdf (24627 chars) =====
+--- Page 1 (Local extraction) ---
+
+SST101SST101 pastpaperpastpaper byby ClareClare GathogaGathoga
+
+ introductionintroduction toto statisticsstatistics (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 (Vision OCR supplement) ---
+
+{**a higher education institution**}
+
+**
+
+**SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+\textbf{2\textsuperscript{ND} SEMESTER 2021/2022} **TIME: 2 HOURS**
+
+**INSTRUCTIONS:** Answer Question ONE and ANY OTHER TWO Questions
+
+**Question 1 (30 Marks)**
+
+(a) Consider the following marks obtained by 20 students in a business statistics test.
+ 
+ 64 \quad 89 \quad 63 \quad 61 \quad 78 \quad 87 \quad 74 \quad 72 \quad 54 \quad 88 
+
+ 62 \quad 81 \quad 78 \quad 73 \quad 63 \quad 56 \quad 83 \quad 86 \quad 83 \quad 93
+ 
+ 
+
+(i) Construct a stem-and-leaf diagram for these marks to assess class performance **(3 Marks)**
+(ii) Describe the shape of this data set **(2 Marks)**
+(b) Given the set of numbers, 12, 6, 7, 9, 15, 13, 11 and 18. Find the variance **(5 Marks)**
+(c) In cannery, assembly lines I, II and III account for 50, 30 and 20 percent of the total output. If 4 percent of the cans from assembly lines I, II and III are 0.6 and 1.2 percent, determine the probability that an improperly sealed can which is discovered at the final inspection of outgoing products, will have come from assembly I **(6 Marks)**
+(d) Let C and D be two events with $P(C) = 0.25$, $P(D) = 0.45$, and $P(C \cap D) = 0.1$. Find $P(C \mid D)$ **(5 Marks)**
+(e) A University student studying the employment situation in a certain town found out that the probabilities of males and females who are employed is as shown in the table below.
+
+ 
+ 
+
+| | **Employed** | **Unemployed** |
+| --- | --- | --- |
+| Males | 0.40 | 0.10 |
+| Females | 0.475 | 0.025 |
+
+ 
+
+ Suppose an unemployed person is chosen at random. Find the probability that the person selected is
+ 
+
+(i) Male **(3 Marks)**
+(ii) Female **(3 Marks)**
+(f) The marks obtained by candidates in an examination were as follows:
+
+ 
+ 
+
+| **Marks** | 20-29 | 30-39 | 40-49 | 50-59 | 60-69 | 70-79 |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Number of candidates** | 4 | 10 | 16 | 19 | 8 | 3 |
+
+ 
+
+ Plot a histogram and a frequency polygon to depict the data **(3 Marks)**
+
+\vfill
+
+**Page 1 of 3**
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 3 (Vision OCR supplement) ---
+**QUESTION 2 (20 Marks)**
+
+(a) Consider the following data for a group of ten students showing the number of times each was late for Statistics lectures in a semester.
+
+$$
+6 \quad 7 \quad 5 \quad 8 \quad 14 \quad 6 \quad 5 \quad 4 \quad 6 \quad 9
+$$
+
+(i) Calculate the second, third and fourth central moments. **(7 Marks)**
+
+(ii) Using the results in (i) above obtain the Skewness and Kurtosis of this data and comment on your results. **(4 Marks)**
+
+(b) The following frequency distribution shows the weights in kilograms of a population of 100 street boys in a certain city. Each weight was recorded to the nearest 100 grams.
+
+| Weight (kg) | Number of boys |
+| :--- | :--- |
+| 10 -- 20 | 14 |
+| 20 -- 30 | 23 |
+| 30 -- 40 | 27 |
+| 40 -- 50 | 21 |
+| 50 -- 60 | 15 |
+
+Estimate the quartile coefficient of Skewness and interpret the value obtained. Show your calculations correct to two decimal places. **(9 Marks)**
+
+**QUESTION 3 (20 MARKS)**
+
+The data below shows the profit in millions Kenya shillings realized by 40 medium sized companies for the year 2008.
+
+$$
+\begin{matrix}
+24.4 & 25.4 & 25.9 & 20.8 & 23.5 & 25.0 \\
+22.6 & 22.3 & 24.1 & 21.4 & 23.4 & 22.9 \\
+23.8 & 24.7 & 21.7 & 22.9 & 23.5 & 24.4 \\
+24.4 & 26.0 & 22.3 & 27.7 & 28.4 & 23.0 \\
+28.1 & 28.7 & 29.0 & 22.6 & 27.5 & 29.6 \\
+28.0 & 25.1 & 22.0 & 22.7 & 28.6 & 29.0 \\
+24.4 & 21.4 & 22.9 & 29.5 & &
+\end{matrix}
+$$
+
+Required:
+
+Using the inclusive form of grouping, prepare a frequency distribution table, with equal classes beginning with the class 20.0-20.9 **(5 Marks)**
+
+(a) Hence calculate:
+(i) Arithmetic Mean using method of coding, where $d_i = x_i - 37.5$ **(5 Marks)**
+(ii) Mode **(5 Marks)**
+(iii) Standard deviation **(5 Marks)**
+
+---
+
+Page 2 of 3
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 4 (Vision OCR supplement) ---
+
+## QUESTION 4 (20 MARKS)
+
+(a) The data below gives performance of students in Computer programming and statistics.
+
+| Roll number | 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- | --- |
+| Marks in Computer programming | 48 | 35 | 17 | 23 | 47 |
+| Marks in Statistics | 45 | 20 | 40 | 25 | 45 |
+
+(i) Determine the correlation coefficient between the performances using the least squares method **(8 Marks)**
+
+(ii) Hence comment on your results. **(2 Mark)**
+
+(b) A company is introducing a job evaluation scheme in which all jobs are graded by points for skill, responsibility and so on. Monthly pay scales (in thousand Kenya shillings) are then drawn up according to the number of points allocated. To date the company has applied this scheme to 9 jobs:
+
+| Job | A | B | C | D | E | F | G | H | I |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Points | 5 | 25 | 7 | 19 | 10 | 12 | 15 | 28 | 16 |
+| Pay | 3.0 | 5.0 | 3.25 | 6.5 | 5.5 | 5.6 | 6.0 | 7.2 | 6.1 |
+
+(i) Fit the least squares regression line for linking pay scales to points **(8 Marks)**
+
+(ii) Estimate the monthly pay for a job graded by 20 points **(2 Marks)**
+
+## QUESTION 5 (20 MARKS)
+
+(a) A graduate applies for a job in two firms X and Y the probability of him being selected in firm X is 0.7 and being rejected at Y is 0.5. The probability of at least one of his applications being rejected is 0.6. Determine the probability that he will be selected by one of the firms. **(5 Marks)**
+
+(b) X and Y are two events such that $P(X/Y) = 0.4$, $P(Y) = 0.25$ and $P(X) = 0.2$
+Find:
+
+(i) $P(Y/X)$ **(3 Marks)**
+(i) $P(X \cap Y)$ **(3 Marks)**
+(ii) $P(X \cup Y)$ **(3 Marks)**
+
+(c) A fruit seller found out that out of 100 apples in a box, 10 were bad and could not be sold. Three fruits are drawn at random by a customer, one at a time, replacing the previous one each time. Find the probability that at least one of the apples is bad. **(6 Marks)**
+
+\vfill
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 5 (Vision OCR supplement) ---
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+ \textsc{a higher education institution} 
+
+ \textsc{University Examinations 2019/2020} 
+
+ \textsc{Second Semester 
+
+ ****SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS****
+
+**DATE:** FRIDAY, \(6^{\text{TH}}\) NOVEMBER, 2020 **TIME:** 8:00 A.M. -- 10:00 A.M.
+
+**INSTRUCTIONS:** 
+
+Answer question ONE and any other TWO questions
+
+ ****QUESTION ONE (30 MARKS)****
+
+a) Calculate mean, median, mode from the following data of the weights in kilogrammes of a group 14 students:
+ 
+
+$$
+63, 62, 63, 61, 63, 64, 60, 65, 63, 64, 64, 66, 64, 67
+$$
+
+ **(6 Marks)**
+b) Find two numbers whose arithmetic mean is 12.5 and geometric mean 10. **(5 Marks)**
+c) In a survey of 25 families in Kisumu county, the number of children per family was recorded and the following data obtained
+ 
+ 
+
+| 1 | 0 | 2 | 3 | 4 |
+| --- | --- | --- | --- | --- |
+| 7 | 2 | 3 | 4 | 4 |
+| 8 | 4 | 5 | 8 | 6 |
+| 7 | 6 | 5 | 3 | 3 |
+| 9 | 7 | 9 | 4 | 5 |
+
+ 
+ 
+
+i) Construct a frequency distribution table using single-valued classes (discrete frequency distribution table) **(2 Marks)**
+ii) Compute the average number of children per family. **(2 Marks)**
+iii) How many families in this sample have less than 4 children? **(1 Mark)**
+d) The following are some of the particulars of the distribution of weights of boys and girls in a certain class.
+ 
+ 
+
+| | **Boys** | **Girls** |
+| --- | --- | --- |
+| Number | 100 | 50 |
+| Mean weight | 60 kg | 45 kg |
+| Variance | 9 | 4 |
+
+ 
+ 
+
+i) Find the standard deviation of the combined data. **(5 Marks)**
+ii) Which of the two distributions is more variable? **(4 Marks)**
+
+ **Page 1 of 3**
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+\end{document}
+
+--- Page 6 (Vision OCR supplement) ---
+e) The first three moments of a distribution about the value 2 are 1, 16 and -40. Show that the mean is 3, variance is 15 and third moment about the mean is -86. **(3 Marks)**
+
+f) A bag contains 5 white, 6 red and 9 black balls. Two balls are drawn at random from the bag without replacement. Find the probability that they will both be black. **(2 Marks)**
+
+**QUESTION TWO (20 MARKS)**
+
+a) Consider the following data for a group of ten students showing the number of times each missed SST 101 lectures in a certain semester
+
+$$
+6, 5, 4, 7, 13, 5, 4, 3, 8, 5
+$$
+
+Compute the first four moments about the arithmetic mean and hence obtain coefficients of skewness and kurtosis. Comment on shape and peakedness of the distribution. **(10 Marks)**
+
+b) An incomplete distribution of data is given below
+
+| **Class** | 55-64 | 65-74 | 75-84 | 85-94 | 95-104 | 105-114 | 115-124 | 125-134 | 135-144 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Frequency** | 2 | 19 | 28 | 78 | \(f_1\) | 300 | \(f_2\) | 92 | 14 |
+
+You are given that the total frequency is 900 and the median is 100.5. Find the missing class frequencies \(f_1\) and \(f_2\) **(4 Marks)**
+
+c) Suppose \(P(A) = \frac{1}{2}\), \(P(B) = \frac{1}{5}\), and \(P(A \cap B) = \frac{1}{10}\).
+Find \(P(A|B)\), \(P(A \cup B)\), \(P(A^c \cap B^c)\). **(6 Marks)**
+
+**QUESTION THREE (20 MARKS)**
+
+The following data give the experience of machine operators and their performance ratings as given by the number of good parts turned out per 100 pieces:
+
+| **Operator** | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Experience (X years)** | 16 | 12 | 18 | 4 | 3 | 10 | 5 | 12 |
+| **Performance Ratings (Y)** | 87 | 88 | 89 | 68 | 78 | 80 | 75 | 83 |
+
+i. construct a scatter diagram for these data. **(2 Marks)**
+ii. What relationship does the scatter plot suggest? **(1 Mark)**
+
+b) Find a regression line that would predict the number of years of experience of an operator given a performance rating. Use this equation to estimate the number of years of experience one should have in order to have a performance rating of 82. **(8 Marks)**
+
+c) Obtain the Pearson's correlation coefficient between experience and performance ratings and comment on your result. **(4 Marks)**
+
+d) Obtain the Spearman's rank correlation coefficient between experience and performance rating. **(5 Marks)**
+
+Page 2 of 3
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 7 (Vision OCR supplement) ---
+
+## QUESTION FOUR (20 MARKS)
+
+Consider the following frequency distribution table.
+
+| Class interval | 5-9 | 10-14 | 15-19 | 20-24 | 25-29 | 30-34 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Frequency | 3 | 4 | 6 | 5 | 4 | 3 |
+
+a) Find the mean and the standard deviation by changing both the location (use an assumed mean $A=17$) and the scale (use common class width). **(9 Marks)**
+b) Calculate
+ 
+
+i) Mode **(2 Marks)**
+ii) Median **(2 Marks)**
+iii) Interquartile Range **(5 Marks)**
+iv) Coefficient of variation based on standard deviation. **(1 Mark)**
+v) Coefficient of Skewness based on quartiles. **(1 Mark)**
+
+## QUESTION FIVE (20 MARKS)
+
+a) The probability that a contractor will get a plumbing contract is $\frac{2}{3}$ and the probability that he will not get an electric contract is $\frac{5}{9}$. If the probability of getting at least one contract is $\frac{4}{5}$. What is the probability that he will get both contracts? **(2 Marks)**
+b) A husband and a wife independently appear in an interview for two vacancies in the same post. The probability of husband's selection is $\frac{1}{7}$ and that of wife's selection is $\frac{1}{5}$. What is the probability that:
+ 
+
+i) both of them will be selected. **(2 Marks)**
+ii) only one of them will be selected, and **(3 Marks)**
+iii) none of them will be selected. **(2 Marks)**
+c) A bag contains 10 white and 5 black balls. Four balls are successively drawn out and not replaced. What is the probability that they are alternatively of different colours? **(3 Marks)**
+d) In a bolt factory machines A, B and C manufacture 25\%, 35\% and 40\% respectively. Of the total of their output 5\%, 4\% and 2\% are defective bolts. A bolt is drawn at random from the products and is found to be defective. What is the probability that it was manufactured by machines A, B and C? **(8 Marks)**
+
+Page 3 of 3
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 8 (Vision OCR supplement) ---
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\begin{document}
+
+ **a higher education institution**
+
+ **UNIVERSITY EXAMINATIONS 2018/2019**
+
+ **SECOND SEMESTER 
+
+ **, AND BACHELOR OF EDUCATION**
+
+ **SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+**DATE:** Thursday, 28\textsuperscript{th} March 2019 **TIME:** 11.00 a.m. - 1.00 p.m.
+
+**INSTRUCTIONS:** Answer question ONE and any other two questions.
+
+**QUESTION ONE (30MARKS)**
+
+(a) Consider the following data for a group of ten students showing the number of times each was late for statistics lectures in a particular semester:
+ 
+ 
+ 9 \quad 6 \quad 4 \quad 5 \quad 6 \quad 14 \quad 8 \quad 5 \quad 7 \quad 6
+ 
+ 
+ Calculate mean, mode, median and variance of the distribution. **(5marks)**
+(b) Fifty students took up a test. The results of those who passed the test is given below:
+
+ 
+ 
+
+| marks | 4 | 5 | 6 | 7 | 8 | 9 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Number of students | 8 | 10 | 9 | 6 | 4 | 3 |
+
+ 
+
+ If the average mark of all fifty students was 5.16, find the average mark of those who failed. **(5marks)**
+(c) The following table shows distribution of marks for 230 students:
+
+ 
+ 
+
+| Marks | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 | 60-70 | 70-80 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Number of students | 12 | 30 | x | 60 | y | 25 | 18 |
+
+ 
+
+ If the median of the distribution is 43, calculate the missing frequencies x and y. **(6marks)**
+(d) The probability that Andrew solves a statistics problem is 0.8 and the probability Beatrice solves the problem is 0.7. what is the probability that
+ 
+
+(i) Both students solve the problem. **(2marks)**
+(ii) Only one student solves the problem. **(3marks)**
+(iii) Both students fail to solve the problem. **(2marks)**
+
+**INVOLVEMENT IN** **REGULARITY SHALL LEAD TO DISCONTINUATION**
+
+ 
+
+\end{document}
+
+--- Page 9 (Vision OCR supplement) ---
+(e) The mean and variance of a set of 20 observations are known to be 10 and 4 respectively. Of the ten observations, one (i.e 8) was incorrect. Calculate the mean and the standard deviation if the correct observation was 12. **(4marks)**
+
+(f) A set $X$ of 20 observations produced the following results: $\sum x = 45, \sum x^2 = 118$
+Calculate the coefficient of variation of $X$. **(3marks)**
+
+**QUESTION TWO (20 MARKS)**
+
+Consider the following frequency distribution table
+
+| Class limits | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 | 60-70 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f | 10 | 20 | 35 | 40 | 25 | 25 | 15 |
+
+Calculate
+
+1. Arithmetic mean **(3marks)**
+2. Median **(3marks)**
+3. Mode **(3marks)**
+4. First and third quartiles **(6marks)**
+5. Variance **(6marks)**
+6. Standard deviation **(2marks)**
+
+**QUESTION THREE (20 MARKS)**
+
+1. Define moments about a point A. **(2marks)**
+2. Derive the relationship of the third moment about a point A and about the mean. **(6marks)**
+3. The first four moments about $\bar{X} = 2$ are 1, 2.5, 5.5 and 16. Determine the skewness and kurtosis of this distribution and comment about the shape and peakedness of the frequency curve **(12marks)**
+
+**QUESTION FOUR (20 MARKS)**
+
+The following data refer to the weights (X) in kgs heights (Y) in inches of 8 students in a certain class in Nairobi County
+
+| X | 62 | 63 | 55 | 58 | 72 | 65 | 77 | 71 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Y | 62 | 57 | 56 | 64 | 79 | 66 | 70 | 61 |
+
+1. 1. Construct a scatter diagram for these data **(2 Marks)**
+2. What relationship does the scatter suggest? **(1 Mark)**
+2. Determine Karl Person correlation coefficient between weights (X) and heights (Y). **(6 Marks)**
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY* *CONTINUATION* 
+
+ **Page 2 of 3**
+
+--- Page 10 (Vision OCR supplement) ---
+c) Obtain a regression line that would predict a person given his/her weight. Use this line to estimate the heights of a person whose weight is 68 Kgs. **(6 Marks)**
+
+d) Find the Spearman's rank correlation between weights and heights. **(5 Marks)**
+
+**QUESTION FIVE (20 MARKS)**
+
+a) Given two events A and B such that $P(B^c) = 0.5$ * and * $P(A \cup B) = 0.9$, find $P(A)$ if A and B are
+
+i) Mutually exclusive events **(3 Marks)**
+ii) Independent events **(3 Marks)**
+
+b) Let A and B be two events such that $P(A \cup B) = \frac{4}{5}$, $P(A) = \frac{1}{3}$ * and * $P(A \cap B) = \frac{1}{25}$
+
+Find $P(A^c \cap B)$ * and * $P(B \mid A^c)$ **(6 Marks)**
+
+c) In a city there are 3 stores each having 20 pieces of a certain item. Let these stores be denoted by $S_1$, $S_2$, and $S_3$. The stores $S_1$, $S_2$, and $S_3$ have 10\%, 20\%, and 30\% defective items, respectively. A customer first chooses a store randomly and then selects an item randomly from the store. Find the probability that the selected item
+
+i) is defective **(2 Marks)**
+ii) has come from $S_1$ **(2 Marks)**
+iii) has come from $S_2$ **(2 Marks)**
+iv) has come from $S_3$ **(2 Marks)**
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+--- Page 11 (Vision OCR supplement) ---
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+**a higher education institution**
+
+**UNIVERSITY EXAMINATIONS 2016/2017**
+
+SECOND SEMESTER 
+
+**SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+**DATE:** Thursday 11\textsuperscript{th} May 2017 **TIME:** 2.00p.m-4.00p.m
+
+**INSTRUCTIONS:**
+
+Answer Question ONE and any other TWO questions
+
+**QUESTION ONE -- 30 MARKS**
+
+(a) The following table gives the number of children less than 18 years of age for 30 randomly selected families:
+
+| 2 | 1 | 3 | 2 | 0 | 2 | 0 | 3 | 4 | 4 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2 | 1 | 1 | 2 | 0 | 2 | 0 | 2 | 2 | 1 |
+| 2 | 3 | 4 | 5 | 6 | 7 | 7 | 8 | 9 | 8 |
+| 0 | 2 | 1 | 1 | 2 | 2 | 1 | 1 | 3 | 2 |
+| 9 | 2 | 1 | 5 | 6 | 7 | 8 | 0 | 0 | 0 |
+| 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+- [(i)] Prepare a frequency distribution table using single-valued classes
+- [(ii)] Calculate average number of children less than 18 years of age per family
+- [(iii)] How many families in this sample have 2 or 3 children less than 18 years of age. (3,3,2)
+
+(b) The following data gives the number of ball bearings manufactured by a Company per day for a sample of 12 days:
+
+24 \quad 32 \quad 27 \quad 23 \quad 35 \quad 33 \quad 29 \quad 21 \quad 23 \quad 28 \quad 25 \quad 33
+
+Calculate median, mode and variance for these data. **(5 marks)**
+
+(c) On a certain examination, the average grade of all the students in class A is 68.4 and of all the students in class B is 71.2. If the average of both classes is 70, what is the ratio of students of the number of class A to the number in class B. **(4marks)**
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+\end{document}
+
+--- Page 12 (Vision OCR supplement) ---
+(d) On a final examination, the mean marks of a group of 125 students in English were 75 and the standard deviation was 6. In mathematics, however, the mean marks of the group were 70 and a standard deviation was 7. In which subject was there greater variability? **(4 marks)**
+
+(e) The first three moments of a distribution about the value 2 are 1, 16, and 40. Calculate the mean and variance of the distribution. **(4marks)**
+
+(f) A bag contains five black balls and three white balls. Three balls are drawn without replacement. What is the probability that the first was black. **(5marks)**
+
+**QUESTION TWO-20 MARKS**
+
+Consider the following frequency distribution table.
+
+| Class Interval | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Frequency | 5 | 10 | 14 | 10 | 6 | 5 |
+
+(a) Find the mean and the standard deviation (s.d) by changing both the location(use an assumed mean of 35) and the scale(use common class width) **(7marks)**
+
+(b) Find (i) \quad mode
+ (ii) \quad median
+ (iii) \quad interquartile range
+ (iv) \quad coefficient of variation based on s.d
+ (v) \quad coefficient of skewnessbased on quartiles. **(13marks)**
+
+**QUESTION THREE-20 MARKS**
+
+(a) All 500 employees of a company were asked whether they are smokers (S) or non-smokers (N) of cigarettes and whether they are college graduates (C) or not (D). Based on this information the following two way classification table was prepared:
+
+| | College graduate (C) | Not a college graduate (D) |
+| --- | --- | --- |
+| Smoker (S) | 55 | 100 |
+| Non-smoker (N) | 150 | 195 |
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION* 
+
+Page 2 of 4
+
+--- Page 13 (Vision OCR supplement) ---
+Suppose one employee is selected at random from this company. Find the probability that he/she
+i) Is a smoker or not a college graduate
+ii) Is a smoker and a college graduate
+iii) Is a smoker or not a smoker
+iv) Is a non-smoker and not a college graduate
+v) Is a college graduate or not **(10 marks)**
+
+(b) A cat is in a room and each of the walls of the room has a door through which the cat could equally likely try to escape. However, there is a trap at each of the doors $D_1$, $D_2$, $D_3$ and $D_4$ and they work with probabilities $0.3$, $0.2$, $0.4$ and $0.5$ respectively. If the cat picks a door at random, find the probability that the cat will escape. **(5 marks)**
+
+(d) According to particular survey, $8\%$ of the population has lung disease. Of those having lung disease, $90\%$ are smokers and of those not having lung disease, $25\%$ are smokers. Find the probability that a randomly selected smoker has a lung disease. **(5marks)**
+
+**QUESTION FOUR-20MARKS**
+
+(a) Consider the following data for a group of ten students showing the number of times each was late for Statistics lectures in a semester
+
+$$
+7 \quad 6 \quad 5 \quad 8 \quad 14 \quad 6 \quad 5 \quad 4 \quad 9 \quad 6
+$$
+
+Calculate the second, third and fourth moments about the arithmetic mean and use them to obtain coefficients of skewness and kurtosis.
+Comment on the shape and peakedness of the distribution. **(9marks)**
+
+(b) An incomplete distribution is given below:
+
+| Class | 200-210 | 210-220 | 220-230 | 230-240 | 240-250 | 250-260 | 260-270 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Freq | 4 | 16 | A | B | c | 6 | 4 |
+
+Given that the median and mode are $233.5$ and $234$ respectively and that the total frequency is $230$, find the values of a, b and c. **(7 marks)**
+
+(c) Suppose $P(A) = \frac{1}{2}$, $P(B) = \frac{1}{3}$ and $P(A \cap C) = \frac{1}{12}$ where A and C are independent. If $P(B \cup C) = \frac{1}{2}$ show that B and C are mutually exclusive. **(4 marks)**
+
+***INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION***
+
+{}
+
+--- Page 14 (Vision OCR supplement) ---
+**QUESTION FIVE-20 MARKS**
+
+The following data refer to the number of hours that 10 students studied for a statistics test and their scores on the test:
+
+| Hours studied (x) | 1 | 17 | 22 | 12 | 7 | 4 | 14 | 10 | 9 | 4 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| Test Score (y) | 21 | 83 | 90 | 60 | 45 | 38 | 74 | 66 | 59 | 32 |
+
+(a) (i) Construct a scatter diagram for these data **(2marks)**
+
+(ii) What relationship does the scatter plot suggest **(2marks)**
+
+(b) Find the Pearson's correlation coefficient between hours studied and Test scores **(6marks)**
+
+(c) Find a regression line that would predict the number of hours studied given a certain test score. Use this line to estimate how many hours one should study in order to have a test score of 80. **(5marks)**
+
+(d) Determine the Spearman's rank correlation coefficient between hours studied and test scores. **(5 marks)**
+
+---
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+Page 4 of 4
+
+===== SOURCE: af7f928bd15f0a71-SST_101_CLASS_CAT.pdf (1786 chars) =====
+--- Page 1 ---
+
+SST101-IntroductionSST101-Introduction toto probabilityprobability andand statistics.statistics. AssignmentAssignment
+ 11
+
+ MathematicsMathematics andand computercomputer sciencescience (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+ SST101- Introduction to Probability and Statistics. Assignment 1.
+
+ Submit to your class rep before Friday 1st November 2024.
+
+1.
+ a) The mean of a certain number of observations is 40, If two or more items with values 50 and
+ 64 are added to this data the mean rises to 42. Find the number of items in the original data.
+ b) In a sample of 100 households in a specific city, the following distribution of number of
+ people per households were observed.
+
+ Number of 1 2 3 4 5 6 7
+ people x
+ Number of 7 x 20 y 18 10 5
+ households
+
+ Given that the mean number of people was found to be 4 and the total households is 100,
+ i) Calculate the missing number of households x and y.
+ ii) Find the median and the lower and upper quartiles.
+2. a) Survey results of the heights (cm) of 400 students in a certain school are shown in this
+ frequency table.
+
+ Height 100-110 110-120 120-130 130-140 140-150 150-160 160-170
+ Cumulative 27 85 215 320 370 395 400
+ frequency
+ i) Draw the ogive curves both less than and more than in the same axis.
+ ii) Use the diagram to estimate the median.
+ iii) Calculate the standard deviation of the data.
+
+ b)The weighted geometric mean of the four numbers 8,25.19 and 28 is 22.15. If the weights of
+ the first three numbers are 3,5,7 respectively. Find the weight of the fourth number. (HINT
+ Weight is the frequency).
+
+===== SOURCE: e612dbd9aa125903-SST_101_PAST_PAPERS_BY_CAROLYNE_MBOYA.pdf (4103 chars) =====
+--- Page 1 (Vision OCR supplement) ---
+CAROLYNE MBOYA SST101
+
+0769827921
+
+a higher education institution
+
+**SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+1\textsuperscript{ST} SEMESTER 2022/2023 TIME: 2 HOURS
+
+**INSTRUCTIONS:**
+
+Answer Question ONE and any other TWO questions
+
+(a) Given that the mean of 20 numbers is 15 and $\sum x^2 = 4820$. Find the variance. **(2 marks)**
+(b) Two groups X and Y sat for the SST 101 examination and the following table shows the outcome.
+
+| | **Number of students** | **Mean** | **Standard Deviation** |
+| --- | --- | --- | --- |
+| X | 12 | 100 | 5 |
+| Y | 18 | 80 | 4 |
+
+(i) Find the overall mean **(4 marks)**
+(ii) Find the overall variance **(4 marks)**
+(c) The table below contains a grouped data obtained from a certain experiment
+
+| **Class Boundaries** | **Number of students** |
+| --- | --- |
+| 3 -- 6 | 2 |
+| 6 -- 9 | 5 |
+| 9 -- 12 | 10 |
+| 12 -- 15 | 25 |
+| 15 -- 18 | 30 |
+| 18 -- 21 | 5 |
+| 21 -- 24 | 1 |
+
+Page 1 of 4
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+--- Page 2 (Vision OCR supplement) ---
+**Find**
+
+(i) The arithmetic mean **(4 marks)**
+
+(ii) The median **(4 marks)**
+
+(iii) The mode **(4 marks)**
+
+(iv) The standard deviation **(4 marks)**
+
+(d) Write the sample space for flipping a fair coin three times. **(2 marks)**
+
+(e) Two dice are rolled at once, what is the probability of obtaining a total of 10? **(2 marks)**
+
+2. During the last year entrance examination into a certain university in the United States, students were graded scored between 0 and 100. The scores of the candidates are recorded in the table below:
+
+| Class Boundaries | Number of students |
+| :--- | :--- |
+| 0 -- 10 | 10 |
+| 10 -- 20 | 15 |
+| 20 -- 30 | 10 |
+| 30 -- 40 | 21 |
+| 40 -- 50 | 33 |
+| 50 -- 60 | 40 |
+| 60 -- 70 | 25 |
+| 70 -- 80 | 12 |
+| 80 -- 90 | 8 |
+| 90 -- 100 | 1 |
+
+(a) Calculate the arithmetic mean using
+
+(i) The direct method **(4 marks)**
+
+(ii) An assumed mean of 40 **(4 marks)**
+
+(iii) The coding method **(4 marks)**
+
+(b) Calculate $Q_1$, $Q_2$, $Q_3$ **(6 marks)**
+
+(c) Calculate the semi-interquartile range **(2 marks)**
+
+--- Page 3 (Vision OCR supplement) ---
+3. Two students were graded in 11 subjects and the results are recorded in the table below
+
+| \multirow{2}{*}{**SUBJECTS**} | \multicolumn{2}{c|}{**SCORES**} | |
+| --- | --- | --- |
+| | **Benny** | **Flora** |
+| 1 | 3 | 6 |
+| 2 | 11 | 10 |
+| 3 | 12 | 10 |
+| 4 | 10 | 4 |
+| 5 | 12 | 4 |
+| 6 | 10 | 5 |
+| 7 | 4 | 8 |
+| 8 | 10 | 9 |
+| 9 | 2 | 1 |
+| 10 | 0 | 6 |
+| 11 | 4 | 5 |
+
+(a) Calculate the coefficient of variation for Benny **(4 marks)**
+
+(b) Calculate the coefficient of variation for Flora. **(4 marks)**
+
+(c) Which of the two teams is least consistent? **(4 marks)**
+
+(d) Calculate the second moment about the mean for Benny **(4 marks)**
+
+(e) Calculate the second moment about the mean for Flora. **(4 marks)**
+
+4. The results from two judges are recorded in the table below:
+
+| X | 3 | 11 | 12 | 9 | 8 | 14 | 1 | 10 | 2 | 0 | 4 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Y | 6 | 10 | 5 | 12 | 13 | 11 | 8 | 9 | 1 | 2 | 3 |
+
+(a) Find the regression line of X on Y **(5 marks)**
+
+(b) Find the regression line of Y on X **(5 marks)**
+
+(c) Find the Pearson's coefficient of correlation **(5 marks)**
+
+(d) Find the Spearman's rank correlation **(5 marks)**
+
+5. (a) In a random experiment, two fair dice are rolled once.
+
+(i) Write out the sample space. **(4 marks)**
+
+(ii) What is the probability that the two dice will show the same face? **(4 marks)**
+
+(iii) What is the probability of having a sum greater than 9. **(4 marks)**
+
+Page 3 of 4
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 4 (Vision OCR supplement) ---
+*(b) A box contains 25 identical balls, out of which 12 are red and 13 are green. Ten balls are to be picked from the box, what is the probability that there are exactly 6 red balls and 4 green balls if:*
+
+*(i) The balls are picked with replacement. **(4 marks)***
+
+*(ii) The balls are picked without replacement. **(4 marks)***
+
+===== SOURCE: ecd7336531ac04d7-SST101_pastpaper_by_Clare_Gathoga.pdf (24226 chars) =====
+--- Page 1 (Vision OCR supplement) ---
+
+{**CLARE GATHOGA**} 
+
+ 
+
+**a higher education institution** 
+
+**
+
+**SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+\textbf{2\textsuperscript{ND} SEMESTER 2021/2022} **TIME: 2 HOURS**
+
+**INSTRUCTIONS:** Answer Question ONE and ANY OTHER TWO Questions
+
+**Question 1 (30 Marks)**
+
+1. Consider the following marks obtained by 20 students in a business statistics test.
+ 
+ 
+
+| 64 | 89 | 63 | 61 | 78 | 87 | 74 | 72 | 54 | 88 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 62 | 81 | 78 | 73 | 63 | 56 | 83 | 86 | 83 | 93 |
+
+ 
+ 
+
+1. Construct a stem-and-leaf diagram for these marks to assess class performance **(3 Marks)**
+2. Describe the shape of this data set **(2 Marks)**
+2. Given the set of numbers, \(12, 6, 7, 9, 15, 13, 11\) and \(18\). Find the variance **(5 Marks)**
+3. In cannery, assembly lines I, II and III account for 50, 30 and 20 percent of the total output. If 4 percent of the cans from assembly lines I, II and III are 0.6 and 1.2 percent, determine the probability that an improperly sealed can which is discovered at the final inspection of outgoing products, will have come from assembly I **(6 Marks)**
+4. Let C and D be two events with \(P(C) = 0.25\), \(P(D) = 0.45\), and \(P(C \cap D) = 0.1\). Find \(P(C \mid D)\) **(5 Marks)**
+5. A University student studying the employment situation in a certain town found out that the probabilities of males and females who are employed is as shown in the table below.
+ 
+ 
+
+| | **Employed** | **Unemployed** |
+| --- | --- | --- |
+| Males | 0.40 | 0.10 |
+| Females | 0.475 | 0.025 |
+
+ 
+ Suppose an unemployed person is chosen at random. Find the probability that the person selected is
+ 
+
+1. Male **(3 Marks)**
+2. Female **(3 Marks)**
+6. The marks obtained by candidates in an examination were as follows:
+ 
+ 
+
+| **Marks** | 20-29 | 30-39 | 40-49 | 50-59 | 60-69 | 70-79 |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Number of candidates** | 4 | 10 | 16 | 19 | 8 | 3 |
+
+ 
+ Plot a histogram and a frequency polygon to depict the data **(3 Marks)**
+
+**Page 1 of 3** 
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 2 (Vision OCR supplement) ---
+**QUESTION 2 (20 Marks)**
+
+(a) Consider the following data for a group of ten students showing the number of times each was late for Statistics lectures in a semester.
+
+$$
+6 \quad 7 \quad 5 \quad 8 \quad 14 \quad 6 \quad 5 \quad 4 \quad 6 \quad 9
+$$
+
+(i) Calculate the second, third and fourth central moments. **(7 Marks)**
+
+(ii) Using the results in (i) above obtain the Skewness and Kurtosis of this data and comment on your results. **(4 Marks)**
+
+(b) The following frequency distribution shows the weights in kilograms of a population of 100 street boys in a certain city. Each weight was recorded to the nearest 100 grams.
+
+| Weight (kg) | Number of boys |
+| :--- | :--- |
+| 10 -- 20 | 14 |
+| 20 -- 30 | 23 |
+| 30 -- 40 | 27 |
+| 40 -- 50 | 21 |
+| 50 -- 60 | 15 |
+
+Estimate the quartile coefficient of Skewness and interpret the value obtained. Show your calculations correct to two decimal places. **(9 Marks)**
+
+**QUESTION 3 (20 MARKS)**
+
+The data below shows the profit in millions Kenya shillings realized by 40 medium sized companies for the year 2008.
+
+$$
+\begin{matrix}
+24.4 & 25.4 & 25.9 & 20.8 & 23.5 & 25.0 \\
+22.6 & 22.3 & 24.1 & 21.4 & 23.4 & 22.9 \\
+23.8 & 24.7 & 24.7 & 22.9 & 23.5 & 24.4 \\
+24.4 & 26.0 & 22.3 & 27.7 & 28.4 & 23.0 \\
+28.1 & 28.7 & 29.0 & 22.6 & 27.5 & 29.6 \\
+28.0 & 25.1 & 22.0 & 22.7 & 28.6 & 29.0 \\
+24.4 & 21.4 & 22.0 & 29.5 & &
+\end{matrix}
+$$
+
+Required:
+
+Using the inclusive form of grouping, prepare a frequency distribution table, with equal classes beginning with the class 20.0-20.9 **(5 Marks)**
+
+(a) Hence calculate:
+(i) Arithmetic Mean using method of coding, where $d_i = x_i - 37.5$ **(5 Marks)**
+(ii) Mode **(5 Marks)**
+(iii) Standard deviation **(5 Marks)**
+
+---
+
+Page 2 of 3
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 3 (Vision OCR supplement) ---
+
+## QUESTION 4 (20 MARKS)
+
+(a) The data below gives performance of students in Computer programming and statistics.
+
+| Roll number | 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- | --- |
+| Marks in Computer programming | 48 | 35 | 17 | 23 | 47 |
+| Marks in Statistics | 45 | 20 | 40 | 25 | 45 |
+
+(i) Determine the correlation coefficient between the performances using the least squares method **(8 Marks)**
+
+(ii) Hence comment on your results. **(2 Mark)**
+
+(b) A company is introducing a job evaluation scheme in which all jobs are graded by points for skill, responsibility and so on. Monthly pay scales (in thousand Kenya shillings) are then drawn up according to the number of points allocated. To date the company has applied this scheme to 9 jobs:
+
+| Job | A | B | C | D | E | F | G | H | I |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Points | 5 | 25 | 7 | 19 | 10 | 12 | 15 | 28 | 16 |
+| Pay | 3.0 | 5.0 | 3.25 | 6.5 | 5.5 | 5.6 | 6.0 | 7.2 | 6.1 |
+
+(i) Fit the least squares regression line for linking pay scales to points **(8 Marks)**
+
+(ii) Estimate the monthly pay for a job graded by 20 points **(2 Marks)**
+
+## QUESTION 5 (20 MARKS)
+
+(a) A graduate applies for a job in two firms X and Y the probability of him being selected in firm X is 0.7 and being rejected at Y is 0.5. The probability of at least one of his applications being rejected is 0.6. Determine the probability that he will be selected by one of the firms. **(5 Marks)**
+
+(b) X and Y are two events such that $P(X/Y) = 0.4$, $P(Y) = 0.25$ and $P(X) = 0.2$
+Find:
+
+(i) $P(Y/X)$ **(3 Marks)**
+(i) $P(X \cap Y)$ **(3 Marks)**
+(ii) $P(X \cup Y)$ **(3 Marks)**
+
+(c) A fruit seller found out that out of 100 apples in a box, 10 were bad and could not be sold. Three fruits are drawn at random by a customer, one at a time, replacing the previous one each time. Find the probability that at least one of the apples is bad. **(6 Marks)**
+
+Page 3 of 3
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 4 (Vision OCR supplement) ---
+
+**a higher education institution**
+
+**UNIVERSITY EXAMINATIONS 2019/2020**
+
+**SECOND SEMESTER 
+
+**SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+**DATE:** FRIDAY, \(6^{\text{TH}}\) NOVEMBER, 2020 **TIME:** 8:00 A.M. - 10:00 A.M.
+
+**INSTRUCTIONS:**
+
+Answer question ONE and any other TWO questions
+
+**QUESTION ONE (30 MARKS)**
+
+1. Calculate mean, median, mode from the following data of the weights in kilogrammes of a group 14 students:
+ 
+
+$$
+63, 62, 63, 61, 63, 64, 60, 65, 63, 64, 64, 66, 64, 67 \text{(6 Marks)}
+$$
+
+2. Find two numbers whose arithmetic mean is 12.5 and geometric mean 10. **(5 Marks)**
+3. In a survey of 25 families in Kisumu county, the number of children per family was recorded and the following data obtained
+ 
+ 
+
+| 1 | 0 | 2 | 3 | 4 |
+| --- | --- | --- | --- | --- |
+| 7 | 2 | 3 | 4 | 4 |
+| 8 | 4 | 5 | 8 | 6 |
+| 7 | 6 | 5 | 3 | 3 |
+| 9 | 7 | 9 | 4 | 5 |
+
+ 
+ 
+
+1. Construct a frequency distribution table using single-valued classes (discrete frequency distribution table) **(2 Marks)**
+2. Compute the average number of children per family. **(2 Marks)**
+3. How many families in this sample have less than 4 children? **(1 Mark)**
+4. The following are some of the particulars of the distribution of weights of boys and girls in a certain class.
+ 
+ 
+
+| | **Boys** | **Girls** |
+| --- | --- | --- |
+| Number | 100 | 50 |
+| Mean weight | 60 kg | 45 kg |
+| Variance | 9 | 4 |
+
+ 
+ 
+
+1. Find the standard deviation of the combined data. **(5 Marks)**
+2. Which of the two distributions is more variable? **(4 Marks)**
+
+ Page 1 of 3
+
+ **INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 5 (Vision OCR supplement) ---
+e) The first three moments of a distribution about the value 2 are 1, 16 and -40. Show that the mean is 3, variance is 15 and third moment about the mean is -86. **(3 Marks)**
+
+f) A bag contains 5 white, 6 red and 9 black balls. Two balls are drawn at random from the bag without replacement. Find the probability that they will both be black. **(2 Marks)**
+
+**QUESTION TWO (20 MARKS)**
+
+a) Consider the following data for a group of ten students showing the number of times each missed SST 101 lectures in a certain semester
+
+$$
+6, 5, 4, 7, 13, 5, 4, 3, 8, 5
+$$
+
+Compute the first four moments about the arithmetic mean and hence obtain coefficients of skewness and kurtosis. Comment on shape and peakedness of the distribution. **(10 Marks)**
+
+b) An incomplete distribution of data is given below
+
+| Class | 55-64 | 65-74 | 75-84 | 85-94 | 95-104 | 105-114 | 115-124 | 125-134 | 135-144 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Frequency | 2 | 19 | 28 | 78 | $f_1$ | 300 | $f_2$ | 92 | 14 |
+
+You are given that the total frequency is 900 and the median is 100.5. Find the missing class frequencies $f_1$ and $f_2$. **(4 Marks)**
+
+c) Suppose $P(A) = \frac{1}{2}$, $P(B) = \frac{1}{5}$, and $P(A \cap B) = \frac{1}{10}$.
+Find $P(A|B)$, $P(A \cup B)$, $P(A^c \cap B^c)$. **(6 Marks)**
+
+**QUESTION THREE (20 MARKS)**
+
+The following data give the experience of machine operators and their performance ratings as given by the number of good parts turned out per 100 pieces:
+
+| Operator | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Experience (X years) | 16 | 12 | 18 | 4 | 3 | 10 | 5 | 12 |
+| Performance Ratings (Y) | 87 | 88 | 89 | 68 | 78 | 80 | 75 | 83 |
+
+i. construct a scatter diagram for these data. **(2 Marks)**
+ii. What relationship does the scatter plot suggest? **(1 Mark)**
+
+b) Find a regression line that would predict the number of years of experience of an operator given a performance rating. Use this equation to estimate the number of years of experience one should have in order to have a performance rating of 82. **(8 Marks)**
+
+c) Obtain the Pearson's correlation coefficient between experience and performance ratings and comment on your result. **(4 Marks)**
+
+d) Obtain the Spearman's rank correlation coefficient between experience and performance rating. **(5 Marks)**
+
+Page 2 of 3
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 6 (Vision OCR supplement) ---
+
+## QUESTION FOUR (20 MARKS)
+
+Consider the following frequency distribution table.
+
+| Class interval | 5-9 | 10-14 | 15-19 | 20-24 | 25-29 | 30-34 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Frequency | 3 | 4 | 6 | 5 | 4 | 3 |
+
+1. Find the mean and the standard deviation by changing both the location (use an assumed mean $A=17$) and the scale (use common class width). **(9 Marks)**
+2. Calculate
+ 
+
+1. Mode **(2 Marks)**
+2. Median **(2 Marks)**
+3. Interquartile Range **(5 Marks)**
+4. Coefficient of variation based on standard deviation. **(1 Mark)**
+5. Coefficient of Skewness based on quartiles. **(1 Mark)**
+
+## QUESTION FIVE (20 MARKS)
+
+1. The probability that a contractor will get a plumbing contract is $\frac{2}{3}$ and the probability that he will not get an electric contract is $\frac{5}{9}$. If the probability of getting at least one contract is $\frac{4}{5}$. What is the probability that he will get both contracts? **(2 Marks)**
+2. A husband and a wife independently appear in an interview for two vacancies in the same post. The probability of husband's selection is $\frac{1}{7}$ and that of wife's selection is $\frac{1}{5}$. What is the probability that:
+ 
+
+1. both of them will be selected. **(2 Marks)**
+2. only one of them will be selected, and **(3 Marks)**
+3. none of them will be selected. **(2 Marks)**
+3. A bag contains 10 white and 5 black balls. Four balls are successively drawn out and not replaced. What is the probability that they are alternatively of different colours? **(3 Marks)**
+4. In a bolt factory machines A, B and C manufacture 25\%, 35\% and 40\% respectively. Of the total of their output 5\%, 4\% and 2\% are defective bolts. A bolt is drawn at random from the products and is found to be defective. What is the probability that it was manufactured by machines A, B and C? **(8 Marks)**
+
+Page 3 of 3 
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+--- Page 7 (Vision OCR supplement) ---
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\begin{document}
+
+ **a higher education institution**
+
+ UNIVERSITY EXAMINATIONS 2018/2019
+
+ SECOND SEMESTER 
+
+ , AND BACHELOR OF EDUCATION
+
+ **SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+DATE: Thursday, 28\textsuperscript{th} March 2019 TIME: 11.00 a.m. - 1.00 p.m.
+
+**INSTRUCTIONS:** Answer question ONE and any other two questions.
+
+**QUESTION ONE (30MARKS)**
+
+(a) Consider the following data for a group of ten students showing the number of times each was late for statistics lectures in a particular semester:
+ 
+ 
+ 9 \quad 6 \quad 4 \quad 5 \quad 6 \quad 14 \quad 8 \quad 5 \quad 7 \quad 6
+ 
+ 
+ Calculate mean, mode, median and variance of the distribution. **(5marks)**
+(b) Fifty students took up a test. The results of those who passed the test is given below:
+
+ 
+ 
+
+| marks | 4 | 5 | 6 | 7 | 8 | 9 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Number of students | 8 | 10 | 9 | 6 | 4 | 3 |
+
+ 
+
+ If the average mark of all fifty students was 5.16, find the average mark of those who failed. **(5marks)**
+(c) The following table shows distribution of marks for 230 students:
+
+ 
+ 
+
+| Marks | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 | 60-70 | 70-80 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Number of students | 12 | 30 | x | 60 | y | 25 | 18 |
+
+ 
+
+ If the median of the distribution is 43, calculate the missing frequencies x and y. **(6marks)**
+(d) The probability that Andrew solves a statistics problem is 0.8 and the probability Beatrice solves the problem is 0.7. what is the probability that
+ 
+
+(i) Both students solve the problem. **(2marks)**
+(ii) Only one student solves the problem. **(3marks)**
+(iii) Both students fail to solve the problem. **(2marks)**
+
+ *INVOLVEMENT IN* *IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+\end{document}
+
+--- Page 8 (Vision OCR supplement) ---
+(e) The mean and variance of a set of 20 observations are known to be 10 and 4 respectively. Of the ten observations, one (i.e 8) was incorrect. Calculate the mean and the standard deviation if the correct observation was 12. **(4marks)**
+
+(f) A set $X$ of 20 observations produced the following results: $\sum x = 45, \sum x^2 = 118$
+Calculate the coefficient of variation of $X$. **(3marks)**
+
+**QUESTION TWO (20 MARKS)**
+
+Consider the following frequency distribution table
+
+| Class limits | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 | 60-70 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| $f$ | 10 | 20 | 35 | 40 | 25 | 25 | 15 |
+
+Calculate
+
+1. Arithmetic mean **(3marks)**
+2. Median **(3marks)**
+3. Mode **(3marks)**
+4. First and third quartiles **(6marks)**
+5. Variance **(6marks)**
+6. Standard deviation **(2marks)**
+
+**QUESTION THREE (20 MARKS)**
+
+1. Define moments about a point A. **(2marks)**
+2. Derive the relationship of the third moment about a point A and about the mean. **(6marks)**
+3. The first four moments about $\bar{X} = 2$ are 1, 2.5, 5.5 and 16. Determine the skewness and kurtosis of this distribution and comment about the shape and peakedness of the frequency curve **(12marks)**
+
+**QUESTION FOUR (20 MARKS)**
+
+The following data refer to the weights (X) in kgs heights (Y) in inches of 8 students in a certain class in Nairobi County
+
+| $X$ | 62 | 63 | 55 | 58 | 72 | 65 | 77 | 71 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| $Y$ | 62 | 57 | 56 | 64 | 79 | 66 | 70 | 61 |
+
+1. 1. Construct a scatter diagram for these data **(2 Marks)**
+2. What relationship does the scatter suggest? **(1 Mark)**
+2. Determine Karl Person correlation coefficient between weights (X) and heights (Y). **(6 Marks)**
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY* *CONTINUATION* 
+
+ **Page 2 of 3**
+
+--- Page 9 (Vision OCR supplement) ---
+c) Obtain a regression line that would predict a person given his/her weight. Use this line to estimate the heights of a person whose weight is 68 Kgs. **(6 Marks)**
+
+d) Find the Spearman's rank correlation between weights and heights. **(5 Marks)**
+
+**QUESTION FIVE (20 MARKS)**
+
+a) Given two events A and B such that $P(B^c) = 0.5$ *and* $P(A \cup B) = 0.9$, find $P(A)$ if A and B are
+i) Mutually exclusive events **(3 Marks)**
+ii) Independent events **(3 Marks)**
+
+b) Let A and B be two events such that $P(A \cup B) = \frac{4}{5}$, $P(A) = \frac{1}{3}$ *and* $P(A \cap B) = \frac{1}{25}$
+Find $P(A^c \cap B)$ *and* $P(B \mid A^c)$ **(6 Marks)**
+
+c) In a city there are 3 stores each having 20 pieces of a certain item. Let these stores be denoted by $S_1$, $S_2$, and $S_3$. The stores $S_1$, $S_2$, and $S_3$ have 10\%, 20\%, and 30\% defective items, respectively. A customer first chooses a store randomly and then selects an item randomly from the store. Find the probability that the selected item
+i) is defective **(2 Marks)**
+ii) has come from $S_1$ **(2 Marks)**
+iii) has come from $S_2$ **(2 Marks)**
+iv) has come from $S_3$ **(2 Marks)**
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+--- Page 10 (Vision OCR supplement) ---
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+ **a higher education institution** 
+
+ **UNIVERSITY EXAMINATIONS 2016/2017** 
+
+ **SECOND SEMESTER 
+
+ **SCIENCE (ANALYTICAL CHEMISTRY, INDUSTRIAL, TELECOMMUNICATION** 
+
+ **AND INFORMATION TECHNOLOGY) BACHELOR OF EDUCATION AND** 
+
+ **BACHELOR OF ACTUARIAL SCIENCE** 
+
+ **SST 101: INTRODUCTION TO PROBABILITY AND STATISTICS**
+
+**DATE:** Thursday 11\textsuperscript{th} May 2017 **TIME:** 2.00p.m-4.00p.m
+
+**INSTRUCTIONS:**
+
+Answer Question ONE and any other TWO questions
+
+**QUESTION ONE -- 30 MARKS**
+
+(a) The following table gives the number of children less than 18 years of age for 30 randomly selected families:
+ 
+ 
+ 
+
+| 2 | 1 | 2 | 3 | 2 | 4 | 3 | 2 | 3 | 4 | 4 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2 | 1 | 1 | 1 | 2 | 0 | 2 | 0 | 0 | 2 | 1 |
+| 3 | 1 | 0 | 1 | 5 | 6 | 1 | 7 | 8 | 2 | 8 |
+| 9 | 2 | 1 | 5 | 2 | 7 | 0 | 0 | 1 | 3 | 2 |
+| 2 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+ 
+
+ 
+
+(i) Prepare a frequency distribution table using single-valued classes
+(ii) Calculate average number of children less than 18 years of age per family
+(iii) How many families in this sample have 2 or 3 children less than 18 years of age. (3,3,2)
+(b) The following data gives the number of ball bearings manufactured by a Company per day for a sample of 12 days:
+ 
+ 
+ 
+
+| 24 | 32 | 27 | 23 | 35 | 33 | 29 | 21 | 23 | 28 | 25 | 33 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+ 
+
+ Calculate median, mode and variance for these data. **(5 marks)**
+(c) On a certain examination, the average grade of all the students in class A is 68.4 and of all the students in class B is 71.2. If the average of both classes is 70, what is the ratio of students of the number of class A to the number in class B. **(4marks)**
+
+ ***INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION***
+
+\end{document}
+
+--- Page 11 (Vision OCR supplement) ---
+(d) On a final examination, the mean marks of a group of 125 students in English were 75 and the standard deviation was 6. In mathematics, however, the mean marks of the group were 70 and a standard deviation was 7. In which subject was there greater variability? **(4 marks)**
+
+(e) The first three moments of a distribution about the value 2 are 1, 16, and 40. Calculate the mean and variance of the distribution. **(4marks)**
+
+(f) A bag contains five black balls and three white balls. Three balls are drawn without replacement. What is the probability that the first was black. **(5marks)**
+
+## QUESTION TWO - 20 MARKS
+
+Consider the following frequency distribution table.
+
+| Class Interval | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Frequency | 5 | 10 | 14 | 10 | 6 | 5 |
+
+(a) Find the mean and the standard deviation (s.d) by changing both the location(use an assumed mean of 35) and the scale(use common class width) **(7marks)**
+
+(b) Find (i) \quad mode
+ (ii) \quad median
+ (iii) \quad interquartile range
+ (iv) \quad coefficient of variation based on s.d
+ (v) \quad coefficient of skewnessbased on quartiles. **(13marks)**
+
+## QUESTION THREE - 20 MARKS
+
+(a) All 500 employees of a company were asked whether they are smokers (S) or non-smokers (N) of cigarettes and whether they are college graduates (C) or not (D). Based on this information the following two way classification table was prepared:
+
+| | College graduate (C) | Not a college graduate (D) |
+| --- | --- | --- |
+| Smoker (S) | 55 | 100 |
+| Non-smoker (N) | 150 | 195 |
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+ Page 2 of 4
+
+--- Page 12 (Vision OCR supplement) ---
+Suppose one employee is selected at random from this company. Find the probability that he/she
+i) Is a smoker or not a college graduate
+ii) Is a smoker and a college graduate
+iii) Is a smoker or not a smoker
+iv) Is a non-smoker and not a college graduate
+v) Is a college graduate or not **(10 marks)**
+
+(b) A cat is in a room and each of the walls of the room has a door through which the cat could equally likely try to escape. However, there is a trap at each of the doors $D_1$, $D_2$, $D_3$ and $D_4$ and they work with probabilities $0.3$, $0.2$, $0.4$ and $0.5$ respectively. If the cat picks a door at random, find the probability that the cat will escape. **(5 marks)**
+
+(d) According to particular survey, $8\%$ of the population has lung disease. Of those having lung disease, $90\%$ are smokers and of those not having lung disease, $25\%$ are smokers. Find the probability that a randomly selected smoker has a lung disease. **(5marks)**
+
+**QUESTION FOUR-20MARKS**
+
+(a) Consider the following data for a group of ten students showing the number of times each was late for Statistics lectures in a semester
+
+7 \quad 6 \quad 5 \quad 8 \quad 14 \quad 6 \quad 5 \quad 4 \quad 9 \quad 6
+
+Calculate the second, third and fourth moments about the arithmetic mean and use them to obtain coefficients of skewness and kurtosis.
+Comment on the shape and peakedness of the distribution. **(9marks)**
+
+(b) An incomplete distribution is given below:
+
+| Class | 200-210 | 210-220 | 220-230 | 230-240 | 240-250 | 250-260 | 260-270 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Freq | 4 | 16 | A | B | c | 6 | 4 |
+
+Given that the median and mode are $233.5$ and $234$ respectively and that the total frequency is $230$, find the values of a, b and c. **(7 marks)**
+
+(c) Suppose $P(A) = \frac{1}{2}$, $P(B) = \frac{1}{3}$ and $P(A \cap C) = \frac{1}{12}$ where A and C are independent. If $P(B \cup C) = \frac{1}{2}$ show that B and C are mutually exclusive. **(4 marks)**
+
+*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*
+
+--- Page 13 (Vision OCR supplement) ---
+**QUESTION FIVE-20 MARKS**
+
+The following data refer to the number of hours that 10 students studied for a statistics test and their scores on the test:
+
+| Hours studied (x) | 1 | 17 | 22 | 12 | 7 | 4 | 14 | 10 | 9 | 4 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| Test Score (y) | 21 | 83 | 90 | 60 | 45 | 38 | 74 | 66 | 59 | 32 |
+
+(a) (i) Construct a scatter diagram for these data **(2marks)**
+
+(ii) What relationship does the scatter plot suggest **(2marks)**
+
+(b) Find the Pearson's correlation coefficient between hours studied and Test scores **(6marks)**
+
+(c) Find a regression line that would predict the number of hours studied given a certain test score. Use this line to estimate how many hours one should study in order to have a test score of 80. **(5marks)**
+
+(d) Determine the Spearman's rank correlation coefficient between hours studied and test scores. **(5 marks)**
+
+---
+
+**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+**Page 4 of 4**

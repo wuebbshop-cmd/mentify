@@ -1,0 +1,2320 @@
+--- Page 1 ---
+
+ SMASMA 230230 NotesNotes
+
+AnalyticalAnalytical GeometryGeometry (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+ a higher education institution
+ DIGITAL 
+ IN COLLABORATION WITH
+ MATHEMATICS AND ACTUARIAL SCIENCE,
+
+ SMA 230: VECTOR ANALYSIS
+ VETTED BY: Prof. James K. Gatoto
+
+ 1
+
+ 
+
+--- Page 3 ---
+
+INTRODUCTION
+Welcome to this module. The module deals with Vector Analysis and its applications. This is an
+interactive instructional module that uses both action and collaborative learning styles that
+provide you with diverse online learning experiences and effective learning processes. The key
+purpose of this module is to expose you albeit theoretically to the operations carried out on
+various geometries. This should hopefully equip you with the necessary knowledge and skills
+crucial in real life applications of Vector Analysis.
+
+Topics covered include the algebra and the differential and integral calculus of vectors, Stokes‟
+theorem, the divergence theorem and other integral theorems together with many applications
+drawn from various fields. This module offers elementary techniques for solving vector
+problems analytically for undergraduates in mathematics and engineering students.
+
+We hope that you will find this module exciting, educative, and engaging.
+
+ 2
+
+ 
+
+--- Page 4 ---
+
+ COURSE CONTENT
+WEEK TOPIC
+
+WEEK 1 VECTOR ALGEBRA
+
+WEEK 2 DOT AND CROSS PRODUCT
+
+WEEK 3 RECIPROCAL SETS OF VECTORS
+
+WEEK 4 VECTOR DIFFERENTIATION
+
+WEEK 5 PARTIAL AND DIRECTIONAL DERIVATIVES
+
+WEEK 6 GRADIENT, DIVERGENCE AND CURL
+
+WEEK 7 VECTOR INTEGRATION
+WEEK 8 GREEN9S THEOREM
+WEEK 9 STOKE9S THEOREM
+
+WEEK 10 DIVERGENCE THEOREM
+
+WEEK 11 REVISION
+
+WEEK 12 & 13 EXAMINATION
+
+ 3
+
+ 
+
+--- Page 5 ---
+
+OVERVIEW OF THE COURSE
+Week 1: Vector Algebra
+
+This is an introductory chapter that gives the overview of the course. The
+definitions of scalar and vector quantities are given.
+
+Week 2: Dot and Cross Product
+In this lesson we study the products of vectors and their application to triple vector products.
+
+Week 3: Reciprocal Sets of Vectors
+In this lesson, we study how to get the reciprocals of a given set of vectors.
+
+Week 4: Vector Differentiation
+In this lesson we study ordinary differentiation of vector and scalar quantities and their
+applications.
+
+Week 5: Partial Differentiation
+In this lesson we study partial differentiation of vector and scalar functions with two or more
+variables and their applications.
+
+Week 6: Gradient, Divergence and Curl
+In this lesson we study the application of the Del operator to determine the gradient, divergence
+and curl of vector and scalar functions.
+
+Week 7: Vector Integration
+In this lesson we study how to integrate vector functions.
+
+Week 8: Green’s theorem
+In this lesson we study how to verify the Green9s theorem and its applications.
+
+Week 9: Stoke’s theorem
+In this lesson we study how to verify the Stoke9s theorem and its applications.
+
+Week 10: Divergence theorem
+In this lesson we study how to verify the Divergence theorem and its applications.
+
+Week 12 & 13: Examination
+These two weeks bring together the work you have been doing to an end. This course unit will
+be examined and will partially contribute to the award of the degree in the programme that you
+are undertaking. We have therefore placed examinations in the last two weeks but Universities
+are allowed to go with their schedules. The university examinations regulations will apply.
+
+ 4
+
+ 
+
+--- Page 6 ---
+
+MODULE LEARNING OUTCOMES
+By the end of this module, you will be able to:
+1. Solve equations in Vector Algebra and Dot & Cross product.
+2. Differentiate vector and scalar functions.
+3. Integrate vector and scalar functions.
+4. Apply the three vector integral functions to solve problems.
+
+COURSE DESCRIPTION
+This is a core unit meant for all students who are taking a, Bachelor of
+Education and Bachelor of Economics. The rationale of offering the course is to equip students
+with knowledge and skills in Vector Analysis and how they can apply these skills in solving
+problems. You will therefore be required to set aside about 5 hours per lesson to complete this
+course successfully.
+
+COURSE REQUIREMENTS
+This is a blended learning course that will utilize the flex model. This means that learning
+materials and instructions will be given online and the lessons will be self-guided with the
+lecturer being available briefly for face to face sessions and support and also on-site (online)
+most of the time. Your lecturer will be meeting you face to face to introduce a lesson and put it
+into perspective and you will actively participate in your search for knowledge by undertaking
+several online activities. This means that some of the 39 instructional hours of the course will be
+delivered face to face while other lessons will be taught online through various learner and
+lecturer activities. It is important for you to note that one instructional hour is equivalent to two
+online hours. Three instructional hours will be needed per week. Out of these, one will be used
+for face to face contact with your lecturer (also referred as e-moderator in the online activities)
+while the other two instructional hours (translating to four online hours) will be used for online
+activities otherwise referred to as e-tivities in the lessons. This will add up to the 5 hours
+requirement per lesson earlier mentioned. There are 27 online activities each taking at least two
+hours and totaling to 54 online hours. You are advised to follow the topic flow-chart given so
+that you cover at least a lesson every week.
+
+You will be required to participate and interact online with your peers and the e-moderator who
+in this case is your lecturer. Guidelines for the online activities (which we shall keep referring to
+as e-tivities) will be provided whenever there is an e-tivity. Please note that since the online e-
+tivities are part of the learning process, they may be graded at the discretion of your e-moderator.
+Such grading will however be communicated in the e-tivity guidelines and feedback given as
+soon as possible after the e-tivity. The e-tivities will include but will not be limited to online
+assessment quizzes, assignments and discussions. There are also assessment questions that you
+can attempt at the end of every lesson to test your understanding of the lesson. The answers to all
+the assessment questions are at the end of the module after lesson 10. All the resource that have
+been used in this module in form of books are available under the resources section after the
+answers to the questions.
+
+ASSESSMENT
+It is important to note that the module has embedded certain learner formative assessment
+feedback tools that will enable you gauge your own learning progress. The tools include online
+collaborative discussions forums that focus on team learning and personal mastery and will
+
+ 5
+
+ 
+
+--- Page 7 ---
+
+therefore provide you with peer feedback, lecturer assessment and self- reflection. You will also
+be required to do one major assignment/project that is meant to assess the application of the
+skills and knowledge gained during the course. The project score in combination with scores for
+e-tivities (where graded) will account for 30% of your final examination score with the
+remaining 70% coming from a face to face sit-in final written examination that will be guided by
+your university examination policy and procedures.
+
+We wish you the very best of experiences in this course.
+
+ 6
+
+ 
+
+--- Page 8 ---
+
+TABLE OF CONTENTS
+Introduction…………………………………………………………………………………… 2
+Overview of Course…………………………………………………………………………… 4
+Module learning Outcomes…………………………………………………….……………… 5
+Course Description……………………………………………………………. ……………… 5
+Course Requirements…………………………………………………………. ….…………… 5
+Course Assessment………………………………………………………………. …………… 5
+Lesson 1……………………………………………………………………………………… 10
+Lesson 2……………………………………………………………………………………… 13
+Lesson 3……………………………………………………………………………………… 21
+Lesson 4……………………………………………………………………………………… 26
+Lesson 5……………………………………………………………………………………… 31
+Lesson 6……………………………………………………………………………………… 38
+Lesson 7……………………………………………………………………………………… 42
+Lesson 8……………………………………………………………………………………… 45
+Lesson 9……………………………………………………………………………………… 49
+Lesson 10………………………………………………………………………………………51
+Lesson 11………………………………………………………………………………………55
+Lesson 12………………………………………………………………………………………59
+
+ 7
+
+ 
+
+--- Page 9 ---
+
+ LESSON 1
+ VECTOR ALGEBRA
+1.1 Introduction
+
+In this lesson, Vector Algebra is introduced. Various operations on vectors are covered here and
+are applied to solve problems.
+
+1.2 Lesson Learning Outcomes
+
+By the end of this lesson, you should be able to;
+1.2.1 Find the magnitude of a vector, the unit vector and the resultant of a given number of
+ vectors.
+
+1.2.1 Magnitude, Unit Vector and Resultant
+1.2.1.1 Vector Representation
+
+ A vector quantity can be represented graphically by a line, drawn so that:
+ a. The length of the line denotes the magnitude of the quantity, according to
+ some stated vector scale.
+ b. The direction of the line denotes the direction in which the vector quantity
+ acts. An arrow head indicates the sense of the direction, e.g.
+ P
+
+ O
+
+ the vector ⃗⃗⃗⃗⃗ has an initial point O and final point P and is analytically
+ represented by a letter with an arrow over it, as.
+
+ ⃗⃗⃗⃗⃗ would represent a vector quantity of the same magnitude but with opposite sense.
+ Two vectors and ⃗ are said to be equal if they have the same magnitude and
+ direction regardless of the position of their initial points.
+
+Thus ⃗
+
+ 8
+
+ 
+
+--- Page 10 ---
+
+1.2.1.2 Addition of Vectors
+
+The sum of two vectors ⃗⃗⃗⃗⃗ and ⃗⃗⃗⃗⃗ is defined as the single or equivalent or
+resultant vector ⃗⃗⃗⃗⃗. C
+
+ ⃗⃗⃗⃗⃗ ⃗⃗⃗⃗⃗ ⃗⃗⃗⃗⃗
+
+ A
+ B
+
+1.2.1.3 Magnitude of a vector
+
+The magnitude of a vector is shown by two vertical bars on either side of the vector. Given the
+vector ̂, then the magnitude is denoted by;
+
+ |a|
+
+And is defined as;
+
+We use Pythagoras' theorem to calculate it:
+
+ |a| = √(x2 + y2)
+
+Example1.1
+
+What is the magnitude of the vector b = (6, 8)?
+
+Solution
+
+|b| = √( 62 + 82) = √( 36+64) = √100 = 10
+
+1.2.1.4 Unit Vector
+
+The unit vector of a vector is formed by taking the vector and dividing it by its magnitude:
+
+ | |
+
+1.2.1.5 Resultant vector
+This is the summation of a given number of vectors, i.e. ⃗ ⃗
+
+ 9
+
+ 
+
+--- Page 11 ---
+
+E-tivity – 1.2.1 Magnitude, unit vector and resultant
+Numbering, pacing and sequencing Lesson 1.2.1
+
+Title Magnitude, unit vector and resultant
+
+Purpose To introduce you to vector algebra operations
+
+Brief summary of overall task Watch the videos on vector algebra;
+ https://www.youtube.com/watch?v=C6EYJVBYXIo
+ https://www.youtube.com/watch?v=IGtQxDHW3k0
+
+Spark
+
+Individual contribution ÷ Watch the videos on vector algebra.
+ ÷ Perform vector algebra operations.
+
+Interaction begins ÷ Post your answers on the discussion forum 1.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 1st week of
+ the semester.
+Next Dot and Cross Product
+
+ 10
+
+ 
+
+--- Page 12 ---
+
+1.3 Assessment
+
+Find the unit vector of ⃗ ̂ ෠
+
+1.4 References
+
+1.4.1 Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+Bacon (1995).
+1.4.2 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+1.4.3 Spiegel, M. R., Vector Analysis. New York: McGraw-Hill (1989).
+1.4.4 Tai, C.T.Generalized Vector and Dyadic Analysis. Oxford: Oxford University Press
+ (1996).
+1.4.5 Wrede, R.C.Introduction to Vector and Tensor Analysis. New York: Wiley (1963).
+1.4.5 https://ncert.nic.in/ncerts/l/leep210.pdf
+1.4.6 https://www.lehman.edu/faculty/anchordoqui/chapter03.pdf
+
+ 11
+
+ 
+
+--- Page 13 ---
+
+ LESSON 2
+ DOT AND CROSS PRODUCT
+2.1 Introduction
+
+The product of two vectors, which yield a scalar, is called the dot or scalar product
+and the product of two vectors, which yield a vector, is called a vector or cross
+product. These products are useful in discussing the properties of vectors.
+
+2.2 Lesson Learning Outcomes
+
+By the end of this lesson, the learner should be able to;
+2.2.1 Determine the dot and cross product.
+2.2.2 Determine a vector perpendicular to a plane.
+2.2.3 Evaluate scalar triple and vector triple products.
+
+2.2.1 The Dot and Cross Product
+2.2.1.1 The Dot or Scalar Product
+
+If and ⃗ are two vectors, the scalar product of and ⃗ is defined as | || ⃗ | where is
+the angle between them. The scalar (dot) product is denoted by ⃗, i.e.
+
+ ⃗ | || ⃗ |
+
+ þ⃗
+
+ �㔃
+ ý
+
+The following laws are valid;
+ a) ⃗ ⃗
+ b) ⃗ ( ⃗⃗ ) ⃗ ⃗ ⃗⃗c)( ⃗ ) ( ⃗ ) ⃗ ( ) ( ⃗ ), where is a scalar.
+ d) ̂ ̂ ⃗ ⃗,
+e)If̂⃗ ෠ ෠ ⃗ are not null vectors, then ⃗ are perpendicular.
+
+Given ⃗⃗ ̂ ෡ and ⃗⃗ ̂ ෡ then;
+ ⃗
+
+2.2.1.2 The Cross or Vector poduct
+Let ⃗ ̂ ෠ and ̂ ෠. Then we define the cross product ⃗ as;
+ ⃗ | ⃗ || | ෝ
+Where is a unit vector indicating the direction of ⃗ The direction of the vector ⃗ is
+perpendicular to the plane of ⃗ and.
+
+ 12
+
+ 
+
+--- Page 14 ---
+
+The following laws are valid;
+ a. ⃗ ⃗
+ b. ⃗ ( ⃗⃗ ) ⃗ ⃗ ⃗⃗c.( ⃗ ) ( ⃗ ) ⃗ ( ) ( ⃗ ), where is a scalar.
+ d. ̂ ̂ ⃗ ⃗,
+e.If ⃗ a. ̂ ෠ ⃗ ̂ are not෠, null෠vectors,෠then ⃗ ̂, are෠ parallel.̂ ෠
+
+We evaluate ⃗ by the determinant of the matrix;
+ ̂ ෠
+ ⃗ | | ( ) ( ) ( ) ෠
+
+Example 2.1
+If ̂ ෠ and ⃗ ̂ ෠, find ⃗
+
+Solution
+ ̂ ෠
+ ⃗ | | | | | | ෠| | ̂ ෠
+
+Example 2.2
+Find the angle between ̂ ෠ and ⃗ ̂ ෠
+
+Solution
+ ⃗ | || ⃗ | (√( ) ( ) ( ) ) (√( ) ( ) ( ) )
+ ⃗ ( ̂ ෠) ( ̂ ෠)
+
+Therefore, and thus. Hence
+
+ 13
+
+ 
+
+--- Page 15 ---
+
+E-tivity 2.2.1 – Dot and Cross Product
+
+Numbering, pacing and sequencing Lesson 2.2.1
+
+Title Dot and Cross Product
+
+Purpose Evaluation of dot and cross product
+
+Brief summary of overall task Watch the videos on dot and cross product;
+ https://www.youtube.com/watch?v=L4aZYLOXFDc
+ https://www.youtube.com/watch?v=vhLHrA0Z_QE
+Spark
+
+Individual contribution ÷ Evaluate dot and cross products.
+ ÷ Study on how to determine the projection of a
+ vector on another vector.
+Interaction begins ÷ Post your answers on the discussion forum 2.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 2nd week of
+ the semester.
+Next Vector perpendicular to a plane
+
+ 14
+
+ 
+
+--- Page 16 ---
+
+2.2.2 Vector Perpendicular to a Plane
+
+The vector ⃗ is the vector perpendicular to the plane on which the vectors and ⃗ lie. That
+is;
+
+ ý þ⃗
+
+ þ⃗
+
+ ý
+
+The three vectors form a right-handed system. The right hand thumb rule is applied to determine
+perpendicularthe direction oftothethevectorplane,perpendicularwe have; to the plane i.e. ⃗. To determine the unit vector
+ ⃗
+ | ⃗ |
+
+Example 2.3
+Determine a unit vector perpendicular to the plane of ̂ ෠ and ⃗ ̂ ෠
+
+Solution
+ ⃗ is a vector perpendicular to the plane of and ⃗.
+ ̂ ෠
+ ⃗ | | ̂ ෠
+
+ ̂ ෠ ෠A unit vector perpendicular to ⃗ is ⃗ | ⃗ | √( ) ( ) ( )
+
+ 15
+
+ 
+
+--- Page 17 ---
+
+E-tivity 2.2.2 – Vector perpendicular to a plane
+
+Numbering, pacing and sequencing Lesson 2.2.2
+
+Title Vector perpendicular to a plane
+
+Purpose Evaluation of a vector perpendicular to a plane
+
+Brief summary of overall task Watch the videos on dot and cross product;
+ https://www.youtube.com/watch?v=L4aZYLOXFDc
+ https://www.youtube.com/watch?v=vhLHrA0Z_QE
+Spark
+
+Individual contribution ÷ Solve problems of vectors perpendicular to
+ planes.
+
+Interaction begins ÷ Post your answers on the discussion forum 2.2.2
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 2nd week of
+ the semester.
+Next Scalar Triple and Vector Triple Products
+
+ 16
+
+ 
+
+--- Page 18 ---
+
+2.2.3 Scalar Triple and Vector Triple Products
+2.2.3.1 The Scalar Triple Product
+
+Let ⃗ ̂ ෠, ̂ ෠ and ⃗⃗ ̂ ෠ then the scalar triple product is
+defined as ⃗ ( ⃗⃗ ) ( ⃗⃗ ⃗ ) ⃗⃗ ( ⃗ ). It can also be defined by the determinant of
+a matrix;
+
+ ⃗ ( ⃗⃗ ) | |
+
+The vectors ⃗ ⃗⃗ are coplanar if ⃗ ( ⃗⃗ )
+
+Example 2.4
+Evaluate
+( ̂) [( ̂ ෠) ( ෠)]
+
+Solution
+
+( ̂) [( ̂ ෠) ( ෠)] | |
+
+2.2.3.2 The Vector Triple Product
+
+Given the vectors ⃗ ⃗⃗, then the vector triple product is defined as;
+ ⃗ ( ⃗⃗ ) ( ⃗ ⃗⃗ ) ( ⃗ ) ⃗⃗
+
+Example 2.5
+If ̂ ෠, ⃗ ̂ ෠ and ̂ ෠, find ( ⃗ )
+
+Solution
+ ( ⃗ ) ⃗ ( ) ( ⃗ ) ⃗ ( ̂ ෠ ) ( ̂ ෠)
+ ̂ ෠
+
+ 17
+
+ 
+
+--- Page 19 ---
+
+E-tivity 2.2.3 – Scalar Triple and Vector Triple Products
+
+Numbering, pacing and sequencing Lesson 2.2.3
+
+Title Scalar Triple and Vector Triple Products
+
+Purpose Evaluation of Scalar Triple and Vector Triple Products
+
+Brief summary of overall task Watch the videos on vector products;
+ https://www.youtube.com/watch?v=iJzg7KpQBPI
+ https://www.youtube.com/watch?v=osd64CbLcHE
+ https://www.youtube.com/watch?v=wgTCe1ACImE
+ https://www.youtube.com/watch?v=l-8hNul1iok
+Spark
+
+Individual contribution ÷ Evaluate scalar and vector triple products.
+ ÷ Show that vectors are coplanar using the
+ determinant method.
+Interaction begins ÷ Post your answers on the discussion forum 2.2.3
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 2nd week of
+ the semester.
+Next Reciprocal Sets of Vectors
+
+2.3 Assessment
+ a) Find the angle between ̂ ෠ and ⃗ ̂ ෠.
+ b) Find the projection of the vector ̂ ෠ on the vector ⃗ ̂ ෠.
+ c) Find the area of a triangle with vertices ( ) ( ) ( ).
+
+ 18
+
+ 
+
+--- Page 20 ---
+
+ d) Find the constant such that the vectors ̂ ෠ ̂ ෠ ̂ ෠ are
+ coplanar.
+
+2.4 References
+2.4.1 Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+Bacon (1995).
+2.4.3 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+2.4.4 https://ncert.nic.in/ncerts/l/leep210.pdf
+2.4.5 https://www.lehman.edu/faculty/anchordoqui/chapter03.pdf
+
+ 19
+
+ 
+
+--- Page 21 ---
+
+ LESSON 3
+ RECIPROCAL SET OF VECTORS
+3.1 Introduction
+Reciprocal vectors are formed by choosing a vector perpendicular to two lattice vectors and of
+length reciprocal to the third lattice vector.
+
+3.2 Lesson Learning Outcomes
+
+By the end of this lesson, you should be able to;
+3.2.1 Evaluate the reciprocal set of vectors.
+
+3.2.1 Evaluation of Reciprocal Set of vectors
+
+The vector which has the same direction as that of vector but has magnitude reciprocal to that
+of vector, is called the reciprocal of vector.
+
+ 20
+
+ 
+
+--- Page 22 ---
+
+E-tivity 3.2.1 – Reciprocal set of vectors
+
+Numbering, pacing and Lesson 3.2.1
+sequencing
+Title Reciprocal set of vectors
+
+Purpose To evaluate reciprocal set of vectors.
+
+Brief summary of overall task Study on reciprocal set of vectors
+ http://www.bhojvirtualuniversity.com/slm/bsc1_maths3.pdf
+
+Spark
+
+Individual contribution ÷ Study on reciprocal set of vectors.
+ ÷ Discuss on how to evaluate dot products between a
+ vector and its reciprocal.
+Interaction begins ÷ Post your answers on the discussion forum 3.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of your
+ colleagues have posted keeping etiquette in mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 3rd week of the
+ semester.
+Next Vector Differentiation
+
+3.3 Assessment
+Find a set of vectors reciprocal to the set ̂ ෠, ̂ ෠, ̂ ෠
+
+3.4 References
+3.4.1 Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+Bacon (1995).
+3.4.2 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+3.4.3 http://www.bhojvirtualuniversity.com/slm/bsc1_maths3.pdf
+
+ 21
+
+ 
+
+--- Page 23 ---
+
+ LESSON 4
+ ORDINARY DIFFERENTIATION OF VECTORS
+
+4.1 Introduction
+
+In this lesson we discuss ordinary differentiation of vectors. We show that ordinary
+rules of differentiation in differential calculus are also applicable to vector calculus,
+where dot and vector products retain their nature.
+
+4.2 Lesson Learning Outcomes
+By the end of the lesson, you should be able to:
+4.2.1 Evaluate ordinary derivatives of vectors.
+4.2.2 Determine tangent and normal vectors.
+4.2.3 Determine velocity and acceleration.
+
+4.2.1 Evaluation of Ordinary Derivatives
+In vector analysis we compute derivatives of vector functions of a real variable; that is we
+compute derivatives of functions of the type:
+ ෠ (t) = f1(t) + f2(t) + f3(t)
+where f1(t), f2(t), and f3(t) are real functions of the real variable t.
+Let (t) be a position vector, extending from the origin to some point P, depending on the single
+scalar variable t. Then (t) traces out some curve in space with increasing values of t. Consider
+ ( ) ( )
+
+where denotes an increment in t. The derivative of (t) with respect to t is given by
+ ( ) ( )
+
+The following differentiation formulae apply;
+
+ 1) ( )
+
+ 2) ( )
+
+ 3) ( )
+
+ ⃗
+ 4) ( )
+
+ ⃗
+ 5) ( ⃗ ) ⃗ ( ⃗ )
+
+ ⃗
+ 6) [ ( ⃗ )] ( ) ( ⃗ ) ( ⃗ )
+
+Higher – order derivatives can also be obtained:
+ ( ) ( ⃗ )
+
+ 22
+
+ 
+
+--- Page 24 ---
+
+Example 4.1
+ ⃗
+Given ⃗ ̂ ෠, find | |
+
+Solution
+ ⃗
+ ̂ ෠
+
+ ⃗
+ ̂
+
+ ⃗
+ | | √( ) ( ) √
+
+Example 4.2
+If ̂ ෠ and ⃗ ̂, find ( ⃗ )
+
+Solution
+ ⃗ ̂ ෠ ̂ ෠
+ ( ⃗ ) ⃗ | | | |
+
+ (( ) ( ) ෠ )
+
+ 23
+
+ 
+
+--- Page 25 ---
+
+E-tivity 4.2.1 – Ordinary Differentiation
+
+Numbering, pacing and sequencing Lesson 4.2.1
+
+Title Ordinary Differentiation
+
+Purpose To find ordinary derivatives of vector functions.
+
+Brief summary of overall task Watch the video on vector differentiation
+ https://www.youtube.com/watch?v=lln0zpfxE10
+ https://www.youtube.com/watch?v=xq72Nl8eQAQ
+ https://www.youtube.com/watch?v=1ZkMy_drQOk
+Spark
+
+Individual contribution ÷ Watch the videos on ordinary differentiation.
+
+Interaction begins ÷ Post your answers on the discussion forum 4.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 4th week of
+ the semester.
+Next Tangent and Normal Vectors
+
+ 24
+
+ 
+
+--- Page 26 ---
+
+4.2.2 Tangent and Normal Vectors
+In mathematics, a tangent vector is a vector that is tangent to a curve or surface at a given point.
+The derivative of a vector valued function gives a new vector valued function that is tangent to
+the defined curve.
+Let ⃗ ( ) be a differentiable vector valued function, then the tangent vector is defined as;
+
+ ⃗ ( ) ⃗ ( )
+
+4.2.2.1 Unit Tangent and Principle Unit Normal Vectors
+Let ⃗ ( ) be a tangent vector, then the unit tangent vector is defined as;
+
+ ⃗ ( )
+ ෠( )
+ | ⃗ ( )|
+A normal vector is a perpendicular vector. Given a vector in the space, there are infinitely
+many perpendicular vectors. Our goal is to select a special vector that is normal to the unit
+tangent vector. Geometrically, for a non-straight curve, this vector is the unique vector that
+points into the curve.
+
+The unit normal is orthogonal (or normal, or perpendicular) to the unit tangent vector and hence
+to the curve as well. Algebraically we can compute the vector using the following definition.
+
+Let ⃗ ( ) be a differentiable vector valued function and let ⃗ ( ) be the tangent vector. Then
+the normal vector is the derivative of the tangent vector;
+ ⃗
+ ⃗ ( )
+The principal unit normal vector ෡( ) is then defined by;
+
+ ⃗ ( )
+ ෡( )
+ | ⃗ ( )|
+
+4.2.2.2 Binormal Vector
+The binormal vector is defined to be;
+ ෠( ) ෠( ) ෡( )
+It is the cross product of the unit tangent and unit normal vector. Thus the binormal vector is
+orthogonal to both the tangent vector and the normal vector.
+
+Example 4.3
+Find the unit normal and binormal vectors for ⃗ ( ) ̂ ෠
+
+Solution
+We first obtain the tangent vector;
+ ⃗
+ ⃗ ( ) ̂ ෠
+
+The unit tangent vector is now;
+
+ 25
+
+ 
+
+--- Page 27 ---
+
+ ⃗ ( ) ̂ ෠ ̂ ෠
+ ෠( )
+ | ⃗ ( )| √( ) ( ) ( ):
+The normal vector is;
+ ⃗
+ ⃗ ( ) ෠
+
+The unit normal vector is;
+ ⃗ ( ) ෠
+ ෡( ) ෠
+ | ⃗ ( )| √( ) ( )
+The binormal vector is now;
+ ̂ ෠
+ ෠( ) ෠( ) ෡( ) | ⁄ ⁄ ⁄ |:::
+
+ ෠:::
+
+ 26
+
+ 
+
+--- Page 28 ---
+
+E-tivity 4.2.2 – Tangent and Normal Vectors
+
+Numbering, pacing and sequencing Lesson 4.2.2
+
+Title Tangent and Normal Vectors
+
+Purpose To determine tangent and normal lines to vector curves.
+
+Brief summary of overall task Watch the video on vector differentiation
+ https://www.youtube.com/watch?v=lln0zpfxE10
+ https://www.youtube.com/watch?v=xq72Nl8eQAQ
+ https://www.youtube.com/watch?v=1ZkMy_drQOk
+Spark
+
+Individual contribution ÷ Watch the videos on tangent and normal lines.
+
+Interaction begins ÷ Post your answers on the discussion forum 4.2.2
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 4th week of
+ the semester.
+Next Velocity and Acceleration
+
+ 27
+
+ 
+
+--- Page 29 ---
+
+4.2.3 Velocity and Acceleration
+The motion of a particle is described by three vectors: position, velocity and acceleration.
+The position vector goes from the origin of the reference frame to the position of the particle.
+The Cartesian components of this vector are given by:
+
+The components of the position vector are time dependent since the particle is in motion. In
+order to simplify the notation we will often omit this dependence in the expressions of the
+vectors.
+The velocity vector is the time derivative of the position vector:
+
+The velocity vector is always tangent to the trajectory of the particle at each point.
+The acceleration vector is the time derivative of the velocity vector:
+
+Example 4.4
+A particle moves along a curve
+ x = 2t2
+ y = t2 - 4t
+ z = 3t - 5
+ where t is time. Find its velocity at time t.
+
+Solution.
+r = 2t2 i + (t2 - 4t)j + (3t - 5)k
+dr/dt = 4ti + (2t - 4)j + 3k
+
+Example 4.5
+
+A particle moves along a curve whose parametric equations are, where is time. Find the magnitudes of the velocity and acceleration at.
+
+Solution
+The position vector of the particle is;
+ ̂ ෠ ̂ ෠
+Then the velocity is;
+
+ 28
+
+ 
+
+--- Page 30 ---
+
+ ̂ ෠
+
+And the acceleration is;
+
+ ̂ ෠
+At ෠ and ⃗ ̂. Then,
+
+Magnitude of velocity is √( ) ( ):
+Magnitude of acceleration is √( ) ( ):
+
+ 29
+
+ 
+
+--- Page 31 ---
+
+4.2.3 E-tivity – Velocity and Acceleration
+
+Numbering, pacing and sequencing Lesson 4.2.3
+
+Title Velocity and Acceleration
+
+Purpose To determine the velocity and acceleration.
+
+Brief summary of overall task Watch the video on vector differentiation
+ https://www.youtube.com/watch?v=lln0zpfxE10
+ https://www.youtube.com/watch?v=xq72Nl8eQAQ
+ https://www.youtube.com/watch?v=1ZkMy_drQOk
+Spark
+
+Individual contribution ÷ Watch the videos on vector differentiation.
+ ÷ Discuss how to determine the components of
+ velocity and acceleration in a given direction.
+Interaction begins ÷ Post your answers on the discussion forum 4.2.3
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 4th week of
+ the semester.
+Next Partial Differentiation
+
+4.3 Assessment
+ a) If ̂ ( ) ෠ and ⃗ ( ) ̂ ෠, find ( ) at.
+
+ b) Show that ( ), where and are constant vectors, is a
+
+ solution of the differential equation
+
+ 30
+
+ 
+
+--- Page 32 ---
+
+ c) Find the unit tangent vector to any point on the curve
+
+ d) Find the velocity of a particle with position vector ̂ ෠.
+ Describe the motion of the particle.
+
+4.4 References
+4.4.1 Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+Bacon (1995).
+4.4.2 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+4.4.3 https://tutorial.math.lamar.edu/classes/calciii/TangentNormalVectors.aspx
+4.4.4 http://www.maths.gla.ac.uk/~cc/2A/2A_notes/chap4notes_sol.pdf
+
+ 31
+
+ 
+
+--- Page 33 ---
+
+ LESSON 5
+ PARTIAL DIFFERENTIATION
+5.1 Introduction
+
+In this lesson we discuss partial differentiation of vectors. We show that partial
+rules of differentiation in differential calculus are also applicable to vector calculus,
+where dot and vector products retain their nature.
+
+5.2 Lesson Learning Outcomes
+At the end of the lesson, you should be able to;
+5.2.1 Evaluate partial derivatives of vectors.
+
+5.2.1 Evaluation of Partial Derivatives
+A partial derivative is the rate of change of a multi-variable function when we allow only one of
+the variables to change. Specifically, we differentiate with respect to only one variable, regarding
+all others as constants. The partial derivatives of scalar functions and vector functions with
+respect to a vector variable are defined and used in dynamics of multibody systems.
+
+If is a vector depending on more than one scalar variable, say for example, then we
+write ( ). The partial derivative of with respect to is defined as;
+ ( ) ( )
+
+ if this limit exists. Similarly;
+ ( ) ( )
+
+ ( ) ( )
+
+Higher order derivatives can also be defined;
+
+ ( ) ( ) ( )
+
+The order of differentiation does not matter, i.e.
+
+Rules for partial differentiation of vectors are similar to those for ordinary differentiation. Thus
+we have;
+
+ 1) ( )
+
+ 2) ( )
+
+ ⃗
+ 3) ( )
+
+ ⃗
+ 4) ( ⃗ ) ⃗ ( ⃗ )
+
+ ⃗
+ 5) [ ( ⃗ )] ( ) ( ⃗ ) ( ⃗ )
+
+ 32
+
+ 
+
+--- Page 34 ---
+
+Example 5.1
+If ( ) ( ) ෠, find
+
+Solution
+
+ ( ) [ ( ) ෠]
+
+ ( ) ෠
+
+Example 5.2
+If ( ) and ̂ ෠, find ( ) at the point ( )
+
+Solution
+ ̂ ෠
+
+ ( ) ̂ ෠
+
+ ( ) ( ̂ ෠) ̂ ෠
+
+ ( ) ( ̂ ෠) ̂
+
+At the point ( ) this becomes = ̂
+
+ 33
+
+ 
+
+--- Page 35 ---
+
+5.2.1 E-tivity – Partial Differentiation
+
+Numbering, pacing and sequencing Lesson 5.2.1
+
+Title Partial Differentiation
+
+Purpose To evaluate partial derivatives for vector functions.
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=FE1G0louzcE
+ https://www.youtube.com/watch?v=pJ5TzU_k4SA
+ https://www.youtube.com/watch?v=ckxCV60pypQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on partial
+ differentiation.
+
+Interaction begins ÷ Post your answers on the discussion forum 5.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 5th week of
+ the semester.
+Next Gradient, Divergence and Curl
+
+5.3 Assessment
+ a) If ̂ ෠ ⃗ ̂ ෠ find ( ⃗ )at ( )
+ b) If are constant vectors and is a constant scalar, show that ⃗ (
+ ) satisfies the partial differential equation
+ ⃗ ⃗
+
+ 34
+
+ 
+
+--- Page 36 ---
+
+5.4 References
+5.4.1 Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+Bacon (1995).
+5.4.2 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+5.4.3 http://www.maths.gla.ac.uk/~cc/2A/2A_notes/chap4notes_sol.pdf
+
+ 35
+
+ 
+
+--- Page 37 ---
+
+ LESSON 6
+ GRADIENT, DIVERGENCE AND CURL
+6.1 Introduction
+The vector differential operator, is defined by ෠. This vector operator
+
+possesses properties analogous to those of ordinary vectors. It is useful in defining three
+quantities which arise in practical applications and are known as the gradient, the divergence and
+the curl.
+
+6.2 Lesson Learning Outcomes
+At the end of the chapter, you should be able to:-
+6.2.1 Determine the gradient of scalar functions.
+6.2.2 Evaluate the divergence of vector functions.
+6.2.3 Evaluate the curl of vector functions.
+
+6.2.1 The Gradient
+The gradient of a given differentiable scalar function ( )denoted by or is
+defined as;
+ ( ̂ ෠) ̂ ෠
+
+ ෠Where is known as nabla or the Del operator.
+
+The quantity,
+
+ ( ̂ ෠) ( ̂ ෠)
+
+is known as the Laplacian operator.
+
+6.2.1.1 The Directional Derivative
+The component of in the direction of a unit vector ො is given by,
+ ො
+and is known as the directional derivative of in the direction of ො Physically, this is the rate of
+change of at ( ) in the direction ො
+
+6.2.1.2 Vector Normal to a Surface
+The vector normal to the surface ( )is given by,
+
+While the unit vector ො normal to the surface ( ) is given by,
+
+ ො
+ | |
+Example 6.1
+Find a unit vector normal to the surface at the point (2,-2, 3).
+
+Solution
+ ( ) ( ෠) ( ) ( ) ̂ ෠ = -2 +
+ ෠4 + 4 at the point (2,-2, 3).
+
+ 36
+
+ 
+
+--- Page 38 ---
+
+ ̂ ෠ ෠Then a unit normal to the surface is =
+ √( )
+Example 6.2
+Find the directional derivative of at (1, -2, -1) in the direction ̂ ෠
+
+Solution
+ ( ) ( ෠) ( ) ̂ ෠ at (1, -2, -1)
+The unit vector in the direction of ̂ ෠ is,
+ ̂ ෠
+ ො ̂ ෠
+ √( ) ( ) ( )
+Then the required directional derivative is,
+ ො ( ̂ ෠) ( ̂ ෠)
+
+Since this is positive, is increasing in this direction.
+
+Example 6.3
+Find the angle between the surfaces and at the point
+(2,-1, 2).
+
+Solution
+The angle between the surfaces at the point is the angle between the normal to the surfaces at the
+point.
+A normal to at (2,-1, 2) is
+ ( ) ̂ ෠ ̂ ෠
+A normal to at (2,-1, 2) is
+ ( ) ̂ ෠ ̂ ෠
+( ) ( ) | || |, where is the required angle. Then
+ ( ̂ ෠) ( ̂ ෠) | ̂ ෠|| ̂ ෠|:
+And, thus the angle is:
+
+ 37
+
+ 
+
+--- Page 39 ---
+
+E-tivity 6.2.1 The Gradient
+
+Numbering, pacing and sequencing Lesson 6.2.1
+
+Title The Gradient
+
+Purpose To evaluate the gradient
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=YrfeWibNGag
+ https://www.youtube.com/watch?v=xsJM6ymPtK4
+ https://www.youtube.com/watch?v=uykIBwdXtys
+Spark
+
+Individual contribution ÷ Watch the videos and read on the gradient.
+ ÷ Study on the Laplacian Operator.
+
+Interaction begins ÷ Post your answers on the discussion forum 6.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 6th week of
+ the semester.
+Next The Divergence
+
+6.2.2 The Divergence
+Let ( ) ̂ ෠ be a differentiable vector field at each point ( ) in a
+certain region of space. Then the divergence of denoted by or is defined by;
+
+ 38
+
+ 
+
+--- Page 40 ---
+
+ ( ̂ ෠) ( ̂ ෠)
+
+A vector function ⃗ ( )is said to be solenoidal if ⃗
+
+Example 6.4
+Calculate the divergence of the vector field G(x,y,z) = exi + ln(xy)j + exyzk.
+Solution
+The divergence of G(x,y,z) is given by • G(x,y,z) which is a dot product. Its components are
+given
+
+ 39
+
+ 
+
+--- Page 41 ---
+
+E-tivity 6.2.2 – The Divergence
+
+Numbering, pacing and sequencing Lesson 6.2.2
+
+Title The Divergence
+
+Purpose To evaluate the divergence
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=OK4w44GHJNc
+ https://www.youtube.com/watch?v=6wte_bzqa44
+ https://www.youtube.com/watch?v=PFWFDyhEH4g
+ https://www.youtube.com/watch?v=DMt9erUmiJE
+
+Spark
+
+Individual contribution ÷ Watch the videos and read on the divergence.
+
+Interaction begins ÷ Post your answers on the discussion forum 6.2.2
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind.
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 6th week of
+ the semester.
+Next The Curl
+
+ 40
+
+ 
+
+--- Page 42 ---
+
+6.2.3 The Curl
+Let ( ) ̂ ෠ be a differentiable vector field. Then the curl of denoted by
+ is defined by;
+ ̂ ෠
+ ( ̂ ෠) ( ̂ ෠) || ||
+
+A vector field ⃗ is said to be conservative or irrotational if ⃗
+
+Example 6.5
+ ෠Determine if the vector field = yz2 + (xz2 + 2) + (2xyz - 1) is conservative.
+
+Solution:
+
+Therefore the given vector field is conservative.
+
+Example 6.6
+Prove that
+
+Solution
+ ̂ ෠
+
+ | |
+ ( ̂ ෠) ( ̂ ෠)
+ | |
+
+ ( ) ( ) ( ) ෠
+
+ 41
+
+ 
+
+--- Page 43 ---
+
+6.2.3 E-tivity – The Curl
+
+Numbering, pacing and sequencing Lesson 6.2.3
+
+Title The Curl
+
+Purpose To evaluate the curl of vector valued functions
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=DMt9erUmiJE
+
+Spark
+
+Individual contribution ÷ Watch the videos and read on the curl.
+ ÷ What9s the value of div curl ⃗? i.e. ( )?
+
+Interaction begins ÷ Post your answers on the discussion forum 6.2.3
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 6th week of
+ the semester.
+Next Vector integration
+
+6.3 Assessment
+ 
+ 2 y  2 xyz  3 y 2 z 2, find at the point a) Given A  xyz iˆ  ø xy  2 yz ù ˆj  yz 2 kˆ and 2 x
+ ø,2 ,1 2 ù
+ 
+ i) Curl A
+ ii) Div grad
+
+ 42
+
+ 
+
+--- Page 44 ---
+
+ b) Find the directional derivative of ( ) at the point ( ) in the
+ direction of the vector ( ).
+ c) Find the gradient of the scalar field ( )
+ d) Given that ̂ ෠ find if | |
+ e) Prove that ( ) given that ̂ ෠
+
+6.4 References
+6.4.1 Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+Bacon (1995).
+6.4.2 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+6.4.3 Spiegel, M. R., Vector Analysis. New York: McGraw-Hill (1989).
+6.4.4 Tai, C.T.Generalized Vector and Dyadic Analysis. Oxford: Oxford University Press
+ (1996).
+6.4.5 Wrede, R.C.Introduction to Vector and Tensor Analysis. New York: Wiley (1963).
+6.4.6 http://www.maths.gla.ac.uk/~cc/2A/2A_notes/chap4notes_sol.pdf
+6.4.7 https://www2.physics.ox.ac.uk/sites/default/files/profiles/fender/vectorcalculus2018-
+ 42414.pdf
+
+ 43
+
+ 
+
+--- Page 45 ---
+
+ LESSON 7
+ VECTOR INTEGRATION
+7.1 Introduction.
+In this lesson, we address properties of line integrals. Double and triple integrals have to be
+evaluated by expressing them as repeated integrals.
+
+7.2 Lesson Learning Outcomes
+At the end of the lesson, you should be able to;
+7.2.1 Evaluate line integrals.
+7.2.2 Evaluate surface integrals.
+7.2.3 Evaluate volume integrals.
+
+7.2.1 Line integrals
+The integral of a single variable is the simplest example of a 8line integral9. A line integral is just
+an integral of a function along a path or curve. That is;
+
+ ∮
+
+Where
+ ̂ ෠
+Thus we have;
+ ̂ ෠
+Therefore, given that ̂ ෠
+
+ ∮ ∮( ̂ ෠) ( ̂ ෠) ∮
+
+If is the force on a particle, this line integral represents the work done. In aerodynamics and
+fluid mechanics, this integral is called the circulation of
+If., then is called a conservative vector field.
+
+Example 7.1
+Find the total work done in moving a particle in a force field given by ̂ ෠
+along the curve from.
+
+Solution
+Total work = + +( ̂ ෠) ( ̂ ෠)
+ +
+Substituting for t and applying the limits, the definite integral is now;
+
+ ∫( )
+
+Example 7.2
+If ( ) ̂ ෠, evaluate + from ( ) ( ) along the
+following paths:
+
+ 44
+
+ 
+
+--- Page 46 ---
+
+ a)
+ b) The straight lines from ( ) to ( ), then to ( ), and then to ( )
+ c) The straight line joining ( )to ( )
+
+Solution
+ ∫ ∫*(( ) ̂ ෠) ( ̂ ෠)+
+
+ ∫( )
+
+ a) If, points ( ) ( ) correspond to and
+ respectively. Then;
+ + + ( ) ( )( )( ) ( )( ) ( )
+
+ + ( )
+ b) Along( ) ( ), while varies from to. Then
+ the integral over this part of the path is;
+ + ( ( ))
+ Along ( ) ( ) while varies from to. Then
+ the integral over this part of the path is;
+ + ( ( ) )
+ Along ( ) ( ) while z varies from to. Then
+ the integral over this part of the path is;
+ + ( ( ) ( )) ( )
+
+ Adding +
+ c) The straight line joining ( ) ( ) is given in parametric form by. Then;
+ + + ( ) ( )( )( ) ( )( ) ( ) + (
+
+ )
+
+ 45
+
+ 
+
+--- Page 47 ---
+
+7.2.1 E-tivity – Line integrals
+
+Numbering, pacing and sequencing Lesson 7.2.1
+
+Title Line Integrals
+
+Purpose To evaluate line integrals
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=21z6gkvhlbQ
+ https://www.youtube.com/watch?v=RjvYKVmV2EQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on line integrals
+ ÷ Determine how to evaluate a conservative vector
+ field.
+Interaction begins ÷ Post your answers on the discussion forum 7.2.1
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 7th week of
+ the semester.
+Next Surface Integrals
+
+ 46
+
+ 
+
+--- Page 48 ---
+
+7.2.2 Surface Integrals
+To evaluate surface integrals, it is convenient to express them as double integrals taken over the
+projected area of the surface In Vector Calculus, the surface integral is the generalization of
+multiple integrals to integration over the surfaces. Sometimes, the surface integral can be thought
+of as a double integral. For any given surface, we can integrate over the surface either in the
+scalar field or the vector field. In the scalar field, the function returns the scalar value, and in the
+vector field, the function returns the vector value.
+
+Let S be a two-sided surface as shown in Fig. 7.1. Let one side of S be considered arbitrarily as
+the positive side. A unit normal ො to any point of the positive side of S is called a positive or
+outward drawn unit normal.
+ �㕛ො
+ z
+
+ S
+
+ �㕝̂
+ O y
+
+ R
+
+ x
+
+ Figure 7.1
+Associate with the differential of surface area dS a vector whose direction is that of ො. Then
+ ො. The integral;
+
+ ∬ ∬ ො
+
+is an example of a surface integral called the flux of over.
+ is the projection of the surface on the – plane and is the projection of
+ො is the unit normal vector drawn outward from the surface element while is the unit vector
+perpendicular to the area element
+The equations to determine ො and are given by;
+
+ ො
+ | | | ො ̂| | ො ̂|
+
+Example 7.3
+Evaluate, ො where ̂ ෠ and S is that part of the plane
+ which is located in the first octant.
+
+ 47
+
+ 
+
+--- Page 49 ---
+
+ Solution
+
+ �㕘෠
+ z �㕛ො
+
+ dS
+ y
+
+ S
+ dxdy
+ R
+
+x
+
+ is the projection of the surface on the plane,
+  ො  ො | ො ො|
+ S R
+ To obtain ො;
+ ̂ ෠
+ ො ̂ ෠
+ | |:
+
+ Thus ො ො ෠ ( ෠) ෠
+
+ and so | ො ො| | ො ෠| ⁄
+
+ Also ො ( ̂ ෠) ( ෠)
+ (7.1)
+ From the equation, we find that
+
+ Substituting for in equation (7.1) we find ො
+
+ Then;
+  ො =  ො | ො ෠|  ( )  ( )
+ S R R R
+
+ To evaluate this integral we consider the xy - plane;
+
+ Consider the equation of the plane. In the – plane, and the
+ equation reduces to
+
+ 48
+
+ 
+
+--- Page 50 ---
+
+ y
+
+ ý
+ þ
+ �㕅
+
+ (6, 0)
+
+ x y=0
+
+We consider the vertical strip moving in the direction of the x-axis and the square inside the strip
+moving in the direction of the y-axis. Thus we integrate with respect to from to
+and with respect to from to. In this manner, the region is completely
+covered. The integral becomes;
+
+ ∫ ∫ ( ) ∫( )
+
+Example 7.4
+Evaluate  ො over the entire surface of the region bounded by the cylinder
+ S
+ if ( ) ෠
+
+Solution
+
+ z
+
+ 8
+
+ S
+ dA
+
+ �㕛ො
+ �㕝̂
+ dS
+ R O
+ 3
+ 3
+ y
+
+ x
+
+ 49
+
+ 
+
+--- Page 51 ---
+
+ ( ) ̂ ̂ ̂ ̂
+ ො
+ | | | ( )| √ √ √
+
+ | | √
+ | ̂| |( ̂) ̂|
+
+ ̂
+  ො  [ ( ) ෠] ( )
+ S R
+ ( )
+ 
+ R
+
+   
+ R R R
+Since we are on the plane, then we need to substitute for, i.e.: (from
+ )
+
+ + + + + + +::
+
+For + +, we use substitution, i.e. we let:. Thus on differentiating,
+
+For the limits: when and when
+Therefore,
+ + + + +::
+
+ ∫∫ ⁄
+
+ ∫
+
+For + +, we have;
+
+ ∫∫ ∫
+
+For + +:, we use trigonometric substitution, i.e. we let. On differentiating,
+
+For the limits: when and when
+Therefore,
+
+ 50
+
+ 
+
+--- Page 52 ---
+
+ ⁄
+
+ ∫∫√ ∫∫√
+
+ ⁄
+
+ ∫∫
+
+ ⁄
+
+ ∫∫
+
+Thus we have,
+  ො
+ S
+
+ 51
+
+ 
+
+--- Page 53 ---
+
+7.2.2 E-tivity – Surface integrals
+
+Numbering, pacing and sequencing Lesson 7.2.2
+
+Title Surface Integrals
+
+Purpose To evaluate surface integrals
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=21z6gkvhlbQ
+ https://www.youtube.com/watch?v=RjvYKVmV2EQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on surface integrals.
+ ÷ Determine how to obtain a unit vector normal to
+ a surface.
+Interaction begins ÷ Post your answers on the discussion forum 7.2.2
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 7th week of
+ the semester.
+Next Volume Integrals
+
+ 52
+
+ 
+
+--- Page 54 ---
+
+7.2.3 Volume Integrals
+
+A volume integral refers to an integral over a 3-dimensional domain, that is, it is a special case
+of multiple integrals evaluated as a triple integral. Volume integrals are especially important
+in physics for many applications, for example, to calculate flux densities.
+Consider a closed surface in space enclosing a volume V. Then;
+- and - re examples of volume integrals. The volume element is
+
+Example 7.4
+Evaluate - over the unit cube where is the vector
+function is ( ) ෠
+
+Solution
+
+ ( ) ( ) ( )
+
+ ∭ ∫∫∫( ) ∫∫( ) ∫
+
+Example 7.5
+For ̂ evaluate V ( ) where is the volume under the plane
+ (and above ) for
+
+Solution
+ ̂ ෠
+
+ || || ෠
+
+So
+ V ( ⃗ ) + + + ( ෡)
+
+ ∫∫[ ] ෡
+
+ ∫∫( ) ෡
+
+ ∫* + ෡ ∫( ) ෡ ෡
+
+ 53
+
+ 
+
+--- Page 55 ---
+
+E-tivity 7.2.3 – Volume Integrals
+
+Numbering, pacing and sequencing Lesson 7.2.3
+
+Title Volume Integrals
+
+Purpose To evaluate volume integrals
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=21z6gkvhlbQ
+ https://www.youtube.com/watch?v=RjvYKVmV2EQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on volume integrals.
+
+Interaction begins ÷ Post your answers on the discussion forum 7.2.3
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 7th week of
+ the semester.
+Next Green9s Theorem
+
+7.3 Assessment
+ 
+ a) Find the work done in moving a particle in the force field F  3 x 2 iˆ  ø2 xz  y ù ˆj  zkˆ
+ along the space curve x  2t 2, y  t, z  4t 2  t from t  0 to t  1.
+
+ 54
+
+ 
+
+--- Page 56 ---
+
+ b) Evaluate  ො where ̂ ෠ and is the surface of the cylinder
+ S
+ included in the first octant between.
+ c) Evaluate V given and is the closed region bounded by the planes
+
+7.4 References
+7.4.1 Davis, H. F. and Snider, A. D. Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+ Bacon (1995).
+7.4.2 Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+7.4.3 Spiegel, M. R., Vector Analysis. New York: McGraw-Hill (1989).
+7.4.4 Tai, C.T.Generalized Vector and Dyadic Analysis. Oxford: Oxford University Press
+ (1996).
+7.4.5 Wrede, R.C.Introduction to Vector and Tensor Analysis. New York: Wiley (1963).
+7.4.6 http://phyweb.physics.nus.edu.sg/~phylimhs/LineSurfVolInt2.pdf
+7.4.7 https://tutorial.math.lamar.edu/classes/calciii/tripleintegrals.aspx
+7.4.8 https://nucinkis-
+lab.cc.ic.ac.uk/HELM/workbooks/workbook_29/29_2_surface_vol_vec_ints.pdf
+
+ 55
+
+ 
+
+--- Page 57 ---
+
+ LESSON 8
+ GREEN’S THEOREM
+8.1 Introduction
+
+Green's theorem gives a relationship between the line integral of a two-dimensional vector field
+over a closed path in the plane and the double integral over the region it encloses.
+
+8.2 Lesson Learning Outcomes
+At the end of the chapter, you should be able to;
+8.2.1 Verify and evaluate Green9s theorem.
+
+8.2.1 Green’s Theorem
+If is a closed region of the - plane bounded by a simple closed curve and if and are
+continuous functions of and having continuous derivatives in, then;
+
+ ö öN öM ö
+  Mdx  Ndy   ÷÷  ÷÷ dA c R ø öx öy ø
+
+where c is traversed in the positive (anticlockwise) direction.
+
+ R c
+
+Example 8.1
+Verify Green9s theorem in the plane for.( ) where c is the closed curve of
+the region bounded by y = x and
+
+Solution
+ y
+
+ ( )
+
+ þ ý
+
+ þ ý R
+
+ x O
+
+ 56
+
+ 
+
+--- Page 58 ---
+
+The Green9s theorem states:
+ ö öN öM ö
+  Mdx  Ndy   ÷÷  ÷÷ dAc R ø öx öy ø
+We need to solve the RHS and LHS and show that they are equal
+
+LHS:
+ 2 2 dy  Mdx  Ndy   øxy  y ùdx  x
+c c
+Along, and the limits are: to
+Thus the line integral is
+
+ ∮( ) ∫[ ( ) ( ) ] ( ) ∫( )
+
+Along y = x, and the limits are: to
+Thus the line integral is
+
+ ∮( ) ∫[ ( ) ] ( ) ∫
+
+Thus the required integral =
+
+RHS:
+ ö öN öM ö
+ dA  ÷÷  ÷÷R ø öx öy ø
+
+ ( ), thus
+
+ ( ), thus
+ ö öN öM ö dA   2 x  ø x  2 y ù dA   x  2 y dA  ÷÷  ÷÷R ø öx öy ø R R
+
+Next we need to obtain the limits. We use either a vertical or horizontal strip:
+
+ y
+
+ ( )
+ þ ý
+
+ þ ý
+ R
+
+ O x
+ 57
+
+ 
+
+--- Page 59 ---
+
+  x 2 y dA,( ) + + ( )
+R
+
+Hence the theorem is verified.
+
+Example 8.2
+Using Green9s theorem, evaluate the following line integral
+  øy 2  sin e x  xy ùdx  øx 2  sec h 4 y  2 xy ùdy where is the square with vertices
+c
+( ) ( ) ( ) and ( ) with positive orientation.
+
+Solution
+
+ y
+
+ c
+ (0, 1) (1, 1)
+
+ R
+
+ O (1, 0) x
+
+ ö öN öM ö
+  Mdx  Ndy   ÷÷  ÷÷ dAc R ø öx öy ø
+To evaluate, we are going to solve the RHS only;
+
+ ö öN öM ö
+ dA  ÷÷  ÷÷R ø öx öy ø
+
+ ( ), thus
+
+ ( ) ( ), thus
+
+ ö öN öM ö dA    2 x  2 y  2 y  x  dA   3 x dA  ÷÷  ÷÷R ø öx öy ø R R
+
+ ∫∫
+
+ 58
+
+ 
+
+--- Page 60 ---
+
+8.3 E-tivity – Green’s theorem
+
+Numbering, pacing and sequencing Lesson 8.2.1
+
+Title Green9s theorem
+Purpose To verify Green9s theorem.
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=21z6gkvhlbQ
+ https://www.youtube.com/watch?v=RjvYKVmV2EQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on the Green9s
+ theorem.
+
+Interaction begins ÷ Post your answers on the discussion forum
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 8th week of
+ the semester.
+Next Stoke9s theorem
+
+8.4 Assessment
+a) State Green9s theorem in a given plane. Hence evaluate the line integral
+ 3 and y  x in the first dx  øx 3  3 xy 2 ùdy round the region bounded by the curves y  x c y 3
+ quadrant.
+
+ 59
+
+ 
+
+--- Page 61 ---
+
+ 2 3 xy dx  x y dy where c is the triangle with verticesb) Verify Green9s theorem given c
+ ( ) ( ) ( ).
+
+ 2 2 2 xy  x ùdx  øx  y ùdy where c is the regionc) Verify Green9s theorem in the plane for c ø
+ bounded by.
+
+References
+1) Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+ Bacon (1995).
+2) Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+3) Spiegel, M. R., Vector Analysis. New York: McGraw-Hill (1989).
+4) Tai, C.T.Generalized Vector and Dyadic Analysis. Oxford: Oxford University Press (1996).
+5) Wrede, R.C.Introduction to Vector and Tensor Analysis. New York: Wiley (1963).
+
+ 60
+
+ 
+
+--- Page 62 ---
+
+ LESSON 9
+ STOKE’S THEOREM
+9.0 Introduction
+
+Stokes' theorem relates a surface integral of a the curl of the vector field to a line integral of the
+vector field around the boundary of the surface.
+
+9.1 Lesson Learning Outcomes
+
+At the end of the chapter, the students should be able to verify Stoke9s theorem.
+
+9.2 Stoke’s theorem
+If S is an open, two-sided surface bounded by a closed, non-intersecting curve c, then if ⃗⃗ has
+continuous derivatives;. ⃗⃗ ⃗,( ⃗ ) ෝ
+
+Example 9.1
+Verify Stoke9s theorem for ⃗ ( ) ̂ ෠ where S is the upper half surface of
+the sphere and c is its boundary.
+
+Solution
+The boundary c is a circle in the xy plane of radius 1 and center at the origin. Let
+ be parametric equations of c. Then;
+
+ ∮ ∮( ) ∫( )( )
+
+ ෠Also
+
+Then,( ) ො, ෠ ො,
+
+This last integral equals;::
++ + + + +: and Stoke9s theorem is verified.:
+
+ 61
+
+ 
+
+--- Page 63 ---
+
+9.3 E-tivity – Stoke’s theorem
+
+Numbering, pacing and sequencing Lesson 9.2.1
+
+Title Stoke9s theorem
+Purpose To verify Stoke9s theorem.
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=21z6gkvhlbQ
+ https://www.youtube.com/watch?v=RjvYKVmV2EQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on Stoke9s theorem.
+ ÷ Discuss Stoke9s theorem on plane surfaces.
+
+Interaction begins ÷ Post your answers on the discussion forum
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 9th week of
+ the semester.
+Next Divergence theorem
+
+9.3 Assessment
+ 
+ ˆ thatVerify the Stoke9s theorem for the vector field F  øx 2  y 2 ù i 2 2 2 2 ˆ  øy  z ù ˆj  øz  x ùk
+exists over that part of the surface S ( x  y  z  1 ) in the first octant.
+
+References
+1) Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+ Bacon (1995).
+
+ 62
+
+ 
+
+--- Page 64 ---
+
+2) Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+3) Spiegel, M. R., Vector Analysis. New York: McGraw-Hill (1989).
+4) Tai, C.T.Generalized Vector and Dyadic Analysis. Oxford: Oxford University Press (1996).
+5) Wrede, R.C.Introduction to Vector and Tensor Analysis. New York: Wiley (1963).
+
+ 63
+
+ 
+
+--- Page 65 ---
+
+ LESSON 10
+ DIVERGENCE THEOREM
+10.0 Introduction
+
+The divergence theorem states that the surface integral of a vector field over a closed surface,
+which is called the flux through the surface, is equal to the volume integral of
+the divergence over the region inside the surface.
+
+10.1Lesson Learning Outcomes
+
+At the end of the chapter, the students should be able to verify the divergence theorem
+
+10.2 Divergence theorem
+It states that if V is the volume bounded by a closed surface S and ⃗ is a vector function, then;
+- ⃗, ⃗ ෝ where ෝ is the positive outward normal to S.
+
+Example 10.1
+
+Verify the divergence theorem for ̂ ෠ taken over the region bounded by.
+
+Solution
+
+ ∭ ∭[ ( ) ( ) ( )] ∭( ):
+
+ ∫ ∫ ∫( ):
+
+ 64
+
+ 
+
+--- Page 66 ---
+
+10.3 E-tivity Divergence theorem
+
+Numbering, pacing and sequencing Lesson 10.2.1
+
+Title Divergence theorem
+
+Purpose To verify divergence theorem.
+
+Brief summary of overall task Watch the following videos;
+ https://www.youtube.com/watch?v=21z6gkvhlbQ
+ https://www.youtube.com/watch?v=RjvYKVmV2EQ
+Spark
+
+Individual contribution ÷ Watch the videos and read on divergence
+ theorem. Interaction begins ÷ Post your answers on the discussion forum
+ ÷ Read what your colleagues have posted.
+ ÷ In a sentence or two, comment on what two of
+ your colleagues have posted keeping etiquette in
+ mind
+E-moderator interventions ÷ Focused group discussion
+ ÷ Providing feedback/ teaching points
+ ÷ Summarising key points
+ ÷ Closing the discussion
+Schedule and time This discussion should be done during the 10th week of
+ the semester.
+Next Revision
+
+10.5 Assessment
+
+ 
+Verify the Divergence Theorem where F  x 2 iˆ  y 2 ˆj  z 2 kˆ and S is the cube that is cut from
+the first octant by the planes x ,1 y ,1 z  1
+
+ 65
+
+ 
+
+--- Page 67 ---
+
+References
+1) Davis, H. F. and Snider, A. D.Introduction to Vector Analysis, 7th ed. Boston: Allyn &
+ Bacon (1995).
+2) Lewis, P. E. and Ward, J. P. Vector Analysis for Engineers and Scientists. Reading, MA:
+ Addison-Wesley (1989).
+3) Spiegel, M. R., Vector Analysis. New York: McGraw-Hill (1989).
+4) Tai, C.T.Generalized Vector and Dyadic Analysis. Oxford: Oxford University Press (1996).
+5) Wrede, R.C.Introduction to Vector and Tensor Analysis. New York: Wiley (1963).
+
+ 66

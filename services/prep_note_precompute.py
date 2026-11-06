@@ -74,11 +74,11 @@ def enqueue_course_topic_note_jobs(course) -> int:
                 continue
             if job.status in {"pending", "running"}:
                 continue
-            if job.status == "complete":
+            if job.status == "complete" and _has_current_topic_note_cache(topic, level, signature):
                 continue
             changed = PrepTopicNotesJob.objects.filter(
                 pk=job.pk,
-                status="failed",
+                status__in=["complete", "failed"],
             ).update(
                 status="pending",
                 attempts=0,
@@ -91,6 +91,45 @@ def enqueue_course_topic_note_jobs(course) -> int:
             )
             queued += int(bool(changed))
     return queued
+
+
+def enqueue_topic_note_job(topic: PrepTopic, level: str, source_signature: str) -> PrepTopicNotesJob:
+    """Ensure this topic-level has a current job, recovering completed jobs with no published cache."""
+    from prep.models import PrepNoteGenerationGuard
+
+    job, created = PrepTopicNotesJob.objects.get_or_create(
+        topic=topic,
+        level=level,
+        source_signature=source_signature,
+        defaults={"status": "pending"},
+    )
+    should_retry = (
+        job.status == "complete"
+        and not _has_current_topic_note_cache(topic, level, source_signature)
+    )
+    if job.status == "failed":
+        guard = PrepNoteGenerationGuard.objects.filter(
+            topic=topic,
+            level=level,
+            source_signature=source_signature,
+        ).first()
+        should_retry = not guard or guard.status != "needs_review"
+    if not created and should_retry:
+        PrepTopicNotesJob.objects.filter(
+            pk=job.pk,
+            status=job.status,
+        ).update(
+            status="pending",
+            attempts=0,
+            last_error="",
+            provider_usage={},
+            model_name="",
+            queued_at=timezone.now(),
+            started_at=None,
+            completed_at=None,
+        )
+        job.refresh_from_db()
+    return job
 
 
 def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
@@ -175,6 +214,7 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     validation_issues = _note_completion_issues(
         notes,
         topic.title,
+        level=job.level,
         **validation_options,
     )
     if validation_issues:
@@ -218,31 +258,51 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
 
 
 def _has_current_topic_note_cache(topic: PrepTopic, level: str, source_signature: str) -> bool:
-    from prep.models import PrepContentCache
-    from services.prep_ai_router import _cache_payload_as_dict, NOTE_VALIDATION_STATE
+    from services.prep_ai_router import _topic_notes_cache_signature, get_published_topic_note_levels
 
-    entries = PrepContentCache.objects.filter(
-        topic=topic,
-        content_type="topic_notes",
-    ).order_by("-updated_at", "-id")
-    for entry in entries:
-        payload = _cache_payload_as_dict(entry.payload)
-        if not payload:
-            continue
-        content = str(payload.get("content") or payload.get("notes") or "").strip()
-        if (
-            payload.get("level", "level_2") == level
-            and payload.get("source_signature") == source_signature
-            and payload.get("validation_state") == NOTE_VALIDATION_STATE
-            and content
-        ):
-            return True
-    return False
+    current_signature = _topic_notes_cache_signature(
+        topic.course,
+        topic,
+        topic.title,
+        topic.subtopics,
+    )
+    return (
+        current_signature == source_signature
+        and level in get_published_topic_note_levels(topic, validated_only=True)
+    )
+
+
+def _recover_valid_cached_topic_notes_job(job: PrepTopicNotesJob, topic: PrepTopic, current_signature: str) -> bool:
+    """Treat a stale job as complete when a current validated cache already exists."""
+    if current_signature == job.source_signature:
+        return False
+    if not _has_current_topic_note_cache(topic, job.level, current_signature):
+        return False
+
+    existing_current_sig = PrepTopicNotesJob.objects.filter(
+        topic=job.topic,
+        level=job.level,
+        source_signature=current_signature,
+    ).exclude(pk=getattr(job, "pk", None)).exists()
+
+    if not existing_current_sig:
+        job.source_signature = current_signature
+        update_fields = ["source_signature", "status", "completed_at", "last_error"]
+    else:
+        update_fields = ["status", "completed_at", "last_error"]
+
+    job.status = "complete"
+    job.completed_at = timezone.now()
+    job.last_error = ""
+    job.save(update_fields=update_fields)
+    return True
 
 
 def _supersede_stale_topic_notes_job(job: PrepTopicNotesJob, topic: PrepTopic, current_signature: str) -> bool:
     if current_signature == job.source_signature:
         return False
+    if _recover_valid_cached_topic_notes_job(job, topic, current_signature):
+        return True
     job.status = "failed"
     job.completed_at = timezone.now()
     job.last_error = "Superseded because the approved topic source changed during note preparation."
@@ -295,7 +355,7 @@ def process_course_notes_in_background(course_id: int):
 
         # Mark course precompute job complete if all jobs are complete
         all_jobs = PrepTopicNotesJob.objects.filter(topic__course=course)
-        if all_jobs.exists() and not all_jobs.filter(status__in=["pending", "running"]).exists():
+        if all_jobs.exists() and not all_jobs.exclude(status="complete").exists():
             PrepNotePrecomputeJob.objects.filter(course=course).update(
                 status="complete",
                 completed_at=timezone.now(),

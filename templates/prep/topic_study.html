@@ -1,6 +1,6 @@
 ﻿{% extends 'prep/base_prep.html' %}
 
-{% block title %}{{ topic.title }} — Study & Practice | Mentify Prep{% endblock %}
+{% block title %}{{ topic.display_title|default:topic.title }} — Study & Practice | Mentify Prep{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -2102,9 +2102,9 @@
     <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
       <a href="{% url 'prep:courses' %}" style="color: var(--green);">Courses</a> &rarr; 
       <a href="{% url 'prep:course_detail' course_code=topic.course_code %}" style="color: var(--green);">{{ topic.course_code }}</a> &rarr; 
-      {{ topic.title }}
+      {{ topic.display_title|default:topic.title }}
     </div>
-    <h1 style="margin-bottom: 4px;">{{ topic.title }}</h1>
+    <h1 style="margin-bottom: 4px;">{{ topic.display_title|default:topic.title }}</h1>
     <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem;">{{ topic.course_code }}{% if topic.course_title and topic.course_code != topic.course_title %} &bull; {{ topic.course_title }}{% endif %}</p>
     {% if subtopics %}
     <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
@@ -2349,7 +2349,7 @@
             <h2 style="font-size:1.05rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Topic study tutor</h2>
             <span class="badge badge-accent topic-tutor-course-tag" style="font-size:.68rem;">{{ topic.course_code }}</span>
           </div>
-          <p class="topic-tutor-subtitle" style="margin:4px 0 0;color:var(--text-muted);font-size:.8rem;">Simple explanations for {{ topic.title }}</p>
+          <p class="topic-tutor-subtitle" style="margin:4px 0 0;color:var(--text-muted);font-size:.8rem;">Simple explanations for {{ topic.display_title|default:topic.title }}</p>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
           <button type="button" id="topic-tutor-expand" class="topic-tutor-expand-button" aria-label="Expand tutor to full screen" aria-pressed="false" title="Expand tutor">
@@ -2368,7 +2368,7 @@
       <div id="topic-tutor-messages" class="topic-tutor-messages" aria-live="polite" aria-relevant="additions text">
         <div class="topic-tutor-message assistant">
           <strong>Hi, I’m here to help you work through this topic.</strong>
-          <p>Ask a question about {{ topic.title }}, or attach relevant study material. I’ll keep the explanation clear and focused.</p>
+          <p>Ask a question about {{ topic.display_title|default:topic.title }}, or attach relevant study material. I’ll keep the explanation clear and focused.</p>
         </div>
       </div>
       <div id="topic-tutor-error" class="topic-tutor-error" role="alert" style="display:none;">
@@ -2419,7 +2419,7 @@
           <button type="button" id="topic-tutor-camera-button" class="topic-tutor-icon-button" aria-label="Take photo with camera" title="Take photo with camera">
             <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </button>
-          <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" rows="1" maxlength="2000" placeholder="Ask about {{ topic.title }}…" aria-label="Ask a question about this topic"></textarea>
+          <textarea id="topic-tutor-input" class="topic-tutor-textarea" name="message" rows="1" maxlength="2000" placeholder="Ask about {{ topic.display_title|default:topic.title }}…" aria-label="Ask a question about this topic"></textarea>
           <button type="submit" id="topic-tutor-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Send message">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
           </button>
@@ -2497,7 +2497,7 @@
           <button type="button" class="btn btn-outline btn-sm" onclick="toggleSolution('auth-sol-{{ q.id }}', '{{ q.id }}')">
             Reveal Verified Solution &amp; Marking Rubric
           </button>
-          <button type="button" class="btn btn-sm" style="background: var(--green); color: #fff; border: 1px solid var(--green);" onclick="deriveR1Proof('{{ q.id }}', '{{ topic.course_code }}', '{{ topic.title }}')">
+          <button type="button" class="btn btn-sm" style="background: var(--green); color: #fff; border: 1px solid var(--green);" onclick="deriveR1Proof('{{ q.id }}', '{{ topic.course_code }}', '{{ topic.display_title|default:topic.title }}')">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             View Step-by-Step Proof &amp; Solution
           </button>
@@ -2677,13 +2677,13 @@
             </svg>
           </div>
           <div class="explore-encyclopedia-content">
-            <h4 class="explore-encyclopedia-title">{{ topic.title }}</h4>
+            <h4 class="explore-encyclopedia-title">{{ topic.display_title|default:topic.title }}</h4>
             <p class="explore-encyclopedia-extract">Explore background definitions, formal proofs, and historical context for this topic on Wikipedia.</p>
             <div class="explore-encyclopedia-source">Source: Wikipedia</div>
           </div>
         </div>
         <div class="explore-encyclopedia-action">
-          <a href="https://en.wikipedia.org/wiki/Special:Search?search={{ topic.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="explore-outline-btn">
+          <a href="https://en.wikipedia.org/wiki/Special:Search?search={{ topic.display_title|default:topic.title|urlencode }}" target="_blank" rel="noopener noreferrer" class="explore-outline-btn">
             <span>Read on Wikipedia</span>
             <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
           </a>
@@ -2856,7 +2856,7 @@
         </span>
       </div>
       <h2 class="quiz-header-title" style="font-size: 1.22rem; font-weight: 700; margin: 0; color: var(--text);">
-        Test Your Understanding: {{ topic.title }}
+        Test Your Understanding: {{ topic.display_title|default:topic.title }}
       </h2>
     </div>
     <div class="quiz-header-actions" style="display: flex; align-items: center; gap: 12px;">
@@ -2884,7 +2884,7 @@
         <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
       </div>
       <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 8px;">
-        Active Recall Drill: {{ topic.title }}
+        Active Recall Drill: {{ topic.display_title|default:topic.title }}
       </h3>
       <p style="font-size: 0.92rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 16px; line-height: 1.55;">
         Test your understanding of core concepts, formulas, and proofs with 5 exam-calibrated multiple-choice questions. Get instant feedback with complete distractor explanations.
@@ -2952,7 +2952,7 @@
 {{ generated_questions|json_script:"generated-questions-data" }}
 {{ assistant_conversations|json_script:"topic-tutor-conversations-data" }}
 {{ initial_assistant_conversation|json_script:"topic-tutor-initial-conversation-data" }}
-{{ topic.title|json_script:"topic-tutor-topic-title-data" }}
+{{ topic.display_title|default:topic.title|json_script:"topic-tutor-topic-title-data" }}
 {{ topic.course_code|json_script:"topic-tutor-course-code-data" }}
 
 <script>
@@ -4597,7 +4597,7 @@
       }
       const input = document.getElementById('topic-tutor-input');
       if (input) {
-        input.placeholder = `Ask about {{ topic.title }}…`;
+        input.placeholder = `Ask about {{ topic.display_title|default:topic.title }}…`;
       }
     };
 

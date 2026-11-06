@@ -1,0 +1,182 @@
+{
+  "course": {
+    "code": "SST 305",
+    "title": "Theory of Estimation"
+  },
+  "topic": {
+    "id": 50,
+    "title": "Least Squares Estimation",
+    "summary": "Using matrix notation to fit a straight line by the method of least squares.",
+    "subtopics": [
+      "Matrix notation for least squares",
+      "Fitting a straight line"
+    ],
+    "content_rules": {}
+  },
+  "level": "level_2",
+  "course_study_profile": {
+    "rules": {
+      "code": "may be generated only when source notes contain code evidence",
+      "authority": "uploaded lecture notes and syllabus only",
+      "math_notation": "may be generated only when source notes contain notation evidence",
+      "chemical_equations": "may be generated only when source notes contain reaction evidence"
+    },
+    "version": 2,
+    "category": "Statistics",
+    "confidence": 0.98,
+    "capabilities": {
+      "code": false,
+      "math_notation": true,
+      "chemical_equations": false
+    },
+    "source_sha256": "3bfa3362da5e1d8157a06a53c99a560e3f63f82bd498cfebce89f0068e153157",
+    "note_structure": [
+      "Purpose and Statistical Context",
+      "Definitions and Assumptions",
+      "Methods and Interpretation",
+      "Worked Applications",
+      "Revision Summary and Common Errors"
+    ],
+    "schema_version": 1,
+    "subject_family": "statistics",
+    "evidence_quotes": [
+      "Introduces the concept of parameter estimation using sample characteristics or statistics, distinguishing population characteristics (parameters, which are usually unknown) from sample characteristics (statistics, which are usually known).",
+      "Outlines the four properties of a \"best\" estimator according to R.A. Fisher: unbiasedness, consistency, efficiency, and sufficiency.",
+      "Covers generating narrow confidence intervals (confidence limits) that enclose an unknown parameter with a high probability."
+    ],
+    "source_document_id": "acdb3cc8-1b3f-4431-9082-3a8406e890d7"
+  },
+  "required_note_sections": [
+    "## 1.",
+    "## 2.",
+    "## 3.",
+    "## 4.",
+    "## 5."
+  ],
+  "level_2_instruction": "Rigorous academic standard: use precise definitions and appropriate academic rigor; include representative worked examples grounded in approved notes; use formal notation only when supported by approved sources.",
+  "validation_options": {
+    "allow_math": true,
+    "allow_code": false,
+    "allow_chemical_equations": false,
+    "content_rules": null,
+    "content_rule_issues": [],
+    "source_references": [
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 19,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 20,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 21,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 22,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 23,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 24,
+        "visuals": []
+      },
+      {
+        "document_id": "acdb3cc8-1b3f-4431-9082-3a8406e890d7",
+        "source_sha256": "3bfa3362da5e1d8157a06a53c99a560e3f63f82bd498cfebce89f0068e153157",
+        "page_number": null,
+        "visuals": []
+      }
+    ]
+  },
+  "approved_source_excerpt": "--- Page 2 ---\nLESSON ONE\n CONCEPT OF ESTIMATION\n\n 1.1 Introduction\n\n In this lesson we introduce the concept of estimation and distinguishing between parameters\n and statistics. Two types of methods of estimation will also be discussed.\n\n 1.2 Learning Outcomes\n\n By the end of this lesson the learner will be able to:\n\n 1.2.1 Explain the concept of estimation of parameters using sample characteristics\n or statistics.\n 1.2.2 Distinguish between point and interval estimations\n 1.2.1 Concept of Estimation\n\n The objective of statistics is to make an inference about a population based on information\n\n contained in a sample. Most statistical inference procedures involve either estimation or\n hypothesis testing. This course looks at estimation.\n\n Assume that some characteristic of elements in a population can be represented by a\n random variable X whose probability density function, p.d.f, is f(x, ) , where the form of the\n\n density is assumed known except that it contains unknown parameter . Further assume\n\n that n observed values x 1, x 2, …xn of a random sample X 1, X 2, …. Xn from f(x, ) , can be\n\n observed. On the basis of observed values x 1, x 2, …xn, it is desired to estimate the value of\n the parameter  or some function ( )  of the unknown parameter.\n\n Population characteristics are called parameters and are usually unknown. Examples:\n\n (a) Binomial distribution, f ( x, p )  n c\n x\n p x 1  p  n  x, x  0,1,. n.\n P is the unknown parameter\n (b) Poisson distribution, f ( x, ) \n e \n x!\n x, x  0,1,. \n \n (c) Normal distribution, (,, )\n 1\n 2\n e x p [\n 2\n 1\n 2\n ( ) 2 ]  \n   \n f x \n \n x \n\n The parameters in the above distributions are p, , and (or2)\n\n--- Page 3 ---\nSample characteristics called statistics, for example sample mean,\n X\n \n 1\n n\n n\n i\n 1\n X\n i\n and sample\n variance, s 2 \n n\n 1\n  1\n n\n i\n 1\n ( X\n i\n \n X\n ) 2\n\n are usually known, are used to estimate parameters.\n This estimation can be made I two ways namely point estimation and interval estimation.\n 1.2.2 Point and Interval Estimations\n (i) Point Estimation\n A point estimation procedure utilizes the sample information to arrive at a single number or\n point that estimates the population parameter.\n If we let the value of some statistic say t(X 1, X 2, …Xn ) to estimate the unknown parameter,\n then t(X 1, X 2, …Xn ) is called a point estimator.\n (ii) Interval Estimation\n An interval estimation procedure makes use of the sample information to arrive at two\n numbers that are intended to enclose the parameter of interest.\n This is where two statistics t 1 (X 1, X 2, …Xn ) and t 2 (X 1, X 2, …Xn ) where t 1 (X 1, X 2, …Xn ) < t 2 (X 1,\n X 2, …Xn ) so that [t 1 (X 1, X 2, …Xn ), t 2 (X 1, X 2, …Xn )] constitutes an interval for which the\n probability can be determined that it contains the unknown parameter.\n In either case, the actual estimation is accomplished by an estimator. An estimator is a rule\n or formula that tells us how to calculate an estimate based on measurements contained in a\n sample. Most frequently, an estimator is expressed as a formula.\n\n--- Page 4 ---\nLESSON TWO\n PROPERTIES OF POINT ESTIMATORS\n\n 2.1 Introduction\n It is possible to obtain many different estimators for the same population parameter, hence it is\n\n essential to discriminate between various statistics (estimators) so as to arrive at the best\n\n estimator. According to R.A. Fisher, an estimator is said to be best if it is;\n (i) Unbiased\n\n (ii) Consistent\n\n (iii) Efficient\n (iv) Sufficient\n\n Let X 1, X 2, …Xn be a random sample of size n from a population having a random variable X\n\n whose pdf is of the form f(x, )  which is known except the parameter is unknown. We discuss\n\n the four properties of a good estimator by considering\n ^\n  as an estimator of .\n This lesson will discuss the first two properties of unbiasedness and consistency.\n 2.2 Learning Outcomes\n By the end of this lesson the learner will be able to:\n\n 2.2.1 Define unbiasedness and test whether an estimator is unbiased or not.\n 2.2.2 Define consistency and test whether an estimator is consistent or not.\n\n 2.2.1 Unbiasedness\n\n An estimator is said to be unbiased if the expected value of the estimator is equal to the\n\n ^\n parameter it is estimating. That is is an unbiased estimator of  if E (\n ^\n ) = .\n ^\n The bias of an estimator of  is given by B (\n ^\n ) = E (\n ^\n\n ) - .\n ^ ^\n If (i) B () = 0, then  is unbiased\n ^ ^\n (ii) B () < 0, then is negatively biased\n ^ ^\n (ii) B () > 0,  is positively biased\n Example 1\n\n--- Page 5 ---\nLet X 1, X 2, …Xn be a random sample of size n from a normal population with mean and\n\n variance 2 . Show that;\n\n (i) The sample mean,\n X\n is an unbiased estimator of the population mean, \n (ii) The sample variance, s 2 \n n\n 1\n  1\n  ( X\n i\n \n X\n ) 2 is an unbiased estimator of the\n 1\n population variance, 2  (X )2\n n i\n (iii) The statistic S 2 \n 1\n n\n  ( X\n i\n \n X\n ) 2 is a biased estimator of 2 \n Solution:\n We know that  E ( X )  and ( ) 2  V X \n (i) E (\n _X\n )  E (\n 1\n n\n n\n i\n 1\n X\n i\n ) =\n 1\n n\n n\n i\n 1\n E ( X\n i\n )\n 1 n 1 ^\n =  n. Hence \n n n\n i1\n X\n is an\n \n unbiased estimator of\n \n For (ii) and (iii) we need E((X X)2)\n i\n Now,\n E (  ( X\n i\n \n X\n ) 2 )  E (  X 2i  n X\n  2\n )   E ( X 2i )  n E (\n X 2\n )   [ V ( X )  2 ]  n ( V (\n X\n )  E ( X\n \n 2 ) ) \n ( 2 2 ) (\n 2\n 2 ) ( 2 2 ) 2 2 ( 1 ) 2\n \n             n\n n\n   n    n  n \n\n 1 \n Or recall a chi-square distribution where (X  X)2  2\n 2 i n1\n Note that if X 2,thenE(X)nandVar(X)2n\n n\n \n This means thatE((X  X)2)(n1)2. Hence\n i\n\n--- Page 6 ---\n1\n (ii) E(s2) (n1)2 2\n n1\n (iii) ( 2 )\n 1\n 2 2   E S \n n \n n\n \n Note: To estimate population mean and population variance, we use the sample mean and the\n sample variance respectively\n Example 2\n A random sample of five values from a normal population with mean and variance 2 \n\n Estimate mean and standard deviation if the five values are: 1.06, 1.03, 1.04, 1.05 and 1.04\n\n (n=5).\n\n Solution:\n ^\n \n _X\n \n 1\n n\n n\n i\n 1\n X\n i\n  1.0 4 4\n ^ 1 _\n  and  (X  X)2 0.11401754\n n1 i\n 2.2.2 Consistency\n Definition\n The estimator\n ^\n n\n  of  is said to be a consistent of, if for any positive number  0 ,\n  \n (\n ^\n   )  1    Ln i m P\n n\n or equivalently\n  \n (\n ^\n   )  0    Ln i m P\n n\n The notation\n ^\n n\n\n  is used to express the fact that the estimator for is calculated by using a\n sample of size n.\n To use the above definition the following theorem stated without proof is helpful to test for\n consistency;\n Theorem: Chebychev’s Inequality\n\n--- Page 7 ---\nLet X be a random variable having finite mean  and finite variance2. Let 0 (i.e., is a\n\n strictly positive real number). Then, the Chebyshev's inequality is given by:\n\n ( ) 1\n (\n 2\n )\n  \n \n P X    \n V a r X\n or equivalently ( )\n (\n 2\n )\n  \n \n P X   \n V a r X\n Remark\n If\n ^\n  is an unbiased estimator of  then\n ^\n  is consistent if\n  \n (\n ^\n )  0  L imn V\n Example 3\n Consider the information given in example 1.\n Show that\n \n (i) the sample mean, X is consistent estimator of the population mean, \n (ii) The sample variance, s 2 \n n\n 1\n  1\n  ( X\n i\n \n X\n ) 2 is a consistent estimator of the\n 1\n population variance, 2  (X )2\n n i\n (iii) The statistic S 2 \n 1\n n\n  ( X\n i\n \n X\n ) 2 is a consistent estimator of 2 \n By Chebyshev's inequality\n _\n _ Var(X)\n (i)P(X)1 =1-\n 2\n 2\n 2\n \n  n\n Hence\n  \n (\n _\n   ) \n  \n ( 1 \n 2\n 2\n )  1\n \n  \n \n Ln im P X L\n n\n im\n n, hence consistent\n \n For (ii) and (iii) use chi-square distribution to show that Var((X  X)2)2(n1)4\n i\n\n--- Page 8 ---\nHence (ii)\n  \n ( 2  2  ) \n  \n (1 \n (\n 2\n 2 )\n ) \n  \n ( 1 \n (\n 2\n  1\n 4\n ) 2\n )  1\n \n  \n  \n Ln im P s Ln im\n V a r s\n L\n n\n im\n n, hence consistent\n (iii)\n  \n ( 2  2  ) \n  \n (1 \n (\n 2\n 2 )\n ) \n  \n ( 1 \n 2 ( \n 2\n 1 )\n 2\n 4\n )  1\n \n  \n  \n Ln i m P S Ln i m\n V a r S\n L\n n\n i m\n n\n n, hence consistent\n Note If two or more estimators for the same parameter are consistent, we choose the one that\n is unbiased to estimate the parameter.\n Exercise\n Let X\n 1, X\n 2,. X\n n\n be a random sample of size n from a population whose\n density function with parameter  is given by\n > 0\n f ( x ) \n \n 0\n x ( 1  1 )\n e,\n x \n ls e w,\n h\n x\n e\n \n r e\n 0, 1  .\n If an estimator of  is given by\n ^\n \n 1\n n\n n\n i\n 1\n X\n i\n ,test whether\n ^\n\n  is an\n (i) Unbiased\n (ii) Consistent estimator of \n\n--- Page 9 ---\nLESSON THREE\n\n Sufficiency and efficiency of an estimators\n\n 3.1 Introduction\n\n This lesson looks at the sufficiency and efficiency properties of a good estimator.\n\n 3.2 Learning Outcomes\n By the end of this lesson the learner will be able to:\n\n 1.2.1 Define sufficiency and test whether an estimator is sufficient or not.\n 1.2.2 Define efficiency and test whether an estimator is efficient or not\n 3.2.1 Sufficiency\n\n Definition\n\n Let X 1, X 2, …Xn be a random sample of size n from a population having a random variable X\n\n whose pdf is of the form f(x,)which is known except the parameter is unknown. The\n statistic T=t(X 1, X 2, …Xn ) is said to be a sufficient statistics for if the conditional\n\n distribution of X given t does not depend on.\n\n That is if P(X=x/T=t) is independent of the parameter, then T is a sufficient statistic for the\n\n parameter.\n\n A statistic is said to be sufficient for  if it carries all information about  that is carried by\n\n the sample. We require an estimator to carry all information about whatever it is estimating\n\n that is originally contained in the sample. Intuitively, we would wish the estimator to carry\n all the relevant information in the sample regarding the parameter. That is it should be\n\n sufficient.\n\n Example 4\n\n Let X 1, X 2, …Xn be a random sample of size n from a Bernoulli distribution having a random\n\n variable X whose pdf\n is\n px 1 p1x, x 0,1\n P(X  x)\n 0,elsewhere\n\n--- Page 10 ---\nShow T \n n\n i\n 1\n X\n i\n is a sufficient statistic for p.\n Solution\n P(X  x,X  x,. X  x,T t)\n P(X/T)= 1 1 2 2 n n where\n P(T t)\n P(X =x,X =x,. X =x,T=t)=P(x,x,. x,t)\n 1 1 2 2 n n 1 2 n\n n1 n\n =P(x 1,x 2,…. xn-1,x n =t-x i ), since t=x i\n i1 i1\n\n = P(X =x )P(X =x ). P(X =x )P(X =t-\n 1 1 2 2 n-1 n-1 n\n n 1 \n i\n 1 \n x\n i\n ) because of independence\n =pt(1-p)n-t using Bernoulli distribution\n Next,\n If X 1, X 2, …Xn are independent Bernoulli random variables, the T=\n n\n i\n 1 \n X i is Binomial.\n Therefore, P(T=t)= c n\n t\n p t 1  p  n  t, t  0,1,. n. Alternatively, use the moment generating function technique to find the distribution of T,\n P(T=t).\n 1\n Hence P(X/T)= which does not depend on the parameter p and conclude that T is a\n cn\n t\n sufficient statistic for p.\n Note: To check sufficiency, we have to compute conditional probabilities, something that is\n not easy sometimes. In many cases a relatively easy criterion for examining sufficiency is\n\n through the following factorization theorem.\n\n Factorization Theorem\n\n--- Page 11 ---\nLet X 1, X 2, …Xn be a random sample of size n from a population having a random variable X\n whose pdf is of the form f(x, )  which is known except the parameter is unknown. The\n\n statistic T=t(X 1, X 2, …Xn ) is said to be a sufficient statistics for if the likelihood function L=\n\n can factored into two function L and L such that\n 1 2\n ∏f(x,𝜃)\n L ( X, ) L\n 1\n ( t, ) L\n 2\n ( x\n 1, x\n 2,. x\n n\n )   \n Where L (t, > 0 (non-negative) and\n 1\n 𝜃)\n L\n 2\n ( x\n 1, x\n 2,. x\n n\n ) >0 and a function of x only.\n Example 5\n Let X 1, X 2, …Xn be a random sample of size n from a Poisson distribution. Show that\n T=\n n\n i\n 1 \n X\n i\n is a sufficient statistic for.\n Solution\n f ( x, ) \n  e\n 0\n ,\n x\n e!\n l s\n x\n e,\n w\n x\n h\n \n e r\n 0\n e,1, \n \n , then the likelihood function is\n L(x, )=f(x 1 )f(x 2)…f(xn )=\n e\n x\n 1!\n x1   e\n x\n 2!\n x 2  \n ….\n e\n x\n n!\n x n  \n =\n e  n\n \n \n x!i\n xi\n \n = L (t, )",
+  "approved_topic_lesson_source": "LESSON SIX \n METHOD OF LEAST SQUARES \n 6.1 Introduction \n This lesson looks at the method of method of least squares \n 6.2 Learning Outcomes \n By the end of this lesson the learner will be able to: \n 6.2.1 Obtain estimators using the method of least squares \n 6.2.1 Method of Least Squares \n Suppose that observations y , y , . . ., y from the random variable Y are made at different\n 1 2 n \n values x , x , . . ., x from the random variable X. Suppose we know that the mean of Y varies\n 1 2 n \n linearly with X but we do not know the exact relationship. In other words we know that\n E(y) = x , i = 1, 2, . . ., n. We can then write \n i i \n \n\n--- Page 20 ---\ny = \n i \n  x \n i \n  e \n i \n   , where e is the error of estimating y such that e are\n i i i,s \n independently distributed with E(e)=0 andV(e)= \n i i \n 2  . \n  and are regression constants to be determined by the method of least squares which\n is such the such of errors squared, S=  e 2i is minimum. \n For  0 \n  \n d \n d \n S \n and  0 \n  \n d \n d \n S \n we get the normal equations \n  y \n i \n  n  x \n i \n   \n  x \n i \n y \n i \n   x \n i \n   x 2i   \n Solving these equations simultaneously, we obtain the least squares estimators of\n   a n d as \n ^ \n  \n n n \n  \n x y \n i \n x \n i2i \n  \n  \n ( \n  \n x  \n i \n x \n i \n ) 2 \n y \n i  \n  ( \n  \n x \n i \n  \n ( x \n _x \n i \n ) \n  \n ( y \n _x \n i \n ) \n  \n 2 \n _y \n ) \n  and \n ^ _y ^ _x \n     \n Now E ( \n ^ \n )  E \n  ( \n  \n x \n i \n  \n ( x \n _x \n i \n ) \n  \n ( y \n _x \n i \n ) \n  \n 2 \n _y \n ) \n  E \n  ( x \n i \n  \n  \n _x \n ) \n x \n y \n i \n 2i \n  \n  \n _y \n n \n _x \n ( ) \n ( \n 2 \n x \n i \n  \n _x \n ) \n  \n _ \n (x x)E(y ) _ \n  i i , (x x)0 \n _ i \n x2 n(x)2 \n i \n  \n  ( \n  \n x \n i \n  \n x 2i \n _x \n ) \n  \n ( \n n ( \n  \n _x \n ) 2 \n x \n i \n ) \n  \n  ( x \n i \n  \n  \n _x \n ) \n x \n  \n 2i  \n  \n n ( \n x ( \n _ \n 2 x ) \n 2i  \n _x \n x \n i \n ) \n  \n  \n  \n 2 x \n i \n 2 x \n i \n  \n  \n _x \n n \n  \n ( \n _x \n ) \n x \n 2 \n i \n     \n  \n    \n  \n  \n x \n x \n 2i \n 2i \n  \n  \n n \n n \n ( \n ( \n _x \n _x \n ) \n ) \n 2 \n 2 \n  \n \n Next, \n ^ _ ^ _ _ ^ _ _ _ \n E() E(yx)=E(y)E()xxx \n \n\n--- Page 21 ---\nSince E ( \n _y \n ) \n _y _x \n    and   E ( \n ^ \n )  \n  Both least square estimators are unbiased estimators. \n A convenient way to manipulate linear equations is through matrices. \n Consider the linear model y = \n i \n  x \n i \n  e \n i \n   , E(e)=0 andV(e)=2. \n i i \n For n independent observations y , y , . . ., y we have \n 1 2 n \n y = \n 1 \n  x \n 1 \n  e \n 1 \n   \n y = \n 2 \n  x \n 2 \n  e \n 2 \n   \n . \n . \n y = x e \n n \n n n \n In matrix notation \n  y \n y \n . \n . \n y \n 1 \n 2 \n n \n  \n  \n  1 \n 1 \n . \n . \n 1 \n . \n . \n x \n x \n x \n 1 \n 2 \n n \n  \n   \n  \n  e \n e \n . \n . \n e \n 1 \n 2 \n n \n  \n  \n  \n Y  X Pe, where \n    \n Y  \n  y \n y \n . \n . \n y \n 1 \n 2 \n n \n  \n , X  \n  1 \n 1 \n . \n . \n 1 \n . \n . \n x \n x \n x \n 1 \n 2 \n n \n  \n  \n , P  and \n   \n   \n e  \n  e \n e \n . \n . \n e \n 1 \n 2 \n n \n  \n \n Also, E(Y) X P since E(e)0 \n    \n Let be the sum of squares of errors. \n Then S e2 e'e(Y X P)'(Y X P)(Y'P'X')(Y X P) \n i \n           \n Y'YY' X PP' X'YP' X'X P \n         \n \n\n--- Page 22 ---\n \n d \n d \n S \n P \n   Y \n  \n ' X  X ' Y  P \n  \n ' X 'X  X 'X P \n For \n d \n d \n S \n P \n  0 ,  Y \n  \n ' X  X ' Y  P \n  \n ' X 'X  X 'X P  0 \n   2 X ' Y  2 X 'X P  0 \n  P  ( X 'X )  1 X ' Y \n Now, \n d \n d \n 2 S \n P 2 \n  2 X 'X  0 and therefore Pminimizes S. Hence \n  \n  \n ^P \n  \n  ^ \n ^ \n  \n  ( X 'X )  1 X ' Y \n  \n give estimators of and  \n  \n Remark \n (i) E ( \n ^P \n ) )  ( X 'X )  1 X 'E ( Y )  ( X 'X )  1 X 'X P  P , hence\n ^P \n is an unbiased \n estimator of P \n  \n (ii) V ( \n ^P \n )  V [ ( X 'X )  1 X ' Y ]  ( X 'X )  1 X 'V ( Y ) [ ( X 'X )  1 X '] '\n (X'X)1X'V(Y)X(X'X)1 \n  \n ( ' ) 1 ' ( ' ) 1 2   X X  X X X X  \n ( ' ) 1 2   X X  \n Example 12 \n Use matrix notation to fit a \n (i) straight line y x     \n (ii) quadratic equation y \n 0 1 \n x \n 2 \n x 2       \n \n using the following five data points: \n X -2 -1 0 1 2 \n Y 0 0 1 1 3 \n Solution \n \n\n--- Page 23 ---\n \n ^P \n  \n  ^ \n ^ \n  \n  ( X 'X )  1 X ' Y \n  \n  \n 0 \n   \n 0 \n (i) Y  \n  \n 1 \n  \n and \n    \n 1 \n   \n 3 \n   \n X  \n  1 \n 1 \n 1 \n 1 \n 1 \n  \n  \n 2 \n 1 \n 0 \n 1 \n 2 \n  \n giving ( X 'X )  1  \n  15 \n 0 \n 0 \n 11 \n 0 \n  \n and X 'Y  \n  5 \n 7 \n  \n ^ 1 0 5 1  \n  P5   = \n      \n  \n 0 1 7 0.7 \n 10 \n  ^ \n ^ \n  \n  \n  \n ^ ^ \n 1, and 0.7 \n Hence y = 1 + 0.7x \n (ii) Y  \n  0 \n 0 \n 1 \n 1 \n 3 \n  \n and X  \n  1 \n 1 \n 1 \n 1 \n 1 \n x \n x \n x \n x \n x \n 1 \n 2 \n 3 \n 4 \n 5 \n x \n x \n x \n x \n x \n 2 \n 1 \n 2 \n 2 \n 2 \n 3 \n 2 \n 4 \n 2 \n 5 \n  \n  \n  1 \n 1 \n 1 \n 1 \n 1 \n  \n  \n 2 \n 1 \n 0 \n 1 \n 2 \n 4 \n 1 \n 0 \n 1 \n 4 \n  \n giving \n ( X 'X )  1  \n  1 7 \n 3 5 \n 0 \n 1 7 \n 0 \n 11 \n 0 \n 0 \n 1 7 \n 0 \n 11 \n 4 \n  \n ( X 'X )  \n  5 \n 0 \n 1 0 \n 0 \n 1 0 \n 0 \n 1 0 \n 0 \n 3 4 \n  \n and X 'Y  \n  5 \n 7 \n 1 3 \n  \n 17 0 15  4  \n ^ 35 7   7  \n  P 0 1 0 7 0.7= \n 10 \n      \n  1 0 1  13   3  \n 7 14 14 \n  ^ \n 0 \n ^ \n 1 \n 2 \n  \n \n  \n  \n  \n ^ ^ ^ \n   4,  7 ,  3 \n 0 7 1 10 2 14 \n 4 7 3 \n Hence y   x x2 \n 7 10 14 \n 6.3 Exercise \n A person has two items to weigh and is allowed four separate weightings on a balance each\n weighing being done independently with zero mean error and constant variance 2\n . \n \n\n--- Page 24 ---\nHe decides to weigh each item separately and also the sum and the difference of their\n weighs. If the weighs are  and \n 1 2 \n \n  \n (a) Find the least square estimates of the unknown weights \n (b) Compare the variance of your estimates with those obtained \n (i) If he had weighed each item twice independently \n \n (ii) If he had weighed their sum and difference twice independently.\n \n which of the three methods is the most efficient \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n\n--- Page 25 ---\n",
+  "current_level_2_content": "## 1. Linear model and objective\n\nLeast squares chooses model parameters to minimize the sum of squared residuals. For observations $(x_i,y_i)$, fit a straight line $y_i=beta_0+beta_1x_i+epsilon_i$, where $beta_0$ is the intercept, $beta_1$ the slope, and $epsilon_i$ the unexplained error. The residual is $e_i=y_i-(betahat_0+betahat_1x_i)$.\n\nIn matrix notation, write $y=X beta+epsilon$, where the $i$th row of $X$ is $(1,x_i)$ and $beta=(beta_0,beta_1)^T$. The least-squares estimate minimizes $S(beta)=(y-X beta)^T(y-X beta)$.\n\n## 2. Normal equations and solution\n\nDifferentiating $S(beta)$ with respect to $beta$ and setting the gradient to zero gives the normal equations $X^T X betahat=X^T y$. If $X$ has full column rank, $X^T X$ is invertible and $betahat=(X^T X)^(-1)X^T y$.\n\nFor a straight line, full column rank requires that the observed $x_i$ values are not all identical. If this condition fails, slope and intercept are not separately identifiable by this formula. With rank deficiency, use a generalized inverse or impose additional constraints, and acknowledge that the coefficient solution may not be unique.\n\n## 3. Scalar formulas and interpretation\n\nWhen there is variation in $x$, the slope is $betahat_1=sum_i(x_i-Xbar)(y_i-Ybar)/sum_i(x_i-Xbar)^2$, and the intercept is $betahat_0=Ybar-betahat_1 Xbar$. The fitted line passes through $(Xbar,Ybar)$, and the residuals sum to zero when an intercept is included.\n\nLeast squares minimizes squared vertical residuals in the response direction; it does not minimize absolute errors or perpendicular distances. Squaring gives large residuals extra influence. A fitted association is not, by itself, evidence of causation.\n\n## 4. Statistical properties and assumptions\n\nThe algebraic least-squares solution does not require normally distributed errors. Under a linear model with zero-mean errors and a full-rank design, it is unbiased for $beta$; with homoscedastic uncorrelated errors of variance $sigma^2$, its covariance matrix is $sigma^2(X^TX)^(-1)$. Normality is additionally used for exact finite-sample normal-theory inference, not for deriving the minimizer.\n\nIf error variances differ or errors are correlated, ordinary least squares may remain computable but its usual covariance and efficiency claims need adjustment. Inspect residual patterns and influential observations before making inferential claims.\n\n## 5. Computation checklist\n\nConstruct $X$ with a column of ones for the intercept, form $X^TX$ and $X^Ty$, and solve the normal equations using a stable linear algebra method rather than explicitly calculating a matrix inverse in numerical work. Then compute fitted values and residuals and verify that the dimensions agree.\n\nCheck the rank condition, distinguish coefficients from residuals, and state what assumptions support any claim of unbiasedness or variance. For a hand calculation, the scalar slope and intercept formulas provide a useful cross-check of the matrix result.",
+  "relevant_verified_questions": [
+    {
+      "number": 1,
+      "marks": 6,
+      "verification_status": "reconstructed",
+      "question": "Use matrix notation to fit a straight line $y = \\beta_0 + \\beta_1 x$ to the following five data points by the method of least squares.\n\n$$\n\\begin{array}\n{c|ccccc}\n x & -2 & -1 & 0 & 1 & 2 \\hline\n y & 0 & 0 & 1 & 1 & 3\n\\end{array}\n$$\n\nWrite down the design matrix $X$, the parameter vector $\\boldsymbol{\\beta}$, and the observation vector $\\mathbf{y}$. Hence obtain the least squares estimates $\\hat{\\beta}_0$ and $\\hat{\\beta}_1$.",
+      "solution": "The model is $\\mathbf{y} = X\\boldsymbol{\\beta} + \\boldsymbol{\\varepsilon}$, where\n\n$$\nX = \\begin{pmatrix}\n1 & -2 \\\\ 1 & -1 \\\\ 1 & 0 \\\\ 1 & 1 \\\\ 1 & 2\n\\end{pmatrix} , \\qquad \\boldsymbol{\\beta} = \\begin{pmatrix}\n\\beta_0 \\\\ \\beta_1\n\\end{pmatrix} , \\qquad \\mathbf{y} = \\begin{pmatrix}\n0 \\\\ 0 \\\\ 1 \\\\ 1 \\\\ 3\n\\end{pmatrix} .\n$$\n\nThe normal equations are $X^{\\mathsf{T}}X\\boldsymbol{\\beta} = X^{\\mathsf{T}}\\mathbf{y}$. Compute:\n\n$$\nX^{\\mathsf{T}}X = \\begin{pmatrix}\n5 & 0 \\\\ 0 & 10\n\\end{pmatrix} , \\qquad X^{\\mathsf{T}}\\mathbf{y} = \\begin{pmatrix}\n5 \\\\ 9\n\\end{pmatrix} .\n$$\n\nThus\n\n$$\n\\begin{pmatrix}\n5 & 0 \\\\ 0 & 10\n\\end{pmatrix}\n\\begin{pmatrix}\n\\hat{\\beta}_0 \\\\ \\hat{\\beta}_1\n\\end{pmatrix} = \\begin{pmatrix}\n5 \\\\ 9\n\\end{pmatrix}.\n$$\n\nSolving gives $5\\hat{\\beta}_0 = 5$, so $\\hat{\\beta}_0 = 1$, and $10\\hat{\\beta}_1 = 9$, so $\\hat{\\beta}_1 = 0.9$.\nTherefore the least squares fitted line is\n\n$$\n\\hat{y} = 1 + 0.9x.\n$$"
+    },
+    {
+      "number": 5,
+      "marks": 6,
+      "verification_status": "reconstructed",
+      "question": "Use matrix notation to fit a straight line $y = \\beta_0 + \\beta_1 x$ to the following sample data by the method of least squares:\n\n$$\n\\begin{array}\n{c|ccccccc}\nx & 6 & -4 & 10 & 8 & 4 & 13 & 2 \\\\\n\\hline\ny & 20 & 18 & 6 & 2 & 13 & 22 & 5\n\\end{array}\n$$\n\nWrite the design matrix $X$, the parameter vector $\\boldsymbol{\\beta}$, and the response vector $\\mathbf{y}$. Hence obtain the least squares estimates of $\\beta_0$ and $\\beta_1$.",
+      "solution": "The model is $y_i = \\beta_0 + \\beta_1 x_i + \\varepsilon_i$, $i=1,\\dots,7$.\n\nIn matrix notation:\n\n$$\n\\mathbf{y} = X\\boldsymbol{\\beta} + \\boldsymbol{\\varepsilon},\n$$\n\nwhere\n\n$$\nX = \\begin{pmatrix}\n1 & 6 \\\\\n1 & -4 \\\\\n1 & 10 \\\\\n1 & 8 \\\\\n1 & 4 \\\\\n1 & 13 \\\\\n1 & 2\n\\end{pmatrix}, \\quad\n\\boldsymbol{\\beta} = \\begin{pmatrix}\n\\beta_0 \\\\\n\\beta_1\n\\end{pmatrix}, \\quad\n\\mathbf{y} = \\begin{pmatrix}\n20 \\\\\n18 \\\\\n6 \\\\\n2 \\\\\n13 \\\\\n22 \\\\\n5\n\\end{pmatrix}.\n$$\n\nThe least squares normal equations are\n\n$$\nX^{\\mathsf{T}}X\\boldsymbol{\\beta} = X^{\\mathsf{T}}\\mathbf{y}.\n$$\n\nCompute:\n\n$$\nX^{\\mathsf{T}}X = \\begin{pmatrix}\n7 & 39 \\\\\n39 & 445\n\\end{pmatrix}, \\qquad\nX^{\\mathsf{T}}\\mathbf{y} = \\begin{pmatrix}\n86 \\\\\n436\n\\end{pmatrix}.\n$$\n\nThus\n\n$$\n\\begin{pmatrix}\n7 & 39 \\\\\n39 & 445\n\\end{pmatrix} \\begin{pmatrix}\n\\beta_0 \\\\\n\\beta_1\n\\end{pmatrix} = \\begin{pmatrix}\n86 \\\\\n436\n\\end{pmatrix}.\n$$\n\nSolving, the determinant is\n\n$$\n\\det(X^{\\mathsf{T}}X) = 7(445) - 39^2 = 3115 - 1521 = 1594.\n$$\n\nHence\n\n$$\n\\hat{\\boldsymbol{\\beta}} = (X^{\\mathsf{T}}X)^{-1}X^{\\mathsf{T}}\\mathbf{y} = \\frac{1}{1594} \\begin{pmatrix}\n445 & -39 \\\\\n-39 & 7\n\\end{pmatrix} \\begin{pmatrix}\n86 \\\\\n436\n\\end{pmatrix}.\n$$\n\nSo\n\n$$\n\\hat{\\beta}_0 = \\frac{445(86) - 39(436)}{1594} = \\frac{38270 - 17004}{1594} = \\frac{21266}{1594} = \\frac{10633}{797} \\approx 13.3413,\n$$\n\nand\n\n$$\n\\hat{\\beta}_1 = \\frac{-39(86) + 7(436)}{1594} = \\frac{-3354 + 3052}{1594} = \\frac{-302}{1594} = -\\frac{151}{797} \\approx -0.1895.\n$$\n\nTherefore the fitted least squares line is\n\n$$\n\\hat{y} = 13.3413 - 0.1895x.\n$$"
+    }
+  ],
+  "curriculum_prior_topics": [
+    "Properties of Estimators",
+    "Confidence Interval Estimation",
+    "Sufficient Statistics",
+    "Moment Estimation",
+    "Maximum Likelihood Estimation"
+  ],
+  "curriculum_future_topics": [
+    "Method of Minimum Variance",
+    "Interval Estimation",
+    "Interval Estimation: Confidence Intervals for the Difference Between Means of Two Independent Normal Distributions"
+  ],
+  "notes_cache_version": "markdown-katex-v18-body-page-source-context",
+  "source_signature": "0127cfb5aa7ddaeb",
+  "current_cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_least_squares_estimation_level_2_0127cfb5aa7ddaeb",
+  "cache_rows": [
+    {
+      "cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_least_squares_estimation_level_2_0127cfb5aa7ddaeb",
+      "level": "level_2",
+      "model": null,
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "0127cfb5aa7ddaeb",
+      "characters": 2968,
+      "is_current_key": true
+    },
+    {
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_least_squares_estimation_level_3_a7d4f7eef4f3c8a8",
+      "level": "level_3",
+      "model": "deepseek-flash",
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "a7d4f7eef4f3c8a8",
+      "characters": 17890,
+      "is_current_key": false
+    },
+    {
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_least_squares_estimation_level_1_a7d4f7eef4f3c8a8",
+      "level": "level_1",
+      "model": "deepseek-flash",
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "a7d4f7eef4f3c8a8",
+      "characters": 17642,
+      "is_current_key": false
+    }
+  ],
+  "repair_records": [
+    {
+      "level": "level_2",
+      "status": "validated",
+      "validation_issues": [],
+      "cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_least_squares_estimation_level_2_0127cfb5aa7ddaeb",
+      "last_error": ""
+    }
+  ],
+  "generation_guards": [],
+  "generation_jobs": []
+}

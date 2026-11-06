@@ -1,0 +1,238 @@
+{
+  "course": {
+    "code": "SST 305",
+    "title": "Theory of Estimation"
+  },
+  "topic": {
+    "id": 53,
+    "title": "Interval Estimation: Confidence Intervals for the Difference Between Means of Two Independent Normal Distributions",
+    "summary": "Extends interval estimation to look at two independent populations (X1 and X2). It details how to derive and compute a 100(1-alpha)% confidence interval for the true mean difference (mu1 - mu2) under two primary cases: when the common variance is known or unknown.",
+    "subtopics": [
+      "Two independent populations (X1 and X2)",
+      "100(1-alpha)% confidence interval for the true mean difference (mu1 - mu2)",
+      "Cases when the common variance is known or unknown"
+    ],
+    "content_rules": {}
+  },
+  "level": "level_2",
+  "course_study_profile": {
+    "rules": {
+      "code": "may be generated only when source notes contain code evidence",
+      "authority": "uploaded lecture notes and syllabus only",
+      "math_notation": "may be generated only when source notes contain notation evidence",
+      "chemical_equations": "may be generated only when source notes contain reaction evidence"
+    },
+    "version": 2,
+    "category": "Statistics",
+    "confidence": 0.98,
+    "capabilities": {
+      "code": false,
+      "math_notation": true,
+      "chemical_equations": false
+    },
+    "source_sha256": "3bfa3362da5e1d8157a06a53c99a560e3f63f82bd498cfebce89f0068e153157",
+    "note_structure": [
+      "Purpose and Statistical Context",
+      "Definitions and Assumptions",
+      "Methods and Interpretation",
+      "Worked Applications",
+      "Revision Summary and Common Errors"
+    ],
+    "schema_version": 1,
+    "subject_family": "statistics",
+    "evidence_quotes": [
+      "Introduces the concept of parameter estimation using sample characteristics or statistics, distinguishing population characteristics (parameters, which are usually unknown) from sample characteristics (statistics, which are usually known).",
+      "Outlines the four properties of a \"best\" estimator according to R.A. Fisher: unbiasedness, consistency, efficiency, and sufficiency.",
+      "Covers generating narrow confidence intervals (confidence limits) that enclose an unknown parameter with a high probability."
+    ],
+    "source_document_id": "acdb3cc8-1b3f-4431-9082-3a8406e890d7"
+  },
+  "required_note_sections": [
+    "## 1.",
+    "## 2.",
+    "## 3.",
+    "## 4.",
+    "## 5."
+  ],
+  "level_2_instruction": "Rigorous academic standard: use precise definitions and appropriate academic rigor; include representative worked examples grounded in approved notes; use formal notation only when supported by approved sources.",
+  "validation_options": {
+    "allow_math": true,
+    "allow_code": false,
+    "allow_chemical_equations": false,
+    "content_rules": null,
+    "content_rule_issues": [],
+    "source_references": [
+      {
+        "document_id": "acdb3cc8-1b3f-4431-9082-3a8406e890d7",
+        "source_sha256": "3bfa3362da5e1d8157a06a53c99a560e3f63f82bd498cfebce89f0068e153157",
+        "page_number": null,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 37,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 38,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 39,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 40,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 41,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 42,
+        "visuals": []
+      }
+    ]
+  },
+  "approved_source_excerpt": "* **Lesson Nine: Interval Estimation: Confidence Intervals for the Difference Between Means of Two Independent Normal Distributions**\n\n * **Details:** Extends interval estimation to look at two independent populations ($X\\_1$ and $X\\_2$). It details how to derive and compute a $100(1-\\\\alpha)%$ confidence interval for the true mean difference ($\\\\mu\\_1 - \\\\mu\\_2$) under two primary cases: when the common variance ($\\\\sigma^2$) is known, and when $\\\\sigma^2$ is unknown (requiring a pooled sample variance estimator).\n\n * **Lesson Ten: Bayes Estimation**\n\n * **Details:** Introduces an estimation approach that treats the unknown parameter as a random variable itself rather than a fixed point. It entails defining the Mean Squared Error (MSE), distinguishing between loss functions (e.g., squared error or absolute error loss) and risk functions (average loss), and utilizing prior distributions alongside sample data to calculate the posterior distribution, Bayes risk, and the final Bayes estimator.\n\n--- APPROVED COURSEWORK EXCERPT ---\n\n--- Page 37 ---\n8.3.2 A random sample of 15 workers from a vacuum flask assembly line was selected\n from a large number of such workers. James, a work-study engineer, asked each\n\n of these workers to assemble a one litre vacuum flask at their normal working\n\n speed. The times taken, in seconds, to complete these tasks are given below:\n 109.2, 146.2, 127.9, 92.0, 108.5, 91.1, 109.8, 114.9, 115.3, 99.0, 112.8, 130.7,\n\n 141.7, 122.6 and 119.9\n Assuming that this sample came from an underlying normal population, calculate\n\n a 90% confidence interval for the variance of the population.\n\n LESSON NINE\n\n INTERVAL ESTIMATION: Confidence Intervals for the difference between means of two\n\n independent normal distribution\n\n 9.1 Introduction\n\n This lesson looks into 100(1-)% confidence intervals for the difference between\n population means of two independent normal distributions\n\n 9.2 Learning Outcomes\n\n By the end of this lesson the learner should be able to derive and compute a\n\n 100(1-)% confidence intervals for the difference between population means of\n\n two independent normal distributions\n 9.2.1 100(1-)% confidence intervals for the difference between population means of\n\n two independent normal distributions\n\n Let X 11, X 12, …X1n1 be a random sample of size n 1 from X 1 ~ N(,2)\n 1 1\n Let X 21, X 22, …X2n2 be a random sample of size n 2 from X 2 ~ N(,2)\n 2 2\n\n  2  2\n Then E(X ) X ~N(, 1 ) and E(X ) X ~N(, 2 )\n 1 1 1 n 2 2 2 n\n 1 2\n If X and X are independent, then\n 1 2\n\n--- Page 38 ---\nX\n \n 1\n  X\n \n 2\n 2 2\n ~ N( , 1  2 )\n 1 2 n n2\n 1\n  Z\n ( X\n 1\n X\n n\n )\n 2\n 2\n 1\n 1\n (\n n\n 1\n 2\n 2\n 2\n 2\n )  \n  \n \n \n \n \n \n \n \n ~ N (0, 1) if the variances are known\n Assume the variances of the two populations are equal i.e\n 1\n 2\n 2\n 2 2     , say.\n Case 1: If 2  is known, then\n Z \n ( X\n \n 1\n  X\n \n 2\n )\n 1\n n\n \n 1\n (\n \n 1\n 1\n n\n 2\n \n 2\n )  \n ~ N(0,1)\n \n Let c and c be such that\n 1 2\n    P ( c\n 1\n \n 1\n \n 2\n  c\n 2\n )  1  ………(i)\n Let\n 2\n \n Z be such that \n  \n P (  Z\n 2\n  Z  Z\n 2\n )  1 \n  \n \n  \n \n  P (  Z\n 2\n \n X\n \n 1\n  X\n \n 2\n \n 1\n n\n 1\n (\n \n 1\n 1\n n\n \n 2\n 2\n )\n  Z\n 2\n )  1 \n   1 1   1 1\n P((X  X ) (  )Z (X  X ) (  )Z )1……….(ii)\n 1 2 n n  1 2 n n \n 1 2 2 1 2 2\n Comparing (i) and (ii)\n   1 1   1 1\n c =X  X  (  )Z and c = X  X  (  )Z where\n 1 2\n 1 2 n n  1 2 n n \n 1 2 2 1 2 2 2\n \n Z is tabulated from\n standard normal tables.\n Case 2: if 2\n\n  \n (X  X )( ) (n 1)s 2  n 1 s 2\n  is not known, then Z  1 2 1 2 where s2= 1 1 2 2\n 1 1 n n 2\n s  1 2\n n n\n 1 2\n\n--- Page 39 ---\nis the unbiased estimator of the common variance 2 . s\n 1\n 2 and s\n 2\n 2 are sample variances of\n populations X and X respectively\n 1 2\n Then c =\n 1\n X\n \n 1\n  X\n \n 2\n  s (\n 1\n n\n 1\n \n 1\n n\n 2\n ) t\n 2\n n, 1 n\n 2\n  2\n and c =\n 2\n \n X\n \n 1\n  X\n \n 2\n  s (\n 1\n n\n 1\n \n 1\n n\n 2\n ) t\n 2\n n, 1 n\n 2\n  2\n where\n \n t is tabulated from t tables.\n ,nn 2\n 2 1 2\n Example 19\n Consider two independent populations X and X with the following statistics:\n 1 2\n X\n \n 1\n =35.22, X\n \n 1\n =31.56,\n n1\n i\n 1 \n X\n 1\n 2i =11361,\n n 2\n i\n 1 \n X\n 2\n 2i, n =n =9\n 1 2\n Estimate the true mean difference,\n 1 2\n    with confidence coefficient 0.95, assuming the\n variances are equal.\n Solution\n ( n\n 1\n  1 ) s\n 1\n 2 \n n1\n i\n 1 \n ( X\n 1 i\n  X\n \n 1\n ) 2 \n n1\n i\n 1 \n X\n 1\n 2i  n\n 1\n X\n \n 1\n 2 =196.96\n n 2  n 2 \n (n 1)s 2 (X  X )2 X 2 n X 2 =157.698\n 2 2 2i 2 2i 2 2\n i1 i1\n s2=(196.96+157.698)/16=22.17, t\n 2\n n, 1 n\n 2\n  2\n  t\n 0.0 2 5,1 6\n  2.1 2 0\n\n \n Hence 1.05 8.37\n 1 2\n 9.3 Assessment\n 9.3.1 Two petrol additives are used in an experiment to determine the petrol\n consumption\n of cars using one or other of the additives. Of a random sample of 18 nominally\n identical cars, 9 were tested using Additive 1 and the other 9 were tested using\n\n--- Page 40 ---\nAdditive 2. The results in m.p.g were as follows:\n\n Additive1 32.3 37.3 35.3 33.7 31.9 30.0 34.6 32.8 36.4\n\n Additive2 38.4 34.8 36.6 32.0 33.9 35.7 37.5 39.3 34.3\n Calculate 95% confidence intervals for\n\n (i) the mean petrol consumption for cars using Additive 1;\n (ii) the mean petrol consumption for cars using Additive 2;\n\n (iii) the difference between the mean petrol consumptions for the two additives.\n\n In each case state the assumptions.\n 9.3.2 Ten samples of a standard cement had an average weight per cent calcium of 80,\n\n with a sample standard deviation of 5, while twelve samples of lead-doped cement had an\n average weight per cent calcium of 77 with a sample standard deviation of 4. Find a 95%\n\n confidence interval on the difference in means for the two types of cement. Assume that the\n\n weight per cent calcium is normally distributed and that both normal populations have the\n same standard deviation\n\n--- Page 41 ---\nLESSON TEN\n BAYES ESTIMATION\n\n 10.1 Introduction\n\n So far we have assumed that we have a random sample of size n from a random variable X\n whose p.d.f f(x, ) is known except for the unknown parameter . We also assumed that we\n\n do not know anything about  apart from that it is a fixed point in some parameter . Our\n\n objective has been to use the random sample X, X, …, X to make some inference about\n 1 2 n\n . Bayes Estimation uses both the density functions of the random variable and of the\n unknown parameter.\n 10.2 Learning outcomes\n\n By the end of this lesson, the learner should be able to;\n\n (i) Define mean squared error\n (ii) Distinguish between loss and risk functions\n\n (iii) Describe the process of Bayes estimation\n (iv) Define Bayes risk and Bayes Estimator\n\n 10.2.1.1 Mean Squared Error (MSE)\n\n Let T=t(X, X,., X ) be an estimator of\n 1 2 n\n ( ) .\n MSE measures the goodness or closeness of an estimator. If MSE(\n t\n ( )  is MSE of T, the\n ( ) ( ( ) ) 2   M S E\n t\n  E T \n Note: (i) ( )  T  is the error made in estimating ( ) \n (ii)If ( ) ( )  E T , then the MSE is the variance\n 10.2.1.2 Loss and Risk functions\n Let t be an estimate of ( ) \n (a) The loss function, l(t, )  is defined to be a real-valued function satisfying\n (i) l(t, ) 0for all possible estimates t and all \n\n (ii) l(t, )= 0 for t ()\n\n The loss function is the loss incurred if one estimates ( )\n\n  to be t when is the true\n parameter value. Examples of loss functions are;\n 1) the squared error loss function, l(t, )(t())2\n\n 2) absolute error loss function, l(t, ) t()\n\n--- Page 42 ---\n(b) The risk function, ( ) ( (, ) )   R\n t\n  E l t is the average loss. For example\n 1) MSE, ( ) ( ( ) ) 2   R\n t\n  E t \n 2) Mean absolute error, ( ) ( )   R\n t\n  E t \n The objective is to choose an estimator that makes the average loss (risk) small and ideally\n select an estimator that has the smallest risk\n 10.2.1.3 Bayes Estimation\n\n In the Bayes estimation approach, we assume we know something about  where it is\n\n regarded as a realised value of a random variable with pdf g(), called the prior distribution.\n Prior distribution summarizes what we know about  without taking a random sample. It is\n\n completely known, contains no unknown parameters and does not depend on the data under\n\n analysis.\n Posterior distribution of  is the distribution of  after the values of the random sample have\n\n been observed. It is denoted by f(/x). It summarizes what we know about  after we take a\n random sample. Note that\n\n  \n \n   \n \n   \n \n f ( / x )\n f (\n f (,\n x\n x\n )\n )\n f\n f\n (\n (\n x\n x\n /\n /\n )\n )\n f\n f\n (\n (\n )\n )\n d\n where f(x/)indicates that  is the value of a\n random variable.\n For a random sample X, X, …, X\n 1 2 n\n  \n  \n \n \n  \n \n \n \n  \n   \n \n   \n   \n \n f ( / x\n 1, x\n 2,  x\n n\n )\n f (\n f (,\n x\n x\n 1\n 1,,\n x\n x\n 2,\n 2,\n \n x\n x\n n\n n\n )\n )\n n\n in\n i 1\n 1\n f\n f\n (\n (\n x\n x\n i\n i\n /\n /\n )\n )\n f\n f\n (\n (\n )\n )\n d\n L\n L\n (\n (\n x\n x\n /\n /\n )\n )\n f\n f\n (\n (\n )\n )\n d\n\n 10.2.1.3 Bayes Risk and Bayes estimator\n (i) Bayes risk of an estimator is the average risk with respect to the prior density\n g()\n (ii)Bayes estimator is the estimator with the smallest Bayes risk.",
+  "current_level_2_content": "## 1. Target and sampling assumptions\n\nLet two independent samples come from normal populations with means $mu_1$ and $mu_2$. The target is the difference $mu_1-mu_2$, estimated by $Xbar_1-Xbar_2$. Independence makes the variance of the difference the sum of the two sample-mean variances.\n\nThis topic's pooled t interval assumes a common but unknown population variance. If the common variance is known, use the normal pivot. If equal variances are not defensible, a Welch interval is generally more appropriate; do not use the pooled formula automatically.\n\n## 2. Common variance known\n\nWhen both populations have the same known variance $sigma^2$, the standard error of $Xbar_1-Xbar_2$ is $sigma sqrt(1/n_1+1/n_2)$. Under independent normal sampling, the standardized difference is standard normal. The two-sided $100(1-alpha)%$ interval is $(Xbar_1-Xbar_2) +/- z_(1-alpha/2) sigma sqrt(1/n_1+1/n_2)$.\n\nThe sign of the estimate follows the order in the target. Reversing the target to $mu_2-mu_1$ reverses the center and endpoints but not the width.\n\n## 3. Common variance unknown: pooled t interval\n\nWhen the common variance is unknown, estimate it by the pooled variance $S_p^2=[(n_1-1)S_1^2+(n_2-1)S_2^2]/(n_1+n_2-2)$. Under independent normal samples with equal population variances, the pivot $(Xbar_1-Xbar_2-(mu_1-mu_2))/(S_p sqrt(1/n_1+1/n_2))$ has a t distribution with $n_1+n_2-2$ degrees of freedom.\n\nTherefore the interval is $(Xbar_1-Xbar_2) +/- t_(1-alpha/2,n_1+n_2-2) S_p sqrt(1/n_1+1/n_2)$. The pooled variance is a degrees-of-freedom-weighted average of the two sample variances, not their simple average unless the sample sizes make those weights equal.\n\n## 4. Interpretation and assumptions\n\nIf the interval contains zero, the data do not establish a nonzero mean difference at the corresponding two-sided significance level; this is not proof that the population means are exactly equal. If the whole interval is positive, it supports a positive $mu_1-mu_2$ under the model; if wholly negative, it supports a negative difference.\n\nThe pooled interval relies on independent random samples, normal populations for exact small-sample inference, and equal population variances. Pairing or dependence changes the standard error, and unequal variances call for a method such as Welch's interval with adjusted degrees of freedom.\n\n## 5. Exam workflow and common errors\n\nDefine the contrast in the requested order, calculate both sample means and variances, and identify whether the common population variance is known. For the unknown case, compute $S_p^2$, then its square root, the standard error, and the t critical value with $n_1+n_2-2$ degrees of freedom. Add and subtract the margin from the observed difference.\n\nCheck that sample variances use divisor $n_i-1$, that the pooled estimate uses the degrees-of-freedom weights, and that endpoints preserve the contrast's sign. State independence and equal-variance assumptions, and do not interpret zero inclusion as proof of equality.",
+  "relevant_verified_questions": [
+    {
+      "number": 1,
+      "marks": 6,
+      "verification_status": "reconstructed",
+      "question": "A researcher compares the average tensile strength of steel rods produced by two independent processes, $X_1$ and $X_2$. Assume that the strengths are normally distributed with a common but unknown variance. Two independent random samples are taken:\n\n- From process $X_1$: $n_1 = 10$, sample mean $\\bar{x}_1 = 72.5$, sample variance $s_1^2 = 16.0$.\n- From process $X_2$: $n_2 = 12$, sample mean $\\bar{x}_2 = 68.0$, sample variance $s_2^2 = 20.0$.\n\nConstruct a $95\\%$ confidence interval for the true difference in mean strengths $\\mu_1 - \\mu_2$. Interpret your interval.",
+      "solution": "Since the populations are independent normal with a common unknown variance, we use the pooled variance estimate and the $t$-distribution.\n\n**Step 1: Compute the pooled variance.**\n\n$$\ns_p^2 = \\frac{(n_1 - 1)s_1^2 + (n_2 - 1)s_2^2}{n_1 + n_2 - 2}\n= \\frac{(10-1)(16.0) + (12-1)(20.0)}{10+12-2}\n= \\frac{9(16.0) + 11(20.0)}{20}\n= \\frac{144 + 220}{20}\n= \\frac{364}{20} = 18.2.\n$$\n\n**Step 2: Compute the standard error of the difference.**\n\n$$\nSE = \\sqrt{s_p^2\\left(\\frac{1}{n_1} + \\frac{1}{n_2}\\right)}\n= \\sqrt{18.2\\left(\\frac{1}{10} + \\frac{1}{12}\\right)}\n= \\sqrt{18.2\\left(\\frac{6+5}{60}\\right)}\n= \\sqrt{18.2 \\times \\frac{11}{60}}\n= \\sqrt{3.3367} \\approx 1.8267.\n$$\n\n**Step 3: Find the critical value.**\nDegrees of freedom: $df = n_1 + n_2 - 2 = 20$. For a $95\\%$ confidence interval, $\\alpha = 0.05$, so $t_{0.025, 20} = 2.086$.\n\n**Step 4: Compute the margin of error.**\n\n$$\nME = t_{0.025, 20} \\times SE = 2.086 \\times 1.8267 \\approx 3.810.\n$$\n\n**Step 5: Construct the confidence interval.**\n\n$$\n(\\bar{x}_1 - \\bar{x}_2) \\pm ME = (72.5 - 68.0) \\pm 3.810 = 4.5 \\pm 3.810.\n$$\n\nThus, the $95\\%$ confidence interval for $\\mu_1 - \\mu_2$ is approximately\n\n$$\n(0.69,\\; 8.31).\n$$\n\n**Interpretation:** We are $95\\%$ confident that the true difference in mean strengths between process $X_1$ and process $X_2$ lies between $0.69$ and $8.31$. Since the entire interval is positive, this suggests that process $X_1$ tends to produce rods with a higher mean strength than process $X_2$."
+    },
+    {
+      "number": 1,
+      "marks": 8,
+      "verification_status": "reconstructed",
+      "question": "A researcher compares the tensile strength of two types of steel wire produced by two different processes. Independent random samples are taken from each process. The sample sizes are \\(n_1 = 10\\) and \\(n_2 = 12\\). The sample means are \\(\\bar{x}_1 = 65.2\\) kg and \\(\\bar{x}_2 = 62.8\\) kg, and the sample standard deviations are \\(s_1 = 2.5\\) kg and \\(s_2 = 2.0\\) kg. Assume that the tensile strengths are normally distributed with a common unknown variance \\(\\sigma^2\\).\n\n(a) State the formula for a \\(100(1-\\alpha)\\%\\) confidence interval for the difference in population means \\(\\mu_1 - \\mu_2\\) when the common variance is unknown. Define all terms in the formula. (2 marks)\n(b) Compute the pooled sample variance \\(s_p^2\\) and the standard error of the difference in sample means. (3 marks)\n(c) Construct a 95\\% confidence interval for \\(\\mu_1 - \\mu_2\\). Interpret the interval in the context of the problem. (3 marks)",
+      "solution": "**Solution:**\n\n(a) The \\(100(1-\\alpha)\\%\\) confidence interval for \\(\\mu_1 - \\mu_2\\) when the common variance is unknown is\n \n\n$$\n(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2,\\, n_1+n_2-2} \\, s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}},\n$$\n\n where \\(s_p^2 = \\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}\\) is the pooled sample variance, \\(t_{\\alpha/2,\\, n_1+n_2-2}\\) is the critical value from the \\(t\\)-distribution with \\(n_1+n_2-2\\) degrees of freedom, and \\(\\bar{x}_1, \\bar{x}_2, s_1^2, s_2^2\\) are the sample means and variances.\n(b) The pooled sample variance is\n \n\n$$\ns_p^2 = \\frac{(10-1)(2.5)^2 + (12-1)(2.0)^2}{10+12-2}\n = \\frac{9(6.25) + 11(4.00)}{20}\n = \\frac{56.25 + 44.00}{20}\n = \\frac{100.25}{20} = 5.0125.\n$$\n\n Thus \\(s_p = \\sqrt{5.0125} \\approx 2.2389\\). The standard error of the difference is\n \n\n$$\ns_p \\sqrt{\\frac{1}{10} + \\frac{1}{12}} = 2.2389 \\sqrt{0.1 + 0.08333} \\approx 2.2389 \\sqrt{0.18333} \\approx 2.2389(0.4282) \\approx 0.9587.\n$$\n\n(c) The sample difference is \\(\\bar{x}_1 - \\bar{x}_2 = 65.2 - 62.8 = 2.4\\). The degrees of freedom are \\(10+12-2 = 20\\). For a 95\\% confidence interval, \\(\\alpha = 0.05\\), so \\(t_{0.025,\\,20} \\approx 2.086\\). The margin of error is\n \n\n$$\nE = 2.086 \\times 0.9587 \\approx 2.000.\n$$\n\n Therefore, the 95\\% confidence interval for \\(\\mu_1 - \\mu_2\\) is\n \n\n$$\n2.4 \\pm 2.000 = (0.400,\\; 4.400).\n$$\n\n Interpretation: We are 95\\% confident that the true difference in mean tensile strength between the two processes lies between 0.400 kg and 4.400 kg. Since the entire interval is positive, this suggests that process 1 tends to produce stronger wire on average than process 2."
+    },
+    {
+      "number": 1,
+      "marks": 6,
+      "verification_status": "reconstructed",
+      "question": "A study compares the mean tensile strength of two independent types of steel wire, A and B. Independent random samples are taken from each type. The sample from type A has size \\(n_1 = 12\\), sample mean \\(\\bar{x}_1 = 72.4\\) kg, and sample standard deviation \\(s_1 = 3.1\\) kg. The sample from type B has size \\(n_2 = 15\\), sample mean \\(\\bar{x}_2 = 68.9\\) kg, and sample standard deviation \\(s_2 = 2.8\\) kg. Assume that the tensile strengths of both types are normally distributed with a common unknown variance. Construct a \\(95\\%\\) confidence interval for the true difference in mean tensile strengths \\(\\mu_1 - \\mu_2\\). Interpret your interval.",
+      "solution": "We have two independent normal populations with a common unknown variance. The sample sizes are \\(n_1 = 12\\), \\(n_2 = 15\\), sample means \\(\\bar{x}_1 = 72.4\\), \\(\\bar{x}_2 = 68.9\\), and sample standard deviations \\(s_1 = 3.1\\), \\(s_2 = 2.8\\). The confidence level is \\(95\\%\\), so \\(\\alpha = 0.05\\).\n\nSince the common variance is unknown, we use the pooled variance estimate:\n\n$$\ns_p^2 = \\frac{(n_1 - 1)s_1^2 + (n_2 - 1)s_2^2}{n_1 + n_2 - 2}.\n$$\n\nSubstitute the values:\n\n$$\ns_p^2 = \\frac{(12 - 1)(3.1)^2 + (15 - 1)(2.8)^2}{12 + 15 - 2}\n= \\frac{11(9.61) + 14(7.84)}{25}\n= \\frac{105.71 + 109.76}{25}\n= \\frac{215.47}{25} = 8.6188.\n$$\n\nThus \\(s_p = \\sqrt{8.6188} \\approx 2.9358\\).\n\nThe standard error of the difference in sample means is:\n\n$$\nSE = s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}\n= 2.9358 \\sqrt{\\frac{1}{12} + \\frac{1}{15}}\n= 2.9358 \\sqrt{0.08333 + 0.06667}\n= 2.9358 \\sqrt{0.15}\n\\approx 2.9358(0.3873) \\approx 1.1371.\n$$\n\nThe degrees of freedom are \\(df = n_1 + n_2 - 2 = 25\\). For a \\(95\\%\\) confidence interval, the critical value is \\(t_{0.025, 25} = 2.060\\).\n\nThe margin of error is:\n\n$$\nME = t_{0.025, 25} \\times SE = 2.060 \\times 1.1371 \\approx 2.3424.\n$$\n\nThe point estimate of \\(\\mu_1 - \\mu_2\\) is:\n\n$$\n\\bar{x}_1 - \\bar{x}_2 = 72.4 - 68.9 = 3.5.\n$$\n\nTherefore, the \\(95\\%\\) confidence interval for \\(\\mu_1 - \\mu_2\\) is:\n\n$$\n(3.5 - 2.3424,\\; 3.5 + 2.3424) = (1.1576,\\; 5.8424).\n$$\n\nInterpretation: We are \\(95\\%\\) confident that the true difference in mean tensile strengths between type A and type B steel wire lies between approximately \\(1.16\\) kg and \\(5.84\\) kg. Since the entire interval is positive, this suggests that type A has a higher mean tensile strength than type B."
+    },
+    {
+      "number": 1,
+      "marks": 8,
+      "verification_status": "reconstructed",
+      "question": "A researcher compares the tensile strength of steel rods produced by two independent processes. Let $X_1$ denote the strength of a rod from Process 1 and $X_2$ denote the strength of a rod from Process 2. Assume that $X_1 \\sim N(\\mu_1, \\sigma^2)$ and $X_2 \\sim N(\\mu_2, \\sigma^2)$, where the common variance $\\sigma^2$ is unknown. Independent random samples of sizes $n_1 = 10$ and $n_2 = 12$ are taken from the two processes, giving sample means $\\bar{x}_1 = 72.4$ and $\\bar{x}_2 = 68.9$, and sample variances $s_1^2 = 16.2$ and $s_2^2 = 14.8$.\n\n(a) State the appropriate pivotal quantity for constructing a $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$ in this case, and give its distribution. (2 marks)\n(b) Derive the $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$ based on this pivotal quantity. (3 marks)\n(c) Compute the $95\\%$ confidence interval for $\\mu_1 - \\mu_2$ using the given data. (3 marks)",
+      "solution": "**Solution.**\n\n**(a)** Since the two normal populations are independent and have a common unknown variance $\\sigma^2$, the appropriate pivotal quantity is\n\n$$\nT = \\frac{(\\bar{X}_1 - \\bar{X}_2) - (\\mu_1 - \\mu_2)}{S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}},\n$$\n\nwhere the pooled sample variance is\n\n$$\nS_p^2 = \\frac{(n_1 - 1)S_1^2 + (n_2 - 1)S_2^2}{n_1 + n_2 - 2}.\n$$\n\nThe statistic $T$ has a Student's $t$-distribution with $\\nu = n_1 + n_2 - 2$ degrees of freedom.\n\n**(b)** Let $t_{\\alpha/2, \\nu}$ be the upper $\\alpha/2$ quantile of the $t$-distribution with $\\nu = n_1 + n_2 - 2$ degrees of freedom. Then\n\n$$\nP\\left( -t_{\\alpha/2, \\nu} \\le \\frac{(\\bar{X}_1 - \\bar{X}_2) - (\\mu_1 - \\mu_2)}{S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}} \\le t_{\\alpha/2, \\nu} \\right) = 1 - \\alpha.\n$$\n\nRearranging the inequalities gives the $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$:\n\n$$\n(\\bar{X}_1 - \\bar{X}_2) \\pm t_{\\alpha/2, \\nu} \\, S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}.\n$$\n\n**(c)** We have $n_1 = 10$, $n_2 = 12$, $\\bar{x}_1 = 72.4$, $\\bar{x}_2 = 68.9$, $s_1^2 = 16.2$, $s_2^2 = 14.8$. The degrees of freedom are $\\nu = 10 + 12 - 2 = 20$. The pooled variance is\n\n$$\ns_p^2 = \\frac{(10 - 1)(16.2) + (12 - 1)(14.8)}{20}\n = \\frac{9(16.2) + 11(14.8)}{20}\n = \\frac{145.8 + 162.8}{20}\n = \\frac{308.6}{20}\n = 15.43.\n$$\n\nThus $s_p = \\sqrt{15.43} \\approx 3.928$.\nThe standard error of the difference is\n\n$$\ns_p \\sqrt{\\frac{1}{10} + \\frac{1}{12}}\n= 3.928 \\sqrt{0.1 + 0.083333}\n= 3.928 \\sqrt{0.183333}\n\\approx 3.928(0.4282)\n\\approx 1.682.\n$$\n\nThe observed difference in sample means is\n\n$$\n\\bar{x}_1 - \\bar{x}_2 = 72.4 - 68.9 = 3.5.\n$$\n\nFor a $95\\%$ confidence interval, $\\alpha = 0.05$, so we need $t_{0.025, 20}$. From $t$-tables, $t_{0.025, 20} = 2.086$. Therefore the margin of error is\n\n$$\n2.086(1.682) \\approx 3.509.\n$$\n\nThe $95\\%$ confidence interval for $\\mu_1 - \\mu_2$ is\n\n$$\n3.5 \\pm 3.509,\n$$\n\nthat is,\n\n$$\n(-0.009,\\; 7.009).\n$$\n\nRounding to two decimal places, the interval is approximately $(-0.01,\\, 7.01)$."
+    },
+    {
+      "number": 1,
+      "marks": 8,
+      "verification_status": "reconstructed",
+      "question": "A researcher compares the tensile strength of steel rods produced by two independent processes. Let $X_1$ denote the strength of a rod from process 1 and $X_2$ the strength of a rod from process 2. Assume that $X_1 \\sim N(\\mu_1, \\sigma^2)$ and $X_2 \\sim N(\\mu_2, \\sigma^2)$ are independent normal distributions with a common but unknown variance $\\sigma^2$. A random sample of $n_1 = 10$ rods from process 1 gave a sample mean $\\bar{x}_1 = 72.4$ and a sample variance $s_1^2 = 8.6$. An independent random sample of $n_2 = 12$ rods from process 2 gave $\\bar{x}_2 = 68.9$ and $s_2^2 = 7.9$.\n\n(a) State the appropriate pivotal quantity for constructing a $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$ when the common variance is unknown, and give its distribution. **(2 marks)**\n(b) Derive the $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$ based on the pivotal quantity in part (a). **(3 marks)**\n(c) Compute the $95\\%$ confidence interval for $\\mu_1 - \\mu_2$ using the given data. Interpret your interval in the context of the problem. **(3 marks)**",
+      "solution": "**Solution.**\n\n**(a)** Since the two normal populations are independent and have a common unknown variance $\\sigma^2$, the appropriate pivotal quantity is\n\n$$\nT = \\frac{(\\bar{X}_1 - \\bar{X}_2) - (\\mu_1 - \\mu_2)}{S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}},\n$$\n\nwhere the pooled sample variance is\n\n$$\nS_p^2 = \\frac{(n_1 - 1)S_1^2 + (n_2 - 1)S_2^2}{n_1 + n_2 - 2}.\n$$\n\nThe statistic $T$ has a Student's $t$-distribution with $\\nu = n_1 + n_2 - 2$ degrees of freedom.\n\n**(b)** Let $t_{\\alpha/2, \\nu}$ be the upper $\\alpha/2$ quantile of the $t$-distribution with $\\nu = n_1 + n_2 - 2$ degrees of freedom. Then\n\n$$\nP\\left(-t_{\\alpha/2, \\nu} \\le T \\le t_{\\alpha/2, \\nu}\\right) = 1 - \\alpha.\n$$\n\nSubstituting the expression for $T$ and rearranging the inequalities gives the $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$:\n\n$$\n(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2, \\nu} \\, s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}},\n$$\n\nwhere\n\n$$\ns_p^2 = \\frac{(n_1 - 1)s_1^2 + (n_2 - 1)s_2^2}{n_1 + n_2 - 2}.\n$$\n\n**(c)** We have $n_1 = 10$, $\\bar{x}_1 = 72.4$, $s_1^2 = 8.6$; $n_2 = 12$, $\\bar{x}_2 = 68.9$, $s_2^2 = 7.9$. The degrees of freedom are $\\nu = 10 + 12 - 2 = 20$. For a $95\\%$ confidence interval, $\\alpha = 0.05$, so we need $t_{0.025, 20} = 2.086$.\n\nThe pooled variance is\n\n$$\ns_p^2 = \\frac{(10 - 1)(8.6) + (12 - 1)(7.9)}{20}\n= \\frac{9(8.6) + 11(7.9)}{20}\n= \\frac{77.4 + 86.9}{20}\n= \\frac{164.3}{20}\n= 8.215.\n$$\n\nThus $s_p = \\sqrt{8.215} \\approx 2.866$.\n\nThe standard error of the difference is\n\n$$\ns_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}\n= 2.866 \\sqrt{\\frac{1}{10} + \\frac{1}{12}}\n= 2.866 \\sqrt{0.1 + 0.083333}\n= 2.866 \\sqrt{0.183333}\n\\approx 2.866(0.4282)\n\\approx 1.227.\n$$\n\nThe sample difference is $\\bar{x}_1 - \\bar{x}_2 = 72.4 - 68.9 = 3.5$. The margin of error is\n\n$$\nt_{0.025, 20} \\, s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}\n= 2.086(1.227) \\approx 2.560.\n$$\n\nTherefore, the $95\\%$ confidence interval for $\\mu_1 - \\mu_2$ is\n\n$$\n3.5 \\pm 2.560 = (0.940, \\, 6.060).\n$$\n\n**Interpretation:** We are $95\\%$ confident that the true difference in mean tensile strength between process 1 and process 2, $\\mu_1 - \\mu_2$, lies between approximately $0.94$ and $6.06$. Since the entire interval is positive, this suggests that process 1 produces rods with a higher mean tensile strength than process 2."
+    },
+    {
+      "number": 3,
+      "marks": 16,
+      "verification_status": "verified",
+      "question": "(a) A random sample $X_1, X_2, \\dots, X_n$ of size $n$ is taken from a normal distribution with mean $\\mu$ and variance $\\theta$. Find the maximum likelihood estimators of $\\mu$ and $\\theta$ and test them for unbiasedness, consistency and sufficiency. \n\n(b) Suppose the weights of randomly selected KU male students are normally distributed with mean $\\mu$ and variance $\\theta$. A random sample of 9 KU male students yielded the following weights in kg:\n\n$$\n58 \\quad 61 \\quad 65 \\quad 63 \\quad 74 \\quad 80 \\quad 76 \\quad 75 \\quad 90\n$$\n\nFind the maximum likelihood estimates of $\\mu$ and $\\theta$. (4marks)",
+      "solution": "**(a) Maximum Likelihood Estimators for $N(\\mu, \\theta)$ (where $\\theta = \\sigma^2$)**\n\nLet $X_1, X_2, \\dots, X_n \\stackrel{\\text{i.i.d.}}{\\sim} N(\\mu, \\theta)$. The likelihood function is\n\n$$\nL(\\mu, \\theta) = \\prod_{i=1}^n \\frac{1}{\\sqrt{2\\pi\\theta}} \\exp\\left(-\\frac{(x_i - \\mu)^2}{2\\theta}\\right) = (2\\pi\\theta)^{-n/2} \\exp\\left(-\\frac{1}{2\\theta}\\sum_{i=1}^n (x_i - \\mu)^2\\right).\n$$\n\nThe log-likelihood function is\n\n$$\n\\ell(\\mu, \\theta) = -\\frac{n}{2}\\ln(2\\pi) - \\frac{n}{2}\\ln\\theta - \\frac{1}{2\\theta}\\sum_{i=1}^n (x_i - \\mu)^2.\n$$\n\nDifferentiating with respect to $\\mu$ and $\\theta$ and setting to zero:\n\n$$\n\\frac{\\partial \\ell}{\\partial \\mu} = \\frac{1}{\\theta}\\sum_{i=1}^n (x_i - \\mu) = 0 \\implies \\hat{\\mu} = \\bar{X} = \\frac{1}{n}\\sum_{i=1}^n X_i,\n\\frac{\\partial \\ell}{\\partial \\theta} = -\\frac{n}{2\\theta} + \\frac{1}{2\\theta^2}\\sum_{i=1}^n (x_i - \\hat{\\mu})^2 = 0 \\implies \\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^n (X_i - \\bar{X})^2.\n$$\n\n- **Unbiasedness:**\n - $E(\\hat{\\mu}) = E(\\bar{X}) = \\mu$, so $\\hat{\\mu}$ is **unbiased** for $\\mu$.\n - Since $\\frac{1}{\\theta}\\sum_{i=1}^n (X_i - \\bar{X})^2 \\sim \\chi^2_{n-1}$, we have $E(\\hat{\\theta}) = \\frac{n-1}{n}\\theta \\neq \\theta$, so $\\hat{\\theta}$ is **biased** (though asymptotically unbiased since $\\frac{n-1}{n}\\theta \\to \\theta$).\n\n- **Consistency:**\n - $\\operatorname{Var}(\\hat{\\mu}) = \\frac{\\theta}{n} \\to 0$ as $n \\to \\infty$, and $E(\\hat{\\mu}) = \\mu$, so $\\hat{\\mu}$ is **consistent** for $\\mu$.\n - For $\\hat{\\theta}$, $\\operatorname{Bias}(\\hat{\\theta}) = -\\frac{\\theta}{n} \\to 0$ and $\\operatorname{Var}(\\hat{\\theta}) = \\frac{2(n-1)\\theta^2}{n^2} \\to 0$ as $n \\to \\infty$, so $\\operatorname{MSE}(\\hat{\\theta}) \\to 0$ and $\\hat{\\theta}$ is **consistent** for $\\theta$.\n\n- **Sufficiency:**\n Rewrite the exponent using $\\sum_{i=1}^n (x_i - \\mu)^2 = \\sum_{i=1}^n (x_i - \\bar{x})^2 + n(\\bar{x} - \\mu)^2 = n\\hat{\\theta} + n(\\hat{\\mu} - \\mu)^2$:\n\n$$\nL(\\mu, \\theta) = (2\\pi\\theta)^{-n/2} \\exp\\left(-\\frac{n\\hat{\\theta} + n(\\hat{\\mu} - \\mu)^2}{2\\theta}\\right) \\cdot 1.\n$$\n\nBy the Fisher-Neyman Factorization Theorem, the pair $(\\hat{\\mu}, \\hat{\\theta}) = \\left(\\bar{X}, \\frac{1}{n}\\sum_{i=1}^n (X_i - \\bar{X})^2\\right)$ is **jointly sufficient** for $(\\mu, \\theta)$.\n\n---\n\n**(b) Numerical MLEs for the Sample of $n = 9$ Students**\n\nGiven the observations $58, 61, 65, 63, 74, 80, 76, 75, 90$:\n\n1. **Sample Mean ($\\hat{\\mu}$):**\n\n$$\n\\sum_{i=1}^9 x_i = 58 + 61 + 65 + 63 + 74 + 80 + 76 + 75 + 90 = 642,\n\\hat{\\mu} = \\bar{x} = \\frac{642}{9} = 71.3333\\text{ kg}.\n$$\n\n2. **MLE of Variance ($\\hat{\\theta}$):**\nUsing $\\sum_{i=1}^9 x_i^2 = 58^2 + 61^2 + 65^2 + 63^2 + 74^2 + 80^2 + 76^2 + 75^2 + 90^2 = 3364 + 3721 + 4225 + 3969 + 5476 + 6400 + 5776 + 5625 + 8100 = 46656$:\n\n$$\n\\sum_{i=1}^9 (x_i - \\bar{x})^2 = \\sum_{i=1}^9 x_i^2 - n\\bar{x}^2 = 46656 - \\frac{642^2}{9} = 46656 - 45796 = 860,\n\\hat{\\theta} = \\frac{860}{9} \\approx 95.5556\\text{ kg}^2.\n$$"
+    },
+    {
+      "number": 3,
+      "marks": 3,
+      "verification_status": "reconstructed",
+      "question": "Let $X_1, X_2, \\ldots, X_{n_1}$ and $Y_1, Y_2, \\ldots, Y_{n_2}$ be independent random samples from two normal distributions $N(\\mu_1, \\sigma^2)$ and $N(\\mu_2, \\sigma^2)$, respectively, where both means are unknown and the common variance $\\sigma^2$ is also unknown. Let $\\bar{X}$ and $\\bar{Y}$ be the sample means, and $S_1^2$ and $S_2^2$ be the sample variances. Derive a $100(1-\\alpha)\\%$ confidence interval for the difference $\\mu_1 - \\mu_2$. State the pivotal quantity used and its distribution.",
+      "solution": "Since the samples are independent and from normal populations with a common unknown variance, the difference of sample means $\\bar{X} - \\bar{Y}$ is normally distributed with mean $\\mu_1 - \\mu_2$ and variance $\\sigma^2\\left(\\frac{1}{n_1} + \\frac{1}{n_2}\\right)$. Thus, the standardized variable\n\n$$\nZ = \\frac{(\\bar{X} - \\bar{Y}) - (\\mu_1 - \\mu_2)}{\\sigma \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}}\n$$\n\nfollows a standard normal distribution. However, $\\sigma^2$ is unknown. The pooled sample variance\n\n$$\nS_p^2 = \\frac{(n_1 - 1)S_1^2 + (n_2 - 1)S_2^2}{n_1 + n_2 - 2}\n$$\n\nis an unbiased estimator of $\\sigma^2$, and the pivotal quantity\n\n$$\nT = \\frac{(\\bar{X} - \\bar{Y}) - (\\mu_1 - \\mu_2)}{S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}}\n$$\n\nfollows a $t$-distribution with $n_1 + n_2 - 2$ degrees of freedom. Let $t_{\\alpha/2, \\, n_1+n_2-2}$ be the upper $\\alpha/2$ quantile of this $t$-distribution. Then\n\n$$\nP\\left( -t_{\\alpha/2} \\le \\frac{(\\bar{X} - \\bar{Y}) - (\\mu_1 - \\mu_2)}{S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}} \\le t_{\\alpha/2} \\right) = 1 - \\alpha.\n$$\n\nRearranging the inequalities gives the $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$:\n\n$$\n(\\bar{X} - \\bar{Y}) \\pm t_{\\alpha/2, \\, n_1+n_2-2} \\, S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}.\n$$\n\nEquivalently,\n\n$$\n\\left[ (\\bar{X} - \\bar{Y}) - t_{\\alpha/2} S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}, \\; (\\bar{X} - \\bar{Y}) + t_{\\alpha/2} S_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}} \\right].\n$$"
+    },
+    {
+      "number": 3,
+      "marks": 5,
+      "verification_status": "reconstructed",
+      "question": "A study compares the lifespan (in days) of two independent groups of mosquitoes: wild type and transgenic. The summary statistics are given below.\n\n| Group | Sample size | Sample mean | Sample standard deviation |\n| --- | --- | --- | --- |\n| Wild type | $n_1 = 88$ | $\\bar{x}_1 = 20.784$ | $s_1 = 12.99$ |\n| Transgenic | $n_2 = 99$ | $\\bar{x}_2 = 16.546$ | $s_2 = 10.78$ |\n\nAssume that the lifespans in each group are normally distributed and that the two population variances are unknown but can be considered equal. Construct a $95\\%$ confidence interval for the difference in population means $\\mu_1 - \\mu_2$, where $\\mu_1$ is the mean lifespan of wild type mosquitoes and $\\mu_2$ is the mean lifespan of transgenic mosquitoes. Interpret your interval.",
+      "solution": "We have two independent samples from normal populations with unknown but equal variances. The $100(1-\\alpha)\\%$ confidence interval for $\\mu_1 - \\mu_2$ is\n\n$$\n(\\bar{x}_1 - \\bar{x}_2) \\pm t_{\\alpha/2,\\, n_1+n_2-2} \\, s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}},\n$$\n\nwhere the pooled sample variance is\n\n$$\ns_p^2 = \\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}.\n$$\n\nGiven:\n\n$$\nn_1 = 88,\\quad \\bar{x}_1 = 20.784,\\quad s_1 = 12.99,\n$$\n\n$$\nn_2 = 99,\\quad \\bar{x}_2 = 16.546,\\quad s_2 = 10.78.\n$$\n\n**Step 1: Compute the pooled variance.**\n\n$$\ns_p^2 = \\frac{(88-1)(12.99)^2 + (99-1)(10.78)^2}{88+99-2}\n= \\frac{87 \\times 168.7401 + 98 \\times 116.2084}{185}.\n$$\n\n$$\n87 \\times 168.7401 = 14680.3887,\\quad 98 \\times 116.2084 = 11388.4232.\n$$\n\n$$\ns_p^2 = \\frac{14680.3887 + 11388.4232}{185} = \\frac{26068.8119}{185} \\approx 140.9125.\n$$\n\nThus,\n\n$$\ns_p = \\sqrt{140.9125} \\approx 11.8707.\n$$\n\n**Step 2: Compute the standard error of the difference.**\n\n$$\nSE = s_p \\sqrt{\\frac{1}{88} + \\frac{1}{99}}\n= 11.8707 \\times \\sqrt{0.0113636 + 0.0101010}\n= 11.8707 \\times \\sqrt{0.0214646}.\n$$\n\n$$\n\\sqrt{0.0214646} \\approx 0.146508,\n$$\n\n$$\nSE \\approx 11.8707 \\times 0.146508 \\approx 1.7392.\n$$\n\n**Step 3: Find the critical value.**\nDegrees of freedom: \\(df = n_1 + n_2 - 2 = 88 + 99 - 2 = 185\\).\nFor a $95\\%$ confidence interval, \\(\\alpha = 0.05\\), so \\(t_{0.025,\\,185} \\approx 1.9729\\).\n\n**Step 4: Compute the margin of error.**\n\n$$\nME = t_{0.025,\\,185} \\times SE \\approx 1.9729 \\times 1.7392 \\approx 3.4313.\n$$\n\n**Step 5: Compute the confidence interval.**\nPoint estimate:\n\n$$\n\\bar{x}_1 - \\bar{x}_2 = 20.784 - 16.546 = 4.238.\n$$\n\nInterval:\n\n$$\n4.238 \\pm 3.4313 = (0.8067,\\; 7.6693).\n$$\n\nThus, the $95\\%$ confidence interval for \\(\\mu_1 - \\mu_2\\) is approximately \\((0.81,\\, 7.67)\\) days.\n\n**Interpretation:** We are $95\\%$ confident that the true difference in mean lifespan between wild type and transgenic mosquitoes lies between $0.81$ and $7.67$ days. Since the entire interval is positive, this suggests that wild type mosquitoes have a longer mean lifespan than transgenic mosquitoes."
+    }
+  ],
+  "curriculum_prior_topics": [
+    "Properties of Estimators",
+    "Confidence Interval Estimation",
+    "Sufficient Statistics",
+    "Moment Estimation",
+    "Maximum Likelihood Estimation",
+    "Least Squares Estimation",
+    "Method of Minimum Variance",
+    "Interval Estimation"
+  ],
+  "curriculum_future_topics": [],
+  "notes_cache_version": "markdown-katex-v18-body-page-source-context",
+  "source_signature": "0596afd22c88526e",
+  "current_cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_interval_estimation:_confidence_intervals_for_the_difference_between_means_of_two_independent_normal_distributions_level_2_0596afd22c88526e",
+  "cache_rows": [
+    {
+      "cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_interval_estimation:_confidence_intervals_for_the_difference_between_means_of_two_independent_normal_distributions_level_2_0596afd22c88526e",
+      "level": "level_2",
+      "model": null,
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "0596afd22c88526e",
+      "characters": 3004,
+      "is_current_key": true
+    },
+    {
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_interval_estimation:_confidence_intervals_for_the_difference_between_means_of_two_independent_normal_distributions_level_3_099501a1b36c4b3e",
+      "level": "level_3",
+      "model": "deepseek-flash",
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "099501a1b36c4b3e",
+      "characters": 19833,
+      "is_current_key": false
+    },
+    {
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_interval_estimation:_confidence_intervals_for_the_difference_between_means_of_two_independent_normal_distributions_level_1_099501a1b36c4b3e",
+      "level": "level_1",
+      "model": "deepseek-flash",
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "099501a1b36c4b3e",
+      "characters": 14040,
+      "is_current_key": false
+    }
+  ],
+  "repair_records": [
+    {
+      "level": "level_2",
+      "status": "validated",
+      "validation_issues": [],
+      "cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_interval_estimation:_confidence_intervals_for_the_difference_between_means_of_two_independent_normal_distributions_level_2_0596afd22c88526e",
+      "last_error": ""
+    },
+    {
+      "level": "level_3",
+      "status": "validated",
+      "validation_issues": [],
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_interval_estimation:_confidence_intervals_for_the_difference_between_means_of_two_independent_normal_distributions_level_3_099501a1b36c4b3e",
+      "last_error": ""
+    }
+  ],
+  "generation_guards": [
+    {
+      "level": "level_3",
+      "status": "open",
+      "failed_attempts": 0,
+      "last_error": "",
+      "source_signature": "099501a1b36c4b3e"
+    }
+  ],
+  "generation_jobs": []
+}

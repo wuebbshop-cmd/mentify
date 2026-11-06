@@ -131,6 +131,7 @@ class Command(BaseCommand):
             issues = _note_completion_issues(
                 notes,
                 topic.title,
+                level=level,
                 **options,
             )
             issues.extend(self._heading_issues(notes))
@@ -257,6 +258,7 @@ class Command(BaseCommand):
             issues = [f"missing cached note level {level}"] if not notes else _note_completion_issues(
                 notes,
                 topic.title,
+                level=level,
                 **options,
             )
             issues.extend(self._heading_issues(notes))

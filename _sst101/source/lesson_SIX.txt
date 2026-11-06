@@ -1,0 +1,290 @@
+LESSON SIX
+
+ SKEWNESS AND KURTOSIS
+
+6.1 Skewness
+
+Skewness refers to lack of symmetry. A skewed distribution is a frequency
+distribution that is asymmetric (not symmetric). When the longer tail of a
+distribution extends to the right, it is said to be skewed to the right and when the
+longer tail of a distribution extends to the left, it said to be skewed to the left.
+
+When a distribution is skewed to the right, it contains a large number of relatively
+low scores and a few extremely high scores. Generally, the mode is less than the
+median which in turn is less than the mean.
+
+ Skewed to the right (Positive Skewness)
+
+frequency
+
+ mode median mean variable
+
+When a distribution is skewed to the left, it contains a large number of relatively
+high scores and a few extremely low scores. Generally, the mean is less than the
+median which in turn is less than the mode.
+
+ 40
+
+--- Page 42 ---
+Skewed to the left (Negative Skewness)
+
+frequency
+
+ Mean median mode variable
+
+For skewed distributions, the mean is different from the median which in turn is
+different from the mode.
+
+Variation tells us about the amount of spread while skewness tells us about the
+direction of spread.
+
+6.1.1: Measures of Skewness
+
+6.1.1.1: Karl Pearson’s Coefficient of Skewness
+
+Karl Pearson’s first coefficient of skewness is given by
+
+ 𝑚𝑒𝑎𝑛−𝑚𝑜𝑑𝑒 𝑥−𝑚𝑜𝑑𝑒
+ 𝑆𝐾𝑃= ……………..(i) 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+Karl Pearson’s second coefficient of skewness is given by
+
+ 3(𝑚𝑒𝑎𝑛−𝑚𝑒𝑑𝑖𝑎𝑛) 3(𝑥−𝑚𝑒𝑑𝑖𝑎𝑛)
+ 𝑆𝐾𝑃= …………(ii) 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+ 41
+
+--- Page 43 ---
+Expression (ii) is particularly useful for distributions with more than one mode.
+Theoretically the value of the coefficient of skewness given by these formulae (i)
+and (ii) can lie between -3 and +3. However, in practice the value of this
+coefficient usually lies between -1 and +1.
+
+6.1.1.2: Bowley’s Coefficient of Skewness
+
+This is also known as quartile coefficient of skewness and is based on quartiles.
+This is given by
+
+ 𝑄3+𝑄1−2𝑄2
+ 𝑆𝐾𝐵= 𝑄3−𝑄1
+
+ 𝑄3+𝑄1−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑄3−𝑄1
+
+It varies between -1 and +1. It is particularly useful when we have open-end
+distributions and where extreme values are present.
+
+6.1.1.3: Percentile Coefficient of Skewness
+
+This was devised by Kelly and is defined as
+
+ 𝑃90+𝑃10−2𝑃50
+ 𝑆𝐾𝐾= 𝑃90−𝑃10
+
+ 𝑃90+𝑃10−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑃90−𝑃10
+ 𝐷9 + 𝐷1 −2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝐷9 −𝐷1
+
+6.1.1.3: Moment Coefficient of Skewness
+
+The moment coefficient of skewness denoted by 𝛽1 is defined by
+ 𝑚32
+ 𝛽1 = 3 ,
+ 𝑚2
+
+where 𝑚2 is the second moment about the mean and 𝑚3 is the third moment
+about the mean.
+
+ 42
+
+--- Page 44 ---
+For perfectly symmetrical curves such as the normal curve, 𝛽1 is zero.
+
+Measures of coefficient of skewness are used mainly for making comparisons
+between two or more distributions. We can talk of slight skewness, moderate
+skewness or marked skewness.
+
+Example 6.1 The following data relate to the profits of 1,000 companies in
+thousands Kenya shillings.
+
+ Profit 100- 120 – 140 - 160 - 180 - 200 - 220 -
+ (in 119 139 159 179 199 219 239
+ thousand
+ shillings)
+ Number of 17 53 199 194 327 208 2
+ companies
+
+Calculate:
+
+ i) the Karl Pearson’s first coefficient of skewness and comment on its
+ value,
+ ii) Bowley’s coefficient of skewness,
+ iii) moment coefficient of skewness.
+
+ Solutions
+
+ Profit Class f 𝑑 𝑢 𝑓𝑢 𝑓𝑢2 𝑓𝑑 𝑓𝑑2 𝑓𝑑3
+ mark = 𝑥−169.5 𝑑
+ =
+ x 20
+ 100- 109.5 17 -60 -3 -51 153 -1020 61200 -3672000
+ 119
+ 120- 129.5 53 -40 -2 -106 212 -2120 84800 -3392000
+ 139
+ 140- 149.5 199 -20 -1 -199 199 -3980 79600 -1592000
+ 159
+ 160- 169.5 194 0 0 0 0 0 0 0
+ 179
+ 180- 189.5 327 20 1 327 327 6540 130800 2616000
+ 199
+ 200- 209.5 208 40 2 416 832 8320 332800 13312000
+ 219
+
+ 43
+
+--- Page 45 ---
+220- 229.5 2 60 3 6 18 120 7200 432000
+239
+Total 1,000 393 1,741 7860 565600 7704000
+ 𝑚𝑒𝑎𝑛−𝑚𝑜𝑑𝑒 𝑥−𝑚𝑜𝑑𝑒
+ i) 𝑆𝐾𝑃= 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+ 1 7 393
+ mean (𝑥) = 𝐴+ ( 𝑛∑ 𝑖=1 𝑓𝑖𝑢𝑖) 𝑐 = 169.5 + (1000) 20 = 177.36
+ The modal class is 180 – 199.
+
+ 𝑓𝑚−𝑓1
+ Mode= 𝐿+ (2𝑓𝑚−𝑓1−𝑓2) 𝑐
+
+ 327−194 133×20
+ = 179.5 + ( 2×327−194−208) 20 = 179.5 + 252
+
+ = 190.06.
+
+ 2
+ 1 7 2 1 7
+ 𝑖=1 𝑓𝑖𝑢𝑖 ) } 𝑠= √𝑐2{𝑛∑ 𝑖=1 𝑓𝑖𝑢𝑖 −(𝑛∑
+
+ 2 2 1741 393
+ = √202 { −( } = √400 × 1.5866 = 25.2. 1000 1000)
+
+ Hence,
+
+ 𝑚𝑒𝑎𝑛−𝑚𝑜𝑑𝑒 𝑥−𝑚𝑜𝑑𝑒
+ 𝑆𝐾𝑃= 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+ 177.36 −190.06
+ = = −0.504
+ 25.2
+ This is considered moderate skewness.
+
+ 𝑄3+𝑄1−2𝑄2
+ ii) 𝑆𝐾𝐵= 𝑄3−𝑄1
+ 𝑄3+𝑄1−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑄3−𝑄1
+
+ 44
+
+--- Page 46 ---
+Class 99.5 119.5 139.5 159.5 179.5 199.5 219.5 239.5
+ boundaries
+ Cf 0 17 70 269 463 790 998 1000
+
+1000
+ = 250 ⇒ 𝑄1 lies in the class interval 140 – 159. Therefore, 4
+
+ 𝑛
+ −(∑𝑓)𝑄1 −70 4 (250 ) 20𝑄1 = 𝐿𝑄1 + ( ) 𝑐1 = 139.5 +
+ 𝑓𝑄1 199
+
+ = 139.5 + 18.09 = 157.59.
+1000
+ = 500 ⇒ 𝑄2 (median) lies in the class interval 180 – 199. Therefore, 2
+
+ 𝑛
+ −(∑𝑓)1 500 −463
+Median= 𝐿1 + ( 2𝑓𝑚𝑒𝑑𝑖𝑎𝑛) 𝑐= 179.5 + ( 327 ) 20
+ = 179.93
+
+3
+ (1000) = 750 ⇒ 𝑄3 (median) lies in the class interval 180 – 199.4
+Therefore,
+
+ 3𝑛
+ −(∑𝑓)𝑄3 −463 4 (750 ) 20 𝑄3 = 𝐿𝑄3 + ( ) 𝑐3𝑄3 = 179.5 +
+ 𝑓𝑄1 327
+
+ = 197.05.
+Hence,
+
+ 𝑄3+𝑄1−2𝑄2
+ 𝑆𝐾𝐵= 𝑄3−𝑄1
+ 𝑄3+𝑄1−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑄3−𝑄1
+ 197.05+157.59−2(179.93)
+ = = −0.1323.
+ 197.05−157.59
+
+ 45
+
+--- Page 47 ---
+𝑚32
+ iii) 𝛽1 = 3
+ 𝑚2
+
+ 1 7860 ′ 𝑘 = 7.86 𝑖=1 𝑓𝑖𝑑𝑖= 𝑚1 = 𝑛∑ 1000
+
+ 1 565600 ′ 𝑘 2 = 565.6 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚2 = 𝑛∑ 1000
+
+ 1 7704000 ′ 𝑘 3 = 7704 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚3 = 𝑛∑ 1000
+
+ 𝑚2 = 𝑚2′ −(𝑚1′ )2 = 565.6 −7.862 = 503.8
+
+ 𝑚3 = 𝑚3′ −3𝑚1′ 𝑚2′ + 2(𝑚1′ )3
+ = 7704 −3(7,86)(565.6) + 2(7.86)2
+ = −5509.3.
+ Hence,
+
+ 𝑚32 (−5509,3)2
+ 𝛽1 = 3 = = 0.2374. 𝑚2 503.83
+
+6.2: Kurtosis
+
+Kurtosis is the degree of peaked-ness of a distribution, usually taken relative to a
+normal distribution. If a curve is more peaked than the normal curve, it is called
+leptokurtic; if it is more flat-topped than the normal curve it is called platykurtic
+or flat topped. The normal curve is known as mesokurtic. The diagram below
+illustrates the three different curves.
+
+ 46
+
+--- Page 48 ---
+Measures of Kurtosis
+
+ Leptokurtic
+
+ Mesokurtic
+
+ Platykurtic
+
+6.2.1: Measures of Kurtosis
+
+Kurtosis is measured by the coefficient 𝛽2 or its derivative 𝛾2 given by
+ 𝑚4
+ 𝛽2 = , 𝛾2 = 𝛽2 −3, 𝑚22
+
+Where 𝑚4 is the fourth moment about the mean and 𝑚2 is the second moment
+about the mean. For the normal curve (mesokurtic) 𝛽2 = 3 𝑖. 𝑒 𝛾2 = 0 . For a
+curve that is more flat-topped than the normal curve (platykurtic curve) 𝛽2 <
+3 𝑖. 𝑒 𝛾2 < 0 and for a curve more peaked than the normal curve (leptokurtic
+curve) 𝛽2 > 3 𝑖. 𝑒 𝛾2 > 0.
+
+ 47
+
+--- Page 49 ---

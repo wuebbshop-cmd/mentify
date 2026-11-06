@@ -1,0 +1,627 @@
+---
+title: "SST 409: Stochastic Processes"
+subtitle: "Lecture Notes on Random Variables"
+---
+
+*A complete transcription of the 15 handwritten notebook pages. All equations, symbols and notation have been re-typeset in LaTeX.*
+
+*Abbreviations used in the original: r.v. = random variable; st. pr. = stochastic process; g.f. = generating function; p.g.f. = probability generating function; dist. = distribution; mtd. = method; qty = quantity; prob. = probability.*
+
+*— p. 1 —*
+
+# 1. Stochastic Processes: Definition and Examples
+
+Here, we mean a set of r.v. $\{X(t)\}$ depending on a real parameter $t$ which varies in a certain set of natural nos.
+
+A st. pr. is denoted by
+
+$$\{X(t),\ t \in T\}.$$
+
+In many problems of theory of st. pr., the parameter $t$ means time. Though it can denote any other physical qty such as space in which the process occurs.
+
+## Exp. of st. pr.
+
+**1.** Random walk where we are concerned with the motion of a particle in a straight line which moves in discrete jumps with certain probabilities i.e. at each stage, it moves one unit to the left or right with probability $p$ or $1-p$. If initially the particle is at the origin then its position $X(n)$ after $n$ jumps is a discrete r.v. depending on the discrete parameter $n$. Thus $\{X(n),\ n \in T\}$ is a st. pr.
+
+**2.** The no. of telephone calls $X(t)$ during the arbitrary period of time $t$ is a discrete random variable depending on the continuous parameter $t$. The family of r.v.'s $\{X(t),\ t \in T\}$ constitutes a st. pr. $\left[T = (0, \infty)\right]$.
+
+*Read 3 & 4.*
+
+*— p. 2 —*
+
+# 2. Generating Functions
+
+**Def:** Let $a_0, a_1, a_2, \ldots$ be a sequence of real numbers. Using a variable $s$ we may define a function
+
+$$A(s) = a_0 + a_1 s + a_2 s^2 + \cdots = \sum_{k=0}^{\infty} a_k s^k \qquad \cdots (1)$$
+
+If $A(s)$ (power series) converges in some interval $s_0 < s < s_1$, then $A(s)$ is called the g.f. of the sequence $a_0, a_1, a_2, \ldots$. The variable $s$ itself has no particular significance.
+
+Now:
+
+$$\frac{dA(s)}{ds} = a_1 + 2a_2 s + 3a_3 s^2 + 4a_4 s^3 + \cdots + k a_k s^{k-1} + \cdots$$
+
+$$\left. \frac{dA(s)}{ds} \right|_{s=0} = a_1$$
+
+$$\frac{d^2 A(s)}{ds^2} = 2a_2 + 3 \times 2\, a_3 s + 4 \times 3\, a_4 s^2 + \cdots + k(k-1) a_k s^{k-2} + \cdots$$
+
+$$\left. \frac{d^2 A(s)}{ds^2} \right|_{s=0} = 2a_2 \quad \Rightarrow \quad a_2 = \frac{1}{2} \left. \frac{d^2 A(s)}{ds^2} \right|_{s=0}$$
+
+$$\left. \frac{d^3 A(s)}{ds^3} \right|_{s=0} = 3!\, a_3 \quad \Rightarrow \quad a_3 = \frac{1}{3!} \left. \frac{d^3 A(s)}{ds^3} \right|_{s=0}$$
+
+$$\left. \frac{d^k A(s)}{ds^k} \right|_{s=0} = k!\, a_k \quad \Rightarrow \quad a_k = \frac{1}{k!} \left. \frac{d^k A(s)}{ds^k} \right|_{s=0}$$
+
+## Exp 1
+
+If $a_k = 1$ for all $n \ge 1$, $\{a_k\} = \{1, 1, 1, \ldots\}$, we have $a_0 = 1$, $a_1 = 1$, $a_2 = 1, \ldots$
+
+Then the g.f. of $\{a_k\}$ is given by
+
+$$A(s) = \sum_{k=0}^{\infty} a_k s^k = a_0 + a_1 s + a_2 s^2 + a_3 s^3 + \cdots = 1 + s + s^2 + s^3 + \cdots = \frac{1}{1-s}, \qquad |s| < 1$$
+
+*— p. 3 —*
+
+## Exp 2
+
+Let $\{a_k\} = \left\{ \frac{1}{k!} \right\}$.
+
+Then $a_0 = 1$, $a_1 = 1$, $a_2 = \frac{1}{2!}$, $a_3 = \frac{1}{3!}, \ldots$
+
+$\therefore$ The g.f. of $\{a_k\}$ is
+
+$$A(s) = \sum_{k=0}^{\infty} a_k s^k = a_0 + a_1 s + a_2 s^2 + a_3 s^3 + \cdots = 1 + s + \frac{s^2}{2!} + \frac{s^3}{3!} + \cdots = e^s$$
+
+## Exp 3
+
+Let $\{a_k\} = \left\{ \binom{n}{k} \right\}$ for fixed $n$.
+
+$\therefore$ The g.f. of $\{a_k\}$ is
+
+$$A(s) = \sum_{k=0}^{\infty} a_k s^k = \sum_{k=0}^{n} \binom{n}{k} s^k = (1+s)^n$$
+
+## Exp 4
+
+Let $a_0, a_1, a_2, \ldots, a_n$ be a sequence of nos satisfying the recurrence relation
+
+$$a_n + a_{n-1} - 16 a_{n-2} + 20 a_{n-3} = 0 \qquad \text{for } n \ge 3$$
+
+subjected to the initial values $a_0 = 0$, $a_1 = 1$ & $a_2 = -1$. Obtain the g.f. of the above sq. $\{a_n\}$.
+
+### Soln
+
+Let $A(s) = \sum_{n=0}^{\infty} a_n s^n$ be the g.f. of $\{a_n\}$.
+
+$$\sum_{n=3}^{\infty} a_n s^n + \sum_{n=3}^{\infty} a_{n-1} s^n - 16 \sum_{n=3}^{\infty} a_{n-2} s^n + 20 \sum_{n=3}^{\infty} a_{n-3} s^n = 0$$
+
+$$\sum_{n=3}^{\infty} a_n s^n + s \sum_{n=3}^{\infty} a_{n-1} s^{n-1} - 16 s^2 \sum_{n=3}^{\infty} a_{n-2} s^{n-2} + 20 s^3 \sum_{n=3}^{\infty} a_{n-3} s^{n-3} = 0$$
+
+$$A(s) - a_0 - a_1 s - a_2 s^2 + s\left[A(s) - a_0 - a_1 s\right] - 16 s^2 \left[A(s) - a_0\right] + 20 s^3 A(s) = 0$$
+
+*— p. 4 —*
+
+$$A(s) - 0 - s + s^2 + s\left[A(s) - 0 - s\right] - 16 s^2 \left[A(s) - 0\right] + 20 s^3 A(s) = 0$$
+
+$$A(s) \left[1 + s - 16 s^2 + 20 s^3\right] = s$$
+
+$$\therefore \quad A(s) = \frac{s}{1 + s - 16 s^2 + 20 s^3}$$
+
+# 3. Probability Generating Function (P.G.F.)
+
+Suppose $X$ is a r.v. which assumes non-negative integral values $0, 1, 2, \ldots$ and that $\Pr\{X = k\} = p_k$, $k = 0, 1, 2, \ldots$ and $\sum_k p_k = 1$, then the probability generating function $P(s)$ of the sequence of probabilities $\{p_k\}$ is given by:
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k = p_0 + p_1 s + p_2 s^2 + \cdots + p_k s^k + \cdots$$
+
+$$= \sum_{k=0}^{\infty} \Pr\{X = k\}\, s^k = F(s^x)$$
+
+where $F(s^x)$ is the expectation of the function $s^x$ (a r.v.) of the r.v. $x$.
+
+The series $P(s)$ converges for at least $-1 \le s \le 1$; clearly $P(1) = 1$.
+
+**NB:** It is possible to have a sequence of probabilities which does NOT form a p.d.f.
+
+e.g. $p_0 = 0$, $p_1 = \frac{1}{4}$, $p_2 = \frac{1}{2}$, $p_3 = \frac{1}{3}$, $p_4 = \frac{3}{4}$
+
+$$A(s) = p_0 + p_1 s + p_2 s^2 + p_3 s^3 + p_4 s^4 = 0 + \frac{1}{4}s + \frac{1}{2}s^2 + \frac{1}{3}s^3 + \frac{3}{4}s^4 = \frac{1}{4}s + \frac{1}{2}s^2 + \frac{1}{3}s^3 + \frac{3}{4}s^4$$
+
+$A(s)$ is a g.f. of $\{p_k\}$ but NOT a p.g.f. since:
+
+$$p_1 + p_2 + p_3 + p_4 \ne 1$$
+
+## 3.1 Determination of mean & variance using the p.g.f.
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k$$
+
+*— p. 5 —*
+
+$$\therefore \quad P'(s) = \sum_k k\, p_k s^{k-1}$$
+
+$$P''(s) = \sum_k k(k-1)\, p_k s^{k-2}$$
+
+The expectation $E(x)$ is given by
+
+$$E(x) = \sum_k k\, p_k = P'(1)$$
+
+We have
+
+$$E\{x(x-1)\} = P''(1) = \sum_k k(k-1) p_k$$
+
+and
+
+$$E(x^2) = E\{x(x-1)\} + Ex = P''(1) + P'(1)$$
+
+Hence
+
+$$\operatorname{Var}(x) = E(x^2) - \left[E(x)\right]^2 = P''(1) + P'(1) - \left[P'(1)\right]^2$$
+
+# 4. The p.g.f. & Moments of Standard Distributions
+
+## (i) Bernoulli dist.
+
+Let $x$ have a Bernoulli dist. with parameter $p$ i.e. $\Pr\{X = k\} = p_k = p^k q^{1-k}$, $q = 1-p$, $k = 0, 1$.
+
+The p.g.f. of $x$ is given by
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k = \sum_{k=0}^{1} p^k q^{1-k} s^k = q + ps$$
+
+$$\therefore \quad P'(s) = p \qquad\qquad E(x) = P'(1) = p$$
+
+$$P''(s) = 0 \quad \Rightarrow \quad P''(1) = 0$$
+
+$$\operatorname{Var}(x) = P''(1) + P'(1) - \left[P'(1)\right]^2 = 0 + p - p^2 = p\left[1-p\right] = pq$$
+
+## (ii) Binomial dist.
+
+Let $x$ have a binomial dist. with parameters $n$ & $p$ i.e.
+
+$$\Pr[X = k] = p_k = \binom{n}{k} p^k q^{n-k}, \qquad k = 0, 1, 2, \ldots, n, \qquad q = 1-p$$
+
+*— p. 6 —*
+
+$\therefore$ The p.g.f. of $x$ is given by:
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k = \sum_{k=0}^{n} \binom{n}{k} p^k q^{n-k} s^k = (q + ps)^n$$
+
+$$\therefore \quad P'(s) = n(q+ps)^{n-1} p = np\,(q+ps)^{n-1}$$
+
+$$\therefore \quad E(x) = P'(1) = np\,(q+p)^{n-1} = np \qquad \text{since } q + p = 1$$
+
+$$P''(s) = n(n-1) p^2 (q+ps)^{n-2}$$
+
+$$P''(1) = n(n-1) p^2 (q+p)^{n-2} = n(n-1) p^2 \qquad \text{since } q + p = 1$$
+
+$$\operatorname{Var}(x) = P''(1) + P'(1) - \left[P'(1)\right]^2$$
+
+$$= n(n-1)p^2 + np - n^2 p^2$$
+
+$$= n^2 p^2 - np^2 + np - n^2 p^2 = np(1-p) = npq$$
+
+## (iii) Geometric dist.
+
+$$\Pr\{X = k\} = p_k = q^k p, \qquad p + q = 1, \qquad k = 0, 1, 2, \ldots$$
+
+The p.g.f. of $x$ is given by:
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k = \sum_{k=0}^{\infty} q^k p\, s^k = p \sum_{k=0}^{\infty} (qs)^k$$
+
+$$= p\left(1 + qs + (qs)^2 + (qs)^3 + \cdots\right)$$
+
+$$= p \left[ \frac{1}{1-qs} \right] = \frac{p}{1-qs}$$
+
+$$P'(s) = \frac{pq}{(1-qs)^2} \qquad \therefore \quad E(x) = P'(1) = \frac{pq}{(1-q)^2} = \frac{pq}{p^2} = \frac{q}{p}$$
+
+$$P''(s) = \frac{2pq^2}{(1-qs)^3} \qquad\qquad P''(1) = \frac{2pq^2}{(1-q)^3} = \frac{2pq^2}{p^3} = \frac{2q^2}{p^2}$$
+
+$$\therefore \quad \operatorname{Var}(x) = P''(1) + P'(1) + \left[P'(1)\right]^2$$
+
+$$= \frac{2q^2}{p^2} + \frac{q}{p} - \frac{q^2}{p^2}$$
+
+$$= \frac{q^2}{p^2} + \frac{q}{p} = \frac{q^2 + pq}{p^2} = \frac{q(q+p)}{p^2} = \frac{q}{p^2} \qquad \text{since } q + p = 1$$
+
+**(iv) Poisson dist. — Read.**
+
+*— p. 7 —*
+
+# 5. Remarks on the p.g.f.
+
+**i)** When $s = e^t$, then
+
+$$P\left(e^t\right) = E\left(e^{tx}\right) \qquad \text{which is the Moment generating fn. of } x.$$
+
+**ii)**
+
+$$\int_0^1 P(s)\, ds = \int_0^1 \left( \sum_{k=0}^{\infty} p_k s^k \right) ds$$
+
+$$= \int_0^1 \left( p_0 + p_1 s + p_2 s^2 + p_3 s^3 + p_4 s^4 + \cdots + p_k s^k \right) ds$$
+
+$$= \int_0^1 p_0\, ds + \int_0^1 p_1 s\, ds + \int_0^1 p_2 s^2\, ds + \int_0^1 p_3 s^3\, ds + \cdots$$
+
+$$= p_0 + \frac{p_1}{2} + \frac{p_2}{3} + \frac{p_3}{4} + \cdots = \sum_{k=0}^{\infty} \frac{p_k}{k+1} = E\left( \frac{1}{X+1} \right)$$
+
+## Exp
+
+Let $x$ be a r.v. with p.g.f. $P(s)$. Find the p.g.f. of $Y = mx + n$, where $m, n$ are integers & $m \ne 0$.
+
+### Soln
+
+Let $P_Y(s)$ be the p.g.f. of $Y$. Then;
+
+$$P_Y(s) = E\left(s^Y\right) = E\left[s^{mx+n}\right]$$
+
+$$= E\left(s^{mx} s^n\right) = s^n E\left(s^{mx}\right) = s^n P\left(s^m\right)$$
+
+## Remarks
+
+**i)** We can obtain the probabilities $p_k$ from the p.g.f. $p_k$ can be found from $P(s)$ i.e.
+
+$$p_k = \frac{1}{k!} \left[ \left. \frac{d^k P(s)}{ds^k} \right|_{s=0} \right]$$
+
+**ii)** $p_k$ is also given by the co-efficient of $s^k$ in the expansion of $P(s)$ as a power series in $s$. e.g.
+
+*— p. 8 —*
+
+**i)**
+
+$$P(s) = e^{-\lambda(1-s)} = e^{-\lambda} e^{\lambda s}$$
+
+$$= e^{-\lambda} \left[ 1 + \lambda s + \frac{(\lambda s)^2}{2!} + \frac{(\lambda s)^3}{3!} + \cdots + \frac{(\lambda s)^k}{k!} + \cdots \right]$$
+
+$$\therefore \quad p_k = \text{co-efficient of } s^k = e^{-\lambda} \frac{\lambda^k}{k!} \qquad \text{which is a Poisson Distribution.}$$
+
+# 6. Sum of Random Variables
+
+## a) Fixed numbers
+
+Let $X$ & $Y$ be 2 independent non-negative integral valued random variables. The sum $z = x + y$ is a r.v.
+
+Let $P_z(s)$ be the p.g.f. of $Z$. Then;
+
+$$P_z(s) = E\left(s^z\right) = E\left(s^{x+y}\right)$$
+
+$$= E\left(s^x\right) E\left(s^y\right) \qquad \text{since } X \text{ \& } Y \text{ are independent}$$
+
+$$= P_x(s)\, P_y(s)$$
+
+[ $P_x(s)$: p.g.f. of $X$;  $P_y(s)$: p.g.f. of $Y$ ]
+
+This result says that the p.g.f. of the sum of two independent r.v.'s $X$ & $Y$ is the product of the p.g.f. of $X$ & $Y$.
+
+The result extends to the case when we have $n$ independent random variables $x_1, x_2, x_3, \ldots, x_n$.
+
+That is the p.g.f. of $S_n = x_1 + x_2 + \cdots + x_n$ is the product of the p.g.f.'s of the individual r.v.'s.
+
+$$P_{S_n}(s) = E\left[s^{S_n}\right] = E\left[s^{x_1 + x_2 + \cdots + x_n}\right]$$
+
+$$= E\left(s^{x_1}\right) E\left(s^{x_2}\right) \cdots E\left(s^{x_n}\right) \qquad \text{since } x_1, x_2, \ldots, x_n \text{ are independent}$$
+
+$$= P_{x_1}(s)\, P_{x_2}(s) \cdots P_{x_n}(s)$$
+
+*— p. 9 —*
+
+If $x_1, x_2, \ldots, x_n$ are also identically distributed, each with p.g.f. $P(s)$, then the p.g.f. of $S_n = x_1 + x_2 + \cdots + x_n$ is
+
+$$\left[P(s)\right]^n$$
+
+## Exp
+
+Let $x_1$ & $x_2$ be indep. poisson r.v.'s with parameters $\lambda_1$ & $\lambda_2$ resp. Find the distribution of $Z = X_1 + X_2$.
+
+### Soln
+
+Let $P_{x_1}(s)$ & $P_{x_2}(s)$ be the p.g.f.'s of $X_1$ & $X_2$ respectively. Then;
+
+$$P_{x_1}(s) = \sum_{k=0}^{\infty} p_k s^k = \sum_{k=0}^{\infty} e^{-\lambda_1} \frac{\lambda_1^k}{k!} s^k$$
+
+$$= e^{-\lambda_1} \sum_{k=0}^{\infty} \frac{(\lambda_1 s)^k}{k!}$$
+
+$$= e^{-\lambda_1} e^{\lambda_1 s} = e^{-\lambda_1 (1-s)}$$
+
+and similarly; $P_{x_2}(s) = e^{-\lambda_2 (1-s)}$
+
+$\therefore$ The p.g.f. of $Z$ is
+
+$$P_z(s) = P_{x_1}(s)\, P_{x_2}(s) = e^{-(\lambda_1 + \lambda_2)(1-s)}$$
+
+This is the p.g.f. of a poisson r.v. with parameters $\lambda_1$ & $\lambda_2$. This shows the sum of the two indep. poisson r.v.'s is also a poisson r.v.
+
+This result extends to the case of $n$ indep. poisson r.v.'s. That is the sum $S_n = x_1 + x_2 + \cdots + x_n$ of $n$ indep. poisson r.v.'s is a poisson r.v. with mean
+
+$$\sum_{i=1}^{n} \lambda_i$$
+
+where $\lambda_i$ is the mean of $x_i$.
+
+## b) Random Number
+
+**Theorem:** Let $x_i$, $i = 1, 2, \ldots$ be identically & independently dist. (i.i.d.) random variables with $P(x_i = k) = p_k$ & p.g.f.
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k, \qquad i = 1, 2, 3, \ldots$$
+
+Let $S_N = x_1 + x_2 + \cdots + x_N$ where $N$ is a r.v. independent of the $x_i$'s. Let the distribution of $N$ be given by $P[N = n] = g_n$ & p.g.f.
+
+*— p. 10 —*
+
+of $N$ be
+
+$$G(s) = \sum_{n=0}^{\infty} g_n s^n.$$
+
+Then the p.g.f., $H(s)$, of $S_N$ is given by the compound function $G\left[P(s)\right]$ i.e.
+
+$$H(s) = \sum_{j=0}^{\infty} P(S_N = j)\, s^j = G\left[P(s)\right]$$
+
+$$H'(s) = G'\left[P(s)\right] P'(s)$$
+
+$$\therefore \quad E(S_N) = H'(1) = G'\left[P(1)\right] \cdot P'(1)$$
+
+$$= G'(1)\, P'(1) = E(N)\, E(x_i)$$
+
+## Exp
+
+Suppose $N$ has a poisson dist. with mean $\lambda$ & $x_i$, $i = 1, 2, \ldots, N$ are i.i.d. with p.g.f. $P(s)$. Find the p.g.f. of $S_N = x_1 + x_2 + \cdots + x_N$.
+
+### Soln
+
+p.g.f. of $S_N$ is
+
+$$H(s) = G\left[P(s)\right]$$
+
+But p.g.f. of a poisson r.v. with mean $\lambda$ is given by;
+
+$$G(s) = e^{-\lambda(1-s)}$$
+
+$$\therefore \quad H(s) = e^{-\lambda\left(1 - P(s)\right)}$$
+
+The mean is given by;
+
+$$E(S_N) = E(x_i)\, E(N) = \lambda E(x)$$
+
+# 7. Tailed or Cumulative Probabilities
+
+## i) Upper tail
+
+Let $X$ have a p.d.f. $\Pr\{X = k\} = p_k$, $k = 0, 1, 2, \ldots$ with p.g.f.
+
+$$P(s) = \sum_{k=0}^{\infty} p_k s^k,$$
+
+and
+
+$$q_k = \Pr\{X > k\} = p_{k+1} + p_{k+2} + \cdots, \qquad k = 0, 1, 2, \ldots$$
+
+with generating funct.
+
+$$\phi(s) = \sum_{k=0}^{\infty} q_k s^k \qquad \left( \sum_k q_k = 1 \right)$$
+
+$$\therefore \quad \phi(s) = \sum_{k=0}^{\infty} q_k s^k$$
+
+$$= q_0 + q_1 s + q_2 s^2 + q_3 s^3 + \cdots$$
+
+$$= (p_1 + p_2 + p_3 + \cdots) + (p_2 + p_3 + p_4 + \cdots) s + (p_3 + p_4 + p_5 + \cdots) s^2 + (p_4 + p_5 + p_6 + \cdots) s^3 + \cdots$$
+
+*— p. 11 —*
+
+$$= p_1 + p_2(1+s) + p_3\left(1 + s + s^2\right) + p_4\left(1 + s + s^2 + s^3\right) + \cdots$$
+
+$$= p_1 + p_2(1+s) + p_3 \frac{\left(1 - s^3\right)}{(1-s)} + p_4 \frac{\left(1 - s^4\right)}{(1-s)} + \cdots$$
+
+$$= \frac{p_1(1-s) + p_2\left(1 - s^2\right) + p_3\left(1 - s^3\right) + p_4\left(1 - s^4\right) + \cdots}{(1-s)}$$
+
+$$= \frac{(p_1 + p_2 + p_3 + p_4 + \cdots) - \left(p_1 s + p_2 s^2 + p_3 s^3 + p_4 s^4 + \cdots\right)}{(1-s)}$$
+
+$$= \frac{(p_0 + p_1 + p_2 + p_3 + p_4 + \cdots) - \left(p_0 + p_1 s + p_2 s^2 + p_3 s^3 + p_4 s^4 + \cdots\right)}{(1-s)}$$
+
+$$\therefore \quad \phi(s) = \frac{1 - P(s)}{1 - s}, \qquad -1 < s < 1$$
+
+### Alt. mtd.
+
+$$q_k = p_{k+1} + p_{k+2} + p_{k+3} + \cdots$$
+
+$$q_{k-1} = p_k + p_{k+1} + p_{k+2} + p_{k+3} + \cdots$$
+
+$$p_k = q_{k-1} - q_k, \qquad k \ge 1$$
+
+Defining $P(s) = \sum_{k=0}^{\infty} p_k s^k$ & $\phi(s) = \sum_{k=0}^{\infty} q_k s^k$
+
+$$\Rightarrow \quad \sum_{k=1}^{\infty} p_k s^k = \sum_{k=1}^{\infty} q_{k-1} s^k - \sum_{k=1}^{\infty} q_k s^k$$
+
+$$P(s) - p_0 = s \sum_{k=1}^{\infty} q_{k-1} s^{k-1} - \left[\phi(s) - q_0\right]$$
+
+$$P(s) - p_0 = s\, \phi(s) - \phi(s) + q_0 \qquad\qquad q_0 = p_1 + p_2 + p_3 + \cdots$$
+
+$$P(s) - (p_0 + q_0) = \phi(s)(s - 1)$$
+
+$$\phi(s)(1 - s) = (p_0 + q_0) - P(s)$$
+
+$$\phi(s)(1 - s) = 1 - P(s) \qquad \text{since } p_0 + q_0 = 1$$
+
+$$\therefore \quad \phi(s) = \frac{1 - P(s)}{1 - s}, \qquad -1 < s < 1$$
+
+*— p. 12 —*
+
+## 2) Lower tail
+
+Let $q_k = \Pr\{X \le k\}$, $k = 0, 1, 2, \ldots$ & $p_k = \Pr\{X = k\}$, $k = 0, 1, 2, \ldots$
+
+Defining $P(s) = \sum_{k=0}^{\infty} p_k s^k$ & $\phi(s) = \sum_{k=0}^{\infty} q_k s^k$
+
+$$\therefore \quad q_k = p_k + p_{k-1} + p_{k-2} + \cdots + p_1 + p_0$$
+
+$$q_{k-1} = p_{k-1} + p_{k-2} + \cdots + p_1 + p_0$$
+
+$$\therefore \quad q_k - q_{k-1} = p_k, \qquad k \ge 1 \qquad \Rightarrow (1)$$
+
+Multiplying both sides of the eqn (1) above by $s^k$ & summing over $k$ we obtain;
+
+$$\sum_{k=1}^{\infty} q_k s^k - \sum_{k=1}^{\infty} q_{k-1} s^k = \sum_{k=1}^{\infty} p_k s^k$$
+
+$$\therefore \quad \phi(s) - q_0 - s\, \phi(s) = P(s) - p_0$$
+
+$$\phi(s)(1 - s) = P(s) - p_0 + q_0$$
+
+$$\phi(s)(1 - s) = P(s) \qquad \text{since } p_0 = q_0$$
+
+$$\therefore \quad \phi(s) = \frac{P(s)}{1 - s}, \qquad -1 < s < 1$$
+
+*— p. 13 —*
+
+# 8. Bivariate Probability Generating Functions
+
+Suppose $X$ & $Y$ are integral valued r.v.'s with joint prob. dist.
+
+$$\Pr\{X = j, Y = k\} = p_{jk}, \qquad j = 0, 1, 2, \ldots; \quad k = 0, 1, 2, \ldots$$
+
+and;
+
+$$\sum_j \sum_k p_{jk} = 1$$
+
+Then the joint p.g.f. of $X$ & $Y$ is given by;
+
+$$P(s_1, s_2) = \sum_{j=0}^{\infty} \sum_{k=0}^{\infty} p_{jk}\, s_1^{\,j} s_2^{\,k} \qquad \text{assuming convergence}$$
+
+for the values of $s_1$ & $s_2$ i.e. $|s_1| < 1$, $|s_2| < 1$.
+
+$$P(s_1, s_2) = E\left(s_1^{\,X} s_2^{\,Y}\right) \quad \Rightarrow (1)$$
+
+If $s_1 = s_2 = s$, then $(1)$ becomes;
+
+$$P(s, s) = E\left(s^X s^Y\right) = E\left(s^{X+Y}\right)$$
+
+if $X$ & $Y$ are mutually indep. r.v.'s then $P(s_1, s_2)$ becomes;
+
+$$P(s_1, s_2) = E\left(s_1^{\,X}\right) E\left(s_2^{\,Y}\right)$$
+
+If $X$ & $Y$ are i.i.d., with a common p.g.f. $G(s)$, then we have
+
+$$P(s_1, s_2) = E\left(s_1^{\,X}\right) E\left(s_2^{\,Y}\right) = G(s_1) \cdot G(s_2) = \left[G(s)\right]^2$$
+
+## P.g.f.'s of Marginal Distributions
+
+Let $X$ & $Y$ be 2 r.v.'s, then;
+
+$$P(s_1, s_2) = E\left(s_1^{\,X} s_2^{\,Y}\right) \quad \rightarrow \text{joint p.g.f.}$$
+
+The p.g.f. of $X$ is given by;
+
+$$P(s_1, 1) = E\left(s_1^{\,X}\right)$$
+
+Similarly, p.g.f. of $Y$ is given by;
+
+$$P(1, s_2) = E\left(s_2^{\,Y}\right)$$
+
+*— p. 14 —*
+
+# 9. Calculations of Means, Variances & Co-variances of Bivariate Prob. Dist. Functions using the Joint p.g.f.
+
+$$P(s_1, s_2) \quad \rightarrow \quad \text{joint p.g.f. } (x \text{ \& } y)$$
+
+$$P(s_1, 1) = P(s_1) \quad \text{---} \quad \text{p.g.f. of } x$$
+
+$$P(1, s_2) = P(s_2) \quad \text{---} \quad \text{p.g.f. of } y$$
+
+$$\therefore \quad E(x) = P'(s_1)\big|_{s_1 = 1} = \left. \frac{\partial P(s_1, 1)}{\partial s_1} \right|_{s_1 = 1}$$
+
+$$E(Y) = P'(s_2)\big|_{s_2 = 1} = \left. \frac{\partial P(1, s_2)}{\partial s_2} \right|_{s_2 = 1}$$
+
+The second moment is:
+
+$$E\left[X(X-1)\right] = \left. \frac{\partial^2 P(s_1, 1)}{\partial s_1^{\,2}} \right|_{s_1 = 1}$$
+
+and
+
+$$E\left[Y(Y-1)\right] = \left. \frac{\partial^2 P(1, s_2)}{\partial s_2^{\,2}} \right|_{s_2 = 1}$$
+
+$$\sigma_x^2 = E\left[X(X-1)\right] + E(x)^2 - \left[E(x)\right]^2$$
+
+$$\sigma_y^2 = E\left[Y(Y-1)\right] + E(Y) - \left[E(Y)\right]^2$$
+
+$$\operatorname{cov}(x, y) = \sigma_{xy} = E(xy) - E(x)E(y)$$
+
+but;
+
+$$E(xy) = \left. \frac{\partial^2 P(s_1, s_2)}{\partial s_1 \partial s_2} \right|_{s_1 = s_2 = 1}$$
+
+## Exp
+
+Consider a series of Bernoulli trials with prob. of success $p$. Suppose that $X$ denotes the no. of failures preceeding the 1st success & $Y$ the no. of failures following 1st success & preceeding 2nd success. Then the joint prob. distribution of $X$ & $Y$ is given by;
+
+$$p_{jk} = \Pr\{X = j, Y = k\} = q^{j+k} p^2; \qquad j, k = 0, 1, 2; \qquad p + q = 1$$
+
+*— p. 15 —*
+
+### Soln
+
+The joint p.g.f. is
+
+$$P(s_1, s_2) = \sum_{j=0}^{\infty} \sum_{k=0}^{\infty} p_{jk}\, s_1^{\,j} s_2^{\,k}$$
+
+$$= \sum_{j=0}^{\infty} \sum_{k=0}^{\infty} q^{j+k} p^2\, s_1^{\,j} s_2^{\,k}$$
+
+$$= p^2 \sum_{j=0}^{\infty} (qs_1)^j \sum_{k=0}^{\infty} (qs_2)^k$$
+
+$$= p^2 \left[ \left(1 + qs_1 + (qs_1)^2 + \cdots\right) \left(1 + qs_2 + (qs_2)^2 + \cdots\right) \right]$$
+
+$$P(s_1, s_2) = p^2 \left( \frac{1}{1 - qs_1} \right) \left( \frac{1}{1 - qs_2} \right) = \frac{p^2}{(1 - qs_1)(1 - qs_2)}$$
+
+$$P(s_1) = P(s_1, 1) = \frac{p^2}{(1 - qs_1)(1 - q)} = \frac{p}{1 - qs_1}, \qquad \text{since } q + p = 1$$
+
+$$\therefore \quad P'(s_1) = \frac{pq}{(1 - qs_1)^2}$$
+
+$$\therefore \quad E(x) = P'(1) = \frac{pq}{(1 - q)^2} = \frac{pq}{p^2} = \frac{q}{p}$$
+
+$$P''(s_1) = \frac{2pq^2}{(1 - qs_1)^3}$$
+
+$$P''(1) = \frac{2pq^2}{(1 - q)^3} = \frac{2pq^2}{p^3} = \frac{2q^2}{p^2}$$
+
+$$\therefore \quad \operatorname{Var}(x) = P''(1) + P'(1) - \left[P'(1)\right]^2$$
+
+$$= \frac{2q^2}{p^2} + \frac{q}{p} - \frac{q^2}{p^2} = \frac{q^2}{p^2} + \frac{q}{p}$$
+
+$$= \frac{q^2 + pq}{p^2} = \frac{q(q+p)}{p^2} = \frac{q}{p^2} \qquad \text{since } q + p = 1$$
+
+Similarly;
+
+$$E(y) = \frac{q}{p} \qquad \& \qquad \operatorname{Var}(y) = \frac{q}{p^2}$$
+
+$$\frac{\partial P(s_1, s_2)}{\partial s_1} = \frac{p^2 q}{(1 - qs_1)^2 (1 - qs_2)}$$
+
+$$\therefore \quad \frac{\partial^2 P(s_1, s_2)}{\partial s_1 \partial s_2} = \frac{p^2 q^2}{(1 - qs_1)^2 (1 - qs_2)^2}$$
+
+# Appendix A. Notes on the Original
+
+*The following are minor notational slips in the handwritten original. They have been transcribed above exactly as written; the corrected forms are given here for study purposes.*
+
+1. **p. 6 (Geometric distribution, variance).** The original writes
+   $\operatorname{Var}(x) = P''(1) + P'(1) + \left[P'(1)\right]^2$; the sign of the last term should be
+   minus: $\operatorname{Var}(x) = P''(1) + P'(1) - \left[P'(1)\right]^2$. The subsequent line,
+   $= \frac{2q^2}{p^2} + \frac{q}{p} - \frac{q^2}{p^2}$, is handled correctly and the final answer
+   $\operatorname{Var}(x) = q/p^2$ is right.
+
+2. **p. 14 (Bivariate variances).** The original writes
+   $\sigma_x^2 = E[X(X-1)] + E(x)^2 - \left[E(x)\right]^2$; the first moment term should be
+   $E(x)$, i.e. $\sigma_x^2 = E[X(X-1)] + E(x) - \left[E(x)\right]^2$. (Compare p. 5, where
+   $E(x^2) = E\{x(x-1)\} + Ex$ is used correctly.) The companion formula for $\sigma_y^2$ is
+   written correctly.
+
+3. **p. 8, item (i).** This is the continuation of the Poisson p.g.f. started on p. 7, item (ii)
+   of "Remarks"; the notes read out $p_k$ as the coefficient of $s^k$ in
+   $P(s) = e^{-\lambda(1-s)}$, giving the Poisson probabilities $p_k = e^{-\lambda}\lambda^k/k!$.
+
+4. **p. 14, example.** The original gives $j, k = 0, 1, 2, \ldots$ (the "$\ldots$" is implied by the
+   geometric-type structure); strictly, $X$ and $Y$ range over all non-negative integers.
+
+# Appendix B. Page Index (source images)
+
+| Page | Source image | Content |
+|------|--------------|---------|
+| 1 | `bg1.png` | Definition of a stochastic process; two examples (random walk, telephone calls) |
+| 2 | `bg2.png` | Generating functions: definition, coefficient extraction by differentiation, Exp 1 |
+| 3 | `bg3.png` | Exp 2 ($1/k!$), Exp 3 ($\binom{n}{k}$), Exp 4 (recurrence relation, set-up) |
+| 4 | `bg4.png` | Completion of Exp 4; probability generating function; NB; mean & variance set-up |
+| 5 | `bg5.png` | Mean/variance from the p.g.f.; Bernoulli and Binomial distributions |
+| 6 | `bg6.png` | Binomial (contd.), Geometric distribution; Poisson (to be read) |
+| 7 | `bg7.png` | Remarks: mgf, integral of $P(s)$, p.g.f. of $Y = mx+n$, recovering $p_k$ |
+| 8 | `bg8.png` | Poisson p.g.f. expanded; sum of independent random variables (fixed number) |
+| 9 | `bg9.png` | i.i.d. case; sum of two Poisson variables; statement of the random-sum theorem |
+| 10 | `bga.png` | Compound (random-sum) p.g.f. $G[P(s)]$; mean; Poisson $N$; upper tail |
+| 11 | `bgb.png` | Upper tail continued (two methods) |
+| 12 | `bgc.png` | Lower tail |
+| 13 | `bgd.png` | Bivariate p.g.f.; independence; marginal p.g.f.'s |
+| 14 | `bge.png` | Means, variances, covariance from the joint p.g.f.; example set-up |
+| 15 | `bgf.png` | Example solved: joint p.g.f., marginals, $E(x)$, $\operatorname{Var}(x)$, cross-derivative |

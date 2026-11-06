@@ -57,6 +57,21 @@ _ADMINISTRATIVE_NOTE_PATTERN = re.compile(
     r"|\b(?:course materials|document)\s+(?:are|is|were|was)\s+associated\s+with\b"
     r"|\b(?:downloaded by|not sponsored or endorsed|contact details|e-?mail address|telephone number)\b",
 )
+_NOTE_SOURCE_META_PATTERN = re.compile(
+    r"(?i)\b(?:according\s+to|as\s+(?:stated|described|noted)\s+in)\s+(?:the\s+)?"
+    r"(?:approved\s+)?(?:source(?:\s+(?:document|notes?|material|excerpt))?|"
+    r"syllabus(?:\s+outline)?|course\s+(?:description|outline)|document\s+provided|uploaded\s+notes?)\b"
+    r"|\bthe\s+source\s+(?:says|states|notes|explains|lists|describes)\b"
+)
+_NOTE_SYLLABUS_DUMP_PATTERN = re.compile(
+    r"(?i)\b(?:the\s+)?(?:course|module)\s+(?:outline|syllabus)\s+"
+    r"(?:lists|names|includes|covers|states)\b"
+    r"|\b(?:course|module)\s+(?:outline|description|learning\s+outcomes?)\s*[:\-]"
+)
+_LEVEL_ONE_ANALOGY_PATTERN = re.compile(
+    r"(?i)\b(?:imagine|think\s+of|picture|everyday\s+(?:example|situation)|"
+    r"for\s+example|for\s+instance|similar\s+to|just\s+like|like\s+a)\b"
+)
 _ADMIN_COVER_SIGNAL_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in (
     r"\blecturer\b",
     r"\binstructor\b|\bcourse coordinator\b",
@@ -172,9 +187,146 @@ def _merge_usage(*usage_items) -> dict:
     return merged
 
 
+def _deterministic_fallback_profile(course_obj) -> dict:
+    """Synthesize a robust fallback study profile when LLM profiling is missing or unconfigured."""
+    if not course_obj:
+        return {}
+    category = str(getattr(course_obj, "category", "") or "").strip().lower()
+    code = str(getattr(course_obj, "code", "") or "").strip().upper()
+    title = str(getattr(course_obj, "title", "") or "").strip().lower()
+
+    if (
+        category == "computing"
+        or any(code.startswith(pfx) for pfx in ("SCS", "COM", "BIT", "CSC", "CIT", "ICT", "CSE", "IS"))
+        or any(w in title for w in ("computer", "programming", "software", "internet", "web", "database", "network", "data structures", "algorithm"))
+    ):
+        return {
+            "subject_family": "computing",
+            "category": "Computing",
+            "capabilities": {"code": True, "math_notation": False, "chemical_equations": False},
+            "note_structure": [
+                "Concept and Use Case",
+                "Data, Syntax, and Core Concepts",
+                "Methods and Operations",
+                "Worked Implementation from the Notes",
+                "Testing, Interpretation, and Common Errors",
+            ],
+            "fallback_generated": True,
+        }
+    elif (
+        category in {"humanities", "arts"}
+        or any(code.startswith(pfx) for pfx in ("HIS", "LIT", "PHI", "REL", "ENG", "VTF", "MUS"))
+        or any(w in title for w in ("theatre", "drama", "literature", "history", "philosophy", "music", "film"))
+    ):
+        return {
+            "subject_family": "humanities",
+            "category": "Humanities",
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            "note_structure": [
+                "Historical and Contextual Background",
+                "Core Themes and Conceptual Arguments",
+                "Textual, Visual, or Case Evidence",
+                "Critical Interpretations and Debates",
+                "Contemporary Significance and Synthesis",
+            ],
+            "fallback_generated": True,
+        }
+    elif (
+        category in {"social sciences", "social science"}
+        or any(code.startswith(pfx) for pfx in ("SOC", "PSY", "POL", "GEO", "ANT"))
+    ):
+        return {
+            "subject_family": "social_science",
+            "category": "Social Sciences",
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            "note_structure": [
+                "Theoretical Framework and Historical Context",
+                "Core Concepts, Hypotheses, and Models",
+                "Empirical Evidence, Case Studies, and Methodologies",
+                "Critical Perspectives, Debates, and Policy Implications",
+                "Contemporary Applications and Research Synthesis",
+            ],
+            "fallback_generated": True,
+        }
+    elif (
+        category in {"business & economics", "business", "economics"}
+        or any(code.startswith(pfx) for pfx in ("BBA", "ECO", "ACC", "FIN", "MKT", "HRM", "BMS"))
+    ):
+        return {
+            "subject_family": "business_economics",
+            "category": "Business & Economics",
+            "capabilities": {"code": False, "math_notation": False, "chemical_equations": False},
+            "note_structure": [
+                "Strategic Context and Economic Principles",
+                "Core Analytical Models and Frameworks",
+                "Empirical Applications and Quantitative Tools",
+                "Managerial and Policy Implications",
+                "Contemporary Industry Cases and Future Directions",
+            ],
+            "fallback_generated": True,
+        }
+    elif (
+        category == "chemistry"
+        or any(code.startswith(pfx) for pfx in ("SCH", "CHE", "BCH"))
+        or "chemistry" in title
+    ):
+        return {
+            "subject_family": "chemical_sciences",
+            "category": "Chemistry",
+            "capabilities": {"code": False, "math_notation": True, "chemical_equations": True},
+            "note_structure": [
+                "Chemical Context, Systems, and Definitions",
+                "Reaction Mechanisms, Energetics, and Kinetics",
+                "Experimental Procedures, Reagents, and Conditions",
+                "Worked Quantitative and Mechanistic Examples",
+                "Industrial, Environmental, and Safety Considerations",
+            ],
+            "fallback_generated": True,
+        }
+    elif (
+        category in {"mathematics", "statistics"}
+        or any(code.startswith(pfx) for pfx in ("SMA", "MAT", "SST", "STA"))
+        or any(w in title for w in ("calculus", "algebra", "probability", "statistics", "differential", "topology", "estimation"))
+    ):
+        return {
+            "subject_family": "mathematical_sciences",
+            "category": getattr(course_obj, "category", "") or "Mathematics",
+            "capabilities": {"code": False, "math_notation": True, "chemical_equations": False},
+            "note_structure": [
+                "Foundational Concepts, Definitions, and Axioms",
+                "Theorems, Lemmas, and Analytical Properties",
+                "Formal Proofs, Derivations, and Methods",
+                "Representative Worked Examples and Solutions",
+                "Mathematical Extensions, Limits, and Common Errors",
+            ],
+            "fallback_generated": True,
+        }
+    elif (
+        category == "physics"
+        or any(code.startswith(pfx) for pfx in ("SPH", "PHY"))
+        or "physics" in title
+    ):
+        return {
+            "subject_family": "physical_sciences",
+            "category": "Physics",
+            "capabilities": {"code": False, "math_notation": True, "chemical_equations": False},
+            "note_structure": [
+                "Physical Phenomenon and Core Principles",
+                "Mathematical Formulations and Governing Laws",
+                "Experimental Verification and Applications",
+                "Worked Derivations and Model Problems",
+                "Physical Limits, Approximations, and Error Sources",
+            ],
+            "fallback_generated": True,
+        }
+    return {}
+
+
 def _course_study_profile(course_obj) -> dict:
     profile = getattr(course_obj, "study_profile", None)
-    return profile if isinstance(profile, dict) and profile.get("subject_family") else {}
+    if isinstance(profile, dict) and profile.get("subject_family"):
+        return profile
+    return _deterministic_fallback_profile(course_obj)
 
 
 def _course_study_profile_version(course_obj) -> int:
@@ -191,8 +343,102 @@ def _topic_content_rules_version(topic_obj) -> int:
     return int(getattr(topic_obj, "content_rules_version", 0) or 0)
 
 
-def _required_note_sections(topic_title: str, study_profile: dict | None = None) -> list[str]:
-    """Return the section headings a generated topic note must contain."""
+_VALID_NOTE_LEVELS = {"level_1", "level_2", "level_3"}
+_DEFAULT_NOTE_SECTION_BLUEPRINTS = {
+    "level_1": [
+        "Core Intuition & Everyday Analogy",
+        "Foundational Concept & Mental Model",
+        "Step-by-Step Explanation in Plain English",
+        "Gentle Worked Example",
+        "Beginner Misconceptions & Key Takeaways",
+    ],
+    "level_2": [
+        "Conceptual Overview & Motivation",
+        "Core Concepts, Definitions & Assumptions",
+        "Methods, Derivations & Interpretation",
+        "Worked Applications",
+        "Summary, Limitations & Common Errors",
+    ],
+    "level_3": [
+        "Exam Scope & High-Yield Focus",
+        "Core Results, Methods & Key Notation",
+        "Exam Question Patterns & Common Traps",
+        "Worked Exam Exemplar & Model Solution",
+        "Marking Priorities, Time Strategy & Revision Checklist",
+    ],
+}
+_DEFAULT_OVERVIEW_SECTION_BLUEPRINTS = {
+    "level_1": [
+        "Everyday Starting Point & Course Purpose",
+        "Main Ideas in Plain Language",
+        "How the Topics Connect",
+        "Gentle Study Path & Key Questions",
+    ],
+    "level_2": [
+        "Overview Purpose & Scope",
+        "Learning Goals and Core Concepts",
+        "Topic Sequence and Connections",
+        "Assessment and Revision Map",
+    ],
+    "level_3": [
+        "Exam Scope and Assessed Outcomes",
+        "High-Yield Concepts and Dependencies",
+        "Question Patterns and Coverage Risks",
+        "Revision Priorities and Exam Checklist",
+    ],
+}
+_LEGACY_DEFAULT_SECTION_TITLES = [
+    "Core Concept Overview & Intuition",
+    "Mathematical Formalization & Core Definitions",
+    "Key Theorems & Essential Results",
+    "Worked Exemplar Problem with Step-by-Step Solution",
+    "High-Yield Exam Takeaways & Common Pitfalls",
+]
+
+
+def _note_section_titles(topic_title: str, study_profile: dict | None, level: str) -> list[str]:
+    """Resolve tutor-approved custom headings or the default level blueprint."""
+    if study_profile:
+        level_structures = study_profile.get("note_structure_by_level")
+        sections = level_structures.get(level) if isinstance(level_structures, dict) else None
+        if not isinstance(sections, list) or not sections:
+            sections = study_profile.get("note_structure")
+        if isinstance(sections, list) and sections:
+            return [str(title).strip() for title in sections if str(title).strip()]
+
+    topic_lower = (topic_title or "").lower()
+    is_overview = any(
+        word in topic_lower
+        for word in ("overview", "introduction", "intro", "outline", "syllabus", "orientation", "prerequisite")
+    )
+    blueprints = _DEFAULT_OVERVIEW_SECTION_BLUEPRINTS if is_overview else _DEFAULT_NOTE_SECTION_BLUEPRINTS
+    return list(blueprints.get(level, _DEFAULT_NOTE_SECTION_BLUEPRINTS["level_2"]))
+
+
+def _section_heading_pattern(
+    index: int,
+    title: str,
+    *,
+    allow_legacy_default: bool = False,
+) -> re.Pattern:
+    """Match a current heading and, for legacy unprofiled notes, its old default."""
+    titles = [title]
+    if allow_legacy_default and 1 <= index <= len(_LEGACY_DEFAULT_SECTION_TITLES):
+        titles.append(_LEGACY_DEFAULT_SECTION_TITLES[index - 1])
+    alternatives = "|".join(re.escape(candidate) for candidate in dict.fromkeys(titles))
+    return re.compile(rf"(?m)^\s*##\s+{index}\.\s+(?:{alternatives})(?:\s|$)")
+
+
+def _required_note_sections(
+    topic_title: str,
+    study_profile: dict | None = None,
+    level: str | None = None,
+) -> list[str]:
+    """Return required headings, exact when a note level is known."""
+    if level in _VALID_NOTE_LEVELS:
+        titles = _note_section_titles(topic_title, study_profile, level)
+        return [f"## {index}. {title}" for index, title in enumerate(titles, start=1)]
+
     if study_profile and isinstance(study_profile.get("note_structure"), list):
         section_count = len(study_profile["note_structure"])
         if section_count:
@@ -224,11 +470,12 @@ def _note_allows_code(course_obj, topic_title: str, summary: str = "", subtopics
     explicit_code_terms = (
         "programming", "software", "python", "r language", "r programming", "data frame",
         "source code", "computer algorithm", "coding", "syntax", "plotting",
+        "html", "css", "javascript", "web", "tag", "tags", "markup", "dom", "element", "elements",
+        "script", "scripts", "bash", "shell", "sql", "query", "database", "api", "endpoint",
+        "server", "http", "https", "url", "protocol", "protocols", "json", "xml", "container",
     )
     family = str(profile.get("subject_family") or "").lower()
-    return any(term in scope for term in explicit_code_terms) or (
-        family == "computing" and bool(re.search(r"\br\b", scope))
-    )
+    return any(term in scope for term in explicit_code_terms) or family == "computing"
 
 
 def _note_allows_math(course_obj) -> bool | None:
@@ -332,12 +579,15 @@ def _note_modalities(content: str) -> set[str]:
     ):
         detected.add("equations")
 
-    chemical_species = r"(?:[A-Z][a-z]?\d*(?:\([aqslg]+\))?)"
-    if re.search(
-        rf"{chemical_species}(?:\s*\+\s*{chemical_species})*\s*(?:<=>|⇌|↔|->|→)\s*{chemical_species}",
-        source,
-    ):
+    if r"\ce{" in source:
         detected.add("chemical_equations")
+    else:
+        chem_formula = r"\b[A-Z][a-z]?(?:\d+|(?:\([aqslg]+\)))\b"
+        if re.search(
+            rf"{chem_formula}(?:\s*\+\s*{chem_formula})*\s*(?:<=>|⇌|↔|->|→)\s*{chem_formula}",
+            source,
+        ):
+            detected.add("chemical_equations")
 
     lines = content.splitlines()
     for header, separator in zip(lines, lines[1:]):
@@ -372,10 +622,10 @@ def _note_modalities(content: str) -> set[str]:
 
 def _note_code_language_issues(content: str) -> list[str]:
     allowed_languages = {
-        "bash", "c", "c++", "c#", "csharp", "cpp", "css", "go", "html", "java",
-        "javascript", "js", "json", "julia", "kotlin", "lua", "markdown", "mermaid",
-        "php", "powershell", "ps1", "python", "py", "r", "rscript", "ruby", "rust",
-        "scala", "shell", "sql", "swift", "text", "typescript", "ts", "xml", "yaml", "yml",
+        "apache", "bash", "c", "c++", "c#", "conf", "csharp", "cpp", "css", "go", "html", "http", "ini", "java",
+        "javascript", "js", "json", "julia", "kotlin", "lua", "markdown", "mermaid", "nginx",
+        "php", "plaintext", "powershell", "ps1", "python", "py", "r", "rscript", "ruby", "rust",
+        "scala", "sh", "shell", "sql", "swift", "text", "typescript", "ts", "xml", "yaml", "yml",
     }
     issues = []
     for index, match in enumerate(re.finditer(r"```([^\n`]*)\n[\s\S]*?```", content), start=1):
@@ -1582,18 +1832,20 @@ def _note_format_issues(content: str) -> list[str]:
         issues.append("unclosed fenced code block")
     if re.search(r"\[\[VISUAL:[^\]]*\]\]", content):
         issues.append("visual marker does not resolve to an approved source crop")
-    if re.search(r"<\s*(?:img|picture|source|svg|iframe|object|embed)\b", content, re.IGNORECASE):
-        issues.append("raw HTML visual markup is not allowed; use an approved visual marker")
     if re.search(r"```mermaid\b|\\begin\{tikzpicture\}|\\begin\{axis\}", content, re.IGNORECASE):
         issues.append("generated diagram markup is not supported without an approved source crop")
     structural_source = re.sub(r"```[\s\S]*?```", "", content)
+    if re.search(r"<\s*(?:img|picture|source|svg|iframe|object|embed)\b", structural_source, re.IGNORECASE):
+        issues.append("raw HTML visual markup is not allowed; use an approved visual marker")
+    non_math_source = re.sub(r"\$\$[\s\S]*?\$\$", "", structural_source)
+    non_math_source = re.sub(r"(?<!\\)\$(?:\\.|[^$])*?(?<!\\)\$", "", non_math_source)
     if structural_source.count("$$") % 2:
         issues.append("unclosed display-math block")
     if "\ufffd" in structural_source:
         issues.append("corrupted encoding replacement character present")
     if re.search(r"\\begin\{(?:verbatim|lstlisting|tabular|table|enumerate|itemize)\}", structural_source):
         issues.append("unconverted LaTeX document environment in markdown source")
-    if re.search(r"\\(?:texttt|textbf|textit|emph|section\*?|subsection\*?)\s*\{", structural_source):
+    if re.search(r"\\(?:texttt|textbf|textit|emph|section\*?|subsection\*?)\s*\{", non_math_source):
         issues.append("unconverted LaTeX text styling command in markdown source")
     issues.extend(_display_math_issues(content))
     issues.extend(_latex_syntax_issues(content))
@@ -1839,7 +2091,12 @@ def _regenerate_invalid_note_sections(
     """Regenerate only the contiguous invalid/missing section range."""
     from prep.models import PrepContentCache, PrepNoteRepair
 
-    required_numbers = [int(heading.split()[1].rstrip(".")) for heading in _required_note_sections(topic_obj.title)]
+    required_headings = _required_note_sections(
+        topic_obj.title,
+        _course_study_profile(topic_obj.course),
+        level,
+    )
+    required_numbers = [int(heading.split()[1].rstrip(".")) for heading in required_headings]
     headings = list(re.finditer(r"(?m)^\s*##\s+(\d+)\.[^\n]*", content))
     section_issues = {}
     existing_numbers = {int(heading.group(1)) for heading in headings}
@@ -1870,7 +2127,10 @@ def _regenerate_invalid_note_sections(
     )
     prefix = content[:first_match.start()] if first_match else content
     suffix = content[next_match.start():] if next_match else ""
-    requested_sections = ", ".join(f"## {number}." for number in range(first_number, last_number + 1))
+    requested_sections = "\n".join(
+        heading for heading in required_headings
+        if first_number <= int(heading.split()[1].rstrip(".")) <= last_number
+    )
     validation_options = _note_validation_options(
         topic_obj.course,
         topic_obj.title,
@@ -1970,6 +2230,7 @@ def _regenerate_invalid_note_sections(
         candidate_issues = _note_completion_issues(
             candidate,
             topic_obj.title,
+            level=level,
             **validation_options,
         )
         review = None
@@ -2182,6 +2443,8 @@ def _note_completion_issues(
     content: str,
     topic_title: str,
     *,
+    level: str | None = None,
+    allow_validated_legacy_headings: bool = False,
     allow_code: bool | None = None,
     allow_math: bool | None = None,
     allow_chemical_equations: bool | None = None,
@@ -2196,14 +2459,60 @@ def _note_completion_issues(
 
     issues: list[str] = []
     issues.extend(f"approved content rules are invalid: {issue}" for issue in (content_rule_issues or []))
+    has_custom_structure = bool(
+        study_profile
+        and (
+            isinstance(study_profile.get("note_structure"), list)
+            or isinstance(study_profile.get("note_structure_by_level"), dict)
+        )
+    )
+    legacy_heading_compatibility = False
+    if level in _VALID_NOTE_LEVELS and not has_custom_structure:
+        legacy_heading_compatibility = all(
+            _section_heading_pattern(index, title, allow_legacy_default=True).search(content)
+            for index, title in enumerate(_note_section_titles(topic_title, study_profile or {}, level), start=1)
+        )
+    if not legacy_heading_compatibility:
+        if _NOTE_SOURCE_META_PATTERN.search(content):
+            issues.append("notes contain source-document meta-language instead of direct teaching")
+        if _NOTE_SYLLABUS_DUMP_PATTERN.search(content):
+            issues.append("notes contain a course-outline or syllabus dump")
+        if level == "level_1":
+            first_math = re.search(
+                r"\$\$|(?<!\$)\$[^$\n]+\$(?!\$)|\\(?:frac|sqrt|sum|prod|int|lim)\b",
+                content,
+            )
+            pre_math = content[:first_math.start()] if first_math else content
+            if first_math and not _LEVEL_ONE_ANALOGY_PATTERN.search(pre_math):
+                issues.append("level_1 notes introduce mathematical notation before an everyday analogy")
     family = str((study_profile or {}).get("subject_family") or "").strip().lower()
     if family in {"social_science", "humanities", "business_economics", "general_science"}:
         if _nontechnical_solution_has_proof_scaffold(content):
             issues.append("mathematical proof scaffold is not allowed for this subject family")
 
-    for heading in _required_note_sections(topic_title, study_profile):
-        if not re.search(rf"(?m)^\s*{re.escape(heading)}(?:\s|$)", content):
-            issues.append(f"missing section {heading}")
+    required_titles = _note_section_titles(topic_title, study_profile or {}, level) if level in _VALID_NOTE_LEVELS else []
+    custom_structure = bool(
+        study_profile
+        and (
+            isinstance(study_profile.get("note_structure"), list)
+            or isinstance(study_profile.get("note_structure_by_level"), dict)
+        )
+    )
+    if level in _VALID_NOTE_LEVELS:
+        for index, title in enumerate(required_titles, start=1):
+            pattern = _section_heading_pattern(
+                index,
+                title,
+                allow_legacy_default=not custom_structure,
+            )
+            if not pattern.search(content):
+                issues.append(f"missing section ## {index}. {title}")
+    else:
+        for heading in _required_note_sections(topic_title, study_profile):
+            if not re.search(rf"(?m)^\s*{re.escape(heading)}(?:\s|$)", content):
+                issues.append(f"missing section {heading}")
+    if allow_validated_legacy_headings and not has_custom_structure:
+        issues = [issue for issue in issues if not issue.startswith("missing section ##")]
 
     # A heading alone is not enough: a truncated response can contain the
     # final heading while missing its actual teaching content.
@@ -2491,6 +2800,67 @@ def _rewrite_embedded_visual_urls(content: str, source_references: list[dict] | 
     return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace, content)
 
 
+def _revalidate_topic_note_cache_entry(
+    entry,
+    payload: dict,
+    topic_obj,
+    source_signature: str,
+    *,
+    validation_options: dict,
+    persist: bool = True,
+) -> tuple[dict | None, list[str]]:
+    """Revalidate cached notes against current topic rules before refreshing metadata."""
+    topic_title = topic_obj.title
+    was_validated = bool(payload.get("validation_state"))
+    content = repair_json_escaped_latex_newlines(
+        str(payload.get("content") or payload.get("notes") or "")
+    ).strip()
+    original_content = content
+    source_references = validation_options["source_references"]
+    if not was_validated:
+        manifest = _approved_visual_manifest(source_references)
+        content = _insert_required_visual_markers(content, manifest)
+        content = _resolve_approved_visual_markers(content, source_references)
+        content = _dedupe_approved_visual_images(content, source_references)
+        content = _normalize_approved_visual_captions(content, source_references).strip()
+    else:
+        content = normalize_math_delimiters(content).strip()
+        content = _rewrite_embedded_visual_urls(content, source_references)
+
+    study_profile = validation_options.get("study_profile") or {}
+    has_custom_structure = bool(
+        isinstance(study_profile.get("note_structure"), list)
+        or isinstance(study_profile.get("note_structure_by_level"), dict)
+    )
+    issues = _note_completion_issues(
+        content,
+        topic_title,
+        level=str(payload.get("level") or "level_2"),
+        allow_validated_legacy_headings=was_validated and not has_custom_structure,
+        **validation_options,
+    )
+    if issues:
+        return None, issues
+
+    published_payload = dict(payload)
+    published_payload["content"] = content
+    published_payload["level"] = payload.get("level") or "level_2"
+    published_payload["validation_state"] = NOTE_VALIDATION_STATE
+    published_payload["validated_at"] = timezone.now().isoformat()
+    published_payload["source_references"] = source_references or []
+    published_payload["study_profile_version"] = _course_study_profile_version(topic_obj.course)
+    published_payload["topic_content_rules_version"] = _topic_content_rules_version(topic_obj)
+    published_payload["source_signature"] = source_signature
+    if content != original_content:
+        from services.prep_blocks import parse_markdown_to_blocks
+
+        published_payload["blocks"] = parse_markdown_to_blocks(content)
+    if persist:
+        entry.payload = published_payload
+        entry.save(update_fields=["payload", "updated_at"])
+    return published_payload, []
+
+
 def _publish_legacy_note_cache(
     entry,
     payload: dict,
@@ -2505,50 +2875,29 @@ def _publish_legacy_note_cache(
     source_references: list[dict] | None = None,
 ) -> dict | None:
     """Validate an unmarked legacy note once, then persist its publication state."""
-    content = repair_json_escaped_latex_newlines(
-        str(payload.get("content") or payload.get("notes") or "")
-    ).strip()
-    original_content = content
-    manifest = _approved_visual_manifest(source_references)
-    content = _insert_required_visual_markers(content, manifest)
-    content = _resolve_approved_visual_markers(content, source_references)
-    content = _dedupe_approved_visual_images(content, source_references)
-    content = _normalize_approved_visual_captions(content, source_references).strip()
-    if not content or _note_completion_issues(
-        content,
+    topic_obj = entry.topic
+    source_signature = _topic_notes_cache_signature(
+        topic_obj.course,
+        topic_obj,
         topic_title,
-        allow_code=allow_code,
-        allow_math=allow_math,
-        allow_chemical_equations=allow_chemical_equations,
-        study_profile=study_profile,
-        content_rules=content_rules,
-        content_rule_issues=content_rule_issues,
-        source_references=source_references,
-    ):
-        return None
-
-    published_payload = dict(payload)
-    published_payload["content"] = content
-    published_payload["level"] = payload.get("level") or "level_2"
-    published_payload["validation_state"] = NOTE_VALIDATION_STATE
-    published_payload["validated_at"] = timezone.now().isoformat()
-    published_payload["source_references"] = source_references or []
-    published_payload["study_profile_version"] = _course_study_profile_version(entry.topic.course) if entry.topic else 0
-    published_payload["topic_content_rules_version"] = _topic_content_rules_version(entry.topic) if entry.topic else 0
-    if content != original_content:
-        from services.prep_blocks import parse_markdown_to_blocks
-
-        published_payload["blocks"] = parse_markdown_to_blocks(content)
-    if entry.topic:
-        published_payload["source_signature"] = _topic_notes_cache_signature(
-            entry.topic.course,
-            entry.topic,
-            entry.topic.title,
-            entry.topic.subtopics,
-        )
-    entry.payload = published_payload
-    entry.save(update_fields=["payload", "updated_at"])
-    return published_payload
+        topic_obj.subtopics,
+    )
+    payload, _issues = _revalidate_topic_note_cache_entry(
+        entry,
+        payload,
+        topic_obj,
+        source_signature,
+        validation_options={
+            "allow_code": allow_code,
+            "allow_math": allow_math,
+            "allow_chemical_equations": allow_chemical_equations,
+            "study_profile": study_profile,
+            "content_rules": content_rules,
+            "content_rule_issues": content_rule_issues,
+            "source_references": source_references or [],
+        },
+    )
+    return payload
 
 
 def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) -> dict[str, str]:
@@ -2605,17 +2954,23 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
         )
         is_exact_signature = (payload_signature == source_signature) and matches_profile
 
-        if payload_validation_state:
-            if payload_validation_state != NOTE_VALIDATION_STATE and validated_only:
-                continue
-            if not is_exact_signature:
-                continue
-        elif validated_only:
+        if not payload_validation_state and validated_only:
             continue
 
-        if validated_only and payload.get("validation_state") != NOTE_VALIDATION_STATE:
-            continue
-        if payload.get("validation_state") != NOTE_VALIDATION_STATE:
+        if payload_validation_state and (
+            payload_validation_state != NOTE_VALIDATION_STATE or not is_exact_signature
+        ):
+            payload, _issues = _revalidate_topic_note_cache_entry(
+                entry,
+                payload,
+                topic_obj,
+                source_signature,
+                validation_options=validation_options,
+            )
+            if not payload:
+                continue
+            is_exact_signature = True
+        elif not payload_validation_state:
             payload = _publish_legacy_note_cache(
                 entry,
                 payload,
@@ -2624,6 +2979,8 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             )
         if not payload:
             continue
+        if validated_only and payload.get("validation_state") != NOTE_VALIDATION_STATE:
+            continue
         content = normalize_math_delimiters(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
@@ -2631,7 +2988,21 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
             continue
         content = _rewrite_embedded_visual_urls(content, validation_options["source_references"])
         if is_exact_signature:
-            content_issues = _note_completion_issues(content, topic_obj.title, **validation_options)
+            study_profile = validation_options.get("study_profile") or {}
+            has_custom_structure = bool(
+                isinstance(study_profile.get("note_structure"), list)
+                or isinstance(study_profile.get("note_structure_by_level"), dict)
+            )
+            content_issues = _note_completion_issues(
+                content,
+                topic_obj.title,
+                level=level,
+                allow_validated_legacy_headings=(
+                    payload.get("validation_state") == NOTE_VALIDATION_STATE
+                    and not has_custom_structure
+                ),
+                **validation_options,
+            )
             if content_issues:
                 continue
         if is_exact_signature:
@@ -2828,6 +3199,57 @@ def _clear_note_generation_guard(topic_obj, level: str, source_signature: str) -
     ).delete()
 
 
+def _backfill_validated_note_cache_metadata(
+    topic_obj,
+    level: str,
+    source_signature: str,
+    cache_key: str,
+    content: str,
+    validation_options: dict,
+) -> bool:
+    """Restore current metadata only for an exact, validated repair payload."""
+    if not topic_obj:
+        return False
+    from prep.models import PrepContentCache, PrepNoteRepair
+
+    repair = PrepNoteRepair.objects.filter(
+        topic=topic_obj,
+        level=level,
+        source_signature=source_signature,
+        status="validated",
+    ).first()
+    if (
+        not repair
+        or repair.validation_issues
+        or repair.current_content != content
+    ):
+        return False
+
+    entry = PrepContentCache.objects.filter(
+        cache_key=cache_key,
+        topic=topic_obj,
+        content_type="topic_notes",
+    ).first()
+    payload = _cache_payload_as_dict(entry.payload) if entry else None
+    if (
+        not payload
+        or payload.get("validation_state") != NOTE_VALIDATION_STATE
+        or str(payload.get("content") or payload.get("notes") or "").strip() != content
+    ):
+        return False
+
+    payload.update({
+        "level": level,
+        "source_signature": source_signature,
+        "study_profile_version": _course_study_profile_version(topic_obj.course),
+        "topic_content_rules_version": _topic_content_rules_version(topic_obj),
+        "source_references": validation_options["source_references"],
+    })
+    entry.payload = payload
+    entry.save(update_fields=["payload", "updated_at"])
+    return True
+
+
 def _mark_cached_note_valid(topic_obj, level: str, source_signature: str, content: str) -> None:
     if not topic_obj:
         return
@@ -2889,7 +3311,7 @@ def _latest_valid_shared_notes(topic_obj, level: str, topic_title: str, *, exclu
         content = repair_json_escaped_latex_newlines(
             str(payload.get("content") or payload.get("notes") or "")
         ).strip()
-        if not content or _note_completion_issues(content, topic_title, **validation_options):
+        if not content or _note_completion_issues(content, topic_title, level=level, **validation_options):
             continue
 
         entry.hit_count += 1
@@ -2989,6 +3411,7 @@ def _repair_invalid_note_cache(topic_obj, level, source_signature, cache_key, co
             candidate_issues = _note_completion_issues(
                 candidate,
                 topic_obj.title,
+                level=level,
                 **validation_options,
             )
             review = None
@@ -4462,7 +4885,7 @@ def get_or_generate_topic_notes(
         cached_content = repair_json_escaped_latex_newlines(
             str(cached.get("content", "") or "")
         )
-        cached_issues = _note_completion_issues(cached_content, topic_title, **validation_options)
+        cached_issues = _note_completion_issues(cached_content, topic_title, level=level, **validation_options)
         if cached.get("validation_state") == NOTE_VALIDATION_STATE and not cached_issues:
             if cached.get("review_status") == "skipped_no_source":
                 return {
@@ -4481,7 +4904,14 @@ def get_or_generate_topic_notes(
             from services.prep_sanitizer import purge_institutional_metadata, sanitize_data_structure
             cached_content = purge_institutional_metadata(cached_content)
             cached_blocks = sanitize_data_structure(cached.get("blocks")) if cached.get("blocks") else cached.get("blocks")
-            # Strict read-only: never mutate or overwrite a valid cache on read.
+            _backfill_validated_note_cache_metadata(
+                topic_obj,
+                level,
+                cache_signature,
+                cache_key,
+                cached_content,
+                validation_options,
+            )
             _mark_cached_note_valid(topic_obj, level, cache_signature, cached_content)
             return {
                 "notes": cached_content,
@@ -4617,7 +5047,7 @@ def get_or_generate_topic_notes(
             coverage_requirements.append("code examples where present in the approved notes")
         subtopic_coverage_block = (
             "MANDATORY EXHAUSTIVE SUBTOPIC & CALCULATION COVERAGE:\n"
-            "The course syllabus explicitly defines the following subtopics for this unit:\n"
+            "The approved topic scope defines the following subtopics for this unit:\n"
             f"{subtopic_items}\n"
             "- Cover EVERY listed subtopic using " + ", ".join(coverage_requirements) + ".\n"
             "- Thoroughly explain all calculation methods, formulas, shortcut/coding techniques, and mathematical derivations present in the approved coursework excerpt for these subtopics (e.g., standard definitions, assumed mean / shift of origin, coding / change of scale, geometric and harmonic means, grouped vs ungrouped data, and related variations).\n"
@@ -4647,8 +5077,9 @@ def get_or_generate_topic_notes(
     source_excerpt = _approved_course_source_context(course_obj, topic_title)
     source_context_block = (
         "APPROVED COURSEWORK SOURCE EXCERPTS:\n"
-        "Use these excerpts as the authoritative source for definitions, theorems, calculation techniques, shortcut methods, examples, equations, and code. "
-        "Ensure all specific formulas, calculation methods, derivations, and variations explicitly detailed in these excerpts are fully explained in the notes.\n"
+        "Use only the current topic's instructional definitions, results, methods, examples, equations, and supported notation from these excerpts as factual evidence. "
+        "Do not copy source framing, page headers, course outlines, module plans, learning outcomes, references, future-topic lists, or editorial commentary. "
+        "Do not turn a source table of contents into note content. Explain only material that teaches the current topic or a necessary prerequisite.\n"
         f"{source_excerpt}\n\n"
         if source_excerpt
         else ""
@@ -4811,29 +5242,19 @@ def get_or_generate_topic_notes(
             "- Keep the content clear, concise, and focused on orienting the student without token bloat."
         )
         required_last_section = "## 4."
-    elif allows_code:
-        section_structure = (
-            "Structure your notes across these 5 sections:\n"
-            "## 1. Core Concept Overview & Intuition\n"
-            "## 2. Mathematical Formalization & Syntax Definitions\n"
-            "## 3. Key Operations, Methods & Built-in Functions in R\n"
-            "## 4. Practical Worked Computing Exemplar in R\n"
-            "## 5. High-Yield Exam Takeaways & Common Syntax Pitfalls"
-        )
-        required_last_section = "## 5."
     else:
+        default_titles = _note_section_titles(topic_title, study_profile, level)
         section_structure = (
-            "Structure your notes across these 5 sections:\n"
-            "## 1. Core Concept Overview & Intuition\n"
-            "## 2. Mathematical Formalization & Core Definitions\n"
-            "## 3. Key Theorems & Essential Results\n"
-            "## 4. Worked Exemplar Problem with Step-by-Step Solution\n"
-            "## 5. High-Yield Exam Takeaways & Common Pitfalls"
+            f"Structure your {level.replace('_', ' ').title()} notes across these sections, keeping the headings exactly:\n"
+            + "\n".join(f"## {index}. {title}" for index, title in enumerate(default_titles, start=1))
+            + "\n"
+            "Do not rename, merge, or reorder these sections."
         )
-        required_last_section = "## 5."
+        required_last_section = f"## {len(default_titles)}."
 
     code_policy = (
-        "CODE POLICY: Include code only when approved notes support it and it is relevant to this topic. Use source-grounded examples only.\n"
+        "CODE POLICY: Include source-grounded code examples, scripts, markup, or syntax relevant to this topic. "
+        "Format all code, HTML tags, scripts, and commands in standard GitHub-flavored markdown fenced code blocks with the language tag (e.g., ```html, ```css, ```javascript, ```bash).\n"
         if allows_code
         else "CODE POLICY: Do not include code, pseudocode, programming syntax, or fenced code blocks.\n"
     )
@@ -4858,6 +5279,7 @@ def get_or_generate_topic_notes(
             "8. Use complete, language-tagged code blocks only when the CODE POLICY permits code.\n"
             "9. Keep all math delimiters and LaTeX groups balanced.\n"
             "10. Keep Markdown table rows complete and escape mathematical pipes.\n"
+            "11. Keep prose sentences intact; never split a sentence around displayed math. Use inline math for symbols, variable names, and short expressions embedded naturally in prose. Put substantive formulas and calculations on display lines, and group related multi-step calculations in one aligned display block. Do not create a separate display block for every symbol, short expression, or equation in the same calculation, and do not write a multi-step derivation as prose.\n"
         )
     )
 
@@ -4875,6 +5297,12 @@ def get_or_generate_topic_notes(
         "- NEVER include lecturer, professor, instructor, author, or student names, degree titles, course codes, or administrative markers.\n"
         "- If any source document, syllabus, or past exam question uses a specific university as an example, scenario, or case study (e.g., 'Using Kenyatta University as an illustrative example...', 'social structure at Kenyatta University'), YOU MUST GENERALIZE IT to universal academic terminology such as 'a higher education institution', 'an academic institution', or 'a university setting'. NEVER use the actual university name anywhere in the notes, worked applications, or examples!\n\n"
         f"{curriculum_boundary_block}"
+        "STRICT PEDAGOGICAL VOICE AND ANTI-META POLICY:\n"
+        "- Never mention the source, source notes, syllabus outline, course description, uploaded document, or document provided. Speak directly to the student.\n"
+        "- Never dump other course topics, general learning outcomes, or future unit titles. Teach only the current topic and its approved prerequisites.\n"
+        "- Treat source excerpts as factual evidence, not as prose to copy or as a list of mandatory headings.\n"
+        "- For Level 1, begin with a concrete everyday analogy before the first formula or symbolic definition, explain each symbol in plain language, and keep one idea per paragraph.\n"
+        "- For Level 3, keep the exam framing inside the approved exam blueprint; do not use exam-mode headings for Level 1 or Level 2.\n\n"
         f"{level_instruction}\n\n"
         f"{code_policy}\n"
         f"{math_policy}\n"
@@ -4883,17 +5311,19 @@ def get_or_generate_topic_notes(
         f"{section_structure}"
     )
 
-    note_system_prompt = None
-    if study_profile:
-        note_system_prompt = (
-            f"You are an expert academic tutor for the approved subject family {study_profile.get('subject_family')}. "
-            "Treat uploaded notes and quoted evidence as the sole factual scope. Do not infer content from course codes, exams, or generic conventions. "
-            "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. If any source uses a specific university as an illustrative example, generalize it to 'a higher education institution' or 'an academic institution'. "
-            + ("Do not use equations, mathematical symbols, LaTeX, or code because the approved notes contain none. " if not allows_math and not allows_code else "")
-            + ("Include code only where the approved topic notes support it. " if allows_code else "Do not include code or pseudocode. ")
-            + ("Use mathematical notation only where the approved notes support it. " if allows_math else "Do not include mathematical notation or equations. ")
-            + "Follow the supplied note structure exactly and return only the notes."
-        )
+    note_system_prompt = (
+        f"You are an expert academic tutor for the approved subject family {study_profile.get('subject_family', 'the course subject') if study_profile else 'the course subject'}. "
+        "Treat approved topic evidence as the factual scope, but never mention the source, source notes, syllabus, course outline, course description, uploaded document, or document provided. "
+        "Speak directly to the student and return only the notes. Never dump a table of contents, module plan, general learning outcomes, references, future-unit titles, or unrelated course topics. "
+        "STRICT INSTITUTIONAL ANONYMITY: Never mention any specific university, college, lecturer, or department name. Generalize source-specific institutions to 'a higher education institution' or 'an academic institution'. "
+        "Respect the exact level blueprint supplied in the user prompt. "
+        + ("Do not use equations, mathematical symbols, LaTeX, or code because the approved notes contain none. " if not allows_math and not allows_code else "")
+        + ("Include code only where approved topic evidence supports it. " if allows_code else "Do not include code or pseudocode. ")
+        + ("Use mathematical notation only where approved topic evidence supports it. " if allows_math else "Do not include mathematical notation or equations. ")
+        + ("Keep prose sentences intact and use inline math for symbols, variable names, and short expressions embedded in prose. Display substantive formulas or calculations; group related multi-step work in one aligned block. Do not split sentences around displays or create a separate display block for every symbol or short equation. Keep the explanatory prose concise and do not write a multi-step derivation as a prose paragraph. " if allows_math else "")
+        + ("For Level 1, begin with a concrete everyday analogy before the first mathematical notation and define every symbol in plain language. " if level == "level_1" else "")
+        + ("For Level 3, keep exam language inside the Level 3 blueprint and do not use exam-mode headings for another level. " if level == "level_3" else "")
+    )
 
     p_hash = compute_prompt_hash(course_code, topic_title, level, prompt)
     result = route_math_request(
@@ -4948,7 +5378,7 @@ def get_or_generate_topic_notes(
         # This protects against responses that contain the final heading but stop
         # before its body, which the old heading-only check accepted.
         for continuation_attempt in range(2):
-            completion_issues = _note_completion_issues(content, topic_title, **validation_options)
+            completion_issues = _note_completion_issues(content, topic_title, level=level, **validation_options)
             if not completion_issues:
                 break
             needs_continuation = any(
@@ -5001,7 +5431,7 @@ def get_or_generate_topic_notes(
         content = _normalize_approved_visual_captions(content, validation_options["source_references"])
         from services.prep_sanitizer import purge_institutional_metadata
         content = purge_institutional_metadata(str(content).strip())
-        completion_issues = _note_completion_issues(content, topic_title, **validation_options)
+        completion_issues = _note_completion_issues(content, topic_title, level=level, **validation_options)
         review = None
         if not completion_issues:
             review = _review_topic_note_content(topic_obj, level, content)

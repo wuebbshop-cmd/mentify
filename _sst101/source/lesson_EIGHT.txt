@@ -1,0 +1,327 @@
+LESSON EIGHT
+ MUTUALLY EXCLUSIVE AND EXHAUSTIVE EVENTS;
+ AND PROBABILITY
+
+8.1: Introduction
+
+In this lesson we will discuss mutually exclusive and exhaustive events, and also
+probability.
+
+8.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. define mutually exclusive and exhaustive events,
+ ii. define probability of an event,
+ iii. find probability of an event when sampling with and without
+ replacement.
+
+8.3: Mutually Exclusive and Exhaustive Events
+
+Two events A and B are said to be mutually exclusive if they are disjoint i.e.
+
+if𝐴∩𝐵= 𝜙. In other words, A and B are mutually exclusive if they cannot occur
+simultaneously.
+
+If two events A and B satisfy 𝐴∪𝐵= 𝑆, then they are said to be exhaustive,
+because the events taken together exhaust the sample space S.
+
+In general, events 𝐸1, 𝐸2, … , 𝐸𝑘 all in the same sample space S, are said to be
+mutually exclusive and exhaustive if they satisfy
+
+ 𝐸𝑖∩𝐸𝑗= 𝜙 for 𝑖≠𝑗 , 𝑖, 𝑗= 1, 2, … , 𝑘
+
+and
+
+ 𝐸1 ∪𝐸2 ∪ … ∪𝐸𝑘= 𝑆.
+
+Example 8.1 A fair coin is tossed twice. A and B are two events such that
+
+ A= {observe at least one head}
+
+ B= {observe two heads}
+
+ 59
+
+--- Page 61 ---
+𝑆= {𝐻𝐻, 𝐻𝑇, 𝑇𝐻, 𝑇𝑇} , 𝐴= {𝐻𝐻, 𝐻𝑇, 𝑇𝐻} , 𝐵= {𝑇𝑇}
+
+ 𝐴∩𝐵= 𝜙 and 𝐴∪𝐵= {𝐻𝐻, 𝐻𝑇, 𝑇𝐻, 𝑇𝑇} = 𝑆.
+
+Therefore, the events A and B are mutually exclusive and exhaustive.
+
+8.4: Definition of Probability
+
+Suppose that the outcomes of a random experiment are represented by a sample
+space S, then probability is a real valued function P, defined on the events of S,
+which satisfies the following axioms:
+
+ i. For every event A, 0 ≤𝑃(𝐴) ≤1
+ ii. 𝑃(𝑆) = 1
+ iii. If A and B are mutually exclusive events, then
+ 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵)
+ iv. If 𝐴1, 𝐴2, … , 𝐴𝑛 is a sequence of mutually exclusive events, then
+
+ 𝑃(𝐴1 ∪𝐴2 ∪… ∪𝐴𝑛) = 𝑃(𝐴1) + 𝑃(𝐴2) + ⋯+ 𝑃(𝐴𝑛)
+
+ This axiom is the additive rule of probability.
+
+Let us now consider some theorems of probability.
+
+8.4.1: Theorem 1
+
+If 𝜙 is the empty set, the 𝑃(𝜙) = 0.
+
+8.4.2: Theorem 2
+
+If 𝐴𝑐 is the complement of an event A, then 𝑃(𝐴𝑐) = 1 −𝑃(𝐴)
+
+8.4.3: Theorem 3
+
+If 𝐴⊂𝐵, then 𝑃(𝐴) ≤𝑃(𝐵)
+
+8.4.4: Theorem 4
+
+If A and B are any two events in the same sample space S, then
+
+ 𝑃(𝐴\𝐵) = 𝑃(𝐴) −𝑃(𝐴∩𝐵)
+
+8.4.5: Theorem 5
+
+If A and B are any two events in the same sample space S, then
+
+ 60
+
+--- Page 62 ---
+𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵)
+
+For any events A, B and C in the same sample space S,
+
+𝑃(𝐴∪𝐵∪𝐶) = 𝑃(𝐴) + 𝑃(𝐵) + 𝑃(𝐶) −𝑃(𝐴∩𝐵) −𝑃(𝐴∩𝐶) −𝑃(𝐵∩𝐶) + 𝑃(𝐴∩𝐵∩𝐶).
+
+8.4.6: De Morgan’s Laws
+
+If A and B are any events in the same sample space S, then
+
+ i. (𝐴∪𝐵)𝑐= 𝐴𝑐∩𝐵𝑐
+ ii. (𝐴∩𝐵)𝑐= 𝐴𝑐∪𝐵𝑐
+
+Example 8.2
+
+ 3 1 1
+Let A and B be events with 𝑃(𝐴) = , 𝑃(𝐵) = and 𝑃(𝐴∩𝐵) = . Find
+ 8 2 4
+ i. 𝑃(𝐴𝑐) and 𝑃(𝐵𝑐)
+ ii. 𝑃(𝐴∪𝐵)
+ iii. 𝑃(𝐴𝑐∩𝐵𝑐)
+ iv. 𝑃(𝐴𝑐∪𝐵𝑐)
+ v. 𝑃(𝐴∩𝐵𝑐)
+ vi. 𝑃(𝐴𝑐∩𝐵)
+
+ Solution
+ 3 5 1 1
+ i. 𝑃(𝐴𝑐) = 1 −𝑃(𝐴) = 1 − = and 𝑃(𝐵𝑐) = 1 −𝑃(𝐵) = 1 − =
+ 8 8 2 2
+ 3 1 1 5
+ ii. 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵) = + − =
+ 8 2 4 8
+ iii. Using, De Morgan’s law we have
+ 5 3
+ 𝑃(𝐴𝑐∩𝐵𝑐) = 𝑃((𝐴∪𝐵)𝑐) = 1 − 𝑃(𝐴∪𝐵) = 1 − =
+ 8 8
+ iv. Using, De Morgan’s law we have
+
+ 3 𝑃(𝐴𝑐∪𝐵𝑐) = 𝑃[(𝐴∩𝐵)𝑐] = 1 − 𝑃(𝐴∩𝐵) = 1 −1 =
+ 4 4
+
+ 3 1 1
+ v. 𝑃(𝐴∩𝐵𝑐) = 𝑃(𝐴\𝐵) = 𝑃(𝐴) − 𝑃(𝐴∩𝐵) = − =
+ 8 4 8
+ 1 1 1
+ vi. 𝑃(𝐴𝑐∩𝐵) = 𝑃(𝐵\𝐴) = 𝑃(𝐵) − 𝑃(𝐴∩𝐵) = − =
+ 2 4 4
+
+ 61
+
+--- Page 63 ---
+Example 8.3
+
+ If the probability that a student A will fail a certain statistics examination is 0.3,
+ the probability that student B will fail the examination is 0.15, and the
+ probability that both students A and B will fail the examination is 0.08. What is
+ the probability that
+
+ i. at least one of these two students will fail the examination?
+ ii. Neither student A nor student B will fail?
+
+ Solution
+ 𝑃(𝐴) = 0.3 , 𝑃(𝐵) = 0.15 . 𝑃(𝐴∩𝐵) = 0.08. Hence
+ i. 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵)
+ = 0.3 + 0.15 −0.08 = 0.37
+ ii. 𝑃((𝐴∪𝐵)𝑐) = 1 − 𝑃(𝐴∪𝐵) = 1 −0.37 = 0.63
+
+Example 8.4 A fair coin is tossed three times and events A and B are defined as
+follows:
+
+ A = {At least one head is observed}
+
+ B = {The number of heads observed is odd}
+
+ a) List the sample points in the events 𝐴, 𝐵, 𝐴∪𝐵, 𝐴𝑐, 𝑎𝑛𝑑 𝐴∩𝐵.
+ b) Find 𝑃(𝐴), 𝑃(𝐵), 𝑃(𝐴∪𝐵), 𝑃(𝐴𝑐), 𝑎𝑛𝑑 𝑃(𝐴∩𝐵).
+ c) Are the events A and B mutually exclusive?
+ Solution
+ a) 𝑆= {𝐻𝐻𝐻, 𝐻𝐻𝑇, 𝐻𝑇𝐻, 𝑇𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻, 𝑇𝑇𝑇} ,
+
+ 𝐴= {𝐻𝐻𝐻, 𝐻𝐻𝑇, 𝐻𝑇𝐻, 𝑇𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇ℎ},
+
+ 𝐵= {𝐻𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻},
+
+ 𝐴∪𝐵= {𝐻𝐻𝐻, 𝐻𝐻𝑇, 𝐻𝑇𝐻, 𝑇𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻, 𝑇𝑇𝑇},
+
+ 𝐴𝑐= {𝑇𝑇𝑇}
+
+ 𝐴∩𝐵= {𝐻𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻]
+
+ 62
+
+--- Page 64 ---
+7 4 1 7 7
+ b) 𝑃(𝐴) = , 𝑃(𝐵) = = , 𝑃(𝐴∪𝐵) = , 𝑃(𝐴𝑐) = 1 −𝑃(𝐴) = 1 − =
+ 8 8 2 8 8
+ 1 4 1
+ , 𝑎𝑛𝑑 𝑃(𝐴∩𝐵) = = .
+ 8 8 2
+ 7 1
+ c) 𝑃(𝐴) + 𝑃(𝐵) = + ≠, 𝑃(𝐴∪𝐵) ⇒ A and B are not mutually
+ 8 2
+ exclusive.
+
+8.4.7: Random Sampling
+
+8.4.7.1: Sampling without replacement
+
+This the case of drawing items which are equally likely from a population without
+replacing them
+
+Example 8.5
+
+A bag contains 5 red balls and 3 black balls. If 3 balls are drawn without
+replacement, what is the probability that
+
+ a) no black balls will be selected,
+ b) exactly one red ball will be selected,
+ c) at least one red ball will be selected,
+ d) at most one black ball will be selected?
+
+ 63
+
+--- Page 65 ---
+Solution
+
+ 3
+ Tree diagram R
+ 6
+
+R- red ball, B- black ball R
+
+ 4 3
+ B
+ 7 6
+
+ R
+
+ R
+
+ 5 3
+ B B
+ 8 7
+
+ R
+ 3
+ R
+ 8
+ 5
+
+ 7
+ B
+
+ B
+
+ R
+
+ B B
+
+ 5 4 3 5
+ a) 𝑃(𝑅𝑅𝑅) = ( 8) (7) (6) = 56
+
+ 5 3 2 3 5 2
+ b) 𝑃(𝑅𝐵𝐵) + 𝑃(𝐵𝑅𝐵) + 𝑃(𝐵𝐵𝑅) = (8) (7) (6) + (8) (7) (6) +
+ 3 2 5
+ (8) ( 7) ( 6)
+
+ 𝟏𝟓
+ =
+ 𝟓𝟔
+
+ 3 2 1 55
+ c) 1 −𝑃(𝐵𝐵𝐵) = 1 −( × × = 8 7 6) 56
+
+ 5 4 3 5 3 4
+ d) 𝑃(𝑅𝑅𝐵) + 𝑃(𝑅𝐵𝑅) + 𝑃(𝐵𝑅𝑅) + 𝑃(𝑅𝑅𝑅) = × × + × × +
+ 8 7 6 8 7 6
+
+ 64
+
+--- Page 66 ---
+3 5 4 5 4 3 5
+ × × + × × =
+ 8 7 6 8 7 6 7
+
+8.4.7.2: Sampling with replacement
+
+Example 8.6
+
+Three bolts and three nuts are put in a box. If two parts are selected one at a time
+at random from the box with replacement, find the probability that one is a bolt
+and one is a nut.
+
+ Solution
+
+ Tree diagram
+
+ B B- bolt, N- nut
+
+ B N
+
+ B
+
+ N
+
+ N
+
+ 3 3 3 3 1
+ 𝑃(𝐵𝑁) + 𝑃𝑃(𝑁𝐵) = × + × =
+ 6 6 6 6 2
+
+7.6: Assessment
+
+1. Three light bulbs are chosen from 15 bulbs of which 5 are defective. Find the
+probability that
+
+ i. non is defective
+ iii. exactly one is defective
+ iv. at least one is defective.
+
+ 65
+
+--- Page 67 ---
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C.
+ Runger
+
+ 66
+
+--- Page 68 ---

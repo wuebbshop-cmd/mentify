@@ -374,10 +374,12 @@ def parse_markdown_to_blocks(raw_markdown: str) -> List[Dict[str, Any]]:
         # 8. Callout Blocks (> **Theorem ...** or > **Definition ...**)
         if stripped.startswith(">"):
             callout_lines = []
-            while i < n and (lines[i].strip().startswith(">") or (lines[i].strip() and not lines[i].strip().startswith("#"))):
+            while i < n and lines[i].strip().startswith(">"):
                 callout_lines.append(re.sub(r"^\s*>\s*", "", lines[i]))
                 i += 1
             full_callout = "\n".join(callout_lines).strip()
+            if not full_callout:
+                continue
             
             # Detect callout style and title
             style = "note"

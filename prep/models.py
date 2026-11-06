@@ -313,8 +313,14 @@ class PrepTopic(models.Model):
         verbose_name = "Prep Topic"
         verbose_name_plural = "Prep Topics"
 
+    @property
+    def display_title(self) -> str:
+        """User-facing title with any trailing TOC page numbers or stray delimiters stripped."""
+        text = re.sub(r"\s+\d+$", "", str(self.title or "")).strip()
+        return text or self.title
+
     def __str__(self):
-        return f"{self.course.code}: Topic {self.order} - {self.title}"
+        return f"{self.course.code}: Topic {self.order} - {self.display_title}"
 
     def save(self, *args, **kwargs):
         if not self.slug:

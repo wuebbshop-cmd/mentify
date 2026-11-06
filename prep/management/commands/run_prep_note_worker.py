@@ -15,10 +15,18 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--once", action="store_true", help="Process available jobs, then exit.")
         parser.add_argument("--poll-seconds", type=float, default=5.0)
+        parser.add_argument(
+            "--max-notes",
+            type=int,
+            default=0,
+            help="Stop after this many topic-note jobs (0 means no limit).",
+        )
 
     def handle(self, *args, **options):
         once = options["once"]
         poll_seconds = max(1.0, options["poll_seconds"])
+        max_notes = max(0, options["max_notes"])
+        processed_notes = 0
         last_expiry_sweep = 0.0
         while True:
             if not connection.in_atomic_block:
@@ -43,6 +51,9 @@ class Command(BaseCommand):
                     self.stderr.write(
                         self.style.ERROR(f"Unexpected worker error for notes job {notes_job.id}: {exc}")
                     )
+                processed_notes += 1
+                if max_notes and processed_notes >= max_notes:
+                    return
                 continue
             if not job:
                 if once:
@@ -154,10 +165,22 @@ class Command(BaseCommand):
             from services.prep_note_precompute import enqueue_course_topic_note_jobs
 
             queued = enqueue_course_topic_note_jobs(job.course)
-            job.status = "complete"
-            job.completed_at = timezone.now()
+            topic_jobs = PrepTopicNotesJob.objects.filter(topic__course=job.course)
+            if topic_jobs.filter(status__in=["pending", "running"]).exists():
+                job.status = "pending"
+                job.completed_at = None
+                job.started_at = None
+            elif topic_jobs.filter(status="failed").exists():
+                job.status = "failed"
+                job.completed_at = timezone.now()
+            else:
+                job.status = "complete"
+                job.completed_at = timezone.now()
             job.last_error = ""
-            self._save_job_resilient(job, update_fields=["status", "completed_at", "last_error"])
+            self._save_job_resilient(
+                job,
+                update_fields=["status", "started_at", "completed_at", "last_error"],
+            )
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Queued all-level note preparation for {job.course.code} "

@@ -1,10 +1,10 @@
 {% extends "prep/base_prep.html" %}
 {% load prep_seo %}
 
-{% block title %}{{ topic.title }} — {{ course.code }} Study Notes, Questions & PDF Material | Mentify Prep{% endblock %}
-{% block meta_description %}Study {{ topic.title }} for {{ course.code }} {{ course.title }} with structured notes, verified past exam questions, worked step-by-step solutions, and printable PDF revision material for students and exam candidates.{% endblock %}
-{% block og_title %}{{ topic.title }} | {{ course.code }} | Mentify Prep{% endblock %}
-{% block og_description %}Study notes, verified past exam questions, and printable revision guides for {{ topic.title }} in {{ course.code }} on Mentify Prep.{% endblock %}
+{% block title %}{{ topic.display_title|default:topic.title }} — {{ course.code }} Study Notes, Questions & PDF Material | Mentify Prep{% endblock %}
+{% block meta_description %}Study {{ topic.display_title|default:topic.title }} for {{ course.code }} {{ course.title }} with structured notes, verified past exam questions, worked step-by-step solutions, and printable PDF revision material for students and exam candidates.{% endblock %}
+{% block og_title %}{{ topic.display_title|default:topic.title }} | {{ course.code }} | Mentify Prep{% endblock %}
+{% block og_description %}Study notes, verified past exam questions, and printable revision guides for {{ topic.display_title|default:topic.title }} in {{ course.code }} on Mentify Prep.{% endblock %}
 {% block robots %}{% if is_indexable %}index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1{% else %}noindex, follow{% endif %}{% endblock %}
 {% block extra_head %}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"{{ topic.title|escapejs }}","description":"Study notes and verified revision questions for {{ topic.title|escapejs }} in {{ course.code|escapejs }} {{ course.title|escapejs }}.","learningResourceType":"Study guide","isPartOf":{"@type":"Course","name":"{{ course.code|escapejs }} {{ course.title|escapejs }}"},"provider":{"@type":"EducationalOrganization","name":"Mentify Prep"},"inLanguage":"en","isAccessibleForFree":false,"hasPart":{"@type":"WebPageElement","isAccessibleForFree":false,"cssSelector":".prep-locked-preview"}}</script>
@@ -48,24 +48,36 @@ document.addEventListener('DOMContentLoaded', function () {
 {% block content %}
 <article style="max-width: 980px; margin: 0 auto; padding: 4px 0 40px;">
   <nav aria-label="Breadcrumb" style="font-size: 0.85rem; margin-bottom: 20px; color: var(--text-muted);">
-    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">Mentify Prep</a> &bull; <a href="{% url 'prep:public_library' %}" style="color: var(--text-muted); text-decoration: none;">Study Library</a> &bull; <a href="{% url 'prep:public_course' course.slug %}" style="color: var(--text-muted); text-decoration: none;">{{ course.code }}</a> &bull; {{ topic.title }}
+    <a href="{% url 'prep:dashboard' %}" style="color: var(--green); text-decoration: none; font-weight: 500;">Mentify Prep</a> &bull; <a href="{% url 'prep:public_library' %}" style="color: var(--text-muted); text-decoration: none;">Study Library</a> &bull; <a href="{% url 'prep:public_course' course.slug %}" style="color: var(--text-muted); text-decoration: none;">{{ course.code }}</a> &bull; {{ topic.display_title|default:topic.title }}
   </nav>
 
   <header style="border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
     <div>
       <p style="margin: 0 0 6px; color: var(--green); font-weight: 700; font-size: 0.82rem;">{{ course.code }} &bull; UNIT {{ topic.order }} &bull; {{ course.category }}</p>
-      <h1 style="font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.02em; color: var(--text);">{{ topic.title }}</h1>
+      <h1 style="font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.02em; color: var(--text);">{{ topic.display_title|default:topic.title }}</h1>
       {% if topic.subtopics %}<p style="color: var(--text-muted); line-height: 1.6; margin: 0; font-size: 0.9rem;">Topics covered: {{ topic.subtopics|join:", " }}</p>{% endif %}
     </div>
-    <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Open in Prep Studio &rarr;</a>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+      {% if course_pdf_pack_url %}
+      <a href="{{ course_pdf_pack_url }}" class="btn btn-sm btn-outline" style="font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-color: rgba(15,118,110,0.35); color: var(--green);" download="{{ course.code }}_PDF_Pack.zip">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
+        Download Course PDF Pack (.zip)
+      </a>
+      {% endif %}
+      <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-primary btn-sm" style="font-weight: 600;">Open in Prep Studio &rarr;</a>
+    </div>
   </header>
 
   <div style="background: linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(13,148,136,0.12) 100%); border: 1px solid rgba(15,118,110,0.2); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
     <div>
-      <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Looking for {{ course.code }} {{ topic.title }} PDF material?</div>
+      <div style="font-weight: 600; font-size: 0.92rem; color: var(--text);">Looking for {{ course.code }} {{ topic.display_title|default:topic.title }} PDF material?</div>
       <div style="font-size: 0.82rem; color: var(--text-muted);">Generate printable PDF revision notes, past examination papers with marking rubrics, and formula cheat sheets.</div>
     </div>
+    {% if course_pdf_pack_url %}
+    <a href="{{ course_pdf_pack_url }}" class="btn btn-outline btn-sm" style="font-weight: 600; border-color: var(--green); color: var(--green);" download="{{ course.code }}_PDF_Pack.zip">Download Course PDF Pack (.zip)</a>
+    {% else %}
     <a href="{% url 'prep:topic_study' topic.id %}" class="btn btn-outline btn-sm" style="font-weight: 600;">Download Study Pack (PDF)</a>
+    {% endif %}
   </div>
 
   {% if preview_notes %}

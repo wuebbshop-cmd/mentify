@@ -1,0 +1,319 @@
+LESSON FIVE
+
+ MOMENTS
+
+Moments are popularly used to describe the characteristics of a distribution and
+are measured about a point.
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑛 are the n values assumed by the variable X, then we define
+the following quantity
+
+ 𝑥1𝑟+𝑥2𝑟+⋯+𝑥𝑛𝑟 𝑥𝑟=
+ 𝑛
+
+As the 𝑟𝑡ℎ moment about zero. For different values of r we obtain different
+moments. When r=1 we obtain the first moment about zero. That is
+
+ 𝑥1+𝑥2+⋯+𝑥𝑛 1 𝑛 𝑥1 = = 𝑖=1 𝑥𝑖= 𝑥 𝑛 𝑛∑
+
+The second moment about zero is obtained when we put r=2. That is
+
+ 𝑥12+𝑥22+⋯+𝑥𝑛2 1 𝑛 2 𝑥2 = = 𝑖=1 𝑥𝑖 𝑛 𝑛∑
+
+The 𝑟𝑡ℎ moment about the mean 𝑥 is given by
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥)𝑟 𝑚𝑟= 𝑛∑
+
+If r=1, then
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥)1 = 0. 𝑚1 = 𝑛∑
+
+If r=2, then
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥)2 = 𝑠2, 𝑚2 = 𝑛∑
+
+Which is the variance of the series 𝑥1, 𝑥2, … , 𝑥𝑛 .
+
+The 𝑟𝑡ℎ moment about any value A is defined as
+
+ ′ 1 𝑛 1 𝑛 𝑟, (𝑥𝑖−𝐴)𝑟 = 𝑚𝑟 = 𝑛∑ 𝑖=1 𝑛∑ 𝑖=1 𝑑𝑖
+
+ 32
+
+--- Page 34 ---
+where 𝑑𝑖= 𝑥𝑖−𝐴.
+
+5.1: Moments for Grouped Data
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, then the
+𝑟𝑡ℎ moment about zero is given by
+ 𝑓1𝑥1𝑟+𝑓2𝑥2𝑟+⋯+𝑓𝑘𝑥𝑘𝑟 𝑥𝑟=
+ 𝑓1+𝑓2+⋯+𝑓𝑘
+
+ 1 𝑘 𝑟
+ 𝑖=1 𝑓𝑖𝑥𝑖 = 𝑛∑
+
+Where,
+
+ 𝑛= ∑𝑘 𝑖=1 𝑓𝑖
+
+Therefore the 𝑟𝑡ℎ moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)𝑟 𝑚𝑟= 𝑛∑
+
+Where,
+
+ 𝑛= ∑𝑘 𝑖=1 𝑓𝑖
+
+And the 𝑟𝑡ℎ moment about any value A is given by
+
+ 1 1
+ 𝑟, 𝑖=1 𝑓𝑖𝑑𝑖 𝑚𝑟′ = 𝑛∑𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)𝑟 = 𝑛∑
+where 𝑛= ∑ 𝑘𝑖=1 𝑓𝑖 and 𝑑𝑖= 𝑥𝑖−𝐴.
+
+If 𝑥𝑖′𝑠 are class marks of grouped data with class intervals of equal sizes and A is
+one of the class marks then each 𝑑𝑖 can be written as 𝑐𝑢𝑖, where c is the class
+interval width (class size). Hence in this case the 𝑟𝑡ℎ moment about A can be
+expressed as
+
+ 1 1
+ 𝑖=1 𝑓𝑖𝑑𝑖 𝑚𝑟′ = 𝑛∑𝑘 𝑘 𝑟 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)𝑟 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑐𝑢𝑖)𝑟 = 𝑛∑
+
+ 33
+
+--- Page 35 ---
+𝑐𝑟 𝑘 𝑖=1 𝑓𝑖𝑢𝑖𝑟 = 𝑛∑
+where 𝑛= ∑ 𝑘𝑖=1 𝑓𝑖 and 𝑑𝑖= 𝑥𝑖−𝐴.
+
+5.2: Relations between Moments
+
+The first moment about any value A is given by
+
+ 1 ′ 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴) 𝑚1 = 𝑛∑
+
+ 1 𝑘
+ 𝑖=1 𝑓𝑖𝑥𝑖−𝐴= 𝑥−𝐴 . = 𝑛∑
+
+The first moment about the mean is given by
+
+ 1 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥) = 0. 𝑚1 = 𝑛∑
+
+The second moment about any value A is given by
+
+ 1 ′ 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)2 . 𝑚2 = 𝑛∑
+
+The second moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)2 𝑚2 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖{(𝑥𝑖−𝐴) −(𝑥−𝐴)}2 = 𝑛∑
+We know that (𝑎−𝑏)2 = 𝑎2 −2𝑎𝑏+ 𝑏2
+
+Let and 𝑥−𝐴= 𝑏. Therefore, 𝑥𝑖−𝐴= 𝑎
+{(𝑥𝑖−𝐴) −(𝑥−𝐴)}2 = (𝑥𝑖−𝐴)2 −2(𝑥𝑖−𝐴)(𝑥−𝐴) +
+ (𝑥−𝐴)2
+
+Thus,
+
+ 1 𝑘 𝑖=1 𝑓𝑖{ (𝑥𝑖−𝐴)2 −2(𝑥𝑖−𝐴)(𝑥−𝐴) + (𝑥−𝐴)2}𝒎𝟐= 𝑛∑
+
+ 34
+
+--- Page 36 ---
+1 1 𝑘 𝑘
+ 𝑖=1 𝑓𝑖 (𝑥𝑖−𝐴) + = 𝑛∑ 𝑖=1 𝑓𝑖 (𝑥𝑖−𝐴)2 −2 (𝑥−𝐴) 𝑛∑
+ (𝑥−𝐴)2
+
+ ′ ′ = 𝒎𝟐 −𝟐(𝑥−𝐴)2+(𝑥−𝐴)2 = 𝑚2 −(𝑥−𝐴)2
+ = 𝑚2′ −(𝑚1′ )2
+
+ ′ ′
+Hence 𝒎𝟐= 𝒎𝟐 −(𝒎𝟏 )𝟐.
+
+The third moment about any value A is given by
+
+ 1 ′ 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)3 . 𝑚3 = 𝑛∑
+
+The third moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)3 𝑚3 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖{(𝑥𝑖−𝐴) −(𝑥−𝐴)}3 = 𝑛∑
+
+We know that
+ (𝑎−𝑏)3 = 𝑎3 −3𝑎2𝑏+ 3𝑎𝑏2 −𝑏3
+
+Let and 𝑥−𝐴= 𝑏. Therefore, 𝑥𝑖−𝐴= 𝑎
+{(𝑥𝑖−𝐴) −(𝑥−𝐴)}3 = (𝑥𝑖−𝐴)3 −3(𝑥𝑖−𝐴)2(𝑥−𝐴) +
+ 3(𝑥𝑖−𝐴)(𝑥−𝐴)2 −(𝑥−𝐴)3
+
+Therefore,
+
+ 𝑘 𝑘
+ 1 1
+ 𝑚3 = 𝑛∑𝑓𝑖(𝑥𝑖−𝐴)3 −3(𝑥−𝐴) 𝑛∑𝑓𝑖(𝑥𝑖−𝐴)2 +
+ 𝑖=1 𝑖=1
+
+ 𝑘
+ 1
+ 3(𝑥−𝐴)2 𝑛∑𝑓𝑖 (𝑥𝑖−𝐴) − (𝑥−𝐴)3
+ 𝑖=1
+
+ 35
+
+--- Page 37 ---
+= 𝑚3′ −3𝑚1′ 𝑚2′ + 3(𝑚1′ )2𝑚1′ −(𝑚1′ )3
+ = 𝑚3′ −3𝑚1′ 𝑚2′ + 3(𝑚1′ )3 −(𝑚1′ )3
+
+ ′ ′ ′
+Hence 𝒎𝟑= 𝒎𝟑 −𝟑𝒎𝟏 𝒎𝟐 + 𝟐(𝒎𝟏′ )𝟑
+
+Similarly, the fourth moment about any value A is given by
+
+ 1 ′ 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)4 , 𝑚4 = 𝑛∑
+
+and the fourth moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)4 𝑚4 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖{(𝑥𝑖−𝐴) −(𝑥−𝐴)}4 = 𝑛∑
+But (𝑎−𝑏)4 = 𝑎4 −4𝑎3𝑏+ 6𝑎2𝑏2 −4𝑎𝑏3 + 𝑏4.
+
+Letting and 𝑥−𝐴= 𝑏 we have 𝑥𝑖−𝐴= 𝑎
+ {(𝑥𝑖−𝐴) −(𝑥−𝐴)}4 = (𝑥𝑖−𝐴)4 −4(𝑥𝑖−𝐴)3(𝑥−𝐴) +
+ 6(𝑥𝑖−𝐴)2(𝑥−𝐴)2
+ −4(𝑥𝑖−𝐴)(𝑥−𝐴)3 + (𝑥−𝐴)4
+
+ 𝑘
+ 1
+∴ 𝑚4 = 𝑛∑𝑓𝑖{(𝑥𝑖−𝐴)4 −4(𝑥𝑖−𝐴)3(𝑥−𝐴)
+ 𝑖=1
+ + 6(𝑥𝑖−𝐴)2(𝑥−𝐴)2 −4(𝑥𝑖−𝐴)(𝑥−𝐴)3
+ + (𝑥−𝐴)4}
+
+ 1 1 𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)3 = 𝑛∑ 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)4 −4(𝑥−𝐴) 𝑛∑
+
+ 1
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)2 +6(𝑥−𝐴)2 𝑛∑𝑘
+
+ 36
+
+--- Page 38 ---
+1
+ 𝑖=1 𝑓𝑖 (𝑥𝑖−𝐴) + (𝑥−𝐴)4 −4(𝑥−𝐴)3 𝑛∑𝑘
+ = 𝑚4′ −4𝑚1′ 𝑚3′ + 6(𝑚1′ )2𝑚2′ −4(𝑚1′ )3𝑚1′ + (𝑚1′ )4
+
+Hence,
+
+ ′ ′ ′
+𝒎𝟒= 𝒎𝟒 −𝟒𝒎𝟏 𝒎𝟑 + 𝟔(𝒎𝟏′ )𝟐𝒎𝟐′ −𝟑(𝒎𝟏′ )𝟒 .
+
+Derive similar results for 𝑚5 and 𝑚6.
+
+Example 5.1
+
+Calculate the first four moments about the mean for the following distribution
+
+ x 0 1 2 3 4 5 6 7 8
+ f 1 8 28 56 70 56 28 8 1
+
+ Solution
+
+Let A=4. Thus, we have to compute the moments about A=4.
+
+ x f d=x - 4 fd 𝑓𝑑2 𝑓𝑑3 𝑓𝑑4
+ 0 1 -4 -4 16 -64 256
+ 1 8 -3 -24 72 -216 648
+ 2 28 -2 -56 112 -224 448
+ 3 56 -1 -56 56 -56 56
+ 4 70 0 0 0 0 0
+ 5 56 1 56 56 56 56
+ 6 28 2 56 112 224 448
+ 7 8 3 24 72 216 648
+ 8 1 4 4 16 65 256
+ Total 256 0 0 512 0 2,816
+
+Therefore,
+
+ 1 0 ′ 𝑘 = 0 𝑖=1 𝑓𝑖𝑑𝑖= 𝑚1 = 𝑛∑ 256
+
+ 37
+
+--- Page 39 ---
+1 512 ′ 𝑘 2 = 2 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚2 = 𝑛∑ 256
+
+ 1 0 ′ 𝑘 3 = 0 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚3 = 𝑛∑ 256
+
+ 1 2816 ′ 𝑘 4 = 11. 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚4 = 𝑛∑ 256
+
+Therefore, the first four moments about the mean are:
+
+ 𝑚1 = 0.
+ 𝑚2 = 𝑚2′ −(𝑚1′ )2 = 2 −0 = 2.
+ 𝑚3 = 𝑚3′ −3𝑚1′ 𝑚2′ + 2(𝑚1′ )3 = 0 −3(0)(2) + 2(0)
+
+ = 0.
+ 𝑚4 = 𝑚4′ −4𝑚1′ 𝑚3′ + 6(𝑚1′ )2𝑚2′ −3(𝑚1′ )4
+ = 11 −4(0)(0) + 6(0)(2) −3(0) = 11.
+
+Example 5.2:
+
+The first four moments of a distribution about a value 5 of a variable are 2, 20, 40
+and 50. Show that the mean of the distribution is 7. Also find the first four
+moments about the mean.
+
+ Solution
+ 𝐴= 5, 𝑚1′ = 2, 𝑚2′ = 20, 𝑚3′ = 40, 𝑚4′ = 50
+
+ 𝑘
+ 1
+ 𝑚1′ = 𝑛∑𝑓𝑖(𝑥𝑖−𝐴)
+ 𝑖=1
+
+ 1 𝑘
+ 𝑖=1 𝑓𝑖𝑥𝑖−𝐴= 𝑥−𝐴 . = 𝑛∑
+∴ 𝑥−𝐴= 𝑚1′ ⇒𝑥−5 = 2 ⇒𝑥= 7.
+
+ 38
+
+--- Page 40 ---
+1 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥) = 0. 𝑚1 = 𝑛∑
+ 𝑚2 = 𝑚2′ −(𝑚1′ )2 = 20 −22 = 16.
+ 𝑚3 = 𝑚3′ −3𝑚1′ 𝑚2′ + 2(𝑚1′ )3
+ = 40 −3(2)(20) + 2(2)3 = −64.
+ 𝑚4 = 𝑚4′ −4𝑚1′ 𝑚3′ + 6(𝑚1′ )2𝑚2′ −3(𝑚1′ )4
+ = 50 −4(2)(40) + 6(22)(20) −3(24) = 162.
+
+Assessment
+
+ 1. From the following data, calculate the first four moments about the mean.
+ Wage (per Number of
+ day) Kshs workers
+ 3 -7 4
+ 8 -12 10
+ 13 -17 20
+ 18 -22 36
+ 23 -27 16
+ 28 -32 12
+ 33-37 2
+
+ 2. The arithmetic mean of a distribution is 5. The second and the third
+ moments about the mean are 20 and 140 respectively. Find the third
+ moment of the distribution about 10.
+ 3. The first three moments of a distribution about the value 2 of a variable are
+ 1, 16 and -40. Show that the mean is 3, the variance is 15 and 𝑚3 = −86.
+ Also show that the first three moments about A=0 are 3, 24 and 76.
+ 4. If the first four moments of a set of numbers about 3 are equal to -2, 10, -
+ 25 and 50. Calculate the corresponding moments about
+ a) The mean
+ b) The number 5
+ c) Zero .
+
+ 39
+
+--- Page 41 ---

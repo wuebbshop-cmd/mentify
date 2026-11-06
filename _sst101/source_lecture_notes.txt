@@ -1,0 +1,2995 @@
+--- Page 1 ---
+a higher education institution
+
+ : MATHEMATICS AND ACTUARIAL SCIENCE
+
+ SST 111: INTRODUCTION TO PROBABILITY AND STATISTICS
+
+VETTED BY:
+
+ 0
+
+--- Page 2 ---
+LESSON ONE
+
+ DEFINITION OF STATISTICS, DATA COLLECTION AND
+ DATA PRESENTATION TECHNIQUES
+
+1.1: Introduction
+
+Statistics is used in various fields like medicine, biology, sociology and others.
+
+1.1 Lesson Learning Outcomes
+ By the end of this lesson the learner will be able to:
+i. Define statistics
+ii. State types of statistics
+iii. State types of data and sources of data
+iv. List various methods of representing data
+
+1.2: Definition of Statistics
+
+Statistics is the science of data. This involves collecting, classifying, summarizing,
+organizing, analyzing, and interpreting numerical information.
+
+1.3: Types of Statistics
+
+There are two types of statistics namely descriptive and inferential statistics.
+Descriptive statistics uses numerical and graphical methods to look for patterns in
+a data set, and to present that information in a convenient form; while inferential
+statistics uses sample data to make estimates, decisions, predictions, or other
+generalizations about a larger set of data.
+
+1.3.1: Fundamental Elements of Statistics
+
+(a) A population is a set of units (usually, people, objects, transactions, or events)
+that we are interested in studying.
+
+(b) A variable is a characteristic or property of an individual population unit.
+
+(c) A sample is a subset of the units of a population.
+
+ 1
+
+--- Page 3 ---
+(d) A statistical inference is an estimate, prediction, or some generalizations about
+a population based on information contained in a sample.
+
+(e) A measure of reliability is a statement (usually associated with a statistical
+inference.
+
+1.4: Types of Data
+
+There are two types of data namely quantitative and qualitative data. Quantitative
+data are measurements that are recorded on a naturally occurring numerical scale;
+while qualitative data are measurements that cannot be measured on a natural
+numerical scale; they can only be classified into one of a group of categories.
+
+1.4.1: Data Collection
+
+Generally, you can obtain data in four different ways:
+
+ (a) Data from a published source
+ (b) Data from a designed experiment
+ (c) Data from a survey
+ (d) Data collected observationally.
+
+1.4.2: Methods of Presenting Data
+
+We can use frequency distribution, histogram, frequency polygon, cumulative
+frequency, graphs, pictograms etc.
+
+1.4.2.1: Frequency distribution (Frequency table)
+
+A frequency distribution is simply a table in which the data is grouped into classes
+and the number of cases which fall in each class are referred to as frequencies.
+
+Example 1.1
+
+In a survey of 35 families in a certain village, the number of children per family was
+recorded and the following data were obtained:
+
+ 1 0 2 3 4 5 6
+
+ 7 2 3 4 0 2 5
+
+ 8 4 5 12 6 3 2
+
+ 7 6 5 3 3 7 8
+
+ 2
+
+--- Page 4 ---
+9 7 9 4 5 4 3
+
+Represent the data in the form of a discrete frequency distribution.
+
+ Solution
+
+ Frequency distribution of the number of children: Table 1
+
+ Tally marks Frequency
+
+ 0 // 2
+ 1 / 1
+ 2 //// 4
+ 3 //// / 6
+ 4 //// 5
+ 5 //// 5
+ 6 /// 3
+ 7 //// 4
+ 8 // 2
+ 9 // 2
+ 10 - 0
+ 11 - 0
+ 12 / 1
+ Total 35
+
+Suppose we have the following table
+
+ Table 2
+
+ Masses of 100 female students at a certain school
+
+ Mass (Kg.) Number of students
+ 50 – 52 5
+ 53 – 55 18
+ 56 – 58 42
+ 59 – 61 27
+ 62 - 64 8
+ Total 100
+
+ 3
+
+--- Page 5 ---
+This type of representation of frequencies is called a grouped frequency
+distribution. In the above table 2 we have 5 groups viz 50 – 52, 53 -55, 56 – 58,
+59 – 61, 62 – 64. The groups are also known as classes.
+
+A symbol defining a class such as 50 – 52 in the above table 2 is called a class
+interval. The numbers 50 and 52 are called class limits. The figures on the left side
+of the classes are called lower class limits while figures on the right are known as
+upper limits.
+
+In the above table 2 the true dividing line between the first and second class is
+52.5. These numbers 49.5, 52.5, 55.5, 57.5, 61.5, 64.5 are called class boundaries
+or true class limits.
+
+The class width or class size of any class interval, is the difference between the
+upper and the lower class boundaries of the class. In table 2 the sizes of classes ae
+the same that is 3 (52.2 – 49.5=3).
+
+The class mark of a class interval is the mid-point of the class interval e.g. the last
+class has lower boundary 61.5 and upper boundary 64.5. Thus, the class mark for
+this class is 63 i.e. (61.5 + 64.5) /2.
+
+Example 1.2
+
+Prepare a frequency distribution for the following observations. Take classes as
+
+15 – 24, 25 – 34, 35 – 44, 45 – 54, 55 – 64, 65 -74, 75 -84 .
+
+ Data
+
+ 15 45 40 42 50 60 62 68 70 42
+
+ 75 75 80 81 25 26 31 32 78 45
+
+ 31 45 42 43 55 56 78 80 81 62
+
+ 60 62 58 69 70 45 50 56 72 58
+
+ 75 62 62 65 60 70 35 37 40 55
+
+ 4
+
+--- Page 6 ---
+Solution
+
+ Frequency distribution
+
+ Marks Tally marks Frequency
+ 15 – 24 / 1
+ 25 – 34 //// 5
+ 35 – 44 //// /// 8
+ 45 – 54 //// / 6
+ 55 – 64 //// //// //// 14
+ 65 – 74 //// // 7
+ 75 - 84 //// //// 9
+ Total 50
+
+1.4.2.2: Histogram
+
+A histogram or frequency histogram consists of a set of rectangles
+
+f
+
+15
+
+10
+
+5
+
+ 14.5 24.5 34.5 44.5 54.5 64.5 74.5 84.5 marks
+
+1.4.2.3: Frequency polygon
+
+A frequency polygon is a line graph of class frequency plotted against class mark. It
+can be obtained by connecting midpoints of the tops of rectangles in the histogram.
+
+ 5
+
+--- Page 7 ---
+1.4.2.4: Cumulative Frequency
+
+The total frequency of all values less than the upper class boundary of a given class
+interval is called the cumulative frequency up to and including the class interval.
+Let us consider table 2
+
+ Mass(Kg) 49.5 52.5 55.5 58.5 61.5 64.5
+ Cumulative 0 5 23 65 92 100
+ frequency
+
+1.6: Assessment
+
+1. Construct a frequency table for the following data of 50 marks obtained by 50
+students in TCU 201 examination. Take classes 5 -15, 15 – 25, etc.
+
+ 64 26 56 85 42 38 10 55 72 65
+
+ 15 47 59 62 52 54 48 62 81 31
+
+ 44 54 50 52 66 38 77 88 17 58
+
+ 15 25 49 51 64 68 53 50 72 58
+
+ 50 61 70 80 90 05 16 51 61 52
+
+2. Draw a histogram for the following data
+
+ 6
+
+--- Page 8 ---
+Variable 100 - 110 - 120 - 130 - 140 – 150 - 160 -
+ 110 120 130 140 150 160 170
+ Frequency 11 28 36 49 33 20 8
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 7
+
+--- Page 9 ---
+LESSON TWO
+
+ MEASURES OF CENTRAL TENDENCY
+
+2.1: Introduction
+
+One of main objectives of statistical analysis is to obtain one single value that
+describes the characteristic of the entire mass of unwieldy data. Such a value is
+called the central value or average value. In this lesson we will consider some of
+central values which are commonly used.
+
+2.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. State measures of location
+ ii. Compute measures of central tendency
+ iii. State uses of measures of location
+
+2.3: Measures of Location
+
+The various types of measures of location or measures of central tendency, in
+common use, are:
+
+ i. Arithmetic mean or simply the mean
+ ii. Geometric mean
+ iii. Harmonic mean
+ iv. Median and Quartiles
+ v. Mode
+
+Notation
+
+We shall denote 𝑥𝑖 (𝑖= 1,2,3, … , 𝑛) as any of the n values 𝑥1, 𝑥2, … , 𝑥𝑛 assumed
+by a variable X. Therefore, 𝑥𝑖 represents the ith observation. We shall use the
+symbol ∑ 𝑛𝑖=1 𝑥𝑖 to denote the sum of all the 𝑥𝑖`𝑠 from i=1 to i=n, that is
+ ∑ 𝑛 𝑖=1 𝑥𝑖 = 𝑥1 + 𝑥2 + … + 𝑥𝑛.
+
+ 8
+
+--- Page 10 ---
+2.3.1: Mean
+
+The arithmetic mean or simply the mean of a set of n numbers 𝑥1, 𝑥2, … , 𝑥𝑛 is
+denoted by 𝑥̅ and is defined as
+
+ 𝑛
+ 1 1
+ 𝑥̅ = 𝑛(𝑥1 + 𝑥2 + … + 𝑥𝑛) = 𝑛∑𝑥𝑖
+ 𝑖=1
+
+Therefore, to compute the mean of a simple series e.g. 3, 6, 9, 13, 15 we simply
+add the items and divide by the number of items. Thus,
+
+ 1
+ 𝑥̅ = (3 + 6 + 9 + 13 + 15) = 9.2
+ 5
+
+If the numbers 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, the
+mean is computed as follows:
+
+ 𝑓1𝑥1 + 𝑓2𝑥2 + … + 𝑓𝑘𝑥𝑘 ∑ 𝑘𝑖=1 𝑓𝑖𝑥𝑖 ∑ 𝑘𝑖=1 𝑓𝑖𝑥𝑖
+ 𝑥̅ = = =
+ 𝑓1 + 𝑓2 + ⋯+ 𝑓𝑘 ∑ 𝑘𝑖=1 𝑓𝑖 𝑛
+Where ∑ 𝑘𝑖=1 𝑓𝑖 = 𝑛.
+
+Example 2.1
+
+Calculate the mean of the frequency distribution shown below
+
+ Mark 𝑥𝑖 22 24 25 27 30 31 34 36
+ (out of
+ 50)
+ Number 𝑓𝑖 2 5 5 6 7 4 5 6
+ of
+ students
+
+Solution
+
+ (22×2)+(24×5)+⋯+(36×6) 1171
+Mean mark (𝑥̅ )= = = 29.3
+ 2+5+⋯+6 40
+
+The arithmetic mean of a grouped frequency distribution is computed by the
+above formula after the classes have been replaced by their mid-values (class
+marks).
+
+ 9
+
+--- Page 11 ---
+Example 2.2 Given the following frequency distribution, calculate the mean
+
+ Monthly 13-17 18-22 23-27 28-32 33-37 38-42 43-47 49-52 53-57
+ wages
+ ($)
+ No. of 2 22 19 14 3 4 6 1 1
+ workers
+
+ Solution
+
+ Mid-value No. of workers Product
+ x f fx
+ 15 2 30
+ 20 22 440
+ 25 19 475
+ 30 14 420
+ 35 3 105
+ 40 4 160
+ 45 6 270
+ 50 1 50
+ 55 1 55
+ Total ∑ 9𝑖=1 𝑓𝑖 =72 ∑ 9𝑖=1 𝑓𝑖𝑥𝑖=2,005
+
+ ∑ 𝑘𝑖=1 𝑓𝑖𝑥𝑖 2005
+Hence 𝑥̅ = = = 27.8
+ 𝑛 72
+
+2.3.1.1: Assumed mean method for computing mean
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑖, … , 𝑥𝑛 are the observed values whose mean is required; the
+we may proceed as follows:
+
+Let A be the assumed mean, and let 𝑑𝑖= 𝑥𝑖−𝐴 (𝑖= 1, 2, … , 𝑛) , then
+
+ 𝑥𝑖= 𝐴+ 𝑑𝑖
+Thus, ∑ 𝑛𝑖=1 𝑥𝑖= ∑ 𝑛𝑖=1(𝐴+ 𝑑𝑖)
+
+Dividing through by n we have
+
+ 10
+
+--- Page 12 ---
+𝑛 𝑛
+ 1 1
+ 𝑛∑𝑥𝑖= 𝑛∑(𝐴+ 𝑑𝑖)
+ 𝑖=1 𝑖=1
+ ∴𝑥̅ = 𝐴+ 𝑑̅
+Where 𝑑̅ = 1 𝑛𝑖=1 𝑑𝑖 . 𝑛∑
+
+Therefore, the mean 𝑥̅ is equal to the assumed mean plus the mean of deviations
+from the assumed mean.
+
+Example 2.3
+
+Calculate the mean of the values 307, 320, 325, 341, 315, 319.
+
+ Solution
+
+Let 𝐴= 320. Then
+
+ 𝑑1 = 307 −320 = −13, 𝑑2 = 320 −320 = 0, 𝑑3 = 325 −320 = 5,
+
+ 𝑑4 = 341 −320 = 21, 𝑑5 = 315 −320 = −5, 𝑑6 = 319 −320 = −1.
+ ∴𝑥̅ = 𝐴+ 𝑑̅
+
+ 1
+ = 320 + [(−13) + 0 + 5 + 21 + (−5) + (−1)] = 321.17
+ 6
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, then using
+the assumed A, we compute the actual mean as follows:
+
+Let 𝑑𝑖= 𝑥𝑖−𝐴 (𝑖= 1, 2, … , 𝑘), then 𝑥𝑖= 𝐴+ 𝑑𝑖. Thus
+
+ 𝑓𝑖𝑥𝑖= 𝑓𝑖𝐴+ 𝑓𝑖𝑑𝑖 and
+
+ ∑ 𝑘 𝑖=1 𝑓𝑖𝑥𝑖= ∑ 𝑘𝑖=1 (𝑓𝑖𝐴+ 𝑓𝑖𝑑𝑖 )
+ = 𝐴∑ 𝑘𝑖=1 𝑓𝑖+ ∑ 𝑘𝑖=1 𝑓𝑖𝑑𝑖
+Dividing both sides by ∑ 𝑘𝑖=1 𝑓𝑖 we obtain
+
+ ∑ 𝑘𝑖=1 𝑓𝑖𝑑𝑖 𝑥̅ = 𝐴+ 𝑑̅ , where 𝑑̅ = 𝑘 ∑ 𝑖=1 𝑓𝑖
+
+ 11
+
+--- Page 13 ---
+For grouped data we have to compute the class marks. If 𝑥𝑖 is the class mark and
+𝑓𝑖 is the class frequency, then
+
+ 𝑘 ∑ 𝑖=1 𝑓𝑖𝑥𝑖
+ 𝑥̅ = 𝑘 if there are k classes. ∑ 𝑖=1 𝑓𝑖
+
+Suppose our assumed mean A coincides with some class mark. Then
+
+ 𝑘 ∑ 𝑖=1 𝑓𝑖𝑑𝑖
+ 𝑥̅ = 𝐴+ 𝑘 . ∑ 𝑖=1 𝑓𝑖
+
+If all the class intervals have equal size c say, then 𝑥̅ may be expressed in the form
+
+ 𝑘 𝑐∑ 𝑖=1 𝑓𝑖𝑢𝑖 ∑ 𝑘𝑖=1 𝑓𝑖𝑢𝑖
+ . This𝑥̅ = 𝐴+ = 𝐴+ 𝑐 𝑢̅ , where 𝑑𝑖= 𝑐 𝑢𝑖 and 𝑢̅ = ∑ 𝑘 ∑ 𝑘 𝑖=1 𝑓𝑖 𝑖=1 𝑓𝑖
+method is known as the coding method for computing the mean.
+
+Example 2.4 Using
+
+ i. the direct method,
+ ii. assumed mean method, A=22.5,
+ iii. the coding method,
+
+compute the mean for the following grouped data
+
+ Class 5-8 9-12 13- 17- 21- 25- 29- 33- 37- 41-
+ 16 20 24 28 32 36 40 44
+ f 3 9 11 10 20 16 15 6 8 2
+
+ 12
+
+--- Page 14 ---
+Solution
+
+To calculate 𝑥̅ using the three methods we make a table as shown below
+
+ Class f X fx d u fd fu
+ 5 – 8 3 6.5 19.5 -16.0 -4 -48.0 -12
+ 9 – 12 9 10.5 94.5 -12.0 -3 -108.0 -27
+ 13 – 16 11 14.5 159.5 -8.0 -2 -88.0 -22
+ 17 – 20 10 18.5 185.0 -4.0 -1 -40.0 -10
+ 21 – 24 20 22.5 450.0 0 0 0 0
+ 25 – 28 16 26.5 424.0 4.0 1 64.0 16
+ 29 - 32 15 30.5 457.5 8.0 2 120.0 30
+ 33 – 36 6 34.5 207.0 12.0 3 72.0 18
+ 37 – 40 8 38.5 308.0 16.0 4 128.0 32
+ 41 - 44 2 42.5 85.0 20.0 5 40.0 10
+ Total 100 2390.0 140.0 35
+
+C = 4, A = 22.5. Thus
+
+ ∑ 𝑘𝑖=1 𝑓𝑖𝑥𝑖 2390.0
+ i. 𝑥̅ = 𝑘 = = 23.9 ∑ 𝑖=1 𝑓𝑖 100
+
+ ∑ 𝑘𝑖=1 𝑓𝑖𝑑𝑖 140.0
+ ii. 𝑥̅ = 𝐴+ 𝑘 = 22.5 + = 23.9 ∑ 𝑖=1 𝑓𝑖 100
+
+ 𝑐∑ 𝑘𝑖=1 𝑓𝑖𝑢𝑖 35
+ iii. 𝑥̅ = 𝐴+ 𝑘 = 22.5 + 4 ( = 23.9 ∑ 𝑖=1 𝑓𝑖 100)
+
+NB: The sum of the deviations of the values 𝑥𝑖 from their mean 𝑥̅ is zero.
+
+ Proof
+
+Let 𝑑1 = 𝑥1 −𝑥̅ , 𝑑2 = 𝑥2 −𝑥̅, … , 𝑑𝑛= 𝑥𝑛−𝑥̅ be the deviations of
+𝑥1, 𝑥2, … , 𝑥𝑖, … , 𝑥𝑛 from their mean 𝑥̅. Then
+ Sum of deviations= ∑ 𝑛𝑖=1 𝑑𝑖 = ∑ 𝑛𝑖=1(𝑥𝑖−𝑥̅)
+ = ∑ 𝑛𝑖=1 𝑥𝑖 −𝑛𝑥̅
+
+ 13
+
+--- Page 15 ---
+𝑛 ∑ 𝑛𝑖=1 𝑥𝑖 𝑛 𝑛
+ = ∑ 𝑖=1 𝑥𝑖 −𝑛( ) = ∑ 𝑖=1 𝑥𝑖 −∑ 𝑖=1 𝑥𝑖 = 0 𝑛
+
+2.4: Assessment
+
+1. Compute the mean for the following grouped data using the three methods
+
+ Class 63-67 68-72 73-77 78-82 83-87 88-92 93-97 98-102
+ f 2 5 12 17 14 6 3 1
+
+ 2. Find the missing frequency, if the arithmetic mean is 34 marks,
+ of the data given below
+ Marks 0 - 10 10 - 20 20 - 30 30 - 40 40 - 50 50 - 60
+ No. of 5 15 20 - 20 10
+ students
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 14
+
+--- Page 16 ---
+LESSON THREE
+
+ MEASURES OF CENTRAL TENDENCY
+
+3.1: Introduction
+
+In this lesson will discuss the other measures of location or measures of central
+tendency namely geometric mean, harmonic mean, median and mode of given
+data.
+
+3.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. Compute geometric mean, harmonic mean, median and mode of given
+ data
+ ii. Determine median and mode using graphical method.
+
+3.3: Geometric Mean
+
+The Geometric mean G of a set of 𝑛 non-zero positive numbers 𝑥1, 𝑥2, … , 𝑥𝑛 is
+the nth root of the product of the numbers. i.e.
+
+ 𝐺= 𝑛√𝑥1𝑥2 … 𝑥𝑛
+
+Example 3.1 Compute the geometric mean of the following numbers 3,9,27.
+
+ Solution
+
+ 3
+ G = √3 × 9 × 27 = 9
+
+If the k non-zero positive variate-values 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies
+𝑓1, 𝑓2, … , 𝑓𝑘 respectively, then geometric mean G, is given by
+
+ 𝑛 𝑓2 𝑓𝑘 𝑘 𝐺= √𝑥1𝑓1𝑥2 … 𝑥𝑘 , where 𝑛= ∑ 𝑖=1 𝑓𝑖
+
+ 𝟏
+ 𝑓2 𝒏 = … 𝑓𝑘] [𝑥1𝑓1𝑥2 𝑥𝑘
+
+Therefore,
+
+ 15
+
+--- Page 17 ---
+1 𝑓2 log 𝐺= 𝑓𝑘] 𝑓1𝑥2 … 𝑥𝑘 𝑛[𝑥1
+
+ 1
+ = 𝑛[𝑓1 log 𝑥1 + 𝑓2 log 𝑥2 + ⋯+ 𝑓𝑘log 𝑥𝑘]
+
+Example 3.2
+
+Compute the geometric mean of the following numbers
+
+ X 3 9 27
+ f 2 2 2
+
+ Solution
+
+ 6
+ G = √32 × 92 × 272 = 9 or
+
+ 1
+ 𝐺= [2 log 3 + 2 log 9 + 2 log 27]
+ 6
+
+ 1 1
+ = [2 log 3 + 4 log 3 + 6 log 3] = [12 log 3]
+ 6 6
+
+ = 2log3
+
+ = log32
+
+ ⇒𝐺= 32 = 9.
+
+3.4: Harmonic Mean
+
+The harmonic mean of the variate-values is the reciprocal of their arithmetic
+mean of their reciprocals. That is the harmonic mean, H, of a set of n numbers
+
+𝑥1, 𝑥2, … , 𝑥𝑛 is given by
+
+ 1
+ 𝐻= 1 𝑛 1
+ 𝑛∑ 𝑖=1 𝑥𝑖
+
+ 𝒏
+ = 𝑛 1 ∑
+ 𝑖=1 𝑥𝑖
+
+Example 3.3
+
+Compute the harmonic mean of the following numbers 3, 9, 27
+
+ Solution
+
+ 16
+
+--- Page 18 ---
+3
+ 𝐻= = 6.23
+ 1 1 1
+ + +
+ 3 9 27
+
+The harmonic mean, H, of k non-zero different variate-values
+𝑥1, 𝑥2, … , 𝑥𝑘 occurring with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively is given by
+
+ ∑ 𝑘𝑖=1 𝑓𝑖 𝐻= 𝑘 𝑓𝑖 ∑
+ 𝑖=1 𝑥𝑖
+
+NB: The relation between arithmetic mean 𝑥̅, geometric mean 𝐺 and the
+harmonic mean 𝐻 is
+
+ 𝐻≤𝐺≤ 𝑥̅
+
+The equality signs hold only if all the numbers 𝑥1, 𝑥2, … , 𝑥𝑛 are identical.
+
+Example 3.4
+
+The set of numbers 3, 9, 27 has 𝑥̅ = 13.0, 𝐺= 9.0, 𝐻= 6.23.
+
+ ∴𝐻< 𝐺< 𝑥̅
+
+3.5: Median, Quartiles, Deciles and Percentiles
+
+3.5.1: Median
+
+The median of a set of n numbers arranged in order of magnitude is the middle
+value if n is odd or the arithmetic mean of the two middle values if n is even. For
+example, the set
+
+ i. 4,7,7,7,9,10,10,12,15 has median 9
+ 8+10
+ ii. 6,7,8,10,11,12 has median 9 i.e. ( ) = 9
+ 2
+
+If the data is grouped then the median is obtained by interpolation given by
+
+ 𝑛
+ 2 −(∑𝑓)1
+ Median= 𝐿1 + ( 𝑓𝑚𝑒𝑑𝑖𝑎𝑛) 𝑐
+
+Where,
+
+ 𝐿1 =lower class boundary of the median class (the class containing the
+
+ Median)
+
+ 17
+
+--- Page 19 ---
+n=number of items in the data (total frequency)
+
+ (∑𝑓)1 = sum of frequencies of all classes lower than the median class
+
+ 𝑓𝑚𝑒𝑑𝑖𝑎𝑛=frequency of median class
+
+ C= size of median class interval
+
+Example 3.5 Calculate the median for the following frequency distribution of the
+number of marks obtained by 49 students in a class.
+
+ Marks 5 - 10 10 - 15 15 - 20 20 - 25 25 - 30 30 - 35 35 - 40 40 - 45
+ group
+ No. of 5 6 25 10 5 4 2 2
+ students
+
+ Solution
+
+ Class Frequency Cumulative frequency
+ (f) (cf)
+ 5 – 10 5 5
+ 10 – 15 6 11
+ 15 – 20 15 26
+ 20 – 25 10 36
+ 25 – 30 5 41
+ 30 – 35 4 45
+ 35 – 40 2 47
+ 40 – 45 2 49
+
+ n 49 1
+ = = 24
+ 2 2 2
+
+Therefore, the median class is 15 – 20
+
+Thus, 𝐿1 = 15, (∑𝑓)1 = 11 (i.e. 5+6=11), 𝑓𝑚𝑒𝑑𝑖𝑎𝑛= 15, c=5.
+
+ 𝑛 49
+ 2 −(∑𝑓)1 2 −11
+ Median= 𝐿1 + ( 𝑓𝑚𝑒𝑑𝑖𝑎𝑛) 𝑐= 15 + ( 15 ) 5 = 19.5 marks
+
+ 18
+
+--- Page 20 ---
+3.5.2: Quartiles, Deciles and Percentiles
+
+Quartiles are those values which divide the total frequency into four equal parts;
+deciles and percentiles divide into ten and one hundred equal parts respectively.
+
+Quartiles are denoted by 𝑄1, 𝑄2 and 𝑄3, that is the first, second and third
+quartiles respectively, the value 𝑄2 being equal to the median. The first quartile
+𝑄1 is often referred to as the lower quartile and the third quartile 𝑄3 is referred to
+as the upper quartile.
+
+Example 3.6
+
+The set 2,3,3,4,4,4,5,5,6,7,7,8 has
+
+ 4+5 3+4 6+7
+ 𝑄2 = = 4.5 , 𝑄1 = = 3.5, 𝑄3 = = 6.5 2 2 2
+
+The formulae for computing the lower and upper quartiles of grouped data is the
+ n n 3n
+same as that of median except instead of we have and for the lower and
+ 2 4 4
+upper quartiles respectively. Thus
+
+ 𝑛
+ −(∑𝑓)𝑄1 4
+ 𝑄1 = 𝐿𝑄1 + ( ) 𝑐1
+ 𝑓𝑄1
+
+and
+
+ 3𝑛
+ −(∑𝑓)𝑄3 4
+ 𝑄3 = 𝐿𝑄3 + ( ) 𝑐3
+ 𝑓𝑄3
+
+Where 𝐿𝑄1 =lower class boundary of the class containing the first quartile,
+
+ 𝑛= total frequency,
+
+ (∑𝑓)𝑄1 =sum of frequencies of all classes lower than the first quartile class,
+
+ 𝑓𝑄1 =frequency of the first quartile class,
+
+ 𝑐1 =size of first quartile class interval,
+
+ 𝐿𝑄3 = lower class boundary of the class containing the third quartile,
+
+ 19
+
+--- Page 21 ---
+(∑𝑓)𝑄3 =sum of frequencies of all classes lower than the third quartile class,
+
+ 𝑓𝑄3 =frequency of the third quartile class,
+
+ 𝑐3 =size of third quartile class interval.
+
+Example 3.7
+
+Compute the lower and upper quartiles for the following frequency distribution.
+
+ Class 5.5- 10.5- 15.5- 20.5- 25.5- 30.5- 35.5- 40.5-
+ 9.5 14.5 19.5 24.5 29.5 34.5 39.5 44.5
+ Frequency 5 6 15 10 5 4 2 2
+
+ Solution
+
+ Class Frequency (f) Cumulative frequency(cf)
+ 5.5 – 9.5 5 5
+ 10.5 – 14.5 6 11
+ 15.5 – 19.5 15 26
+ 20.5 – 24.5 10 36
+ 25.5 – 29.5 5 41
+ 30.5 – 34.5 4 45
+ 35.5 – 39.5 2 47
+ 40.5 – 44.5 2 49
+ Total 49
+
+ 𝑛 49 1
+To compute 𝑄1 we have = = 12 . Thus 𝑄1 lies in the class 15.5 – 19.5. 4 4 4
+Therefore, 𝐿𝑄1 = 15, 𝑛= 49, (∑𝑓)𝑄1 = 11, 𝑓𝑄1 = 15, 𝑐1 = 5.
+
+Hence
+ 𝑛
+ −(∑𝑓)𝑄1 4
+ 𝑄1 = 𝐿𝑄1 + ( ) 𝑐1
+ 𝑓𝑄1
+
+ 49
+ −11
+ 4 = 15 + ( ) 5 = 15.41
+ 15
+
+ 20
+
+--- Page 22 ---
+3𝑛 3(49) 3
+To compute 𝑄3 we have = = 36 . Thus 𝑄3 lies in the class 25.5 – 29.5. 4 4 4
+Therefore, 𝐿𝑄3 = 25, 𝑛= 49, (∑𝑓)𝑄3 = 36, 𝑓𝑄1 = 5, 𝑐1 = 5.
+
+Hence
+ 3𝑛
+ −(∑𝑓)𝑄3 4
+ 𝑄3 = 𝐿𝑄3 + ( ) 𝑐3
+ 𝑓𝑄1
+
+ 3(49)
+ −36
+ 4 = 25 + ( ) 5 = 25.75.
+ 5
+
+Deciles are denoted 𝐷1, 𝐷2, … , 𝐷8, 𝐷9 and percentiles are denoted by
+
+𝑃1, 𝑃2, … , 𝑃98, 𝑃99 . For grouped data we compute deciles and percentiles using
+the following formulae:
+
+ 𝑖𝑛
+ −(∑𝑓)𝐷𝑖 10
+ 𝐷𝑖= 𝐿𝐷𝑖+ ( ) 𝑐𝐷𝑖 , 𝑖= 1,2, … , 9
+ 𝑓𝐷𝑖
+
+and
+
+ 𝑖𝑛
+ −(∑𝑓)𝑃𝑖 100
+ 𝑃𝑖= 𝐿𝑃𝑖+ ( ) 𝑐𝑃𝑖 , 𝑖= 1,2, … ,99
+ 𝑓𝑃𝑖
+
+Quartiles, Deciles and Percentiles for grouped data can be obtained using
+graphical method.
+
+3.6: Mode
+
+The mode or modal value of the distribution is that value of the variable for which
+the frequency is maximum.
+
+Example 3.8
+
+The set
+
+ i. 2, 2, 5, 8, 8, 8 has mode 8,
+
+ 21
+
+--- Page 23 ---
+ii. 3, 5, 6, 8, 9, 10 has no mode,
+ iii. 14, 16, 12.2, 12.2, 12, 17, 17, 18, 20 has two modes 12.2 and 17 and is
+ known as bimodal.
+
+For a frequency distribution, the mode is computed by the following formula:
+
+ 𝑓𝑚−𝑓1
+ Mode= 𝐿+ (2𝑓𝑚−𝑓1−𝑓2) 𝑐 ,
+
+Where, 𝐿=lower class boundary of the modal class (the class interval having
+
+ Maximum frequency),
+
+ 𝑓𝑚= the maximum frequency (frequency of the modal class),
+
+ 𝑓1 = the frequency of the class preceding the modal class,
+
+ 𝑓2 = the frequency of the class following the modal class,
+
+ 𝑐= size of the modal class interval.
+
+Example 3.9
+
+Find the mode of the distribution given below:
+
+ Marks 5 - 10 10 - 15 15 – 20 - 25 25 - 30 30 - 35 35 - 40 40 - 45
+ group 20
+ No. of 5 6 15 10 5 4 2 2
+ students
+
+ Solution
+
+Clearly the class interval 15 – 20 has maximum frequency, hence it is the modal
+class.
+
+Therefore, 𝐿= 15, 𝑓1 = 6, 𝑓2 = 10, 𝑓𝑚=15, 𝑐= 5. Hence
+
+ 𝑓𝑚−𝑓1
+ Mode= 𝐿+ (2𝑓𝑚−𝑓1−𝑓2) 𝑐
+
+ 15−6
+ = 15 + (2(10)−6−10) 5 = 18.21
+
+ 22
+
+--- Page 24 ---
+3.7: Assessment
+
+1. Marks obtained by 80 students are given below:
+
+ Marks 0 - 10 10 – 20 20 - 30 30 - 40 40 - 50 50 - 60
+ Frequency 3 9 15 30 18 5
+ a) Compute the median, quartiles and mode for the above frequency
+ distribution.
+ b) Draw a cumulative frequency curve, hence determine the median and
+ quartiles.
+
+ 3. The median and mode of the following wage distribution are known to be
+ $ 33.5 and $ 34 respectively. Three frequency values from the table are
+ however missing. Find these missing values.
+ Wages 0 - 10 10 -20 20-30 30-40 40-50 50-60 60-70 Total
+ ($)
+ No. of 4 16 ? ? ? 6 4 230
+ Workers
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 23
+
+--- Page 25 ---
+LESSON FOUR
+
+ MEASURES OF DISPERSION
+
+4.1: Introduction
+
+The measures of central tendency are not sufficient measures to reveal the shape
+of the distribution of data set. The measures that show the spread of a data set
+are called the measures of dispersion. The main measures of dispersion are range,
+inter quartile range, standard deviation, variance and coefficient of variation. In
+this lesson we will discuss these measures of dispersion.
+
+4.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. State measures of dispersion
+ ii. Compute measures of dispersion
+
+4.3: Range
+
+The range is the difference between two extreme values of a distribution. If 𝑥𝑔
+and 𝑥𝑙 are the greatest and the smallest observations respectively in a
+distribution, then the range of the distribution is 𝑥𝑔−𝑥𝑙 .
+
+The range is the simplest and also the least reliable measure of dispersion. This is
+due to the fact that, it is based only on two extreme values.
+
+Example 4.1
+
+Find the range for the following data: 20, 21, 15, 10, 7, 4, 51, 49
+
+ Solution
+
+The range for the above data is 𝑥𝑔−𝑥𝑙= 51 −4 = 47.
+
+4.4: Quartile Deviation (semi- interquartile range)
+
+The quartile deviation or semi-interquartile range 𝑄 is given by
+
+ 1
+ 𝑄= (𝑄3 −𝑄1) , 2
+
+Where 𝑄1 and 𝑄3 are the first and third quartiles of the distribution respectively.
+
+ 24
+
+--- Page 26 ---
+Interquartile range= 𝑄3 −𝑄1.
+
+Quartile deviation is definitely a better measure of dispersion than the range as it
+makes use of 50% of the data. Since it ignores the rest 50% of the data, it cannot
+be regarded as a reliable measure of dispersion.
+
+4.5: Standard Deviation
+
+The standard deviation of a set of n numbers 𝑥1, 𝑥2, … , 𝑥𝑛 is usually denoted by s
+and is the positive root of the arithmetic mean of the squares of deviations of the
+given values from their arithmetic mean.
+
+Thus, the standard deviation of n observations 𝑥1, 𝑥2, … , 𝑥𝑛 is given by
+
+ 1 𝑛
+ 𝑖=1(𝑥𝑖−𝑥̅)2 𝑠= √ 𝑛∑
+
+Example 4.2
+
+Compute the standard deviation of the following set of numbers 120, 60, 70, 30,
+150, 100, 180, 50.
+
+ Solution
+
+ 1
+ 𝑥̅ = (120 + 60 + ⋯+ 50) = 95
+ 8
+
+ 𝑛
+ ∴ 𝑠= √1 𝑛∑(𝑥𝑖−𝑥̅)2
+ 𝑖=1
+
+ 1
+ 𝑠= √ [(120 −95)2 + (60 −95)2 + ⋯+ (50 −95)2]
+ 8
+
+ = √2375 = 48.7
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, the
+standard deviation s can be expressed as
+
+ 1 𝑘 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥̅)2 , where 𝑛= ∑ 𝑖=1 𝑓𝑖 𝑠= √ 𝑛∑
+
+ 25
+
+--- Page 27 ---
+This formula is also applicable to grouped data if we identify 𝑥𝑖 as the class mark
+of the ith class and 𝑓𝑖 as the corresponding class frequency.
+
+4.6: Variance
+
+The square of the standard deviation is called the variance and is denoted by 𝑠2.
+Thus, if 𝑥1, 𝑥2, … , 𝑥𝑛 is a set of n numbers, then their variance is given by
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥̅)2 . 𝑠2 = 𝑛∑
+
+If 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, their variance is
+given by
+
+ 1 𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥̅)2 , where 𝑛= ∑ 𝑖=1 𝑓𝑖 𝑠2 = 𝑛∑
+
+This formula is also applicable to grouped data if we identify 𝑥𝑖 as the class mark
+of the ith class and 𝑓𝑖 as the corresponding class frequency.
+
+ Let us consider different formula for computing variance.
+
+The variance of a set of n numbers is given by
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥̅)2 𝑠2 = 𝑛∑
+
+ 1 𝑛 2 𝑖=1 𝑥𝑖 −𝑥̅2 = 𝑛∑
+
+Example 4.3 Find the variance and standard deviation of the following set of
+numbers: 12, 6, 7, 9, 15, 13, 18, 11.
+
+ Solution
+
+To find the variance of these numbers we first find the mean of the
+
+numbers i.e. 𝑥̅ .Thus
+
+ 1
+ 𝑥̅ = (12 + 6 + 7 + 9 + 15 + 13 + 18 + 11) = 11.375
+ 8
+Therefore, 𝑥̅2 = 129.391
+
+Next, we find the mean of the squares of numbers i.e.
+
+ 26
+
+--- Page 28 ---
+1 𝑛 2 1 [122 + 62 + ⋯+ 182 + 112] = 143.625. 𝑖 = 𝑛∑𝑥𝑖 8
+
+ 1 𝑛 2 1 8 2 ∑ 𝑖 −𝑥̅2 = 𝑖=1 𝑥𝑖 −𝑥̅2 = 143.625 −129.391 = 14.2Finally, 𝑠2 = 𝑛∑𝑥𝑖 8
+
+Hence the standard deviation 𝑠= √14.2 = 3.8
+
+If 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, their variance is
+given by
+
+ 1 𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥̅)2 , where 𝑛= ∑ 𝑖=1 𝑓𝑖 𝑠2 = 𝑛∑
+
+ 1 𝑘 2 𝑖=1 𝑓𝑖𝑥𝑖 −𝑥̅2 = 𝑛∑
+
+Example 4.4
+
+The marks obtained by 30 students in statistics quiz marked out of 20 were as
+shown below:
+
+ Mark 8 9 10 11 12 14 15 17 18 20
+ x
+ Number 2 3 4 4 5 3 3 3 2 1
+ of
+ students
+ f
+Find the variance and standard deviation of the marks.
+
+ 27
+
+--- Page 29 ---
+Solution
+
+ Mark x Frequency f fx fx2
+ 8 2 16 128
+ 9 3 27 243
+ 10 4 40 400
+ 11 4 44 484
+ 12 5 60 720
+ 14 3 42 588
+ 15 3 45 675
+ 17 3 51 867
+ 18 2 36 648
+ 20 1 20 400
+ Total 30 381 5153
+
+ 2
+ 1 𝑘 2 5153 381 −( ) = 10.48. 𝑖=1 𝑓𝑖𝑥𝑖 −𝑥̅2 =𝑠2 = 𝑛∑ 30 30
+
+Hence 𝑠= √10.48 = 3.24
+
+4.6.1: Variance of Combined series
+
+Suppose we have two series of numbers i.e.
+
+ 𝑥11, 𝑥12, … , 𝑥1𝑛1 and 𝑥21, 𝑥22, … , 𝑥2𝑛2
+
+The first series has 𝑛1 numbers, and the second series has 𝑛2 numbers.
+
+Let the mean of the first series be 𝑥̅1 and the mean of the second series be 𝑥̅2 .
+Let the variance of the first series be 𝑠12 and the variance of the second series be
+𝑠22 .
+
+If 𝑥̅ denotes the mean of the combined series, then
+
+ 𝑛1𝑥̅1+𝑛2𝑥̅2
+ 𝑥̅ = .
+ 𝑛1+𝑛2
+Suppose 𝑠2 is the variance of the combined series. Then
+
+ 28
+
+--- Page 30 ---
+𝑛1 𝑛2
+ 1
+ 𝑠2 = [∑(𝑥1𝑖− 𝑥̅)2 + ∑(𝑥2𝑖− 𝑥̅)2 ]
+ 𝑛1 + 𝑛2
+ 𝑖=1 𝑖=1
+
+But,
+
+ 𝑛1 𝑛1 ∑ 𝑖=1 (𝑥1𝑖− 𝑥̅)2 = ∑ 𝑖=1[(𝑥1𝑖−𝑥1) + (𝑥1 −𝑥)]2
+
+ 𝑛1 𝑛1 = ∑ 𝑖=1 (𝑥1𝑖−𝑥1)2 + 2(𝑥1 −𝑥) ∑ 𝑖=1 (𝑥1𝑖−𝑥1) + 𝑛1(𝑥1 −𝑥)2
+
+ 2 𝑛1 = 𝑛1{𝑠1 + (𝑥1 −𝑥)2} since ∑ 𝑖=1 (𝑥1𝑖−𝑥1) = 0
+
+ Similarly,
+
+ 𝑛2 2 ∑ 𝑖=1(𝑥2𝑖− 𝑥̅)2 = 𝑛2{𝑠2 + (𝑥2 −𝑥)2}
+
+Hence,
+
+ 1
+ 𝑠2 = [𝑛1{𝑠12 + (𝑥1 − 𝑥̅)2} + 𝑛2{𝑠22 + (𝑥2 − 𝑥̅)2}]
+ 𝑛1 + 𝑛2
+
+If there are k series then the combined variance (pooled variance) of the series is
+given by
+
+ 1 2 2
+𝑠2 = 𝑛1+𝑛2+⋯+𝑛𝑘[𝑛1{𝑠1 + (𝑥1 − 𝑥̅)2} + 𝑛2{𝑠2 + (𝑥2 − 𝑥̅)2} + ⋯+
+ 𝑛𝑘{𝑠𝑘2 + (𝑥𝑘− 𝑥̅)2}]
+
+where,
+
+ 𝑛1𝑥̅1+𝑛2𝑥̅2+⋯+𝑛𝑘𝑘
+ 𝑥̅ =
+ 𝑛1+𝑛2+⋯+𝑛𝑘
+
+Example 4.5
+
+Analysis of monthly wages paid to the workers in two firms A and B belonging to
+the same industry gives the following results:
+
+ Firm A Firm B
+ Number of workers 500 600
+ Average monthly wage $ 186 $ 175
+ Variance of distribution 81 100
+ a) Which firm has a larger wage bill?
+ b) Calculate,
+
+ 29
+
+--- Page 31 ---
+i. the average monthly wage, and
+ ii. the variance and hence standard deviation of the distribution of
+ wages in the firms A and B taken together.
+
+ Solution
+
+ a) Wage bill for firm A= 𝑛1𝑥̅1 = $ (186 × 500) = $ 93,000
+ Wage bill for firm B= 𝑛2𝑥̅2 = $ (175 × 600) = $ 105,000.
+ Therefore, firm B has a larger wage bill.
+ b) 𝑛1 = 500, 𝑛2 = 600, 𝑥1 = $ 186, 𝑥2 = 175, 𝑠12 = 81, 𝑠22 = 100
+
+ i. The pooled (or combined) average monthly wage is
+
+ 𝑛1𝑥̅1+𝑛2𝑥̅2 93,000+105,000
+ 𝑥̅ = = 𝑥̅ = = $ 180
+ 𝑛1+𝑛2 500+600
+
+ ii. The pooled (or combined) variance is given by
+
+ 1
+ 𝑠2 = [500{81 + (186 −180)2} + 600{100 + (175 −180)2}]
+ 500 + 600
+
+ = 121.36.
+
+Hence standard deviation 𝑠= √121.36 = 11.02
+
+4.7: Coefficient of Variation
+
+The standard deviation is an absolute measure of dispersion. The corresponding
+relative measure is known as the coefficient of variation. The coefficient of
+variation (C.V) is defined by the formula
+
+ 𝑆𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛
+ 𝐶. 𝑉= 100% 𝐴𝑟𝑖𝑡ℎ𝑚𝑒𝑡𝑖𝑐 𝑚𝑒𝑎𝑛×
+
+ 𝑠
+ = × 100%
+ 𝑥̅
+
+This measure is used in problems where we want to compare the variability of
+two or more series. The series(group) for which the C.V is greater is said to be
+more variable or conversely less consistent or less homogeneous. On the other
+
+ 30
+
+--- Page 32 ---
+hand, the series for which the C.V is small is said to be less variable or more
+consistent or more homogeneous.
+
+4.8: Assessment
+
+ 1. Compute the mean, range, variance and standard deviation of the
+ following set of numbers: 6, 10, 15, 25, 30, 32, 40, 46.
+ 2. Calculate the mean, variance and standard deviation for the
+ following set of data.
+ 𝑥 0 −3 4 −7 8 −11 12 −15 16 −19 20 −23
+ 𝑓 7 4 18 12 7 6
+
+ 3. The following data give the mean and standard deviation of 3
+ subgroups.
+ Subgroup No. of workers Average wages Standard
+ ($) deviation ()$
+ A 50 61.0 8.0
+ B 100 70.8 9.0
+ C 120 80.5 10.0
+
+ Calculate,
+ i. the mean and standard deviation of the whole group,
+ ii. the C.V for each group and the C.V for the whole group.
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 31
+
+--- Page 33 ---
+LESSON FIVE
+
+ MOMENTS
+
+Moments are popularly used to describe the characteristics of a distribution and
+are measured about a point.
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑛 are the n values assumed by the variable X, then we define
+the following quantity
+
+ 𝑥1𝑟+𝑥2𝑟+⋯+𝑥𝑛𝑟 𝑥𝑟=
+ 𝑛
+
+As the 𝑟𝑡ℎ moment about zero. For different values of r we obtain different
+moments. When r=1 we obtain the first moment about zero. That is
+
+ 𝑥1+𝑥2+⋯+𝑥𝑛 1 𝑛 𝑥1 = = 𝑖=1 𝑥𝑖= 𝑥 𝑛 𝑛∑
+
+The second moment about zero is obtained when we put r=2. That is
+
+ 𝑥12+𝑥22+⋯+𝑥𝑛2 1 𝑛 2 𝑥2 = = 𝑖=1 𝑥𝑖 𝑛 𝑛∑
+
+The 𝑟𝑡ℎ moment about the mean 𝑥 is given by
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥)𝑟 𝑚𝑟= 𝑛∑
+
+If r=1, then
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥)1 = 0. 𝑚1 = 𝑛∑
+
+If r=2, then
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥)2 = 𝑠2, 𝑚2 = 𝑛∑
+
+Which is the variance of the series 𝑥1, 𝑥2, … , 𝑥𝑛 .
+
+The 𝑟𝑡ℎ moment about any value A is defined as
+
+ ′ 1 𝑛 1 𝑛 𝑟, (𝑥𝑖−𝐴)𝑟 = 𝑚𝑟 = 𝑛∑ 𝑖=1 𝑛∑ 𝑖=1 𝑑𝑖
+
+ 32
+
+--- Page 34 ---
+where 𝑑𝑖= 𝑥𝑖−𝐴.
+
+5.1: Moments for Grouped Data
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, then the
+𝑟𝑡ℎ moment about zero is given by
+ 𝑓1𝑥1𝑟+𝑓2𝑥2𝑟+⋯+𝑓𝑘𝑥𝑘𝑟 𝑥𝑟=
+ 𝑓1+𝑓2+⋯+𝑓𝑘
+
+ 1 𝑘 𝑟
+ 𝑖=1 𝑓𝑖𝑥𝑖 = 𝑛∑
+
+Where,
+
+ 𝑛= ∑𝑘 𝑖=1 𝑓𝑖
+
+Therefore the 𝑟𝑡ℎ moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)𝑟 𝑚𝑟= 𝑛∑
+
+Where,
+
+ 𝑛= ∑𝑘 𝑖=1 𝑓𝑖
+
+And the 𝑟𝑡ℎ moment about any value A is given by
+
+ 1 1
+ 𝑟, 𝑖=1 𝑓𝑖𝑑𝑖 𝑚𝑟′ = 𝑛∑𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)𝑟 = 𝑛∑
+where 𝑛= ∑ 𝑘𝑖=1 𝑓𝑖 and 𝑑𝑖= 𝑥𝑖−𝐴.
+
+If 𝑥𝑖′𝑠 are class marks of grouped data with class intervals of equal sizes and A is
+one of the class marks then each 𝑑𝑖 can be written as 𝑐𝑢𝑖, where c is the class
+interval width (class size). Hence in this case the 𝑟𝑡ℎ moment about A can be
+expressed as
+
+ 1 1
+ 𝑖=1 𝑓𝑖𝑑𝑖 𝑚𝑟′ = 𝑛∑𝑘 𝑘 𝑟 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)𝑟 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑐𝑢𝑖)𝑟 = 𝑛∑
+
+ 33
+
+--- Page 35 ---
+𝑐𝑟 𝑘 𝑖=1 𝑓𝑖𝑢𝑖𝑟 = 𝑛∑
+where 𝑛= ∑ 𝑘𝑖=1 𝑓𝑖 and 𝑑𝑖= 𝑥𝑖−𝐴.
+
+5.2: Relations between Moments
+
+The first moment about any value A is given by
+
+ 1 ′ 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴) 𝑚1 = 𝑛∑
+
+ 1 𝑘
+ 𝑖=1 𝑓𝑖𝑥𝑖−𝐴= 𝑥−𝐴 . = 𝑛∑
+
+The first moment about the mean is given by
+
+ 1 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥) = 0. 𝑚1 = 𝑛∑
+
+The second moment about any value A is given by
+
+ 1 ′ 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)2 . 𝑚2 = 𝑛∑
+
+The second moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)2 𝑚2 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖{(𝑥𝑖−𝐴) −(𝑥−𝐴)}2 = 𝑛∑
+We know that (𝑎−𝑏)2 = 𝑎2 −2𝑎𝑏+ 𝑏2
+
+Let and 𝑥−𝐴= 𝑏. Therefore, 𝑥𝑖−𝐴= 𝑎
+{(𝑥𝑖−𝐴) −(𝑥−𝐴)}2 = (𝑥𝑖−𝐴)2 −2(𝑥𝑖−𝐴)(𝑥−𝐴) +
+ (𝑥−𝐴)2
+
+Thus,
+
+ 1 𝑘 𝑖=1 𝑓𝑖{ (𝑥𝑖−𝐴)2 −2(𝑥𝑖−𝐴)(𝑥−𝐴) + (𝑥−𝐴)2}𝒎𝟐= 𝑛∑
+
+ 34
+
+--- Page 36 ---
+1 1 𝑘 𝑘
+ 𝑖=1 𝑓𝑖 (𝑥𝑖−𝐴) + = 𝑛∑ 𝑖=1 𝑓𝑖 (𝑥𝑖−𝐴)2 −2 (𝑥−𝐴) 𝑛∑
+ (𝑥−𝐴)2
+
+ ′ ′ = 𝒎𝟐 −𝟐(𝑥−𝐴)2+(𝑥−𝐴)2 = 𝑚2 −(𝑥−𝐴)2
+ = 𝑚2′ −(𝑚1′ )2
+
+ ′ ′
+Hence 𝒎𝟐= 𝒎𝟐 −(𝒎𝟏 )𝟐.
+
+The third moment about any value A is given by
+
+ 1 ′ 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)3 . 𝑚3 = 𝑛∑
+
+The third moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)3 𝑚3 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖{(𝑥𝑖−𝐴) −(𝑥−𝐴)}3 = 𝑛∑
+
+We know that
+ (𝑎−𝑏)3 = 𝑎3 −3𝑎2𝑏+ 3𝑎𝑏2 −𝑏3
+
+Let and 𝑥−𝐴= 𝑏. Therefore, 𝑥𝑖−𝐴= 𝑎
+{(𝑥𝑖−𝐴) −(𝑥−𝐴)}3 = (𝑥𝑖−𝐴)3 −3(𝑥𝑖−𝐴)2(𝑥−𝐴) +
+ 3(𝑥𝑖−𝐴)(𝑥−𝐴)2 −(𝑥−𝐴)3
+
+Therefore,
+
+ 𝑘 𝑘
+ 1 1
+ 𝑚3 = 𝑛∑𝑓𝑖(𝑥𝑖−𝐴)3 −3(𝑥−𝐴) 𝑛∑𝑓𝑖(𝑥𝑖−𝐴)2 +
+ 𝑖=1 𝑖=1
+
+ 𝑘
+ 1
+ 3(𝑥−𝐴)2 𝑛∑𝑓𝑖 (𝑥𝑖−𝐴) − (𝑥−𝐴)3
+ 𝑖=1
+
+ 35
+
+--- Page 37 ---
+= 𝑚3′ −3𝑚1′ 𝑚2′ + 3(𝑚1′ )2𝑚1′ −(𝑚1′ )3
+ = 𝑚3′ −3𝑚1′ 𝑚2′ + 3(𝑚1′ )3 −(𝑚1′ )3
+
+ ′ ′ ′
+Hence 𝒎𝟑= 𝒎𝟑 −𝟑𝒎𝟏 𝒎𝟐 + 𝟐(𝒎𝟏′ )𝟑
+
+Similarly, the fourth moment about any value A is given by
+
+ 1 ′ 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)4 , 𝑚4 = 𝑛∑
+
+and the fourth moment about the mean is given by
+
+ 1 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥)4 𝑚4 = 𝑛∑
+
+ 1 𝑘 𝑖=1 𝑓𝑖{(𝑥𝑖−𝐴) −(𝑥−𝐴)}4 = 𝑛∑
+But (𝑎−𝑏)4 = 𝑎4 −4𝑎3𝑏+ 6𝑎2𝑏2 −4𝑎𝑏3 + 𝑏4.
+
+Letting and 𝑥−𝐴= 𝑏 we have 𝑥𝑖−𝐴= 𝑎
+ {(𝑥𝑖−𝐴) −(𝑥−𝐴)}4 = (𝑥𝑖−𝐴)4 −4(𝑥𝑖−𝐴)3(𝑥−𝐴) +
+ 6(𝑥𝑖−𝐴)2(𝑥−𝐴)2
+ −4(𝑥𝑖−𝐴)(𝑥−𝐴)3 + (𝑥−𝐴)4
+
+ 𝑘
+ 1
+∴ 𝑚4 = 𝑛∑𝑓𝑖{(𝑥𝑖−𝐴)4 −4(𝑥𝑖−𝐴)3(𝑥−𝐴)
+ 𝑖=1
+ + 6(𝑥𝑖−𝐴)2(𝑥−𝐴)2 −4(𝑥𝑖−𝐴)(𝑥−𝐴)3
+ + (𝑥−𝐴)4}
+
+ 1 1 𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)3 = 𝑛∑ 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)4 −4(𝑥−𝐴) 𝑛∑
+
+ 1
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝐴)2 +6(𝑥−𝐴)2 𝑛∑𝑘
+
+ 36
+
+--- Page 38 ---
+1
+ 𝑖=1 𝑓𝑖 (𝑥𝑖−𝐴) + (𝑥−𝐴)4 −4(𝑥−𝐴)3 𝑛∑𝑘
+ = 𝑚4′ −4𝑚1′ 𝑚3′ + 6(𝑚1′ )2𝑚2′ −4(𝑚1′ )3𝑚1′ + (𝑚1′ )4
+
+Hence,
+
+ ′ ′ ′
+𝒎𝟒= 𝒎𝟒 −𝟒𝒎𝟏 𝒎𝟑 + 𝟔(𝒎𝟏′ )𝟐𝒎𝟐′ −𝟑(𝒎𝟏′ )𝟒 .
+
+Derive similar results for 𝑚5 and 𝑚6.
+
+Example 5.1
+
+Calculate the first four moments about the mean for the following distribution
+
+ x 0 1 2 3 4 5 6 7 8
+ f 1 8 28 56 70 56 28 8 1
+
+ Solution
+
+Let A=4. Thus, we have to compute the moments about A=4.
+
+ x f d=x - 4 fd 𝑓𝑑2 𝑓𝑑3 𝑓𝑑4
+ 0 1 -4 -4 16 -64 256
+ 1 8 -3 -24 72 -216 648
+ 2 28 -2 -56 112 -224 448
+ 3 56 -1 -56 56 -56 56
+ 4 70 0 0 0 0 0
+ 5 56 1 56 56 56 56
+ 6 28 2 56 112 224 448
+ 7 8 3 24 72 216 648
+ 8 1 4 4 16 65 256
+ Total 256 0 0 512 0 2,816
+
+Therefore,
+
+ 1 0 ′ 𝑘 = 0 𝑖=1 𝑓𝑖𝑑𝑖= 𝑚1 = 𝑛∑ 256
+
+ 37
+
+--- Page 39 ---
+1 512 ′ 𝑘 2 = 2 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚2 = 𝑛∑ 256
+
+ 1 0 ′ 𝑘 3 = 0 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚3 = 𝑛∑ 256
+
+ 1 2816 ′ 𝑘 4 = 11. 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚4 = 𝑛∑ 256
+
+Therefore, the first four moments about the mean are:
+
+ 𝑚1 = 0.
+ 𝑚2 = 𝑚2′ −(𝑚1′ )2 = 2 −0 = 2.
+ 𝑚3 = 𝑚3′ −3𝑚1′ 𝑚2′ + 2(𝑚1′ )3 = 0 −3(0)(2) + 2(0)
+
+ = 0.
+ 𝑚4 = 𝑚4′ −4𝑚1′ 𝑚3′ + 6(𝑚1′ )2𝑚2′ −3(𝑚1′ )4
+ = 11 −4(0)(0) + 6(0)(2) −3(0) = 11.
+
+Example 5.2:
+
+The first four moments of a distribution about a value 5 of a variable are 2, 20, 40
+and 50. Show that the mean of the distribution is 7. Also find the first four
+moments about the mean.
+
+ Solution
+ 𝐴= 5, 𝑚1′ = 2, 𝑚2′ = 20, 𝑚3′ = 40, 𝑚4′ = 50
+
+ 𝑘
+ 1
+ 𝑚1′ = 𝑛∑𝑓𝑖(𝑥𝑖−𝐴)
+ 𝑖=1
+
+ 1 𝑘
+ 𝑖=1 𝑓𝑖𝑥𝑖−𝐴= 𝑥−𝐴 . = 𝑛∑
+∴ 𝑥−𝐴= 𝑚1′ ⇒𝑥−5 = 2 ⇒𝑥= 7.
+
+ 38
+
+--- Page 40 ---
+1 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥) = 0. 𝑚1 = 𝑛∑
+ 𝑚2 = 𝑚2′ −(𝑚1′ )2 = 20 −22 = 16.
+ 𝑚3 = 𝑚3′ −3𝑚1′ 𝑚2′ + 2(𝑚1′ )3
+ = 40 −3(2)(20) + 2(2)3 = −64.
+ 𝑚4 = 𝑚4′ −4𝑚1′ 𝑚3′ + 6(𝑚1′ )2𝑚2′ −3(𝑚1′ )4
+ = 50 −4(2)(40) + 6(22)(20) −3(24) = 162.
+
+Assessment
+
+ 1. From the following data, calculate the first four moments about the mean.
+ Wage (per Number of
+ day) Kshs workers
+ 3 -7 4
+ 8 -12 10
+ 13 -17 20
+ 18 -22 36
+ 23 -27 16
+ 28 -32 12
+ 33-37 2
+
+ 2. The arithmetic mean of a distribution is 5. The second and the third
+ moments about the mean are 20 and 140 respectively. Find the third
+ moment of the distribution about 10.
+ 3. The first three moments of a distribution about the value 2 of a variable are
+ 1, 16 and -40. Show that the mean is 3, the variance is 15 and 𝑚3 = −86.
+ Also show that the first three moments about A=0 are 3, 24 and 76.
+ 4. If the first four moments of a set of numbers about 3 are equal to -2, 10, -
+ 25 and 50. Calculate the corresponding moments about
+ a) The mean
+ b) The number 5
+ c) Zero .
+
+ 39
+
+--- Page 41 ---
+LESSON SIX
+
+ SKEWNESS AND KURTOSIS
+
+6.1 Skewness
+
+Skewness refers to lack of symmetry. A skewed distribution is a frequency
+distribution that is asymmetric (not symmetric). When the longer tail of a
+distribution extends to the right, it is said to be skewed to the right and when the
+longer tail of a distribution extends to the left, it said to be skewed to the left.
+
+When a distribution is skewed to the right, it contains a large number of relatively
+low scores and a few extremely high scores. Generally, the mode is less than the
+median which in turn is less than the mean.
+
+ Skewed to the right (Positive Skewness)
+
+frequency
+
+ mode median mean variable
+
+When a distribution is skewed to the left, it contains a large number of relatively
+high scores and a few extremely low scores. Generally, the mean is less than the
+median which in turn is less than the mode.
+
+ 40
+
+--- Page 42 ---
+Skewed to the left (Negative Skewness)
+
+frequency
+
+ Mean median mode variable
+
+For skewed distributions, the mean is different from the median which in turn is
+different from the mode.
+
+Variation tells us about the amount of spread while skewness tells us about the
+direction of spread.
+
+6.1.1: Measures of Skewness
+
+6.1.1.1: Karl Pearson’s Coefficient of Skewness
+
+Karl Pearson’s first coefficient of skewness is given by
+
+ 𝑚𝑒𝑎𝑛−𝑚𝑜𝑑𝑒 𝑥−𝑚𝑜𝑑𝑒
+ 𝑆𝐾𝑃= ……………..(i) 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+Karl Pearson’s second coefficient of skewness is given by
+
+ 3(𝑚𝑒𝑎𝑛−𝑚𝑒𝑑𝑖𝑎𝑛) 3(𝑥−𝑚𝑒𝑑𝑖𝑎𝑛)
+ 𝑆𝐾𝑃= …………(ii) 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+ 41
+
+--- Page 43 ---
+Expression (ii) is particularly useful for distributions with more than one mode.
+Theoretically the value of the coefficient of skewness given by these formulae (i)
+and (ii) can lie between -3 and +3. However, in practice the value of this
+coefficient usually lies between -1 and +1.
+
+6.1.1.2: Bowley’s Coefficient of Skewness
+
+This is also known as quartile coefficient of skewness and is based on quartiles.
+This is given by
+
+ 𝑄3+𝑄1−2𝑄2
+ 𝑆𝐾𝐵= 𝑄3−𝑄1
+
+ 𝑄3+𝑄1−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑄3−𝑄1
+
+It varies between -1 and +1. It is particularly useful when we have open-end
+distributions and where extreme values are present.
+
+6.1.1.3: Percentile Coefficient of Skewness
+
+This was devised by Kelly and is defined as
+
+ 𝑃90+𝑃10−2𝑃50
+ 𝑆𝐾𝐾= 𝑃90−𝑃10
+
+ 𝑃90+𝑃10−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑃90−𝑃10
+ 𝐷9 + 𝐷1 −2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝐷9 −𝐷1
+
+6.1.1.3: Moment Coefficient of Skewness
+
+The moment coefficient of skewness denoted by 𝛽1 is defined by
+ 𝑚32
+ 𝛽1 = 3 ,
+ 𝑚2
+
+where 𝑚2 is the second moment about the mean and 𝑚3 is the third moment
+about the mean.
+
+ 42
+
+--- Page 44 ---
+For perfectly symmetrical curves such as the normal curve, 𝛽1 is zero.
+
+Measures of coefficient of skewness are used mainly for making comparisons
+between two or more distributions. We can talk of slight skewness, moderate
+skewness or marked skewness.
+
+Example 6.1 The following data relate to the profits of 1,000 companies in
+thousands Kenya shillings.
+
+ Profit 100- 120 – 140 - 160 - 180 - 200 - 220 -
+ (in 119 139 159 179 199 219 239
+ thousand
+ shillings)
+ Number of 17 53 199 194 327 208 2
+ companies
+
+Calculate:
+
+ i) the Karl Pearson’s first coefficient of skewness and comment on its
+ value,
+ ii) Bowley’s coefficient of skewness,
+ iii) moment coefficient of skewness.
+
+ Solutions
+
+ Profit Class f 𝑑 𝑢 𝑓𝑢 𝑓𝑢2 𝑓𝑑 𝑓𝑑2 𝑓𝑑3
+ mark = 𝑥−169.5 𝑑
+ =
+ x 20
+ 100- 109.5 17 -60 -3 -51 153 -1020 61200 -3672000
+ 119
+ 120- 129.5 53 -40 -2 -106 212 -2120 84800 -3392000
+ 139
+ 140- 149.5 199 -20 -1 -199 199 -3980 79600 -1592000
+ 159
+ 160- 169.5 194 0 0 0 0 0 0 0
+ 179
+ 180- 189.5 327 20 1 327 327 6540 130800 2616000
+ 199
+ 200- 209.5 208 40 2 416 832 8320 332800 13312000
+ 219
+
+ 43
+
+--- Page 45 ---
+220- 229.5 2 60 3 6 18 120 7200 432000
+239
+Total 1,000 393 1,741 7860 565600 7704000
+ 𝑚𝑒𝑎𝑛−𝑚𝑜𝑑𝑒 𝑥−𝑚𝑜𝑑𝑒
+ i) 𝑆𝐾𝑃= 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+ 1 7 393
+ mean (𝑥) = 𝐴+ ( 𝑛∑ 𝑖=1 𝑓𝑖𝑢𝑖) 𝑐 = 169.5 + (1000) 20 = 177.36
+ The modal class is 180 – 199.
+
+ 𝑓𝑚−𝑓1
+ Mode= 𝐿+ (2𝑓𝑚−𝑓1−𝑓2) 𝑐
+
+ 327−194 133×20
+ = 179.5 + ( 2×327−194−208) 20 = 179.5 + 252
+
+ = 190.06.
+
+ 2
+ 1 7 2 1 7
+ 𝑖=1 𝑓𝑖𝑢𝑖 ) } 𝑠= √𝑐2{𝑛∑ 𝑖=1 𝑓𝑖𝑢𝑖 −(𝑛∑
+
+ 2 2 1741 393
+ = √202 { −( } = √400 × 1.5866 = 25.2. 1000 1000)
+
+ Hence,
+
+ 𝑚𝑒𝑎𝑛−𝑚𝑜𝑑𝑒 𝑥−𝑚𝑜𝑑𝑒
+ 𝑆𝐾𝑃= 𝑠𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛= 𝑠
+
+ 177.36 −190.06
+ = = −0.504
+ 25.2
+ This is considered moderate skewness.
+
+ 𝑄3+𝑄1−2𝑄2
+ ii) 𝑆𝐾𝐵= 𝑄3−𝑄1
+ 𝑄3+𝑄1−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑄3−𝑄1
+
+ 44
+
+--- Page 46 ---
+Class 99.5 119.5 139.5 159.5 179.5 199.5 219.5 239.5
+ boundaries
+ Cf 0 17 70 269 463 790 998 1000
+
+1000
+ = 250 ⇒ 𝑄1 lies in the class interval 140 – 159. Therefore, 4
+
+ 𝑛
+ −(∑𝑓)𝑄1 −70 4 (250 ) 20𝑄1 = 𝐿𝑄1 + ( ) 𝑐1 = 139.5 +
+ 𝑓𝑄1 199
+
+ = 139.5 + 18.09 = 157.59.
+1000
+ = 500 ⇒ 𝑄2 (median) lies in the class interval 180 – 199. Therefore, 2
+
+ 𝑛
+ −(∑𝑓)1 500 −463
+Median= 𝐿1 + ( 2𝑓𝑚𝑒𝑑𝑖𝑎𝑛) 𝑐= 179.5 + ( 327 ) 20
+ = 179.93
+
+3
+ (1000) = 750 ⇒ 𝑄3 (median) lies in the class interval 180 – 199.4
+Therefore,
+
+ 3𝑛
+ −(∑𝑓)𝑄3 −463 4 (750 ) 20 𝑄3 = 𝐿𝑄3 + ( ) 𝑐3𝑄3 = 179.5 +
+ 𝑓𝑄1 327
+
+ = 197.05.
+Hence,
+
+ 𝑄3+𝑄1−2𝑄2
+ 𝑆𝐾𝐵= 𝑄3−𝑄1
+ 𝑄3+𝑄1−2 𝑚𝑒𝑑𝑖𝑎𝑛
+ =
+ 𝑄3−𝑄1
+ 197.05+157.59−2(179.93)
+ = = −0.1323.
+ 197.05−157.59
+
+ 45
+
+--- Page 47 ---
+𝑚32
+ iii) 𝛽1 = 3
+ 𝑚2
+
+ 1 7860 ′ 𝑘 = 7.86 𝑖=1 𝑓𝑖𝑑𝑖= 𝑚1 = 𝑛∑ 1000
+
+ 1 565600 ′ 𝑘 2 = 565.6 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚2 = 𝑛∑ 1000
+
+ 1 7704000 ′ 𝑘 3 = 7704 𝑖=1 𝑓𝑖𝑑𝑖 = 𝑚3 = 𝑛∑ 1000
+
+ 𝑚2 = 𝑚2′ −(𝑚1′ )2 = 565.6 −7.862 = 503.8
+
+ 𝑚3 = 𝑚3′ −3𝑚1′ 𝑚2′ + 2(𝑚1′ )3
+ = 7704 −3(7,86)(565.6) + 2(7.86)2
+ = −5509.3.
+ Hence,
+
+ 𝑚32 (−5509,3)2
+ 𝛽1 = 3 = = 0.2374. 𝑚2 503.83
+
+6.2: Kurtosis
+
+Kurtosis is the degree of peaked-ness of a distribution, usually taken relative to a
+normal distribution. If a curve is more peaked than the normal curve, it is called
+leptokurtic; if it is more flat-topped than the normal curve it is called platykurtic
+or flat topped. The normal curve is known as mesokurtic. The diagram below
+illustrates the three different curves.
+
+ 46
+
+--- Page 48 ---
+Measures of Kurtosis
+
+ Leptokurtic
+
+ Mesokurtic
+
+ Platykurtic
+
+6.2.1: Measures of Kurtosis
+
+Kurtosis is measured by the coefficient 𝛽2 or its derivative 𝛾2 given by
+ 𝑚4
+ 𝛽2 = , 𝛾2 = 𝛽2 −3, 𝑚22
+
+Where 𝑚4 is the fourth moment about the mean and 𝑚2 is the second moment
+about the mean. For the normal curve (mesokurtic) 𝛽2 = 3 𝑖. 𝑒 𝛾2 = 0 . For a
+curve that is more flat-topped than the normal curve (platykurtic curve) 𝛽2 <
+3 𝑖. 𝑒 𝛾2 < 0 and for a curve more peaked than the normal curve (leptokurtic
+curve) 𝛽2 > 3 𝑖. 𝑒 𝛾2 > 0.
+
+ 47
+
+--- Page 49 ---
+LESSON SEVEN
+
+ REGRESSION AND CORRELATION ANALYSIS
+
+7.1: Introduction
+
+In this lesson we will discuss regression and correlation. Correlation analysis deals
+with the association between two or more variables; while regression analysis
+attempts to establish the nature of the relationship between variables.
+
+7.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. determine regression lines of two variables,
+ ii. find correlation coefficient between two variates,
+ iii. compute Spearman’s rank correlation coefficient.
+
+7.3: Regression
+
+For studying the relationship between two variables X and Y, the simplest
+regression equation is of the form
+
+ 𝑦= 𝑎+ 𝑏𝑥
+
+Where a and b are constants. This equation specifies the linear regression of Y on
+X. The constant b which is the slope of the above regression line, is known as the
+coefficient of regression of Y on X.
+
+7.3.1: The least squares regression line of Y on X
+
+The regression line of Y on X is given by the equation
+
+ 𝑦= 𝑎+ 𝑏𝑥
+
+The constants a and b are determined by using normal equations. In this case the
+normal equations are
+
+ ∑𝑦= 𝑛𝑎+ 𝑏∑𝑥 and ∑𝑥𝑦= 𝑎∑𝑥+ 𝑏∑𝑥2.
+
+ 48
+
+--- Page 50 ---
+7.3.2: The least squares regression line of X on Y
+
+The regression line of X on Y is given by the equation
+
+ 𝑥= 𝑐+ 𝑑𝑥
+
+The constants c and d are determined by using normal equations. In this case the
+normal equations are
+
+ ∑𝑥= 𝑛𝑐+ 𝑑∑𝑥 and ∑𝑥𝑦= 𝑐∑𝑦+ 𝑑∑𝑦2.
+
+Example 7.1
+
+The following table shows the distribution of marks in calculus and statistics of
+eight students in a certain university.
+
+ Calculus(X) 55 44 33 47 42 65 51 63
+ Statistics(Y) 43 52 35 38 51 43 48 50
+
+ i. Fit simple regression lines of Y on X and X on Y.
+ ii. Estimate the score in statistics for a student who scored 50 in calculus.
+ iii. Estimate the score in calculus for a student who scored 50 in statistics.
+ Solution
+
+ X Y XY X2 Y2
+ 55 43 2,365 3,025 1,849
+ 44 52 2,288 1,936 2,704
+ 33 35 1,155 1,089 1,225
+ 47 38 1,786 2,209 1,444
+ 42 51 2,142 1,764 2,601
+ 65 43 2,785 4,225 1,849
+ 51 48 2,448 2,601 2,304
+ 63 50 3,150 3,969 2,500
+
+ ∑400 ∑360 ∑18,129 ∑20,818 ∑16,476
+
+ i. The regression line of Y on X is
+ 𝑌= 𝑎+ 𝑏𝑋
+ The normal equations are:
+
+ 49
+
+--- Page 51 ---
+∑𝑌= 𝑛𝑎+ 𝑏∑𝑋⇒360 = 8𝑎+ 400𝑏 ………………………………… (1)
+ and
+ ∑𝑋𝑌= 𝑎∑𝑋+ 𝑏∑𝑋2 ⇒18,129 = 400𝑎+ 20,818𝑏 ……………. (2)
+
+ Therefore, solving equations (1) and (2) simultaneously we have
+ (1) × 50 ⇒400𝑎+ 20,000𝑏= 18,000 ………………………………… (3)
+ (2) × 1 ⇒400𝑎+ 20,818𝑏= 18,129 ………………………………… (4)
+ (3) −(4) we have −818𝑏= −129
+ ∴𝑏= 0.1577 and from equation (1) we have 𝑎= 37.115. Hence the
+ regression line of Y on X is
+ 𝑌= 37.115 + 0.1577𝑋
+
+ The regression line of X on Y is
+ 𝑋= 𝑐+ 𝑑 𝑌
+ The normal equations are:
+ ∑𝑋= 𝑛𝑐+ 𝑑∑𝑌⇒400 = 8𝑐+ 360𝑑 ………………………………… (1)
+ and
+ ∑𝑋𝑌= 𝑐∑𝑌+ 𝑑∑𝑌2 ⇒18,129 = 360𝑐+ 16.476d……………. (2)
+
+ Therefore, solving equations (1) and (2) simultaneously we have
+ (1) × 45 ⇒360𝑐+ 16,200𝑏= 18,000 ………………………………… (3)
+ (2) × 1 ⇒360𝑐+ 16,476𝑑= 18,129 ………………………………… (4)
+ (3) −(4) we have −276𝑑= −129
+ ∴𝑑= 0.4674 and from equation (1) we have 𝑐= 28.967. Hence the
+ regression line of Y on X is
+ 𝑋= 28.967 + 0.4674𝑌
+
+ii. The required score in statistics for a student who scored 50 in calculus is
+ 𝑌= 37.115 + 0.1577𝑋= 37.115 + 0.1577(50) = 45 .
+
+iii. The required score in calculus for a student who scored 50 in statistics is
+
+ 𝑋= 28.967 + 0.4674𝑌= 28.967 + 0.4674(50) = 52.
+
+ 50
+
+--- Page 52 ---
+7.4: Correlation
+
+In bivariate distributions there are two variates x and y. If the change in one
+affects the change in other, the variables are said to be correlated, otherwise they
+are said to be uncorrelated. If, increase (or decrease) in one, results in increase
+(or decrease) in the other, the correlation is said to be positive otherwise
+negative.
+
+As a measure of degree of linear relationship between the variates, coefficient of
+correlation is defined by
+
+ 𝐶𝑜𝑣(𝑥, 𝑦)
+ 𝑟𝑥𝑦=
+ √[𝑉𝑎𝑟(𝑥) × 𝑉𝑎𝑟(𝑦)]
+
+ 51
+
+--- Page 53 ---
+Where 𝐶𝑜𝑣(𝑥, 𝑦) denotes the covariance between variates x and y, and is given
+by
+
+ 1 𝑛
+ 𝑖=1(𝑥𝑖−𝑥̅) (𝑦𝑖−𝑦̅). Where 𝑥̅ and 𝑦̅ are the means of x and y𝐶𝑜𝑣(𝑥, 𝑦) = 𝑛∑
+respectively. Thus,
+
+ 1 𝑛
+ 𝑖=1 (𝑥𝑖−𝑥̅) (𝑦𝑖−𝑦̅) 𝑛∑
+𝑟𝑥𝑦=
+ 𝑛 𝑛 √{[1 𝑖=1(𝑥𝑖−𝑥̅)2] [1 𝑖=1(𝑦𝑖−𝑦̅)2] } 𝑛∑ 𝑛∑
+
+ 𝑛 1 𝑛 𝑛 ∑ 𝑖=1 𝑥𝑖𝑦𝑖 − 𝑛∑ 𝑖=1 𝑥𝑖∑ 𝑖=1 𝑦𝑖 =
+ 𝑛 𝑛 𝑛 𝑛 √{[∑ 𝑦𝑖 )2]} 𝑖=1 𝑥𝑖2−1𝑛(∑ 𝑖=1 𝑥𝑖 )2][∑ 𝑖=1 𝑦𝑖2−1𝑛(∑ 𝑖=1
+
+This formula is referred to as product-moment (or Karl Pearson’s correlation
+coefficient) formula for linear correlation.
+
+7.4.1: Properties of Correlation Coefficient
+
+ i. The correlation coefficient is numerically independent of origin
+ and scale.
+ ii. For two independent variates correlation coefficient is zero.
+ iii. The correlation coefficient cannot numerically exceed unity i.e.
+ |𝑟𝑥𝑦| ≤1 𝑜𝑟−1 ≤𝑟𝑥𝑦≤1.
+
+Example 7.2
+
+The ages (x) and systolic blood pressure (y) of 12 students are given below.
+
+ Ages in 56 42 72 36 63 47 55 49 38 42 68 60
+ years(x)
+ Blood 147 125 160 118 149 128 150 145 115 140 152 155
+ pressure(y)
+Calculate the correlation coefficient between x and y and comment on your
+solution.
+
+ 52
+
+--- Page 54 ---
+Solution
+
+Let 𝑢= 𝑥−52 and 𝑣= 𝑦−140. Then we have the table of values as below.
+
+ 𝑥 𝑦 𝑢 𝑣 𝑢2 𝑣2 𝑢𝑣
+ 56 147 4 7 16 49 28
+ 42 125 -10 -15 100 225 150
+ 72 160 20 20 400 400 400
+ 36 118 -16 -22 256 484 352
+ 63 149 11 9 121 81 99
+ 47 128 -5 -12 25 144 60
+ 55 150 3 10 9 100 30
+ 49 145 -3 5 9 25 -15
+ 38 115 -14 -25 196 625 350
+ 42 140 -10 0 100 0 0
+ 68 152 16 12 256 144 192
+ 60 155 8 15 64 225 120
+ 4 4 1,552 2,502 1,766
+
+ ∑(𝑢𝑣) −1 𝑛(∑𝑢)(∑𝑣)
+ 𝑟𝑥𝑦= 𝑟𝑢𝑣=
+ √{[∑𝑢2 −1 −1 𝑛(∑𝑢)2][∑𝑣2 𝑛(∑𝑣)2]}
+ 1766−1 12(4)(4) = = 0.896
+ √{[1552−112(4)2][2502−112(4)2]}
+
+The ages and blood pressures of the students are positively correlated.
+
+7.4.2: Rank Correlation
+
+7.4.2.1: Non-repeated Ranks
+
+Let n be the number of individuals which are ranked according to two characters
+A and B. Let 𝑥 and 𝑦 be the ranks with respect to A and B respectively. Assuming
+that the ranks are not repeated in either series, both 𝑥 and 𝑦 take the same
+values 1, 2, …, n.
+
+ 53
+
+--- Page 55 ---
+Then,
+
+ 𝑛(𝑛+1)
+ ∑𝑥= ∑𝑦= 1 + 2 + 3 + ⋯+ 𝑛=
+ 2
+
+and
+
+ 𝑛(𝑛+1)(2𝑛+1)
+ ∑𝑥2 = ∑𝑦2 = 12 + 22 + 32 + ⋯+ 𝑛2 =
+ 6
+
+ 2 1 ∑𝑥
+ 𝑉𝑎𝑟(𝑥) = 𝑉𝑎𝑟(𝑦) = 𝑛∑𝑥2 −( 𝑛)
+
+ 2
+ 1
+ = ) } −(𝑛(𝑛+1) 𝑛{𝑛(𝑛+1)(2𝑛+1)6 2𝑛
+ (𝑛+1)(2𝑛+1) (𝑛+1)2
+ = − 6 4
+ 2(𝑛+1)(2𝑛+1)−3(𝑛+1)2
+ =
+ 12
+ 𝑛2−1
+ =
+ 12
+
+Let d be the difference between the ranks i.e. 𝑑= 𝑥−𝑦
+
+⟹∑𝑑2 = ∑(𝑥−𝑦)2
+
+ = ∑{(𝑥−𝑥) −(𝑦−𝑦)}2 since 𝑥= 𝑦
+
+ = ∑{(𝑥−𝑥)2 + (𝑦−𝑦)2 −2(𝑥−𝑥)(𝑦−𝑦)}
+
+ = ∑(𝑥−𝑥)2 + ∑(𝑦−𝑦)2 −2 ∑(𝑥−𝑥)(𝑦−𝑦)
+
+Therefore, dividing both sides by 𝑛 we have
+
+1 1 1 1
+ +𝑛∑𝑑2 = 𝑛∑(𝑥−𝑥)2 𝑛∑(𝑦−𝑦)2 −(2) 𝑛∑(𝑥−𝑥)(𝑦−𝑦)
+ = 𝑉𝑎𝑟(𝑥) + 𝑉𝑎𝑟(𝑦) −2𝐶𝑜𝑣(𝑥, 𝑦)
+
+ 𝑛2−1 𝑛2−1
+ = + −2𝐶𝑜𝑣(𝑥, 𝑦)
+ 12 12
+
+ 54
+
+--- Page 56 ---
+𝑛2 −1 1
+∴2𝐶𝑜𝑣(𝑥, 𝑦) = − 𝑛∑𝑑2 6
+ 𝑛2 −1 1
+ ∴𝐶𝑜𝑣(𝑥, 𝑦) = − 2𝑛∑𝑑2 12
+
+Thus, the rank correlation coefficient between 𝑥 and 𝑦 is given by
+
+ 𝐶𝑜𝑣(𝑥,𝑦)
+ 𝑟=
+ √𝑉𝑎𝑟(𝑥) 𝑉𝑎𝑟(𝑦)
+
+ 𝑛2−1 1
+ − 12 2𝑛∑𝑑2 𝑟=
+ √(𝑛2−1)(𝑛2−1)
+ 12 12
+
+ 6 ∑𝑑2
+ 𝑟= 1 − . 𝑛(𝑛2−1)
+
+This is also called Spearman’s rank correlation coefficient.
+
+Example 7.3
+
+Compute Spearman’s rank correlation coefficient from the following data and
+interpret your result.
+
+ 𝑥 33 61 20 19 40
+ 𝑦 26 36 65 25 35
+
+ Solution
+
+ 𝑥 𝑦 𝑅𝑥 𝑅𝑦 𝑑= 𝑅𝑥−𝑅𝑦 𝑑2
+ 33 26 3 4 -1 1
+ 61 36 1 2 -1 1
+ 20 65 4 1 3 9
+ 19 25 5 5 0 0
+ 40 35 2 3 -1 1
+ Total 12
+
+ 55
+
+--- Page 57 ---
+Therefore, the Spearman’s rank correlation coefficient is given by
+
+ 6 ∑𝑑2 6(12)
+ 𝑟𝑠𝑝= 1 − = 1 − = 0.4 𝑛(𝑛2−1) 5(52−1)
+
+Hence the ranks are positively correlated.
+
+7.4.2.2: Repeated Ranks
+
+If any two or more individuals are bracketed equal in any classification with
+respect to characteristic A and B, or if there is more than one item with the same
+value in the series, then the Spearman’s formula for calculating the rank
+correlation coefficient breaks down since in this case each of the variable X and Y
+does not assume the values 1, 2, …, n and consequently 𝑥̅ ≠𝑦̅.
+
+ 𝑚(𝑚2−1)
+Therefore, we add the factor to ∑𝑑2, where m is the number of times an
+ 12
+item is repeated. This correction factor is to be added for each repeated value.
+Thus, the rank correlation formula becomes
+
+ 𝑚(𝑚2−1)
+ 6[∑𝑑2+∑ ]
+ 𝑟𝑠𝑝= 1 − 12 𝑛(𝑛2−1)
+
+Example 7.4
+
+Obtain the rank correlation coefficient for the following data.
+
+ X 68 64 75 50 64 80 75 40 55 64
+ Y 62 58 68 45 81 60 68 48 50 70
+
+ Solution
+
+In the X-series we see that the value 75 occurs 2 times. The common rank given to
+these values is 2.5 which is the average of 2 and 3, the ranks which these values
+would have taken if they were different. The next value 68, gets the next rank
+which is 4. Again, we see that value 64 occurs thrice. The common rank given to it
+is 6 which is the average of 5, 6 and 7. Similarly in the Y-series value 68 occurs
+twice and its common rank is 3.5 which is the average of 3 and 4. As a result of
+
+ 56
+
+--- Page 58 ---
+these common rankings, the formula for 𝑟𝑠𝑝 has to be corrected. To ∑𝑑2 we add
+∑𝑚(𝑚2−1) for each value repeated, where m is the number of times a value
+ 12
+occurs. In the X-series the correction is to be applied twice, once for the value 75
+which occurs twice (m =2) and then for the value 64 which occurs thrice (m = 3).
+The total correction for the X-series is
+
+ 2(4−1) 3(9−1) 1 5
+ + = + 2 =
+ 12 12 2 2
+
+ 2(4−1) 1
+Similarly, this correction for the Y-series is = , as the value 68 occurs
+ 12 2
+twice.
+
+Thus,
+
+ 5 6[∑𝑑2+∑𝑚(𝑚2−1) ] 6[72+ 12 2+12]
+ 𝑟𝑠𝑝= 1 − = 1 − = 0.545 𝑛(𝑛2−1) 10(100−1)
+
+7.5: Assessment
+
+ 1. Obtain the equations of lines of regression lines and find an estimate of
+ Y which should correspond on average to X = 6.2.
+
+ X 1 2 3 4 5 6 7 8 9
+ Y 9 8 10 12 11 13 14 16 15
+
+ 2. The coefficient of rank correlation is 0.8. If the sum of squares of the
+ difference in ranks is 33, find the number of individuals.
+ 3. Calculate correlation coefficient and Spearman’s rank correlation
+ coefficient for the following data:
+
+ X 5 15 10 20 25 40
+ y 21 14 28 7 35 42
+
+ 4. The table below shows the respective heights of 12 fathers and their
+ oldest sons in inches.
+
+ 57
+
+--- Page 59 ---
+Father(x) 63 63 67 64 68 62 70 66 68 67 69 71
+ Son(y) 68 66 68 65 69 66 68 65 71 67 68 70
+
+ Find the Spearman’s rank correlation coefficient and comment on
+ Your result.
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 58
+
+--- Page 60 ---
+LESSON EIGHT
+ MUTUALLY EXCLUSIVE AND EXHAUSTIVE EVENTS;
+ AND PROBABILITY
+
+8.1: Introduction
+
+In this lesson we will discuss mutually exclusive and exhaustive events, and also
+probability.
+
+8.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. define mutually exclusive and exhaustive events,
+ ii. define probability of an event,
+ iii. find probability of an event when sampling with and without
+ replacement.
+
+8.3: Mutually Exclusive and Exhaustive Events
+
+Two events A and B are said to be mutually exclusive if they are disjoint i.e.
+
+if𝐴∩𝐵= 𝜙. In other words, A and B are mutually exclusive if they cannot occur
+simultaneously.
+
+If two events A and B satisfy 𝐴∪𝐵= 𝑆, then they are said to be exhaustive,
+because the events taken together exhaust the sample space S.
+
+In general, events 𝐸1, 𝐸2, … , 𝐸𝑘 all in the same sample space S, are said to be
+mutually exclusive and exhaustive if they satisfy
+
+ 𝐸𝑖∩𝐸𝑗= 𝜙 for 𝑖≠𝑗 , 𝑖, 𝑗= 1, 2, … , 𝑘
+
+and
+
+ 𝐸1 ∪𝐸2 ∪ … ∪𝐸𝑘= 𝑆.
+
+Example 8.1 A fair coin is tossed twice. A and B are two events such that
+
+ A= {observe at least one head}
+
+ B= {observe two heads}
+
+ 59
+
+--- Page 61 ---
+𝑆= {𝐻𝐻, 𝐻𝑇, 𝑇𝐻, 𝑇𝑇} , 𝐴= {𝐻𝐻, 𝐻𝑇, 𝑇𝐻} , 𝐵= {𝑇𝑇}
+
+ 𝐴∩𝐵= 𝜙 and 𝐴∪𝐵= {𝐻𝐻, 𝐻𝑇, 𝑇𝐻, 𝑇𝑇} = 𝑆.
+
+Therefore, the events A and B are mutually exclusive and exhaustive.
+
+8.4: Definition of Probability
+
+Suppose that the outcomes of a random experiment are represented by a sample
+space S, then probability is a real valued function P, defined on the events of S,
+which satisfies the following axioms:
+
+ i. For every event A, 0 ≤𝑃(𝐴) ≤1
+ ii. 𝑃(𝑆) = 1
+ iii. If A and B are mutually exclusive events, then
+ 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵)
+ iv. If 𝐴1, 𝐴2, … , 𝐴𝑛 is a sequence of mutually exclusive events, then
+
+ 𝑃(𝐴1 ∪𝐴2 ∪… ∪𝐴𝑛) = 𝑃(𝐴1) + 𝑃(𝐴2) + ⋯+ 𝑃(𝐴𝑛)
+
+ This axiom is the additive rule of probability.
+
+Let us now consider some theorems of probability.
+
+8.4.1: Theorem 1
+
+If 𝜙 is the empty set, the 𝑃(𝜙) = 0.
+
+8.4.2: Theorem 2
+
+If 𝐴𝑐 is the complement of an event A, then 𝑃(𝐴𝑐) = 1 −𝑃(𝐴)
+
+8.4.3: Theorem 3
+
+If 𝐴⊂𝐵, then 𝑃(𝐴) ≤𝑃(𝐵)
+
+8.4.4: Theorem 4
+
+If A and B are any two events in the same sample space S, then
+
+ 𝑃(𝐴\𝐵) = 𝑃(𝐴) −𝑃(𝐴∩𝐵)
+
+8.4.5: Theorem 5
+
+If A and B are any two events in the same sample space S, then
+
+ 60
+
+--- Page 62 ---
+𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵)
+
+For any events A, B and C in the same sample space S,
+
+𝑃(𝐴∪𝐵∪𝐶) = 𝑃(𝐴) + 𝑃(𝐵) + 𝑃(𝐶) −𝑃(𝐴∩𝐵) −𝑃(𝐴∩𝐶) −𝑃(𝐵∩𝐶) + 𝑃(𝐴∩𝐵∩𝐶).
+
+8.4.6: De Morgan’s Laws
+
+If A and B are any events in the same sample space S, then
+
+ i. (𝐴∪𝐵)𝑐= 𝐴𝑐∩𝐵𝑐
+ ii. (𝐴∩𝐵)𝑐= 𝐴𝑐∪𝐵𝑐
+
+Example 8.2
+
+ 3 1 1
+Let A and B be events with 𝑃(𝐴) = , 𝑃(𝐵) = and 𝑃(𝐴∩𝐵) = . Find
+ 8 2 4
+ i. 𝑃(𝐴𝑐) and 𝑃(𝐵𝑐)
+ ii. 𝑃(𝐴∪𝐵)
+ iii. 𝑃(𝐴𝑐∩𝐵𝑐)
+ iv. 𝑃(𝐴𝑐∪𝐵𝑐)
+ v. 𝑃(𝐴∩𝐵𝑐)
+ vi. 𝑃(𝐴𝑐∩𝐵)
+
+ Solution
+ 3 5 1 1
+ i. 𝑃(𝐴𝑐) = 1 −𝑃(𝐴) = 1 − = and 𝑃(𝐵𝑐) = 1 −𝑃(𝐵) = 1 − =
+ 8 8 2 2
+ 3 1 1 5
+ ii. 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵) = + − =
+ 8 2 4 8
+ iii. Using, De Morgan’s law we have
+ 5 3
+ 𝑃(𝐴𝑐∩𝐵𝑐) = 𝑃((𝐴∪𝐵)𝑐) = 1 − 𝑃(𝐴∪𝐵) = 1 − =
+ 8 8
+ iv. Using, De Morgan’s law we have
+
+ 3 𝑃(𝐴𝑐∪𝐵𝑐) = 𝑃[(𝐴∩𝐵)𝑐] = 1 − 𝑃(𝐴∩𝐵) = 1 −1 =
+ 4 4
+
+ 3 1 1
+ v. 𝑃(𝐴∩𝐵𝑐) = 𝑃(𝐴\𝐵) = 𝑃(𝐴) − 𝑃(𝐴∩𝐵) = − =
+ 8 4 8
+ 1 1 1
+ vi. 𝑃(𝐴𝑐∩𝐵) = 𝑃(𝐵\𝐴) = 𝑃(𝐵) − 𝑃(𝐴∩𝐵) = − =
+ 2 4 4
+
+ 61
+
+--- Page 63 ---
+Example 8.3
+
+ If the probability that a student A will fail a certain statistics examination is 0.3,
+ the probability that student B will fail the examination is 0.15, and the
+ probability that both students A and B will fail the examination is 0.08. What is
+ the probability that
+
+ i. at least one of these two students will fail the examination?
+ ii. Neither student A nor student B will fail?
+
+ Solution
+ 𝑃(𝐴) = 0.3 , 𝑃(𝐵) = 0.15 . 𝑃(𝐴∩𝐵) = 0.08. Hence
+ i. 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵)
+ = 0.3 + 0.15 −0.08 = 0.37
+ ii. 𝑃((𝐴∪𝐵)𝑐) = 1 − 𝑃(𝐴∪𝐵) = 1 −0.37 = 0.63
+
+Example 8.4 A fair coin is tossed three times and events A and B are defined as
+follows:
+
+ A = {At least one head is observed}
+
+ B = {The number of heads observed is odd}
+
+ a) List the sample points in the events 𝐴, 𝐵, 𝐴∪𝐵, 𝐴𝑐, 𝑎𝑛𝑑 𝐴∩𝐵.
+ b) Find 𝑃(𝐴), 𝑃(𝐵), 𝑃(𝐴∪𝐵), 𝑃(𝐴𝑐), 𝑎𝑛𝑑 𝑃(𝐴∩𝐵).
+ c) Are the events A and B mutually exclusive?
+ Solution
+ a) 𝑆= {𝐻𝐻𝐻, 𝐻𝐻𝑇, 𝐻𝑇𝐻, 𝑇𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻, 𝑇𝑇𝑇} ,
+
+ 𝐴= {𝐻𝐻𝐻, 𝐻𝐻𝑇, 𝐻𝑇𝐻, 𝑇𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇ℎ},
+
+ 𝐵= {𝐻𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻},
+
+ 𝐴∪𝐵= {𝐻𝐻𝐻, 𝐻𝐻𝑇, 𝐻𝑇𝐻, 𝑇𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻, 𝑇𝑇𝑇},
+
+ 𝐴𝑐= {𝑇𝑇𝑇}
+
+ 𝐴∩𝐵= {𝐻𝐻𝐻, 𝐻𝑇𝑇, 𝑇𝐻𝑇, 𝑇𝑇𝐻]
+
+ 62
+
+--- Page 64 ---
+7 4 1 7 7
+ b) 𝑃(𝐴) = , 𝑃(𝐵) = = , 𝑃(𝐴∪𝐵) = , 𝑃(𝐴𝑐) = 1 −𝑃(𝐴) = 1 − =
+ 8 8 2 8 8
+ 1 4 1
+ , 𝑎𝑛𝑑 𝑃(𝐴∩𝐵) = = .
+ 8 8 2
+ 7 1
+ c) 𝑃(𝐴) + 𝑃(𝐵) = + ≠, 𝑃(𝐴∪𝐵) ⇒ A and B are not mutually
+ 8 2
+ exclusive.
+
+8.4.7: Random Sampling
+
+8.4.7.1: Sampling without replacement
+
+This the case of drawing items which are equally likely from a population without
+replacing them
+
+Example 8.5
+
+A bag contains 5 red balls and 3 black balls. If 3 balls are drawn without
+replacement, what is the probability that
+
+ a) no black balls will be selected,
+ b) exactly one red ball will be selected,
+ c) at least one red ball will be selected,
+ d) at most one black ball will be selected?
+
+ 63
+
+--- Page 65 ---
+Solution
+
+ 3
+ Tree diagram R
+ 6
+
+R- red ball, B- black ball R
+
+ 4 3
+ B
+ 7 6
+
+ R
+
+ R
+
+ 5 3
+ B B
+ 8 7
+
+ R
+ 3
+ R
+ 8
+ 5
+
+ 7
+ B
+
+ B
+
+ R
+
+ B B
+
+ 5 4 3 5
+ a) 𝑃(𝑅𝑅𝑅) = ( 8) (7) (6) = 56
+
+ 5 3 2 3 5 2
+ b) 𝑃(𝑅𝐵𝐵) + 𝑃(𝐵𝑅𝐵) + 𝑃(𝐵𝐵𝑅) = (8) (7) (6) + (8) (7) (6) +
+ 3 2 5
+ (8) ( 7) ( 6)
+
+ 𝟏𝟓
+ =
+ 𝟓𝟔
+
+ 3 2 1 55
+ c) 1 −𝑃(𝐵𝐵𝐵) = 1 −( × × = 8 7 6) 56
+
+ 5 4 3 5 3 4
+ d) 𝑃(𝑅𝑅𝐵) + 𝑃(𝑅𝐵𝑅) + 𝑃(𝐵𝑅𝑅) + 𝑃(𝑅𝑅𝑅) = × × + × × +
+ 8 7 6 8 7 6
+
+ 64
+
+--- Page 66 ---
+3 5 4 5 4 3 5
+ × × + × × =
+ 8 7 6 8 7 6 7
+
+8.4.7.2: Sampling with replacement
+
+Example 8.6
+
+Three bolts and three nuts are put in a box. If two parts are selected one at a time
+at random from the box with replacement, find the probability that one is a bolt
+and one is a nut.
+
+ Solution
+
+ Tree diagram
+
+ B B- bolt, N- nut
+
+ B N
+
+ B
+
+ N
+
+ N
+
+ 3 3 3 3 1
+ 𝑃(𝐵𝑁) + 𝑃𝑃(𝑁𝐵) = × + × =
+ 6 6 6 6 2
+
+7.6: Assessment
+
+1. Three light bulbs are chosen from 15 bulbs of which 5 are defective. Find the
+probability that
+
+ i. non is defective
+ iii. exactly one is defective
+ iv. at least one is defective.
+
+ 65
+
+--- Page 67 ---
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C.
+ Runger
+
+ 66
+
+--- Page 68 ---
+LESSON NINE
+
+ CONDITIONAL PROBABILITY, INDEPENDENT EVENTS
+ AND BAYES’ THEOREM
+
+9.1: Introduction
+
+In this lesson we will discuss conditional probability, independent events and
+Bayes’ theorem and its application.
+
+9.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. determine the conditional probability of an event given another one has
+ occurred,
+ ii. state when are events independent,
+ iii. apply Bayes’ theorem.
+
+9.3: Conditional Probability
+
+Let, E be an arbitrary event in a sample space S with 𝑃(𝐸) > 0. The probability
+that an event A occurs once E has occurred or, in other words, the conditional
+probability of A given E, written as 𝑃(𝐴/𝐸), is defined as follows:
+
+ 𝑃(𝐴∩𝐸)
+ 𝑃(𝐴∕𝐸) =
+ 𝑃(𝐸)
+
+If S is a finite equiprobable space and |𝐴| denotes the number of elements in an
+event A, then
+
+ |𝐴∩𝐸| |𝐸|
+ 𝑃(𝐴∩𝐸) = , 𝑃(𝐸) = ,
+ |𝑆| |𝑆|
+
+ 𝑃(𝐴∩𝐸) |𝐴∩𝐸|
+and also 𝑃(𝐴𝐸⁄ ) = = .
+ 𝑃(𝐸) |𝐸|
+
+Example 9.1 Suppose that a family with two children is selected at random from a
+residential estate. Assume that each child has an equal chance of being a boy as
+
+ 67
+
+--- Page 69 ---
+of being a girl. Calculate the conditional probability that both children are girls,
+given that
+
+ i. the older child is a girl,
+ ii. at least one of the children is a girl.
+
+ Solution
+ b-boy, g-girl
+ 𝑆= {𝑏𝑏, 𝑏𝑔, 𝑔𝑏, 𝑔𝑔}
+
+Let 𝐸1 be the event that the older child is girl. Let 𝐸2 be the event that at least one
+of the children is a girl and let 𝐸3 be the event that both children are girls. Then
+
+ 𝐸1 = {𝑔𝑏. 𝑔𝑔} , 𝐸2 = {𝑏𝑔, 𝑔𝑏, 𝑔𝑔} , 𝐸3 = {𝑔𝑔}
+
+ 𝑃(𝐸3∩𝐸1)
+ i. 𝑃(𝐸3 ⁄ 𝐸1 ) = , but 𝐸3 ∩𝐸1 = {𝑔𝑔} 𝑃(𝐸1)
+ 1
+ 𝑃(𝐸3 ∩𝐸1) 4 1 ∴𝑃(𝐸3 ⁄ 𝐸1 ) = = =
+ 𝑃(𝐸1) 2 2
+ 4
+
+ 𝑃(𝐸3∩𝐸2)
+ ii. 𝑃(𝐸3 ⁄ 𝐸2 ) = , but 𝐸3 ∩𝐸2 = {𝑔𝑔}
+ 𝑃(𝐸2)
+ 1
+ 𝑃(𝐸3 ∩𝐸2) 4 1 ∴𝑃(𝐸3 ⁄ 𝐸2 ) = = =
+ 𝑃(𝐸2) 3 3
+ 4
+
+ 1 1 1
+Example 9.2 Let A and B be events with 𝑃(𝐴) = , 𝑃(𝐵) = and 𝑃(𝐴∪𝐵) = .
+ 3 4 2
+
+Find
+
+ i. 𝑃(𝐴𝐵⁄ ),
+ ii. 𝑃(𝐵𝐴⁄ ),
+ iii. 𝑃(𝐴∕𝐵𝑐).
+
+ 68
+
+--- Page 70 ---
+Solution
+
+ 𝑃(𝐴∩𝐵)
+ i. 𝑃(𝐴𝐵⁄ ) = , but
+ 𝑃(𝐵)
+
+ 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵)
+
+ ⇒𝑃(𝐴∩𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∪𝐵)
+
+ 1 1 1 1
+ = + − =
+ 3 4 2 12
+
+ 1
+ 12 1 ∴𝑃(𝐴𝐵⁄ ) = 1 =
+ 3
+ 4
+
+ 1
+ 𝑃(𝐵∩𝐴) 12 1 ii. 𝑃(𝐵𝐴⁄ ) = = 1 =
+ 𝑃(𝐴) 4
+ 3
+
+ 𝑃(𝐴∩𝐵𝑐) 𝑃(𝐴\𝐵) 𝑃(𝐴)−𝑃(𝐴∩𝐵)
+ iii. 𝑃(𝐴𝐵𝑐⁄ ) = = =
+ 𝑃(𝐵𝑐) 𝑃{𝐵𝑐) 1−𝑃(𝐵)
+
+ 1 1
+ −
+ 3 12 1 = =
+ 1−1 3
+ 4
+
+9.3.1: Multiplication Rule for Conditional Probability
+
+ 𝑃(𝐸1 ∩𝐸2)
+ 𝑃(𝐸1 ∕𝐸2) =
+ 𝑃(𝐸2)
+
+If both sides of this equation, is multiplied by 𝑃(𝐸2) we obtain the formula
+
+ 𝑃(𝐸1 ∩𝐸2 = 𝑃(𝐸2)𝑃(𝐸1 ⁄ 𝐸2 ) ,
+
+Which is called the general multiplication rule for calculating the probability that
+the two events will occur.
+
+For any events 𝐸1, 𝐸2, … , 𝐸𝑛
+
+ 69
+
+--- Page 71 ---
+𝑃(𝐸1 ∩ 𝐸2 ∩ … ∩ 𝐸𝑛)
+ = 𝑃(𝐸1)𝑃(𝐸2 ⁄𝐸1 )𝑃(𝐸3 ⁄ 𝐸1 ∩𝐸2) … 𝑃(𝐸𝑛∕𝐸1 ∩ 𝐸2 ∩ … ∩ 𝐸𝑛−1)
+
+Example 9.3 In a certain small town, the probability that a woman attends a
+family planning clinic is 0.4 and the probability that her husband attends the clinic
+is 0.1. The probability that a husband attends a clinic given that the wife does is
+0.08. Calculate the probability that
+
+ i. both wife and husband will attend the clinic,
+ ii. the wife will attend the clinic given that the husband does,
+ iii. one of the two persons will attend a clinic.
+
+ Solution
+
+Let A denotes the event that the wife attends a clinic and B denotes the event
+that the husband attends the same clinic. Then
+
+𝑃(𝐴) = 0.4, 𝑃(𝐵) = 0.1 and 𝑃(𝐵𝐴⁄ ) = 0.08.
+
+ i. 𝑃(𝐴∩𝐵) = 𝑃(𝐴)𝑃(𝐵𝐴⁄ ) = (0.4)(0.08) = 0.032
+
+ 𝑃(𝐴∩𝐵) 𝑜.032
+ ii. 𝑃(𝐴𝐵⁄ ) = = = 0.32
+ 𝑃(𝐵) 0.1
+
+ iii. 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵) = 0.4 + 0.1 −0.032 = 0.468.
+
+9.3.2: Independence of Events
+
+Let 𝐸1 and 𝐸2 be any two events in the sample space S. Assume that 𝑃(𝐸1) > 0
+and 𝑃(𝐸2) > 0. Then we have the following definition:
+
+The events 𝐸1 and 𝐸2 are said to be stochastically or statistically independent if
+
+ 𝑃(𝐸1 ⁄ 𝐸2 ) = 𝑃(𝐸1) or 𝑃(𝐸2 ⁄ 𝐸1 ) = 𝑃(𝐸2)
+
+If two events 𝐸1 and 𝐸2 are not independent then they are said to be dependent.
+
+The general multiplication rule is
+
+ 𝑃(𝐸1 ∩𝐸2 = 𝑃(𝐸2)𝑃(𝐸1 ⁄ 𝐸2 ),
+
+ 70
+
+--- Page 72 ---
+It follows that the events 𝐸1 and 𝐸2 are independent if and only if
+
+ 𝑃(𝐸1 ∩𝐸2 = 𝑃(𝐸1)𝑃(𝐸2)
+
+Example 9.4
+
+Two fair dice are tossed, and the following events are defined:
+
+ A = {Sum of the numbers showing is odd}
+
+ B = {Sum of the numbers showing is 9, 11, 12}
+
+Are events A and B independent? Why?
+
+ Solution
+
+ 𝑆= {(1,1), (1,2), (1,3), … , (6,6)}
+
+There are 36 sample elements in S.
+
+ (1,2), (1,4), (1,6), (2,1), (2,3), (2,5), (3,2), (3,4), (3,6),
+ 𝐴= { }
+ (4,1), (4,3), (4,5), (5,2), (5,4), (5,6), ( 6,1), (6,3), (6,5)
+
+ 𝐵= {(3,6), (4,5), (5,4), (5,6), (6,3), (6,5), (6,6)}
+
+ 𝐴∩𝐵= {(3,6), (4,5), (5,4), (5,6), (6,3), (6,5)}.
+
+Thus, there are 18, 7, 6 sample elements in A, B and 𝐴∩𝐵 respectively.
+Therefore,
+
+ 18 1 7 6 1
+ 𝑃(𝐴) = = , 𝑃(𝐵) = and 𝑃(𝐴∩𝐵) = = 36 2 36 36 6.
+
+ 7 7 𝑃(𝐴). 𝑃(𝐵) = (1 ( = ⇒𝑃(𝐴). 𝑃(𝐵) ≠𝑃(𝐴∩𝐵) 2) 36) 72
+
+Thus, the events A and B are not independent.
+
+9.3.3: Bayes’ Theorem
+
+Suppose 𝐸1, 𝐸2, … , 𝐸𝑘 are k mutually exclusive events in the sample space S such
+that 𝐸1 ∪𝐸2 ∪… ∪𝐸𝑘= 𝑆 and 𝑃(𝐸𝑖) > 0 for 𝑖= 1, 2, … , 𝑘. Then some arbitrary
+event B, which is associated with 𝐸𝑖′𝑠 such that 𝑃(𝐵) > 0, we can find out the
+probabilities 𝑃(𝐵𝐸1⁄ ), 𝑃(𝐵𝐸2⁄ ), … , 𝑃(𝐵𝐸𝑘⁄ ) .
+
+ 71
+
+--- Page 73 ---
+In Bayes’ approach we want to find out the posterior probability of an event 𝐸𝑖
+given that B has occurred i.e. 𝑃(𝐸𝑖)
+
+ 𝑃(𝐸𝑖∩𝐵)
+ 𝑃(𝐸𝑖∕𝐵) = if and only if 𝑃(𝐵) > 0 𝑃(𝐵)
+
+We know that B is also a set in S and hence 𝐵= 𝐵∩𝑆 or in other form
+
+ 𝐵= 𝐵∩(𝐸1 ∪𝐸2 ∪… ∪𝐸𝑘) and 𝐸𝑖′𝑠 are disjoint
+
+Or 𝐵= (𝐵∩𝐸1) ∪(𝐵∩𝐸2) ∪… ∪(𝐵∩𝐸𝑘).
+
+Thus,
+
+ 𝑃(𝐵) = ∑ 𝑘𝑖=1 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐵)
+
+ 𝑃(𝐵∩𝐸𝑖) = 𝑃(𝐸𝑖𝐵⁄ )𝑃(𝐵)
+
+Also
+
+ 𝑃(𝐵∩𝐸𝑖) = 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+
+Therefore,
+
+ 𝑃(𝐵) = ∑ 𝑘𝑖=1 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+
+Hence,
+
+ 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+ 𝑃(𝐸𝑖∕𝐵) = 𝑘 ∑ 𝑖=1 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+
+This formula is known as Bayes’ formula.
+
+Example 9.5
+
+In a city there are 3 stores each having 20 pieces of an item. Let these stores be
+denoted by 𝑆1, 𝑆2 and 𝑆3. The stores 𝑆1, 𝑆2 and 𝑆3 have 10%, 20% and 30%
+defective items, respectively. A costumer first chooses a store randomly and then
+selects an item randomly from the store. Find the probability that
+
+ a) the selected item is defective,
+ b) the selected item is defective has come from
+ i. store 𝑆1 ,
+ ii. store 𝑆2 ,
+ iii. store 𝑆3 .
+
+ 72
+
+--- Page 74 ---
+Solution
+
+Let 𝐸𝑖 denote the event that the store 𝑆𝑖 (𝑖= 1, 2,3) is selected. Then,
+
+ 1 1
+𝑃(𝐸𝑖) = 𝑖. 𝑒. 𝑃(𝐸1) = 𝑃(𝐸2) = 𝑃(3) = . 3 3
+
+Let B denotes the event that a selected item is defective. Therefore,
+
+𝑃(𝐵𝐸1⁄ ) = 10% = 0.1, 𝑃(𝐵𝐸2⁄ ) = 20% = 0.2, 𝑃(𝐵𝐸3⁄ ) = 30% = 0.3 .
+
+ a) 𝑃(𝐵) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1) + 𝑃(𝐵𝐸2⁄ )𝑃(𝐸2) + 𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ 1 = (0.1) (1 + (0.2) (1 + (0.3) (1 = 3) 3) 3) 5
+ b)
+ 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)
+ i. 𝑃(𝐸1 ⁄ 𝐵 ) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)+𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)+𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ (0.1) (1 1 3) = =
+ 1 6
+ 5
+
+ 𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)
+ ii. 𝑃(𝐸2 ⁄ 𝐵 ) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)+𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)+𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+
+ (0.2) (1 1 3) = =
+ 1 3
+ 5
+
+ 𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ iii. 𝑃(𝐸3 ⁄𝐵 ) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)+𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)+𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ (0.3) (1 1 3) = =
+ 1 2
+ 5
+
+Check: A defective selected item belongs to one of the stores. Hence
+
+ 73
+
+--- Page 75 ---
+3 1 1 1 ∑ 𝑖=1 𝑃( 𝐸3 ⁄ 𝐵 ) = + + = 1. 6 3 2
+
+9.4: Assessment
+
+ 1. For two events A and B, 𝑃(𝐴) = 0.4, 𝑃(𝐵) = 0.2 and 𝑃(𝐴∪𝐵) =
+ 0.52. Find 𝑃(𝐴∩𝐵), 𝑃(𝐴𝐵⁄ ) and 𝑃(𝐵𝐴⁄ ).
+ 2. Suppose that two balanced dice are tossed. Let A denote the event of
+ an odd total, B the event of a ‘1’ on the first die, and C the event of a
+ total of seven.
+ i. Are A and B independent?
+ ii. Are A and C independent?
+ iii. Are B and C independent?
+ 3. A gift shop employs three persons to wrap the gifts. Helen who
+ wraps 45% of the gifts fails to remove the price tag on 2% of the
+ items. Jane who wraps 35% of the items fails to remove the price tag
+ on 5% of the items she wraps. Mary who wraps the remaining items
+ fails 3% of her wrapping.
+ a) Find the probability that a gift wrapped at this store has
+ a price tag on it.
+ b) A gift wrapped in this store was found to have a price
+ tag on it later on. What is the probability that this packet
+ was wrapped by
+ i. Helen,
+ ii. Jane.
+ iii. Mary.
+
+References
+
+ 3. Statistical Methods by S.P. Gupta
+ 4. Applied Statistics and Probability for Engineers by D.C.
+ Runger
+
+ 74
+
+--- Page 76 ---
+75

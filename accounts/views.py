@@ -35,6 +35,8 @@ from .models import User, Profile, Guardian, GuardianLinkRequest, GuardianLinkRe
 from .decorators import role_required
 from services.email_service import send_welcome_email, send_email_verification_email
 
+PREP_HOME_PATH = "/prep/"
+
 
 def _form_error_message(form, default="Please correct the errors below and try again."):
     if form.non_field_errors():
@@ -60,7 +62,7 @@ def _finish_password_registration(request, user):
     user.save(update_fields=["is_email_verified"])
     request.session["pending_verification_email"] = user.email
     request.session["email_verification_next"] = (
-        request.POST.get("next") or request.GET.get("next") or user.get_dashboard_url()
+        request.POST.get("next") or request.GET.get("next") or PREP_HOME_PATH
     )
     return _send_email_verification(request, user)
 
@@ -93,14 +95,14 @@ def promote_if_admin_email(user):
 def home(request):
     """Public landing page."""
     if request.user.is_authenticated:
-        return redirect(request.user.get_dashboard_url())
+        return _post_login_redirect(request, request.user)
     return render(request, "home.html")
 
 
 def role_select(request):
     """Landing page where user picks their role before registering."""
     if request.user.is_authenticated:
-        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
+        return _post_login_redirect(request, request.user, request.GET.get("next"))
     return render(request, "accounts/role_select.html")
 
 
@@ -165,7 +167,7 @@ def cookie_policy(request):
 def register_learner(request):
     """Learner self-registration."""
     if request.user.is_authenticated:
-        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
+        return _post_login_redirect(request, request.user, request.GET.get("next"))
 
     if request.method == "POST":
         form = LearnerRegistrationForm(request.POST)
@@ -191,7 +193,7 @@ def register_learner(request):
 def register_guardian(request):
     """Guardian self-registration."""
     if request.user.is_authenticated:
-        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
+        return _post_login_redirect(request, request.user, request.GET.get("next"))
     if request.method == "POST":
         form = LearnerRegistrationForm(request.POST)
         if form.is_valid():
@@ -215,7 +217,7 @@ def register_guardian(request):
 def register_tutor(request):
     """Tutor self-registration."""
     if request.user.is_authenticated:
-        return redirect(request.GET.get("next") or request.user.get_dashboard_url())
+        return _post_login_redirect(request, request.user, request.GET.get("next"))
     if request.method == "POST":
         form = LearnerRegistrationForm(request.POST)
         if form.is_valid():
@@ -364,24 +366,23 @@ def guardian_link_confirm(request, token):
     return render(request, "accounts/guardian_link_confirm.html", {"request_obj": request_obj})
 
 
-PREP_HOME_PATH = "/prep/"
-
-
 def _post_login_redirect(request, user, next_url=None):
     """
-    Where a freshly signed-in user lands.
+    Where a freshly signed-in or registered user lands.
 
-    The Android wrapper is a Prep-only app: it must never drop the user on the
-    main Mentify dashboard, which serves a different purpose. Requests carrying
-    the app User-Agent therefore always go to /prep/, honouring a `next` target
-    only when that target is itself inside Prep.
+    Users are directed directly to Mentify Prep (/prep/) rather than the main app
+    dashboard to avoid confusion and churn. Specific valid `next` redirect targets
+    are honoured when provided (unless they point to the generic main dashboard).
     """
     if is_mobile_app_request(request):
         if next_url and next_url.startswith("/prep/"):
             return redirect(next_url)
         return redirect(PREP_HOME_PATH)
 
-    return redirect(next_url or user.get_dashboard_url())
+    if next_url and next_url.strip() and next_url.strip() not in ("/dashboard/", "/dashboard/learner/", "/dashboard"):
+        return redirect(next_url)
+
+    return redirect(PREP_HOME_PATH)
 
 
 def login_view(request):
@@ -448,10 +449,10 @@ def verify_email(request, uidb64, token):
         send_welcome_email(user)
 
     request.session.pop("pending_verification_email", None)
-    next_url = request.session.pop("email_verification_next", None) or user.get_dashboard_url()
+    next_url = request.session.pop("email_verification_next", None)
     login(request, user)
     messages.success(request, "Your email is verified. Welcome to Mentify!")
-    return redirect(next_url)
+    return _post_login_redirect(request, user, next_url)
 
 
 class MentifyPasswordResetView(PasswordResetView):
@@ -1333,8 +1334,8 @@ def google_callback(request):
         return _mobile_redirect(f"{MOBILE_OAUTH_REDIRECT}?token={quote(token, safe='')}")
 
     login(request, user)
-    next_url = request.session.pop("oauth_next", None) or user.get_dashboard_url()
-    return redirect(next_url)
+    next_url = request.session.pop("oauth_next", None)
+    return _post_login_redirect(request, user, next_url)
 
 
 def _issue_mobile_login_token(user) -> str:

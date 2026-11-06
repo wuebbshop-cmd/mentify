@@ -1,0 +1,413 @@
+LESSON SEVEN
+
+ REGRESSION AND CORRELATION ANALYSIS
+
+7.1: Introduction
+
+In this lesson we will discuss regression and correlation. Correlation analysis deals
+with the association between two or more variables; while regression analysis
+attempts to establish the nature of the relationship between variables.
+
+7.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. determine regression lines of two variables,
+ ii. find correlation coefficient between two variates,
+ iii. compute Spearman’s rank correlation coefficient.
+
+7.3: Regression
+
+For studying the relationship between two variables X and Y, the simplest
+regression equation is of the form
+
+ 𝑦= 𝑎+ 𝑏𝑥
+
+Where a and b are constants. This equation specifies the linear regression of Y on
+X. The constant b which is the slope of the above regression line, is known as the
+coefficient of regression of Y on X.
+
+7.3.1: The least squares regression line of Y on X
+
+The regression line of Y on X is given by the equation
+
+ 𝑦= 𝑎+ 𝑏𝑥
+
+The constants a and b are determined by using normal equations. In this case the
+normal equations are
+
+ ∑𝑦= 𝑛𝑎+ 𝑏∑𝑥 and ∑𝑥𝑦= 𝑎∑𝑥+ 𝑏∑𝑥2.
+
+ 48
+
+--- Page 50 ---
+7.3.2: The least squares regression line of X on Y
+
+The regression line of X on Y is given by the equation
+
+ 𝑥= 𝑐+ 𝑑𝑥
+
+The constants c and d are determined by using normal equations. In this case the
+normal equations are
+
+ ∑𝑥= 𝑛𝑐+ 𝑑∑𝑥 and ∑𝑥𝑦= 𝑐∑𝑦+ 𝑑∑𝑦2.
+
+Example 7.1
+
+The following table shows the distribution of marks in calculus and statistics of
+eight students in a certain university.
+
+ Calculus(X) 55 44 33 47 42 65 51 63
+ Statistics(Y) 43 52 35 38 51 43 48 50
+
+ i. Fit simple regression lines of Y on X and X on Y.
+ ii. Estimate the score in statistics for a student who scored 50 in calculus.
+ iii. Estimate the score in calculus for a student who scored 50 in statistics.
+ Solution
+
+ X Y XY X2 Y2
+ 55 43 2,365 3,025 1,849
+ 44 52 2,288 1,936 2,704
+ 33 35 1,155 1,089 1,225
+ 47 38 1,786 2,209 1,444
+ 42 51 2,142 1,764 2,601
+ 65 43 2,785 4,225 1,849
+ 51 48 2,448 2,601 2,304
+ 63 50 3,150 3,969 2,500
+
+ ∑400 ∑360 ∑18,129 ∑20,818 ∑16,476
+
+ i. The regression line of Y on X is
+ 𝑌= 𝑎+ 𝑏𝑋
+ The normal equations are:
+
+ 49
+
+--- Page 51 ---
+∑𝑌= 𝑛𝑎+ 𝑏∑𝑋⇒360 = 8𝑎+ 400𝑏 ………………………………… (1)
+ and
+ ∑𝑋𝑌= 𝑎∑𝑋+ 𝑏∑𝑋2 ⇒18,129 = 400𝑎+ 20,818𝑏 ……………. (2)
+
+ Therefore, solving equations (1) and (2) simultaneously we have
+ (1) × 50 ⇒400𝑎+ 20,000𝑏= 18,000 ………………………………… (3)
+ (2) × 1 ⇒400𝑎+ 20,818𝑏= 18,129 ………………………………… (4)
+ (3) −(4) we have −818𝑏= −129
+ ∴𝑏= 0.1577 and from equation (1) we have 𝑎= 37.115. Hence the
+ regression line of Y on X is
+ 𝑌= 37.115 + 0.1577𝑋
+
+ The regression line of X on Y is
+ 𝑋= 𝑐+ 𝑑 𝑌
+ The normal equations are:
+ ∑𝑋= 𝑛𝑐+ 𝑑∑𝑌⇒400 = 8𝑐+ 360𝑑 ………………………………… (1)
+ and
+ ∑𝑋𝑌= 𝑐∑𝑌+ 𝑑∑𝑌2 ⇒18,129 = 360𝑐+ 16.476d……………. (2)
+
+ Therefore, solving equations (1) and (2) simultaneously we have
+ (1) × 45 ⇒360𝑐+ 16,200𝑏= 18,000 ………………………………… (3)
+ (2) × 1 ⇒360𝑐+ 16,476𝑑= 18,129 ………………………………… (4)
+ (3) −(4) we have −276𝑑= −129
+ ∴𝑑= 0.4674 and from equation (1) we have 𝑐= 28.967. Hence the
+ regression line of Y on X is
+ 𝑋= 28.967 + 0.4674𝑌
+
+ii. The required score in statistics for a student who scored 50 in calculus is
+ 𝑌= 37.115 + 0.1577𝑋= 37.115 + 0.1577(50) = 45 .
+
+iii. The required score in calculus for a student who scored 50 in statistics is
+
+ 𝑋= 28.967 + 0.4674𝑌= 28.967 + 0.4674(50) = 52.
+
+ 50
+
+--- Page 52 ---
+7.4: Correlation
+
+In bivariate distributions there are two variates x and y. If the change in one
+affects the change in other, the variables are said to be correlated, otherwise they
+are said to be uncorrelated. If, increase (or decrease) in one, results in increase
+(or decrease) in the other, the correlation is said to be positive otherwise
+negative.
+
+As a measure of degree of linear relationship between the variates, coefficient of
+correlation is defined by
+
+ 𝐶𝑜𝑣(𝑥, 𝑦)
+ 𝑟𝑥𝑦=
+ √[𝑉𝑎𝑟(𝑥) × 𝑉𝑎𝑟(𝑦)]
+
+ 51
+
+--- Page 53 ---
+Where 𝐶𝑜𝑣(𝑥, 𝑦) denotes the covariance between variates x and y, and is given
+by
+
+ 1 𝑛
+ 𝑖=1(𝑥𝑖−𝑥̅) (𝑦𝑖−𝑦̅). Where 𝑥̅ and 𝑦̅ are the means of x and y𝐶𝑜𝑣(𝑥, 𝑦) = 𝑛∑
+respectively. Thus,
+
+ 1 𝑛
+ 𝑖=1 (𝑥𝑖−𝑥̅) (𝑦𝑖−𝑦̅) 𝑛∑
+𝑟𝑥𝑦=
+ 𝑛 𝑛 √{[1 𝑖=1(𝑥𝑖−𝑥̅)2] [1 𝑖=1(𝑦𝑖−𝑦̅)2] } 𝑛∑ 𝑛∑
+
+ 𝑛 1 𝑛 𝑛 ∑ 𝑖=1 𝑥𝑖𝑦𝑖 − 𝑛∑ 𝑖=1 𝑥𝑖∑ 𝑖=1 𝑦𝑖 =
+ 𝑛 𝑛 𝑛 𝑛 √{[∑ 𝑦𝑖 )2]} 𝑖=1 𝑥𝑖2−1𝑛(∑ 𝑖=1 𝑥𝑖 )2][∑ 𝑖=1 𝑦𝑖2−1𝑛(∑ 𝑖=1
+
+This formula is referred to as product-moment (or Karl Pearson’s correlation
+coefficient) formula for linear correlation.
+
+7.4.1: Properties of Correlation Coefficient
+
+ i. The correlation coefficient is numerically independent of origin
+ and scale.
+ ii. For two independent variates correlation coefficient is zero.
+ iii. The correlation coefficient cannot numerically exceed unity i.e.
+ |𝑟𝑥𝑦| ≤1 𝑜𝑟−1 ≤𝑟𝑥𝑦≤1.
+
+Example 7.2
+
+The ages (x) and systolic blood pressure (y) of 12 students are given below.
+
+ Ages in 56 42 72 36 63 47 55 49 38 42 68 60
+ years(x)
+ Blood 147 125 160 118 149 128 150 145 115 140 152 155
+ pressure(y)
+Calculate the correlation coefficient between x and y and comment on your
+solution.
+
+ 52
+
+--- Page 54 ---
+Solution
+
+Let 𝑢= 𝑥−52 and 𝑣= 𝑦−140. Then we have the table of values as below.
+
+ 𝑥 𝑦 𝑢 𝑣 𝑢2 𝑣2 𝑢𝑣
+ 56 147 4 7 16 49 28
+ 42 125 -10 -15 100 225 150
+ 72 160 20 20 400 400 400
+ 36 118 -16 -22 256 484 352
+ 63 149 11 9 121 81 99
+ 47 128 -5 -12 25 144 60
+ 55 150 3 10 9 100 30
+ 49 145 -3 5 9 25 -15
+ 38 115 -14 -25 196 625 350
+ 42 140 -10 0 100 0 0
+ 68 152 16 12 256 144 192
+ 60 155 8 15 64 225 120
+ 4 4 1,552 2,502 1,766
+
+ ∑(𝑢𝑣) −1 𝑛(∑𝑢)(∑𝑣)
+ 𝑟𝑥𝑦= 𝑟𝑢𝑣=
+ √{[∑𝑢2 −1 −1 𝑛(∑𝑢)2][∑𝑣2 𝑛(∑𝑣)2]}
+ 1766−1 12(4)(4) = = 0.896
+ √{[1552−112(4)2][2502−112(4)2]}
+
+The ages and blood pressures of the students are positively correlated.
+
+7.4.2: Rank Correlation
+
+7.4.2.1: Non-repeated Ranks
+
+Let n be the number of individuals which are ranked according to two characters
+A and B. Let 𝑥 and 𝑦 be the ranks with respect to A and B respectively. Assuming
+that the ranks are not repeated in either series, both 𝑥 and 𝑦 take the same
+values 1, 2, …, n.
+
+ 53
+
+--- Page 55 ---
+Then,
+
+ 𝑛(𝑛+1)
+ ∑𝑥= ∑𝑦= 1 + 2 + 3 + ⋯+ 𝑛=
+ 2
+
+and
+
+ 𝑛(𝑛+1)(2𝑛+1)
+ ∑𝑥2 = ∑𝑦2 = 12 + 22 + 32 + ⋯+ 𝑛2 =
+ 6
+
+ 2 1 ∑𝑥
+ 𝑉𝑎𝑟(𝑥) = 𝑉𝑎𝑟(𝑦) = 𝑛∑𝑥2 −( 𝑛)
+
+ 2
+ 1
+ = ) } −(𝑛(𝑛+1) 𝑛{𝑛(𝑛+1)(2𝑛+1)6 2𝑛
+ (𝑛+1)(2𝑛+1) (𝑛+1)2
+ = − 6 4
+ 2(𝑛+1)(2𝑛+1)−3(𝑛+1)2
+ =
+ 12
+ 𝑛2−1
+ =
+ 12
+
+Let d be the difference between the ranks i.e. 𝑑= 𝑥−𝑦
+
+⟹∑𝑑2 = ∑(𝑥−𝑦)2
+
+ = ∑{(𝑥−𝑥) −(𝑦−𝑦)}2 since 𝑥= 𝑦
+
+ = ∑{(𝑥−𝑥)2 + (𝑦−𝑦)2 −2(𝑥−𝑥)(𝑦−𝑦)}
+
+ = ∑(𝑥−𝑥)2 + ∑(𝑦−𝑦)2 −2 ∑(𝑥−𝑥)(𝑦−𝑦)
+
+Therefore, dividing both sides by 𝑛 we have
+
+1 1 1 1
+ +𝑛∑𝑑2 = 𝑛∑(𝑥−𝑥)2 𝑛∑(𝑦−𝑦)2 −(2) 𝑛∑(𝑥−𝑥)(𝑦−𝑦)
+ = 𝑉𝑎𝑟(𝑥) + 𝑉𝑎𝑟(𝑦) −2𝐶𝑜𝑣(𝑥, 𝑦)
+
+ 𝑛2−1 𝑛2−1
+ = + −2𝐶𝑜𝑣(𝑥, 𝑦)
+ 12 12
+
+ 54
+
+--- Page 56 ---
+𝑛2 −1 1
+∴2𝐶𝑜𝑣(𝑥, 𝑦) = − 𝑛∑𝑑2 6
+ 𝑛2 −1 1
+ ∴𝐶𝑜𝑣(𝑥, 𝑦) = − 2𝑛∑𝑑2 12
+
+Thus, the rank correlation coefficient between 𝑥 and 𝑦 is given by
+
+ 𝐶𝑜𝑣(𝑥,𝑦)
+ 𝑟=
+ √𝑉𝑎𝑟(𝑥) 𝑉𝑎𝑟(𝑦)
+
+ 𝑛2−1 1
+ − 12 2𝑛∑𝑑2 𝑟=
+ √(𝑛2−1)(𝑛2−1)
+ 12 12
+
+ 6 ∑𝑑2
+ 𝑟= 1 − . 𝑛(𝑛2−1)
+
+This is also called Spearman’s rank correlation coefficient.
+
+Example 7.3
+
+Compute Spearman’s rank correlation coefficient from the following data and
+interpret your result.
+
+ 𝑥 33 61 20 19 40
+ 𝑦 26 36 65 25 35
+
+ Solution
+
+ 𝑥 𝑦 𝑅𝑥 𝑅𝑦 𝑑= 𝑅𝑥−𝑅𝑦 𝑑2
+ 33 26 3 4 -1 1
+ 61 36 1 2 -1 1
+ 20 65 4 1 3 9
+ 19 25 5 5 0 0
+ 40 35 2 3 -1 1
+ Total 12
+
+ 55
+
+--- Page 57 ---
+Therefore, the Spearman’s rank correlation coefficient is given by
+
+ 6 ∑𝑑2 6(12)
+ 𝑟𝑠𝑝= 1 − = 1 − = 0.4 𝑛(𝑛2−1) 5(52−1)
+
+Hence the ranks are positively correlated.
+
+7.4.2.2: Repeated Ranks
+
+If any two or more individuals are bracketed equal in any classification with
+respect to characteristic A and B, or if there is more than one item with the same
+value in the series, then the Spearman’s formula for calculating the rank
+correlation coefficient breaks down since in this case each of the variable X and Y
+does not assume the values 1, 2, …, n and consequently 𝑥̅ ≠𝑦̅.
+
+ 𝑚(𝑚2−1)
+Therefore, we add the factor to ∑𝑑2, where m is the number of times an
+ 12
+item is repeated. This correction factor is to be added for each repeated value.
+Thus, the rank correlation formula becomes
+
+ 𝑚(𝑚2−1)
+ 6[∑𝑑2+∑ ]
+ 𝑟𝑠𝑝= 1 − 12 𝑛(𝑛2−1)
+
+Example 7.4
+
+Obtain the rank correlation coefficient for the following data.
+
+ X 68 64 75 50 64 80 75 40 55 64
+ Y 62 58 68 45 81 60 68 48 50 70
+
+ Solution
+
+In the X-series we see that the value 75 occurs 2 times. The common rank given to
+these values is 2.5 which is the average of 2 and 3, the ranks which these values
+would have taken if they were different. The next value 68, gets the next rank
+which is 4. Again, we see that value 64 occurs thrice. The common rank given to it
+is 6 which is the average of 5, 6 and 7. Similarly in the Y-series value 68 occurs
+twice and its common rank is 3.5 which is the average of 3 and 4. As a result of
+
+ 56
+
+--- Page 58 ---
+these common rankings, the formula for 𝑟𝑠𝑝 has to be corrected. To ∑𝑑2 we add
+∑𝑚(𝑚2−1) for each value repeated, where m is the number of times a value
+ 12
+occurs. In the X-series the correction is to be applied twice, once for the value 75
+which occurs twice (m =2) and then for the value 64 which occurs thrice (m = 3).
+The total correction for the X-series is
+
+ 2(4−1) 3(9−1) 1 5
+ + = + 2 =
+ 12 12 2 2
+
+ 2(4−1) 1
+Similarly, this correction for the Y-series is = , as the value 68 occurs
+ 12 2
+twice.
+
+Thus,
+
+ 5 6[∑𝑑2+∑𝑚(𝑚2−1) ] 6[72+ 12 2+12]
+ 𝑟𝑠𝑝= 1 − = 1 − = 0.545 𝑛(𝑛2−1) 10(100−1)
+
+7.5: Assessment
+
+ 1. Obtain the equations of lines of regression lines and find an estimate of
+ Y which should correspond on average to X = 6.2.
+
+ X 1 2 3 4 5 6 7 8 9
+ Y 9 8 10 12 11 13 14 16 15
+
+ 2. The coefficient of rank correlation is 0.8. If the sum of squares of the
+ difference in ranks is 33, find the number of individuals.
+ 3. Calculate correlation coefficient and Spearman’s rank correlation
+ coefficient for the following data:
+
+ X 5 15 10 20 25 40
+ y 21 14 28 7 35 42
+
+ 4. The table below shows the respective heights of 12 fathers and their
+ oldest sons in inches.
+
+ 57
+
+--- Page 59 ---
+Father(x) 63 63 67 64 68 62 70 66 68 67 69 71
+ Son(y) 68 66 68 65 69 66 68 65 71 67 68 70
+
+ Find the Spearman’s rank correlation coefficient and comment on
+ Your result.
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 58
+
+--- Page 60 ---

@@ -147,6 +147,39 @@ Table of Contents
             "Probability Generating Function (Pgf)",
         ])
 
+    def test_topic_extraction_reads_lesson_sequences_and_wrapped_headings(self):
+        text = """
+--- Page 1 ---
+LESSON 1
+First Order Linear Equations with
+constant coefficients
+1.1 Introduction
+1.2 Objectives
+1.3 Definition of the equation
+--- Page 2 ---
+LESSON 2
+First Order Exact Equations
+2.1. Introduction
+2.2. Objectives
+2.3. Integrating factors
+--- Page 3 ---
+LESSON 9
+Linear Equations of Order 9
+9.1 Introduction
+This lesson covers nth order equations.
+9.2 Objectives
+9.3 Definition of a linear equation
+"""
+
+        topics = extract_topic_candidates(text)
+
+        self.assertEqual([topic["order"] for topic in topics], [1, 2, 9])
+        self.assertEqual(topics[0]["title"], "First Order Linear Equations With Constant Coefficients")
+        self.assertEqual(topics[0]["subtopics"], ["Definition of the equation"])
+        self.assertEqual(topics[1]["subtopics"], ["Integrating factors"])
+        self.assertEqual(topics[2]["title"], "Linear Equations Of Order N")
+        self.assertEqual(topics[2]["subtopics"], ["Definition of a linear equation"])
+
     def test_topic_extraction_uses_numbered_sections_when_no_top_level_entries_exist(self):
         text = """
 Contents

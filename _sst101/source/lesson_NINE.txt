@@ -1,0 +1,357 @@
+LESSON NINE
+
+ CONDITIONAL PROBABILITY, INDEPENDENT EVENTS
+ AND BAYES’ THEOREM
+
+9.1: Introduction
+
+In this lesson we will discuss conditional probability, independent events and
+Bayes’ theorem and its application.
+
+9.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. determine the conditional probability of an event given another one has
+ occurred,
+ ii. state when are events independent,
+ iii. apply Bayes’ theorem.
+
+9.3: Conditional Probability
+
+Let, E be an arbitrary event in a sample space S with 𝑃(𝐸) > 0. The probability
+that an event A occurs once E has occurred or, in other words, the conditional
+probability of A given E, written as 𝑃(𝐴/𝐸), is defined as follows:
+
+ 𝑃(𝐴∩𝐸)
+ 𝑃(𝐴∕𝐸) =
+ 𝑃(𝐸)
+
+If S is a finite equiprobable space and |𝐴| denotes the number of elements in an
+event A, then
+
+ |𝐴∩𝐸| |𝐸|
+ 𝑃(𝐴∩𝐸) = , 𝑃(𝐸) = ,
+ |𝑆| |𝑆|
+
+ 𝑃(𝐴∩𝐸) |𝐴∩𝐸|
+and also 𝑃(𝐴𝐸⁄ ) = = .
+ 𝑃(𝐸) |𝐸|
+
+Example 9.1 Suppose that a family with two children is selected at random from a
+residential estate. Assume that each child has an equal chance of being a boy as
+
+ 67
+
+--- Page 69 ---
+of being a girl. Calculate the conditional probability that both children are girls,
+given that
+
+ i. the older child is a girl,
+ ii. at least one of the children is a girl.
+
+ Solution
+ b-boy, g-girl
+ 𝑆= {𝑏𝑏, 𝑏𝑔, 𝑔𝑏, 𝑔𝑔}
+
+Let 𝐸1 be the event that the older child is girl. Let 𝐸2 be the event that at least one
+of the children is a girl and let 𝐸3 be the event that both children are girls. Then
+
+ 𝐸1 = {𝑔𝑏. 𝑔𝑔} , 𝐸2 = {𝑏𝑔, 𝑔𝑏, 𝑔𝑔} , 𝐸3 = {𝑔𝑔}
+
+ 𝑃(𝐸3∩𝐸1)
+ i. 𝑃(𝐸3 ⁄ 𝐸1 ) = , but 𝐸3 ∩𝐸1 = {𝑔𝑔} 𝑃(𝐸1)
+ 1
+ 𝑃(𝐸3 ∩𝐸1) 4 1 ∴𝑃(𝐸3 ⁄ 𝐸1 ) = = =
+ 𝑃(𝐸1) 2 2
+ 4
+
+ 𝑃(𝐸3∩𝐸2)
+ ii. 𝑃(𝐸3 ⁄ 𝐸2 ) = , but 𝐸3 ∩𝐸2 = {𝑔𝑔}
+ 𝑃(𝐸2)
+ 1
+ 𝑃(𝐸3 ∩𝐸2) 4 1 ∴𝑃(𝐸3 ⁄ 𝐸2 ) = = =
+ 𝑃(𝐸2) 3 3
+ 4
+
+ 1 1 1
+Example 9.2 Let A and B be events with 𝑃(𝐴) = , 𝑃(𝐵) = and 𝑃(𝐴∪𝐵) = .
+ 3 4 2
+
+Find
+
+ i. 𝑃(𝐴𝐵⁄ ),
+ ii. 𝑃(𝐵𝐴⁄ ),
+ iii. 𝑃(𝐴∕𝐵𝑐).
+
+ 68
+
+--- Page 70 ---
+Solution
+
+ 𝑃(𝐴∩𝐵)
+ i. 𝑃(𝐴𝐵⁄ ) = , but
+ 𝑃(𝐵)
+
+ 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵)
+
+ ⇒𝑃(𝐴∩𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∪𝐵)
+
+ 1 1 1 1
+ = + − =
+ 3 4 2 12
+
+ 1
+ 12 1 ∴𝑃(𝐴𝐵⁄ ) = 1 =
+ 3
+ 4
+
+ 1
+ 𝑃(𝐵∩𝐴) 12 1 ii. 𝑃(𝐵𝐴⁄ ) = = 1 =
+ 𝑃(𝐴) 4
+ 3
+
+ 𝑃(𝐴∩𝐵𝑐) 𝑃(𝐴\𝐵) 𝑃(𝐴)−𝑃(𝐴∩𝐵)
+ iii. 𝑃(𝐴𝐵𝑐⁄ ) = = =
+ 𝑃(𝐵𝑐) 𝑃{𝐵𝑐) 1−𝑃(𝐵)
+
+ 1 1
+ −
+ 3 12 1 = =
+ 1−1 3
+ 4
+
+9.3.1: Multiplication Rule for Conditional Probability
+
+ 𝑃(𝐸1 ∩𝐸2)
+ 𝑃(𝐸1 ∕𝐸2) =
+ 𝑃(𝐸2)
+
+If both sides of this equation, is multiplied by 𝑃(𝐸2) we obtain the formula
+
+ 𝑃(𝐸1 ∩𝐸2 = 𝑃(𝐸2)𝑃(𝐸1 ⁄ 𝐸2 ) ,
+
+Which is called the general multiplication rule for calculating the probability that
+the two events will occur.
+
+For any events 𝐸1, 𝐸2, … , 𝐸𝑛
+
+ 69
+
+--- Page 71 ---
+𝑃(𝐸1 ∩ 𝐸2 ∩ … ∩ 𝐸𝑛)
+ = 𝑃(𝐸1)𝑃(𝐸2 ⁄𝐸1 )𝑃(𝐸3 ⁄ 𝐸1 ∩𝐸2) … 𝑃(𝐸𝑛∕𝐸1 ∩ 𝐸2 ∩ … ∩ 𝐸𝑛−1)
+
+Example 9.3 In a certain small town, the probability that a woman attends a
+family planning clinic is 0.4 and the probability that her husband attends the clinic
+is 0.1. The probability that a husband attends a clinic given that the wife does is
+0.08. Calculate the probability that
+
+ i. both wife and husband will attend the clinic,
+ ii. the wife will attend the clinic given that the husband does,
+ iii. one of the two persons will attend a clinic.
+
+ Solution
+
+Let A denotes the event that the wife attends a clinic and B denotes the event
+that the husband attends the same clinic. Then
+
+𝑃(𝐴) = 0.4, 𝑃(𝐵) = 0.1 and 𝑃(𝐵𝐴⁄ ) = 0.08.
+
+ i. 𝑃(𝐴∩𝐵) = 𝑃(𝐴)𝑃(𝐵𝐴⁄ ) = (0.4)(0.08) = 0.032
+
+ 𝑃(𝐴∩𝐵) 𝑜.032
+ ii. 𝑃(𝐴𝐵⁄ ) = = = 0.32
+ 𝑃(𝐵) 0.1
+
+ iii. 𝑃(𝐴∪𝐵) = 𝑃(𝐴) + 𝑃(𝐵) −𝑃(𝐴∩𝐵) = 0.4 + 0.1 −0.032 = 0.468.
+
+9.3.2: Independence of Events
+
+Let 𝐸1 and 𝐸2 be any two events in the sample space S. Assume that 𝑃(𝐸1) > 0
+and 𝑃(𝐸2) > 0. Then we have the following definition:
+
+The events 𝐸1 and 𝐸2 are said to be stochastically or statistically independent if
+
+ 𝑃(𝐸1 ⁄ 𝐸2 ) = 𝑃(𝐸1) or 𝑃(𝐸2 ⁄ 𝐸1 ) = 𝑃(𝐸2)
+
+If two events 𝐸1 and 𝐸2 are not independent then they are said to be dependent.
+
+The general multiplication rule is
+
+ 𝑃(𝐸1 ∩𝐸2 = 𝑃(𝐸2)𝑃(𝐸1 ⁄ 𝐸2 ),
+
+ 70
+
+--- Page 72 ---
+It follows that the events 𝐸1 and 𝐸2 are independent if and only if
+
+ 𝑃(𝐸1 ∩𝐸2 = 𝑃(𝐸1)𝑃(𝐸2)
+
+Example 9.4
+
+Two fair dice are tossed, and the following events are defined:
+
+ A = {Sum of the numbers showing is odd}
+
+ B = {Sum of the numbers showing is 9, 11, 12}
+
+Are events A and B independent? Why?
+
+ Solution
+
+ 𝑆= {(1,1), (1,2), (1,3), … , (6,6)}
+
+There are 36 sample elements in S.
+
+ (1,2), (1,4), (1,6), (2,1), (2,3), (2,5), (3,2), (3,4), (3,6),
+ 𝐴= { }
+ (4,1), (4,3), (4,5), (5,2), (5,4), (5,6), ( 6,1), (6,3), (6,5)
+
+ 𝐵= {(3,6), (4,5), (5,4), (5,6), (6,3), (6,5), (6,6)}
+
+ 𝐴∩𝐵= {(3,6), (4,5), (5,4), (5,6), (6,3), (6,5)}.
+
+Thus, there are 18, 7, 6 sample elements in A, B and 𝐴∩𝐵 respectively.
+Therefore,
+
+ 18 1 7 6 1
+ 𝑃(𝐴) = = , 𝑃(𝐵) = and 𝑃(𝐴∩𝐵) = = 36 2 36 36 6.
+
+ 7 7 𝑃(𝐴). 𝑃(𝐵) = (1 ( = ⇒𝑃(𝐴). 𝑃(𝐵) ≠𝑃(𝐴∩𝐵) 2) 36) 72
+
+Thus, the events A and B are not independent.
+
+9.3.3: Bayes’ Theorem
+
+Suppose 𝐸1, 𝐸2, … , 𝐸𝑘 are k mutually exclusive events in the sample space S such
+that 𝐸1 ∪𝐸2 ∪… ∪𝐸𝑘= 𝑆 and 𝑃(𝐸𝑖) > 0 for 𝑖= 1, 2, … , 𝑘. Then some arbitrary
+event B, which is associated with 𝐸𝑖′𝑠 such that 𝑃(𝐵) > 0, we can find out the
+probabilities 𝑃(𝐵𝐸1⁄ ), 𝑃(𝐵𝐸2⁄ ), … , 𝑃(𝐵𝐸𝑘⁄ ) .
+
+ 71
+
+--- Page 73 ---
+In Bayes’ approach we want to find out the posterior probability of an event 𝐸𝑖
+given that B has occurred i.e. 𝑃(𝐸𝑖)
+
+ 𝑃(𝐸𝑖∩𝐵)
+ 𝑃(𝐸𝑖∕𝐵) = if and only if 𝑃(𝐵) > 0 𝑃(𝐵)
+
+We know that B is also a set in S and hence 𝐵= 𝐵∩𝑆 or in other form
+
+ 𝐵= 𝐵∩(𝐸1 ∪𝐸2 ∪… ∪𝐸𝑘) and 𝐸𝑖′𝑠 are disjoint
+
+Or 𝐵= (𝐵∩𝐸1) ∪(𝐵∩𝐸2) ∪… ∪(𝐵∩𝐸𝑘).
+
+Thus,
+
+ 𝑃(𝐵) = ∑ 𝑘𝑖=1 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐵)
+
+ 𝑃(𝐵∩𝐸𝑖) = 𝑃(𝐸𝑖𝐵⁄ )𝑃(𝐵)
+
+Also
+
+ 𝑃(𝐵∩𝐸𝑖) = 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+
+Therefore,
+
+ 𝑃(𝐵) = ∑ 𝑘𝑖=1 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+
+Hence,
+
+ 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+ 𝑃(𝐸𝑖∕𝐵) = 𝑘 ∑ 𝑖=1 𝑃(𝐵𝐸𝑖⁄ )𝑃(𝐸𝑖)
+
+This formula is known as Bayes’ formula.
+
+Example 9.5
+
+In a city there are 3 stores each having 20 pieces of an item. Let these stores be
+denoted by 𝑆1, 𝑆2 and 𝑆3. The stores 𝑆1, 𝑆2 and 𝑆3 have 10%, 20% and 30%
+defective items, respectively. A costumer first chooses a store randomly and then
+selects an item randomly from the store. Find the probability that
+
+ a) the selected item is defective,
+ b) the selected item is defective has come from
+ i. store 𝑆1 ,
+ ii. store 𝑆2 ,
+ iii. store 𝑆3 .
+
+ 72
+
+--- Page 74 ---
+Solution
+
+Let 𝐸𝑖 denote the event that the store 𝑆𝑖 (𝑖= 1, 2,3) is selected. Then,
+
+ 1 1
+𝑃(𝐸𝑖) = 𝑖. 𝑒. 𝑃(𝐸1) = 𝑃(𝐸2) = 𝑃(3) = . 3 3
+
+Let B denotes the event that a selected item is defective. Therefore,
+
+𝑃(𝐵𝐸1⁄ ) = 10% = 0.1, 𝑃(𝐵𝐸2⁄ ) = 20% = 0.2, 𝑃(𝐵𝐸3⁄ ) = 30% = 0.3 .
+
+ a) 𝑃(𝐵) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1) + 𝑃(𝐵𝐸2⁄ )𝑃(𝐸2) + 𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ 1 = (0.1) (1 + (0.2) (1 + (0.3) (1 = 3) 3) 3) 5
+ b)
+ 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)
+ i. 𝑃(𝐸1 ⁄ 𝐵 ) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)+𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)+𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ (0.1) (1 1 3) = =
+ 1 6
+ 5
+
+ 𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)
+ ii. 𝑃(𝐸2 ⁄ 𝐵 ) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)+𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)+𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+
+ (0.2) (1 1 3) = =
+ 1 3
+ 5
+
+ 𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ iii. 𝑃(𝐸3 ⁄𝐵 ) = 𝑃(𝐵𝐸1⁄ )𝑃(𝐸1)+𝑃(𝐵𝐸2⁄ )𝑃(𝐸2)+𝑃(𝐵𝐸3⁄ )𝑃(𝐸3)
+ (0.3) (1 1 3) = =
+ 1 2
+ 5
+
+Check: A defective selected item belongs to one of the stores. Hence
+
+ 73
+
+--- Page 75 ---
+3 1 1 1 ∑ 𝑖=1 𝑃( 𝐸3 ⁄ 𝐵 ) = + + = 1. 6 3 2
+
+9.4: Assessment
+
+ 1. For two events A and B, 𝑃(𝐴) = 0.4, 𝑃(𝐵) = 0.2 and 𝑃(𝐴∪𝐵) =
+ 0.52. Find 𝑃(𝐴∩𝐵), 𝑃(𝐴𝐵⁄ ) and 𝑃(𝐵𝐴⁄ ).
+ 2. Suppose that two balanced dice are tossed. Let A denote the event of
+ an odd total, B the event of a ‘1’ on the first die, and C the event of a
+ total of seven.
+ i. Are A and B independent?
+ ii. Are A and C independent?
+ iii. Are B and C independent?
+ 3. A gift shop employs three persons to wrap the gifts. Helen who
+ wraps 45% of the gifts fails to remove the price tag on 2% of the
+ items. Jane who wraps 35% of the items fails to remove the price tag
+ on 5% of the items she wraps. Mary who wraps the remaining items
+ fails 3% of her wrapping.
+ a) Find the probability that a gift wrapped at this store has
+ a price tag on it.
+ b) A gift wrapped in this store was found to have a price
+ tag on it later on. What is the probability that this packet
+ was wrapped by
+ i. Helen,
+ ii. Jane.
+ iii. Mary.
+
+References
+
+ 3. Statistical Methods by S.P. Gupta
+ 4. Applied Statistics and Probability for Engineers by D.C.
+ Runger
+
+ 74
+
+--- Page 76 ---
+75

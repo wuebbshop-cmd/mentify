@@ -567,10 +567,7 @@
     searchInput.addEventListener('input', function () {
       syncClearButton();
       clearTimeout(submitTimer);
-      submitTimer = setTimeout(function () {
-        if (searchInput.value.trim() === initialValue) return;
-        submitSearch();
-      }, 450);
+      submitTimer = setTimeout(submitSearch, 450);
     });
 
     searchInput.addEventListener('keydown', function (event) {

@@ -36,6 +36,9 @@ urlpatterns = [
     path("terms/", views.prep_terms, name="terms"),
     path("privacy/", views.prep_privacy, name="privacy"),
     # Export Endpoints (PDF & DOCX)
+    path("course/<str:course_code>/download-pack/", views.prep_download_course_pack, name="download_course_pack"),
+    path("topic/<str:topic_id>/download-pack/", views.prep_download_topic_course_pack, name="download_topic_course_pack"),
+    path("document/<uuid:doc_id>/download/", views.prep_download_document, name="download_document"),
     path("export/topic/<str:topic_id>/<str:fmt>/", views.prep_export_topic, name="export_topic"),
     path("export/paper/<str:course_code>/<str:paper_id>/<str:fmt>/", views.prep_export_paper, name="export_paper"),
     # AI Router & Zero-Cost Cache Endpoints

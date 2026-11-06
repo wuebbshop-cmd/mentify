@@ -1,4 +1,4 @@
-﻿import os
+import os
 import re
 import json
 import unicodedata
@@ -199,6 +199,8 @@ def clean_tag_label(label: str) -> str:
     for ch in ("$", "{", "}", "^", "_", "`", "\\"):
         text = text.replace(ch, "")
     text = re.sub(r"\s+", " ", text).strip()
+    # Strip trailing Table of Contents page numbers (e.g. "Area Under A Curve 61" -> "Area Under A Curve")
+    text = re.sub(r"\s+\d+$", "", text).strip()
     return text
 
 
@@ -230,6 +232,9 @@ def clean_topic_summary(summary: str, title: str = "", subtopics: list[str] | No
         # Strip leading "An introductory course in ...", "A course covering ..." if it was purely a course blurb
         text = re.sub(r"(?i)^an?\s+(?:introductory\s+)?course\s+(?:in|covering)\s+[^,.;]+[.,;]?\s*", "", text)
         text = re.sub(r"\s+", " ", text).strip(" ,.;:-")
+
+    if text:
+        text = re.sub(r"\s+\d+(?=[.,;]?\s*$)", "", text).strip(" ,.;:-")
 
     # If empty or too trivial, synthesize a crisp subject-matter summary based on title & subtopics
     if not text or len(text) < 15:
@@ -487,8 +492,13 @@ def prep_public_library(request):
 
             courses = [c for c in courses if _matches(c)]
             courses.sort(key=lambda c: (_search_rank(c, needle, tokens), c["code"]))
+    category_fallback = False
     if selected_category and selected_category.lower() != "all":
-        courses = [c for c in courses if c["category"].lower() == selected_category.lower()]
+        courses_in_cat = [c for c in courses if c["category"].lower() == selected_category.lower()]
+        if courses_in_cat or not query:
+            courses = courses_in_cat
+        else:
+            category_fallback = True
 
     page_obj = Paginator(courses, PREP_LIBRARY_PAGE_SIZE).get_page(request.GET.get("page"))
 
@@ -498,7 +508,8 @@ def prep_public_library(request):
         "page_obj": page_obj,
         "filtered_total": len(courses),
         "search_query": query,
-        "selected_category": selected_category.lower() or "all",
+        "selected_category": "all" if category_fallback else (selected_category.lower() or "all"),
+        "category_fallback": category_fallback,
         "page_size": PREP_LIBRARY_PAGE_SIZE,
         "active_tab": "library",
     }
@@ -517,7 +528,7 @@ def _get_course_topics_summary(course):
     Uses indexed queries instead of scanning and parsing hundreds of pages of raw text per topic,
     reducing course page latency from ~35s down to <0.5s.
     """
-    cache_key = f"prep_course_topics_summary_v4_{course.pk}"
+    cache_key = f"prep_course_topics_summary_v7_{course.pk}"
     cached_bundle = cache.get(cache_key)
     if cached_bundle is not None:
         return cached_bundle
@@ -537,10 +548,14 @@ def _get_course_topics_summary(course):
         .values_list("topic_id", "cnt")
     )
 
-    # 2. Bulk inspect notes levels available in PrepContentCache
+    # 2. Bulk inspect notes levels that are validated and displayed in-app
+    from services.prep_ai_router import NOTE_VALIDATION_STATE
     cache_entries = PrepContentCache.objects.filter(
         topic_id__in=topic_ids,
         content_type="topic_notes",
+        payload__validation_state=NOTE_VALIDATION_STATE,
+    ).exclude(
+        payload__review_status="skipped_no_source",
     ).values_list("topic_id", "cache_key")
 
     levels_by_topic = {tid: set() for tid in topic_ids}
@@ -579,13 +594,18 @@ def _get_course_topics_summary(course):
         raw_subtopics = t.subtopics if isinstance(t.subtopics, list) else []
         clean_subtopics = [clean_tag_label(str(st)) for st in raw_subtopics if clean_tag_label(str(st))]
 
+        clean_t_title = clean_tag_label(t.title) if clean_tag_label(t.title) else t.title
+        clean_sum = clean_topic_summary(t.summary, clean_t_title, clean_subtopics)
+        if t.title and t.title != clean_t_title and clean_sum:
+            clean_sum = clean_sum.replace(t.title, clean_t_title)
+
         t_data = {
             "id": str(t.id),
             "num": t.order,
             "order": t.order,
-            "title": clean_tag_label(t.title) if clean_tag_label(t.title) else t.title,
+            "title": clean_t_title,
             "slug": t.slug,
-            "summary": clean_topic_summary(t.summary, t.title, clean_subtopics),
+            "summary": clean_sum,
             "subtopics": clean_subtopics,
             "subtopics_count": len(clean_subtopics),
             "question_count": auth_count,
@@ -635,6 +655,9 @@ def prep_public_course(request, course_slug):
         "description": desc,
     }
 
+    from services.prep_course_packs import get_course_pdf_documents
+    course_pdf_docs = get_course_pdf_documents(course)
+
     resp = render(
         request,
         "prep/public_course.html",
@@ -644,6 +667,11 @@ def prep_public_course(request, course_slug):
             "total_questions_count": total_questions_count,
             "published_papers": course.papers.filter(is_published=True).order_by("-created_at"),
             "active_tab": "library",
+            "course_pdf_docs": course_pdf_docs,
+            "course_pdf_docs_count": len(course_pdf_docs),
+            "course_lecture_notes": [d for d in course_pdf_docs if d["is_note"]],
+            "course_past_papers_docs": [d for d in course_pdf_docs if d["is_paper"]],
+            "course_pdf_pack_url": reverse("prep:download_course_pack", kwargs={"course_code": course.code}),
         },
     )
     return set_prep_cache_headers(
@@ -815,6 +843,7 @@ def prep_public_topic(request, course_slug, topic_id, topic_slug):
             "questions": questions,
             "is_indexable": bool(notes or questions),
             "active_tab": "library",
+            "course_pdf_pack_url": reverse("prep:download_course_pack", kwargs={"course_code": course.code}),
         },
     )
     return set_prep_cache_headers(
@@ -1259,6 +1288,9 @@ def prep_course_detail(request, course_code):
     total_subtopics_count = sum(len(t.get("subtopics") or []) for t in topics_data)
     ready_topics_count = sum(1 for t in topics_data if t.get("ready_levels"))
 
+    from services.prep_course_packs import get_course_pdf_documents
+    course_pdf_docs = get_course_pdf_documents(course)
+
     context = {
         "active_tab": "courses",
         "user_credits": get_available_credits(wallet),
@@ -1271,6 +1303,11 @@ def prep_course_detail(request, course_code):
         "course_documents": pending_documents,
         "pending_documents": pending_documents,
         "pending_review_count": pending_review_count,
+        "course_pdf_docs": course_pdf_docs,
+        "course_pdf_docs_count": len(course_pdf_docs),
+        "course_lecture_notes": [d for d in course_pdf_docs if d["is_note"]],
+        "course_past_papers_docs": [d for d in course_pdf_docs if d["is_paper"]],
+        "course_pdf_pack_url": reverse("prep:download_course_pack", kwargs={"course_code": course.code}),
     }
     return render(request, "prep/course_detail.html", context)
 
@@ -1517,6 +1554,17 @@ def prep_topic_study(request, topic_id):
     context["topic_papers"] = topic_papers
     context["wiki_entry"] = wiki_entry
     context["is_in_spaced_deck"] = is_in_spaced_deck
+
+    # 5. Course PDF Pack (Lecture notes & authentic past exam papers from Cloudflare R2)
+    from services.prep_course_packs import get_course_pdf_documents
+    course_pdf_docs = get_course_pdf_documents(topic.course)
+    context["course_pdf_docs"] = course_pdf_docs
+    context["course_pdf_docs_count"] = len(course_pdf_docs)
+    context["course_documents_count"] = len(course_pdf_docs)
+    context["course_lecture_notes"] = [d for d in course_pdf_docs if d["is_note"]]
+    context["course_past_papers"] = [d for d in course_pdf_docs if d["is_paper"]]
+    context["course_pdf_pack_url"] = reverse("prep:download_course_pack", kwargs={"course_code": topic.course.code})
+
     return render(request, "prep/topic_study.html", context)
 
 
@@ -3675,20 +3723,12 @@ def prep_topic_notes_api(request):
         # Notes are absent / awaiting background preparation
         if topic_obj:
             from services.prep_ai_router import _topic_notes_cache_signature
+            from services.prep_note_precompute import enqueue_topic_note_job
+
             sig = _topic_notes_cache_signature(
                 topic_obj.course, topic_obj, topic_obj.title, subtopics
             )
-            job = PrepTopicNotesJob.objects.filter(
-                topic=topic_obj,
-                level=level,
-            ).order_by("-queued_at", "-id").first()
-            if not job:
-                PrepTopicNotesJob.objects.create(
-                    topic=topic_obj,
-                    level=level,
-                    source_signature=sig,
-                    status="pending",
-                )
+            enqueue_topic_note_job(topic_obj, level, sig)
         label = NOTE_LEVEL_LABELS.get(level, level)
         return JsonResponse({
             "success": False,
@@ -4666,6 +4706,106 @@ def prep_export_paper(request, course_code, paper_id, fmt="pdf"):
         logger.error("Failed to generate paper export (%s): %s", fmt, exc)
         messages.error(request, f"Unable to generate {fmt.upper()} export for this past paper at this time. Please try again.")
         return redirect("prep:paper_detail", course_code=course_code, paper_id=paper_id)
+
+
+@login_required
+def prep_download_course_pack(request, course_code):
+    """
+    Download a consolidated, high-speed ZIP package of all course PDFs
+    (lecture notes and past papers) directly from Cloudflare R2 edge storage.
+    Enforces authentication and rate-limiting.
+    """
+    rate_ident = request.user.pk if request.user.is_authenticated else "anon"
+    rate_key = f"prep_pack_download_rate_{rate_ident}"
+    recent_pack_count = cache.get(rate_key, 0)
+    if recent_pack_count >= 10:
+        messages.error(request, "Course pack download limit reached (max 10 per hour). Please try again later.")
+        return redirect("prep:course_detail", course_code=course_code)
+    cache.set(rate_key, recent_pack_count + 1, 3600)
+    course = (
+        PrepCourse.objects.filter(code__iexact=course_code.replace("-", " "), is_active=True).first()
+        or PrepCourse.objects.filter(code__iexact=course_code, is_active=True).first()
+        or PrepCourse.objects.filter(slug__iexact=course_code, is_active=True).first()
+    )
+    if not course:
+        messages.error(request, f"Course '{course_code}' was not found.")
+        return redirect("prep:courses")
+
+    from services.prep_course_packs import build_or_get_course_pdf_pack
+    try:
+        zip_bytes, filename = build_or_get_course_pdf_pack(course)
+    except Exception as exc:
+        logger.exception("Failed to build course PDF pack for %s: %s", course.code, exc)
+        messages.error(request, "Unable to generate course PDF pack. Please try again shortly.")
+        return redirect("prep:course_detail", course_code=course.code)
+
+    response = HttpResponse(zip_bytes, content_type="application/zip")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response["Content-Length"] = len(zip_bytes)
+    response["Cache-Control"] = "public, max-age=86400"
+    return response
+
+
+@login_required
+def prep_download_topic_course_pack(request, topic_id):
+    """Convenience redirect/download from a topic ID to its course PDF pack."""
+    topic = get_object_or_404(PrepTopic, pk=topic_id, is_active=True)
+    return prep_download_course_pack(request, topic.course.code)
+
+@login_required
+def prep_download_document(request, doc_id):
+    """
+    Zero-trace streaming download for individual course PDF documents.
+    Streams directly from Cloudflare R2 or local media storage.
+    Browser DevTools and LLMs never see Cloudflare R2 or upstream sources.
+    """
+    doc = get_object_or_404(PrepDocument, pk=doc_id)
+
+    # 1. Rate limiting: max 50 documents per 10 minutes per IP/user
+    rate_ident = request.user.pk if request.user.is_authenticated else (request.META.get("REMOTE_ADDR") or "anon")
+    rate_key = f"prep_doc_download_rate_{rate_ident}"
+    recent_count = cache.get(rate_key, 0)
+    if recent_count >= 50:
+        messages.error(request, "Download limit reached. Please wait a few minutes before downloading more documents.")
+        return redirect("prep:course_detail", course_code=doc.course.code)
+    cache.set(rate_key, recent_count + 1, 600)
+
+    # 2. Retrieve file bytes
+    file_bytes = None
+    from services.cloudflare_storage import CloudflareR2MediaStorage, is_cloudflare_r2_configured
+    storage = CloudflareR2MediaStorage() if is_cloudflare_r2_configured() else None
+    clean_name = doc.file.name if doc.file else ""
+
+    if storage and clean_name:
+        try:
+            clean_key = storage._clean_key(clean_name)
+            file_bytes = storage.download_bytes(clean_key)
+        except Exception as exc:
+            logger.warning("Could not read document %s from R2: %s", clean_name, exc)
+
+    if not file_bytes and clean_name:
+        local_path = Path(settings.MEDIA_ROOT) / clean_name
+        if local_path.is_file():
+            file_bytes = local_path.read_bytes()
+
+    if not file_bytes:
+        messages.error(request, "This document is temporarily being updated. Please try again shortly.")
+        return redirect("prep:course_detail", course_code=doc.course.code)
+
+    # 3. Format safe, clean filename
+    safe_course = re.sub(r"[^A-Za-z0-9]", "", doc.course.code).upper()
+    safe_title = re.sub(r'[\\/*?:"<>|]', "", doc.topic_name or doc.doc_type).strip().replace(" ", "_")
+    download_filename = f"{safe_course}_{safe_title}.pdf"
+    if not download_filename.lower().endswith(".pdf"):
+        download_filename += ".pdf"
+
+    # 4. Stream response with zero external trace
+    response = HttpResponse(file_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{download_filename}"'
+    response["Content-Length"] = len(file_bytes)
+    response["Cache-Control"] = "private, no-transform, max-age=3600"
+    return response
+
 
 
 @never_cache

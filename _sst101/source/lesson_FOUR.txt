@@ -1,0 +1,342 @@
+LESSON FOUR
+
+ MEASURES OF DISPERSION
+
+4.1: Introduction
+
+The measures of central tendency are not sufficient measures to reveal the shape
+of the distribution of data set. The measures that show the spread of a data set
+are called the measures of dispersion. The main measures of dispersion are range,
+inter quartile range, standard deviation, variance and coefficient of variation. In
+this lesson we will discuss these measures of dispersion.
+
+4.2: Lesson Learning Outcomes
+
+By the end of this lesson the learner will be able to:
+
+ i. State measures of dispersion
+ ii. Compute measures of dispersion
+
+4.3: Range
+
+The range is the difference between two extreme values of a distribution. If 𝑥𝑔
+and 𝑥𝑙 are the greatest and the smallest observations respectively in a
+distribution, then the range of the distribution is 𝑥𝑔−𝑥𝑙 .
+
+The range is the simplest and also the least reliable measure of dispersion. This is
+due to the fact that, it is based only on two extreme values.
+
+Example 4.1
+
+Find the range for the following data: 20, 21, 15, 10, 7, 4, 51, 49
+
+ Solution
+
+The range for the above data is 𝑥𝑔−𝑥𝑙= 51 −4 = 47.
+
+4.4: Quartile Deviation (semi- interquartile range)
+
+The quartile deviation or semi-interquartile range 𝑄 is given by
+
+ 1
+ 𝑄= (𝑄3 −𝑄1) , 2
+
+Where 𝑄1 and 𝑄3 are the first and third quartiles of the distribution respectively.
+
+ 24
+
+--- Page 26 ---
+Interquartile range= 𝑄3 −𝑄1.
+
+Quartile deviation is definitely a better measure of dispersion than the range as it
+makes use of 50% of the data. Since it ignores the rest 50% of the data, it cannot
+be regarded as a reliable measure of dispersion.
+
+4.5: Standard Deviation
+
+The standard deviation of a set of n numbers 𝑥1, 𝑥2, … , 𝑥𝑛 is usually denoted by s
+and is the positive root of the arithmetic mean of the squares of deviations of the
+given values from their arithmetic mean.
+
+Thus, the standard deviation of n observations 𝑥1, 𝑥2, … , 𝑥𝑛 is given by
+
+ 1 𝑛
+ 𝑖=1(𝑥𝑖−𝑥̅)2 𝑠= √ 𝑛∑
+
+Example 4.2
+
+Compute the standard deviation of the following set of numbers 120, 60, 70, 30,
+150, 100, 180, 50.
+
+ Solution
+
+ 1
+ 𝑥̅ = (120 + 60 + ⋯+ 50) = 95
+ 8
+
+ 𝑛
+ ∴ 𝑠= √1 𝑛∑(𝑥𝑖−𝑥̅)2
+ 𝑖=1
+
+ 1
+ 𝑠= √ [(120 −95)2 + (60 −95)2 + ⋯+ (50 −95)2]
+ 8
+
+ = √2375 = 48.7
+
+Suppose 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, the
+standard deviation s can be expressed as
+
+ 1 𝑘 𝑘
+ 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥̅)2 , where 𝑛= ∑ 𝑖=1 𝑓𝑖 𝑠= √ 𝑛∑
+
+ 25
+
+--- Page 27 ---
+This formula is also applicable to grouped data if we identify 𝑥𝑖 as the class mark
+of the ith class and 𝑓𝑖 as the corresponding class frequency.
+
+4.6: Variance
+
+The square of the standard deviation is called the variance and is denoted by 𝑠2.
+Thus, if 𝑥1, 𝑥2, … , 𝑥𝑛 is a set of n numbers, then their variance is given by
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥̅)2 . 𝑠2 = 𝑛∑
+
+If 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, their variance is
+given by
+
+ 1 𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥̅)2 , where 𝑛= ∑ 𝑖=1 𝑓𝑖 𝑠2 = 𝑛∑
+
+This formula is also applicable to grouped data if we identify 𝑥𝑖 as the class mark
+of the ith class and 𝑓𝑖 as the corresponding class frequency.
+
+ Let us consider different formula for computing variance.
+
+The variance of a set of n numbers is given by
+
+ 1 𝑛 𝑖=1(𝑥𝑖−𝑥̅)2 𝑠2 = 𝑛∑
+
+ 1 𝑛 2 𝑖=1 𝑥𝑖 −𝑥̅2 = 𝑛∑
+
+Example 4.3 Find the variance and standard deviation of the following set of
+numbers: 12, 6, 7, 9, 15, 13, 18, 11.
+
+ Solution
+
+To find the variance of these numbers we first find the mean of the
+
+numbers i.e. 𝑥̅ .Thus
+
+ 1
+ 𝑥̅ = (12 + 6 + 7 + 9 + 15 + 13 + 18 + 11) = 11.375
+ 8
+Therefore, 𝑥̅2 = 129.391
+
+Next, we find the mean of the squares of numbers i.e.
+
+ 26
+
+--- Page 28 ---
+1 𝑛 2 1 [122 + 62 + ⋯+ 182 + 112] = 143.625. 𝑖 = 𝑛∑𝑥𝑖 8
+
+ 1 𝑛 2 1 8 2 ∑ 𝑖 −𝑥̅2 = 𝑖=1 𝑥𝑖 −𝑥̅2 = 143.625 −129.391 = 14.2Finally, 𝑠2 = 𝑛∑𝑥𝑖 8
+
+Hence the standard deviation 𝑠= √14.2 = 3.8
+
+If 𝑥1, 𝑥2, … , 𝑥𝑘 occur with frequencies 𝑓1, 𝑓2, … , 𝑓𝑘 respectively, their variance is
+given by
+
+ 1 𝑘 𝑘 𝑖=1 𝑓𝑖(𝑥𝑖−𝑥̅)2 , where 𝑛= ∑ 𝑖=1 𝑓𝑖 𝑠2 = 𝑛∑
+
+ 1 𝑘 2 𝑖=1 𝑓𝑖𝑥𝑖 −𝑥̅2 = 𝑛∑
+
+Example 4.4
+
+The marks obtained by 30 students in statistics quiz marked out of 20 were as
+shown below:
+
+ Mark 8 9 10 11 12 14 15 17 18 20
+ x
+ Number 2 3 4 4 5 3 3 3 2 1
+ of
+ students
+ f
+Find the variance and standard deviation of the marks.
+
+ 27
+
+--- Page 29 ---
+Solution
+
+ Mark x Frequency f fx fx2
+ 8 2 16 128
+ 9 3 27 243
+ 10 4 40 400
+ 11 4 44 484
+ 12 5 60 720
+ 14 3 42 588
+ 15 3 45 675
+ 17 3 51 867
+ 18 2 36 648
+ 20 1 20 400
+ Total 30 381 5153
+
+ 2
+ 1 𝑘 2 5153 381 −( ) = 10.48. 𝑖=1 𝑓𝑖𝑥𝑖 −𝑥̅2 =𝑠2 = 𝑛∑ 30 30
+
+Hence 𝑠= √10.48 = 3.24
+
+4.6.1: Variance of Combined series
+
+Suppose we have two series of numbers i.e.
+
+ 𝑥11, 𝑥12, … , 𝑥1𝑛1 and 𝑥21, 𝑥22, … , 𝑥2𝑛2
+
+The first series has 𝑛1 numbers, and the second series has 𝑛2 numbers.
+
+Let the mean of the first series be 𝑥̅1 and the mean of the second series be 𝑥̅2 .
+Let the variance of the first series be 𝑠12 and the variance of the second series be
+𝑠22 .
+
+If 𝑥̅ denotes the mean of the combined series, then
+
+ 𝑛1𝑥̅1+𝑛2𝑥̅2
+ 𝑥̅ = .
+ 𝑛1+𝑛2
+Suppose 𝑠2 is the variance of the combined series. Then
+
+ 28
+
+--- Page 30 ---
+𝑛1 𝑛2
+ 1
+ 𝑠2 = [∑(𝑥1𝑖− 𝑥̅)2 + ∑(𝑥2𝑖− 𝑥̅)2 ]
+ 𝑛1 + 𝑛2
+ 𝑖=1 𝑖=1
+
+But,
+
+ 𝑛1 𝑛1 ∑ 𝑖=1 (𝑥1𝑖− 𝑥̅)2 = ∑ 𝑖=1[(𝑥1𝑖−𝑥1) + (𝑥1 −𝑥)]2
+
+ 𝑛1 𝑛1 = ∑ 𝑖=1 (𝑥1𝑖−𝑥1)2 + 2(𝑥1 −𝑥) ∑ 𝑖=1 (𝑥1𝑖−𝑥1) + 𝑛1(𝑥1 −𝑥)2
+
+ 2 𝑛1 = 𝑛1{𝑠1 + (𝑥1 −𝑥)2} since ∑ 𝑖=1 (𝑥1𝑖−𝑥1) = 0
+
+ Similarly,
+
+ 𝑛2 2 ∑ 𝑖=1(𝑥2𝑖− 𝑥̅)2 = 𝑛2{𝑠2 + (𝑥2 −𝑥)2}
+
+Hence,
+
+ 1
+ 𝑠2 = [𝑛1{𝑠12 + (𝑥1 − 𝑥̅)2} + 𝑛2{𝑠22 + (𝑥2 − 𝑥̅)2}]
+ 𝑛1 + 𝑛2
+
+If there are k series then the combined variance (pooled variance) of the series is
+given by
+
+ 1 2 2
+𝑠2 = 𝑛1+𝑛2+⋯+𝑛𝑘[𝑛1{𝑠1 + (𝑥1 − 𝑥̅)2} + 𝑛2{𝑠2 + (𝑥2 − 𝑥̅)2} + ⋯+
+ 𝑛𝑘{𝑠𝑘2 + (𝑥𝑘− 𝑥̅)2}]
+
+where,
+
+ 𝑛1𝑥̅1+𝑛2𝑥̅2+⋯+𝑛𝑘𝑘
+ 𝑥̅ =
+ 𝑛1+𝑛2+⋯+𝑛𝑘
+
+Example 4.5
+
+Analysis of monthly wages paid to the workers in two firms A and B belonging to
+the same industry gives the following results:
+
+ Firm A Firm B
+ Number of workers 500 600
+ Average monthly wage $ 186 $ 175
+ Variance of distribution 81 100
+ a) Which firm has a larger wage bill?
+ b) Calculate,
+
+ 29
+
+--- Page 31 ---
+i. the average monthly wage, and
+ ii. the variance and hence standard deviation of the distribution of
+ wages in the firms A and B taken together.
+
+ Solution
+
+ a) Wage bill for firm A= 𝑛1𝑥̅1 = $ (186 × 500) = $ 93,000
+ Wage bill for firm B= 𝑛2𝑥̅2 = $ (175 × 600) = $ 105,000.
+ Therefore, firm B has a larger wage bill.
+ b) 𝑛1 = 500, 𝑛2 = 600, 𝑥1 = $ 186, 𝑥2 = 175, 𝑠12 = 81, 𝑠22 = 100
+
+ i. The pooled (or combined) average monthly wage is
+
+ 𝑛1𝑥̅1+𝑛2𝑥̅2 93,000+105,000
+ 𝑥̅ = = 𝑥̅ = = $ 180
+ 𝑛1+𝑛2 500+600
+
+ ii. The pooled (or combined) variance is given by
+
+ 1
+ 𝑠2 = [500{81 + (186 −180)2} + 600{100 + (175 −180)2}]
+ 500 + 600
+
+ = 121.36.
+
+Hence standard deviation 𝑠= √121.36 = 11.02
+
+4.7: Coefficient of Variation
+
+The standard deviation is an absolute measure of dispersion. The corresponding
+relative measure is known as the coefficient of variation. The coefficient of
+variation (C.V) is defined by the formula
+
+ 𝑆𝑡𝑎𝑛𝑑𝑎𝑟𝑑 𝑑𝑒𝑣𝑖𝑎𝑡𝑖𝑜𝑛
+ 𝐶. 𝑉= 100% 𝐴𝑟𝑖𝑡ℎ𝑚𝑒𝑡𝑖𝑐 𝑚𝑒𝑎𝑛×
+
+ 𝑠
+ = × 100%
+ 𝑥̅
+
+This measure is used in problems where we want to compare the variability of
+two or more series. The series(group) for which the C.V is greater is said to be
+more variable or conversely less consistent or less homogeneous. On the other
+
+ 30
+
+--- Page 32 ---
+hand, the series for which the C.V is small is said to be less variable or more
+consistent or more homogeneous.
+
+4.8: Assessment
+
+ 1. Compute the mean, range, variance and standard deviation of the
+ following set of numbers: 6, 10, 15, 25, 30, 32, 40, 46.
+ 2. Calculate the mean, variance and standard deviation for the
+ following set of data.
+ 𝑥 0 −3 4 −7 8 −11 12 −15 16 −19 20 −23
+ 𝑓 7 4 18 12 7 6
+
+ 3. The following data give the mean and standard deviation of 3
+ subgroups.
+ Subgroup No. of workers Average wages Standard
+ ($) deviation ()$
+ A 50 61.0 8.0
+ B 100 70.8 9.0
+ C 120 80.5 10.0
+
+ Calculate,
+ i. the mean and standard deviation of the whole group,
+ ii. the C.V for each group and the C.V for the whole group.
+
+References
+
+ 1. Statistical Methods by S.P. Gupta
+ 2. Applied Statistics and Probability for Engineers by D.C. Runger
+
+ 31
+
+--- Page 33 ---

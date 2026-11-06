@@ -1,0 +1,198 @@
+{
+  "course": {
+    "code": "SST 305",
+    "title": "Theory of Estimation"
+  },
+  "topic": {
+    "id": 52,
+    "title": "Interval Estimation",
+    "summary": "Covers generating narrow confidence intervals (confidence limits) that enclose an unknown parameter with a high probability. Assuming a normal population, it walks through deriving and computing 100(1-alpha)% confidence intervals for the population mean (mu) and variance (sigma squared) under different scenarios: when sigma squared is known or unknown, and when mu is known or unknown.",
+    "subtopics": [
+      "Confidence intervals (confidence limits)",
+      "Normal population",
+      "100(1-alpha)% confidence intervals for the population mean (mu)",
+      "100(1-alpha)% confidence intervals for the population variance (sigma squared)",
+      "Cases when sigma squared is known or unknown",
+      "Cases when mu is known or unknown"
+    ],
+    "content_rules": {}
+  },
+  "level": "level_2",
+  "course_study_profile": {
+    "rules": {
+      "code": "may be generated only when source notes contain code evidence",
+      "authority": "uploaded lecture notes and syllabus only",
+      "math_notation": "may be generated only when source notes contain notation evidence",
+      "chemical_equations": "may be generated only when source notes contain reaction evidence"
+    },
+    "version": 2,
+    "category": "Statistics",
+    "confidence": 0.98,
+    "capabilities": {
+      "code": false,
+      "math_notation": true,
+      "chemical_equations": false
+    },
+    "source_sha256": "3bfa3362da5e1d8157a06a53c99a560e3f63f82bd498cfebce89f0068e153157",
+    "note_structure": [
+      "Purpose and Statistical Context",
+      "Definitions and Assumptions",
+      "Methods and Interpretation",
+      "Worked Applications",
+      "Revision Summary and Common Errors"
+    ],
+    "schema_version": 1,
+    "subject_family": "statistics",
+    "evidence_quotes": [
+      "Introduces the concept of parameter estimation using sample characteristics or statistics, distinguishing population characteristics (parameters, which are usually unknown) from sample characteristics (statistics, which are usually known).",
+      "Outlines the four properties of a \"best\" estimator according to R.A. Fisher: unbiasedness, consistency, efficiency, and sufficiency.",
+      "Covers generating narrow confidence intervals (confidence limits) that enclose an unknown parameter with a high probability."
+    ],
+    "source_document_id": "acdb3cc8-1b3f-4431-9082-3a8406e890d7"
+  },
+  "required_note_sections": [
+    "## 1.",
+    "## 2.",
+    "## 3.",
+    "## 4.",
+    "## 5."
+  ],
+  "level_2_instruction": "Rigorous academic standard: use precise definitions and appropriate academic rigor; include representative worked examples grounded in approved notes; use formal notation only when supported by approved sources.",
+  "validation_options": {
+    "allow_math": true,
+    "allow_code": false,
+    "allow_chemical_equations": false,
+    "content_rules": null,
+    "content_rule_issues": [],
+    "source_references": [
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 2,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 3,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 32,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 33,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 34,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 35,
+        "visuals": []
+      },
+      {
+        "document_id": "608a3985-a00b-47d4-8b87-145ff58b304d",
+        "source_sha256": "0dc854ecf00197488c50beaff503c11b061fd256c80ffb5796da80dd1d12dbee",
+        "page_number": 36,
+        "visuals": []
+      },
+      {
+        "document_id": "acdb3cc8-1b3f-4431-9082-3a8406e890d7",
+        "source_sha256": "3bfa3362da5e1d8157a06a53c99a560e3f63f82bd498cfebce89f0068e153157",
+        "page_number": null,
+        "visuals": []
+      }
+    ]
+  },
+  "approved_source_excerpt": "--- Page 2 ---\nLESSON ONE\n CONCEPT OF ESTIMATION\n\n 1.1 Introduction\n\n In this lesson we introduce the concept of estimation and distinguishing between parameters\n and statistics. Two types of methods of estimation will also be discussed.\n\n 1.2 Learning Outcomes\n\n By the end of this lesson the learner will be able to:\n\n 1.2.1 Explain the concept of estimation of parameters using sample characteristics\n or statistics.\n 1.2.2 Distinguish between point and interval estimations\n 1.2.1 Concept of Estimation\n\n The objective of statistics is to make an inference about a population based on information\n\n contained in a sample. Most statistical inference procedures involve either estimation or\n hypothesis testing. This course looks at estimation.\n\n Assume that some characteristic of elements in a population can be represented by a\n random variable X whose probability density function, p.d.f, is f(x, ) , where the form of the\n\n density is assumed known except that it contains unknown parameter . Further assume\n\n that n observed values x 1, x 2, …xn of a random sample X 1, X 2, …. Xn from f(x, ) , can be\n\n observed. On the basis of observed values x 1, x 2, …xn, it is desired to estimate the value of\n the parameter  or some function ( )  of the unknown parameter.\n\n Population characteristics are called parameters and are usually unknown. Examples:\n\n (a) Binomial distribution, f ( x, p )  n c\n x\n p x 1  p  n  x, x  0,1,. n.\n P is the unknown parameter\n (b) Poisson distribution, f ( x, ) \n e \n x!\n x, x  0,1,. \n \n (c) Normal distribution, (,, )\n 1\n 2\n e x p [\n 2\n 1\n 2\n ( ) 2 ]  \n   \n f x \n \n x \n\n The parameters in the above distributions are p, , and (or2)\n\n--- Page 3 ---\nSample characteristics called statistics, for example sample mean,\n X\n \n 1\n n\n n\n i\n 1\n X\n i\n and sample\n variance, s 2 \n n\n 1\n  1\n n\n i\n 1\n ( X\n i\n \n X\n ) 2\n\n are usually known, are used to estimate parameters.\n This estimation can be made I two ways namely point estimation and interval estimation.\n 1.2.2 Point and Interval Estimations\n (i) Point Estimation\n A point estimation procedure utilizes the sample information to arrive at a single number or\n point that estimates the population parameter.\n If we let the value of some statistic say t(X 1, X 2, …Xn ) to estimate the unknown parameter,\n then t(X 1, X 2, …Xn ) is called a point estimator.\n (ii) Interval Estimation\n An interval estimation procedure makes use of the sample information to arrive at two\n numbers that are intended to enclose the parameter of interest.\n This is where two statistics t 1 (X 1, X 2, …Xn ) and t 2 (X 1, X 2, …Xn ) where t 1 (X 1, X 2, …Xn ) < t 2 (X 1,\n X 2, …Xn ) so that [t 1 (X 1, X 2, …Xn ), t 2 (X 1, X 2, …Xn )] constitutes an interval for which the\n probability can be determined that it contains the unknown parameter.\n In either case, the actual estimation is accomplished by an estimator. An estimator is a rule\n or formula that tells us how to calculate an estimate based on measurements contained in a\n sample. Most frequently, an estimator is expressed as a formula.\n\n--- Page 4 ---\nLESSON TWO\n PROPERTIES OF POINT ESTIMATORS\n\n 2.1 Introduction\n It is possible to obtain many different estimators for the same population parameter, hence it is\n\n essential to discriminate between various statistics (estimators) so as to arrive at the best\n\n estimator. According to R.A. Fisher, an estimator is said to be best if it is;\n (i) Unbiased\n\n (ii) Consistent\n\n (iii) Efficient\n (iv) Sufficient\n\n Let X 1, X 2, …Xn be a random sample of size n from a population having a random variable X\n\n whose pdf is of the form f(x, )  which is known except the parameter is unknown. We discuss\n\n the four properties of a good estimator by considering\n ^\n  as an estimator of .\n This lesson will discuss the first two properties of unbiasedness and consistency.\n 2.2 Learning Outcomes\n By the end of this lesson the learner will be able to:\n\n 2.2.1 Define unbiasedness and test whether an estimator is unbiased or not.\n 2.2.2 Define consistency and test whether an estimator is consistent or not.\n\n 2.2.1 Unbiasedness\n\n An estimator is said to be unbiased if the expected value of the estimator is equal to the\n\n ^\n parameter it is estimating. That is is an unbiased estimator of  if E (\n ^\n ) = .\n ^\n The bias of an estimator of  is given by B (\n ^\n ) = E (\n ^\n\n ) - .\n ^ ^\n If (i) B () = 0, then  is unbiased\n ^ ^\n (ii) B () < 0, then is negatively biased\n ^ ^\n (ii) B () > 0,  is positively biased\n Example 1\n\n--- Page 5 ---\nLet X 1, X 2, …Xn be a random sample of size n from a normal population with mean and\n\n variance 2 . Show that;\n\n (i) The sample mean,\n X\n is an unbiased estimator of the population mean, \n (ii) The sample variance, s 2 \n n\n 1\n  1\n  ( X\n i\n \n X\n ) 2 is an unbiased estimator of the\n 1\n population variance, 2  (X )2\n n i\n (iii) The statistic S 2 \n 1\n n\n  ( X\n i\n \n X\n ) 2 is a biased estimator of 2 \n Solution:\n We know that  E ( X )  and ( ) 2  V X \n (i) E (\n _X\n )  E (\n 1\n n\n n\n i\n 1\n X\n i\n ) =\n 1\n n\n n\n i\n 1\n E ( X\n i\n )\n 1 n 1 ^\n =  n. Hence \n n n\n i1\n X\n is an\n \n unbiased estimator of\n \n For (ii) and (iii) we need E((X X)2)\n i\n Now,\n E (  ( X\n i\n \n X\n ) 2 )  E (  X 2i  n X\n  2\n )   E ( X 2i )  n E (\n X 2\n )   [ V ( X )  2 ]  n ( V (\n X\n )  E ( X\n \n 2 ) ) \n ( 2 2 ) (\n 2\n 2 ) ( 2 2 ) 2 2 ( 1 ) 2\n \n             n\n n\n   n    n  n \n\n 1 \n Or recall a chi-square distribution where (X  X)2  2\n 2 i n1\n Note that if X 2,thenE(X)nandVar(X)2n\n n\n \n This means thatE((X  X)2)(n1)2. Hence\n i\n\n--- Page 6 ---\n1\n (ii) E(s2) (n1)2 2\n n1\n (iii) ( 2 )\n 1\n 2 2   E S \n n \n n\n \n Note: To estimate population mean and population variance, we use the sample mean and the\n sample variance respectively\n Example 2\n A random sample of five values from a normal population with mean and variance 2 \n\n Estimate mean and standard deviation if the five values are: 1.06, 1.03, 1.04, 1.05 and 1.04\n\n (n=5).\n\n Solution:\n ^\n \n _X\n \n 1\n n\n n\n i\n 1\n X\n i\n  1.0 4 4\n ^ 1 _\n  and  (X  X)2 0.11401754\n n1 i\n 2.2.2 Consistency\n Definition\n The estimator\n ^\n n\n  of  is said to be a consistent of, if for any positive number  0 ,\n  \n (\n ^\n   )  1    Ln i m P\n n\n or equivalently\n  \n (\n ^\n   )  0    Ln i m P\n n\n The notation\n ^\n n\n\n  is used to express the fact that the estimator for is calculated by using a\n sample of size n.\n To use the above definition the following theorem stated without proof is helpful to test for\n consistency;\n Theorem: Chebychev’s Inequality\n\n--- Page 7 ---\nLet X be a random variable having finite mean  and finite variance2. Let 0 (i.e., is a\n\n strictly positive real number). Then, the Chebyshev's inequality is given by:\n\n ( ) 1\n (\n 2\n )\n  \n \n P X    \n V a r X\n or equivalently ( )\n (\n 2\n )\n  \n \n P X   \n V a r X\n Remark\n If\n ^\n  is an unbiased estimator of  then\n ^\n  is consistent if\n  \n (\n ^\n )  0  L imn V\n Example 3\n Consider the information given in example 1.\n Show that\n \n (i) the sample mean, X is consistent estimator of the population mean, \n (ii) The sample variance, s 2 \n n\n 1\n  1\n  ( X\n i\n \n X\n ) 2 is a consistent estimator of the\n 1\n population variance, 2  (X )2\n n i\n (iii) The statistic S 2 \n 1\n n\n  ( X\n i\n \n X\n ) 2 is a consistent estimator of 2 \n By Chebyshev's inequality\n _\n _ Var(X)\n (i)P(X)1 =1-\n 2\n 2\n 2\n \n  n\n Hence\n  \n (\n _\n   ) \n  \n ( 1 \n 2\n 2\n )  1\n \n  \n \n Ln im P X L\n n\n im\n n, hence consistent\n \n For (ii) and (iii) use chi-square distribution to show that Var((X  X)2)2(n1)4\n i\n\n--- Page 8 ---\nHence (ii)\n  \n ( 2  2  ) \n  \n (1 \n (\n 2\n 2 )\n ) \n  \n ( 1 \n (\n 2\n  1\n 4\n ) 2\n )  1\n \n  \n  \n Ln im P s Ln im\n V a r s\n L\n n\n im\n n, hence consistent\n (iii)\n  \n ( 2  2  ) \n  \n (1 \n (\n 2\n 2 )\n ) \n  \n ( 1 \n 2 ( \n 2\n 1 )\n 2\n 4\n )  1\n \n  \n  \n Ln i m P S Ln i m\n V a r S\n L\n n\n i m\n n\n n, hence consistent\n Note If two or more estimators for the same parameter are consistent, we choose the one that\n is unbiased to estimate the parameter.\n Exercise\n Let X\n 1, X\n 2,. X\n n\n be a random sample of size n from a population whose\n density function with parameter  is given by\n > 0\n f ( x ) \n \n 0\n x ( 1  1 )\n e,\n x \n ls e w,\n h\n x\n e\n \n r e\n 0, 1  .\n If an estimator of  is given by\n ^\n \n 1\n n\n n\n i\n 1\n X\n i\n ,test whether\n ^\n\n  is an\n (i) Unbiased\n (ii) Consistent estimator of \n\n--- Page 9 ---\nLESSON THREE\n\n Sufficiency and efficiency of an estimators\n\n 3.1 Introduction\n\n This lesson looks at the sufficiency and efficiency properties of a good estimator.\n\n 3.2 Learning Outcomes\n By the end of this lesson the learner will be able to:\n\n 1.2.1 Define sufficiency and test whether an estimator is sufficient or not.\n 1.2.2 Define efficiency and test whether an estimator is efficient or not\n 3.2.1 Sufficiency\n\n Definition\n\n Let X 1, X 2, …Xn be a random sample of size n from a population having a random variable X\n\n whose pdf is of the form f(x,)which is known except the parameter is unknown. The\n statistic T=t(X 1, X 2, …Xn ) is said to be a sufficient statistics for if the conditional\n\n distribution of X given t does not depend on.\n\n That is if P(X=x/T=t) is independent of the parameter, then T is a sufficient statistic for the\n\n parameter.\n\n A statistic is said to be sufficient for  if it carries all information about  that is carried by\n\n the sample. We require an estimator to carry all information about whatever it is estimating\n\n that is originally contained in the sample. Intuitively, we would wish the estimator to carry\n all the relevant information in the sample regarding the parameter. That is it should be\n\n sufficient.\n\n Example 4\n\n Let X 1, X 2, …Xn be a random sample of size n from a Bernoulli distribution having a random\n\n variable X whose pdf\n is\n px 1 p1x, x 0,1\n P(X  x)\n 0,elsewhere\n\n--- Page 10 ---\nShow T \n n\n i\n 1\n X\n i\n is a sufficient statistic for p.\n Solution\n P(X  x,X  x,. X  x,T t)\n P(X/T)= 1 1 2 2 n n where\n P(T t)\n P(X =x,X =x,. X =x,T=t)=P(x,x,. x,t)\n 1 1 2 2 n n 1 2 n\n n1 n\n =P(x 1,x 2,…. xn-1,x n =t-x i ), since t=x i\n i1 i1\n\n = P(X =x )P(X =x ). P(X =x )P(X =t-\n 1 1 2 2 n-1 n-1 n\n n 1 \n i\n 1 \n x\n i\n ) because of independence\n =pt(1-p)n-t using Bernoulli distribution\n Next,\n If X 1, X 2, …Xn are independent Bernoulli random variables, the T=\n n\n i\n 1 \n X i is Binomial.\n Therefore, P(T=t)= c n\n t\n p t 1  p  n  t, t  0,1,. n. Alternatively, use the moment generating function technique to find the distribution of T,\n P(T=t).\n 1\n Hence P(X/T)= which does not depend on the parameter p and conclude that T is a\n cn\n t\n sufficient statistic for p.\n Note: To check sufficiency, we have to compute conditional probabilities, something that is\n not easy sometimes. In many cases a relatively easy criterion for examining sufficiency is\n\n through the following factorization theorem.\n\n Factorization Theorem\n\n--- Page 11 ---\nLet X 1, X 2, …Xn be a random sample of size n from a population having a random variable X\n whose pdf is of the form f(x, )  which is known except the parameter is unknown. The\n\n statistic T=t(X 1, X 2, …Xn ) is said to be a sufficient statistics for if the likelihood function L=\n\n can factored into two function L and L such that\n 1 2\n ∏f(x,𝜃)\n L ( X, ) L\n 1\n ( t, ) L\n 2\n ( x\n 1, x\n 2,. x\n n\n )   \n Where L (t, > 0 (non-negative) and\n 1\n 𝜃)\n L\n 2\n ( x\n 1, x\n 2,. x\n n\n ) >0 and a function of x only.\n Example 5\n Let X 1, X 2, …Xn be a random sample of size n from a Poisson distribution. Show that\n T=\n n\n i\n 1 \n X\n i\n is a sufficient statistic for.\n Solution\n f ( x, ) \n  e\n 0\n ,\n x\n e!\n l s\n x\n e,\n w\n x\n h\n \n e r\n 0\n e,1, \n \n , then the likelihood function is\n L(x, )=f(x 1 )f(x 2)…f(xn )=\n e\n x\n 1!\n x1   e\n x\n 2!\n x 2  \n ….\n e\n x\n n!\n x n  \n =\n e  n\n \n \n x!i\n xi\n \n = L (t, )",
+  "current_level_2_content": "## 1. Confidence limits and normal samples\n\nAn interval estimator gives lower and upper confidence limits for an unknown parameter. For a normal population, exact intervals can be derived from pivots with normal, Student t, or chi-square distributions. A $100(1-alpha)%$ procedure has that long-run coverage when the sampling model and the stated known/unknown parameter conditions hold.\n\nUse $Xbar$ for the sample mean and $S^2=(n-1)^(-1)sum_i(X_i-Xbar)^2$ for the unbiased sample variance. Keep the degrees of freedom tied to whether the population mean is known or estimated.\n\n## 2. Confidence interval for the population mean\n\nIf $X_i$ are independent normal observations with known population variance $sigma^2$, then $(Xbar-mu)/(sigma/sqrt(n))$ is standard normal. The two-sided interval is $Xbar +/- z_(1-alpha/2)sigma/sqrt(n)$.\n\nIf $sigma^2$ is unknown, replace $sigma$ by $S$. For a normal population, $(Xbar-mu)/(S/sqrt(n))$ follows a t distribution with $n-1$ degrees of freedom, giving $Xbar +/- t_(1-alpha/2,n-1)S/sqrt(n)$. The t formula is exact under normality; the known-variance z formula should not silently substitute $S$ in a small sample.\n\n## 3. Confidence interval for population variance\n\nFor a normal sample with unknown mean, $(n-1)S^2/sigma^2$ follows chi-square with $n-1$ degrees of freedom. If $chi^2_(q,nu)$ denotes the q quantile with $nu$ degrees of freedom, the two-sided interval for $sigma^2$ is $[(n-1)S^2/chi^2_(1-alpha/2,n-1), (n-1)S^2/chi^2_(alpha/2,n-1)]$. The reversed quantile placement is necessary because the pivot is in the denominator.\n\nIf the population mean $mu$ is known, use $Q=sum_i(X_i-mu)^2$ and $Q/sigma^2~chi^2_n$. The interval becomes $[Q/chi^2_(1-alpha/2,n), Q/chi^2_(alpha/2,n)]$. This known-mean case has $n$ degrees of freedom; estimating the mean costs one degree of freedom.\n\n## 4. Choosing the correct case\n\nFor an interval for $mu$, determine whether $sigma$ is known: use z when it is known and t with $n-1$ degrees of freedom when it is estimated from a normal sample. For an interval for $sigma^2$, determine whether $mu$ is known: center the squared deviations at the known $mu$ for $n$ degrees of freedom, or at $Xbar$ for $n-1$ degrees of freedom.\n\nIntervals for variance are generally asymmetric. If the question asks for a confidence interval for standard deviation, take square roots of both positive variance endpoints. Do not use the normal-theory chi-square interval without the normal population assumption.\n\n## 5. Calculation checklist\n\nWrite the target parameter and known quantities first. Select the pivot, confidence-tail probabilities, and degrees of freedom; obtain the matching critical values; then isolate the parameter carefully. For a variance interval, place the larger chi-square quantile in the denominator of the lower endpoint.\n\nCheck that variance endpoints are positive and ordered, that units are squared for $sigma^2$, and that the result is in the original units if square roots are requested. Explain the confidence level as repeated-sample coverage, not as a probability assigned to a fixed parameter after the interval is observed.",
+  "relevant_verified_questions": [
+    {
+      "number": 1,
+      "marks": 5,
+      "verification_status": "reconstructed",
+      "question": "A random sample of $n=25$ steel rods from a normal population has a sample mean diameter of $\\bar{x}=10.02$ mm. The population standard deviation is known to be $\\sigma=0.05$ mm. Construct a $95\\%$ confidence interval for the population mean diameter $\\mu$.",
+      "solution": "Since the population is normal and $\\sigma$ is known, the $100(1-\\alpha)\\%$ confidence interval for $\\mu$ is\n\n$$\n\\bar{x} \\pm z_{\\alpha/2}\\frac{\\sigma}{\\sqrt{n}}.\n$$\n\nHere $1-\\alpha=0.95$, so $\\alpha=0.05$ and $z_{0.025}=1.96$. Given $\\bar{x}=10.02$, $\\sigma=0.05$, and $n=25$, the standard error is\n\n$$\n\\frac{\\sigma}{\\sqrt{n}}=\\frac{0.05}{\\sqrt{25}}=0.01.\n$$\n\nThe margin of error is\n\n$$\nz_{0.025}\\frac{\\sigma}{\\sqrt{n}}=1.96(0.01)=0.0196.\n$$\n\nThus the $95\\%$ confidence interval is\n\n$$\n10.02 \\pm 0.0196 = (10.0004,\\, 10.0396).\n$$\n\nWe are $95\\%$ confident that the true mean diameter lies between $10.0004$ mm and $10.0396$ mm."
+    },
+    {
+      "number": 1,
+      "marks": 6,
+      "verification_status": "reconstructed",
+      "question": "A random sample of 12 fuel rods from a normal population gave the following summary statistics on percentage enrichment:\n\n$$\n\\sum_{i=1}^{12} x_i = 34.82, \\qquad \\sum_{i=1}^{12} x_i^2 = 101.1486.\n$$\n\nConstruct a \\(99\\%\\) confidence interval for the population mean percentage enrichment \\(\\mu\\). Assume the measurements are normally distributed with unknown variance \\(\\sigma^2\\).",
+      "solution": "Let \\(n=12\\). The sample mean is\n\n$$\n\\bar{x}=\\frac{1}{n}\\sum_{i=1}^{n}x_i=\\frac{34.82}{12}=2.901666\\ldots \\approx 2.9017.\n$$\n\nThe sample variance is\n\n$$\ns^2=\\frac{1}{n-1}\\left(\\sum_{i=1}^{n}x_i^2-\\frac{(\\sum x_i)^2}{n}\\right)\n=\\frac{1}{11}\\left(101.1486-\\frac{(34.82)^2}{12}\\right).\n$$\n\nCompute\n\n$$\n\\frac{(34.82)^2}{12}=\\frac{1212.4324}{12}=101.036033\\ldots,\n$$\n\nso\n\n$$\ns^2=\\frac{101.1486-101.036033\\ldots}{11}\n=\\frac{0.112566\\ldots}{11}\n=0.010233\\ldots.\n$$\n\nThus \\(s=\\sqrt{0.010233\\ldots}\\approx 0.10116\\).\n\nSince \\(\\sigma^2\\) is unknown and the population is normal, use the \\(t\\)-distribution with \\(n-1=11\\) degrees of freedom. For a \\(99\\%\\) confidence interval, \\(\\alpha=0.01\\), so we need \\(t_{0.005,11}\\). From \\(t\\)-tables,\n\n$$\nt_{0.005,11}\\approx 3.106.\n$$\n\nThe standard error is\n\n$$\n\\frac{s}{\\sqrt{n}}=\\frac{0.10116}{\\sqrt{12}}\\approx \\frac{0.10116}{3.4641}\\approx 0.02920.\n$$\n\nThe margin of error is\n\n$$\nE=t_{0.005,11}\\cdot \\frac{s}{\\sqrt{n}}\\approx 3.106\\times 0.02920\\approx 0.0907.\n$$\n\nTherefore the \\(99\\%\\) confidence interval for \\(\\mu\\) is\n\n$$\n\\bar{x}\\pm E \\approx 2.9017\\pm 0.0907,\n$$\n\nthat is,\n\n$$\n(2.8110,\\;2.9924).\n$$\n\nSo we are \\(99\\%\\) confident that the true mean percentage enrichment lies between approximately \\(2.81\\%\\) and \\(2.99\\%\\)."
+    },
+    {
+      "number": 1,
+      "marks": 5,
+      "verification_status": "reconstructed",
+      "question": "A random sample of 10 children from a certain population was taken and their weights (in kg) were recorded. The sample mean weight was found to be \\(38.4\\text{ kg}\\). Assume that the population of weights is normally distributed with unknown mean \\(\\mu\\) and known variance \\(\\sigma^2 = 30\\text{ kg}^2\\). Construct a \\(98\\%\\) confidence interval for the population mean weight \\(\\mu\\).",
+      "solution": "Let \\(X_1, X_2, \\dots, X_{10}\\) be the weights of the 10 children. We assume \\(X_i \\sim N(\\mu, \\sigma^2)\\) with \\(\\sigma^2 = 30\\) known. The sample mean is \\(\\bar{x} = 38.4\\). The sample size is \\(n = 10\\).\n\nFor a \\(100(1-\\alpha)\\%\\) confidence interval for \\(\\mu\\) when \\(\\sigma^2\\) is known, we use the pivot\n\n$$\nZ = \\frac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}} \\sim N(0,1).\n$$\n\nThus\n\n$$\nP\\left(-z_{\\alpha/2} \\le \\frac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}} \\le z_{\\alpha/2}\\right) = 1-\\alpha,\n$$\n\nwhich gives the confidence interval\n\n$$\n\\bar{x} \\pm z_{\\alpha/2} \\frac{\\sigma}{\\sqrt{n}}.\n$$\n\nHere \\(1-\\alpha = 0.98\\), so \\(\\alpha = 0.02\\) and \\(\\alpha/2 = 0.01\\). From the standard normal table, \\(z_{0.01} \\approx 2.326\\).\n\nThe standard error is\n\n$$\n\\frac{\\sigma}{\\sqrt{n}} = \\frac{\\sqrt{30}}{\\sqrt{10}} = \\sqrt{3} \\approx 1.732.\n$$\n\nThe margin of error is\n\n$$\nz_{0.01} \\frac{\\sigma}{\\sqrt{n}} \\approx 2.326 \\times 1.732 \\approx 4.028.\n$$\n\nTherefore, the \\(98\\%\\) confidence interval for \\(\\mu\\) is\n\n$$\n38.4 \\pm 4.028 = (34.372,\\; 42.428).\n$$\n\nSo we are \\(98\\%\\) confident that the true mean weight of the children lies between approximately \\(34.37\\text{ kg}\\) and \\(42.43\\text{ kg}\\)."
+    }
+  ],
+  "curriculum_prior_topics": [
+    "Properties of Estimators",
+    "Confidence Interval Estimation",
+    "Sufficient Statistics",
+    "Moment Estimation",
+    "Maximum Likelihood Estimation",
+    "Least Squares Estimation",
+    "Method of Minimum Variance"
+  ],
+  "curriculum_future_topics": [
+    "Interval Estimation: Confidence Intervals for the Difference Between Means of Two Independent Normal Distributions"
+  ],
+  "notes_cache_version": "markdown-katex-v18-body-page-source-context",
+  "source_signature": "e60f7aee6c391b57",
+  "current_cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_interval_estimation_level_2_e60f7aee6c391b57",
+  "cache_rows": [
+    {
+      "cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_interval_estimation_level_2_e60f7aee6c391b57",
+      "level": "level_2",
+      "model": null,
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "e60f7aee6c391b57",
+      "characters": 3134,
+      "is_current_key": true
+    },
+    {
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_interval_estimation_level_1_131041f23b79acb0",
+      "level": "level_1",
+      "model": "deepseek-flash",
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "131041f23b79acb0",
+      "characters": 16466,
+      "is_current_key": false
+    },
+    {
+      "cache_key": "notes:markdown-katex-v16-numbered-figure-context_sst_305_interval_estimation_level_3_131041f23b79acb0",
+      "level": "level_3",
+      "model": "deepseek-flash",
+      "validation_state": "validated-v11-numbered-figure-context",
+      "source_signature": "131041f23b79acb0",
+      "characters": 16334,
+      "is_current_key": false
+    }
+  ],
+  "repair_records": [
+    {
+      "level": "level_2",
+      "status": "validated",
+      "validation_issues": [],
+      "cache_key": "notes:markdown-katex-v18-body-page-source-context_sst_305_interval_estimation_level_2_e60f7aee6c391b57",
+      "last_error": ""
+    }
+  ],
+  "generation_guards": [],
+  "generation_jobs": []
+}
