@@ -1,0 +1,721 @@
+{
+ "deleted": [
+  {
+   "id": 36,
+   "paper": "sma300-doc-5d28f903",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q1160",
+   "status": "flagged",
+   "text": "Show that the union of an arbitrary collection of open subsets in $\\Re$ is open.",
+   "solution": "Let $\\{G_\\alpha\\}_{\\alpha \\in I}$ be an arbitrary collection of open subsets of $\\mathbb{R}$, and let\n\n$$\nG = \\bigcup_{\\alpha \\in I} G_\\alpha.\n$$\n\nTo show that $G$ is open in $\\mathbb{R}$, let $x \\in G$ be arbitrary. By the definition of the union, there exists at least one index $\\alpha_0 \\in I$ such that $x \\in G_{\\alpha_0}$.\n\nSince $G_{\\alpha_0}$ is an open subset of $\\mathbb{R}$, there exists $\\varepsilon > 0$ such that the open interval $(x - \\varepsilon, x + \\varepsilon)$ is contained in $G_{\\alpha_0}$:\n\n$$\n(x - \\varepsilon, x + \\varepsilon) \\subseteq G_{\\alpha_0}.\n$$\n\nBecause $G_{\\alpha_0} \\subseteq \\bigcup_{\\alpha \\in I} G_\\alpha = G$, it follows that\n\n$$\n(x - \\varepsilon, x + \\varepsilon) \\subseteq G.\n$$\n\nThus every point $x \\in G$ is an interior point of $G$, which proves that $G = \\bigcup_{\\alpha \\in I} G_\\alpha$ is open in $\\mathbb{R}$."
+  },
+  {
+   "id": 40,
+   "paper": "sma300-doc-1763dcca",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q245",
+   "status": "flagged",
+   "text": "Does the set of rational numbers given by A=  qQ:q2 2  satisfy the completeness\n axiom? Explain.",
+   "solution": ""
+  },
+  {
+   "id": 41,
+   "paper": "sma300-doc-1763dcca",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q246",
+   "status": "flagged",
+   "text": "Show that if x and y are real numbers such that x y, then there exists an irrational number\n z such that x z y. \n 3",
+   "solution": ""
+  },
+  {
+   "id": 42,
+   "paper": "sma300-doc-1763dcca",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q247",
+   "status": "flagged",
+   "text": "Use Mathematical induction to show that 3+3+9+18+30+45+⋯+ 𝑛(𝑛+1) = \n 2 \n 1 \n 𝑛(𝑛+1)(𝑛+2) for every natural number 𝑛. \n 2",
+   "solution": ""
+  },
+  {
+   "id": 43,
+   "paper": "sma300-doc-1763dcca",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q248",
+   "status": "flagged",
+   "text": "Find Max S, Min S, Sup S and Inf S given that \n  1  \n (a) S =1+ :nN . \n  3n  \n (b) 𝑆 = {𝑥 ∈ ℜ:𝑥2 ≤ 4}. (3mks)",
+   "solution": ""
+  },
+  {
+   "id": 50,
+   "paper": "sma300-doc-9ec355c9",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q255",
+   "status": "flagged",
+   "text": "Prove by first principles that lim  . \n n3n2 5n1 3 \n n1",
+   "solution": ""
+  },
+  {
+   "id": 51,
+   "paper": "sma300-doc-9ec355c9",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q256",
+   "status": "flagged",
+   "text": "Consider the sequence x  defined by x 1n1 . Compute \n n n n \n liminf x and limsupx . \n n n",
+   "solution": ""
+  },
+  {
+   "id": 52,
+   "paper": "sma300-doc-9ec355c9",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q257",
+   "status": "flagged",
+   "text": "Test whether the following series converges or diverges, justify your\n answer in each case; \n Each) \n   n  n \n a)  \n   \n 2n5 \n n1 \n  1 \n b)  \n n2 n \n n1 \n  (2n)! \n c)  \n 5n \n n1 \n  1 \n d)  \n nlnn \n n2",
+   "solution": ""
+  },
+  {
+   "id": 53,
+   "paper": "sma300-doc-9ec355c9",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q258",
+   "status": "flagged",
+   "text": "Determine whether the following series is conditionally or absolutely\n convergent \n  \n 1n1 \n  . \n n3 \n n4",
+   "solution": ""
+  },
+  {
+   "id": 54,
+   "paper": "sma300-doc-9ec355c9",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q259",
+   "status": "flagged",
+   "text": "Show that the set of all irrational numbers is uncountable.",
+   "solution": ""
+  },
+  {
+   "id": 120,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q363",
+   "status": "flagged",
+   "text": "}\n\na) Let \\(S \\subseteq \\mathbb{R}\\) be the set given by:\n \n\n$$\nS = \\left\\{ \\frac{(-1)^n}{2n} : n \\in \\mathbb{N} \\right\\}\n$$\n\n Determine the supremum and the infimum for the set \\(S\\). (3 marks)\nb) Define each of the following:\n \n \n (i) An interior point of a set\n (ii) A limit point of a set (4 marks)\nc) Prove by induction that \\(5^{2n} - 4^n\\) is divisible by 3 \\(\\forall n \\in \\mathbb{N}\\) (3 marks)\nd) Prove that if the series \\(\\sum a_n\\) is convergent then \\(\\lim_{n \\to \\infty} a_n = 0\\) (2 marks)\ne) Show that every open interval \\((a,b) \\subset \\mathbb{R}\\) of is an open set (3 marks)\nf) Let \\(f: \\mathbb{R} \\to \\mathbb{R}\\) be defined by \\(f(x) = 5x + 3\\). Show that \\(f\\) is continuous on \\(\\mathbb{R}\\). (3 marks)\ng) Show that if \\(S\\) is irrational then \\(t = \\frac{S}{S+1}\\) is irrational. (3 marks)\nh) Is the set \\(S = \\{a, b, d, e\\}\\) closed? Justify your answer. (2 marks)\ni) Determine the convergence or divergence of the series\n \n\n$$\n\\sum \\frac{2n}{9n^4} (3 \\text{ marks})\n$$\n\nj) Let \\(\\{S_n\\}\\) be a sequence of real numbers. Prove that if the limit of \\(\\{S_n\\}\\) exists, then the limit is unique. (4 marks)",
+   "solution": ""
+  },
+  {
+   "id": 121,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q364",
+   "status": "flagged",
+   "text": "**\n\na) Let $S$ be a subset of the set of real numbers. Prove that $S$ is closed if the only if its complement is open \n(9 marks)\n\nb) Let $\\{A_1, A_2, \\dots, A_n\\}$ be a finite collection of open sets. Show that $A = \\bigcap_{i=1}^{n} A_i$ is open. \n(6 marks)\n\nc) Show by use of an example that an arbitrary intersection of open sets need not be open. \n(5 marks)",
+   "solution": ""
+  },
+  {
+   "id": 122,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q365",
+   "status": "flagged",
+   "text": "**\n\na) Let $\\{x_n\\}$ and $\\{y_n\\}$ be sequences of real number. Suppose that $x_n \\to x$ and $y_n \\to y$ as $n \\to \\infty$. Prove that $x_n \\cdot y_n \\to x \\cdot y$ as $n \\to \\infty$ \n(7 marks)\n\nb) For all real numbers $x, y$ show that $|x + y| \\leq |x| + |y|$ and $|x - y| \\geq ||x| - |y||$ \n(9 marks)\n\nc) Let $A \\subseteq \\mathbb{R}$ and $B \\subseteq \\mathbb{R}$ be non-empty sets. Suppose $x \\leq y \\ \\forall x \\in A, y \\in B$. Show that if $A$ is bounded above and $B$ is bounded below, then: \n$\\text{Sup } A \\leq \\text{Inf } B$ \n(4 marks)",
+   "solution": ""
+  },
+  {
+   "id": 123,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q366",
+   "status": "flagged",
+   "text": "**\n\na) Let $f: X \\to Y$ be a function. Define what is meant by $f$ is uniformly continuous. \n(2 marks)\n\nb) Prove that the $f: X \\to Y$ defined by $f(x) = 2x^2 - 3x + 1$ is uniformly continuous on the interval $[-2, 2]$ \n(6 marks)\n\nc) Use the definition of a limit to show that $\\lim_{x \\to 2} \\frac{x^3 - 4}{x^2 + 1} = \\frac{4}{5}$ \n(7 marks)\n\nd) Show that the function \n\n$$\nF(x) =\n$$\n\n$$\n\\begin{cases}\n\\frac{x^2 + 4x - 5}{x - 1}, & x \\neq 1 \\\\ 2, & x = 1\n\\end{cases}\n$$\n\n$$\nis discontinuous at $x = 1$ \nRe-define the function $f(x)$ so that it is continuous at $x = 1$ \n(5 marks)\n$$",
+   "solution": ""
+  },
+  {
+   "id": 124,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 21,
+   "reason": "superseded by clean reconstruction q367",
+   "status": "flagged",
+   "text": "**\n\na) Show that every convergent sequence $\\{a_n\\}$ is a Cauchy sequence \n(5 marks)\n\nb) Determine the convergence of each of the following series\n\n**a higher education institution** \n**UNIVERSITY EXAMINATIONS 2015/2016** \n**FIRST SEMESTER \n**SMA 300: REAL ANALYSIS I**\n\n**DATE:** Thursday 26\\textsuperscript{th} November, 2015 **TIME:** 11.00 a.m - 1.00 p.m\n\n**INSTRUCTIONS:**\n\nAnswer question ONE and any other TWO questions.",
+   "solution": ""
+  },
+  {
+   "id": 125,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q368",
+   "status": "flagged",
+   "text": "}\n\na) For all real numbers \\(x\\) and \\(y\\) show that:\n \n\n$$\n\\sqrt{xy} \\leq \\frac{1}{2}(x+y), \\text{ where } x,y > 0.\n$$\n\n [2 marks]\nb) Prove by mathematical induction that \\(n^3 + 2n : n \\in \\mathbb{N}\\), is divisible by 3.\n [3 marks]\nc) Using Cauchy convergence criterion, show that the sequence \\(\\{S_n\\}\\) given by:\n \n\n$$\nS_n = 1 + \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{4} + \\dots + \\frac{1}{n}\n$$\n\n is divergent.\n [5 marks]\nd) Show that \\(S\\) is a closed proper subset of \\(\\mathbb{R}\\) if and only if \\(S^c\\) is open.\n [5 marks]\ne) Consider the sequence \\(\\{s_n\\}\\) defined by \\(s_1 = 1, s_{n+1} = 2 + \\frac{1}{3}s_n\\). If \\(\\lim_{n\\to\\infty} s_n = \\lim_{n\\to\\infty} s_{n+1} = s\\), find \\(s\\).\n [2 marks]\nf) Show that if \\(r\\) is irrational, then \\(t = \\frac{r}{r+1}\\) is irrational.\n [2 marks]\ng) Let \\(\\{a_n\\} = \\sin\\frac{n\\pi}{3}, n \\in \\mathbb{N}\\). Find \\(\\liminf a_n\\) and \\(\\limsup a_n\\).\n [2 marks]\n\nh) Investigate the convergence or divergence of the series $\\sum_{n=1}^{\\infty} \\frac{n\\sqrt{n}+1}{n^2}$. [4 marks]\n\ni) Distinguish between uniform continuity and pointwise continuity. Hence or otherwise, prove that the function $f(x) = \\frac{1}{x}$ is **NOT** uniformly continuous on $(0,1)$. [5 marks]",
+   "solution": ""
+  },
+  {
+   "id": 126,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q369",
+   "status": "flagged",
+   "text": "}}\n\na) Show that the interval $(x, y)$ contains both rational and irrational numbers where $x \\geq 0$ and $x$ and $y$ are real numbers. [5 marks]\n\nb) Let $S$ and $T$ be non-empty subsets of real numbers such that $S \\subseteq T$. Prove that if:\n\ni. $T$ is bounded above then $SupS \\leq SupT$. [3 marks]\nii. $T$ is bounded below then $InfT \\leq InfS$. [3 marks]\n\nc) i) Show that the union of an arbitrary collection of non-empty open sets is an open set. [5 marks]\n\nii) Show using the collection of sets on $\\mathbb{R}$ given by $G_n = \\left( 2 - \\frac{1}{n}, 3 + \\frac{1}{n} \\right) \\forall n \\in \\mathbb{N}$ that the intersection of an arbitrary collection of open sets need not be again open. Give a detailed explanation as to why the arbitrary intersection found is not an open set. [4 marks]",
+   "solution": ""
+  },
+  {
+   "id": 127,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 21,
+   "reason": "superseded by clean reconstruction q370",
+   "status": "flagged",
+   "text": "}}\n\na) Prove that the limit of a sequence in $\\mathbb{R}$, if at all it exists, is unique and hence show that $\\lim_{n \\to \\infty} \\frac{3n+2}{n+1} = 3$. [10 marks]\n\nb) Prove that every convergent sequence is Cauchy. [3 marks]\n\nc) i) Show that convergence of sequence in $\\mathbb{R}$ implies boundedness. [4 marks]\n\nii) Prove by use of a counter example that the converse of c i) above is not necessarily true. [3 marks]\n\n5\n\nSTUDENT CENTRE KM\nEmail: studentcentre@yahoo.com\n\nSTUDENT CENTRE KM\nEmail: studentcentre@yahoo.com\n\nSTUDENT CENTRE KM\nEmail: studentcentre@yahoo.com",
+   "solution": ""
+  },
+  {
+   "id": 128,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q371",
+   "status": "flagged",
+   "text": "**\n\na) For each of the following series below, tell whether the series is convergent or divergent. Show your working out as you state which convergence/divergence test you have used.\n[3 marks each]\n\ni) $\\displaystyle \\sum_{n=1}^{\\infty} \\frac{1}{5n^2+n}$\n\nii) $\\displaystyle \\sum_{n=1}^{\\infty} \\left(\\frac{n+2}{3n-1}\\right)^n$\n\niii) $\\displaystyle \\sum_{n=1}^{\\infty} \\frac{(n!)^2}{(2n)!}$\n\niv) $\\displaystyle \\sum_{n=1}^{\\infty} \\frac{\\cos^2 n\\pi}{n^2}$\n\nb) Let $\\sum a_n$ be a series of numbers. Define what is meant by the series $\\sum a_n$ to be\ni) absolutely divergent\nii) conditionally convergent\n[2 marks]\n\nc) Determine whether $\\displaystyle \\sum_{n=2}^{\\infty} (-1)^n \\frac{1}{n(\\ln n)}$ converges absolutely, conditionally or not at all.\n[6 marks]",
+   "solution": ""
+  },
+  {
+   "id": 129,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q372",
+   "status": "flagged",
+   "text": "**\n\na) Show from definition of a limit of a function that $\\displaystyle \\lim_{x \\to 1} \\frac{2x^2-3x+1}{x-1}=1$\n[4 marks]\n\nb)\ni) Define what is meant by a denumerable (countable) set\n[2 marks]\nii) Show that the set of all odd natural numbers is denumerable.\n[2 marks]\n\nc) Prove that the function $f: \\mathbb{R} \\to \\mathbb{R}$ defined by $f(x)=4x^2-3x+2$ is continuous at the point $x=2$.\n[4 marks]\n\nd) Show that the function $\\displaystyle f(x)=\\frac{1}{x}$ is uniformly continuous on $[2, \\infty)$.\n[4 marks]\n\ne) Show that if $f$ and $g$ are uniformly continuous on a subset $S \\subseteq \\mathbb{R}$, then $f+g$ is uniformly continuous on $S$.\n[4 marks]\n\n**a higher education institution** \n**UNIVERSITY EXAMINATIONS 2017/2018** \n**FIRST SEMESTER \n**** \n****SMA 300: REAL ANALYSIS I****\n\n**DATE:** Thursday, 1\\textsuperscript{st} February 2018 **TIME:** 11.00a.m-1.00p.m\n\n**INSTRUCTIONS:**\n\nAnswer question One and any other Two\n\n1. (a) (i) Let $(a_n)$ be an infinite sequence of real numbers. Let $\\displaystyle\\sum_{n=1}^{\\infty} a_n = a_1 + a_2 + \\dots + a_n + \\dots$\n \n be an infinite series. When is the series $\\displaystyle\\sum_{n=1}^{\\infty} a_n$ said to be convergent? (2marks)\n \n Hint: Use partial sums\n \n \n (ii) Hence determine if the series $\\displaystyle\\sum_{n=1}^{\\infty} n$ is convergent or divergent. If it converges determine its value. (3marks)\n \n \n (ii) When is a series $\\sum a_n$ said to be absolutely convergent? (1marks)\n \n \n (b) Let $A$ be a non-empty set bounded above in an order field\n \n \n (i) Give the two conditions that must be satisfied for the number $L$ to be the least upper bound or supremum of $A$. (2marks)\n\n(ii) Show that if $u = \\text{Sup } A$, then for every $n \\in \\mathbb{N}$, the number $u - \\frac{1}{n}$ is not an upper bound.\n (4 marks)\n\n(c) (i) When is a non-empty set in $\\mathbb{R}$ said to satisfy the completeness axiom of the set of real numbers?\n (2 marks)\n\n(ii) Does the set of rational numbers given by $A = \\{q \\in \\mathbb{Q} : q^2 < 2\\}$ satisfy the completeness axiom? Explain\n (2 marks)\n\n(iii) Let $S \\subseteq T \\subseteq \\mathbb{R}$ and $S \\neq \\emptyset$, show that if $T$ is bounded below then $\\text{Inf } T \\leq \\text{Inf } S$.\n (2 marks)\n\n(d) Consider the sequence of real numbers defined by the relations\n\n$$\nx_1 = 1 \\text{ and } x_{n+1} = \\sqrt{1 + 2x_n} \\text{ for } n \\geq 1.\n$$\n\nUse the principle of Mathematical Induction to show that $x_n < 4$ for all $n \\geq 1$.\n (6 marks)\n\n(e) (i) Let $S$ be a subset of $\\mathbb{R}$. Give the definition of an accumulation point of the set $S$ in $\\mathbb{R}$\n (2 marks)\n\n(ii) Let $S = \\left\\{ \\left(1 + \\frac{1}{n}\\right)^n : n \\in \\mathbb{N} \\right\\}$\nFind the accumulation points of the set $S$ in $\\mathbb{R}$\n (1 mark)\n\n(iii) When is a set $S$ in $\\mathbb{R}$ said to be closed?\n (1 marks)\n\n(iv) Let $U_n = \\left[ -1, -\\frac{1}{n} \\right]$, $n \\in \\mathbb{N}$ be a collection of closed sets. Using this collection, show clearly that an infinite union of closed sets in $\\mathbb{R}$ is not necessarily closed\n (2 marks)",
+   "solution": ""
+  },
+  {
+   "id": 130,
+   "paper": "sma300-doc-f6da5523",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q294",
+   "status": "flagged",
+   "text": "**",
+   "solution": ""
+  },
+  {
+   "id": 131,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q249",
+   "status": "flagged",
+   "text": "(a) Use the algebraic properties of the set of all real numbers $\\mathbb{R}$ to show that $a \\cdot 0 = 0$ for all $a \\in \\mathbb{R}$. \n \n\n (b) prove that $5^{2n+1} + 2^{2n+1}$ is divisible by 7 for all $n \\geq 0$. \n (5marks)\n\n (c) Find the supremum and infimum (if they exist) of each of the following sets. Also decide which sets have maximum and minimum elements respectively \n\n (i) $S = \\{x \\in \\mathbb{R} \\mid x^2 < 5, \\text{ and } x \\text{ is a rational} \\}$. \n (2marks)\n\n (ii) $T = \\left\\{ \\frac{1}{n} + (-1)^2 \\mid n \\in \\mathbb{N} \\right\\}$. \n (2marks)\n\n (d) Suppose that $r$ is a rational number and $s$ is an irrational number such that $t = r + s$. Prove that $t$ is irrational. \n (3marks)\n\n (e) Show that the intersection of a finite collection of open sets is open. \n (5marks)",
+   "solution": ""
+  },
+  {
+   "id": 132,
+   "paper": "sma300-doc-f6da5523",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q295",
+   "status": "flagged",
+   "text": "**",
+   "solution": ""
+  },
+  {
+   "id": 133,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q250",
+   "status": "flagged",
+   "text": "(a) Find the derived set of each of the following sets. In each case, determine whether the set is closed or not; \n\n (i) $A = \\mathbb{Z}$, the set of all integers. \n \n\n (ii) $B = \\left\\{ a \\mid a \\in \\mathbb{Q}, \\, 12 < a < 100 \\right\\}$ \n (2marks)\n\n(b) Use the family $\\{F_n\\}$, where $F_n = \\left[ \\frac{1}{n+1}, \\frac{1}{n+1} \\right]$, $n \\in \\mathbb{N}$ to show that the union of an arbitrary collection of closed sets is not necessarily closed. (4 marks)\n\n(c) Use definition of limit of a sequence to prove that\n\n$$\n\\lim_{n \\to \\infty} \\frac{2n^2+1}{n^2+1} = 2.\n$$\n\n (4 marks)\n\n(d) Prove that every convergent sequence $(x_n)$ in $\\mathbb{R}$ is cauchy. (4 marks)\n\n(e) Find $\\limsup x_n$ and $\\liminf x_n$ given that $x_n = (-1)^{n+1} \\frac{n+1}{n+2}$. (4 marks)",
+   "solution": ""
+  },
+  {
+   "id": 134,
+   "paper": "sma300-doc-f6da5523",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q279",
+   "status": "flagged",
+   "text": "}",
+   "solution": ""
+  },
+  {
+   "id": 135,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q280",
+   "status": "flagged",
+   "text": "(a) Find the sum of the infinite series $\\sum_{n=1}^{\\infty} (-1)^n \\frac{4}{3^n}$. \n\n(b) Let $(S_n) = \\left[ \\frac{1}{2}, \\frac{1}{4}, \\frac{3}{4}, \\frac{1}{8}, \\frac{7}{8}, \\frac{1}{16}, \\frac{15}{16}, \\dots \\right]$ Find $\\lim_{n \\to \\infty} \\sup s_n$ and $\\lim_{n \\to \\infty} \\inf s_n$\nDoes the sequence converge? (5 marks)\n\n(c) Test for absolute or conditional convergence of the series\n\n$$\n\\sum_{n=1}^{\\infty} \\frac{(-1)^{n-1}}{n^2+1}\n$$\n\n (4 marks)\n\n(d) Prove that $\\sum_{n=1}^{\\infty} \\frac{1}{n^q} < \\infty$, whenever $q > 1$. (4 marks)\n\n```latex\n\\documentclass{article}\n\\usepackage{amsmath, amssymb}\n\\usepackage[margin=1in]{geometry}\n\n\\begin{document}\n\n **a higher education institution** \\\\\n UNIVERSITY EXAMINATIONS 2018/2019 \\\\\n FIRST SEMESTER \n **SMA 300: REAL ANALYSIS**\n\n**DATE:** Wednesday, 21\\(^{\\text{st}}\\) November 2018 **TIME:** 8.00 a.m. - 10.00 a.m.\n\n**INSTRUCTIONS:**\n\nAnswer question One and any other Two\n```",
+   "solution": ""
+  },
+  {
+   "id": 136,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q296",
+   "status": "flagged",
+   "text": "}\n\n(a) State the completeness axiom of the set of real numbers. (2mks)\n(b) Find the \\(\\sup S\\), \\(\\inf S\\), \\(\\max S\\) and \\(\\min S\\), if they exist, of \\(S = \\left\\{ n + (-1)^n \\frac{1}{n} : n \\in \\mathbb{N} \\right\\}\\). (2mks)\n(c) (i) Let \\(S\\) be a subset of \\(\\mathbb{R}\\). Define what is meant by a limit point of \\(S\\). (2mks)\n \n (ii) Find the closure of the set \\(S = \\bigcup_{n \\in \\mathbb{N}} (n, n+1)\\). (2mks)\n(d) Use the definition of a limit of a sequence to prove that \\(\\lim_{n \\to \\infty} \\frac{n^2 - 1}{n^2 + 1} = 1\\). (3mks)\n(e) Use any suitable example to show that the intersection of an infinite number of open sets in \\(\\mathbb{R}\\) is not open. (3mks)\n(f) Prove that \\(9^n - 8n - 1\\) is divisible by \\(64\\) for all \\(n \\in \\mathbb{N}\\). (4mks)\n\n\\rule{\\textwidth}{1pt}\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n\\rule{\\textwidth}{1pt}\n\n\\end{document}\n```\n\n(g) Show that $f(x) = 3x^2 + 5x - 4$ is continuous at $x = 2$ by using the definition the $\\varepsilon - \\delta$ definition. \n(4mks)\n\n(h) Let $\\{x_n\\}_{n=1}^{\\infty}$ be a convergent of real numbers with $x_n \\to x$. \nProve that $kx_n \\to kx$ as $n \\to \\infty$. \n(4mks)\n\n(i) Use a suitable test to determine whether the series $\\sum_{n=1}^{\\infty} \\frac{n^7 7^n}{n!}$ is convergent or not. \n(4mks)\n```",
+   "solution": ""
+  },
+  {
+   "id": 137,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q373",
+   "status": "flagged",
+   "text": "**\n\n(a) Use the properties of real number system to show that:\n\nIf $x + y = x + z$ then $y = z$ for all $x, y, z \\in \\mathfrak{R}$. \n(2mks)\n\n(b) Let $S \\subseteq T \\subseteq \\mathfrak{R}$ where $S \\neq \\phi$. Show that\n\n(i) If $T$ is bounded above then $\\sup S \\leq \\sup T$. \n(3mks)\n\n(ii) If $T$ is bounded below then $\\inf T \\leq \\inf S$. \n(3mks)\n\n(c) Show that the union of a finite collection of closed sets is closed. \n(3mks)\n\n(d) Show that if $r$ is rational and $x$ is irrational then $x + r$ is irrational. \n(4mks)\n\n(e) For all $n \\in N$, prove by mathematical induction that:\n\n$$\n1^3 + 2^3 + 3^3 + \\ldots + n^3 = \\frac{n^2(n+1)^2}{4}.\n$$\n\n \n(5mks)\n\n**STUDENT CENTRE K.M** \nEmail: studentcentre.km@yahoo.com",
+   "solution": ""
+  },
+  {
+   "id": 138,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 21,
+   "reason": "superseded by clean reconstruction q374",
+   "status": "flagged",
+   "text": "}\n\na) Define what is meant by limit point of a sequence. (2 marks)\nb) Let $(x_n)$ and $(y_n)$ be convergent sequences in $\\mathbb{R}$. Show that, the sequence $(x_n + y_n)$ converges and\n \n\n$$\n\\lim_{n \\to \\infty} (x_n + y_n) = \\lim_{n \\to \\infty} x_n + \\lim_{n \\to \\infty} y_n.\n$$\n\n (3 marks)\nc) Let $(x_n)$ be a sequence of real numbers.\n \n \n i) What is meant by limit superior of $(x_n)$? (2 marks)\n ii) If $(x_n) = \\sin(n)$, find limit superior and limit inferior of $(x_n)$. Decide whether $(x_n)$ is convergent. (3 marks)\nd) Using an example, show that not every Cauchy sequence is convergent. (3 marks)\ne) State and prove Cauchy's criterion for convergence. (7 marks)",
+   "solution": ""
+  },
+  {
+   "id": 139,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q375",
+   "status": "flagged",
+   "text": "}\n\na) i) Find the sum of the series $\\sum_{n=0}^{\\infty} \\frac{2^n}{3}$ (3mks)\n ii) State the integral test for convergence of a series. Hence apply it to show that the series $\\sum_{n=1}^{\\infty} \\frac{1}{n^p}, p = 1$ diverges. (8mks)\nb) Determine the convergence of the following series\n \n \n i) $\\sum \\frac{\\cos(n\\pi)}{n\\sqrt{n}}$ (4mks)\n ii) $\\sum_{n=0}^{\\infty} \\frac{1}{n!}$ (5mks)\n\n\\small{",
+   "solution": ""
+  },
+  {
+   "id": 140,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q376",
+   "status": "flagged",
+   "text": "**\n\n(a) (i) Determine whether the series $\\sum_{k=1}^{\\infty} \\frac{(-1)^{k+1} k}{2^k}$ converges conditionally, or diverges. \n(3 marks)\n\n(ii) Evaluate $\\lim_{x \\to 4} \\frac{\\sqrt{x} - 2}{x - 4}$ \n(2 marks)\n\n(b) (i) Define what is meant by an infinite set to be countable. \n(1 mark)\n\n(ii) Show that the set $\\mathbb{Z}$ of integers is countable. \n(2 marks)\n\n(c) A function $f$ is defined by $f(x) =\n\n$$\n\\begin{cases}\n-x^2 & \\text{if } x \\leq 0 \\\\ 5x - 4 & \\text{if } 0 < x \\leq 1 \\\\ 4x^2 - 3x & \\text{if } 1 < x < 2 \\\\ 3x + 4 & \\text{if } x \\geq 2\n\\end{cases}\n$$\n\n$\n\nExamine $f$ for continuity at $x = 0, 1, 2$. Also discuss the kind of discontinuity if any. \n(6 marks)\n\n(d) (i) Differentiate between what is meant by a function $f$ is continuous on an interval $I$ and what is meant by a function $f$ is uniformly continuous on an interval $I$. \n(2 marks)\n\n(ii) Show that $f(x) = \\frac{1}{x}$ is not uniformly continuous on $(0, 1)$. \n(4 marks)\n\n**a higher education institution**\n**UNIVERSITY EXAMINATIONS 2013/2014**\n**FIRST SEMESTER \n**SMA 300: REAL ANALYSIS I**\n\nDATE: Monday, 18\\textsuperscript{th} November, 2013 TIME: 11.00 a.m--1.00 p.m.\n\n**INSTRUCTIONS:** Answer question ONE and any other TWO questions,",
+   "solution": ""
+  },
+  {
+   "id": 141,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q377",
+   "status": "flagged",
+   "text": "}\n\n1. Prove that $\\frac{1}{3}\\sqrt{2} + 5$ is irrational. [4 marks]\n2. Find the supremum, infimum, maximal and minimal elements of the following sets if they exist.\n \n \n 1. $S = \\left\\{ (-1)^n \\left(1 + \\frac{1}{n}\\right) : n \\in \\mathbb{N} \\right\\}$\n 2. $A = \\left\\{ \\frac{1}{m} + \\frac{1}{n} : m, n \\in \\mathbb{N} \\right\\}$ [4 marks]\n3. Show that an arbitrary intersection of closed sets is closed. [3 marks]\n4. Determine whether the series $\\sum_{n=0}^{\\infty} \\frac{1}{n - \\sqrt{2}}$ converges or diverges. [3 marks]\n5. Determine the interior of the set $A = \\left\\{ 1 + \\frac{1}{5^n} : n \\in \\mathbb{N} \\right\\}$. Is $A$ open? Justify your answer. [2 marks]\n6. Show that every convergent sequence is Cauchy. [4 marks]\n7. Show that the set $\\mathbb{Q}^c$ of irrational numbers is uncountable. [3 marks]\n8. Prove by using the definition of the limit of a sequence that $\\lim_{n \\to \\infty} \\frac{1}{7^n} = 0$. [3 marks]\n9. Prove that the function $f: \\mathbb{R} \\to \\mathbb{R}$ defined by $f(x) = x^2 - 7x + 12$ is continuous at $x = 2$. [4 marks]",
+   "solution": ""
+  },
+  {
+   "id": 142,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q378",
+   "status": "flagged",
+   "text": "**\n\na) Prove that\ni) If $E \\subseteq F$ then $E \\subseteq F^\\circ$ [3 marks]\nii) $E^\\circ$ is always an open set [2 marks]\niii) $E^\\circ$ is the largest open subset of $X$ contained in $E$ [2 marks]\niv) $E$ is open iff $E = E^\\circ$ [3 marks]\n\nb) Find the derived set of $A = \\left\\{1 + \\frac{n}{n+1} : n \\in \\mathbb{N}\\right\\}$. Is $A$ closed? Give reasons. [3 marks]\n\nc) State and prove the sandwich theorem of sequence and hence show that $\\lim_{n \\to \\infty} \\sqrt{n+1} - \\sqrt{n} = 0$. [4 marks]\n\nd) If $\\{x_n\\}$ is a monotonic increasing sequence then show that it is bounded and it converges to its supremum. [3 marks]",
+   "solution": ""
+  },
+  {
+   "id": 143,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q379",
+   "status": "flagged",
+   "text": "**\n\na) Show that the interval $(a, b)$ contains both rational and irrational numbers. [5 marks]\n\nb) Let $A$ and $B$ be non-empty subsets of the set of real numbers and let $C$ be defined as:\n$C = \\{x + y : x \\in A, y \\in B\\}$. If each of these sets has a supremum, then show that:\n$Sup\\ C = Sup\\ A + Sup\\ B$ [5 marks]\n\nc) Show that if a sequence has a limit, then this limit is unique. [4 marks]\n\nd) Let $\\{x_n\\}$ and $\\{y_n\\}$ be sequences converging to $l$ and $h$ respectively as $n \\to \\infty$. Then show that the limit;\n$x_n \\cdot y_n \\to l \\cdot h$ as $n \\to \\infty$. [4 marks]\n\ne) Show by using the definition of a limit of a sequence that $\\lim_{n \\to \\infty} 1 + \\frac{1}{n} = 1$. [2 marks]",
+   "solution": ""
+  },
+  {
+   "id": 144,
+   "paper": "sma300-doc-f6da5523",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q380",
+   "status": "flagged",
+   "text": "**\n\na) For each of the series below, tell whether the series is convergent or divergent. Show your working out as you state which convergence/divergence test you have used. In the case where the series converges, give its sum:\n\ni) $\\sum_{n=0}^{\\infty} \\frac{(-1)^n}{2^n}$ [3 marks]\n\nii) $\\sum_{n=1}^{\\infty} \\frac{1}{(2n - 1)(2n + 1)}$ [3 marks]",
+   "solution": ""
+  },
+  {
+   "id": 145,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q347",
+   "status": "flagged",
+   "text": "**\n\na) Let $S \\subseteq \\mathbb{R}$ be the set given by:\n\n$$\nS = \\left\\{ \\frac{(-1)^n}{2n} : n \\in \\mathbb{N} \\right\\}\n$$\n\nDetermine the supremum and the infimum for the set $S$. (3 marks)\n\nb) Define each of the following:\n(i) An interior point of a set\n(ii) A limit point of a set (4 marks)\n\nc) Prove by induction that $5^{2n} - 4^n$ is divisible by 3 $\\forall n \\in \\mathbb{N}$ (3 marks)\n\nd) Prove that if the series $\\sum a_n$ is convergent then $\\lim_{n \\to \\infty} a_n = 0$ (2 marks)\n\ne) Show that every open interval $(a,b) \\subset \\mathbb{R}$ of is an open set (3 marks)\n\nf) Let $f: \\mathbb{R} \\to \\mathbb{R}$ be defined by $f(x) = 5x + 3$. Show that $f$ is continuous on $\\mathbb{R}$. (3 marks)\n\ng) Show that if $S$ is irrational then $t = \\frac{S}{S+1}$ is irrational. (3 marks)\n\nh) Is the set $S = \\{a, b, d, e\\}$ closed? Justify your answer. (2 marks)\n\ni) Determine the convergence or divergence of the series\n\n$$\n\\sum \\frac{2n}{9n^3}\n$$\n\n (3 marks)\n\nj) Let $\\{S_n\\}$ be a sequence of real numbers. Prove that if the limit of $\\{S_n\\}$ exists, then the limit is unique. (4 marks)",
+   "solution": ""
+  },
+  {
+   "id": 146,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q348",
+   "status": "flagged",
+   "text": "**\n\na) Let $S$ be a subset of the set of real numbers. Prove that $S$ is closed if the only if its complement is open (9 marks)\n\nb) Let $\\{A_1, A_2, \\dots, A_n\\}$ be a finite collection of open sets. Show that $A = \\bigcap_{i=1}^{n} A_i$ is open. (6 marks)\n\nc) Show by use of an example that an arbitrary intersection of open sets need not be open. (5 marks)",
+   "solution": ""
+  },
+  {
+   "id": 147,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q349",
+   "status": "flagged",
+   "text": "**\n\na) Let $\\{x_n\\}$ and $\\{y_n\\}$ be sequences of real number. Suppose that $x_n \\to x$ and $y_n \\to y$ as $n \\to \\infty$. Prove that $x_n \\cdot y_n \\to x \\cdot y$ as $n \\to \\infty$ (7 marks)\n\nb) For all real numbers $x, y$ show that $|x + y| \\leq |x| + |y|$ and $|x - y| \\geq ||x| - |y||$ (9 marks)\n\nc) Let $A \\subseteq \\mathbb{R}$ and $B \\subseteq \\mathbb{R}$ be non-empty sets. Suppose $x \\leq y \\ \\forall x \\in A, y \\in B$. Show that if $A$ is bounded above and $B$ is bounded below, then:\n\n$$\n\\text{Sup } A \\leq \\text{Inf } B\n$$\n\n (4 marks)",
+   "solution": ""
+  },
+  {
+   "id": 148,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q350",
+   "status": "flagged",
+   "text": "**\n\na) Let $f: X \\to Y$ be a function. Define what is meant by $f$ is uniformly continuous. (2 marks)\n\nb) Prove that the $f: X \\to Y$ defined by $f(x) = 2x^2 - 3x + 1$ is uniformly continuous on the interval $[-2, 2]$ (6 marks)\n\nc) Use the definition of a limit to show that $\\lim_{x \\to 2} \\frac{x^3 - 4}{x^2 + 1} = \\frac{4}{5}$ (7 marks)\n\nd) Show that the function\n\n$$\nF(x) =\n$$\n\n$$\n\\begin{cases}\n\\frac{x^2 + 4x - 5}{x - 1}, & x \\neq 1 \\\\ 2, & x = 1\n\\end{cases}\n$$\n\n$$\nis discontinuous at $x = 1$\nRe-define the function $f(x)$ so that it is continuous at $x = 1$ (5 marks)\n$$",
+   "solution": ""
+  },
+  {
+   "id": 149,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 21,
+   "reason": "superseded by clean reconstruction q351",
+   "status": "flagged",
+   "text": "**\n\na) Show that every convergent sequence $\\{a_n\\}$ is a Cauchy sequence (5 marks)\n\nb) Determine the convergence of each of the following series\n\n**a higher education institution** \n**UNIVERSITY EXAMINATIONS 2015/2016** \n**FIRST SEMESTER \n**SMA 300: REAL ANALYSIS I**\n\n**DATE:** Thursday 26\\textsuperscript{th} November, 2015 **TIME:** 11.00 a.m. - 1.00 p.m\n\n**INSTRUCTIONS:**\n\nAnswer question ONE and any other TWO questions.",
+   "solution": ""
+  },
+  {
+   "id": 150,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q352",
+   "status": "flagged",
+   "text": "}\n\na) For all real numbers \\(x\\) and \\(y\\) show that:\n \n\n$$\n\\sqrt{xy} \\leq \\frac{1}{2}(x+y), \\text{ where } x,y > 0.\n$$\n\n [2 marks]\nb) Prove by mathematical induction that \\(n^3 + 2n : n \\in \\mathbb{N}\\), is divisible by 3.\n [3 marks]\nc) Using Cauchy convergence criterion, show that the sequence \\(\\{S_n\\}\\) given by:\n \n\n$$\nS_n = 1 + \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{4} + \\dots + \\frac{1}{n}\n$$\n\n is divergent.\n [5 marks]\nd) Show that \\(S\\) is a closed proper subset of \\(\\mathbb{R}\\) if and only if \\(S^c\\) is open.\n [5 marks]\ne) Consider the sequence \\(\\{s_n\\}\\) defined by \\(s_1 = 1, s_{n+1} = 2 + \\frac{1}{3}s_n\\). If \\(\\lim_{n \\to \\infty} s_n = \\lim_{n \\to \\infty} s_{n+1} = s\\), find \\(s\\).\n [2 marks]\nf) Show that if \\(r\\) is irrational, then \\(t = \\frac{r}{r+1}\\) is irrational.\n [2 marks]\ng) Let \\(\\{a_n\\} = \\sin\\frac{n\\pi}{3}, n \\in \\mathbb{N}\\). Find \\(\\liminf a_n\\) and \\(\\limsup a_n\\).\n [2 marks]\n\nh) Investigate the convergence or divergence of the series $\\sum_{n=1}^{\\infty} \\frac{n\\sqrt{n}+1}{n^2}$. [4 marks]\n\ni) Distinguish between uniform continuity and pointwise continuity. Hence or otherwise, prove that the function $f(x) = \\frac{1}{x}$ is **NOT** uniformly continuous on $(0,1)$. [5 marks]",
+   "solution": ""
+  },
+  {
+   "id": 151,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q353",
+   "status": "flagged",
+   "text": "}\n\na) Show that the interval $(x, y)$ contains both rational and irrational numbers where $x \\ge 0$ and $x$ and $y$ are real numbers. [5 marks]\n\nb) Let $S$ and $T$ be non-empty subsets of real numbers such that $S \\subseteq T$. Prove that if:\n\ni. $T$ is bounded above then $SupS \\le SupT$. [3 marks]\nii. $T$ is bounded below then $InfT \\le InfS$. [3 marks]\n\nc) i) Show that the union of an arbitrary collection of non-empty open sets is an open set. [5 marks]\n\nii) Show using the collection of sets on $\\mathbb{R}$ given by $G_n = \\left( 2 - \\frac{1}{n}, 3 + \\frac{1}{n} \\right) \\forall n \\in \\mathbb{N}$ that the intersection of an arbitrary collection of open sets need not be again open. Give a detailed explanation as to why the arbitrary intersection found is not an open set. [4 marks]",
+   "solution": ""
+  },
+  {
+   "id": 152,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 21,
+   "reason": "superseded by clean reconstruction q354",
+   "status": "flagged",
+   "text": "}\n\na) Prove that the limit of a sequence in $\\mathbb{R}$, if at all it exists, is unique and hence show that $\\lim_{n \\to \\infty} \\frac{3n+2}{n+1} = 3$. [10 marks]\n\nb) Prove that every convergent sequence is Cauchy. [3 marks]\n\nc) i) Show that convergence of sequence in $\\mathbb{R}$ implies boundedness. [4 marks]\n\nii) Prove by use of a counter example that the converse of c i) above is not necessarily true. [3 marks]\n\n5\n\n**STUDENT CENTRE KM**\nEmail: studentcentre@yahoo.com",
+   "solution": ""
+  },
+  {
+   "id": 153,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q355",
+   "status": "flagged",
+   "text": "**\n\na) For each of the following series below, tell whether the series is convergent or divergent. Show your working out as you state which convergence/divergence test you have used.\n[3 marks each]\n\ni) $\\displaystyle \\sum_{n=1}^{\\infty} \\frac{1}{5n^2+n}$\n\nii) $\\displaystyle \\sum_{n=1}^{\\infty} \\left(\\frac{n+2}{3n-1}\\right)^n$\n\niii) $\\displaystyle \\sum_{n=1}^{\\infty} \\frac{(n!)^2}{(2n)!}$\n\niv) $\\displaystyle \\sum_{n=1}^{\\infty} \\frac{\\cos^2 n\\pi}{n^2}$\n\nb) Let $\\sum a_n$ be a series of numbers. Define what is meant by the series $\\sum a_n$ to be\ni) absolutely divergent\nii) conditionally convergent\n[2 marks]\n\nc) Determine whether $\\displaystyle \\sum_{n=2}^{\\infty} (-1)^n \\frac{1}{n(\\ln n)}$ converges absolutely, conditionally or not at all.\n[6 marks]",
+   "solution": ""
+  },
+  {
+   "id": 154,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q356",
+   "status": "flagged",
+   "text": "**\n\na) Show from definition of a limit of a function that $\\displaystyle \\lim_{x \\to 1} \\frac{2x^2-3x+1}{x-1}=1$\n[4 marks]\n\nb)\ni) Define what is meant by a denumerable (countable) set\n[2 marks]\nii) Show that the set of all odd natural numbers is denumerable.\n[2 marks]\n\nc) Prove that the function $f: \\mathbb{R} \\to \\mathbb{R}$ defined by $f(x)=4x^2-3x+2$ is continuous at the point $x=2$.\n[4 marks]\n\nd) Show that the function $\\displaystyle f(x)=\\frac{1}{x}$ is uniformly continuous on $[2, \\infty)$.\n[4 marks]\n\ne) Show that if $f$ and $g$ are uniformly continuous on a subset $S \\subseteq \\mathbb{R}$, then $f+g$ is uniformly continuous on $S$.\n[4 marks]\n\n\\textsc{Kenya\\textsc{tta} University}\n\\textsc{University Examinations 2017/2018}\n\\textsc{First Semester \n\\textsc{}\\\\[1em]\n**\\textsc{SMA 300: Real Analysis I**}\n\n\\textsc{Date:} Thursday, 1\\textsuperscript{st} February 2018 \\textsc{Time:} 11.00a.m-1.00p.m\n\n**\\textsc{Instructions:**}\n\nAnswer question One and any other Two\n\n1. (a) (i) Let $(a_n)$ be an infinite sequence of real numbers. Let $\\displaystyle\\sum_{n=1}^{\\infty} a_n = a_1 + a_2 + \\dots + a_n + \\dots$ be an infinite series. When is the series $\\displaystyle\\sum_{n=1}^{\\infty} a_n$ said to be convergent? (2marks)\n \n Hint: Use partial sums\n (ii) Hence determine if the series $\\displaystyle\\sum_{n=1}^{\\infty} n$ is convergent or divergent. If it converges determine its value. (3marks)\n (ii) When is a series $\\displaystyle\\sum a_n$ said to be absolutely convergent? (1marks)\n (b) Let $A$ be a non-empty set bounded above in an order field\n \n \n (i) Give the two conditions that must be satisfied for the number $L$ to be the least upper bound or supremum of $A$. (2marks)\n\n\\footnotesize \n\n(ii) Show that if $u = \\sup A$ then for every $n \\in \\mathbb{N}$, the number $u - \\frac{1}{n}$ is not an upper bound. \n (4 marks)\n\n(c) (i) When is a non-empty set in $\\mathbb{R}$ said to satisfy the completeness axiom of the set of real numbers? \n (2 marks)\n\n(ii) Does the set of rational numbers given by $A = \\{q \\in \\mathbb{Q} : q^2 < 2\\}$ satisfy the completeness axiom? Explain \n (2 marks)\n\n(iii) Let $S \\subseteq T \\subseteq \\mathbb{R}$ and $S \\neq \\emptyset$, show that if $T$ is bounded below then $\\inf T \\leq \\inf S$. \n (2 marks)\n\n(d) Consider the sequence of real numbers defined by the relations \n\n$$\nx_1 = 1 \\text{ and } x_{n+1} = \\sqrt{1 + 2x_n} \\text{ for } n \\geq 1.\n$$\n\n \nUse the principle of Mathematical Induction to show that $x_n < 4$ for all $n \\geq 1$. \n (6 marks)\n\n(e) (i) Let $S$ be a subset of $\\mathbb{R}$. Give the definition of an accumulation point of the set $S$ in $\\mathbb{R}$ \n (2 marks)\n\n(ii) Let $S = \\left\\{ \\left( -1 \\right)^n \\left( 1 + \\frac{1}{n} \\right) : n \\in \\mathbb{N} \\right\\}$ \nFind the accumulation points of the set $S$ in $\\mathbb{R}$ \n (1 mark)\n\n(iii) When is a set $S$ in $\\mathbb{R}$ said to be closed? \n (1 marks)\n\n(iv) Let $U_n = \\left[ -1, -\\frac{1}{n} \\right], n \\in \\mathbb{N}$ be a collection of closed sets. Using this collection, show clearly that an infinite union of closed sets in $\\mathbb{R}$ is not necessarily closed \n (2 marks)",
+   "solution": ""
+  },
+  {
+   "id": 155,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q297",
+   "status": "flagged",
+   "text": "**",
+   "solution": ""
+  },
+  {
+   "id": 156,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q252",
+   "status": "flagged",
+   "text": "(a) Use the algebraic properties of the set of all real numbers $\\mathbb{R}$ to show that $a \\cdot 0 = 0$ for all $a \\in \\mathbb{R}$. \n \n\n (b) prove that $5^{2n+1} + 2^{2n+1}$ is divisible by 7 for all $n \\geq 0$. \n (5marks)\n\n (c) Find the supremum and infimum (if they exist) of each of the following sets. Also decide which sets have maximum and minimum elements respectively \n\n (i) $S = \\{ x \\in \\mathbb{R} \\mid x^2 < 5, \\text{ and } x \\text{ is a rational} \\}$. \n (2marks)\n\n (ii) $T = \\left\\{ \\frac{1}{n} + (-1)^2 \\mid n \\in \\mathbb{N} \\right\\}$. \n (2marks)\n\n (d) Suppose that $r$ is a rational number and $s$ is an irrational number such that $t = r + s$. Prove that $t$ is irrational. \n (3marks)\n\n (e) Show that the intersection of a finite collection of open sets is open. \n (5marks)",
+   "solution": ""
+  },
+  {
+   "id": 157,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q298",
+   "status": "flagged",
+   "text": "**",
+   "solution": ""
+  },
+  {
+   "id": 158,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q253",
+   "status": "flagged",
+   "text": "(a) Find the derived set of each of the following sets. In each case, determine whether the set is closed or not; \n\n (i) $A = \\mathbb{Z}$, the set of all integers. \n \n\n (ii) $B = \\{ a \\mid a \\in \\mathbb{Q}, \\, 12 < a < 100 \\}$ \n (2marks)\n\n(b) Use the family $\\{F_n\\}$, where $F_n = \\left[ \\frac{1}{n+1}, \\frac{1}{n+1} \\right]$, $n \\in \\mathbb{N}$ to show that the union of an arbitrary collection of closed sets is not necessarily closed. (4 marks)\n\n(c) Use definition of limit of a sequence to prove that\n\n$$\n\\lim_{n \\to \\infty} \\frac{2n^2+1}{n^2+1} = 2.\n$$\n\n (4 marks)\n\n(d) Prove that every convergent sequence $(x_n)$ in $\\mathbb{R}$ is cauchy. (4 marks)\n\n(e) Find $\\limsup x_n$ and $\\liminf x_n$ given that $x_n = (-1)^{n+1} \\frac{n+1}{n+2}$. (4 marks)",
+   "solution": ""
+  },
+  {
+   "id": 159,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": null,
+   "reason": "superseded by clean reconstruction q281",
+   "status": "flagged",
+   "text": "**",
+   "solution": ""
+  },
+  {
+   "id": 160,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q254",
+   "status": "flagged",
+   "text": "(a) Find the sum of the infinite series $\\sum_{n=1}^{\\infty} (-1)^n \\frac{4}{3^n}$. \n\n(b) Let $(S_n) = \\left[ \\frac{1}{2}, \\frac{1}{4}, \\frac{3}{4}, \\frac{1}{8}, \\frac{7}{8}, \\frac{1}{16}, \\frac{15}{16}, \\dots \\right]$ Find $\\lim_{n \\to \\infty} \\sup s_n$ and $\\lim_{n \\to \\infty} \\inf s_n$\nDoes the sequence converge? (5 marks)\n\n(c) Test for absolute or conditional convergence of the series\n\n$$\n\\sum_{n=1}^{\\infty} \\frac{(-1)^{n-1}}{n^2+1}\n$$\n\n (4 marks)\n\n(d) Prove that $\\sum_{n=1}^{\\infty} \\frac{1}{n^q} < \\infty$, whenever $q > 1$. (4 marks)\n\n\\includegraphics[width=0.15\\textwidth]{kenyatta_logo} \\\\[1em]\n**a higher education institution** \nUNIVERSITY EXAMINATIONS 2018/2019 \nFIRST SEMESTER \n**SMA 300: REAL ANALYSIS**\n\n**DATE:** Wednesday, 21\\(^{\\text{st}}\\) November 2018 **TIME:** 8.00 a.m. - 10.00 a.m.\n\n****INSTRUCTIONS:****\n\nAnswer question One and any other Two",
+   "solution": ""
+  },
+  {
+   "id": 161,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q282",
+   "status": "flagged",
+   "text": "}\n\n(a) State the completeness axiom of the set of real numbers. (2mks)\n(b) Find the \\(\\sup S\\), \\(\\inf S\\), \\(\\max S\\) and \\(\\min S\\), if they exist, of \\(S = \\left\\{ n + (-1)^n \\frac{1}{n} : n \\in \\mathbb{N} \\right\\}\\). (2mks)\n(c) (i) Let \\(S\\) be a subset of \\(\\mathbb{R}\\). Define what is meant by a limit point of \\(S\\). (2mks)\n4. (ii) Find the closure of the set \\(S = \\bigcup_{n \\in \\mathbb{N}} (n, n+1)\\). (2mks)\n(d) Use the definition of a limit of a sequence to prove that \\(\\lim_{n \\to \\infty} \\frac{n^2 - 1}{n^2 + 1} = 1\\). (3mks)\n(e) Use any suitable example to show that the intersection of an infinite number of open sets in \\(\\mathbb{R}\\) is not open. (3mks)\n(f) Prove that \\(9^n - 8n - 1\\) is divisible by \\(64\\) for all \\(n \\in \\mathbb{N}\\). (4mks)\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n\n(g) Show that $f(x) = 3x^2 + 5x - 4$ is continuous at $x = 2$ by using the definition the $\\varepsilon - \\delta$ definition. \n(4mks)\n\n(h) Let $\\{x_n\\}_{n=1}^{\\infty}$ be a convergent of real numbers with $x_n \\to x$. \nProve that $kx_n \\to kx$ as $n \\to \\infty$. \n(4mks)\n\n(i) Use a suitable test to determine whether the series $\\sum_{n=1}^{\\infty} \\frac{n^7 7^n}{n!}$ is convergent or not. \n(4mks)",
+   "solution": ""
+  },
+  {
+   "id": 162,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q357",
+   "status": "flagged",
+   "text": "**\n\n(a) Use the properties of real number system to show that:\n\nIf $x + y = x + z$ then $y = z$ for all $x, y, z \\in \\mathfrak{R}$. \n(2mks)\n\n(b) Let $S \\subseteq T \\subseteq \\mathfrak{R}$ where $S \\neq \\emptyset$. Show that\n\n(i) If $T$ is bounded above then $\\sup S \\leq \\sup T$. \n(3mks)\n\n(ii) If $T$ is bounded below then $\\inf T \\leq \\inf S$. \n(3mks)\n\n(c) Show that the union of a finite collection of closed sets is closed. \n(3mks)\n\n(d) Show that if $r$ is rational and $x$ is irrational then $x + r$ is irrational. \n(4mks)\n\n(e) For all $n \\in N$, prove by mathematical induction that:\n\n$$\n1^3 + 2^3 + 3^3 + \\ldots + n^3 = \\frac{n^2(n+1)^2}{4}.\n$$\n\n \n(5mks)\n\n7\n\n**STUDENT CENTRE KM**\nEmail: studentcentrekm@yahoo.com",
+   "solution": ""
+  },
+  {
+   "id": 163,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 21,
+   "reason": "superseded by clean reconstruction q358",
+   "status": "flagged",
+   "text": "**\n\na) Define what is meant by limit point of a sequence.\n(2 marks)\n\nb) Let $(x_n)$ and $(y_n)$ be convergent sequences in $\\mathbb{R}$. Show that, the sequence $(x_n + y_n)$ converges and\n\n$$\n\\lim_{n \\to \\infty} (x_n + y_n) = \\lim_{n \\to \\infty} x_n + \\lim_{n \\to \\infty} y_n.\n$$\n\n(3 marks)\n\nc) Let $(x_n)$ be a sequence of real numbers.\ni) What is meant by limit superior of $(x_n)$?\n(2 marks)\nii) If $(x_n) = \\sin(n)$, find limit superior and limit inferior of $(x_n)$. Decide whether $(x_n)$ is convergent.\n(3 marks)\n\nd) Using an example, show that not every Cauchy sequence is convergent.\n(3 marks)\n\ne) State and prove Cauchy's criterion for convergence.\n(7 marks)",
+   "solution": ""
+  },
+  {
+   "id": 164,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q359",
+   "status": "flagged",
+   "text": "**\n\na) i) Find the sum of the series $\\sum_{n=0}^{\\infty} \\frac{2^n}{3}$\n(3mks)\n\nii) State the integral test for convergence of a series. Hence apply it to show that the series $\\sum_{n=1}^{\\infty} \\frac{1}{n^p}, p = 1$ diverges.\n(8mks)\n\nb) Determine the convergence of the following series\n\ni) $\\sum \\frac{\\cos(n\\pi)}{n\\sqrt{n}}$\n(4mks)\n\nii) $\\sum_{n=0}^{\\infty} \\frac{1}{n!}$\n(5mks)",
+   "solution": ""
+  },
+  {
+   "id": 165,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q299",
+   "status": "flagged",
+   "text": "**\n\n(a) (i) Determine whether the series $\\sum_{k=1}^{\\infty} \\frac{(-1)^{k+1} k}{2^k}$ converges conditionally, or diverges. \n(3 marks)\n\n(ii) Evaluate $\\lim_{x \\to 4} \\frac{\\sqrt{x} - 2}{x - 4}$ \n(2 marks)\n\n(b) (i) Define what is meant by an infinite set to be countable. \n(1 mark)\n\n(ii) Show that the set $\\mathbb{Z}$ of integers is countable. \n(2 marks)\n\n(c) A function $f$ is defined by $f(x) =\n\n$$\n\\begin{cases}\n-x^2 & \\text{if } x \\leq 0 \\\\ 5x - 4 & \\text{if } 0 < x \\leq 1 \\\\ 4x^2 - 3x & \\text{if } 1 < x < 2 \\\\ 3x + 4 & \\text{if } x \\geq 2\n\\end{cases}\n$$\n\n$\n\nExamine $f$ for continuity at $x = 0, 1, 2$. Also discuss the kind of discontinuity if any. \n(6 marks)\n\n(d) (i) Differentiate between what is meant by a function $f$ is continuous on an interval $I$ and what is meant by a function $f$ is uniformly continuous on an interval $I$. \n(2 marks)\n\n(ii) Show that $f(x) = \\frac{1}{x}$ is not uniformly continuous on $(0, 1)$. \n(4 marks)\n\n```latex\n\\documentclass{article}\n\\usepackage{amsmath, amssymb}\n\\usepackage[margin=1in]{geometry}\n\n\\begin{document}\n\n **a higher education institution**\\\\\n **UNIVERSITY EXAMINATIONS 2013/2014**\\\\\n **FIRST SEMESTER \n \n **SMA 300: \\quad REAL ANALYSIS I**\n\n**DATE:** Monday, 18\\textsuperscript{th} November, 2013 **TIME:** 11.00 a.m--1.00 p.m.\n\n**INSTRUCTIONS:** Answer question **ONE** and any other **TWO** questions,\n```",
+   "solution": ""
+  },
+  {
+   "id": 166,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q300",
+   "status": "flagged",
+   "text": "}\n\na) Prove that $\\frac{1}{3}\\sqrt{2} + 5$ is irrational. [4 marks]\nb) Find the supremum, infimum, maximal and minimal elements of the following sets if they exist.\n \n \n i) $S = \\left\\{ (-1)^n \\left(1 + \\frac{1}{n}\\right) : n \\in \\mathbb{N} \\right\\}$\n ii) $A = \\left\\{ \\frac{1}{m} + \\frac{1}{n} : m, n \\in \\mathbb{N} \\right\\}$ [4 marks]\nc) Show that an arbitrary intersection of closed sets is closed. [3 marks]\nd) Determine whether the series $\\sum_{n=0}^{\\infty} \\frac{1}{n - \\sqrt{2}}$ converges or diverges. [3 marks]\ne) Determine the interior of the set $A = \\left\\{ 1 + \\frac{1}{5^n} : n \\in \\mathbb{N} \\right\\}$. Is $A$ open? Justify your answer. [2 marks]\nf) Show that every convergent sequence is Cauchy. [4 marks]\ng) Show that the set $\\mathbb{Q}^c$ of irrational numbers is uncountable. [3 marks]\nh) Prove by using the definition of the limit of a sequence that $\\lim_{n \\to \\infty} \\frac{1}{7^n} = 0$. [3 marks]\ni) Prove that the function $f: \\mathbb{R} \\to \\mathbb{R}$ defined by $f(x) = x^2 - 7x + 12$ is continuous at $x = 2$. [4 marks]\n\n\\end{document}\n```\n```",
+   "solution": ""
+  },
+  {
+   "id": 167,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q360",
+   "status": "flagged",
+   "text": "**\n\na) Prove that\ni) If $E \\subseteq F$ then $E \\subseteq F^o$ [3 marks]\nii) $E^o$ is always an open set [2 marks]\niii) $E^o$ is the largest open subset of $X$ contained in $E$ [2 marks]\niv) $E$ is open iff $E = E^o$ [3 marks]\n\nb) Find the derived set of $A = \\left\\{1 + \\frac{n}{n+1} : n \\in \\mathbb{N}\\right\\}$. Is A closed? Give reasons. [3 marks]\n\nc) State and prove the sandwich theorem of sequence and hence show that $\\lim_{n \\to \\infty} \\sqrt{n+1} - \\sqrt{n} = 0$. [4 marks]\n\nd) If $\\{x_n\\}$ is a monotonic increasing sequence then show that it is bounded and it converges to its supremum. [3 marks]",
+   "solution": ""
+  },
+  {
+   "id": 168,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q361",
+   "status": "flagged",
+   "text": "**\n\na) Show that the interval $(a, b)$ contains both rational and irrational numbers. [5 marks]\n\nb) Let $A$ and $B$ be non-empty subsets of the set of real numbers and let $C$ be defined as:\n$C = \\{x + y : x \\in A, y \\in B\\}$. If each of these sets has a supremum, then show that:\n$Sup\\ C = Sup\\ A + Sup\\ B$ [5 marks]\n\nc) Show that if a sequence has a limit, then this limit is unique. [4 marks]\n\nd) Let $\\{x_n\\}$ and $\\{y_n\\}$ be sequences converging to $l$ and $h$ respectively as $n \\to \\infty$. Then show that the limit;\n$x_n \\cdot y_n \\to l \\cdot h$ as $n \\to \\infty$. [4 marks]\n\ne) Show by using the definition of a limit of a sequence that $\\lim_{n \\to \\infty} 1 + \\frac{1}{n} = 1$. [2 marks]",
+   "solution": ""
+  },
+  {
+   "id": 169,
+   "paper": "sma300-doc-d494cdc6",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q362",
+   "status": "flagged",
+   "text": "**\n\na) For each of the series below, tell whether the series is convergent or divergent. Show your working out as you state which convergence/divergence test you have used. In the case where the series converges, give its sum:\n\ni) $\\sum_{n=0}^{\\infty} \\frac{(-1)^n}{2^n}$ [3 marks]\n\nii) $\\sum_{n=1}^{\\infty} \\frac{1}{(2n-1)(2n+1)}$ [3 marks]",
+   "solution": ""
+  },
+  {
+   "id": 170,
+   "paper": "sma300-doc-3dd79739",
+   "topic": 19,
+   "reason": "superseded by clean reconstruction q283",
+   "status": "flagged",
+   "text": "a) Let S be defined by S= Determine the infinum, supremum, \n minimal and maximal elements of S if they exist. [4 marks] \n { √ } \n b) Prove that the function defined by =  is a metric. [ 3 marks] \n \n c) Find the derived sets of the following sets and state whether they are closed or not:\n ( ) | | \n (i) A= \n \n (ii) B={ . } [ 4 marks] \n d) Investigate{ c o nv e r g e nc e o r }divergence of each of the series, justify your answer in each\n \n case. \n \n  n! \n  [ 3marks] \n 2n \n n1 \n e) Prove that every convergent sequence is bounded. [ 4 marks] \n \n f) Given a sequence ( ), where =1+ , find that < for all n>N \n \n if | | [ 3 marks] \n \n s \n g) Sho w th a t if s i s irrational then t  is irrational. [ 3 marks] \n s1 \n h) Show that an arbitrary intersection of open sets need not be open using the family\n     \n G  21 ,3 1 :nN [ 3 marks] \n n n n \n i) Let f :be defined by fx =2x1. Prove that f is continuous at any\n point p. [3 marks] \n \n \n \n Website: ma ktaba.elab.co.ke DownloadWedh bay tAsmAbprops:e +M2we5u4 (a 7m0br4os 9eh8m6w e4u@47gmail.com) Email: info@elab.co.ke",
+   "solution": ""
+  },
+  {
+   "id": 171,
+   "paper": "sma300-doc-3dd79739",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q284",
+   "status": "flagged",
+   "text": "a) Prove that is irrational. [ 4 marks] \n \n b) i) Define the term open set [ 2marks] \n √ \n ii) Find the interior of the following sets and state whether they are open or not:\n A= (2,4] [ 2 marks] \n \n  1  \n B=  :nN. [2 marks] \n n  \n c) (i) Let E be a subset of . Explain what is meant by a limit point of E. [ 2 marks]\n \n (ii) Show that finite sets have no limit points. [ 4 marks] \n   \n d) Let that H  0, . Prove that H is not compact. [4 marks]",
+   "solution": ""
+  },
+  {
+   "id": 172,
+   "paper": "sma300-doc-3dd79739",
+   "topic": 20,
+   "reason": "superseded by clean reconstruction q285",
+   "status": "flagged",
+   "text": "a) Let x be a sequence. Define what is meant by the sequence x converges to\n n n \n a lim(it x). ( ) [ 2 marks] \n \n lim 3n2 \n b) Using definition in Q3 (a), show that  3 [ 5 marks] \n n n1  \n c) Prove that a convergent sequence of real numbers has a unique limit. [ 5 marks]\n \n \n d) (i) Define what is meant by a Cauchy sequence. [ 2marks] \n  \n ii) Show that the sequence x  1 :nN  is Cauchy sequence. [ 6 marks]\n n 3n",
+   "solution": ""
+  },
+  {
+   "id": 173,
+   "paper": "sma300-doc-3dd79739",
+   "topic": 24,
+   "reason": "superseded by clean reconstruction q286",
+   "status": "flagged",
+   "text": "(a) Let S. Differentiate between point wise and uniform continuity of the function\n f :S . [ 4 marks] \n \n (b) Let f be defined by \n \n x2  x6 \n  , x  2 \n f(x)   x2 \n   6 , x  2 \n Show that f is discontinuous at x 2. Redefine the function f to make it continuous at\n \n x=2. [6 marks] \n \n (c) Prove that function f :defined by fx  x2 2x6is continuous at x=3\n [5 marks] \n \n 1 \n (d) Show that the function fx  is not uniformly continuous on the interval (0,1).\n x \n [5 marks]",
+   "solution": ""
+  },
+  {
+   "id": 174,
+   "paper": "sma300-doc-3dd79739",
+   "topic": 22,
+   "reason": "superseded by clean reconstruction q301",
+   "status": "flagged",
+   "text": "(a) Use the integral test to investigate the convergence of the series \n \n  n \n  [ 4 marks] \n n2 1 \n n1 \n ( b) Let anbe a series of real numbers. Define what is meant by the series anas to be\n (i) Absolutely convergent \n (ii) Conditionally convergent [ 4 marks] \n \n ( c) Determine whether each of the following series converges or diverges. Justify your\n answer in each case \n \n  n \n (i)  log n1  \n n1 \n  Cos n \n (ii)  \n n2 \n n1 \n   1 n \n (iii)  \n n \n n1 \n  n! \n (iv)  [ 12 marks] \n n2 \n n1",
+   "solution": ""
+  }
+ ],
+ "repaired": [
+  {
+   "id": 23,
+   "before": "Let $A$ be a countable set and let $B \\subseteq A$.\n\n(i) Prove directly from the definition that $B$ is countable.\n\n(ii) Let $\\{A_n\\}_{n=1}^{\\infty}$ be a countable family of countable sets. Prove that $\\displaystyle\\bigcup_{n=1}^{\\infty} A_n$ is countable.\n\n(iii) Use part (ii) to show that the set of all integers $\\mathbb{Z}$ is countable.",
+   "after": "Let $A$ be a countable set and let $B \\subseteq A$. (i) Prove directly from the definition that $B$ is countable. (ii) Let $\\{A_n\\}_{n=1}^{\\infty}$ be a countable family of countable sets. Prove that $\\displaystyle\\bigcup_{n=1}^{\\infty} A_n$ is countable. (iii) Use part (ii) to show that the set of all integers $\\mathbb{Z}$ is countable."
+  },
+  {
+   "id": 24,
+   "before": "Recall that a set $S$ is uncountable if it is neither finite nor countably infinite.\n\n(i) State precisely what it means for a set to be countably infinite.\n\n(ii) Prove by Cantor's diagonal argument that the open interval $(0,1)$ is uncountable.\n\n(iii) Deduce that $\\mathbb{R}$ is uncountable.",
+   "after": "Recall that a set $S$ is uncountable if it is neither finite nor countably infinite. (i) State precisely what it means for a set to be countably infinite. (ii) Prove by Cantor's diagonal argument that the open interval $(0,1)$ is uncountable. (iii) Deduce that $\\mathbb{R}$ is uncountable."
+  },
+  {
+   "id": 25,
+   "before": "Let $\\mathbb{Q}$ denote the set of rational numbers and $\\mathbb{I} = \\mathbb{R} \\setminus \\mathbb{Q}$ the set of irrational numbers.\n\n(i) Prove that $\\mathbb{Q}$ is countably infinite.\n\n(ii) Using the fact that $\\mathbb{R}$ is uncountable and $\\mathbb{Q}$ is countable, prove that $\\mathbb{I}$ is uncountable.\n\n(iii) Let $S \\subseteq \\mathbb{R}$ be a set such that $\\mathbb{Q} \\subseteq S$. Prove that if $S$ is countable, then $S \\setminus \\mathbb{Q}$ is countable. Deduce that no countable set can contain all irrational numbers.",
+   "after": "Let $\\mathbb{Q}$ denote the set of rational numbers and $\\mathbb{I} = \\mathbb{R} \\setminus \\mathbb{Q}$ the set of irrational numbers. (i) Prove that $\\mathbb{Q}$ is countably infinite. (ii) Using the fact that $\\mathbb{R}$ is uncountable and $\\mathbb{Q}$ is countable, prove that $\\mathbb{I}$ is uncountable. (iii) Let $S \\subseteq \\mathbb{R}$ be a set such that $\\mathbb{Q} \\subseteq S$. Prove that if $S$ is countable, then $S \\setminus \\mathbb{Q}$ is countable. Deduce that no countable set can contain all irrational numbers."
+  },
+  {
+   "id": 26,
+   "before": "Let $a, b, c \\in \\mathbb{R}$.\n\n(i) Using only the field axioms and the order axioms of $\\mathbb{R}$, prove that $a \\cdot 0 = 0$ for every $a \\in \\mathbb{R}$.\n\n(ii) Prove that if $a < b$ and $c > 0$, then $ac < bc$.\n\n(iii) Prove that if $a < b$ and $c < 0$, then $ac > bc$.",
+   "after": "Let $a, b, c \\in \\mathbb{R}$. (i) Using only the field axioms and the order axioms of $\\mathbb{R}$, prove that $a \\cdot 0 = 0$ for every $a \\in \\mathbb{R}$. (ii) Prove that if $a < b$ and $c > 0$, then $ac < bc$. (iii) Prove that if $a < b$ and $c < 0$, then $ac > bc$."
+  },
+  {
+   "id": 27,
+   "before": "Let $A = \\left\\{ \\dfrac{2n}{n+1} : n \\in \\mathbb{N} \\right\\}$.\n\n(i) Show that $A$ is bounded above and bounded below.\n\n(ii) Determine $\\sup A$ and $\\inf A$, justifying your answers rigorously.\n\n(iii) State the Completeness Axiom and explain how it guarantees the existence of $\\sup A$.",
+   "after": "Let $A = \\left\\{ \\dfrac{2n}{n+1} : n \\in \\mathbb{N} \\right\\}$. (i) Show that $A$ is bounded above and bounded below. (ii) Determine $\\sup A$ and $\\inf A$, justifying your answers rigorously. (iii) State the Completeness Axiom and explain how it guarantees the existence of $\\sup A$."
+  },
+  {
+   "id": 28,
+   "before": "(i) State the Density of Rational Numbers theorem.\n\n(ii) Prove that between any two distinct real numbers $a < b$, there exists an irrational number.\n\n(iii) Prove that $\\sqrt{2}$ is irrational.",
+   "after": "(i) State the Density of Rational Numbers theorem. (ii) Prove that between any two distinct real numbers $a < b$, there exists an irrational number. (iii) Prove that $\\sqrt{2}$ is irrational."
+  },
+  {
+   "id": 29,
+   "before": "Consider the infinite series\n\n$$\n\\sum_{n=1}^{\\infty} \\frac{3n^2+2n+1}{5n^2+7}.\n$$\n\n(i) State the $n$th term $a_n$ of the series.\n\n(ii) Use the $n$th Term Divergence Test to determine whether the series converges or diverges. Justify your conclusion carefully.",
+   "after": "Consider the infinite series $$ \\sum_{n=1}^{\\infty} \\frac{3n^2+2n+1}{5n^2+7}. $$ (i) State the $n$th term $a_n$ of the series. (ii) Use the $n$th Term Divergence Test to determine whether the series converges or diverges. Justify your conclusion carefully."
+  },
+  {
+   "id": 30,
+   "before": "Consider the series\n\n$$\n\\sum_{n=1}^{\\infty} \\frac{n!}{3^n}.\n$$\n\n(i) Write down the general term $a_n$.\n\n(ii) Apply the Ratio Test to determine whether the series converges absolutely, converges conditionally, or diverges. Show all steps of the limit computation.",
+   "after": "Consider the series $$ \\sum_{n=1}^{\\infty} \\frac{n!}{3^n}. $$ (i) Write down the general term $a_n$. (ii) Apply the Ratio Test to determine whether the series converges absolutely, converges conditionally, or diverges. Show all steps of the limit computation."
+  },
+  {
+   "id": 31,
+   "before": "Consider the alternating series\n\n$$\n\\sum_{n=1}^{\\infty} \\frac{(-1)^{n+1}}{\\sqrt{n}} = 1-\\frac{1}{\\sqrt{2}}+\\frac{1}{\\sqrt{3}}-\\frac{1}{\\sqrt{4}}+\\cdots.\n$$\n\n(i) Determine whether the series converges using the Alternating Series Test.\n\n(ii) Determine whether the series converges absolutely by examining $\\displaystyle\\sum_{n=1}^{\\infty}\\left|\\frac{(-1)^{n+1}}{\\sqrt{n}}\\right|$.\n\n(iii) State whether the series is absolutely convergent, conditionally convergent, or divergent.",
+   "after": "Consider the alternating series $$ \\sum_{n=1}^{\\infty} \\frac{(-1)^{n+1}}{\\sqrt{n}} = 1-\\frac{1}{\\sqrt{2}}+\\frac{1}{\\sqrt{3}}-\\frac{1}{\\sqrt{4}}+\\cdots. $$ (i) Determine whether the series converges using the Alternating Series Test. (ii) Determine whether the series converges absolutely by examining $\\displaystyle\\sum_{n=1}^{\\infty}\\left|\\frac{(-1)^{n+1}}{\\sqrt{n}}\\right|$. (iii) State whether the series is absolutely convergent, conditionally convergent, or divergent."
+  },
+  {
+   "id": 32,
+   "before": "Let $f:\\mathbb{R}\\to\\mathbb{R}$ be defined by\n\n$$\nf(x)= \\begin{cases}\nx^2\\sin\\left(\\frac{1}{x}\\right), & x\\neq 0,\\\\ 0, & x=0.\n\\end{cases}\n$$\n\n(i) Use the sequential criterion for limits to prove that $\\lim\\limits_{x\\to 0} f(x)=0$.\n(ii) Determine whether $f$ is continuous at $x=0$. Justify your answer using the definition of pointwise continuity.",
+   "after": "Let $f:\\mathbb{R}\\to\\mathbb{R}$ be defined by $$ f(x)= \\begin{cases} x^2\\sin\\left(\\frac{1}{x}\\right), & x\\neq 0,\\\\ 0, & x=0. \\end{cases} $$ (i) Use the sequential criterion for limits to prove that $\\lim\\limits_{x\\to 0} f(x)=0$. (ii) Determine whether $f$ is continuous at $x=0$. Justify your answer using the definition of pointwise continuity."
+  },
+  {
+   "id": 33,
+   "before": "Define $g:\\mathbb{R}\\to\\mathbb{R}$ by\n\n$$\ng(x)= \\begin{cases}\nx, & x\\in\\mathbb{Q},\\\\ 0, & x\\notin\\mathbb{Q}.\n\\end{cases}\n$$\n\n(i) Prove that $g$ is continuous at $x=0$.\n(ii) Prove that $g$ is discontinuous at every $x_0\\neq 0$.\n(iii) Determine whether $g$ is continuous on $\\mathbb{R}$. Justify your answer.",
+   "after": "Define $g:\\mathbb{R}\\to\\mathbb{R}$ by $$ g(x)= \\begin{cases} x, & x\\in\\mathbb{Q},\\\\ 0, & x\\notin\\mathbb{Q}. \\end{cases} $$ (i) Prove that $g$ is continuous at $x=0$. (ii) Prove that $g$ is discontinuous at every $x_0\\neq 0$. (iii) Determine whether $g$ is continuous on $\\mathbb{R}$. Justify your answer."
+  },
+  {
+   "id": 34,
+   "before": "(i) Prove directly from the definition that$f(x)=\\frac{1}{x}$ is not uniformly continuous on $(0,1)$.\n\n(ii) Prove that $h(x)=\\sqrt{x}$ is uniformly continuous on $[0,\\infty)$.\n\n(iii) State whether the function $k(x)=x^2$ is uniformly continuous on $\\mathbb{R}$. Justify your answer rigorously.",
+   "after": "(i) Prove directly from the definition that $f(x)=\\frac{1}{x}$ is not uniformly continuous on $(0,1)$. (ii) Prove that $h(x)=\\sqrt{x}$ is uniformly continuous on $[0,\\infty)$. (iii) State whether the function $k(x)=x^2$ is uniformly continuous on $\\mathbb{R}$. Justify your answer rigorously."
+  },
+  {
+   "id": 55,
+   "before": "Test whether each of the following series converges or diverges. Justify your answer in each case.\n\n(i) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{3n^2+2n+1}{5n^2+7}$\n\n(ii) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{2^n+3^n}{6^n}$\n\n(iii) $\\displaystyle\\sum_{n=1}^{\\infty} \\left(\\frac{4n+1}{4n+3}\\right)^{n}$",
+   "after": "Test whether each of the following series converges or diverges. Justify your answer in each case. (i) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{3n^2+2n+1}{5n^2+7}$ (ii) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{2^n+3^n}{6^n}$ (iii) $\\displaystyle\\sum_{n=1}^{\\infty} \\left(\\frac{4n+1}{4n+3}\\right)^{n}$"
+  },
+  {
+   "id": 56,
+   "before": "Determine whether each of the following series converges or diverges. Justify your answer in each case.\n\n(i) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{1}{n^{3}+2n}$\n\n(ii) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{n!}{3^{n}}$\n\n(iii) $\\displaystyle\\sum_{n=2}^{\\infty} \\frac{1}{n(\\ln n)^{2}}$",
+   "after": "Determine whether each of the following series converges or diverges. Justify your answer in each case. (i) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{1}{n^{3}+2n}$ (ii) $\\displaystyle\\sum_{n=1}^{\\infty} \\frac{n!}{3^{n}}$ (iii) $\\displaystyle\\sum_{n=2}^{\\infty} \\frac{1}{n(\\ln n)^{2}}$"
+  },
+  {
+   "id": 57,
+   "before": "Determine whether the following series is absolutely convergent, conditionally convergent, or divergent. Justify your answer.\n\n$$\n\\sum_{n=2}^{\\infty} \\frac{(-1)^{n}}{\\sqrt{n}+(-1)^{n}}\n$$",
+   "after": "Determine whether the following series is absolutely convergent, conditionally convergent, or divergent. Justify your answer. $$ \\sum_{n=2}^{\\infty} \\frac{(-1)^{n}}{\\sqrt{n}+(-1)^{n}} $$"
+  },
+  {
+   "id": 58,
+   "before": "Test whether each of the following series converges or diverges. Justify your answer in each case.\n\n(i) \n\n$$\n\\sum_{n=1}^{\\infty} \\frac{n^3}{4^n}\n$$\n\n(ii) \n\n$$\n\\sum_{n=1}^{\\infty} \\frac{3n+2}{n^2+5n}\n$$\n\n(iii) \n\n$$\n\\sum_{n=1}^{\\infty} \\frac{(3n)!}{(n!)^3}\n$$\n\n(iv) \n\n$$\n\\sum_{n=2}^{\\infty} \\frac{1}{n(\\ln n)^2}\n$$",
+   "after": "Test whether each of the following series converges or diverges. Justify your answer in each case. (i) $$ \\sum_{n=1}^{\\infty} \\frac{n^3}{4^n} $$ (ii) $$ \\sum_{n=1}^{\\infty} \\frac{3n+2}{n^2+5n} $$ (iii) $$ \\sum_{n=1}^{\\infty} \\frac{(3n)!}{(n!)^3} $$ (iv) $$ \\sum_{n=2}^{\\infty} \\frac{1}{n(\\ln n)^2} $$"
+  },
+  {
+   "id": 59,
+   "before": "Determine whether the following series is conditionally convergent, absolutely convergent, or divergent:\n\n$$\n\\sum_{n=2}^{\\infty} \\frac{(-1)^n}{n\\ln n}\n$$",
+   "after": "Determine whether the following series is conditionally convergent, absolutely convergent, or divergent: $$ \\sum_{n=2}^{\\infty} \\frac{(-1)^n}{n\\ln n} $$"
+  },
+  {
+   "id": 60,
+   "before": "Let $A = (1, 5) \\cup \\{7\\}$.\n\n(i) Find the interior $A^0$ of $A$.\n\n(ii) Determine whether $A$ is an open subset of $\\mathbb{R}$. Justify your answer.",
+   "after": "Let $A = (1, 5) \\cup \\{7\\}$. (i) Find the interior $A^0$ of $A$. (ii) Determine whether $A$ is an open subset of $\\mathbb{R}$. Justify your answer."
+  },
+  {
+   "id": 61,
+   "before": "Let $A = \\left\\{\\dfrac{1}{n} : n \\in \\mathbb{N}\\right\\} \\cup \\{0\\}$.\n\n(i) Find the derived set $A'$ (the set of all limit points of $A$).\n\n(ii) State whether $A$ is a closed subset of $\\mathbb{R}$. Justify your answer.",
+   "after": "Let $A = \\left\\{\\dfrac{1}{n} : n \\in \\mathbb{N}\\right\\} \\cup \\{0\\}$. (i) Find the derived set $A'$ (the set of all limit points of $A$). (ii) State whether $A$ is a closed subset of $\\mathbb{R}$. Justify your answer."
+  },
+  {
+   "id": 62,
+   "before": "Let $A = [0, 2) \\cup (3, 5]$.\n\n(i) Find the closure $\\overline{A}$ of $A$.\n\n(ii) Determine whether $A$ is a closed subset of $\\mathbb{R}$. Justify your answer.",
+   "after": "Let $A = [0, 2) \\cup (3, 5]$. (i) Find the closure $\\overline{A}$ of $A$. (ii) Determine whether $A$ is a closed subset of $\\mathbb{R}$. Justify your answer."
+  },
+  {
+   "id": 63,
+   "before": "Prove that the real number\n\n$$\nr = 5 - 3\\sqrt{2}\n$$\n\nis irrational.",
+   "after": "Prove that the real number $$ r = 5 - 3\\sqrt{2} $$ is irrational."
+  },
+  {
+   "id": 64,
+   "before": "Consider the set\n\n$$\nA = \\{q \\in \\mathbb{Q} : q^2 < 3\\}.\n$$\n\nDoes $A$ satisfy the completeness axiom as a subset of $\\mathbb{Q}$? Explain briefly.",
+   "after": "Consider the set $$ A = \\{q \\in \\mathbb{Q} : q^2 < 3\\}. $$ Does $A$ satisfy the completeness axiom as a subset of $\\mathbb{Q}$? Explain briefly."
+  },
+  {
+   "id": 65,
+   "before": "Let $x, y \\in \\mathbb{R}$ with $x < y$. Show that there exists a rational number $q$ such that\n\n$$\nx < q < y.\n$$",
+   "after": "Let $x, y \\in \\mathbb{R}$ with $x < y$. Show that there exists a rational number $q$ such that $$ x < q < y. $$"
+  },
+  {
+   "id": 540,
+   "before": "Find the limit superior and limit inferior of the sequence $\\{x_n\\}$ defined by\n\n$$\nx_n = (-1)^n\\left(2 + \\frac{3}{n}\\right).\n$$\n\nJustify your answer.",
+   "after": "Find the limit superior and limit inferior of the sequence $\\{x_n\\}$ defined by $$ x_n = (-1)^n\\left(2 + \\frac{3}{n}\\right). $$ Justify your answer."
+  },
+  {
+   "id": 541,
+   "before": "Prove by first principles that\n\n$$\n\\lim_{n \\to \\infty} \\frac{2n^2 + 3n + 1}{5n^2 + 2n + 4} = \\frac{2}{5}.\n$$",
+   "after": "Prove by first principles that $$ \\lim_{n \\to \\infty} \\frac{2n^2 + 3n + 1}{5n^2 + 2n + 4} = \\frac{2}{5}. $$"
+  },
+  {
+   "id": 542,
+   "before": "(a) Prove that the limit of a sequence in $\\mathbb{R}$, if it exists, is unique. Hence, using the definition of convergence, show that $\\displaystyle\\lim_{n\\to\\infty}\\frac{4n+3}{2n+1}=2$. **[10 marks]**\n\n(b) Prove that every convergent sequence of real numbers is a Cauchy sequence. **[3 marks]**\n\n(c) (i) Show that every convergent sequence in $\\mathbb{R}$ is bounded. **[4 marks]**\n\n(ii) Give an explicit counterexample to show that the converse of\n\n(c) (i) is false, i.e. a bounded sequence that does not converge. Justify your answer. **[3 marks]**",
+   "after": "(a) Prove that the limit of a sequence in $\\mathbb{R}$, if it exists, is unique. Hence, using the definition of convergence, show that $\\displaystyle\\lim_{n\\to\\infty}\\frac{4n+3}{2n+1}=2$. **[10 marks]** (b) Prove that every convergent sequence of real numbers is a Cauchy sequence. **[3 marks]** (c) (i) Show that every convergent sequence in $\\mathbb{R}$ is bounded. **[4 marks]** (ii) Give an explicit counterexample to show that the converse of (c) (i) is false, i.e. a bounded sequence that does not converge. Justify your answer. **[3 marks]**"
+  }
+ ]
+}

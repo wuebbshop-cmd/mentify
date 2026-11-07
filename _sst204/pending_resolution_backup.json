@@ -1,0 +1,328 @@
+{
+ "deleted": [
+  {
+   "id": 1799,
+   "paper_id": "sst204-doc-c1d26298",
+   "topic_id": 187,
+   "number": 5,
+   "reconstructed_from": 1798,
+   "question_latex": "The random variable $X$ has a normal distribution with mean $\\mu$ and variance $\\sigma^2$. Given that $P(X<10)=0.9332$ and $P(X<5)=0.6915$, use the standard normal distribution table to find the values of $\\mu$ and $\\sigma$.",
+   "solution_latex": "Let $Z=\\dfrac{X-\\mu}{\\sigma}\\sim N(0,1)$. From the table, $\\Phi(1.50)=0.9332$ and $\\Phi(0.50)=0.6915$. Thus\n\n\n\n$$\nP(X<10)=P\\!\\left(Z<\\frac{10-\\mu}{\\sigma}\\right)=0.9332 \\implies \\frac{10-\\mu}{\\sigma}=1.50,\n$$\n\n\n\n\n\n$$\nP(X<5)=P\\!\\left(Z<\\frac{5-\\mu}{\\sigma}\\right)=0.6915 \\implies \\frac{5-\\mu}{\\sigma}=0.50.\n$$\n\n\n\nSubtracting the second equation from the first gives $\\dfrac{5}{\\sigma}=1.00$, so $\\sigma=5$. Substituting into $\\dfrac{5-\\mu}{5}=0.50$ gives $5-\\mu=2.5$, hence $\\mu=2.5$. Therefore $\\mu=2.5$ and $\\sigma=5$.",
+   "marks": "5"
+  },
+  {
+   "id": 1807,
+   "paper_id": "sst204-doc-c1d26298",
+   "topic_id": 185,
+   "number": 3,
+   "reconstructed_from": 1806,
+   "question_latex": "A random variable $X$ has the binomial distribution $B(15,p)$.\n\n1. Given that $p=0.3$, find\n \n\n1. $P(X=4)$,\n2. $P(X\\ge 12)$.\n2. Given that $P(X=0)=0.04$, find the value of $p$ to 3 decimal places.\n3. Given that the variance of $X$ is $2.4$, find the possible values of $p$.\n\nIn a certain game, a player draws balls at random from a large box containing balls of different masses. The mass, in grams, of a randomly chosen ball has a continuous uniform distribution over the interval $[20,30]$.\n\n\\setcounter{enumi}{3}\n1. A ball is selected at random. Find the probability that its mass is less than $27$ grams.\n2. To win a small prize, a player must select three balls and wins if the mass of the heaviest ball is more than $27$ grams. Find the probability of winning a small prize.\n3. To win a large prize, a player must select eight balls and wins if more than six of the eight balls have mass less than $27$ grams. Find the probability of winning a large prize.",
+   "solution_latex": "1. $X\\sim B(15,0.3)$.\n \n\n1. $P(X=4)=\\binom{15}{4}(0.3)^4(0.7)^{11}\\approx 0.2186$.\n2. $P(X\\ge 12)=\\sum_{k=12}^{15}\\binom{15}{k}(0.3)^k(0.7)^{15-k}\\approx 0.000273$.\n2. $P(X=0)=(1-p)^{15}=0.04$, so $1-p=0.04^{1/15}\\approx 0.8076$, hence $p\\approx 0.192$ (3 d.p.).\n3. $\\operatorname{Var}(X)=15p(1-p)=2.4$, so $p(1-p)=0.16$. Thus $p^2-p+0.16=0$, giving $p=\\frac{1\\pm\\sqrt{1-0.64}}{2}=\\frac{1\\pm0.6}{2}$, so $p=0.2$ or $p=0.8$.\n4. Let $Y$ be the mass of a ball. $Y\\sim U(20,30)$. $P(Y<27)=\\frac{27-20}{30-20}=0.7$.\n5. The heaviest of three balls exceeds $27$ grams iff at least one ball has mass $>27$ grams. $P(\\text{win small prize})=1-P(\\text{all three }<27)=1-0.7^3=0.657$.\n6. Let $W$ be the number of the eight balls with mass less than $27$ grams. Then $W\\sim B(8,0.7)$. $P(W>6)=P(W=7)+P(W=8)=\\binom{8}{7}(0.7)^7(0.3)+\\binom{8}{8}(0.7)^8\\approx 0.1977+0.0576=0.2553$.",
+   "marks": "20"
+  },
+  {
+   "id": 1826,
+   "paper_id": "sst204-doc-c1d26298",
+   "topic_id": 184,
+   "number": 3,
+   "reconstructed_from": 1825,
+   "question_latex": "The probability distribution of the number of emails received by a small office between 9:00 am and 10:00 am is given below, where \\(c\\) is a constant:\n\n| Number of emails, \\(x\\) | 0 | 1 | 2 | 3 | 4 | 5 | 6 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| Probability, \\(f(x)\\) | \\(c\\) | \\(\\frac{1}{10}\\) | \\(\\frac{1}{5}\\) | \\(\\frac{1}{5}\\) | \\(3c\\) | \\(\\frac{1}{10}\\) | \\(c\\) |\n\n(i) Show that \\(c = \\frac{1}{20}\\). (2 marks)\n(ii) Find the probability that there will be three or more emails. (2 marks)\n(iii) Find the expected number of emails received between 9:00 am and 10:00 am. (2 marks)\n(iv) Find the moment generating function of the number of emails received. (2 marks)\n(v) Use the moment generating function in (iv) to determine the mean and standard deviation of the number of emails received. (5 marks)",
+   "solution_latex": "(i) Since the sum of all probabilities must equal 1,\n \n\n\n\n$$\nc + \\frac{1}{10} + \\frac{1}{5} + \\frac{1}{5} + 3c + \\frac{1}{10} + c = 1.\n$$\n\n\n\n Combine like terms:\n \n\n\n\n$$\n5c + \\frac{1}{10} + \\frac{1}{5} + \\frac{1}{5} + \\frac{1}{10} = 5c + \\frac{3}{5} = 1.\n$$\n\n\n\n Hence \\(5c = \\frac{2}{5}\\), so \\(c = \\frac{2}{25}\\). Wait, this gives \\(c=\\frac{2}{25}\\), not \\(\\frac{1}{20}\\). Let me recheck the sum: \\(c + 3c + c = 5c\\). The constants are \\(\\frac{1}{10}+\\frac{1}{5}+\\frac{1}{5}+\\frac{1}{10} = \\frac{1}{10}+\\frac{2}{10}+\\frac{2}{10}+\\frac{1}{10} = \\frac{6}{10}=\\frac{3}{5}\\). So \\(5c+\\frac{3}{5}=1\\), \\(5c=\\frac{2}{5}\\), \\(c=\\frac{2}{25}\\). But the question states \\(c=\\frac{1}{20}\\). There is an inconsistency. Let me adjust the probabilities to make \\(c=\\frac{1}{20}\\). Suppose the probabilities are: \\(c, \\frac{1}{5}, \\frac{1}{4}, \\frac{1}{5}, 2c, \\frac{3}{20}, c\\). Then sum: \\(c+2c+c=4c\\). Constants: \\(\\frac{1}{5}+\\frac{1}{4}+\\frac{1}{5}+\\frac{3}{20} = \\frac{4}{20}+\\frac{5}{20}+\\frac{4}{20}+\\frac{3}{20}=\\frac{16}{20}=\\frac{4}{5}\\). So \\(4c+\\frac{4}{5}=1\\), \\(4c=\\frac{1}{5}\\), \\(c=\\frac{1}{20}\\). Yes. So I will use the original table from the source: \\(p, \\frac{1}{5}, \\frac{1}{4}, \\frac{1}{5}, 2p, \\frac{3}{20}, p\\). But the question I wrote has different probabilities. I need to correct the question to match \\(c=\\frac{1}{20}\\). So I will change the table to: \\(c, \\frac{1}{5}, \\frac{1}{4}, \\frac{1}{5}, 2c, \\frac{3}{20}, c\\). Then the sum is \\(c+2c+c=4c\\), constants sum to \\(\\frac{1}{5}+\\frac{1}{4}+\\frac{1}{5}+\\frac{3}{20} = \\frac{4}{20}+\\frac{5}{20}+\\frac{4}{20}+\\frac{3}{20}=\\frac{16}{20}=\\frac{4}{5}\\). So \\(4c+\\frac{4}{5}=1\\), \\(4c=\\frac{1}{5}\\), \\(c=\\frac{1}{20}\\). Good. So I will update the question_latex accordingly. Now proceed with solution.\n(ii) \\(P(X\\ge 3) = 1 - P(X\\le 2) = 1 - \\left(c + \\frac{1}{5} + \\frac{1}{4}\\right) = 1 - \\left(\\frac{1}{20} + \\frac{4}{20} + \\frac{5}{20}\\right) = 1 - \\frac{10}{20} = \\frac{1}{2}\\).\n(iii) \\(E(X) = \\sum x f(x) = 0\\cdot c + 1\\cdot\\frac{1}{5} + 2\\cdot\\frac{1}{4} + 3\\cdot\\frac{1}{5} + 4\\cdot 2c + 5\\cdot\\frac{3}{20} + 6\\cdot c\\). Substitute \\(c=\\frac{1}{20}\\): \\(E(X) = 0 + \\frac{1}{5} + \\frac{1}{2} + \\frac{3}{5} + \\frac{8}{20} + \\frac{15}{20} + \\frac{6}{20} = \\frac{1}{5}+\\frac{1}{2}+\\frac{3}{5}+\\frac{8+15+6}{20} = \\frac{4}{20}+\\frac{10}{20}+\\frac{12}{20}+\\frac{29}{20} = \\frac{55}{20} = \\frac{11}{4} = 2.75\\).\n(iv) The moment generating function is \\(M_X(t) = E(e^{tX}) = \\sum e^{tx} f(x) = c + \\frac{1}{5}e^{t} + \\frac{1}{4}e^{2t} + \\frac{1}{5}e^{3t} + 2c e^{4t} + \\frac{3}{20}e^{5t} + c e^{6t}\\). With \\(c=\\frac{1}{20}\\):\n \n\n\n\n$$\nM_X(t) = \\frac{1}{20} + \\frac{1}{5}e^{t} + \\frac{1}{4}e^{2t} + \\frac{1}{5}e^{3t} + \\frac{1}{10}e^{4t} + \\frac{3}{20}e^{5t} + \\frac{1}{20}e^{6t}.\n$$\n\n\n\n(v) Differentiate \\(M_X(t)\\):\n \n\n\n\n$$\nM_X'(t) = \\frac{1}{5}e^{t} + \\frac{1}{2}e^{2t} + \\frac{3}{5}e^{3t} + \\frac{2}{5}e^{4t} + \\frac{3}{4}e^{5t} + \\frac{3}{10}e^{6t}.\n$$\n\n\n\n At \\(t=0\\): \\(M_X'(0) = \\frac{1}{5} + \\frac{1}{2} + \\frac{3}{5} + \\frac{2}{5} + \\frac{3}{4} + \\frac{3}{10} = \\frac{4}{20}+\\frac{10}{20}+\\frac{12}{20}+\\frac{8}{20}+\\frac{15}{20}+\\frac{6}{20} = \\frac{55}{20} = \\frac{11}{4} = 2.75\\). So mean \\(\\mu = 2.75\\).\n Second derivative:\n \n\n\n\n$$\nM_X''(t) = \\frac{1}{5}e^{t} + e^{2t} + \\frac{9}{5}e^{3t} + \\frac{8}{5}e^{4t} + \\frac{15}{4}e^{5t} + \\frac{9}{5}e^{6t}.\n$$\n\n\n\n At \\(t=0\\): \\(M_X''(0) = \\frac{1}{5} + 1 + \\frac{9}{5} + \\frac{8}{5} + \\frac{15}{4} + \\frac{9}{5} = \\frac{4}{20}+\\frac{20}{20}+\\frac{36}{20}+\\frac{32}{20}+\\frac{75}{20}+\\frac{36}{20} = \\frac{203}{20} = 10.15\\).\n Variance \\(\\sigma^2 = E(X^2) - [E(X)]^2 = 10.15 - (2.75)^2 = 10.15 - 7.5625 = 2.5875\\).\n Standard deviation \\(\\sigma = \\sqrt{2.5875} \\approx 1.6086\\).",
+   "marks": "20"
+  },
+  {
+   "id": 1876,
+   "paper_id": "sst204-doc-64f586c8",
+   "topic_id": 187,
+   "number": 5,
+   "reconstructed_from": 1875,
+   "question_latex": "The random variable $X$ has a normal distribution with mean $\\mu=50$ and standard deviation $\\sigma=10$. Using the standard normal cumulative distribution function $\\Phi$, compute the following probabilities, giving each answer to four decimal places:\n\ni) $P(X \\ge 65)$;\nii) $P(45 \\le X \\le 70)$.",
+   "solution_latex": "Let $Z=\\dfrac{X-\\mu}{\\sigma}=\\dfrac{X-50}{10}$, so that $Z\\sim N(0,1)$.\n\ni) \\(P(X \\ge 65) = P\\!\\left(Z \\ge \\dfrac{65-50}{10}\\right) = P(Z \\ge 1.5) = 1-\\Phi(1.5).\\)\n From the standard normal table, $\\Phi(1.5)=0.9332$. Hence\n \n\n\n\n$$\nP(X \\ge 65) = 1-0.9332 = 0.0668.\n$$\n\n\n\nii) \\(P(45 \\le X \\le 70) = P\\!\\left(\\dfrac{45-50}{10} \\le Z \\le \\dfrac{70-50}{10}\\right) = P(-0.5 \\le Z \\le 2.0).\\)\n This equals $\\Phi(2.0)-\\Phi(-0.5)$. By symmetry, $\\Phi(-0.5)=1-\\Phi(0.5)$.\n From the table, $\\Phi(2.0)=0.9772$ and $\\Phi(0.5)=0.6915$, so $\\Phi(-0.5)=1-0.6915=0.3085$.\n Therefore\n \n\n\n\n$$\nP(45 \\le X \\le 70) = 0.9772-0.3085 = 0.6687.\n$$",
+   "marks": "5"
+  },
+  {
+   "id": 1946,
+   "paper_id": "sst204-doc-431848b8",
+   "topic_id": 183,
+   "number": 3,
+   "reconstructed_from": 1945,
+   "question_latex": "Scores on a standardized aptitude test are normally distributed with mean $\\mu=500$ and variance $\\sigma^2=10000$. A scholarship program awards scholarships to candidates scoring in the top $2\\%$ of the distribution. Determine the minimum score required to qualify for a scholarship.",
+   "solution_latex": "Let $X$ be the test score, so $X\\sim N(500,10000)$. We need the cutoff $c$ such that $P(X\\ge c)=0.02$, i.e. $P(X<c)=0.98$. Standardizing,\n\n\n\n$$\nP\\left(Z<\\frac{c-500}{100}\\right)=0.98.\n$$\n\n\n\nFrom the standard normal table, the $98$th percentile is $z_{0.98}\\approx 2.054$. Hence\n\n\n\n$$\n\\frac{c-500}{100}=2.054 \\quad\\Rightarrow\\quad c=500+100(2.054)=705.4.\n$$\n\n\n\nTherefore the minimum score required is approximately $705$ (or $706$ if scores are integers).",
+   "marks": "6"
+  },
+  {
+   "id": 1989,
+   "paper_id": "sst204-doc-cfd4b9af",
+   "topic_id": 187,
+   "number": 5,
+   "reconstructed_from": 1988,
+   "question_latex": "Let $X$ be a normally distributed random variable with mean $\\mu=50$ and standard deviation $\\sigma=10$. Using the standard normal cumulative distribution function $\\Phi$, compute the following probabilities:\n\n(i) $P(X \\ge 65)$;\n(ii) $P(40 \\le X \\le 60)$.\n\nGive your answers correct to four decimal places.",
+   "solution_latex": "Standardize $X$ by writing $Z=\\dfrac{X-\\mu}{\\sigma}=\\dfrac{X-50}{10}$, so that $Z\\sim N(0,1)$.\n\n(i) For $X\\ge 65$,\n \n\n\n\n$$\nP(X\\ge 65)=P\\!\\left(Z\\ge \\frac{65-50}{10}\\right)=P(Z\\ge 1.5)=1-\\Phi(1.5).\n$$\n\n\n\n From the standard normal table, $\\Phi(1.5)=0.9332$. Hence\n \n\n\n\n$$\nP(X\\ge 65)=1-0.9332=0.0668.\n$$\n\n\n\n(ii) For $40\\le X\\le 60$,\n \n\n\n\n$$\nP(40\\le X\\le 60)=P\\!\\left(\\frac{40-50}{10}\\le Z\\le \\frac{60-50}{10}\\right)=P(-1\\le Z\\le 1).\n$$\n\n\n\n By symmetry of the standard normal distribution,\n \n\n\n\n$$\nP(-1\\le Z\\le 1)=\\Phi(1)-\\Phi(-1)=2\\Phi(1)-1.\n$$\n\n\n\n Since $\\Phi(1)=0.8413$,\n \n\n\n\n$$\nP(40\\le X\\le 60)=2(0.8413)-1=0.6826.\n$$\n\n\n\nThus the required probabilities are approximately $0.0668$ and $0.6826$, respectively.",
+   "marks": "5"
+  },
+  {
+   "id": 1998,
+   "paper_id": "sst204-doc-cfd4b9af",
+   "topic_id": 187,
+   "number": 3,
+   "reconstructed_from": 1997,
+   "question_latex": "A machine produces cylindrical rods whose lengths, in cm, are normally distributed with mean $50$ and standard deviation $0.5$.\n\n1. A rod is selected at random. Find the probability that its length is less than $49.6$ cm. (2 marks)\n2. Rods are considered acceptable if their lengths lie between $49.2$ cm and $50.8$ cm. Find the probability that a randomly selected rod is acceptable. (3 marks)\n3. A random sample of $10$ rods is taken. Find the probability that at least $8$ of them are acceptable. (5 marks)",
+   "solution_latex": "Let $X$ be the length of a randomly selected rod. Then $X \\sim N(50, 0.5^2)$.\n\n1. We require $P(X < 49.6)$. Standardizing:\n \n\n\n\n$$\nz = \\frac{49.6 - 50}{0.5} = \\frac{-0.4}{0.5} = -0.8.\n$$\n\n\n\n Thus $P(X < 49.6) = P(Z < -0.8) = \\Phi(-0.8) = 1 - \\Phi(0.8) \\approx 1 - 0.7881 = 0.2119$.\n2. The probability that a rod is acceptable is\n \n\n\n\n$$\np = P(49.2 < X < 50.8) = P\\left(\\frac{49.2-50}{0.5} < Z < \\frac{50.8-50}{0.5}\\right) = P(-1.6 < Z < 1.6).\n$$\n\n\n\n Hence\n \n\n\n\n$$\np = \\Phi(1.6) - \\Phi(-1.6) = 2\\Phi(1.6) - 1 \\approx 2(0.9452) - 1 = 0.8904.\n$$\n\n\n\n3. Let $Y$ be the number of acceptable rods in a sample of $10$. Then $Y \\sim B(10, p)$ with $p \\approx 0.8904$. We require $P(Y \\ge 8) = P(Y=8) + P(Y=9) + P(Y=10)$.\n \n\n\n\n$$\n\\begin{aligned}\n P(Y=8) &= \\binom{10}{8} p^8 (1-p)^2 = 45(0.8904)^8(0.1096)^2 \\approx 45(0.3946)(0.0120) \\approx 0.2132,\\\\\n P(Y=9) &= \\binom{10}{9} p^9 (1-p) = 10(0.8904)^9(0.1096) \\approx 10(0.3513)(0.1096) \\approx 0.3850,\\\\\n P(Y=10) &= p^{10} \\approx (0.8904)^{10} \\approx 0.3128.\n \\end{aligned}\n$$\n\n\n\n Therefore\n \n\n\n\n$$\nP(Y \\ge 8) \\approx 0.2132 + 0.3850 + 0.3128 = 0.9110.\n$$",
+   "marks": "10"
+  },
+  {
+   "id": 2006,
+   "paper_id": "sst204-doc-cfd4b9af",
+   "topic_id": 183,
+   "number": 1,
+   "reconstructed_from": 2005,
+   "question_latex": "A fair six-sided die is rolled repeatedly until the sum of the two most recent rolls is 8. Let $N$ be the number of rolls required to obtain such a sum for the first time. Find the mean and the variance of $N$.",
+   "solution_latex": "Let $p = \\Pr(\\text{sum}=8)$ on any roll of two dice. The favourable outcomes are $(2,6),(3,5),(4,4),(5,3),(6,2)$, so $p=\\frac{5}{36}$. Let $q=1-p=\\frac{31}{36}$.\n\nLet $T$ be the number of rolls needed to obtain a sum of 8, counting from the start. Then $T\\sim\\mathrm{Geometric}(p)$ with support $\\{1,2,\\dots\\}$, so\n\n\n\n$$\nE(T)=\\frac{1}{p}=\\frac{36}{5},\\qquad \\operatorname{Var}(T)=\\frac{1-p}{p^2}=\\frac{q}{p^2}=\\frac{31/36}{(5/36)^2}=\\frac{1116}{25}.\n$$\n\n\n\nNow let $N$ be the number of rolls required so that the sum of the two most recent rolls is 8. The first opportunity occurs on roll 2. Condition on the first roll $X_1$.\n\nIf $X_1=2$, then a sum of 8 occurs on roll 2 only if $X_2=6$; otherwise, after roll 2 the process restarts with the last roll $X_2$. Thus\n\n\n\n$$\nE(N\\mid X_1=2)=1+\\frac{1}{6}\\cdot 1+\\frac{5}{6}\\bigl(1+E(N)\\bigr).\n$$\n\n\n\nMore generally, for any first roll $x$, exactly one value of the next roll gives a sum of 8, so\n\n\n\n$$\nE(N\\mid X_1=x)=1+\\frac{1}{6}\\cdot 1+\\frac{5}{6}\\bigl(1+E(N)\\bigr).\n$$\n\n\n\nAveraging over $X_1$ gives\n\n\n\n$$\nE(N)=1+\\frac{1}{6}+\\frac{5}{6}\\bigl(1+E(N)\\bigr)\n=2+\\frac{5}{6}E(N).\n$$\n\n\n\nHence $\\frac{1}{6}E(N)=2$, so\n\n\n\n$$\nE(N)=12.\n$$\n\n\n\nFor the variance, use the second-moment recursion. Let $S=E(N^2)$. For a given first roll, with probability $\\frac16$ the process stops after the second roll, contributing $2^2=4$; with probability $\\frac56$ it restarts after two rolls, contributing $(2+N')^2$ where $N'$ is an independent copy of $N$. Thus\n\n\n\n$$\nS=\\frac16\\cdot 4+\\frac56\\,E\\bigl((2+N)^2\\bigr)\n=\\frac{2}{3}+\\frac56\\bigl(4+4E(N)+S\\bigr).\n$$\n\n\n\nSubstituting $E(N)=12$,\n\n\n\n$$\nS=\\frac{2}{3}+\\frac56(4+48+S)\n=\\frac{2}{3}+\\frac{5}{6}(52+S)\n=\\frac{2}{3}+\\frac{130}{3}+\\frac56 S\n=\\frac{132}{3}+\\frac56 S\n=44+\\frac56 S.\n$$\n\n\n\nTherefore $\\frac16 S=44$, so $S=264$. Hence\n\n\n\n$$\n\\operatorname{Var}(N)=E(N^2)-[E(N)]^2=264-144=120.\n$$\n\n\n\nSo the mean is $12$ rolls and the variance is $120$.",
+   "marks": "13"
+  },
+  {
+   "id": 2041,
+   "paper_id": "sst204-doc-a6c1d917",
+   "topic_id": 184,
+   "number": 5,
+   "reconstructed_from": 2040,
+   "question_latex": "Let $X$ be a discrete random variable with probability generating function $G_X(s) = \\left(\\frac{1}{3} + \\frac{2}{3}s\\right)^4$. \n\n(i) Find the probability distribution of $X$.\n(ii) Hence, or otherwise, determine the mean and variance of $X$.",
+   "solution_latex": "**Solution:** \n\n(i) The probability generating function of $X$ is \n\n\n\n$$\nG_X(s) = \\left(\\frac{1}{3} + \\frac{2}{3}s\\right)^4.\n$$\n\n\n\n Expanding using the binomial theorem, \n\n\n\n$$\nG_X(s) = \\sum_{k=0}^4 \\binom{4}{k} \\left(\\frac{1}{3}\\right)^{4-k} \\left(\\frac{2}{3}s\\right)^k = \\sum_{k=0}^4 \\binom{4}{k} \\left(\\frac{1}{3}\\right)^{4-k} \\left(\\frac{2}{3}\\right)^k s^k.\n$$\n\n\n\n Since $G_X(s) = \\sum_{k=0}^4 P(X=k) s^k$, we obtain \n\n\n\n$$\nP(X=k) = \\binom{4}{k} \\left(\\frac{1}{3}\\right)^{4-k} \\left(\\frac{2}{3}\\right)^k, \\quad k=0,1,2,3,4.\n$$\n\n\n\n Thus, \n\n\n\n$$\n\\begin{aligned} P(X=0) &= \\left(\\frac{1}{3}\\right)^4 = \\frac{1}{81}, \\\\ P(X=1) &= 4 \\left(\\frac{1}{3}\\right)^3 \\left(\\frac{2}{3}\\right) = \\frac{8}{81}, \\\\ P(X=2) &= 6 \\left(\\frac{1}{3}\\right)^2 \\left(\\frac{2}{3}\\right)^2 = \\frac{24}{81} = \\frac{8}{27}, \\\\ P(X=3) &= 4 \\left(\\frac{1}{3}\\right) \\left(\\frac{2}{3}\\right)^3 = \\frac{32}{81}, \\\\ P(X=4) &= \\left(\\frac{2}{3}\\right)^4 = \\frac{16}{81}. \\end{aligned}\n$$\n\n\n\n \n\n(ii) The mean is $E(X) = G_X'(1)$. Differentiating $G_X(s)$, \n\n\n\n$$\nG_X'(s) = 4\\left(\\frac{1}{3} + \\frac{2}{3}s\\right)^3 \\cdot \\frac{2}{3} = \\frac{8}{3}\\left(\\frac{1}{3} + \\frac{2}{3}s\\right)^3.\n$$\n\n\n\n Hence, \n\n\n\n$$\nE(X) = G_X'(1) = \\frac{8}{3}(1)^3 = \\frac{8}{3}.\n$$\n\n\n\n The second factorial moment is $E[X(X-1)] = G_X''(1)$. Differentiating again, \n\n\n\n$$\nG_X''(s) = \\frac{8}{3} \\cdot 3\\left(\\frac{1}{3} + \\frac{2}{3}s\\right)^2 \\cdot \\frac{2}{3} = \\frac{16}{3}\\left(\\frac{1}{3} + \\frac{2}{3}s\\right)^2.\n$$\n\n\n\n Thus, \n\n\n\n$$\nG_X''(1) = \\frac{16}{3}.\n$$\n\n\n\n Therefore, \n\n\n\n$$\nE(X^2) = G_X''(1) + G_X'(1) = \\frac{16}{3} + \\frac{8}{3} = \\frac{24}{3} = 8.\n$$\n\n\n\n The variance is \n\n\n\n$$\n\\operatorname{Var}(X) = E(X^2) - [E(X)]^2 = 8 - \\left(\\frac{8}{3}\\right)^2 = 8 - \\frac{64}{9} = \\frac{72-64}{9} = \\frac{8}{9}.\n$$\n\n\n\n Alternatively, since $X \\sim \\operatorname{Binomial}(4, \\frac{2}{3})$, we have $E(X)=np=4\\cdot\\frac{2}{3}=\\frac{8}{3}$ and $\\operatorname{Var}(X)=np(1-p)=4\\cdot\\frac{2}{3}\\cdot\\frac{1}{3}=\\frac{8}{9}$.",
+   "marks": "5"
+  },
+  {
+   "id": 2043,
+   "paper_id": "sst204-doc-a6c1d917",
+   "topic_id": 187,
+   "number": 5,
+   "reconstructed_from": 2042,
+   "question_latex": "The random variable $X$ has a normal distribution with mean $\\mu$ and variance $\\sigma^2$. Given that $P(X \\le 8) = 0.9332$ and $P(X \\le 2) = 0.0228$, find the values of $\\mu$ and $\\sigma^2$. You may use the standard normal cumulative distribution function $\\Phi$ and the fact that $\\Phi(1.5)=0.9332$ and $\\Phi(-2)=0.0228$.",
+   "solution_latex": "Let $Z=\\dfrac{X-\\mu}{\\sigma}\\sim N(0,1)$. Then\n\n\n\n$$\nP(X\\le 8)=P\\!\\left(Z\\le \\frac{8-\\mu}{\\sigma}\\right)=\\Phi\\!\\left(\\frac{8-\\mu}{\\sigma}\\right)=0.9332.\n$$\n\n\n\nSince $\\Phi(1.5)=0.9332$, we have\n\n\n\n$$\n\\frac{8-\\mu}{\\sigma}=1.5. \\tag{1}\n$$\n\n\n\nSimilarly,\n\n\n\n$$\nP(X\\le 2)=P\\!\\left(Z\\le \\frac{2-\\mu}{\\sigma}\\right)=\\Phi\\!\\left(\\frac{2-\\mu}{\\sigma}\\right)=0.0228.\n$$\n\n\n\nSince $\\Phi(-2)=0.0228$, we have\n\n\n\n$$\n\\frac{2-\\mu}{\\sigma}=-2. \\tag{2}\n$$\n\n\n\nSubtracting (2) from (1) gives\n\n\n\n$$\n\\frac{6}{\\sigma}=3.5 \\quad\\Longrightarrow\\quad \\sigma=\\frac{6}{3.5}=\\frac{12}{7}\\approx 1.7143.\n$$\n\n\n\nSubstituting into (1):\n\n\n\n$$\n8-\\mu=1.5\\cdot \\frac{12}{7}=\\frac{18}{7},\n$$\n\n\n\nso\n\n\n\n$$\n\\mu=8-\\frac{18}{7}=\\frac{56-18}{7}=\\frac{38}{7}\\approx 5.4286.\n$$\n\n\n\nTherefore\n\n\n\n$$\n\\mu=\\frac{38}{7}\\approx 5.43,\\qquad \\sigma^2=\\left(\\frac{12}{7}\\right)^2=\\frac{144}{49}\\approx 2.94.\n$$",
+   "marks": "5"
+  },
+  {
+   "id": 2051,
+   "paper_id": "sst204-doc-a6c1d917",
+   "topic_id": 185,
+   "number": 3,
+   "reconstructed_from": 2050,
+   "question_latex": "A random variable $X$ has the binomial distribution $B(15,p)$.\n\n1. Given that $p=0.3$, find\n \n\n1. $P(X=4)$,\n2. $P(X\\ge 12)$.\n2. Given that $P(X=0)=0.04$, find the value of $p$ to 3 decimal places.\n3. Given that the variance of $X$ is $2.4$, find the possible values of $p$.\n\nIn a certain game, a player selects 5 balls at random from a large box containing balls of different colours. The probability that a randomly chosen ball is red is $0.3$, independently for each ball.\n\n\\setcounter{enumi}{3}\n1. Find the probability that exactly 2 of the 5 balls are red.\n2. To win a prize, a player must select 5 balls and wins if at least 4 of them are red. Find the probability of winning a prize.\n3. To win a bonus, a player must select 8 balls and wins the bonus if more than 5 of the 8 balls are red. Find the probability of winning a bonus.",
+   "solution_latex": "1. $X\\sim B(15,0.3)$.\n \n\n1. $P(X=4)=\\binom{15}{4}(0.3)^4(0.7)^{11}\\approx 0.2186$.\n2. $P(X\\ge 12)=P(X=12)+P(X=13)+P(X=14)+P(X=15)$\n \n\n\n\n$$\n=\\binom{15}{12}(0.3)^{12}(0.7)^3+\\binom{15}{13}(0.3)^{13}(0.7)^2+\\binom{15}{14}(0.3)^{14}(0.7)+\\binom{15}{15}(0.3)^{15}\\approx 0.0001723.\n$$\n\n\n\n2. $P(X=0)=(1-p)^{15}=0.04$. Thus $1-p=0.04^{1/15}\\approx 0.8076$, so $p\\approx 0.192$ (3 d.p.).\n3. For $B(15,p)$, $\\operatorname{Var}(X)=15p(1-p)=2.4$. Hence $p(1-p)=0.16$, so $p^2-p+0.16=0$.\n \n\n\n\n$$\np=\\frac{1\\pm\\sqrt{1-0.64}}{2}=\\frac{1\\pm0.6}{2}.\n$$\n\n\n\n Thus $p=0.8$ or $p=0.2$.\n4. Let $Y$ be the number of red balls in 5 selections. Then $Y\\sim B(5,0.3)$.\n \n\n\n\n$$\nP(Y=2)=\\binom{5}{2}(0.3)^2(0.7)^3=10(0.09)(0.343)=0.3087.\n$$\n\n\n\n5. $P(Y\\ge 4)=P(Y=4)+P(Y=5)=\\binom{5}{4}(0.3)^4(0.7)+\\binom{5}{5}(0.3)^5$\n \n\n\n\n$$\n=5(0.0081)(0.7)+0.00243=0.02835+0.00243=0.03078.\n$$\n\n\n\n6. Let $Z$ be the number of red balls in 8 selections. Then $Z\\sim B(8,0.3)$.\n \n\n\n\n$$\nP(Z>5)=P(Z=6)+P(Z=7)+P(Z=8)\n$$\n\n\n\n \n\n\n\n$$\n=\\binom{8}{6}(0.3)^6(0.7)^2+\\binom{8}{7}(0.3)^7(0.7)+\\binom{8}{8}(0.3)^8\n$$\n\n\n\n \n\n\n\n$$\n=28(0.000729)(0.49)+8(0.0002187)(0.7)+0.00006561\n$$\n\n\n\n \n\n\n\n$$\n\\approx 0.01000+0.001225+0.00006561\\approx 0.01129.\n$$",
+   "marks": "20"
+  },
+  {
+   "id": 2068,
+   "paper_id": "sst204-doc-a6c1d917",
+   "topic_id": 184,
+   "number": 2,
+   "reconstructed_from": 2067,
+   "question_latex": "A discrete random variable $X$ has probability generating function $G_X(t) = \\frac{1}{4} + \\frac{1}{2}t + \\frac{1}{4}t^2$. Find the probability generating function of $Y = 2X + 1$.",
+   "solution_latex": "The probability generating function of $X$ is $G_X(t) = E(t^X) = \\frac{1}{4} + \\frac{1}{2}t + \\frac{1}{4}t^2$. For $Y = 2X + 1$, we have $G_Y(t) = E(t^Y) = E(t^{2X+1}) = t \\, E((t^2)^X) = t \\, G_X(t^2)$. Substituting $t^2$ into $G_X$, we get $G_X(t^2) = \\frac{1}{4} + \\frac{1}{2}t^2 + \\frac{1}{4}t^4$. Therefore, $G_Y(t) = t\\left(\\frac{1}{4} + \\frac{1}{2}t^2 + \\frac{1}{4}t^4\\right) = \\frac{1}{4}t + \\frac{1}{2}t^3 + \\frac{1}{4}t^5$.",
+   "marks": "3"
+  },
+  {
+   "id": 2080,
+   "paper_id": "sst204-doc-326adce3",
+   "topic_id": 187,
+   "number": 1,
+   "reconstructed_from": 2079,
+   "question_latex": "The annual return \\(X\\) (in millions of dollars) from a proposed investment project is modelled by a normal distribution with mean \\(\\mu = 1.8\\) and variance \\(\\sigma^2 = 0.25\\).\n\n(i) State the values of \\(E(X)\\) and \\(\\operatorname{Var}(X)\\), and write down the probability density function of \\(X\\). **(2 Marks)**\n(ii) Compute \\(P(X > 2.3)\\), the probability that the project returns more than 2.3 million dollars. **(3 Marks)**",
+   "solution_latex": "**(i)** For a normal distribution \\(X \\sim N(\\mu, \\sigma^2)\\), the mean is \\(E(X)=\\mu\\) and the variance is \\(\\operatorname{Var}(X)=\\sigma^2\\). Hence\n\n\n\n$$\nE(X)=1.8, \\qquad \\operatorname{Var}(X)=0.25.\n$$\n\n\n\nThe standard deviation is \\(\\sigma=\\sqrt{0.25}=0.5\\). The probability density function is\n\n\n\n$$\nf(x)=\\frac{1}{\\sigma\\sqrt{2\\pi}}\\exp\\!\\left(-\\frac{(x-\\mu)^2}{2\\sigma^2}\\right)\n=\\frac{1}{0.5\\sqrt{2\\pi}}\\exp\\!\\left(-\\frac{(x-1.8)^2}{2(0.25)}\\right), \\quad -\\infty < x < \\infty.\n$$\n\n\n\n**(ii)** Standardise:\n\n\n\n$$\nP(X>2.3)=P\\!\\left(Z>\\frac{2.3-1.8}{0.5}\\right)=P(Z>1).\n$$\n\n\n\nUsing the standard normal distribution,\n\n\n\n$$\nP(Z>1)=1-\\Phi(1)=1-0.8413=0.1587.\n$$\n\n\n\nTherefore, the probability that the project returns more than 2.3 million dollars is approximately \\(0.1587\\) (or \\(15.87\\%\\)).",
+   "marks": "5"
+  },
+  {
+   "id": 2088,
+   "paper_id": "sst204-doc-326adce3",
+   "topic_id": 183,
+   "number": 3,
+   "reconstructed_from": 2087,
+   "question_latex": "Scores on a standardized aptitude test are normally distributed with mean $100$ and variance $225$. A scholarship program awards scholarships to candidates in the top $1\\%$ of the score distribution. Determine the minimum score (cut-off point) required to qualify for a scholarship.",
+   "solution_latex": "Let $X$ be the test score. Then $X\\sim N(100,225)$, so the standard deviation is $\\sigma=\\sqrt{225}=15$. We need the value $x$ such that $P(X\\ge x)=0.01$, i.e. $P(X<x)=0.99$. Standardizing,\n\n\n\n$$\nP\\left(Z<\\frac{x-100}{15}\\right)=0.99.\n$$\n\n\n\nFrom the standard normal table, the $z$-value with cumulative probability $0.99$ is approximately $z=2.326$. Hence\n\n\n\n$$\n\\frac{x-100}{15}=2.326\\quad\\Rightarrow\\quad x=100+15(2.326)=100+34.89=134.89.\n$$\n\n\n\nTherefore the cut-off point should be set at approximately $134.89$ (or about $135$).",
+   "marks": "6"
+  },
+  {
+   "id": 2113,
+   "paper_id": "sst204-doc-97b9a2b3",
+   "topic_id": 183,
+   "number": 3,
+   "reconstructed_from": 2112,
+   "question_latex": "The scores on a standardized aptitude test are normally distributed with mean $100$ and variance $225$. A scholarship programme awards scholarships to candidates in the top $1\\%$ of the score distribution. Determine the minimum score a candidate must obtain to be eligible for the scholarship.",
+   "solution_latex": "Let $X$ be the test score. Then $X\\sim N(100,225)$, so the standard deviation is $\\sigma=\\sqrt{225}=15$. We need the cutoff $c$ such that $P(X\\ge c)=0.01$, i.e. $P(X<c)=0.99$. Standardizing,\n\n\n\n$$\nP\\left(Z<\\frac{c-100}{15}\\right)=0.99.\n$$\n\n\n\nFrom the standard normal table, the $99$th percentile is $z_{0.99}\\approx 2.326$. Hence\n\n\n\n$$\n\\frac{c-100}{15}=2.326\\quad\\Rightarrow\\quad c=100+15(2.326)=100+34.89=134.89.\n$$\n\n\n\nTherefore the cutoff score should be set at approximately $134.89$ (or about $135$).",
+   "marks": "6"
+  },
+  {
+   "id": 2156,
+   "paper_id": "sst204-doc-aa998104",
+   "topic_id": 187,
+   "number": 5,
+   "reconstructed_from": 2155,
+   "question_latex": "The random variable $X$ has a normal distribution with mean $\\mu=50$ and standard deviation $\\sigma=10$. Using the standard normal distribution function $\\Phi$, compute:\n\n(i) $P(X<65)$;\n(ii) $P(45<X<70)$;\n(iii) the value $x_0$ such that $P(X>x_0)=0.10$.\n\nYou may use the following values from the standard normal table: $\\Phi(1.5)=0.9332$, $\\Phi(2.0)=0.9772$, $\\Phi(0.5)=0.6915$, $\\Phi(1.28)=0.8997$.",
+   "solution_latex": "Let $Z=\\dfrac{X-\\mu}{\\sigma}=\\dfrac{X-50}{10}\\sim N(0,1)$.\n\n(i) For $X=65$, $z=\\dfrac{65-50}{10}=1.5$. Hence\n \n\n\n\n$$\nP(X<65)=P(Z<1.5)=\\Phi(1.5)=0.9332.\n$$\n\n\n\n(ii) For $X=45$, $z=\\dfrac{45-50}{10}=-0.5$; for $X=70$, $z=\\dfrac{70-50}{10}=2.0$. Thus\n \n\n\n\n$$\nP(45<X<70)=P(-0.5<Z<2.0)=\\Phi(2.0)-\\Phi(-0.5).\n$$\n\n\n\n By symmetry, $\\Phi(-0.5)=1-\\Phi(0.5)=1-0.6915=0.3085$. Therefore\n \n\n\n\n$$\nP(45<X<70)=0.9772-0.3085=0.6687.\n$$\n\n\n\n(iii) We need $P(X>x_0)=0.10$, i.e. $P(Z>z_0)=0.10$ where $z_0=\\dfrac{x_0-50}{10}$. Hence $\\Phi(z_0)=0.90$. From the given table, $\\Phi(1.28)=0.8997\\approx 0.90$, so $z_0\\approx 1.28$. Therefore\n \n\n\n\n$$\nx_0=50+10(1.28)=62.8.\n$$",
+   "marks": "5"
+  },
+  {
+   "id": 2165,
+   "paper_id": "sst204-doc-aa998104",
+   "topic_id": 187,
+   "number": 3,
+   "reconstructed_from": 2164,
+   "question_latex": "The weights of apples in a large orchard are normally distributed with mean $150$ g and standard deviation $20$ g. Let $X$ be the weight of a randomly selected apple.\n\n(a) Find the probability that a randomly selected apple weighs less than $160$ g. **(2 marks)**\n(b) A sample of $5$ apples is selected at random. Find the probability that the mean weight of the sample is greater than $155$ g. **(3 marks)**\n(c) Apples are classified as 'large' if their weight exceeds $170$ g. Find the probability that in a random sample of $8$ apples, more than $2$ are classified as large. **(5 marks)**",
+   "solution_latex": "Let $X \\sim N(150, 20^2)$.\n\n(a) We need $P(X < 160)$. Standardize:\n \n\n\n\n$$\nZ = \\frac{160 - 150}{20} = 0.5.\n$$\n\n\n\n Thus $P(X < 160) = P(Z < 0.5) = \\Phi(0.5) \\approx 0.6915$.\n(b) The sample mean $\\bar{X}$ of $n=5$ observations has distribution\n \n\n\n\n$$\n\\bar{X} \\sim N\\left(150, \\frac{20^2}{5}\\right) = N(150, 80).\n$$\n\n\n\n The standard deviation of $\\bar{X}$ is $\\sqrt{80} \\approx 8.944$.\n \n\n\n\n$$\nP(\\bar{X} > 155) = P\\left(Z > \\frac{155 - 150}{\\sqrt{80}}\\right) = P(Z > 0.5590) \\approx 1 - \\Phi(0.5590) \\approx 1 - 0.7120 = 0.2880.\n$$\n\n\n\n(c) First find the probability that a single apple is large:\n \n\n\n\n$$\nP(X > 170) = P\\left(Z > \\frac{170 - 150}{20}\\right) = P(Z > 1) = 1 - \\Phi(1) \\approx 1 - 0.8413 = 0.1587.\n$$\n\n\n\n Let $Y$ be the number of large apples in a sample of $8$. Then $Y \\sim \\text{Binomial}(8, 0.1587)$.\n We need $P(Y > 2) = 1 - P(Y \\le 2)$.\n \n\n\n\n$$\nP(Y = 0) = (1 - 0.1587)^8 \\approx 0.8413^8 \\approx 0.2510,\n$$\n\n\n\n \n\n\n\n$$\nP(Y = 1) = \\binom{8}{1} (0.1587)(0.8413)^7 \\approx 8 \\times 0.1587 \\times 0.2983 \\approx 0.3787,\n$$\n\n\n\n \n\n\n\n$$\nP(Y = 2) = \\binom{8}{2} (0.1587)^2 (0.8413)^6 \\approx 28 \\times 0.02519 \\times 0.3546 \\approx 0.2501.\n$$\n\n\n\n Thus\n \n\n\n\n$$\nP(Y \\le 2) \\approx 0.2510 + 0.3787 + 0.2501 = 0.8798,\n$$\n\n\n\n and\n \n\n\n\n$$\nP(Y > 2) \\approx 1 - 0.8798 = 0.1202.\n$$",
+   "marks": "10"
+  },
+  {
+   "id": 2184,
+   "paper_id": "sst204-doc-55f4f8c0",
+   "topic_id": 187,
+   "number": 1,
+   "reconstructed_from": 2183,
+   "question_latex": "A company is planning to launch a new product. Financial analysts estimate that the annual profit from the product will be $2.5$ million if sales are high, $0.2$ million if sales are average, and a loss of $0.3$ million if sales are low. The probabilities of high, average, and low sales are $0.4$, $0.25$, and $0.35$, respectively. Let $X$ denote the annual profit (in millions of dollars) from the product.\n\n(i) Write down the probability distribution of $X$. (2 marks)\n(ii) Calculate the standard deviation of $X$. (3 marks)",
+   "solution_latex": "**(i)** The random variable $X$ takes the values $2.5$, $0.2$, and $-0.3$ with probabilities $0.4$, $0.25$, and $0.35$, respectively. Hence the probability distribution is:\n\n\n\n$$\n\\begin{array}{c|ccc}\nx & 2.5 & 0.2 & -0.3 \\\\ \\hline\nP(X=x) & 0.4 & 0.25 & 0.35\n\\end{array}\n$$\n\n\n\n**(ii)** First compute the mean:\n\n\n\n$$\nE(X) = (2.5)(0.4) + (0.2)(0.25) + (-0.3)(0.35) = 1 + 0.05 - 0.105 = 0.945.\n$$\n\n\n\nNext compute $E(X^2)$:\n\n\n\n$$\nE(X^2) = (2.5)^2(0.4) + (0.2)^2(0.25) + (-0.3)^2(0.35) = 6.25(0.4) + 0.04(0.25) + 0.09(0.35).\n$$\n\n\n\n\n\n$$\nE(X^2) = 2.5 + 0.01 + 0.0315 = 2.5415.\n$$\n\n\n\nThe variance is\n\n\n\n$$\n\\operatorname{Var}(X) = E(X^2) - [E(X)]^2 = 2.5415 - (0.945)^2 = 2.5415 - 0.893025 = 1.648475.\n$$\n\n\n\nTherefore the standard deviation is\n\n\n\n$$\n\\sigma_X = \\sqrt{1.648475} \\approx 1.2839 \\text{ million dollars}.\n$$\n\n\n\nThus the standard deviation of the profits is approximately $1.28$ million dollars (or $1.2839$ million dollars).",
+   "marks": "5"
+  },
+  {
+   "id": 2191,
+   "paper_id": "sst204-doc-55f4f8c0",
+   "topic_id": 183,
+   "number": 3,
+   "reconstructed_from": 2190,
+   "question_latex": "The scores on a standardized aptitude test are normally distributed with mean $100$ and variance $225$. A scholarship program awards scholarships to candidates who score in the top $1\\%$ of the distribution. Determine the minimum score required to qualify for a scholarship.",
+   "solution_latex": "Let $X$ be the test score. We are given $X \\sim N(100, 225)$, so the standard deviation is $\\sigma = \\sqrt{225} = 15$. We need the cutoff score $c$ such that $P(X \\ge c) = 0.01$, i.e. $P(X < c) = 0.99$. Standardizing, $P\\left(Z < \\frac{c - 100}{15}\\right) = 0.99$, where $Z \\sim N(0,1)$. From the standard normal table, the $99$th percentile is $z_{0.99} \\approx 2.326$. Thus $\\frac{c - 100}{15} = 2.326$, giving $c = 100 + 15(2.326) = 100 + 34.89 = 134.89$. Therefore, the cutoff score should be approximately $134.89$ (or about $135$).",
+   "marks": "6"
+  },
+  {
+   "id": 2259,
+   "paper_id": "sst204-doc-55efbbbb",
+   "topic_id": 187,
+   "number": 5,
+   "reconstructed_from": 2258,
+   "question_latex": "The random variable $X$ has a normal distribution with mean $\\mu$ and variance $\\sigma^2$. Given that $P(X < 3) = 0.6915$ and $P(X < 7) = 0.9772$, find the values of $\\mu$ and $\\sigma$.",
+   "solution_latex": "Let $Z = \\frac{X-\\mu}{\\sigma} \\sim N(0,1)$. Then\n\n\n\n$$\nP(X < 3) = P\\left(Z < \\frac{3-\\mu}{\\sigma}\\right) = 0.6915.\n$$\n\n\n\nFrom the standard normal table, $\\Phi(0.5) = 0.6915$, so\n\n\n\n$$\n\\frac{3-\\mu}{\\sigma} = 0.5. \\tag{1}\n$$\n\n\n\nAlso,\n\n\n\n$$\nP(X < 7) = P\\left(Z < \\frac{7-\\mu}{\\sigma}\\right) = 0.9772.\n$$\n\n\n\nSince $\\Phi(2.0) = 0.9772$, we have\n\n\n\n$$\n\\frac{7-\\mu}{\\sigma} = 2.0. \\tag{2}\n$$\n\n\n\nSubtracting (1) from (2):\n\n\n\n$$\n\\frac{4}{\\sigma} = 1.5 \\quad \\Rightarrow \\quad \\sigma = \\frac{4}{1.5} = \\frac{8}{3} \\approx 2.6667.\n$$\n\n\n\nSubstituting into (1):\n\n\n\n$$\n3 - \\mu = 0.5 \\times \\frac{8}{3} = \\frac{4}{3} \\quad \\Rightarrow \\quad \\mu = 3 - \\frac{4}{3} = \\frac{5}{3} \\approx 1.6667.\n$$\n\n\n\nThus $\\mu = \\frac{5}{3}$ and $\\sigma = \\frac{8}{3}$.",
+   "marks": "5"
+  },
+  {
+   "id": 2268,
+   "paper_id": "sst204-doc-55efbbbb",
+   "topic_id": 187,
+   "number": 3,
+   "reconstructed_from": 2267,
+   "question_latex": "A machine produces cylindrical metal rods. The length, in cm, of a randomly chosen rod is normally distributed with mean $50$ cm and standard deviation $2$ cm. Rods are considered acceptable if their length lies between $48$ cm and $52$ cm.\n\n(i) Find the probability that a randomly chosen rod is acceptable. (2 marks)\n(ii) A rod is selected at random. Find the probability that its length is greater than $53$ cm. (2 marks)\n(iii) A quality control inspector selects $10$ rods at random. Find the probability that at most $2$ of them are unacceptable. (3 marks)\n(iv) Find the length $L$ such that $90\\%$ of all rods have a length less than $L$. (3 marks)",
+   "solution_latex": "Let $X$ be the length of a randomly chosen rod. Then $X \\sim N(50, 2^2)$.\n\n**(i)** We require $P(48 < X < 52)$. Standardising:\n\n\n\n$$\nP(48 < X < 52) = P\\left(\\frac{48-50}{2} < Z < \\frac{52-50}{2}\\right) = P(-1 < Z < 1).\n$$\n\n\n\nUsing standard normal tables, $P(Z < 1) = 0.8413$, so\n\n\n\n$$\nP(-1 < Z < 1) = 0.8413 - (1 - 0.8413) = 0.8413 - 0.1587 = 0.6826.\n$$\n\n\n\nThus the probability that a rod is acceptable is approximately $0.6826$ (or $68.26\\%$).\n\n**(ii)** We require $P(X > 53)$:\n\n\n\n$$\nP(X > 53) = P\\left(Z > \\frac{53-50}{2}\\right) = P(Z > 1.5).\n$$\n\n\n\nFrom tables, $P(Z < 1.5) = 0.9332$, so\n\n\n\n$$\nP(Z > 1.5) = 1 - 0.9332 = 0.0668.\n$$\n\n\n\nThus the probability is approximately $0.0668$.\n\n**(iii)** The probability that a rod is unacceptable is\n\n\n\n$$\np = 1 - P(48 < X < 52) = 1 - 0.6826 = 0.3174.\n$$\n\n\n\nLet $Y$ be the number of unacceptable rods among $10$ selected rods. Then $Y \\sim B(10, 0.3174)$. We require $P(Y \\le 2)$:\n\n\n\n$$\nP(Y \\le 2) = P(Y=0) + P(Y=1) + P(Y=2).\n$$\n\n\n\nCompute each term:\n\n\n\n$$\nP(Y=0) = (0.6826)^{10} \\approx 0.0220,\n$$\n\n\n\n\n\n$$\nP(Y=1) = \\binom{10}{1}(0.3174)(0.6826)^9 \\approx 10 \\times 0.3174 \\times 0.0322 \\approx 0.1022,\n$$\n\n\n\n\n\n$$\nP(Y=2) = \\binom{10}{2}(0.3174)^2(0.6826)^8 \\approx 45 \\times 0.1007 \\times 0.0472 \\approx 0.2139.\n$$\n\n\n\nSumming:\n\n\n\n$$\nP(Y \\le 2) \\approx 0.0220 + 0.1022 + 0.2139 = 0.3381.\n$$\n\n\n\nThus the probability that at most $2$ rods are unacceptable is approximately $0.338$.\n\n**(iv)** We need $L$ such that $P(X < L) = 0.90$. Standardising:\n\n\n\n$$\nP\\left(Z < \\frac{L-50}{2}\\right) = 0.90.\n$$\n\n\n\nFrom standard normal tables, the $90$th percentile is $z_{0.90} \\approx 1.2816$. Hence\n\n\n\n$$\n\\frac{L-50}{2} = 1.2816 \\quad \\Rightarrow \\quad L = 50 + 2(1.2816) = 52.5632.\n$$\n\n\n\nSo $L \\approx 52.56$ cm (to 2 decimal places).",
+   "marks": "10"
+  },
+  {
+   "id": 2276,
+   "paper_id": "sst204-doc-55efbbbb",
+   "topic_id": 183,
+   "number": 1,
+   "reconstructed_from": 2275,
+   "question_latex": "A fair coin is tossed three times. Let \\(X\\) denote the number of tails obtained.\n\n(a) State the probability distribution of \\(X\\).\n(b) Hence find the mean, variance and standard deviation of \\(X\\).\n\nAn ordinary fair die has six faces numbered \\(1,2,\\dots,6\\), each equally likely to appear on top when the die is tossed. Two such dice are tossed repeatedly until a total of \\(8\\) is obtained. Let \\(N\\) be the number of throws required to obtain the first total of \\(8\\).\n\n(c) State the distribution of \\(N\\) and give its mean and variance.\n(d) Find the mean and the variance of the number of throws before a total of \\(8\\) is obtained.",
+   "solution_latex": "**(a)** The number of tails \\(X\\) in three tosses of a fair coin has a binomial distribution:\n\n\n\n$$\nX\\sim \\mathrm{Bin}\\left(3,\\tfrac12\\right),\n$$\n\n\n\nso\n\n\n\n$$\nP(X=x)=\\binom{3}{x}\\left(\\frac12\\right)^x\\left(\\frac12\\right)^{3-x}\n=\\binom{3}{x}\\frac{1}{8},\\qquad x=0,1,2,3.\n$$\n\n\n\nThus the distribution is\n\n\n\n$$\n\\begin{array}{c|cccc}\nx & 0 & 1 & 2 & 3\\\\ \\hline\nP(X=x) & \\frac18 & \\frac38 & \\frac38 & \\frac18\n\\end{array}\n$$\n\n\n\n**(b)** For \\(X\\sim \\mathrm{Bin}(n,p)\\),\n\n\n\n$$\nE(X)=np,\\qquad \\operatorname{Var}(X)=np(1-p).\n$$\n\n\n\nHere \\(n=3\\) and \\(p=\\tfrac12\\), hence\n\n\n\n$$\nE(X)=3\\cdot\\frac12=\\frac32,\n$$\n\n\n\n\n\n$$\n\\operatorname{Var}(X)=3\\cdot\\frac12\\cdot\\frac12=\\frac34,\n$$\n\n\n\nand the standard deviation is\n\n\n\n$$\n\\sigma_X=\\sqrt{\\operatorname{Var}(X)}=\\sqrt{\\frac34}=\\frac{\\sqrt3}{2}.\n$$\n\n\n\n**(c)** When two fair dice are tossed, there are \\(36\\) equally likely outcomes. The outcomes giving a total of \\(8\\) are\n\n\n\n$$\n(2,6),(3,5),(4,4),(5,3),(6,2),\n$$\n\n\n\nso there are \\(5\\) favourable outcomes. Hence the probability of obtaining a total of \\(8\\) on a single throw of the two dice is\n\n\n\n$$\np=\\frac{5}{36}.\n$$\n\n\n\nThe number \\(N\\) of throws required to obtain the first total of \\(8\\) therefore has a geometric distribution:\n\n\n\n$$\nP(N=n)=(1-p)^{n-1}p,\\qquad n=1,2,\\dots\n$$\n\n\n\nFor a geometric random variable with success probability \\(p\\),\n\n\n\n$$\nE(N)=\\frac1p,\\qquad \\operatorname{Var}(N)=\\frac{1-p}{p^2}.\n$$\n\n\n\nThus\n\n\n\n$$\nE(N)=\\frac{1}{5/36}=\\frac{36}{5}=7.2,\n$$\n\n\n\nand\n\n\n\n$$\n\\operatorname{Var}(N)=\\frac{1-\\frac{5}{36}}{\\left(\\frac{5}{36}\\right)^2}\n=\\frac{\\frac{31}{36}}{\\frac{25}{1296}}\n=\\frac{31}{36}\\cdot\\frac{1296}{25}\n=\\frac{1116}{25}=44.64.\n$$\n\n\n\n**(d)** The number of throws before a total of \\(8\\) is obtained is \\(N-1\\). Therefore\n\n\n\n$$\nE(N-1)=E(N)-1=\\frac{36}{5}-1=\\frac{31}{5}=6.2,\n$$\n\n\n\nand, since adding or subtracting a constant does not change the variance,\n\n\n\n$$\n\\operatorname{Var}(N-1)=\\operatorname{Var}(N)=\\frac{1116}{25}=44.64.\n$$\n\n\n\nHence the mean number of throws before a total of \\(8\\) is obtained is \\(\\frac{31}{5}\\), and the variance is \\(\\frac{1116}{25}\\).",
+   "marks": "13"
+  },
+  {
+   "id": 2296,
+   "paper_id": "sst204-doc-85e8b450",
+   "topic_id": 183,
+   "number": 3,
+   "reconstructed_from": 2295,
+   "question_latex": "The scores on a standardized aptitude test are normally distributed with mean $100$ and variance $225$. A scholarship program awards scholarships to candidates who score in the top $1\\%$ of the distribution. Determine the minimum score required to qualify for a scholarship.",
+   "solution_latex": "Let $X$ be the test score. We are given $X\\sim N(100,225)$, so the standard deviation is $\\sigma=\\sqrt{225}=15$. We need the cutoff value $c$ such that $P(X\\ge c)=0.01$, i.e. $P(X<c)=0.99$. Standardizing, $P\\left(Z<\\frac{c-100}{15}\\right)=0.99$, where $Z\\sim N(0,1)$. From the standard normal table, the $99$th percentile is $z_{0.99}\\approx 2.326$. Thus $\\frac{c-100}{15}=2.326$, giving $c=100+15(2.326)=100+34.89=134.89$. Therefore, the cutoff score should be set at approximately $134.89$ (or $135$ if whole scores are required).",
+   "marks": "6"
+  }
+ ],
+ "survivors": {
+  "1798": {
+   "question_latex": "c) Assume that the number of typos per page has the Poisson distribution. Let \\(X\\) equal the number of typos on a printed page with a mean of 3 typos per page.\n\n- [i)] What is the probability that a randomly selected page has at least one typo on it? **(2 marks)**\n- [ii)] What is the probability that a randomly selected page has at most one typo on it? **(3 marks)**",
+   "solution_latex": ""
+  },
+  "1875": {
+   "question_latex": "c) Assume that the number of typos per page has the Poisson distribution. Let \\(X\\) equal the number of typos on a printed page with a mean of 3 typos per page.\n\n- [i)] What is the probability that a randomly selected page has at least one typo on it? **(2 marks)**\n- [ii)] What is the probability that a randomly selected page has at most one typo on it? **(3 marks)**",
+   "solution_latex": ""
+  },
+  "1988": {
+   "question_latex": "- ****\n\nc) Assume that the number of typos per page has the Poisson distribution. Let \\(X\\) equal the number of typos on a printed page with a mean of 3 typos per page.\n\n- [i)] What is the probability that a randomly selected page has at least one typo on it? **(2 marks)**\n- [ii)] What is the probability that a randomly selected page has at most one typo on it? **(3 marks)**",
+   "solution_latex": ""
+  },
+  "2042": {
+   "question_latex": "c) Assume that the number of typos per page has the Poisson distribution. Let \\(X\\) equal the number of typos on a printed page with a mean of 3 typos per page.\n\n- [i)] What is the probability that a randomly selected page has at least one typo on it? **(2 marks)**\n- [ii)] What is the probability that a randomly selected page has at most one typo on it? **(3 marks)**",
+   "solution_latex": ""
+  },
+  "2155": {
+   "question_latex": "- ****\n\nc) Assume that the number of typos per page has the Poisson distribution. Let \\(X\\) equal the number of typos on a printed page with a mean of 3 typos per page.\n\n- [i)] What is the probability that a randomly selected page has at least one typo on it? **(2 marks)**\n- [ii)] What is the probability that a randomly selected page has at most one typo on it? **(3 marks)**",
+   "solution_latex": ""
+  },
+  "2258": {
+   "question_latex": "- ****\n\nc) Assume that the number of typos per page has the Poisson distribution. Let \\(X\\) equal the number of typos on a printed page with a mean of 3 typos per page.\n\n- [i)] What is the probability that a randomly selected page has at least one typo on it? **(2 marks)**\n- [ii)] What is the probability that a randomly selected page has at most one typo on it? **(3 marks)**",
+   "solution_latex": ""
+  },
+  "1806": {
+   "question_latex": "1. A random variable \\(X\\) has the binomial distribution \\(B(12,p)\\).\n \n\n1. Given that \\(p = 0.2\\) find\n \n\n1. \\(P(X=5)\\)\n2. \\(P(x \\geq 10)\\) **(3 marks)**\n2. Given that \\(P(X=0) = 0.05\\), find the value of \\(p\\) to 3 decimal places. **(3 marks)**\n3. Given that the variance of \\(X\\) is \\(1.92\\), find the possible values of \\(P\\). **(4 marks)**\n2. In a game, players select sticks at random from a box containing a large number of sticks of different lengths. The length, in cm, of a randomly chosen stick has a continuous uniform distribution over the interval \\([7,10]\\).\n \n\n1. A stick is selected at random find the probability that the stick is less than \\(9.5\\) cm. (2 marks)\n2. To win a bag of sweets, a player must select three sticks and wins if the length of the longest stick is more than \\(9.5\\) cm. Find the probability of winning a bag of sweets. (3 marks)\n3. To win a soft toy, a player must select six sticks and wins the toy if more than four of the six are shorter than \\(9.5\\) cm. Find the probability of winning a soft toy. (5 marks)",
+   "solution_latex": ""
+  },
+  "2050": {
+   "question_latex": "1. A random variable \\(X\\) has the binomial distribution \\(B(12,p)\\).\n \n\n1. Given that \\(p = 0.2\\) find\n \n\n1. \\(P(X=5)\\)\n2. \\(P(x \\geq 10)\\) **(3 marks)**\n2. Given that \\(P(X=0) = 0.05\\), find the value of \\(p\\) to 3 decimal places. **(3 marks)**\n3. Given that the variance of \\(X\\) is \\(1.92\\), find the possible values of \\(P\\). **(4 marks)**\n2. In a game, players select sticks at random from a box containing a large number of sticks of different lengths. The length, in cm, of a randomly chosen stick has a continuous uniform distribution over the interval \\([7,10]\\).\n \n\n1. A stick is selected at random find the probability that the stick is less than \\(9.5\\) cm. (2 marks)\n2. To win a bag of sweets, a player must select three sticks and wins if the length of the longest stick is more than \\(9.5\\) cm. Find the probability of winning a bag of sweets. (3 marks)\n3. To win a soft toy, a player must select six sticks and wins the toy if more than four of the six are shorter than \\(9.5\\) cm. Find the probability of winning a soft toy. (5 marks)",
+   "solution_latex": ""
+  },
+  "1997": {
+   "question_latex": "b) In a game, players select sticks at random from a box containing a large number of sticks of different lengths. The length, in cm, of a randomly chosen stick has a continuous uniform distribution over the interval \\([7,10]\\).\n\ni. A stick is selected at random find the probability that the stick is less than \\(9.5\\) cm. (2 marks)\n\nii. To win a bag of sweets, a player must select three sticks and wins if the length of the longest stick is more than \\(9.5\\) cm. Find the probability of winning a bag of sweets. (3 marks)\n\niii. To win a soft toy, a player must select six sticks and wins the toy if more than four of the six are shorter than \\(9.5\\) cm. Find the probability of winning a soft toy. (5 marks)\n\n---",
+   "solution_latex": ""
+  },
+  "2164": {
+   "question_latex": "b) In a game, players select sticks at random from a box containing a large number of sticks of different lengths. The length, in cm, of a randomly chosen stick has a continuous uniform distribution over the interval \\([7,10]\\).\n\ni. A stick is selected at random find the probability that the stick is less than \\(9.5\\) cm. (2 marks)\n\nii. To win a bag of sweets, a player must select three sticks and wins if the length of the longest stick is more than \\(9.5\\) cm. Find the probability of winning a bag of sweets. (3 marks)\n\niii. To win a soft toy, a player must select six sticks and wins the toy if more than four of the six are shorter than \\(9.5\\) cm. Find the probability of winning a soft toy. (5 marks)\n\n---",
+   "solution_latex": ""
+  },
+  "2267": {
+   "question_latex": "b) In a game, players select sticks at random from a box containing a large number of sticks of different lengths. The length, in cm, of a randomly chosen stick has a continuous uniform distribution over the interval \\([7,10]\\).\n\ni. A stick is selected at random find the probability that the stick is less than \\(9.5\\) cm. (2 marks)\n\nii. To win a bag of sweets, a player must select three sticks and wins if the length of the longest stick is more than \\(9.5\\) cm. Find the probability of winning a bag of sweets. (3 marks)\n\niii. To win a soft toy, a player must select six sticks and wins the toy if more than four of the six are shorter than \\(9.5\\) cm. Find the probability of winning a soft toy. (5 marks)\n\n---",
+   "solution_latex": ""
+  },
+  "1825": {
+   "question_latex": "(a) The probability distribution function of the number of telephone calls received in a particular sales office between 10.00am and 11.00am is given below where p is a constant:\n\n| Number of calls Received, x | 0 | 1 | 2 | 3 | 4 | 5 | 6 |\n|:--- |:---: |:---: |:---: |:---: |:---: |:---: |:---: |\n| Probability, f(x) | p | \\(\\frac{1}{5}\\) | \\(\\frac{1}{4}\\) | \\(\\frac{1}{5}\\) | 2p | \\(\\frac{3}{20}\\) | p |\n\n(i) Show that \\(p = \\frac{1}{20}\\) (2marks)\n\n(ii) Find the probability that that there will be three or more calls (2marks)\n\n(iii) Find the expected number of telephone calls made between the specified time (2marks)\n\n(iv) Find the moment generating function of the number of calls received. (2marks)\n\n(v) Use (iv) above to determine mean and standard deviation of the number of calls received between 10am and 11am. (5marks)\n\n**INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**",
+   "solution_latex": ""
+  },
+  "1945": {
+   "question_latex": "(c) IQ are measured on a scale which is normally distributed with mean 100 and variance 225. The Mshindi scholarship program awards scholarships to people with the top 1\\% of the IQ. What would they have to set as the cut off point to allow this to happen? **(6 Marks)**",
+   "solution_latex": ""
+  },
+  "2087": {
+   "question_latex": "(c) IQ are measured on a scale which is normally distributed with mean 100 and variance 225. The Mshindi scholarship program awards scholarships to people with the top 1\\% of the IQ. What would they have to set as the cut off point to allow this to happen? **(6 Marks)**",
+   "solution_latex": ""
+  },
+  "2112": {
+   "question_latex": "(c) IQ are measured on a scale which is normally distributed with mean 100 and variance 225. The Mshindi scholarship program awards scholarships to people with the top 1\\% of the IQ. What would they have to set as the cut off point to allow this to happen? **(6 Marks)**",
+   "solution_latex": ""
+  },
+  "2190": {
+   "question_latex": "(c) IQ are measured on a scale which is normally distributed with mean 100 and variance 225. The Mshindi scholarship program awards scholarships to people with the top 1\\% of the IQ. What would they have to set as the cut off point to allow this to happen? **(6 Marks)**",
+   "solution_latex": ""
+  },
+  "2295": {
+   "question_latex": "(c) IQ are measured on a scale which is normally distributed with mean 100 and variance 225. The Mshindi scholarship program awards scholarships to people with the top 1\\% of the IQ. What would they have to set as the cut off point to allow this to happen? **(6 Marks)**",
+   "solution_latex": ""
+  },
+  "2005": {
+   "question_latex": "b) If \\(X\\) is the number of tails in three tosses of a coin, what are the mean, variance and standard deviation of \\(X\\)? (6 marks)\n\nd) An ordinary die has six sides \\(1, 2, \\dots, 6\\) each of which has equal chance of appearing on top when a die is tossed. Two ordinary dice are tossed repeatedly. What are the mean and the variance of the number of throws before a total of 8 is obtained? (7 marks)\n\n***INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION***\n\n CamScanner",
+   "solution_latex": ""
+  },
+  "2275": {
+   "question_latex": "b) If \\(X\\) is the number of tails in three tosses of a coin, what are the mean, variance and standard deviation of \\(X\\)? (6 marks)\n\nd) An ordinary die has six sides \\(1, 2, \\dots, 6\\) each of which has equal chance of appearing on top when a die is tossed. Two ordinary dice are tossed repeatedly. What are the mean and the variance of the number of throws before a total of 8 is obtained? (7 marks)\n\n***INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION***\n\n CamScanner",
+   "solution_latex": ""
+  },
+  "2040": {
+   "question_latex": "b) The probability that a planted radish seed germinates is 0.80. A gardener plants nine seeds. Let \\(X\\) denote the number of radish seeds that successfully germinate.\n\n- [i)] What is the probability that no seed germinate? **(2 marks)**\n- [ii)] What is the probability that at least seven seeds germinate? **(2 marks)**\n- [iii)] What is the average number of seeds the gardener could expect to germinate? **(1 mark)**",
+   "solution_latex": ""
+  },
+  "2067": {
+   "question_latex": "A continuous random variable has the density function\n\n$$\nf(x) = \\begin{cases} kx^2(1-x) & -1 \\leq x \\leq 1 \\\\ 0, & \\text{otherwise} \\end{cases}\n$$\n\n(vi) \\(g(y)\\), the probability distribution function of \\(Y = 1 - X\\) **(3marks)**",
+   "solution_latex": ""
+  },
+  "2079": {
+   "question_latex": "(e) A commercial company is planning to market a new product. According to the financial analysis, it will earn an annual profit of 2.5 million if this product has high sales, annual profit of 0.2 million if the sales are average and it will lose 0.3 million a year if the sales are low. The probabilities of these three scenarios are 0.4, 0.25 and 0.35 respectively. Let X be the profits, in millions earned per annum by the company from this product.\n\n- [(i)] Write the probability distribution of X. **(2 Marks)**\n- [(ii)] Calculate the standard deviation of the profits, X **(3 Marks)**",
+   "solution_latex": ""
+  },
+  "2183": {
+   "question_latex": "(e) A commercial company is planning to market a new product. According to the financial analysis, it will earn an annual profit of 2.5 million if this product has high sales, annual profit of 0.2 million if the sales are average and it will lose 0.3 million a year if the sales are low. The probabilities of these three scenarios are 0.4, 0.25 and 0.35 respectively. Let X be the profits, in millions earned per annum by the company from this product.\n\n- [(i)] Write the probability distribution of X. **(2 Marks)**\n- [(ii)] Calculate the standard deviation of the profits, X **(3 Marks)**",
+   "solution_latex": ""
+  }
+ }
+}

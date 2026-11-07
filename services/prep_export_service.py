@@ -19,6 +19,7 @@ import os
 import re
 import tempfile
 from datetime import datetime
+from pathlib import Path
 
 from django.conf import settings
 logger = logging.getLogger(__name__)
@@ -84,6 +85,73 @@ FONT_BODY = "Arial" if "Arial" in pdfmetrics.getRegisteredFontNames() else "Helv
 FONT_BOLD = "Arial-Bold" if "Arial-Bold" in pdfmetrics.getRegisteredFontNames() else "Helvetica-Bold"
 FONT_ITALIC = "Arial-Italic" if "Arial-Italic" in pdfmetrics.getRegisteredFontNames() else "Helvetica-Oblique"
 FONT_CODE = "Consolas" if "Consolas" in pdfmetrics.getRegisteredFontNames() else "Courier"
+
+PDF_BRAND_NAME = "Mentify Prep"
+PDF_BRAND_URL = "https://mentify.study/prep/"
+
+
+def _pdf_brand_logo_path() -> Path:
+    """Return the bundled logo used in generated PDF attribution footers."""
+    return Path(settings.BASE_DIR) / "static" / "images" / "logo.png"
+
+
+def _pdf_brand_footer_html() -> str:
+    """Build the browser PDF footer with the Mentify logo and platform link."""
+    logo_html = ""
+    try:
+        logo_data = base64.b64encode(_pdf_brand_logo_path().read_bytes()).decode("ascii")
+        logo_html = (
+            '<img src="data:image/png;base64,' + logo_data + '" '
+            'style="width:11px;height:11px;vertical-align:-2px;margin-right:4px;" alt="">'
+        )
+    except OSError:
+        pass
+
+    return (
+        '<div style="font-size:8pt;font-family:-apple-system,BlinkMacSystemFont,sans-serif;'
+        'color:#64748b;width:100%;padding:0 16mm;box-sizing:border-box;display:flex;'
+        'align-items:center;justify-content:space-between;">'
+        f'<span>{logo_html}<a href="{PDF_BRAND_URL}" style="color:#0f766e;text-decoration:none;font-weight:700;">'
+        f'{PDF_BRAND_NAME}</a> <span style="color:#94a3b8;">| mentify.study/prep/</span></span>'
+        '<span style="color:#94a3b8;">Page <span class="pageNumber"></span> of '
+        '<span class="totalPages"></span></span></div>'
+    )
+
+
+def _draw_pdf_brand_footer(canvas, doc) -> None:
+    """Draw a branded, clickable footer on each ReportLab fallback PDF page."""
+    canvas.saveState()
+    page_width, _page_height = A4
+    footer_y = 18
+    left = doc.leftMargin
+    right = page_width - doc.rightMargin
+
+    canvas.setStrokeColor(colors.HexColor("#dbe5e7"))
+    canvas.setLineWidth(0.4)
+    canvas.line(left, footer_y + 10, right, footer_y + 10)
+
+    text_x = left
+    try:
+        logo_path = _pdf_brand_logo_path()
+        if logo_path.is_file():
+            canvas.drawImage(
+                str(logo_path), left, footer_y - 2, width=12, height=12,
+                preserveAspectRatio=True, mask="auto",
+            )
+            text_x += 17
+    except Exception:
+        pass
+
+    label = f"{PDF_BRAND_NAME} | mentify.study/prep/"
+    canvas.setFillColor(colors.HexColor("#0f766e"))
+    canvas.setFont(FONT_BOLD, 7.5)
+    canvas.drawString(text_x, footer_y, label)
+    canvas.linkURL(PDF_BRAND_URL, (text_x, footer_y - 2, text_x + 108, footer_y + 8), relative=0, thickness=0)
+
+    canvas.setFillColor(colors.HexColor("#94a3b8"))
+    canvas.setFont(FONT_BODY, 7.5)
+    canvas.drawRightString(right, footer_y, f"Page {doc.page}")
+    canvas.restoreState()
 
 
 # ─── Mathematical Formula Beautifier & Sanitizer ─────────────────────────────
@@ -338,10 +406,7 @@ def _render_html_with_playwright(
     timeout_ms: int = 15000,
     require_browser: bool = False,
 ) -> bytes:
-    """
-    Renders an HTML string to a publication-ready vector PDF using headless Chrome/Edge and Playwright.
-    Returns empty bytes b"" if Playwright or Chrome is unavailable, falling back seamlessly.
-    """
+    """Render HTML to PDF with the existing browser renderer when it is available."""
     chrome_candidates = [
         os.environ.get("CHROME_PATH", ""),
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -349,7 +414,7 @@ def _render_html_with_playwright(
         r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
         r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
     ]
-    chrome_path = next((p for p in chrome_candidates if p and os.path.exists(p)), None)
+    chrome_path = next((path for path in chrome_candidates if path and os.path.exists(path)), None)
     if not chrome_path and not require_browser:
         return b""
 
@@ -357,26 +422,20 @@ def _render_html_with_playwright(
     try:
         from playwright.sync_api import sync_playwright
 
-        with tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w", encoding="utf-8") as f:
-            f.write(html_content)
-            tmp_path = f.name
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w", encoding="utf-8") as source_file:
+            source_file.write(html_content)
+            tmp_path = source_file.name
 
-        norm_path = tmp_path.replace("\\", "/")
-        file_url = f"file:///{norm_path}"
-
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
+        normalized_path = tmp_path.replace("\\", "/")
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(
                 executable_path=chrome_path if chrome_path else None,
                 args=["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
             )
             page = browser.new_page()
-            page.goto(file_url, wait_until="networkidle", timeout=timeout_ms)
+            page.goto(f"file:///{normalized_path}", wait_until="networkidle", timeout=timeout_ms)
             try:
-                page.wait_for_selector(
-                    ".render-complete[data-done='true']",
-                    state="attached",
-                    timeout=timeout_ms,
-                )
+                page.wait_for_selector(".render-complete[data-done='true']", state="attached", timeout=timeout_ms)
                 page.evaluate("() => document.fonts ? document.fonts.ready : Promise.resolve()")
             except Exception as exc:
                 if require_browser:
@@ -390,15 +449,11 @@ def _render_html_with_playwright(
                 print_background=True,
                 display_header_footer=True,
                 header_template=(
-                    f'<div style="font-size: 8pt; font-family: -apple-system, BlinkMacSystemFont, sans-serif; '
-                    f'color: #94a3b8; width: 100%; text-align: right; padding-right: 16mm;">'
+                    f'<div style="font-size:8pt;font-family:-apple-system,BlinkMacSystemFont,sans-serif;'
+                    f'color:#94a3b8;width:100%;text-align:right;padding-right:16mm;">'
                     f'{safe_header} &bull; Mentify Academic Prep</div>'
                 ),
-                footer_template=(
-                    '<div style="font-size: 8pt; font-family: -apple-system, BlinkMacSystemFont, sans-serif; '
-                    'color: #94a3b8; width: 100%; text-align: center;">'
-                    'Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>'
-                ),
+                footer_template=_pdf_brand_footer_html(),
             )
             browser.close()
             return pdf_bytes
@@ -665,7 +720,7 @@ def _export_topic_notes_reportlab(
         rightMargin=40,
         leftMargin=40,
         topMargin=40,
-        bottomMargin=40,
+        bottomMargin=52,
     )
 
     styles = getSampleStyleSheet()
@@ -980,7 +1035,7 @@ def _export_topic_notes_reportlab(
                 story.append(sol_table)
             story.append(Spacer(1, 10))
 
-    doc.build(story)
+    doc.build(story, onFirstPage=_draw_pdf_brand_footer, onLaterPages=_draw_pdf_brand_footer)
     return buffer.getvalue()
 
 
@@ -1001,7 +1056,7 @@ def _export_paper_questions_reportlab(
         rightMargin=40,
         leftMargin=40,
         topMargin=40,
-        bottomMargin=40,
+        bottomMargin=52,
     )
 
     styles = getSampleStyleSheet()
@@ -1147,7 +1202,7 @@ def _export_paper_questions_reportlab(
         q_flowables.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#e2e8f0"), spaceBefore=4, spaceAfter=12))
         story.append(KeepTogether(q_flowables))
 
-    doc.build(story)
+    doc.build(story, onFirstPage=_draw_pdf_brand_footer, onLaterPages=_draw_pdf_brand_footer)
     return buffer.getvalue()
 
 
@@ -1164,9 +1219,7 @@ def export_topic_notes_pdf(
     timeout_ms: int = 15000,
 ) -> bytes:
     """
-    Generate publication-ready PDF for topic notes.
-    Uses Playwright + Chrome for pixel-perfect KaTeX vectors and syntax highlighting,
-    with automatic fallback to ReportLab.
+    Generate a lightweight, branded PDF for topic notes.
     """
     level_labels = {
         "level_1": "Level 1: Intuition & Foundations",
@@ -1220,8 +1273,7 @@ def export_paper_questions_pdf(
     timeout_ms: int = 15000,
 ) -> bytes:
     """
-    Generate publication-ready PDF for past paper questions and step-by-step proofs.
-    Uses Playwright + Chrome for pixel-perfect KaTeX vectors, with automatic fallback to ReportLab.
+    Generate a lightweight, branded PDF for past paper questions and answers.
     """
     if not include_questions and not include_answers:
         raise ValueError("At least questions or answers must be selected for export.")

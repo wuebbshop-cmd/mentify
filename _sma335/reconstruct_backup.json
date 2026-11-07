@@ -1,0 +1,284 @@
+{
+ "987": {
+  "question_latex": "a) Give the order of each of the given differential equations.\n\ni) $xy\\dfrac{d^{3}y}{dx^{3}} - y^{2}\\sin x = 0$ **(2 marks)**\n\nii) $\\left[1 + \\left(\\dfrac{dy}{dx}\\right)^{2}\\right]^{3} = 2\\dfrac{d^{2}y}{dx^{2}}$ **(2 marks)**\n\nb) Solve $x\\dfrac{dy}{dx} = 5x^{4} + 4x^{2} + 2x$ by direct integration. **(4 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "53494312-9da3-4a9e-be9e-e0bab0bc3a99",
+   "source_page_number": 2,
+   "original_transcription": "COMPULSORY\n\na) Give the order of the given differential equation\n\n  d 3 2 y  2\n i) xy  2  − y sin x = 0 (2 marks)\n  dx \n\n 3\n  2  2 2  dy  d y\n ii) 1 +    = 2 (2 marks)\n   dx   dx\n\n dy 4 2b) Solve x = 5 x + 4 x + 2 x by direct integration (4 marks)\n dx\n\n Examination Irregularity is punishable by expulsion Page 1 of 3",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1001": {
+  "question_latex": "a) Distinguish clearly between the following terms as used in differential equations.\n\ni) Order and degree\n\nii) General solution and particular solution\n\n**(3 marks)**\n\nb) Form the differential equation by eliminating the arbitrary constants in\n\n$$\ny = Ax^{2} + Bx^{2}\\ln x .\n$$\n\n**(4 marks)**\n\nc) Show that\n\n$$\n(2x\\cos y + 3x^{2}y)\\,dx + (x^{3} - x^{2}\\sin y - y)\\,dy = 0\n$$\n\nis exact, hence or otherwise find its general solution. **(4 marks)**\n\nd) Find the particular solution of the initial value problem\n\n$$\n-2\\frac{d^{2}y}{dx^{2}} + 4\\frac{dy}{dx} + 13y = 0, \\qquad y(0) = -1, \\quad y'(0) = -4 .\n$$\n\n**(6 marks)**\n\ne) The population of a certain town is known to grow at a rate proportional to the number of people present. If after 10 years the population has doubled, and after three years the population is 400,000, estimate the number of people initially living in the city. **(5 marks)**\n\nf) Find the solution of the homogeneous system\n\n$$\n\\frac{dx}{dt} = 2x + 3y, \\qquad \\frac{dy}{dt} = 2x + y .\n$$\n\n**(5 marks)**\n\ng) Show that $y = x^{-2}$ is a solution to the differential equation\n\n$$\nx^{2}y'' + 5xy' + 4y = 0, \\qquad x \\neq 0 .\n$$\n\n**(3 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "4e5ad06c-fc8d-43fb-b1a9-f4f968fa5605",
+   "source_page_number": 2,
+   "original_transcription": "a) Distinguish clearly between the following terms as used in differential equations.\n\n i) Order and degree\n\n ii) General solution and particular solution\n\n (3 marks)\n\nb) Form the differential equation by eliminating the arbitrary constants in\n\n y = AX2 + BX2 In x. (4 marks)\n\nc) Show that (2xcos y + 3x2 y)dx + (x3 - X2 siny - y)dy = 0 is exact, hence\n\n or otherwise find its general solution. (4 marks)\n\nd) Find the particular solution of the initial value problem\n\n (6 marks) -2d 2 y + 4 »: d + 13y _ - O. y(O) _ - 1, y '()_0 - 4. dx x\n\ne) The population of a certain town is known to grow at a rate proportional to\n\n the number of people present. If after 10 years the population has doubled,\n\n and after three years the population is 400,000, estimate the number of people\n\n initially living in the city. (5 marks)\n\n Page 1 of3\n\n •\n\nf) Find the solution of the homogenous system.\n\n dx\n - = 2x+3y\n dt\n\n dy = 2x+ y\n dt\n (5 marks)\n\ng) Show that y = x-2 is a solution to the differential equation.\n x2y\"+5xy'+4y=0, x c- O. (3 marks)",
+   "original_extraction_issues": [
+    "question text contains OCR replacement of zero with capital O"
+   ]
+  }
+ },
+ "1005": {
+  "question_latex": "a) Find the general solution of the differential equation\n\n$$\n(D^{4} - 2D^{3} + 7D^{2} + 18D + 26)y = 0,\n$$\n\ngiven that one of the roots is $-1 + i$ and that complex roots occur in conjugate pairs. **(7 marks)**\n\nb) The rate at which a body cools is proportional to the difference between the temperature of the body and that of the surrounding air. If a body in air at $25^{\\circ}\\mathrm{C}$ will cool from $100^{\\circ}\\mathrm{C}$ to $75^{\\circ}\\mathrm{C}$ in one minute, find its temperature at the end of 3 minutes. **(8 marks)**\n\nc) Find the orthogonal trajectories of the family of curves\n\n$$\ny(x - 1) = c .\n$$\n\n**(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "4e5ad06c-fc8d-43fb-b1a9-f4f968fa5605",
+   "source_page_number": 3,
+   "original_transcription": "a) Find the general solution of the differential equation\n\n (D4 _ 2D3 + 7D2 + 18D + 26)y = 0, if one of the roots is -1+i and complex\n\n (7 marks) roots occur in conjugate pairs.\n\n Page 2 of3\n\n •\n\nb) The rate at which a body cools is proportional to the difference between the\n\n temperature of the body and that of the surrounding air. If a body in air\n at zs-c will cool from 1000e to 7Soe in one minute, find its temperature at the\n\n end of 3 minutes. (8 marks)\n\nc) Find the orthogonal trajectories of the family of curves y(x -1) = c'. (5 marks)",
+   "original_extraction_issues": [
+    "question text contains corrupted variable exponent notation"
+   ]
+  }
+ },
+ "1007": {
+  "question_latex": "a) Find the power series solution of the differential equation\n\n$$\n(x^{2} - 1)\\frac{d^{2}y}{dx^{2}} + x\\frac{dy}{dx} - y = 0\n$$\n\nabout the point $x = 0$. **(10 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "4e5ad06c-fc8d-43fb-b1a9-f4f968fa5605",
+   "source_page_number": 4,
+   "original_transcription": "a) Find the power series solution of the differential equation.\n\n (x2 -1) d?iax2 + x d~x - y = 0 about the point x = O. (10 marks)",
+   "original_extraction_issues": [
+    "question text contains OCR replacement of zero with capital O"
+   ]
+  }
+ },
+ "1019": {
+  "question_latex": "Find the general solution to the differential equation\n\n$$\n(D^{2} - 6D + 25)y = 0 .\n$$\n\n**(3 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f72c1a26-b5cd-4b53-ac82-1a6eaa6b8bfe",
+   "source_page_number": 2,
+   "original_transcription": "Find the general solution to the differential equation D 2  6 D  25 y  0  ",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1023": {
+  "question_latex": "4) Use the method of undetermined parameters to solve the differential equation\n\n$$\ny'' - 2y' - 3y = 3x^{2} + 4x - 5 .\n$$\n\n**(6 marks)**\n\n5) Solve the differential equation\n\n$$\n\\frac{d^{2}y}{dx^{2}} + \\cot x\\,\\frac{dy}{dx} = \\sin x .\n$$\n\n**(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f72c1a26-b5cd-4b53-ac82-1a6eaa6b8bfe",
+   "source_page_number": 2,
+   "original_transcription": "Use the method of undetermined parameters to solve the differential equation\n y   2 y   3 y  3 x 2  4 x  5 (6 marks)\n\n d 2 y dy\n  cot x  sin x (5 marks)5) Solve the differential equation 2\n dx dx",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1025": {
+  "question_latex": "6) Solve the differential equation\n\n$$\n(D^{4} + 2D^{3} - 7D^{2} + 2D + 70)y = 0\n$$\n\ngiven that one of the roots of the auxiliary equation is $-3 + i$. **(7 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f72c1a26-b5cd-4b53-ac82-1a6eaa6b8bfe",
+   "source_page_number": 2,
+   "original_transcription": "Solve the differential equation D 4  2 D 3  7 D 2  2 D  70 y  0 if one of the roots of the auxillary  \n equation is 3 i \n\n 1",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1028": {
+  "question_latex": "b) Solve the differential equations\n\ni) $y' = y^{2} + 1$. **(4 marks)**\n\nii) $(2y^{4} + x^{4})\\,dx - xy^{3}\\,dy = 0$. **(4 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "14688bc6-d6de-4bbb-ae75-846464e0f02a",
+   "source_page_number": 2,
+   "original_transcription": "b) Solve the differential equation\n\n i) y1 y 2  1 [4 marks]\n\n 3 dy  0 [4 marks] ii) 2 y 4  x 4 dx  xy",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1030": {
+  "question_latex": "c) Use the method of undetermined coefficients to solve the equation\n\n$$\ny'' + 9y = e^{-x} .\n$$\n\n**(4 marks)**\n\nd) Find a series solution about the point $x = 0$ of the differential equation\n\n$$\ny'' - y^{4} = 0\n$$\n\nusing the power series method. **(5 marks)**\n\ne) Determine the orthogonal trajectory obtained from the family of curves\n\n$$\ncy^{2} + x^{2} = 4 .\n$$\n\n**(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "14688bc6-d6de-4bbb-ae75-846464e0f02a",
+   "source_page_number": 2,
+   "original_transcription": "c) Use the method of undetermined co-efficient to solve the equation.\n y  9 y  e  x [4 marks]\n\n\n\nd) Find a series solution about the point x  0 of the d.e y y4  0.\n\n Using the power series method. [5 marks]\n\n\n\ne) Determine orthogonal trajectory obtained from the family of curves\n\n cy 2 x 2  4. [5 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1033": {
+  "question_latex": "a) Explain each of the following terms.\n\ni) Degree and order of a differential equation. **(3 marks)**\n\nii) The general solution of a differential equation of order $n$.\n\nb) Show that the transformation $y = vx$ reduces the equation given below into a separable equation, and hence solve it.\n\n$$\n(x^{3} + y^{3})\\,dx - 3xy^{2}\\,dy = 0 .\n$$\n\n**(10 marks)**\n\nc) Test for exactness and hence solve\n\n$$\n(y^{3} + 2x)\\,dx + (3xy^{2} + 1)\\,dy = 0 .\n$$\n\n**(7 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "14688bc6-d6de-4bbb-ae75-846464e0f02a",
+   "source_page_number": 3,
+   "original_transcription": ". a) Explain each of the following terms\n\n i) Degree and order of a differential equation. [ 3 marks]\n\n ii) The general solution of a differential equation of order n.\n b) Show that the transformation y  vx reduces the equation given below\n\n into a separable equation and hence solve it.\n\n 2 x 3  y 2 dx  3 xy 2 dy  0. [ 10 marks]\n\n c) Test for exactness and hence solve it.\n  y 3  2 x dx  3 xy 2  1dy =0 [ 7 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1036": {
+  "question_latex": "a) Solve the differential equation\n\n$$\n(D^{4} - 6D^{3} + 7D^{2} + 16D + 60)y = 0\n$$\n\ngiven that one of the roots is of the form $4 - 2i$. **(6 marks)**\n\nb) Solve the initial value problem\n\n$$\ny''' - 2y'' - 5y' + 6y = 0\n$$\n\nsubject to the conditions $y(0) = 4$, $y'(0) = 11$ and $y''(0) = 17$. **(6 marks)**\n\nc) A certain radioactive material is known to decay at a rate proportional to the amount present. If initially $500\\,\\mathrm{mg}$ of the material is present and after 3 years $20\\%$ of the original mass has decayed, find\n\ni) an expression for the amount present at any time $t$; **(4 marks)**\n\nii) the amount remaining after 25 years; **(2 marks)**\n\niii) the half life of the material. **(2 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "14688bc6-d6de-4bbb-ae75-846464e0f02a",
+   "source_page_number": 3,
+   "original_transcription": ". a) Solve the differential equation\n D 4  6 D 3  7 D 2  16 D  60 y  0 given that one root is of the form\n 4  i2 [ 6 marks]\n b) Solve the initial value problem y  2 y  5 y  6 y  0 subject to the\n condition y 0 ,4 y0  11 and y0  17 [ 6 marks]\n\n c) A certain radioactive material is known to decay at a rate proportional to\n\n the amount present. If initially 500mg of the material is present and after\n\n 3 years, 20% of the original mass has decayed, find\n\n i) an expression of the amount present at any time t. [ 4 marks]\n\n ii) the amount remaining after 25 years. [ 2 marks]\n\n iii) the half life of the material [ 2 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1039": {
+  "question_latex": "a) Use the method of undetermined coefficients to solve the differential equation\n\n$$\ny'' + 9y = 81x^{2} + 18x + 45 .\n$$\n\n**(8 marks)**\n\nb) Use the method of variation of parameters to solve the differential equation\n\n$$\ny'' + 4y' + 4y = 4x^{2}e^{-2x} .\n$$\n\n**(7 marks)**\n\nc) Solve the Bernoulli equation\n\n$$\nxy' + y = xy^{3} .\n$$\n\n**(7 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "14688bc6-d6de-4bbb-ae75-846464e0f02a",
+   "source_page_number": 3,
+   "original_transcription": ". (a) Use the method of undermined co-efficient to solve the differential\n equation y  9 y  81x 2  18 x  45. [ 8 marks]\n\n b) Use the variation of parameters method to solve the differential equation\n y  4 y  4 y  4 x 2 e 2 x [7 marks]\n\n c) Solve the Bernoulli’s equation xy  y  xy 3 [ 7 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1042": {
+  "question_latex": "a) Determine whether $y = \\dfrac{1}{x}$ is a solution of the differential equation\n\n$$\ny' + y^{2} = 0 .\n$$\n\n**(3 marks)**\n\nb) The solution to the differential equation\n\n$$\ny'' - 2xy' - 2y = 0\n$$\n\nis of the form $y = c_{1}y_{1} + c_{2}y_{2}$, where $y_{1}$ and $y_{2}$ are two linearly independent solutions. Use the power series method to solve the differential equation at $x_{0} = 0$. Give the first terms in $y_{1}$ and $y_{2}$.\n\nc) Solve the differential equations\n\ni) $4y'' - 12y' + 9y = 0$ **(5 marks)**\n\nii) $y'' - 2y' + 3y = 0$ **(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "14688bc6-d6de-4bbb-ae75-846464e0f02a",
+   "source_page_number": 4,
+   "original_transcription": ". (a) Determine whether y  1 x is a solution of the differential equation\n\n y  y 2  0. [ 3 marks]\n\n (b) The solution to the differential equation y  2 xy  2 y  0 is of the form\n\n y  c1 y1  c2 y2 where y1 and y2 are the two linearly independent\n\n solutions. Use the power series method to solve the differential equation at\n X o .0 Give the first terms in 1y and 2y.\n\n ( c) Solve the d.e\n i) 4 y  12 y  9 y  0 [ 5 marks]\n\n ii) y  2 y  3 y  0 [ 5 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1642": {
+  "question_latex": "b) Show that the differential equation\n\n$$\n(5x^{4} + 3x^{2}y^{2} - 2xy^{3})\\,dx + (2x^{3}y - 3x^{2}y^{2} - 5y^{4})\\,dy = 0\n$$\n\nis exact. Hence solve it. **(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "0c4a82c1-8d55-41d5-815a-111c5c0f737c",
+   "source_page_number": 6,
+   "original_transcription": "**\n\nb) Show that the differential equation\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n **Page 2 of 3**\n\n\\textsc{a higher education institution}\n\n\\textsc{University Examinations 2018/2019}\n\n**FIRST SEMESTER \n\n**SMA 335: ORDINARY DIFFERENTIAL EQUATIONS**\n\\end{tabular}\n\n**DATE:** MONDAY 19\\(^{\\text{th}}\\) NOVEMBER 2018 **TIME:** 2.00 P.M. - 4.00 P.M.\n\n**INSTRUCTIONS:** Answer Question One and any other **TWO** questions",
+   "original_extraction_issues": [
+    "question text begins with a stray Markdown bold marker",
+    "unclosed LaTeX environment",
+    "compound inline math is joined directly to surrounding prose"
+   ]
+  }
+ },
+ "1085": {
+  "question_latex": "b) Solve the differential equations\n\ni) $y' = y^{2} + 1$. **(4 marks)**\n\nii) $(2y^{4} + x^{4})\\,dx - xy^{3}\\,dy = 0$. **(4 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f2677f37-e77d-4df2-9b84-4fb75d0f15c7",
+   "source_page_number": 2,
+   "original_transcription": "b) Solve the differential equation\n\n i) y1 y 2  1 [4 marks]\n\n 3 dy  0 [4 marks] ii) 2 y 4  x 4 dx  xy",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1087": {
+  "question_latex": "c) Use the method of undetermined coefficients to solve the equation\n\n$$\ny'' + 9y = e^{-x} .\n$$\n\n**(4 marks)**\n\nd) Find a series solution about the point $x = 0$ of the differential equation\n\n$$\ny'' - y^{4} = 0\n$$\n\nusing the power series method. **(5 marks)**\n\ne) Determine the orthogonal trajectory obtained from the family of curves\n\n$$\ncy^{2} + x^{2} = 4 .\n$$\n\n**(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f2677f37-e77d-4df2-9b84-4fb75d0f15c7",
+   "source_page_number": 2,
+   "original_transcription": "c) Use the method of undetermined co-efficient to solve the equation.\n y  9 y  e  x [4 marks]\n\n\n\nd) Find a series solution about the point x  0 of the d.e y y4  0.\n\n Using the power series method. [5 marks]\n\n\n\ne) Determine orthogonal trajectory obtained from the family of curves\n\n cy 2 x 2  4. [5 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1090": {
+  "question_latex": "a) Explain each of the following terms.\n\ni) Degree and order of a differential equation. **(3 marks)**\n\nii) The general solution of a differential equation of order $n$.\n\nb) Show that the transformation $y = vx$ reduces the equation given below into a separable equation, and hence solve it.\n\n$$\n(x^{3} + y^{3})\\,dx - 3xy^{2}\\,dy = 0 .\n$$\n\n**(10 marks)**\n\nc) Test for exactness and hence solve\n\n$$\n(y^{3} + 2x)\\,dx + (3xy^{2} + 1)\\,dy = 0 .\n$$\n\n**(7 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f2677f37-e77d-4df2-9b84-4fb75d0f15c7",
+   "source_page_number": 3,
+   "original_transcription": ". a) Explain each of the following terms\n\n i) Degree and order of a differential equation. [ 3 marks]\n\n ii) The general solution of a differential equation of order n.\n b) Show that the transformation y  vx reduces the equation given below\n\n into a separable equation and hence solve it.\n\n 2 x 3  y 2 dx  3 xy 2 dy  0. [ 10 marks]\n\n c) Test for exactness and hence solve it.\n  y 3  2 x dx  3 xy 2  1dy =0 [ 7 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1093": {
+  "question_latex": "a) Solve the differential equation\n\n$$\n(D^{4} - 6D^{3} + 7D^{2} + 16D + 60)y = 0\n$$\n\ngiven that one of the roots is of the form $4 - 2i$. **(6 marks)**\n\nb) Solve the initial value problem\n\n$$\ny''' - 2y'' - 5y' + 6y = 0\n$$\n\nsubject to the conditions $y(0) = 4$, $y'(0) = 11$ and $y''(0) = 17$. **(6 marks)**\n\nc) A certain radioactive material is known to decay at a rate proportional to the amount present. If initially $500\\,\\mathrm{mg}$ of the material is present and after 3 years $20\\%$ of the original mass has decayed, find\n\ni) an expression for the amount present at any time $t$; **(4 marks)**\n\nii) the amount remaining after 25 years; **(2 marks)**\n\niii) the half life of the material. **(2 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f2677f37-e77d-4df2-9b84-4fb75d0f15c7",
+   "source_page_number": 3,
+   "original_transcription": ". a) Solve the differential equation\n D 4  6 D 3  7 D 2  16 D  60 y  0 given that one root is of the form\n 4  i2 [ 6 marks]\n b) Solve the initial value problem y  2 y  5 y  6 y  0 subject to the\n condition y 0 ,4 y0  11 and y0  17 [ 6 marks]\n\n c) A certain radioactive material is known to decay at a rate proportional to\n\n the amount present. If initially 500mg of the material is present and after\n\n 3 years, 20% of the original mass has decayed, find\n\n i) an expression of the amount present at any time t. [ 4 marks]\n\n ii) the amount remaining after 25 years. [ 2 marks]\n\n iii) the half life of the material [ 2 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1096": {
+  "question_latex": "a) Use the method of undetermined coefficients to solve the differential equation\n\n$$\ny'' + 9y = 81x^{2} + 18x + 45 .\n$$\n\n**(8 marks)**\n\nb) Use the method of variation of parameters to solve the differential equation\n\n$$\ny'' + 4y' + 4y = 4x^{2}e^{-2x} .\n$$\n\n**(7 marks)**\n\nc) Solve the Bernoulli equation\n\n$$\nxy' + y = xy^{3} .\n$$\n\n**(7 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f2677f37-e77d-4df2-9b84-4fb75d0f15c7",
+   "source_page_number": 3,
+   "original_transcription": ". (a) Use the method of undermined co-efficient to solve the differential\n equation y  9 y  81x 2  18 x  45. [ 8 marks]\n\n b) Use the variation of parameters method to solve the differential equation\n y  4 y  4 y  4 x 2 e 2 x [7 marks]\n\n c) Solve the Bernoulli’s equation xy  y  xy 3 [ 7 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ },
+ "1099": {
+  "question_latex": "a) Determine whether $y = \\dfrac{1}{x}$ is a solution of the differential equation\n\n$$\ny' + y^{2} = 0 .\n$$\n\n**(3 marks)**\n\nb) The solution to the differential equation\n\n$$\ny'' - 2xy' - 2y = 0\n$$\n\nis of the form $y = c_{1}y_{1} + c_{2}y_{2}$, where $y_{1}$ and $y_{2}$ are two linearly independent solutions. Use the power series method to solve the differential equation at $x_{0} = 0$. Give the first terms in $y_{1}$ and $y_{2}$.\n\nc) Solve the differential equations\n\ni) $4y'' - 12y' + 9y = 0$ **(5 marks)**\n\nii) $y'' - 2y' + 3y = 0$ **(5 marks)**",
+  "verification_status": "reconstructed",
+  "reconstruction_metadata": {
+   "reason": "The scanned PDF lost all operators and fractions, so the stored text was unreadable. Question wording recovered from the document-level text of the same PDF and cross-checked algebraically.",
+   "review_status": "source_flagged",
+   "source_document_id": "f2677f37-e77d-4df2-9b84-4fb75d0f15c7",
+   "source_page_number": 4,
+   "original_transcription": ". (a) Determine whether y  1 x is a solution of the differential equation\n\n y  y 2  0. [ 3 marks]\n\n (b) The solution to the differential equation y  2 xy  2 y  0 is of the form\n\n y  c1 y1  c2 y2 where y1 and y2 are the two linearly independent\n\n solutions. Use the power series method to solve the differential equation at\n X o .0 Give the first terms in 1y and 2y.\n\n ( c) Solve the d.e\n i) 4 y  12 y  9 y  0 [ 5 marks]\n\n ii) y  2 y  3 y  0 [ 5 marks]",
+   "original_extraction_issues": [
+    "unreadable private-use glyphs from source extraction"
+   ]
+  }
+ }
+}

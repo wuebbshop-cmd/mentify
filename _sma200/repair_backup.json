@@ -1,0 +1,1128 @@
+{
+ "deleted": [
+  {
+   "id": 709,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "a dx = + c , a is any positive constant ∫ ln a\n e x dx = e x + c 4. ∫\n\n For example\n x 2 x 2 dx = + c ∫ ln 2\n x 5 x 5 dx = + c ∫ ln 5\n1.8 (C) Basic Formulae for Integration of Trigonometric functions",
+   "status": "auto_validated"
+  },
+  {
+   "id": 710,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "cos xdx = sin x + c , since d (sin x + c ) = cos x ∫ dx\n\n 8",
+   "status": "auto_validated"
+  },
+  {
+   "id": 711,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sin xdx = − cos x + c , since d (cos x + c ) = − sin x ∫ dx\n\n 2 x 7. xdx = tan x + c , since d (tan x + c ) = sec ∫ sec2 dx\n d",
+   "status": "auto_validated"
+  },
+  {
+   "id": 712,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sec x tan xdx = sec x + c , since (sec x + c ) = sec x tan x ∫ dx\n d",
+   "status": "auto_validated"
+  },
+  {
+   "id": 713,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1237",
+   "text": "cos ecx cot xdx = − cos ecx + c , since (cos ecx + c ) = − cos ecx cot x ∫ dx\n 2 d 2 10. cos ec xdx = − cot x + c , since cot s = − cos ec x ∫ dx\n\nNote that we shall consider integration of tan x, cot x, sec x and cosec x afterwards.\n\n1.9 Addition and subtraction Rule in Integration\n\n d d d d\nJust like (u + v − w) = u + v − w ,\n dx dx dx dx\n\n we have wdx , ∫ ( u + v − w ) dx = ∫ udx + ∫ vdx − ∫\n where u, v, w are functions of x.\n\nFor example\n e x dx ∫ ( x 2 + sin x − e x ) dx = ∫ x 2 dx + ∫ sin xdx − ∫\n x 3 x = −cos x − e + c\n 3\n\n1.10 Integration of constant times a function\n\n f ( x ) dx ∫ kf ( x ) dx = k ∫\n\nFor example\n 3 3 5 x 4 x dx = + c∫ 5 x dx = 5 ∫ 4\n cos xdx = 8 sin x + c∫ 8 cos xdx = 8 ∫\n\nExample 1\nFind ( 2 x 5 + 3e x + 4 x + 5) dx ∫\n\n 9\n\nSolution\n dx∫ ( 2 x 5 + 3e x + 4 x + 5) dx = 2 ∫ x 5 dx + 3∫ e x dx + 4 ∫ xdx + 5 ∫\n 2 x 6 x 4 x 2 = + 3e + + 5 x + c\n 6 2\n x 6 x 2 = + 3e + 2 x + 5 x + c\n 3\n\nWe should put one constant c after the process of integration.\n\nNote that\n\n dx = x + c ∫\n d x = 5 x + c∫ 5dx = 5 ∫\n x 2\n xdx = + c∫ 2\n\nExample 2\nFind ( 2 x + 3)( x − 2) dx ∫\n\nSolution\nFirst we find the product and then we integrate\n ( 2 x + 3)( x − 2) dx∫\n= ( 2 x 2 + x − 6) dx ∫\n x 2 x 2\n= 2 + − 6 x + c\n 3 2\n\nExample 3\n  2 x 3 + 5 x 2 + 8 x + 9 \nFind dx ∫    x \n\nSolution\nFirst we divide each term by x and then we integrate\n  2 x 3 + 5 x 2 + 8 x + 9   2 x 3 5 x 2 8 x 9 \n dx = dx∫   ∫  + + +   x   x x x x \n\n 10\n\n 3 9  = 2 x + 5 x + 8 x +  dx ∫   x \n 2 x 3 5 x 2\n = + + 8 x + 9 ln x + c\n 3 2\n\nExample 4\n  x 2 + 5 x + 6 \nFind dx ∫    ( x + 2) \n\nSolution\n x 2 + 5 x + 6\nFirst we simplify the integrand and then we integrate.\n x + 2\n  x 2 + 5 x + 6  ( x + 3)( x + 2)\n dx dx =∫   ∫  ( x + 2)  ( x + 2)\n = ( x + )3 dx ∫\n x 2\n = + 3 x + c\n 2\n\nExample 5\n 3 9 x x\nIntegrate 9x + 3 + 2 + 3e − x +1 x\n\nSolution\n 3 9 x x\n∫ (9 x + 3 + 2 + 3e − x + )1 dx x\n 9x4 9x−2 2x x x2\n= + + + 3e − + x + c\n 4 − 2 ln2 2\n\nExample 6\nFind (2 cos x + 3 sin x + 4 sec 2 x − 5 cos ecx cot x )dx ∫\n\nSolution\n (2 cos x + 3 sin x + 4 sec 2 x − 5 cos ecx cot x )dx∫\n= 2 sin x − 3 cos x + 4 tan x + 5 cos ecx + c\n\n 11\n\nExample 7\n 2 2 x ( + 5secx tanx − 6cosec x + 4 + )8dxFind ∫ x\n\nSolution\n 2 2 x ( + 5 sec x tan x − 6 cos ec x + 4 + 8) dx ∫ x\n 1 2 x 2 dx + 5 sec x tan xdx − 6 cosec xdx + 4 dx + 8 dx= ∫ ∫ ∫ ∫ ∫ x\n 4 x\n= 2 ln x + 5 sec x + 6 cot x + + 8 x + c\n ln 4\n\nExercise 1\nUsing the ten basic formula for integration find\n  5 3 4 x x  1. 2 x + 5 − + 2e + 4 + 1 dx ∫   x x ",
+   "status": "flagged"
+  },
+  {
+   "id": 714,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "(3 sin x − 4 sec x tan x + 5 sec 2 x )dx ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 715,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1238",
+   "text": "(3 cos x − 4 cos ecx cot x + 5 cos ec 2 x )dx ∫\n  15 1 4 x 7  4. x + 15 + 8 x − 3e + + 7 x + 8  dx ∫   x x \n ( x 2 + 7 x + 10)",
+   "status": "flagged"
+  },
+  {
+   "id": 716,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( x + 5)\n x 2 + 6 x + 7",
+   "status": "auto_validated"
+  },
+  {
+   "id": 717,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( x − )1\n 3 x 2 + 4 x 3 + 8 x 5 + 9 x + 2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 718,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 2 x\n ( x 2 + 3 x + 1)( x 3 + 7 x 2 + 2)",
+   "status": "auto_validated"
+  },
+  {
+   "id": 719,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1239",
+   "text": "dx ∫ 2 x",
+   "status": "flagged"
+  },
+  {
+   "id": 721,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1240",
+   "text": "If (3 x 2 + 2 x − 12) dx = 0 find the values of x ∫\n  x 3 + 5 x 2 + 6 x ",
+   "status": "flagged"
+  },
+  {
+   "id": 722,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1241",
+   "text": "Find dx ∫  2   ( x + 2 x ) \n\n 12\n\ne 2 x + e 5 x − e x\n dx 12. Find x ∫ e\n\nYou have learnt the following from this chapter\n\n i). Integration is the reverse or converse process of differentiation.\n\n ii). The meaning of “integrand” and constant of integration.\n\n iii). The Ten Basic Formula for Integration, namely\n\n n x n + 1 x dx = + c if n ≠ -1 1. ∫ n + 1\n 1\n dx = ln x + c = ln Ax 2. ∫ x\n x a x",
+   "status": "flagged"
+  },
+  {
+   "id": 723,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "a dx = + c , ∫ ln a\n e x dx = e x + c 4. ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 724,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "cos xdx = sin x + c , ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 725,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sin xdx = − cos x + c , ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 726,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "xdx = tan x + c , ∫ sec2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 727,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sec x tan xdx = sec x + c , ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 728,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "cos ecx cot xdx = − cos ecx + c , ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 729,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "cos ec 2 xdx = − cot x + c , ∫\n\nFurther Reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 730,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1242",
+   "text": "Pure mathematics (First Coure)\n By J. K Backhouse and others\n Longman Group Ltd\n Harlow, Essex, U.K\n\n 13\n\nCHAPTER 2\n Integration of Functions Containing First Degree Expressions –\n Extension of the Basic Formula.\n\n2.1 Introduction\n\n In chapter one you have learnt to integrate functions using the Ten Basic\n Formulae. Unlike differentiation of functions, integration is not so easy, however\n we have about six techniques of integration with which a given function can be\n integrated. One of the techniques is integration using the Extension formulae.\n Suppose that a first degree expression is present in the place of x in the Ten Basic\n formula, we can use conveniently the same Basic formulae and obtain the result.\n The new formulae are called “the extension formulae”. In this chapter we shall\n integrate expressions containing the first degree, using the Ten Extension\n Formulae.\n\n2.2 Objectives of the chapter\n\n By the end of this chapter you should be able to\n • write the Ten Extension Formulae corresponding to the Ten Basic\n formulae.\n • apply the Ten Extension Formulae to integrate expressions containing\n first degree in x.\n\n2.3 Definition of the Integrand\n\n The expression to be integrated is written between the integral symbol and the\n corresponding dx symbol. This expression or the function is called the\n Integrand of the integral.\n\n For example in x 2 e x dx , the expression x2 ex is called the “integrand” of the ∫\n integration.\n\n Similarly in cos xdx , cos x is called “the integrand” of the integral. ∫\n\n2.4 The extension of the Basic formulae\n\n In each of the ten Basic formulae the integrand contains x. Suppose we replace x\n\n in both sides of the formula by a first degree expression in x of the form (2x +\n\n 3),\n\n 14\n\n(5x – 7), (3 - 4x) or (ax + b) in general. All the ten formulae hold good when we\n\ndivide the final result by coefficient of x namely a. The Ten Extension Formulae\n\nare given in the following table:\n\nBasic Formulae Corresponding Extension formulae with\n an example – Applicable for first degree in x only\n n x n + 1 n ( ax + b ) n + 1 ( ax + b ) dx = + c",
+   "status": "flagged"
+  },
+  {
+   "id": 731,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ x dx = + c ∫ a ( n + )1 n + 1\n 10 ( 2 x + )311\n (n ≠ -1) ( 2 x + )3 dx = + c e.g.∫ 112.\n\n 1 1 ln( ax + b )\n dx = ln x + dx = + c 2. ∫ ∫ x ax + b a\n 1 ln( 2 x − 3)\n dx = + c e.g.∫ 2 x − 3 2\n\n x p x ax + b p ax + b p dx = p dx = + c 3. ∫ + ∫ ln p a ln p\n 5 x + 1 35 x + 1 3 dx = + c (p is positive) e.g.∫ 5 ln 3\n\n e ax + b e x dx = e x + 4. e ax + b dx = ∫ ∫ + c a\n 4 − 7 x e 4 − 7 x e dx = + c e.g. ∫ − 7\n sin( ax + b ) 5. ∫ cos xdx = sin ∫ cos( ax + b ) dx = + c a\n sin 100 x\n cos 100 xdx = + c e.g.∫ 100\n\n 15\n\n− cos( ax + b ) sin xdx = − co 6. ax + b ) dx = + c ∫ ∫sin( a\n − cos(100 x + 5)\n sin(100 x + 5) dx = + c e.g. ∫ 100\n\n tan(ax + b ) sec2 xdx = ta 7. ∫ ( ax + b ) dx = ∫sec2 + c a\n tan(3 − 4 x )\n (3 − 4 x ) dx = + c e.g. ∫ sec2 − 4\n\n − cot( ax + b ) cos ec 2 xdx = − 8. ∫ cos ec 2 ( ax + b ) dx = ∫ + c a\n 2 − cot( 20 x + )1 cos ec ( 20 x + )1 dx = + c e.g. ∫ 20\n\n sec(ax + b) 9. sec x tan xdx ∫ sec(ax + b) tan(ax + b) dx = + c ∫ a\n sec 5 x\n sec 5 x tan 5 xdx = + c e.g. ∫ 5",
+   "status": "auto_validated"
+  },
+  {
+   "id": 732,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1243",
+   "text": "cos ecx cot xdx ∫ cos ec ( ax + b ) cot( ax + b ) dx = − cos ec ( ax + b ) + c ∫ a\n − cos ecπx\n cos ecπx cot πxdx = + c e.g. ∫ π\n\n2.5 Proof of the Ten Extension Formulae\n\n We shall prove some of he Ten Extension formulae using the substitution\n du\n u = ax + b so that dx =\n a\nExample 1\n n ( ax + b ) n + 1 a). Prove that ( ax + b ) dx = + c ∫ a ( n + )1\n b). Hence find ( 4 x + 9) 20 dx ∫\n\n 16\n\nSolution\n du\n Let u = a x + b so that dx =\n a\n u n du\n a) Then ∫ ( ax + b n) dx = ∫ a\n 1 n = u du (we use the Basic formula to get) ∫ a\n 1 u n + 1\n = + c\n a n + 1\n ( ax + b ) n + 1\n = + c\n a ( n + )1\n\n x 21\n b) Using dx = + c , ∫ x20 21\n 20 ( 4 x + 9) 21 ( 4 x + 9) dx = + c , ∫ 214.\n ( 4 x + 9) 21\n = + c\n 84\n\nExample 2\n 1 ln( ax + b )\n a). Prove that dx = + c ∫ ax + b a\n dx\n b). Find ∫ 7 − 100 x\n\nSolution\n 1\n a). We shall use the Basic formula dx = ln x + c to prove this result ∫ x\n du\n Let u = a x + b so that = dx\n a\n dx du 1\n Then ln u + c ∫ = ∫ = ax + b au a\n ln( ax + b )\n = + c\n a\n b). Using he extension formula\n dx ln(7 − 100 x )\n = + c ∫ 7 − 100 x − 100\n\n 17\n\ndx ln(7 − 100 x )\n unless you are asked to prove = + c you can just write ∫ 7 − 100 x − 100\n down the result without proof.\n\nExample 3\n ax + b e ax + bProve that e dx = + c where a and b are constants. ∫ a\n\nProof\nThe integrand contains a linear function of x namely (a x + b)\n\n du\nLet u = a x + b (1) so that = a (2)\n dx\n du\nand dx = (3)\n a\n\nSubstitution of (1) and (3) in the given integral\n + b du dx =∫ eax ∫ eu a\n 1 u = du ∫e a\n 1 u = e + c\n a\n e ax + b\n = + c\n a\n\nIn the same way by taking the linear function of x as u or u = a x + b we can establish\nall the ten extension formulae.\n\nExample 4\nFind ( 2 x + 35) dx ∫\n\nSolution\nWe compare this integration with dx ∫ x5\n x 6\n dx = + c∫ x5 6\n\nBy the extension technique\n\n 18\n\n5 ( 2 x + 3) 6 ( 2 x + 3) 6 ( 2 x + 3) dx = + c = + c∫ 6 × 2 12\n\nExample 5\n 1\nFind dx (1) ∫ (5 x − 7 )\n\nSolution\n 1\nWe compare (1) dx = ln x + c with∫ x\nBy the extension technique to (a x + b),\n 1 ln(5 x − 7 )\n dx = + c∫ (5 x − 7 ) 5\n\nExample 6\n\nFind e 3 − 4 x dx (1) ∫\n\nSolution\nWe compare (1) with the Basic formula\n e x dx = e x + c∫\n e 3 −4 x\n e 3 − 4 x dx = + cThen ∫ −4\n\nExample 7\nFind sin( 2 −x)3 dx (1) ∫\n\nSolution\nComparing (1) with the Basic formula\n sin xdx = − cos x + c∫\n cos( 2 − 3 x )\nwhere sin( 2 −x)3 dx = + c ∫ 3\n\nExample 8\nFind cos ec (5 − 4 x ) cot(5 − 4 x ) dx (1) ∫\n\nSolution\nComparing (1) with the corresponding basic formula\n\n 19\n\ncos ecx cot xdx = − cos ecx + c∫\n − cosec5( − 4x)\nWe have cos ec (5 − 4 x ) cot(5 − 4 x ) dx = + c ∫ − 4\nNote that the same (5 – 4x) should be present in both the places in (1), or else we\ncannot use the formula.\n\nExample 9\nFind (3 x + )115 dx (1) ∫\n\nSolution\n 15 x16Using ( x ) dx = + c we have ∫ 16\n 15 (3 x + )116 (3 x + )1 dx = + c ∫ 16 × 3\n (3 x + )116\n = + c\n 48\n\nNote:\nYou should note that the extension formula is applicable only when the integrand\nis of first degree in x, such as 2x + 3, 5 – 2x or (a x + b) in general when a and b are\nconstants.\n\nExample 10\n 1\nFind dx ∫ 3 x + 8\n\nSolution\n 1\nUsing the Basic dx = ln x + c formula∫ x\n 1 ln(3 x + 8)\nWe have dx = + c ∫ 3 x + 8 3\n\nExample 11\nFind sec 5 x tan 5 xdx ∫\n\nSolution\nUsing the Basic sec x tan xdx = sec x + c formula∫\n sec 5 x\nWe have sec 5 x tan 5 xdx = + c ∫ 5\n\n 20\n\nExample 12\n  10 2 − 3 x 1 2 Find 1( − x ) + e + − cos ec 7 x dx ∫  3 − x \n\nSolution\nUsing the corresponding Basic formula, we have\n\n  10 2 − 3 x 1 2  1( − x )11 e 2 − 3 x 1( − x ) + e + − cos ec 7 x dx = + − ln(3 − x ) + cot 7 x + c ∫  3 − x  − 11 − 3\n\nExercise 2",
+   "status": "flagged"
+  },
+  {
+   "id": 733,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Cos (4x + 3) 2. Sin 3 x 1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 734,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1244",
+   "text": "Sin x\n 2",
+   "status": "flagged"
+  },
+  {
+   "id": 735,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "e-2x 5. e3x-2 6.\n 2 x − 5",
+   "status": "auto_validated"
+  },
+  {
+   "id": 736,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "(4x – 3)3 8. cos (5x + 4) 9. Sin (3 – 4x)",
+   "status": "auto_validated"
+  },
+  {
+   "id": 737,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sec 3x tan 3x 11. cosec 2x cot 2x\n\nFind the integrals of the following",
+   "status": "auto_validated"
+  },
+  {
+   "id": 738,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "(sin 13 x + cos 4 x + e 2 x) dx ∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 739,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1245",
+   "text": "[2 x + 5 + ex − 5 − cos ec 2 5 x + ( 2 x + 3) 5 ]dx ∫\n\n  1 10 14. ( ax + b ) + cos( ax + b ) dx ∫ +  ax + b \n\n  1 1 2 1 15. sec x tan x + cos ec x  dx ∫   2 2 2 \n\n  2 1 1 16. (3 − 2 x ) + 2 + + sin(3 − 2 x ) dx ∫  (3 − 2 x ) 3 − 2 x \n\n 21\n\nSummary\nYou have learnt the following from this chapter\n • to integrate expressions using the Ten Extension Formulae\n\nFurther Reading",
+   "status": "flagged"
+  },
+  {
+   "id": 740,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Advanced Calculus\n By Watson Fulks\n John Wiley & sons\n New York Brisbane. Toronto\n\n 22\n\nCHAPTER 3\n Integration Using Substitutions.\n\n3.1 Introduction\n\nIn the previous chapters you have learnt to integrate expressions using the Ten Basic\nformulae and the extension of the formulae. In this chapter you will learn one of the\nmost important techniques of integration of expressions consisting of two functions\none of which is the derivative of the other.\n\n3.2 Objectives of the Chapter:\n\nBy the end of this chapter you should be able to\n • recognize a function u and its derivative u′ in the integrand\n • integrate the expression using the substitution u and u′.\n • adjust the derivative so that the integrand consists of one function u and its\n derivative.\n • derive the formulae for integration of tan x and cos x.\n\n3.3 Integration using substitution.\n\nWhen the integrand consists of two functions one of which is the derivative of the\nother function we use the substitution technique of integration. We call the main\n du\nfunction as u and its derivative as u′ or so that u′ dx will become du. The\n dx\nsubstitution transforms the integral into one of the basic formula of integration in the\nnew variable u only. Hence we integrate easily using the basic formula. The\ntechnique is illustrated in the following examples.\n\nType 1\n\n u ′\n dx = ln u + c ∫ u\n\nExample 1\n 3 x 2 + cos x\nConsider dx ∫ 3 x + sin x\n\n3x2 + cos x is the derivative of x3 + sin x.\nLet us use the substitution\n\n 23\n\nu = x3 + sin x (1)\n\n du\n Then = 3x2 + cos x\n dx\n\nThen du = (3x2 + cos x ) dx. (2)\n\nUsing (1) and (2) the integral is transformed into\n du\n which comes under one of the basic formulae ∫u\n\n 3x 2 + cos x du\nHence ∫ 3 dx = x + sin x u\n\n = ln u + c\n = ln (x3 +sin x ) + c\nType 2\n\n u ′ du − n u − n +1 dx = = u du = + c n n∫ ∫ ∫ u u − n + 1\n\nExample 2\n\n 3 x 2 + cos x\nConsider dx ∫ 3 x + sin x\n\nAgain there are two functions\n x3 + sin x and its derivative 3x2 + cos x (leaving the index ten)\n\nLet u = x3 + sin x (1)\n\n du\nThen = 3x2 + cos x\n dx\n\n or du = (3x2 + cos x ) dx (2)\n\nSubstitution of (1) and (2) in the given integral\n\n 24\n\ndu 2 + cos x (3 x )dx = 3 10 10 ∫ ∫ ( x + sin x ) u\n\n 10du (using the Basic formula we have) = u∫ −\n\n u −9\n = + c\n − 9\n\n = 1 + c\n -9u9\n\n 1\n = 3 9 + c − 9( x + sin x )\n\nType 3\n\n e u du = e u + c ∫eu u′ dx = ∫\n\n x 3 + sin x 2\nConsider e (3x + cos x ) dx ∫ ∫\n\nThe integrand contains the function\n u = x3 + sin x and its derivative (3x2 + cos x)\n\n Let u = x3 + sin x (1)\n\n du\n = 3x2 + cos x\n dx\n\nThen du = (3x2 + cosx) dx (2)\n\nSubstitution of (1) and (2) in the given integral\n e x + sin x (3x 2 + cos x ) dx ∫ 3\n e u du = ∫\nusing the basic formula\n = e u + c\n\n 25\n\n= e x 3 +sin x + c\n\n n u n + 1 u du = + cType 4 ∫un u/ dx = ∫ n + 1\n\nConsider ∫ (x3 + 3x2 + 6x + 2 )15 (3x2 + 6x + 6) dx\n\nThe integrand contains the function\n u = x3 + 3x2 + 6x + 2 and its derivative (3x2 +6x +6)\nLet u = x3 + 3x2 + 6x + 2\n\n and du = (3x2 + 6x + 6 ) dx (2)\n\nSubstitution of (1) and (2) in the given integral\n ∫ (x3 + 3x2 + 6x + 2)15 (3x2 + 6x + 6 )dx =∫ u15 du\n\n u 16\n = + c\n 16\n ( x 3 + 3 x 2 + 6 x + 2 )16\n = + c\n 16\nType 5\n ∫sin u u1 dx form = ∫ sin u du = - cos u + c\n\nConsider sin (x 3 + x 2 + 5) (3x 2 + 2x) dx . . ∫\nThe integrand contains a function\n u = x3 + x2 + 5 (within sine) and its derivative\n\n u1 = 3x2 + 2x\n\nLet u = x3 + x2 + 5 (1)\n du\nThen = 3x2 + 2x\n dx\n\n or du = (3x2+2x) dx (2)\n\nSubstitution of (1) and (2) in the given integral\n\n 26\n\nsin (x 3 + x 2 + 5) (3x 2 + 2x) dx . ∫\n =∫ sin u du which is a standard formula\n\n = -cosu + c\n = -cos (x3+x2+5) + c\n\nType 6\n∫cosec u cot u. u1 dx = ∫cosec u cot u du = - cosec u + c\nConsider ∫cosec x2 cot x2 (2x) dx\n\n du\nHence u = x2 and = 2x or du = 2xdx\n dx\n\nSubstitution of u in the given integral gives\n∫cosec u cot u du = -cosec u + c using formula\n = -cosec x2 + c\nExample 3\nFind x tanx dx ∫ sec2\nThe integrand contains u = tan x and its derivative sec2 x\n\nLet u = tan x (1)\n\n du\nThen = sec2x\n dx\n\n or du = sec2 x dx (2)\n\nSubstitution of (1) and (2) in the given integral\n\n udu∫ tan x sec 2 x dx = ∫\n\n u 2\n = + c\n 2\n\n = tan2 x + c\nExample 4\n\n cosx dxFind ∫ esinx\n\n 27\n\nLet u = sin x, du = cos xdx\n duHence cos xdx = ∫ eu ∫ esin x\n = eu + c\n = esin x + c\nExample 5\n\nFind (tan x )10 sec 2 xdx ∫\nLet u = tan x, then du = sec2 xdx\n duHence ∫(tan x )10 sec 2 xdx = ∫ u10\n u 11\n = + c\n 11\n tan11 x\n = + c\n 11",
+   "status": "auto_validated"
+  },
+  {
+   "id": 741,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Adjustment of the derivative\nSometimes the integrand may not have the exact derivative of the function u present.\nIn such cases we shall adjust the derivative so that the function u and its exact\nderivative u1 are present in the integrand. The following examples shall illustrate this\nprinciple.\n\nExample 6\n\n x 2 + x + 1\n dxFind 3 3 ∫ 2x + 3x + 6x + 5\n\nSolution\nThe integrand has one function\n u = 2x3 + 3x2 + 6x + 5\nThen u1 = 6x2 + 6x + 6 = 6 (x2 + x + 10)\nThe other function present in the integrand is (x2 + x + 1). We must multiply this\nsecond function by six and divide by six to get u1.\n\n x 2 + x + 1 1 6x 2 + 6x + 1\n dxThus 3 2 3 2 ∫ dx = ∫ 2x + 3x + 6x + 5 6 2x + 3x + 6x + 5\n\nNow the integrand has u and its derivative u1.\nLet u = 2x3 + 3x2 + 6x + 5\n\n 28\n\ndu\n = 6x2 + 6x + 6 = 6(x2 + x+1)\n dx\n du = (6x2+6x+6) dx\n\nThen the given integral is transformed into\n 1 du 1\n ln u + c ∫ = 6 u 6\n\n 1 = ln (2x3 + 3x2 + 6x+5) + c\n 6\n\nExample 7\n\n x 3 x 4 - 1 dxFind ∫\n\nSolution\n\nLet u = x4-1\ndu\n = 4x3\n dx\n\n du = 4x3dx\n 3 4 1 3 4 4x x − 1 dxThen ∫ x x - 1 dx = ∫ 4\n 1 1\n u 2 du = ∫ 4\n\n 3\n u 2\n = + c\n 6\n\n 1 4 3/2 = (x -1) + c\n 6\n\nExample 8\n\nFind x tan x dx ∫ sec5\n\n 29\n\nSolution\n du\nIf u = sec x, = sec tan x\n dx\n\nNow x tan x dx = x secx tan xdx . ∫ sec5 ∫ sec4\n Let u = sec x du = sec x tan xdx\n\n duThen tanxdx = ∫ sec5 ∫ u4\n\n u5\n = + c\n 5\n sec 5 x\n = + c\n 5\n\nExample 9\n\n 8x cos 8xdxFind ∫ sin3\n\n du\nLet u = sin 8x, = 8 cos 8x\n dx\n\n du = 8 cos 8xdx\n 1 3Then 8x cos 8xdx = sin 8x(8 cos 8x)dx ∫ sin3 ∫ 8\n 1 3 = u du ∫ 8\n u 4\n = + c\n 32\n sin 4 8x\n = + c\n 32\n\n3.5 Integration of tan x and cot x (formulae)\n sinx\na) tan xdx = dx ∫ cos\n\n du\nLet u = cosx, = -sinx,\n dx\n\n du = -sinx dx,\n\n 30\n\n- sinx\n dxThen ∫ tan xdx = − ∫ cos\n\n − du\n = − ∫ u\n = - ln u + c\n = ln u-1 + c\n\n 1\n = ln + c\n u\n 1\n = ln + c\n cos x\n\n = ln (secx) + c\nwe write ∫tan xdx = ln secx + c\n\nshowing that ln of negative values does not exist\nb) Find ∫cot xdx\n cos x\n dx cot xdx = ∫∫ sin x\n\nLet u = sin x so that du = cos dx\n\n du\n ln u + cThen ∫cot xdx = ∫ = u\n cot xdx = ln (sin x ) + c ∫\n\nExercise 3\n\nFind the integrals of the following:\n 3x 2 + 2\n dx 1. ∫ 3 x + 2x + 1\n\n cosx + e x\n dx 2. ∫ x e + sin x\n\n 31\n\nx 2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 742,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "e xdx ∫\n\n x (x 2 - 3) 5 dx 4. ∫\n\n x + 1\n dx 5. 2 ∫ x + 2x - 5\n\n 2x 3x2 - 5 dx 6. ∫\n\n x -1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 743,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx 2 ∫ (2x - 4x +1)5\n\n ex\n dx 8. x ∫ e 1-\n (lnx)2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 744,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1246",
+   "text": "dx ∫ x\n tan5 x sec2 xdx 10. ∫\n\n sec2 x tan2 xdx 11. ∫\n\n sec 4 x tan xdx 12. ∫\n\n Summary\n\nYou have learnt the following from this chapter:",
+   "status": "flagged"
+  },
+  {
+   "id": 745,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1247",
+   "text": "When the integrand contains a function and its derivative you can integrate\n using the substitution:",
+   "status": "flagged"
+  },
+  {
+   "id": 746,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "The following are the formulae learnt:\n\n u ′\n dx = ln u + c a) ∫ u\n\n 32\n\nu′ u-n+1\n dx = + c b) n ∫ u 1- n\n\n n un+1 u u′dx= + c c) ∫ 1+ n\n\n eu u′ dx = eu + c d) ∫\n\n (sin u) u′ dx = - cos u + c e) ∫\n and similar trigonometric results.\n f) tan x dx = ln sec x + c\n\n g) cot x dx = ln sin x + c\n\n Further Reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 747,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1248",
+   "text": "Advanced Calculus\n By Watson Fulks\n John Wiley & sons\n New York Brisbane. Toronto\n\n 33\n\nCHAPTER 4\n Integration by parts\n\nIn chapter three you have learnt to integrate an expression containing two functions\none of which is the derivative of the other. If the two functions in the integrand are\nnot related we use an important technique called integration by parts. We shall\nestablish a formula using the product rule of differentiation and apply the same to\nintegrate product of two functions.\n\n4.2 Objectives of the Chapter:\nBy the end of this chapter you should be able to\n  derive the formula for integration by parts\n  apply the formula to integrate product of two functions.\n\n4.3 Integration by parts – Formula\nWe shall establish the formula\n dv du\n u dx = uv − v dx (1) ∫ ∫ dx dx\n\nFormula (1) is also written as\n ∫ udv = uv – ∫vdu (2)\n\nIn formula (1) the integrand contains the product of two functions namely\n dv\n u and\n dx\nThe result (1) will be helpful only when\n du dv\n is easier thanv∫ u∫ dx dx\n\nFormula for integration by parts\n\n d(uv ) dv du\nWe know that = u + v (3)\n dx dx dx\n\n dv d (uv ) du\nThen u = − v (4)\n dx dx dx\nIntegrate both sides of (4) with respect to x\n\n dv du\n u dx = uv − v dx (5)∫ ∫ dx dx\n\n 34\n\nvor ∫ udv = uv - ∫du\n\n dv\nNote: The functions u and can be Logarithmic, Inverse trigonometric, Algebraic,\n dx\nTrigonometric or Exponential. We must arrange the two functions in proper order in\nthe integrand before we proceed to apply the formula. You remember the order using\nthe key word.: LIATE\n\nwhere L, I, A, T and E represents the functions Logarithmic, Inverse trigonometric,\nAlgebraic, Trigonometric or Exponential respectively.\nThe following examples illustrate the process of integration by parts.\n\nExample 1\nFind ∫ex x dx\n\nSolution\nThe integrand consists of product of two functions ex (Exponential) and x\n(Algebraic).\nRemember the order LIATE\nAlgebraic function should come first and then only Exponential function must be\nwritten\nIf we do not follow this principle\n du dv\n ∫v will be more complicated than ∫u (Remember LIATE ! )\n dx dx\n\nThe required integration is\n x e x dx (in proper order) ∫\n We let u = x\n du dv = 1 = ex\n dx dx\n d 2 u\n dx 2 = 0 v = ∫ ex dx\n v = ex\n\n(constant we can put at the end)\n\nSubstitution of the results in the formula\n dv du\n v dx ∫ u dx = uv − ∫ dx dx\n\n 35\n\nx\n e 1 dxWe have ∫ x e x dx = xe x - ∫\n = xex – ex + c\n\nExample 2\nFind ∫x cos dx\n\nSolution\n(The order of LIATE is correct. Algebraic first and then comes Trigonometric;\notherwise the formula will not be useful. Check yourself).\n dv\nLet u = x =cos x, dv = cosxdx\n dx\n\n du\n = 1 v = ∫cos xdx\n dx\n v = sin x\n\nUsing the formula\n dv du\n v dx ∫ u dx = uv − ∫ dx dx\nWe have ∫x cos xdx = x sin x – ∫sin x + dx\n = x sin x + cos x + c\nExample 3\nFind ∫ x3 ln x dx\n\nSolution\n\n∫ x3 ln xdx = ∫ ln x. x3 dx writing in the order LIATE\n Let u = ln x dv = x3\n x 4 du 1 3 x dx = = v = ∫ dx x 4\n\nSubstituting in the formula\n dv du\n v dx we have ∫ u dx = uv − ∫ dx dx\n\n 36\n\n3 x 4 x 4 1 dx ∫ ln x ( x )dx = ln x. − ∫ 4 4 x\n 3 x 4 x 3 dx ∫ x ln xdx = ln x − ∫ 4 4\n x 4 x 4\n = ln x − + c\n 4 16\n\nExample 4\nFind ∫x2 e2x dx\n\nSolution\nThe order of x2 e2x satisfies “LIATE”\n dv 2 x Let u = x2 = e\n dx\n du\n = 2x v = ∫e2x dx\n dx\n e 2x\n = (constant can be put at the end)\n 2\n\nUsing the formula\n dv du\n v dx ∫ u dx = uv − ∫ dx dx\n 2 2x x 2 e 2x e 2xwe have 2xdx ∫ x e dx = - ∫ 2 2\n\n 1 2 2x 2x\n x e dx (1) = x e - ∫ 2\n\nNow we must integrate ∫x e2x dx\n\n dvAgain let u = x = e2x\n dx\n\n du 2x 1 2x e dx = e = 1 v = ∫ dx 2\n\n 37\n\nUsing the formula\n dv du\n v dx ∫ u dx = uv − ∫ dx dx\n 2x 1 2x 1 2x e 1 dxWe have ∫ xe dx = xe - ∫ 2 2\n\n 1 2x 1 2x = xe - e (2)\n 2 4\n\nUsing the result (2) in (1)\n 2 2x 1 2 2x 1 2x 1 2x x e dx = x e − ( x e - e ) ∫ 2 2 4\n\n 1 2 2x 1 2x 1 2x = x e - x e + e + c\n 2 2 4\n\n 1 2x 2 = e (2x - 2x + 1) + c\n 4\n\nExample 5\nFind ∫ x2 cos x dx\n\nSolution\n(In this problem Algebraic Function x2 comes before the Trigonometric function cos\nx. This satisfies the condition of LIATE).\n dvLet u = x2 = cos x\n dx\n du cos x dx = sin x = 2 x v = ∫ dx\n\nUsing the formula\n dv du\n v dx we have ∫ u dx = uv − ∫ dx dx\n\n sin x 2x dx ∫ x 2 cos xdx = x 2 sin x - ∫\n x sin xdx (1) = x2 sin x - 2 ∫\n\n 38\n\nNow we must integrate sin xdx x∫\nUsing again integration by parts.\n dv\n Let u = x = sin x\n dx\n du\n sin xdx = - cosx = 1 v = ∫ dx\n\nApplying the formula\n dv du\n v dx we have ∫ u dx = uv − ∫ dx dx\n\n ∫ x sin xdx = -x cos x + ∫ cos x 1 dx\n = -x cos x + sin x (2)\n\nUsing the result (2) in (1) we have\n ∫ x2 cos x dx = x2 sin x – 2 (– x cos x + sin x ) + c\n = x2 sin x + 2x cos x – 2 sin x + c\n\nExample 6\nFind ∫x3 ln x dx\n\nSolution\nTo satisfy the condition for LIATE we write the integral as\n ∫ ln x (x3) dx\n\n dv\nLet u = ln x = 3x\n dv\n\n du 1 3 x 4 x dx = = v = ∫ dx x 4\n\nApplying the formula\n dv du\n v dx we have ∫ u dx = uv − ∫ dx dx\n\n 3 x 4 x 4 1 dx∫ (ln x) x dx = (lnx) - ∫ 4 4 x\n\n 39\n\n1 4 1 3 x dx = x ln x - ∫ 4 4\n 1 4 1 4 = x ln x - x + c\n 4 16\n\n4.4 Formula for integration of ln x, x>0\n\n ln x dx = x ln x - x + c ∫\n\nProof\nConsider ∫ ln x dx = ∫ ln x 1 dx\n\n dv\nLet u =ln x = 1\n dx\n du 1\nThen = v = ∫ 1dx = x\n dx x\n\nUsing the formula\n\n dv du\n v dx ∫ u dx = uv − ∫ dx dx\n 1\n x dx ∫ lnx dx = x ln x - ∫ x\n = x ln x –∫ dx\n = x ln x – x + c\n\nExample 7\nFind ∫ (ln x)2 dx\n\nSolution\n (lnx) 2 1.dx ∫ (lnx) 2 dx = ∫\n dv\nLet u = (lnx)2 = 1\n dx\n du 1\n = 2lnx v= ∫ 1 dx = x\n dx x\n\n 40\n\nSubstitution of the results in the formula\n dv du\n v dx∫ u dx = uv − ∫ dx dx\n 2 2 1 2x(ln x ) dx ∫ (lnx) dx = x(lnx) - ∫ x\n\n (ln x ) dx = x(lnx)2 - 2 ∫\n = x(ln x)2 – 2(x lnx – x) + c\n\n = xlnx (lnx-2) + 2x + c\n\nExercise 4\nFind\n1 ∫ xe2x dx 7 ∫ x2 ln x dx\n\n2 ∫ x sin x dx lnx 8 dx ∫ 2 x\n3 ∫ x lnx dx 9 ∫ ln 2x dx\n\n4 ∫ ln (x-1) dx 10 ∫ tan-1 x dx\n\n5 ∫ x cos 3x dx 11 ∫ x2 sin xdx\n\n6 ∫ ex sin x dx 12 ∫ x-3 lnx dx\n\nSummary\n\nYou have learnt the following from this chapter:",
+   "status": "flagged"
+  },
+  {
+   "id": 748,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Formula for integration by parts\n dv du\n v dx∫ u dx = uv − ∫ dx dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 749,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Apply the formula to integrate product of two functions.",
+   "status": "auto_validated"
+  },
+  {
+   "id": 750,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "The formula ∫ ln x dx = x ln x – x + c where x > 0.\n\nFurther Reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 751,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1249",
+   "text": "Advanced Calculus\n Watson Fulks\n John Wiley & Sons\n New York. Brisbane. Toronto.\n\n 41\n\nCHAPTER 5\n Integration Using Trigonometric Identities.\n\n 5.1 Introduction\n\n You have learnt some four important techniques of Integration so far. Now we\n shall learn in this chapter to integrate expressions using trigonometric identities\n and substitutions of trigonometric functions. Thus we transform the integrals to\n one of the basic formulae and then integrate easily.\n\n 5.2 Objectives of the chapter.\n\n By the end of this chapter you should be able to: -\n • use one of the important techniques of integration namely, integrating\n trigonometric expressions using trigonometric identities.\n\n 5.3 Review of some Important Trigonometric Identities Used in Integration.\n i). Sin2 x + cos2 x = 1\n ii). 1 + tan2 x = sec2 x\n iii). 1 + cot2 x = cosec2 x\n\n iv). sin 2x = 2 sin x cos x\n v). cos 2x = cos2 – sin2 x = 2 cos2 x – 1 = 1 – 2 sin2 x\n\n vi). sin (A + B) = sin A cos B + cos A sin B (1)\n\n vii). sin (A – B) = sin A cos B – cos A sin B (2)\n\n Adding (1) and (2) we get the formulae:\n\n 2 sin A cos B = sin (A + B) + sin (A – B) (3)\n\n Subtracting (2) from (1),\n\n 2 cos A sin B = sin (A + B) – sin (A – B) (4)\n\nviii). cos (A + B) = cos A cos B – sin A sin B (5)\n\n ix). cos (A – B) = cos A cos B + sin A sin B (6)\n\n adding (5) and (6)\n\n 2 cos A cos B = cos (A + B) + cos (A – B) (7)\n\n subtracting (6) from (5) we have\n\n -2 sin A sin B = cos (A + B) – cos (A – B) (8)\n\n 42\n\nFormulae (3), (4), (7) and (8) are very useful to resolve the product of two\n trigonometric functions into sum of two functions and integrate the sum of the\n functions easily. (Anyone of the formulae (3) or (4) is enough).\n\n x). sin 3 x = 3 sin x – 4 sin3 x\n 3 1\n Hence sin3 x = sin x − sin 3 x\n 4 4\n 3 sin 30 x\n Similarly sin3 30 x = sin 10 x −\n 4 4\nxi). Cos 3 x = - 3 cos x + 4 cos3 x\n 3 1\n Cos3 = cosx + cos3x\n 4 4\n\n 5.4 Integration using the fundamental identities\n Sin2 x + cos2 x = 1 (1)\n 1 + tan2 x = sec2 x (2)\n 1 + cot2 x = cosec2 (3)\n\n Example 1\n sin2 x\n Find dx ∫+1 cos x\n\n Solution\n Using the identity (1) sin 2 x + cos2 x = 1\n\n sin2 x 1( − cos 2 x )\n dx = dx ∫+1 cos x ∫ 1( + cos x )\n\n (1 − cos x )(1 + cos x )\n = dx ∫ 1( + cos x )\n\n = (1 − cos x) dx ∫\n\n = x – sin x + c\n\n Example 2\n\n tan 2 xdx Find ∫\n\n 43\n\nSolution\nWe use 1 + tan2 x = sec2 x\n (sec 2 x − )1 dxThen ∫ tan 2 xdx = ∫\n 1dx = ∫ (sec 2 xdx − ∫\n = tan x – x + c\n\nExample 3\n cos2 x\nFind dx ∫−1 sin x\n\nSolution\nWe have the identity cos2 x = 1 – sin2 x\n\n cos2 x (1 − sin 2 x )\nThen dx dx ∫−1 sin x =∫ 1( − sin x )\n\n (1 + sin x )(1 − sin x )\n dx =∫ 1( − sin x ) dx\n\n = (1 + sin x) dx ∫\n\n = sin xdx ∫ 1dx + ∫\n\n = x – cos x + c\n\nExample 4\nFind cot 2 xdx ∫\n\nSolution\nUsing the identity 1 + cot2 x = cosec2 x, we have\n (cos ec 2 x − )1 dx∫ cot 2 xdx = ∫\n = ∫ cos ec2 xdx −dx∫\n = - cot x – x + c\n\n5.5 Integration using the identity\n Cos 2x = cos2 x – sin2 x\n = 2 cos2 x – 1\n = 1 – 2 sin2 x.\n\n 44\n\nExample 5\n sin 2 xdxFind = ∫\n\nSolution\n 1 1\nUsing the identity cos 2x = 1 – 2 sin2 x, 2 sin2 x = 1 – cos 2x or sin2 x = − cos 2 x\n 2 2\n 2  1 1 Hence sin xdx = cos 2 x  dx ∫  − ∫  2 2 \n 1 1 sin 2 x\n = x − + c\n 2 2 2\n 1 1\n = x − sin 2 x + c\n 2 4\n\nExample 6\n cos 2 10 xdxFind = ∫\n\nSolution\nUsing the identity cos 2x = 2 cos2 x – 1\n 1 1\nCos 20 x = 2 cos2 10x – 1, then cos2 10x = + cos 20 x\n 2 2\n\n 2  1 1 \n cos 20 x  dxThen cos 10 xdx = ∫  + ∫  2 2 \n\n 1 1\n = x + sin 20 x + c\n 2 40\n\nExample 7\n cos 6 x\nFind dx =∫ (cos 3 x − sin 3 x )\n\nSolution\nUsing the identity cos 2x = cos2 x – sin2 x\nCos 6 x = cos2 3x – sin2 3x\n\n cos 6 x (cos 2 3 x − sin 2 3 x )\nHence dx = dx ∫ ∫ (cos 3 x − sin 3 x ) (cos 3 x − sin 3 x )\n\n 45\n\n(cos 3 x + sin 3 x )(cos 3 x − sin 3 x ) dx\n = ∫ (cos 3 x − sin 3 x )\n 3 x + sin 3 x ) dx =∫(cos\n sin 3 x cos 3 x\n = − + c\n 3 3\n\n5.6 Integration using the identities,\n 2 sin A cos B = sin (A + B) + sin (A – B)\n 2 cos A cos B = cos (A + B) + cos (A – B)\n -2 sin A sin B = cos (A+B) – cos (A – B)\n\nThese identities convert the product into sums. The following examples illustrate the\nuse of these identities.\n\nExample 8\nFind ∫sin 10x cos8x dx\n\nSolution\nUsing the identity 2 sin A cos B = sin (A + B) + sin (A – B)\n 1\nWe have ∫ sin 10 x cos 8 xdx = ∫ 2 sin 10 x cos 8 xdx 2\n 1\n = (sin 18 x + sin 2 x ) dx ∫ 2\n 1  1 1  =  − cos 18 x − cos 2 x  + c\n 2  18 2 \n − 1 1\n = cos 18 x − cos 2 x + c\n 36 4\n\nExample 9\nFind = cos 12 x sin 3 xdx ∫\n\nSolution\n cos 12 x sin 3 xdx = sin 3 x cos 12 xdx∫ ∫\n 1\n = 2 sin 3 x cos 12 xdx ∫ 2\n\n 46\n\n1 = [sin 15 x + sin( − 9 x ) ]dx ∫ 2\n 1\n (sin 15 x − sin 9 x ) dx = ∫ 2\n 1 1 1\n ( − cos 15 x + cos 9 x ) + c = ∫ 2 15 9\n 1 1\n = − cos 15 x + cos 9 x + c\n 30 18\nExample 10\nFind = cos 5 x cos 7 xdx ∫\nSolution\n 1\n∫ cos 5 x cos 7 xdx = ∫ 2 cos 5 x cos 7 xdx 2\n 1 = [cos 12 x + cos( − 2 x ) ]dx ∫ 2\n 1 cos 12 x + cos 2 x )dx = ∫ ( 2\n 1  1 1 \n =  sin 12 x + sin 2 x  + c\n 2  12 2 \n 1 1\n = sin 12 x + sin 2 x + c\n 24 4\nExample 11\nFind = sin 8 x sin 15 xdx ∫\n\nSolution\n 1\n 2 sin 8 x sin 15 xdx sin 8 x sin 15 xdx = − ∫−∫ 2\n\n 1 = − [cos 23 x + cos( − 7 x ) ]dx ∫ 2\n\n 1\n (cos 23 x − cos 7 x ) dx = − ∫ 2\n\n 47\n\n1 1\n = − sin 23 x + sin 7 x + c\n 46 14\n\n5.7 Integration using the identity\nSin 3x = 3 sin x – 4 sin3 x\nCos 3x = -3 cos x + 4 cos3 x\n\nExample 12\n sin 3 6 xdxFind = ∫\n\nSolution\nUsing the identity, sin 3x = 3 sin x – 4 sin3 x,\n sin 18 x = 3 sin 6x – 4 sin3 6 x\n\n 3 3 1sin 6 x = sin 6 x − sin 18 x\n 4 4\n 3 3 1 sin 18 xdx sin 6 xdx =Hence ∫ sin 6 xdx − ∫ ∫ 4 4\n 3 − cos 6 x  1 − cos 18 x \n =   −  \n 4  6  4  18 \n cos 18 x 3 cos 6 x\n = − + c\n 72 24\n\nExample 13\n cos 3 9 xdxFind = ∫\n\nSolution\nUsing the identity cos 3 x = - 3 cos x + 4 cos3 x\n Cos 27 x = 3 cos 9 x +4 cos3 9 x\n\n 3 3 1Hence cos 9 x = cos 9 x + cos 27 x\n 4 4\n 3 3 1 cos 27 xdx cos 9 xdx = ∫ cos 9 xdx + ∫∫ 4 4\n\n 48\n\n3  sin 9 x  1  sin 27 x \n =   +   + c\n 4  9  4  27 \n 1 1\n = sin 9 x + sin 27 x + c\n 12 108\n\n5.8 Formulae for integration when the integrand contains quadratic expressions\n in the denominator.\n dx 1 − 1 x = tan + c 1. 2 2 ∫ x + a a a\n\n dx 1 x − a\n = ln + c 2. 2 2 ∫ x − a 2 a x + a\n\n dx − 1 x",
+   "status": "flagged"
+  },
+  {
+   "id": 752,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ 2 2 = sinh + c a x + a\n\n dx − 1 x",
+   "status": "auto_validated"
+  },
+  {
+   "id": 753,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1250",
+   "text": "∫ 2 2 = cosh if x > a a x − a\n −1 − x  = cosh   if –x > a\n  a \n\n dx − 1 x",
+   "status": "flagged"
+  },
+  {
+   "id": 754,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1251",
+   "text": "∫ 2 2 = sin a x − a\n\nExample 14\n dx 1 − 1 x = tanProve that 2 2 ∫ x + a a a\n\nProof\n − 1 x\nLet x = a tan θ so that θ = tan\n a\n\n 49\n\nThen x2 + a2 = a2 tan2 θ + a2 = a2 (1 + tan2 θ) = a2 sec2 θ\n dx = d (a tan θ) = a sec2 θ d θ\n\n dx a sec 2 θdθ\nHence 2 2 ∫ = ∫ x + a a 2 sec 2 θ\n 1\n dθ = ∫ a\n 1\n = θ\n a\n 1 −1 x = tan + c\n a a\n\nExample 13\n dx − 1 x\nProve that∫ 2 2 = sin + c a x − a\n\nProof\nLet x = a sin θ so that dx = a cos θ d θ\nand a 2 − x 2 = a 2 − a 2 sin 2 θ = a 2 cos 2 θ = a cos θ\n = a cos θ\n\n dx a cos θdθ\nHence ∫ 2 2 = ∫ a cos θ x − a\n = d ∫θ\n = θ + c\n −1 x = sin + c since x = a sin θ\n a\n\nExample 14\n dx\nFind 2 =∫ 25 x + 4\n\n 50\n\nSolution\n dx dx 2 = ∫∫  2 4  25 x + 4 25  x + \n  25 \n\n 1 dx\n = ∫ 25 2 2  2  x +  \n  5 \n 1 − 1 2 x = tan + c\n 25 5\n\nExample 15\n dx\nFind 2 =∫ x −3 x + 2\n\nSolution\nx2 – 3x + 2 = x2 – 3x + a2 –a2 – 2\n = (x – a)2 – a2 + 2\n = x2 – 2ax + a2 – a2 + 2\n\n 3\nEquating coefficient of x on both sides 2a = 3 or a =\n 2\n  3  2  3  2\nHence x2 – 3x +2 =  x −  –   + 2\n  2   2 \n 2\n 3  1 =  x −  −\n  2  4\n\n dx dx\n 2 2Then 2 = ∫ ∫ x −3 x + 2  3   1   x −  −  \n  2   2 \n\n 51\n\n 3  1  x −  −\n 1  2  2 ln + c\n =  1   3  1 2    x −  +\n  2   2  2\n  dx 1 x − a \n 2 2 = ln + c  using  ∫  x − a 2 a x + a \n\n dx x − 2\n = ln + cHence 2 ∫ x − 3 x + 2 x − 1\n dx\nNote: since x2 – 3x + 2 = (x – 2) (x – 1), we can resolve 2 into partial x − 3 x + 2\nfraction and then integrate to get the same answer. Try this method yourself.\n\nExample 16\n dx\nFind =∫ 2 2 x − 5 x + 2\n\nSolution\n 5\nLet 2x2 + 5x + 1 = 2(x2 + + 1)\n 2\n = 2[(x + a)2 – a2 + 1]\n = 2[x2 + 2ax + a2 – a2 + 1]\n\n 5\nComparing the coefficient of x on both sides 4a = 5 or a = .\n 4\n  2 2   5   5 \n 2   x +  −   + 1Hence 2x2 + 5x + 1 =\n   4   4  \n  2   5  9\n 2   x +  −  =\n   4  16 \n\n 52\n\n 2 2   5   3 \n 2   x +  −    =\n   4   4  \n 1 dx dx = ∫ 2 2∫ 2 2 2 x − 5 x + 2  5   3   x +  −  \n  4   4 \n  5   x + \n 1 − 1 4 3 cosh   = 2  4 3  if x > \n  4 \n 1 − 1 4 x + 5 3\n = cosh + c if x >\n 2 3 4\n 1 − 1 − 4 x − 5 3 3\n = cosh + c if -x > or x < - .\n 2 3 4 4\n\n 53\n\nExercise 5 18. ∫cos3 5x dx\n Find the integrals of the following",
+   "status": "flagged"
+  },
+  {
+   "id": 755,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫cos3 8x dx\n 2 dx sin x",
+   "status": "auto_validated"
+  },
+  {
+   "id": 756,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx 20. ∫ ∫ x + 16 1 − cos x\n dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 757,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "2 2 ∫ cot 4 xdx x −162. ∫\n 2 dx\n cos x 22. ∫ 2 dx3. x + 25 ∫ 1 + sin x\n dx\n 2 23. ∫ 24. sin 5 xdx x −25 ∫\n 2 dx5. cos 5 xdx ∫ 24. ∫ 4 − x 2\n cos 8 x\n dx dx6. ∫ (cos 4 x − sin 4 x 25. ∫ 2 16 − x\n dx cos 2 ax",
+   "status": "auto_validated"
+  },
+  {
+   "id": 758,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx 26. ∫ ∫ 3 x + 5 x + 1 (cos ax − sin ax\n dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 759,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "28. cos 10x sin 4x dx ∫ ∫ 4 x + 12 x + 9\n dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 760,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ cos 4x sin 9x dx 28. ∫ 2 9 x − 6 x + 1\n dx\n dx 29. ∫ 210. 2 9 x + 6 x + 1 ∫ 5 x + 9 x − 8\n dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 761,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ sin 5x cos 7x dx 30. ∫ 2 25 − x",
+   "status": "auto_validated"
+  },
+  {
+   "id": 762,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ cos 8x cos 5x dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 763,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ cos 3x cos 11x dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 764,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ sin 4x sin 10x dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 765,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ sin 12x sin 5x dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 766,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1252",
+   "text": "∫ sin3 4x sin dx",
+   "status": "flagged"
+  },
+  {
+   "id": 767,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "∫ sin3 5x dx\n\n 54\n\nSummary\n\nYou have learnt the following from this chapter:\n\n i). The technique of integration of trigonometric expressions using the following\n trigonometric identities.\n 2 1 1 sin x = − cos 2 x\n 2 2 1.\n 2 1 1 2. cos x = + cos 2 x\n 2 2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 768,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "tan 2 x = sec 2 x − 1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 769,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "cot2 x = cosec2 x - 1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 770,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "2 sin A cos B = sin (A + B) + sin (A – B)",
+   "status": "auto_validated"
+  },
+  {
+   "id": 771,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "2 cos A cos B = cos (A + B) + cos (A – B)",
+   "status": "auto_validated"
+  },
+  {
+   "id": 772,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "-2 sin A sin B = cos (A+B) – cos (A – B)",
+   "status": "auto_validated"
+  },
+  {
+   "id": 773,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sin 3x = 3 sin x – 4 sin3 x",
+   "status": "auto_validated"
+  },
+  {
+   "id": 774,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1253",
+   "text": "cos 3x = -3 cos x + 4 cos3 x\n\nii). The technique of integration using the following formulae:\n dx 1 − 1 x = tan + c 1. 2 2 ∫ x + a a a\n 1 1 x − a\n + ln + c 2. 2 2 ∫ x − a 2 a x + a\n\n dx − 1 x\n ∫ 2 2 = sinh a x + a 3.\n\n dx − 1 x\n ∫ 2 2 = cosh a x + a 4. if x > a\n 1 x = cosh− if x < -a\n a\n\n 55\n\ndx − 1 x\n ∫ 2 2 = sin a x − a5.\n\n Further Reading\n Additional pure mathematics\n Harwood Clarke\n Heinemann Educational Books Ltd.\n London.\n\n 56\n\nCHAPTER 6\n Integration Using Partial Fractions\n\n6.1 Introduction\n\nSome algebraic expressions cannot be integrated directly. An important technique\nwhich we use for such expressions is to split it into partial fractions that can be\nintegrated easily using the basic formulae.\n\n6.2 Objectives of the chapter\n\nBy the end of this chapter you should be able to split an algebraic expression into\npartial fractions and integrate.\n\n6.3 Expressions with only linear factors in the denominator\n f ( x ) f ( x )\nIn this section we shall see dx where is a proper fraction (degree of x ∫ F ( x ) F ( x )\nin f is less than that in F) and F(x) has only non-repeated linear factors. The technique\nof integration of such integral is illustrated in the following examples:\n\nExample 1\n x − 11\nFind dx (1) ∫ ( x + 3)( x − 4)\n\nSolution\n x − 11 A B\nWe write = +\n ( x + 3)( x − 4) x + 3 x − 4\n\n A( x − 4) + B ( x + )3\n =\n ( x + 3)( x − 4)\n\nThen x -11 = A (x-4) + B (x+3) (2)\nWe can put special values for x on both sides of (2)\nLet x=4, then\n4 - 11 = A (0) + B (7)\n-7 = 7B, and B=-1\n\nLet x = -3, then (2) becomes\n- 3 – 11 = A (- 3 – 4) + B (-3 +3)\n-14 = -7A and A=2\n\n 57\n\nx − 11 2 1\nHence = −\n ( x + 3)( x − 4) x + 3 x − 4\n ( x − 11) 2 1\n dxThen ∫ dx = ∫ dx − ∫ ( x + 3)( x − 4) x + 3 x − 4\nWe split the integrand into two partial fractions each can be integrated using the\nextension of the basic formulae for (ax + b)\n\n ( x − 11)\nThen dx = 2 ln (x + 3) – ln (x – 4) + A ∫ ( x + 3)( x − 4)\n = ln (x +3)2 – ln (x – 4) + A\n ( x + 3)2\n = ln + A\n x − 4\n6.4 Integration of expression with repeated linear factors in the denominator.\n 1\nConsider dx (1) ∫ ( x + 2)( x − 2)1\nThe integrand is a proper fraction and with repeated linear factors\nIt is written as\n 1 A B C\n = + +\n ( x + 2)( x − 1)( x − )1 x + 2 x − 1 ( x − 2)1\n A( x − )1 2 + B ( x + 2)( x − )1 + C ( x + 2)\n =\n ( x + 2)( x − 1)( x − )1\n\nThen 1 = A (x-1)2 + B (x +2) (x – 1) + C (x + 2) (2)\n\nLet us put x = 1 on both sides of (1) so that the terms containing A and B will become\nzero.\n 1\nThen 1 = A (0) + B (0) + C (1+2), Hence C =\n 3\nSimilarly put x = -2 on both sides of (1) so that the terms containing B and C become\nzero.\n 1\nThen 1 = A (-2 – 1)2 + B (0) + C (0), Hence A = .\n 9\nTo get the value of B either we can give one more value other than 1 and –2 for x or\nelse we can compare the coefficients of x2 on both sides of (2)\n0 = A + B\n 1 1\n0 = + B then B = - .\n 9 9\nHence the integral (1) becomes\n\n 58\n\n1 1 1 1\n∫ 2 dx = ∫ dx − ∫ dx + ∫ 2 dx ( x + 2)( x − )1 9( x + 2) 9( x − )1 (3 x − )1\n 1 1 1 −1 = ln( x + 2) − ln( x − )1 − ( x − )1 + C\n 9 9 3\n 1 x + 2 1\n = ln − + C\n 9 x − 1 (3 x − )1\n6.5 Integration of expressions with quadratic factor in the denominator –\n proper fraction.\n\nExample 2\n 3 x + 7\nConsider dx (1) ∫ 2 ( x − 1)( x + )1\nThe integrand is a proper fraction and has a quadratic factor. It is written as\n 3 x + 7 A Bx + C\n = +\n ( x − 1)( x 2 + )1 x − 1 x 2 + 1\n 3 x + 7 A( x 2 + )1 + ( Bx + C )( x − )1\n =\n ( x − 1)( x 2 + )1 ( x − 1)( x 2 + )1\n\nThen (3x + 7) = A (x2 + 1) + (B x + C)(x – 1) (2)\n\nWe can put x = 1 on both sides of (2) to get\n3 (1) + 7 = A (1 + 1) + (B + C) (0)\n 10 = 2 A or A = 5\n\nPutting x = 0, 7 = A – C, C = -2\nEquating coefficient of x2, 0 = A + B or B = -A = -5\n 3 x + 7 5 ( − 5 x − 2)\nThen = +\n ( x − 1)( x 2 + )1 x − 1 x 2 + 1\n\n 3 x + 7 dx 5 x dx\nHence ∫ 2 dx = 5 ∫ − ∫ 2 dx − 2 ∫ 2 ( x − 1)( x + )1 x − 1 x + 1 x + 1\n 5\n = 5 ln (x – 1) – ln (x2 + 1) – 2 tan-1 x + C\n 2\n6.6 Integrand is an improper fraction\nIf the degree of x in the Numerator is the same or greater that that of x in the\n\ndenominator the Algebraic Fraction is called an improper fraction.\n\n 59\n\nf ( x )\nIf the integrand is an improper fraction we shall divide f (x) by F (x)\n F ( x )\n\nand the remainder is resolved into partial fractions. This principle is illustrated\n\nfrom the following example:\n\nExample 3\n 3 x 2 − 2 x − 7\nFind dx ∫ 2 x − x − 2\n\nSolution\n\nThe integrand is an improper algebraic fraction. Hence using long division we\nfind that the quotient is 3 and the remainder is (x – 1)\n\n 3 x 2 − 2 x − 7 ( x − )1\nThen = 3 +\n x 2 − x − 2 ( x − 2)( x + )1\nNote: sometimes instead of long division it is easier to proceed as follows:\n3 x 2 − 2 x − 7 3( x 2 − x − 2) + x − 1\n =\n x 2 − x − 2 ( x 2 − x − 2)\n x − 1\n = 3 +\n ( x 2 − x − 2)\n ( x − )1\n = 3 +\n ( x − 2)( x + )1\n x − 1\nNow we can resolve into partial fractions.\n ( x − 2)( x + )1\n x − 1 A B\nLet = +\n ( x − 2)( x + )1 x − 2 x + 1\n A( x + )1 + B ( x − 2)\n =\n ( x − 2)( x + )1\n\n(x – 1) = A (x + 1) + B (x – 2) (2)\n\n 1\nPutting x = 2 on both sides of (2) A = .\n 3\n 2\nPutting x = -1 on both sides of (2), we have – 2 = B (-3) or = B\n 3\n\n 60\n\nx − 1 1 2\nThen = +\n ( x − 2)( x + )1 (3 x − 2) 3( x + )1\nHence the integral (1), is written as\n 3 x 2 − 2 x − 7  ( x − )1 \n 3 + dx∫ 2 dx = ∫ x − x − 2  ( x − 2)( x + )1 \n\n  1 2 \n = 3 + + dx ∫  (3 x − 2) (3 x + )1 \n 1 2\n = 3 x + ln( x − 2) + ln( x + )1 + C\n 3 3\n\nExercise 6\n\nFind\n x − 11",
+   "status": "flagged"
+  },
+  {
+   "id": 775,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( x + 3)( x − 4)\n\n x",
+   "status": "auto_validated"
+  },
+  {
+   "id": 776,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 2 ( 25 − x )\n\n 3 x 2 − 21x + 24",
+   "status": "auto_validated"
+  },
+  {
+   "id": 777,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( x − 1)( x − 2)( x − )3\n\n 5 x 2 − 10 x + 11",
+   "status": "auto_validated"
+  },
+  {
+   "id": 778,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 2 ( x − 3)( x + 4)\n\n x − 5",
+   "status": "auto_validated"
+  },
+  {
+   "id": 779,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( x − 22)\n\n 5 x + 4",
+   "status": "auto_validated"
+  },
+  {
+   "id": 780,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( x − 1)( x + 22)\n\n 3 x + 7",
+   "status": "auto_validated"
+  },
+  {
+   "id": 781,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ x ( x + 2)( x − )1\n\n 2 x 3 − x − 1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 782,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 2 ( x − 3)( x + )1\n\n 61\n\nx 3 + 2 x 2 − 10 x − 9",
+   "status": "auto_validated"
+  },
+  {
+   "id": 783,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 2 ( x − 9)\n\n ( x − 2)",
+   "status": "auto_validated"
+  },
+  {
+   "id": 784,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ ( 3x + )1\nHint: a3 + b3 = (a + b) (a2 – a b + b2)\n\n ( x + )3",
+   "status": "auto_validated"
+  },
+  {
+   "id": 850,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1292",
+   "text": "**\n\na) Using the Fundamental Theorem of Calculus Part 1, find $\\frac{dy}{dx}$ given $y = \\int_{2}^{3x} \\sin(t^2) dt$. **[4 marks]**\nb) By using an appropriate algebraic substitution, evaluate the following indefinite integrals:\n \n\na. $\\int \\frac{(\\ln x)^2}{x} dx$ **[2 marks]**\nb. $\\int \\frac{x^2+3x+5}{x+1} dx$ **[4 marks]**\nc. $\\int \\frac{2x}{(1+x^2)^{3/2}} dx$ **[5 marks]**\nd. $\\int \\frac{1}{\\sqrt{9-x^2}} dx$ **[5 marks]**\nc) Use integration by parts to evaluate $\\int x^2 \\sin x \\, dx$. **[4 marks]**\nd) Obtain a reduction formula for $I_n = \\int x^n e^x \\, dx$. Hence evaluate $\\int x^3 e^x \\, dx$. **[6 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 851,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1293",
+   "text": "**\n\na) Use four strips to find an approximate value for the definite integral $\\int_{1}^{3} x^3 dx$ using\n \n\ni) The Trapezium rule **[3 marks]**\nii) The Simpson's rule **[3 marks]**\niii) which gives a better approximation. Explain. **[1 mark]**\nb) Using partial fractions, find $\\int \\frac{x^2+1}{x^2-1} dx$. **[3 marks]**\nc) Evaluate the following integrals:\n \n\ni) $\\int 16 \\sin^4 2x \\cos 2x \\, dx$ **[6 marks]**\nii) $\\int \\tan^5 x \\, dx$ **[4 marks]**\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION* Page 1 of 2\n\n\\end{document}",
+   "status": "flagged"
+  },
+  {
+   "id": 852,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1294",
+   "text": "**\n\na) Find the area bounded by the curves $y = \\cos x$ and $y = \\sin x$ and the $y - \\text{axis}$. **[4 marks]**\n\nb) Find the volume generated when the area bounded by the $x$ and $y - \\text{axes}$, the line $x = 1$ and the curve $y = e^x$ is rotated through one revolution about the $x$-axis. **[5 marks]**\n\nc) Prove that the length of the arc of the plane curve $y = (x + 1)(x + 2) - \\frac{1}{8}\\ln(2x + 3)$ between the points for which $x = 1$ and $x = 2$ respectively is $6 + \\frac{1}{8}\\ln\\left(\\frac{7}{5}\\right)$. **[6 marks]**\n\nd) Evaluate $\\int \\sin^3 x \\cos^2 x dx$ **[5 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 853,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1295",
+   "text": "**\n\na) Evaluate the following integrals\ni) $\\int \\frac{(2x - 6)dx}{(x^2 - 6x + 13)^2}$ **[5 marks]**\nii) $\\int \\frac{dx}{\\sqrt{9 + 16x - 4x^2}}$ **[9 marks]**\n\nb) Evaluate the improper integral $\\int_{-1}^{1} x^{-\\frac{2}{3}} dx$ **[6 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 854,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1296",
+   "text": "**\n\na) Show that $\\int_{0}^{\\frac{\\pi}{2}} \\cos^m x dx = \\frac{m - 1}{m} \\int_{0}^{\\frac{\\pi}{2}} \\cos^{m - 2} x dx$. hence evaluate $\\int_{0}^{\\frac{\\pi}{2}} \\cos^5 x dx$ **[8 marks]**\n\nb) Use the Fundamental Theorem of Calculus to find $F'(x)$ given $F(x) = \\int_{\\sqrt{x}}^{2x} \\text{Tan}^{-1}(t)dt$.\nHence evaluate $F''(\\sqrt{3})$. **[7 marks]**\n\nc) Evaluate $\\int x \\text{Tan}^{-1} x dx$. **[5 marks]**\n\n**NDUTA FOR FEMALE** \n\n**Anastasia NDUTA** \n\n**FOR FEMALE DELEGATE**\n\n**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**",
+   "status": "flagged"
+  },
+  {
+   "id": 855,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1297",
+   "text": "**\n\na) Use trapezoidal and Simpson's rules and seven ordinates to find the area bounded by the curve $xy = 12$, the $x$ - axis and ordinates at $x = 1$ and $x = 4$ **(9 Marks)**\n\nb) The ordinates of a curve $y = f(x)$ are given at the table\n\n| $X$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |\n| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| $Y$ | 0 | 2 | 2.5 | 2.3 | 2 | 1.7 | 1.5 |\n\nUse Simpson's rule to estimate the volume generated when the area bounded with this curve and the ordinates at $x = 0$, $x = 6$ revolves about the $x$-axis. **(5 Marks)**\n\nc) Estimate the absolute value of the maximum error that can occur when approximating\n\n$$\n\\int_{1}^{4} \\frac{1}{x} dx\n$$\n\nby\ni) The trapezoidal approximation with $n=10$. **(3 Marks)**\nii) Simpson's rule with $n=10$ **(3 Marks)**",
+   "status": "flagged"
+  },
+  {
+   "id": 856,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1298",
+   "text": "**\n\na) The curve $y = 1 + \\cos x$ is rotated about $x$- axis. Find the volume contained by the surface of revolution and planes $x = \\frac{-\\pi}{2}$ and $x = \\frac{\\pi}{2}$ **(7 Marks)**\n\nb) Find the area of surface formed by the rotation of the curve $y^2 = 4x$ about the $x$-axis from the origin to $x=8$ **(6 Marks)**\n\nc) Evaluate the following integral\n\n$$\n\\int \\frac{8 dx}{\\sqrt{2x^2 + 2x + 3}}\n$$\n\n **(7 Marks)**\n\nREVISE WITH ANASTACIA KOUTA\n\\# NOUTA NA SPAC\n\n\\documentclass{article}\n\\usepackage{amsmath}\n\\usepackage{amssymb}\n\\usepackage[margin=1in]{geometry}\n\n\\begin{document}\n\n**a higher education institution**\n\n**UNIVERSITY EXAMINATIONS 2020/2021**\n\n**FIRST SEMESTER \n\n**SMA 200: CALCULUS II**\n\n**DATE: THURSDAY 16\\(^{\\text{TH}}\\) JUNE 2021** **TIME: 4.30 P.M - 6.30 P.M**\n\n**INSTRUCTIONS:**\n\nAnswer question ONE and any other TWO questions",
+   "status": "flagged"
+  },
+  {
+   "id": 857,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1299",
+   "text": "**\n\na) Evaluate the integral $\\int (2x+1)(x^2+x+1)^3 \\, dx$ **[3 marks]**\nb) Given that $f(x) = \n\n$$\n\\begin{cases}\nx+1, & \\text{if } 0 \\le x < 1 \\\\ 2-x, & \\text{if } 1 \\le x \\le 2\n\\end{cases}\n$$\n\n$, find $\\int_0^2 f(x) \\, dx$ **[5 marks]**\nc) Find $\\frac{dh}{dx}$ if $h(x) = \\int_1^{\\sqrt{x}} \\frac{s^2}{s^2+1} \\, ds$ **[5 marks]**\nd) Find the area bounded by the line $y = x - 1$ and the parabola $y^2 = 2x + 6$. **[6 marks]**\ne) Evaluate $\\int \\frac{\\sqrt{x+4}}{x} \\, dx$ **[7 marks]**\nf) Determine whether $\\int_2^\\infty \\frac{1}{(x+3)^{\\frac{3}{2}}} \\, dx$ is convergent. If it is convergent, evaluate it. **[4 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 858,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1300",
+   "text": "**\n\na) Use Part 1 of the Fundamental Theorem of Calculus to evaluate $\\frac{dy}{dx}$ given $y = \\int_{2x}^{3x} \\frac{u^2-1}{u^2+1} \\, du$ **[5 marks]**\nb) By using an appropriate algebraic substitution, evaluate each of the following integrals.\n \n\ni. $\\int x\\sqrt{x+1} \\, dx$ \\quad (Hint: Use $x+1 = u^2$) **[4 marks]**\nii. $\\int \\sin(1-x)[2-\\cos(1-x)] \\, dx$ **[3 marks]**\n\n***INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION***\n\n\\end{document}\n\nc) Determine the volume of the solid obtained by rotating the region bounded by $y = \\sqrt{x}$, $x = 8$ and the $x$-axis about the $x$-axis. **[6 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 859,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1301",
+   "text": "**\n\na) Evaluate\n\n1. $\\int_{1}^{2} \\frac{1}{(x^2-2x+4)^{\\frac{3}{2}}} dx$ **[6 marks]**\n2. $\\int \\frac{6-x}{2x^2-x-15} dx$ **[5 marks]**\n3. $\\int \\frac{dx}{x\\sqrt{x^2+9}}$ **[5 marks]**\n\nb) Find the length of arc of the parabola $y = x^2$ from $x = 0$ to $x = 1$. **[4 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 860,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1302",
+   "text": "**\n\na) Use integration by parts to evaluate the following indefinite integrals:\n\n1. $\\int x \\sin 4x \\, dx$ **[2 marks]**\n2. $\\int x\\sqrt{x+4} \\, dx$ **[2 marks]**\n\nb) Use integration by parts to evaluate the following definite integrals:\n\n1. $\\int_{1}^{a} \\ln x \\, dx$ **[3 marks]**\n2. $\\int_{\\frac{\\pi}{6}}^{\\frac{\\pi}{4}} x \\csc^2 x \\, dx$ **[3 marks]**\n\nc) If $I_n = \\int_{0}^{\\frac{\\pi}{2}} \\sin^n x \\, dx$, show that\n\n$$\nI_n = \\frac{1}{\\left(\\frac{n}{2^2}\\right)(n)} + \\frac{n-1}{n} I_{n-2}, n \\geq 2\n$$\n\n **[5 marks]**\n\nd) A particle starts from rest with acceleration $(30 - 6t) \\, m/s^2$ at time $t$. When and where will it come to rest again? **[5 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 861,
+   "paper": "sma200-doc-83a8d27b",
+   "reason": "superseded by clean reconstruction q1303",
+   "text": "**\n\na) Use the Trapezoidal Rule with $n = 5$ to approximate the integral $\\int_{1}^{2} \\frac{1}{x} dx$. **[4 marks]**\n\nb) \n\n1. Use the Simpson's Rule with $n = 10$ to approximate the integral $\\int_{0}^{1} e^{x^2} dx$. **[6 marks]**\n2. Estimate the error involved in this approximation. **[5 marks]**\n\nc) Evaluate the improper integral $\\int_{-\\infty}^{\\infty} \\frac{1}{1+x^2} dx$ **[5 marks]**\n\n **Anastasia NDUTA** \n\n **NDUTA NA SPAS** \n\n **FEMALE DELEGATE ASPIRANT**\n\n***INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** Page 2 of 2*",
+   "status": "flagged"
+  },
+  {
+   "id": 862,
+   "paper": "sma200-doc-cad1c495",
+   "reason": "superseded by clean reconstruction q1304",
+   "text": ". - [Compulsory - ]\n\n (a) Find the following indefinite integrals: (3 marks each)\n\n 1. x~ 1dx J\n\n X2 dx ii. J\n Jx3 +3\n (b) Evaluate the following definite integrals: (3 marks)\n\n :.22' d\n ~ x\n i. 0 VI + 4X2 1\n ll.12x2(lnx)dx.\n\n 4\n 1ll.1 ~dX.\n o 2x + 1\n (c) Find the area bounded by the graph y = 2X2 - 3x + 2, the x-axis\n and the ordinates x=U, X= 2. (3 marks)\n (d) Find the area of the surface swept out when the curve y = Vx\n between x = 1 and x = 4 rotates about the x-axis. (3 marks)\n\n (e) Find the volume of the solid generated by revolving the region\n bounded by the graph f (x) = J sin x for 0 :; x :; IT and y=O\n about the x-axis, (4 marks)\n\n 1\n\n \n\n x\n\n ~ is a con- (f) Show that the function f(x) =1~ +1 a u2 + 1 a u2 + 1\n stant for x > O. (3 marks)\n\n (g) Evaluate the improper integral -;dx. (2 marks) /4\n 1 x",
+   "status": "flagged"
+  },
+  {
+   "id": 864,
+   "paper": "sma200-doc-cad1c495",
+   "reason": "superseded by clean reconstruction q1305",
+   "text": ". [Optional - ]\n\n 3\n (a) Find the length of the arc of the curve f(x) = X2 - 1; 0:; x :; 4.\n (6 marks)\n\n (b) Find the surface area of the solid generated by revolving the curve\n x3 1 Y = 6 + 2x; 1 :; x < 2, about the x-axis. (7 marks)\n\n (c) A sphere of radius T is generated by revolving the graph the graph\n of y = JT2 - X2 about the x-axis. Verify that the surface area of\n the sphere is 47fT2. (7 marks)\n\n 2\n\n •",
+   "status": "flagged"
+  },
+  {
+   "id": 866,
+   "paper": "sma200-doc-cad1c495",
+   "reason": "superseded by clean reconstruction q1306",
+   "text": ". [Optional-]\n\n (a) Using the First Fundamental Theorem of Calculus evaluate F'(x)\n\n x3\n if F(x) sin t2dt (3 marks) =l\n\n (b) show that with the substitution u = x - ~ the integral\n V2 x2 + 1\n 1= --dx\n 1 X4 + 1 J\n\n becomes\n I ,= 1~1-2--du. ( 4 marks)\n o u + 2\n (c) Use the Simpson's rule with n = 6 to approximate the integral\n r 2 ~dX. (7 marks)\n Jo 1+ x3\n (d) Determine the smallest value of n so that Trapezoidal rule will\n approximate the value of the integral\n 1 1\n --dx.\n o 1+ x 1\n with an error less than 0.00001. (6 marks)\n\n 3\n\n •",
+   "status": "flagged"
+  },
+  {
+   "id": 868,
+   "paper": "sma200-doc-ebb20b06",
+   "reason": "superseded by clean reconstruction q1307",
+   "text": "Find the area of the region between y  cos x and y = 𝒄𝒐𝒔(𝟐𝒙) over [0, 3]\n\n ",
+   "status": "flagged"
+  },
+  {
+   "id": 869,
+   "paper": "sma200-doc-ebb20b06",
+   "reason": "unreadable scan, no clean reconstruction",
+   "text": "Find the length of the arc from  0 to  of the curve given by x  cos ,\n 4\n y  3sin  .",
+   "status": "flagged"
+  },
+  {
+   "id": 871,
+   "paper": "sma200-doc-ebb20b06",
+   "reason": "superseded by clean reconstruction q1308",
+   "text": "Evaluate the following improper integrals\n 3 dx\n i.  2 0 9  x\n\n \n dx\n ii.  2 0 x  4",
+   "status": "flagged"
+  },
+  {
+   "id": 872,
+   "paper": "sma200-doc-ebb20b06",
+   "reason": "superseded by clean reconstruction q1309",
+   "text": "Calculate the trapezoidal and Simpson’s approximation to\n\n 1 2\n i. dx with n  10 . 2 0 1 x\n\n ii. Compare the results with exact solution",
+   "status": "flagged"
+  },
+  {
+   "id": 873,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1310",
+   "text": "**\n\na) Using the Fundamental Theorem of Calculus Part 1, find $\\frac{dy}{dx}$ given $y = \\int_{2}^{3x} \\sin(t^2) dt$. **[4 marks]**\nb) By using an appropriate algebraic substitution, evaluate the following indefinite integrals:\n \n\na. $\\int \\frac{(\\ln x)^2}{x} dx$ **[2 marks]**\nb. $\\int \\frac{x^2+3x+5}{x+1} dx$ **[4 marks]**\nc. $\\int \\frac{2x}{(1+x^2)^{3/2}} dx$ **[5 marks]**\nd. $\\int \\frac{1}{\\sqrt{9-x^2}} dx$ **[5 marks]**\nc) Use integration by parts to evaluate $\\int x^2 \\sin x \\, dx$. **[4 marks]**\nd) Obtain a reduction formula for $I_n = \\int x^n e^x \\, dx$. Hence evaluate $\\int x^3 e^x \\, dx$. **[6 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 874,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1311",
+   "text": "**\n\na) Use four strips to find an approximate value for the definite integral $\\int_{1}^{5} x^3 \\, dx$ using\n \n\ni) The Trapezium rule **[3 marks]**\nii) The Simpson's rule **[3 marks]**\niii) which gives a better approximation. Explain. **[1 mark]**\nb) Using partial fractions, find $\\int \\frac{x^2+1}{x^2-1} dx$. **[3 marks]**\nc) Evaluate the following integrals:\n \n\ni) $\\int 16 \\sin^4 2x \\cos 2x \\, dx$ **[6 marks]**\nii) $\\int \\tan^5 x \\, dx$ **[4 marks]**\n\n**INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**\n\n\\end{document}",
+   "status": "flagged"
+  },
+  {
+   "id": 875,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1312",
+   "text": "**\n\na) Find the area bounded by the curves $y = \\cos x$ and $y = \\sin x$ and the $y-$axis. **[4 marks]**\n\nb) Find the volume generated when the area bounded by the $x$ and $y-$axes, the line $x = 1$ and the curve $y = e^x$ is rotated through one revolution about the $x$-axis. **[5 marks]**\n\nc) Prove that the length of the arc of the plane curve $y = (x+1)(x+2) - \\frac{1}{8}\\ln(2x+3)$ between the points for which $x = 1$ and $x = 2$ respectively is $6 + \\frac{1}{8}\\ln\\left(\\frac{7}{5}\\right)$. **[6 marks]**\n\nd) Evaluate $\\int \\sin^3 x \\cos^2 x dx$ **[5 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 876,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1313",
+   "text": "**\n\na) Evaluate the following integrals\ni) $\\int \\frac{(2x - 6)dx}{(x^2 - 6x + 13)^2}$ **[5 marks]**\nii) $\\int \\frac{dx}{\\sqrt{9 + 16x - 4x^2}}$ **[9 marks]**\n\nb) Evaluate the improper integral $\\int_{-1}^{1} x^{-\\frac{2}{3}} dx$ **[6 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 877,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1314",
+   "text": "**\n\na) Show that $\\int_{0}^{\\frac{\\pi}{2}} \\cos^m x dx = \\frac{m-1}{m} \\int_{0}^{\\frac{\\pi}{2}} \\cos^{m-2} x dx$. hence evaluate $\\int_{0}^{\\frac{\\pi}{2}} \\cos^5 x dx$ **[8 marks]**\n\nb) Use the Fundamental Theorem of Calculus to find $F'(x)$ given $F(x) = \\int_{\\sqrt{3}}^{2x} \\tan^{-1}(t) dt$.\nHence evaluate $F'''(\\sqrt{3})$. **[7 marks]**\n\nc) Evaluate $\\int x \\tan^{-1} x dx$. **[5 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 878,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1315",
+   "text": "**\n\na) use trapezoidal and Simpson's rules and seven ordinates to find the area bounded by the curve $xy=12$, the $x$-axis and ordinates at $x=1$ and $x=4$ **(9 Marks)**\n\nb) the ordinates of a curve $y=f(x)$ are given at the table\n\n| X | 0 | 1 | 2 | 3 | 4 | 5 | 6 |\n| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| Y | 0 | 2 | 2.5 | 2.3 | 2 | 1.7 | 1.5 |\n\nUse Simpson's rule to estimate the volume generated when the area bounded with this curve and the ordinates at $x=0$, $x=6$ revolves about the $x$-axis. **(5 Marks)**\n\nc) Estimate the absolute value of the maximum error that can occur when approximating\n\n$$\n\\int_{1}^{2} \\frac{4}{x} \\, dx\n$$\n\nby\n\ni) The trapezoidal approximation with $n=10$. **(3 Marks)**\n\nii) Simpson's rule with $n=10$ **(3 Marks)**",
+   "status": "flagged"
+  },
+  {
+   "id": 879,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1316",
+   "text": "**\n\na) The curve $y = 1+\\cos x$ is rotated about $x$- axis. Find the volume contained by the surface of revolution and planes $x = \\frac{-\\pi}{2}$ and $x = \\frac{\\pi}{2}$ **(7 Marks)**\n\nb) Find the area of surface formed by the rotation of the curve $y^2 = 4x$ about the $x$-axis from the origin to $x=8$ **(6 Marks)**\n\nc) Evaluate the following integral\n\n$$\n\\int \\frac{8 \\, dx}{\\sqrt{2x^2+2x+3}}\n$$\n\n **(7 Marks)**\n\nREVISE WITH ANASTACIA ROUTH\n# NDUFA NA SPAC.\n\n\\documentclass{article}\n\\usepackage{amsmath}\n\\usepackage{amssymb}\n\\usepackage[margin=1in]{geometry}\n\n\\begin{document}\n\n **a higher education institution**\n\n **UNIVERSITY EXAMINATIONS 2020/2021**\n\n **FIRST SEMESTER \n\n \n **SMA 200: CALCULUS II**\n\n**DATE: THURSDAY 16\\(^{\\text{TH}}\\) JUNE 2021** **TIME: 4.30 P.M - 6.30 P.M**\n\n**INSTRUCTIONS:**\n\n**Answer question ONE and any other TWO questions**",
+   "status": "flagged"
+  },
+  {
+   "id": 881,
+   "paper": "sma200-doc-bdcb3fac",
+   "reason": "superseded by clean reconstruction q1317",
+   "text": "****\n\na) Use Part I of the Fundamental Theorem of Calculus to evaluate \\(\\frac{dy}{dx}\\) given \\(y = \\int_{2x}^{3x} \\frac{u^2 - 1}{u^2 + 1} du\\) **[5 marks]**\nb) By using an appropriate algebraic substitution, evaluate each of the following integrals.\n \n\ni. \\(\\int x\\sqrt{x+1} dx\\) ( Hint: Use \\(x + 1 = u^2\\) ) **[4 marks]**\nii. \\(\\int Sin(1 - x)[2 - Cos(1 - x)]^4 dx\\) **[5 marks]**\n\n***INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION***\n\n **Page 1 of 2**\n\n\\end{document}\n\nc) Determine the volume of the solid obtained by rotating the region bounded by $y = \\sqrt{x}$, $x = 8$ and the $x$-axis about the $x$-axis. **[6 marks]**",
+   "status": "flagged"
+  },
+  {
+   "id": 885,
+   "paper": "sma200-doc-e4204b55",
+   "reason": "reading list only",
+   "text": "Frank A., and Elliot M., Schaum’s Outline of Calculus, 6th edition, McGraw-Hill\n Education, 2012\nInstructional Materials\nWhiteboard/chalkboard, overhead projector, smart board\n\n TEACHING SCHEDULE\n\nWeek Content\n\n1 Anti-derivatives; First and second fundamental theorem of integral Calculus\n\n2 Anti-derivatives; First and second fundamental theorem of integral Calculus\n\n3 Integration: Properties, techniques of integration; power rule, substitution\n\n4 Integration by parts & tabular form\n\n5 Integration using partial fractions, trigonometric substitution\n\n6 C. A. T I\n\n7 Integration of products of sines & cosines\n Improper integrals\n8 Applications of integration: displacement & distance, areas under curve\n\n9 Applications of integration: length of a curve and surface area of revolution\n\n10 Volume of solid of revolution; disk, washer, and cylindrical shells method\n\n11 Numerical Integration: Trapezoidal rule, Simpsons rule\n\n12 C. A. T II\n\n13-14 EXAMINATIONS",
+   "status": "auto_validated"
+  },
+  {
+   "id": 886,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 3 x −8\na3 - b3 = (a - b) (a2 + a b + b2)\n\n 2 x + 1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 887,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "dx ∫ 3 x − 1\n\n Summary\n\n You have learnt the following from this chapter:\n i). Splitting a fraction into partial fractions.\n 2 x + 1 A B\n Type I: = +\n ( x − a )( x − b ) ( x − a ) ( x − b )\n\n ax + b A B C\n Type II: = + +\n ( x − a )( x − b )( x − b ) x − a x − b ( x − b 2)\n\n ax + b A Bx + C\n Type III: = +\n ( x − a )( px 2 + qx + r ) x − a ( px 2 + qx + r )\n\n Type IV: For improper algebraic fraction, we must divide and consider only the\n remainder for partial fraction.\n\n ii). After partial fractions, integrand is transformed into the form of basic\n formula which can be integrated.\n\n Further Reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 888,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Additional pure mathematics\n By L. Harwood Clarke.\n Heinemann Educational Books Ltd London.\n\n 62\n\nCHAPTER 7\nDefinite Integral and the Fundamental Theorem of Calculus\n\n7.1 Introduction\n\nYou have learnt the integral of functions using seven techniques. In this chapter we\nshall learn the value of the integral between two limits for the variable. Such an\nintegral is called a Definite Integral. The definite integral is evaluated using the\n b\nfundamental theorem of the integral calculus namely f ( x ) dx = G (b ) − G ( a ) where ∫\n a\n\n f ( x ) dx = G (x )∫\n\n7.2 Objectives of the Chapter\n\nBy the end of this chapter you should be able to\n• define the definite integral\n• state the fundamental Theorem of the Integral calculus\n• apply this theorem to evaluate the definite Integrals.\n\n7.3. Definite Integral\nSuppose that f(x) is integrable in an interval [a ≤ x ≤ b ] Draw the curve y = f(x)\n\n y = f(x)\n\n f(b\n )\n f(a)\n\n a ar-1 ξ r ar b\n\n Figure 1\n\nDivide the interval ab into n equal parts at a(=a0), a1, a2 …….., an = l\n\n 63\n\nb − a\nThe width of each interval h = consider a point ξ r in the interval\n n\na r −1 ≤ x ≤ ra\n b n\n lim f ( x ) dx =The integral f (ξr ) h is defined as the definite integral of f(x) in ∫ h → 0 ∑\n a n → ∞ r =1\nthe interval [a ≤ x ≤ b ]\n\nSecond definition of the definite Integral\nIf f(x) is continuous in the interval [a ≤ x ≤ b ] we definite the area enclosed by\nthe curve y = f(x), the ordinates x = a, x = b, and the x axis as the definite integral of\n b\n f ( x ) dx∫\n a\n\n7.4 Some important properties of definite Integral:\nIf f(x) is continuous in [a ≤ x ≤ b ]\n a\n f ( x ) dx = 01. ∫\n a\n b a\n f ( x ) dx = − f ( x ) dx2. ∫ ∫\n a b",
+   "status": "auto_validated"
+  },
+  {
+   "id": 889,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "If f is integrable in [a ≤ x ≤ b ] and c is a point between a and b\n b c b\n f ( x ) dx ∫ f ( x ) dx = ∫ f ( x ) dx + ∫\n a a c",
+   "status": "auto_validated"
+  },
+  {
+   "id": 890,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1318",
+   "text": "If f(x) is integrable in [a ≤ x ≤ b ] and c is any constant then\n b b + c\n f ( x − c ) dx ∫ f ( x ) dx = ∫\n a a + c\n b − c\n f ( x + c ) dx = ∫\n a − c\n [a ≤ x ≤ b ]5. If f(x) is integrable in and m is any constant then\n\n 64\n\nb mb  x \n f   dx ∫ f ( x ) dx = ∫ a ma  m \n b\n b m\n f (mx )dx ∫ f ( x ) dx = ∫\n a a\n m\n\n7.5 Definition of an Indefinite Integral [or primitive of f(x)]\n [a ≤ x ≤ b ]Suppose that f(x) is integrable in the interval then\n d x\n f ( t ) dt = f ( x ) at each point x in the interval. ∫ dx a\nA function F(x) with the property that F1(x) = f(x) at every point x of the interval\n[a ≤ x ≤ b ] is called an indefinite integral or primitive of f(x)\n x\n F ( x ) = f ( t ) dtThus for a continuous function f(x) we have ∫\n a\n b\n f ( x ) dxConsider if f ( x ) dx = G ( x ) , we say in short, G(x) is the ∫ ∫\n a\n b\n f ( x) dxindefinite integral of ∫\n a\n\n7.6 The fundamental Theorem of the integral calculus\n [a ≤ x ≤ b ]If f(x) is continuous in and G is a primitive (indefinite integral) of\n b\n f ( x ) dx = G ( b ) − G ( a )f(x) then a∫\n\nThis is called the fundamental theorem of the integral calculus\n\nProof\n\nLet F be given by\n\n 65\n\nx\n f ( t ) dt F ( x ) = ∫\n a\n Then F ( x ) = G ( x ) + c\n\n a\n F ( a ) = ( t ) dt = 0 Since we have ∫\n a\n F ( a ) = 0 = G ( a ) + c\n\n c = − G (a )\n\nHence F ( x ) = G ( x ) + G ( a )\n\n b\n F ( b ) = f ( x ) dx = G ( b ) − G ( a ) or where G is the primitive of f(x). ∫\n a\n\nThis is the Fundamental theorem of the Integral calculus.\n bG ( b ) − G ( a ) is usually written as [G ( x ) ] a\n\n7.7 Evaluation of definite integrals\nUsing the fundamental theorem of integral calculus we can evaluate definite integrals.\nThe following examples will illustrate the evaluation of definite integrals.\n\nExample 1\n\n 3\n 2 + 2 x )dxEvaluate (x ∫\n 2\n\nSolution\n 3 3\n (x 2 + 2 x )dx =  x 3 + x 2  ∫ 3 1 2   2\n  8 4  = [9 + 9 ] − +  3 1 \n 20\n = 18 –\n 3\n\n 66\n\n34\n =\n 3\nExample 2\n π\n 2\n cos 2 xdxEvaluate ∫\n 0\n\nSolution\n π π\n 2 2  1 1  2  + cos 2 x dx ∫ cos xdx = ∫ 0 0  2 2 \n π\n 2  1 1 \n = x + sin 2 x  2 4  0\n  π  π =  + 0  − (0 + 0 ) =\n  4  4\nExample 3\n π\n 2 cos x\n dxEvaluate ∫ 1 + sin x 0\n\nSolution\nCos x is the derivative of 1 + sin x\n du\nPut u = I + sin x, = cos x\n dx\n du = cos x dx\n π π\n 2 cos x 2 du\nHence ∫ dx = ∫ 1 + sin x u 0 0\n = ln u\n\n(For definite integral we need not put the constant of integration)\n π\n = [ln (1 + sin x )]20\n = {ln (1 + 1 )} − {ln 1}\n\n 67\n\n= (ln 2 ) − ( 0 )\n = ln 2\nExample 4\n 3\n e 2 x dxEvaluate ∫\n 0\nSolution\n 3 3\n 2 x  e 2 x  e dx = ∫ 2 0   0\n e 6 1\n = −\n 2 2\n 1 6 = (e − 1 )\n 2\n\nExample 5\n π\n 2\n x sin xdxEvaluate ∫\n 0\nSolution\nUsing integration by parts\n π π\n 2 π 2\n x sin xdx = [− x cos x ]0 ∫ 2 + ∫ cos xdx\n 0 0\n π\n = [− x cos x + sin x ]20\n = (0 + 1) – (0 + 0)\n = 1\nExample 6\n π\n sin 8 x sin 3 xdxEvaluate ∫\n 0\n\n 68\n\nSolution\n π π\n 1\n 2 sin 8 x sin 3 xdx ∫ sin 8 x sin 3 xdx = − ∫ − 2 0 0\n π\n 1 cos 11 x − cos 5 x )dx = − ∫ ( 2 0\n π π\n 1  sin 11 x  1  sin 5 x  = −   −  \n 2  11  0 2  5  0\n 1 1 = − (0 − 0 ) − (0 − 0 )\n 2 2\n = 0\n\n 69\n\nExercise 7 π\n sin 2 5 xdx 12. ∫Evaluate the following 0\n π 2 x 2 + 3 x + 8",
+   "status": "flagged"
+  },
+  {
+   "id": 891,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "sin 3 xdx ∫ 13. 0 x ∫\n −π\n 1 π\n ( x + 3 )( x − 2 ) dx 22. ∫ 1 + sin x\n 0 dx 14. 2 ∫ 0 cos x\n 3 2\n (x 5 + 2 x 2 )dx x 2 e x dx3. 15. ∫ ∫\n 2 1\n 2 2\n 7 dx 2 x + 3 ) dx dx4. 16. ∫ ( ∫ ( x − 1)( x − 2 ) 0 0\n π 2\n dx cos 7 xdx5. 2 ∫ 17. ∫ 0 0 ( x + 1)( x + 1)\n π 3\n 2 dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 892,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "2 tan( 2 x + 3 ) dx ∫6. 1 ( x − 1) ( x − 2 ) ∫\n 0\n 2 x 2 + 8 x + 15\n dx 19. π 2 ∫ cos x + 4 x + 3 x 1 ( x + 3 )\n dx7. 3 2 π ∫ 0 x + 2 x + sin x 2 x sin 2 xdx 20. ∫\n 0\n π\n 2\n x cos xdx8. ∫\n 0\n 1\n e 5 x + 3 dx9. ∫\n 0\n 2 dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 893,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1319",
+   "text": "dx ∫ 7 x + 3 1\n π\n 2\n cos 2 3 xdx11. ∫\n 0\n\n 70\n\nSummary\n\nYou have learnt the following from this chapter:\na). The fundamental Theorem of the Integral calculus\n\n If f ( x ) dx = G ( x ) then ∫\n b\n f ( x ) dx = G ( b ) − G ( a ) ∫\n a\n b\n f ( x ) dxb). can be defined as the area enclosed by the four boundaries y = f(x), ∫\n a\n the x- axis and the ordinates x = a and x = b.\n\nFurther Reading\n i).Additional Pure mathematics\n Harwood Clarke\n Heinemann Educational Books Ltd\n London\n\n 71\n\nCHAPTER 8\n Area Under a Curve\n\n8.1 Introduction\n\nIn the previous chapter we have learnt the meaning of the definite integrals. In this\nchapter we shall learn one of the important applications of the definite integrals\nnamely calculating the area under a curve, x – axis and the ordinates x = a and x = b.\n\n8.2 Objectives of the chapter\n\nBy the end of this chapter you should be able to: -\n • establish the formula for finding the area under a curve the x – axis and the\n ordinates x = a and x = b.\n • apply the formula to calculate exact area under different types of curves and also\n the areas between two curves.\n\n8.3 Formula for the area under a curve and enclosed by the lines\n\nthe x – axis, and the ordinates x = a and x = b.\n\n S R y = f (x)\n\n y\n x =b\n x=a p Q\n\n a x x + ∆ x b\n\n Figure 1\n\nConsider the area under a curve y = f (x), and enclosed by the lines the x- axis and the\nordinates x = a and x = b.\nDivide the area into n equal strips of width ∆x and height y.\nThe area of the strip PQRS = yr∆x. Consider the total area of all the strips.\nTotal area required = ∆x . ∑ yr\n x = b b\n ydx or A = f ( x )dxIf ∆x → 0 the area required is A = ∫ x = a a∫\n\n 72\n\n8.4 Area below x – axis\nIf the required area is below x – axis as in the figure 2\n\n x=a x=b\n\n a b c\n y=f (x)\n\n Figure 2\n Figure 3\n\n x )dx will beThen A = ∫−( y )dx since the y coordinate is negative. Hence ∫f (\nnegative. Since we are interested only in the magnitude of the area we can take only\nthe magnitude if the area is negative.\n\n8.5 Combined area under a curve\n\nIf we wish to find the area under a curve between x = a and x = c (figure 3). We must\nfind the area above x-axis and the area below x – axis separately and add the\nmagnitudes of the two areas.\nFor example, let the area under the curve between x = a and x = b be 15 units and in\nbetween x = b to x = c be –5 units. Then the total area under the curve between x = a\nand x = c is:\nA = 15 + − 5\n =15+5\n =20 sq units\n\n8.6 Area between two intersecting curves\n\n y=f (x)\n\n P Q\n\n y1 Y=g (x) y2\n\n a b\n 73\n\nFigure 4\nLet the equations of two curves be y = f (x) and y = g (x).\nSuppose that they intersect at P and Q. Let the points of the intersection of the two\ncurves be (a , y1 ) and (b, y2).\nThe magnitude of the area between the two curves is:\n b\n f ( x ) − g ( x )]dxA = ∫ [\n x = a\n\nProof\nThe area bounded by the four boundaries y = f (x), the x- axis, x = a and x = b is\n b\n f ( x ) dx∫\n a\nSimilarly the area enclosed by the four boundaries y = g (x), the x – axis x = a and x =\n b\nb is g ( x )dx . Hence the shaded area between the two curves is: ∫\n a\n b b\n g [x ]dxA = ∫ f ( x )dx − ∫\n a a\n b\n f ( x ) − g ( x )]dx= ∫ [\n a\nIf this is negative we can take only the magnitude or the modulus of A.\nThe following examples illustrate all the types of areas under the curves.\n\nExample 1\nFind the area of the rectangle bounded by the line y = 2, the x – axis, the ordinate x =\n ydx1 and x = 5 using the formula. A = ∫\n\nSolution\n\n y=2\n\n y=2\n\n x=1 x=5\n Figure 5\nThe curve in this case is y = 2.\n\n 74\n\nb\n ydx we haveUsing the formula A = ∫\n a\n 5\n 2dx A = ∫\n 1\n x 5 = = [2 x ] x =1\n =(10) – (2)\n = 8 sq units\n\nThe area in this case is very simple since the area of the rectangle of length 4 units\nand breadth 2 units is 8 sq units.\n\nExample 2\nSketch the curve y = 2x2 from x = 0 to x = 5.\nEvaluate the area enclosed by the curve, the x – axis and the ordinates x = 1 to x = 4\n\nSolution\nLet us prepare a table showing some points on the curve.\n\n X 0 1 3 5\n Y 0 2 18 50\n\n y=2x2\n\n 1 5\n\n Figure 6\n\nThe above figure shows the curve y = 2x2.\nBy formula,\n b\n ydxA = ∫\n x = a\n 4\n 2x 2dx= ∫\n 1\n\n 75\n\nx = 4\n  2 x 3 \n=\n 3   x =1\n  128   2 =   −  \n  3   3 \n=42 sq units\n\nExample 3",
+   "status": "flagged"
+  },
+  {
+   "id": 896,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1320",
+   "text": "Evaluate (x 3 − 3 x 2 + 2 x )dx . Interpret your result. ∫\n 0\nSolution\n\na) The following table shows some points on the curve.\n X 0 1 2 0.5 1.5 2\n Y 0 0 0 0.375 -0.375 0\n\nThe graph is shown in the figure\n\n 0 1 2\n\n Figure 7\n\nb) Part of the area is positive and the other part is negative. Hence we should find\n each area separately.\nArea from x =0 to x = 1 is given by\n 1\n A = (x 3 − 3 x 2 + 2 x )dx ∫\n x = 0\n\n 76\n\n4  x 1   1  3 2 = − x + x =  − 1 + 1  − 0\n 4 4    0 \n\n =1/4 sq units\nArea from x = 1 to x = 2 is given by\n 2\n 3 − 3 x 2 + 2 x )dx A2 = (x ∫\n 1\n 2\n  x 4 3 2  = − x + x\n 4   x = 1\n  1  = (4 − 8 + 4 ) −  − 1 + 1\n  4 \n 1\n = − sq units\n 4\n\nRequired area = A1 + A2\n\n 1 1 = +\n 4 4\n 1 = sq units\n 2\n\n 2\n c) A = (x 3 − 3 x 2 + 2 x )dx ∫\n 0\n\n 4  x 2 3 2  = − x + x\n 4   0\n = (4 − 8 + 4 ) − (0 )\n = 0 sq unit\n\nIf we evaluate the area directly from x = 0 to x =2 we get the area = 0.\nThis is because the area above x – axis is positive and that below the x- axis is\nnegative. Hence we should not find the area directly from x = 0 to x = 2.\n\nExample 4\nEvaluate the area enclosed between the curve y = x2 – 5x + 4 and the x- axis.\n\n 77\n\nSolution\nHere the ordinates are not given. Let us find the points of intersection of the curve\nwith the x – axis.\nSolving y = x2 – 5x + 4 (the curve)\nAnd y = 0 (the x – axis)\nwe have x2 – 5x + 4 = 0\n (x – 1) (x – 4) = 0\nHence x = 1 and x = 4.\nIf we sketch the curve y = (x – 1) (x – 4) we get the following graph.\n\n 0\n 1 4\n\n y=(x-1)(x-4)\n\nThe entire area is below x – axis hence requiredFigurearea8 is:\n 4\nA = (x 2 − 5 x + 4 )dx ∫\n x =1\n  x 4 3 5 x 2 \n=  − + 4 x  3 2 1\n  64 80   1 5 =  − + 16  −  − + 4 \n  3 2   3 2 \n 27= sq units\n 6\n\n=4.5 sq units\n\nExample 5\nFind the area between the curve x2 = y and the straight line y = 2.\n\nSolution\nIt is always better to sketch the curve to determine whether the required area is\ncompletely above the x – axis or below the x – axis or a portion of the area is above\nthe x – axis and the other portion is below the x – axis.\nThe following figure shows the sketch of the curves:\n\n 78\n\ny=x2\n\n A B\n\n ….. ……………….………. y = 2\n ……….………………\n …………………\n ….………\n D C\n\n x=- 2 x = 2\n\n Figure 9\n\nSolving y = x2 and y =2 we get x2 = 2 and x = 2 and x = - 2 and y =2. Since the\ncomplete area required is above the x – axis we get the required area.\n\n 2\n ydxA = ∫\n − 2\n\n 2\n= ∫ x2dx\n − 2\n\n 3   x 2\n=   3 − 2\n\n  2 2  − 2 2 \n=   −    3   3 \n\n4 2\n sq units.\n 3\nThis is the area below the curve and the x – axis.\n 4 2\nThe shaded area = Area of the rectangle ABCD -\n 3\n\n 79\n\n4 2= 2 (2 2 ) −\n 3\n\n − 4 2\n= 4 2 −\n 3\n\n 8 2\n= sq units\n 3\nExample 6\nFind the area enclosed by the line y = 4x and the curve y = x2.\n\nSolution\nThe graph is shown in the figure below:\n\n y=4x\n y=x2\n\n 16\n\n 0,0 4 Figure 10\nThe points of intersection of the curve y = x2 and the line y = 4x are given by solving\nthe two equations.\nUsing x2 = 4x we have\nX2 – 4x = 0 or x (x – 4) = 0.\nHence x = 0 or x = 4 correspondingly y = 0 or y = 16.\nThe required area (shaded) = Area under the line (y = 4x) – area under the curve (y =\nx2).\n 4\n 2= (4 x − x )dx ∫\n 0\n\n  4 x 4 2 x 3 \n=  −   2 3  0\n\n= 32 – 64/3\n\n= 32/3 sq units\n\n 80\n\nExercise 8",
+   "status": "flagged"
+  },
+  {
+   "id": 906,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1321",
+   "text": "Find the area common to the circle\n x2 + y2 = 16 and the ellipse x2 + 3y2 = 24.\n\nSummary\n\nYou have learnt the following from this chapter:\n\n i. The area enclosed by a curve y = f (x), the x – axis, the ordinate x = a and the\n ordinate x = b is given by\n b\n ydx A = ∫\n a\n\n b\n f ( x)dx = ∫\n a\n\n ii. Area above the x – axis is positive and the area below the x – axis is negative.\n\n 81\n\niii. If the required area consists of one portion above the x - axis and the other\n portion below the x – axis. We must find each area separately and add their\n magnitudes.\n\n iv. If y = f (x) and y = g (x) are two curves and if they intersect, the numerical\n b\n value of the area between the two curves. f ( x ) − g ( x ) dx ] provided the [∫\n a\n common points of intersection have their x coordinates a and b.\n\nFurther reading\n Additional pure mathematics\n By L. Harwood Clarke\n Heinemann Educational Books Ltd\n London\n\n 82\n\nCHAPTER 9\n Improper Integrals\n\n9.1 Introduction\nIn the chapter seven, we have learnt to evaluate the definite integrals whose limits\n\nare finite (a ≤ x ≤ b). In this chapter we shall learn to evaluate some integrals\n\nwhose limits are infinite or the integrands become infinite even though the interval\n\nis finite. Such integrals are called improper integrals. We shall define improper\n\nintegrals in detail in the following sections.\n\n9.2 Objectives of the chapter.\n\nBy the end of this chapter you should be able to\n • define the improper integrals of two kinds\n • test the convergence and divergence of improper integrals\n • test the absolute convergence and conditional convergence of improper integrals\n • evaluate the Cauchy’s principal value of the improper integral of the second\n\n kind.\n\n9.3 Definition of improper Integrals\n\nThere are two kinds of improper Integrals\n\na). Improper Integrals of the first kind\n\n When one or both the limits of a definite integral is infinite the integral is called\n an improper integrals of the first kind.\nb). Improper integrals of the second kind\n\n When the integrand has a singular point (the integrand becomes infinite) in the\n interval of the limits, the definite integral is called an improper integral of the\n second kind.\n 3 3 + 2\n Consider x∫ 0 ( x − 1)dx\n The interval of the limit is 0 ≤ x ≤ 3\n\n 83\n\nx 3 + 2\n At the point x = 1, the integrand becomes infinite and hence\n x − 1\n 3 3 + 2\n is an improper integral of the second kind x∫ 0 ( x − 1)dx\n x = 3 x 3 + 2 x = 3 x 3 + 2\n dx and dx are also improper integrals of the second kind x∫= 0 x x∫= 0 ( x − 3)\n having singularities at the lower limit x = 0 and at the upper limit x = 3\n respectively.\n9.4 Convergence or divergence of the improper integrals of the type\n ∞\n f ( x )dx a∫\n b\n ∞ lim f ( x ) dxThe improper integral f ( x )dx is said to be convergent if a∫ b → ∞ a∫\n\nexists (or converges) to a finite limit and the limit is called the value of the improper\nintegral.\nIf the limit does not exist we say that the improper integral does not exist (or\ndiverges)\n\nExample 1\n ∞\n 1\na). When will you say that the improper integral dx is convergent or ∫ x 1\n divergent.\n ∞\n 1\nb). Show that dx is divergent. ∫ x 1\n\nSolution\n b ∞ 1 1 lim\na). If ∫ dx converges (or exists) we say that ∫ dx converges b → ∞ 1 x 1 x\n otherwise we say that it diverges.\n l\n lim 1 lim bb). dx = [ln x ]1 ∫ b → ∞ 1 x b → ∞\n\n 84\n\nlim\n = ln b – ln 1\n b → ∞\n lim\n = ln b since ln 1 = 0\n b → ∞\n = ln ∞\n = ∞\n\n ∞\n 1\nSince b → ∞ dx dose not exist, it diverges. ∫ x 1\n\nExample 2\n ∞ 1\nShow that the improper integral dx is convergent ∫ 2 1 x\n\nSolution\n\n ∞\n 1 lim dx converges or diverges if dx exists or does not. ∫ b 1 ∫ x 2 b → ∞ 1 1 x 2\n\n b\n b 1 − 1\nlim dx  x  2 = ∫ 1b → ∞ 1 x  −  1\n b\n 1  lim − = b → ∞  x  1\n lim 1  1 \n = - b → ∞ −b  −1 \n lim 1 = 1 −\n b → ∞ b\n 1\n = 1 −\n ∞\n = 1 (Limit exists and finite)\n ∞\n 1\n dx is convergent.Hence 2 ∫ x 1\n\n 85\n\n9.5 Definition of absolute convergence and conditional convergence of an\n improper integral\n ∞\n f ( x ) dx i).The improper integral, ∫ is said to be absolutely convergent if\n a\n ∞\n f ( x ) dx ∫ is convergent.\n a\n ∞\nii).The improper integral f ( x ) dx is said to be conditionally convergent if ∫\n a\n b ∞\n f ( x ) dx is convergent but f ( x ) dx is not convergent. ∫ ∫\n a a\n\n 9.6 Cauchy’s inequality for definite integrals\n b b\n f ( x ) dx ≤ f ( x ) dx Cauchy’s inequality states that ∫ ∫\n a a\n This inequality is very useful to determine the absolutely convergent and\n\n conditionally convergent improper integrals.\n\n Example 3\n ∞ sin x\n Show that dx is absolutely convergent. ∫ 2 1 x\n\n Solution\n By cauchy’s inequality,\n ∞ ∞\n sin x sin x\n 2 ∫ dx ≤ ∫ dx x x 1 1\n ∞\n 1 sin x ≤ 1 ≤ 2 dx since x is positive and ∫ 1 x\n ∞\n ≤ ∫ x − 2 dx\n 1\n (1)\n\n 86\n\nl\n − 2 b lim x dx lim  − x Now ∫ = b → ∞ 1 b → ∞  − 11\n lim 1  b = −\n b → ∞  x  1\n lim 1   1 \n = - b → ∞ −b   −1 \n 1\n lim 1 − =\n b → ∞ b\n = 1\n ∞ sin x\nHence from (1) dx ≤ 1 ∫ 2 1 x\n ∞\n sin x\n dx is absolutely convergent.Then 2 ∫ x 1\n\nExample 4\n ∞\nShow that xe − x dx is convergent. ∫\n 0\n\nSolution\n∞\n − x lim b − x xe dx is convergent if xe dx is convergent. ∫ ∫ 0 b → ∞ 0\n\nUsing integration by parts\n l b\n e dx lim ∫ − x − x b − x xe dx = l → ∞ [− xe ]0 + ∫ b → ∞ 0 0\n lim − b − b = [− be + 1 − e ]\n b → ∞\n\n lim  − b 1 \n = b + 1 − b b → ∞  e e \n lim − b\n = 1 Since → 0\n b → ∞ be\n\n 87\n\n∞\nHence xe − x dx is convergent. ∫\n 0\n\n b\n f ( x ) dx9.7 Theorem: if is an absolutely convergent improper ∫\n a\n integral it is also convergent, where b can be finite or infinite.\n\nProof\nBy Cauchy’s inequality,\n b\n\n b f ( x ) dx a∫ f ( x ) dx ≤ a∫\n\n b\n f ( x ) dxIf is convergent (or absolutely convergent) then it has an upper a∫\nbound M\n b\n f ( x ) dxHence ≤ M a∫\n\n b\nThen f ( x ) dx ≤ M and hence it is convergent. a∫\n b\n b\n f ( x ) dx is convergent ifIn other words f ( x ) dx is convergent. a∫ a∫\n\nExample 5\n ∞\n e −x cos 2x dxShow that is absolutely convergent. 0∫\n\nSolution\n ∞\n e - x cos 2x dxWe must show that is convergent. ∫\n 0\n\n 88\n\n∞ b\n e - x cos 2x dx e - x cos 2x dx = lim ∫ ∫ 0 b → ∞ 0\n b\n lim e - x dx ≤ b → ∞ 0∫\n lim - x l ≤ [e ]0\n b → ∞\n lim 1 − 1 ≤ b\n b → ∞ e\n ≤ - 1\n b\n lim - xSince e cos 2x dx is convergent since the limit exists ∫ b → ∞ 0\n∞\n e - x cos 2x dx is convergent. 0∫\n ∞\n e −x cos 2xHence is absolutely convergent. 0∫\n9.8 Convergence and divergence of the improper integrals of the second\n\n kind.\n\n b\n f ( x) dx suppose that f(x) has a singularity at anConsider the integral ∫\n a\ninterior point c of [a ≤ x ≤ l ]\n\n c\n b b\nNow ∫ f ( x) dx = ∫ f ( x) dx + ∫ f ( x) dx\n a a c\n\n (1)\n\n b\nThe improper integral f ( x) dx is said to be convergent if both the improper ∫\n a\n\nintegrals on the right side of (1) exist.\n\nThe sum of these is defined as the value of the improper integral from a to b in (1)\n\n 89\n\nb\n 9.9 The Cauchy’s principal value of f ( x) dx ∫\n a\n Let f(x) be defined on [a ≤ x ≤ l ] except possibly at any interior point c, which\n\n is a singular point of f(x).\n\n b c b\n If f ( x) dx = f ( x) dx + f ( x) dx does not exist but ∫ ∫ ∫\n a a c\n  c − ε b \n lim f ( x) dx + f ( x) dx   does exist. We call this limit ∫ ∫\nε → 0  a c + ε \n b\n the Cauchy’s principal value of f ( x) dx ∫\n a\n Thus the Cauchy’s principal value of\n b\n f ( x) dx =  f ( x ) dx  ∫ lim  c −ε b  ∫ f ( x ) dx + ∫ a ε → 0  a c +ε \n\n Example 6\n 2 1\n a) Show that dx is improper. ∫ −x1\n 2 1\n b) Find the Cauchy’s principle value of dx −x1∫\n\n Solution\n 1 a) The integrand has a singularity at x = 0 in the interval [- 1 ≤ x ≤ 2 ] ]\n x\n 2 1\n Hence dx is an improper integral of the second kind. −x1∫\n 2 1 0 1 2 1 0 1 2 1\nb) dx Clearly dx and dx ∫ dx = ∫ dx + ∫ x x x x − 1 − 1 0 −x1∫ 0∫\n both diverge;\n\n 90\n\n0 1 0 dx = [lnx ]− 1 = ln 0 − ln (− 1 ) = ln 0 does not exist −∫x1\n 2 1 2 dx = [lnx ]0 = ln 2 − ln( 0 ) ln(0) does not exist. ∫x 0\n 2 1\n Hence dx does not exist. −x1∫\n - ε 2\n 1 1\n However dx exist when ε → 0 ∫ dx + ∫ x x − 1 ε\n ε 1 − ε\n Since −∫x1 dx = [lnx ]− 1 = ln (− ε ) − ln (− 1 ) = ln ε\n 2 1 2 and dx = [lnx ]ε = ln 2 − ln ε ∫x ε\n - ε 2\n 1 1\n dx = ln ε + ln 2 − ln ε Hence ∫ dx + ∫ x x − 1 ε\n = ln 2\n\n 2 1\n dx = ln 2 Thus the Cauchy’s principal value of ∫ −x1\n\nExample 7\n 3 dx\nShow that 4 ∫ x − 2\n i). does not converge\nii). does not have a principal value\n\nSolution\n 3 dx\nThe integral 4 is improper since x = 0 is a singularity on the interval [-2 ≤ x ∫ x − 2\n≤ 3]\n 3 dx 0 dx 3 dx\nNow 4 4 ∫ = ∫ + ∫ x x x 4 − 2 - 2 0\n\n 91\n\n 1  0  1  3\n = 3 + 3  − 3 x  - 2  − 3 x  0\n 1 1\n = −∞ − − − ∞\n 24 81\n does not converge\n\nThe Cauchy’s principal value of\n 3 − ε 3\n dx dx dx\n 4 4 4 where ε → 0 ∫ = ∫ + ∫ x x x − 2 - 2 ε\n - ε 3\n  1   1 \n = 3 + 3  − 3 x  - 2  − 3 x  ε\n  1  1  1  1 =  3  − +   + 3 where  3 ε  24  − 81  3 ε\n ε → 0\n = ∞\n\nThus even the principal value does not exist.\n\n Exercise 9",
+   "status": "flagged"
+  },
+  {
+   "id": 907,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Classify the following into\n Improper integrals of the first kind and\n Improper integrals of the second kind.\n ∞ 2 ∞ − x x + 1 e sin x\n a). dx b). dx ∫ ∫ x 0 ( x − 1 ) − ∞\n 3 dx 5 x 3\n dx c). 4 d). ∫ x ( x − 3 ) − 2 2∫\n\n ∞",
+   "status": "auto_validated"
+  },
+  {
+   "id": 908,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "When will you say that the improper integral f ( x ) dx converges or ∫\n a\n diverges.\n 2 dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 909,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "When will you say that the improper integral 3 converges or diverges. ∫ x − 2\n\n 92\n\nb",
+   "status": "auto_validated"
+  },
+  {
+   "id": 910,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Define the Cauchy’s principal value of the improper integral f ( x ) dx if f ∫\n a\n (x) has a singularity at c where a < c < b",
+   "status": "auto_validated"
+  },
+  {
+   "id": 911,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Define absolute convergence and conditional convergence of an improper\n b\n integral f ( x ) dx ∫\n a\n 1 dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 912,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Show that 5 is divergent . ∫ x 0\n ∞\n dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 915,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Evaluate ln(sin x ) dx ∫\n 0\n ∞\n cos 2 xdx converges12. Prove that ∫\n 0\n (Hint: Make the substitution u = x2)\n a ∞",
+   "status": "auto_validated"
+  },
+  {
+   "id": 916,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Define f(x)dx and f(x)dx ∫ ∫\n - ∞ - ∞",
+   "status": "auto_validated"
+  },
+  {
+   "id": 917,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Test the following integrals for convergence\n ∞ 3\n x\n a). sin x dx b). dx ∫ ∫ lnx 0 1\n ∞ 2 π x x\n dx d). dx c). 2 2 ∫ ∫ (1 + x ) sinx 0 0\n\n 93\n\n5 dx",
+   "status": "auto_validated"
+  },
+  {
+   "id": 919,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Show that dx converges. ∫ x 0\n\nSummary\n\nYou have learnt the following from the chapter:\n\n i. Definition of improper integrals of first and second kind.\n\n ii. Convergence and divergence of improper integrals.\n\n iii. Absolute convergence and conditional convergence of improper integrals.\n\n iv. Cauchy’s inequality for absolute convergence.\n b\n v. The cauchy’s principal value of the improper integrals f ( x ) dx when ∫\n a\n f(x) has a singularity at c where a ≤ c ≤ b\n\nFurther reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 920,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1322",
+   "text": "Advanced Calculus\n By Watson Fulks\n John Wiley and sons\n New York. Brisbane Toronto.\n\n 94\n\nCHAPTER 10\n Length of an Arc of a Curve\n10.1 Introduction\n If you ask a secondary school student to measure the length of an arc of a curve,\n he will use a string or a flexible material like a string placed upon the arc of the\n curve and he measures the length of the string placing against a ruler. Also an\n approximation of length could be found by marking a number of points on the arc\n and finding the sum of the lengths of all the chords that are small. Any\n mathematician could do the same method unless he knows the equation of the\n curve either in Cartesian form or Parametric or any other form. In this chapter we\n shall learn the method of finding the length of an arc of a curve.\n\n10.2 Objectives of the chapter\n\n By the end of this chapter you should be able to.\n • derive an expression or formula for S, the arc length of a curve if the\n Cartesian or parametric equation of the curve is known.\n • calculate accurately the length of the curve using the formula.\n\n10.3 Length of an arc S of a curve in Cartesian equation is\n\n 2\n b  dy \n S = ∫ 1 + dx a  dx \n\nProof Pn\n\n Pr\n\n ∆y\n\n Pr-1 ∆x\n Po P1\n\n Figure 1\n\nSuppose that an arc of a curve is divided into n parts by points p0, p1, p2……..pn. We\nshall assume that the sum of the lengths of chords, p0 p1 + p1 p2 + …….pr-1 pr + ….pn-\n1 pn is equal to the length of the arc in the limit when the length of the chords →0.\n\nIf ∆ x and ∆ y are the increments in x and y from pr-1 to pr.\n (pr –1\n pr)2 = ( ∆x ) 2 + ( ∆y ) 2\n\n 95\n\n  ∆y  2  2 = ( ∆x ) 1 +   \n   ∆x  \n\n   ∆y  2 \nThen pr-1 pr = 1 +    ∆x\n   ∆x  \nSumming for all the chords and proceeding to the limit\n\n b   dy  2 \n  dx  Length of arc S = a∫ 1 +    dx\n\nwhere a and b are the values of x corresponding to the end points of the arc.\n\n10.4 The length of an arc S of a curve in the Parametric form is\n\n t 2  2 2   dx   dy \nS = t∫1   +    dt  dt   dt  \n\nwhere t1 and t2 are the values of t corresponding to the end points of the arc.\n\nProof\nWe have seen in the previous section\n( rp −1 pr 2) = ( ∆x ) 2 + ( ∆y 2)\n   ∆x 2  ∆y  2  2 =   +    ( ∆t )\n  ∆t   ∆t  \n\n  ∆x  2  ∆y  2\nThen pr −1 p =   +   dt\n  ∆t   ∆t \n\nSumming for all the chords and proceeding to the limit.\n t 2  2 2   dx   dy \nLength of the arc S = t∫1   +    dt  dt   dt  \n\n 96\n\nExample 1\nFind the length of the arc of parabola y2 = 4 a x cut off by its latus rectum.\n\n T\n (a, 2a)\n\n 0 L\n (a, 0)\n\n Figure 2\n S\n\nSolution\nThe equation of a parabola in parametric equation is x = a t2, y = 2 a t.\n\nLatus Rectum is the line perpendicular to the axis of the parabola (in the Figure 2) at\na distance a from the vertex. If TS is the Latus Rectum, the coordinates of L is (a, 0)\nand of T is (a t2, 2 a t). Hence a t2 = a and t = 1. At the vertex 0, a t2 = 0\n\n Since arc SOT = Twice arc OT\n\n t =1  2 2   dx   dy \nwe have S =\n  dt   dt   2 t∫= 0   +    dt (SOT = 2OT)\n ( 2 at ) 2 + ( 2 a ) 2 dt(arc = 2OT) = 2 ∫\n 4 a 2 t 2 + 4 a 2 dt = 2 ∫\n 1 + t 2 dt = 4 a∫\n  2 2  1 2 a t 1 + t + ln t + 1 + t\n =   0 using integration by parts.\n = 2 a [ 2 + ln( 2 + 1 ]\n\n 97\n\nExample 2\na). Draw the curve 6 y2 = x (x – 2)2\nb). Find the point of intersection of the curve with x-axis.\n 1\nc). Calculate the length of the loop of the curve y2 = x (x – 2)2\n 6\n\n 0 1 2\n 6 y2 = x (x – 2)2\n\n Figure 3\n\nSolution\nb) Let 6 y2 = x (x – 2)2\n Differentiating with respect to x\n dy\n 12 y = (x – 2)2 + 2 x (x – 2)\n dx\n = (x – 2) (3x – 2)\n dy ( x − 2)(3 x −)2\n =\n dx 12 y\n  dy  2 ( x − 2 ) 2 (3 x − 2 ) 2\n1 +   = 1 + 2  dx  24 x ( x − 2 )\n ( x − 2) 2 (3 x − 2) 2\n =\n 24 x ( x − 2) 2\n (3 x − 2) 2\n = 1 +\n 24 x\n\n a  dy  2\nLength of the loop =\n dx  2 x∫= 0 1 +   dx\n 2 (3 x + 2 )\n 2 dx = ∫ 0 24 x\n\n 98\n\n2  3 x 2 \n 2 + dx = ∫   0  2 6 2 6 x \n  2 3 \n 2  2 × 3 x 2  + 4 x =   2 6 3     0\n 1  3 3 \n 2.2 2 + 2.2 2 =   6  \n 8\n =\n 3\n\nExample 3\nShow that the length of the circumference of a circle of radius a is 2 π a.\n\nSolution\n\n (o, a)\n B x2 + y2 = a2\n\n P\n\n 0 A\n (a, o)\n\n Figure 4\n\nThe equation of the circle of radius a is x2 + y2 = a2. Differentiating with respect to x,\n dy dy − 2 x − x\nwe have 2 x + 2 y = 0 = =\n dx dx 2 y y\n\n 99\n\nx = a  dy  2\nlength of arc APB =\n dx  S = x∫= 0 1 +   dx\n a  x 2 \n 2  = ∫ 1 +  dx y x =0  \n a x 2 + y 2\n = dx 2 ∫ y x =0\n\n a a\n dx = ∫ y 0\n a 1\n = a ∫ 2 2 dx 0 a − x\n  −1 x  a = a sin\n  a  0\n πa\n S =\n 2\n\nthe length of the circumference of the circle\n = 4 times S\n πa\n = 4 ×\n 2\n = 2πa\n\nExample 4\n 3\n 2 1Find the length of the arc in the first quadrant of y = 2x from x = 0 to x = .\n 3\n\nSolution\nThe equation of the curve is given in Cartesian form. The length of the arc of a curve\nin Cartesian form is given by\n b 2\n  dy \n dx  S = a∫ 1+   dx\n\n 100\n\n1\n 2\n 3  d 32  = ∫ 1 +  2 x  dx 0  dx \n\n 1\n 3\n 1 + 9 x dx = ∫\n 0\n 1\n 3 1\n 9 x + 1 ) 2 dx = ∫ (\n 0\n (9 x + 1 ) 32 =\n 3",
+   "status": "flagged"
+  },
+  {
+   "id": 921,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1323",
+   "text": "2\n\n using (ax + b) formula\n 2 1 3 = [9 x + 1]0\n 27\n 2 = [(3 + 1) − (1)]\n 27\n 2\n = units\n 9\n\nExample 5\n π\nFind the length of the arc from θ = 0 to θ = of the curve given by x = 3 cos θ,\n 4\n\ny = 3 sin θ.\n\nSolution\n\nThe equation of the curve is given in parametric equation. In parametric equation, the\n\nlength of arc is given by\n\n t 2 2 2\n  dx   dy \n  dt   dt S = t∫1   +   dt\nHere\n\n 101\n\nπ\n θ=\n 4 2 2  d3 cosθ  d 3 sinθ   +   dθS = ∫ θ=0  dθ   dθ \n π\n 4\n 2 dθ (− 3 sinθ) 2 + (3 cosθ) = ∫\n 0\n π\n 4\n 3 (sin 2 θ+ cos2 θ)dθ = ∫\n 0\n π\n 4\n 3 1dθ = ∫\n 0\n π\n = (3θ0)4\n\n 3π\n = units\n 4\n\nLength of an arc S of a curve in polar coordinates (r, θ) is\n β 2\n 2  dr  r +   dθ S = ∫ α  dθ\n\nwhere values α and β are the values of θ corresponding to the end points of the\ncurve.\n\nProof\n\n 102\n\nPr N\n\n r + ∆r\n\n Pr-1 r\n ∆θ\n θ x 0\n\n Figure 5\n\n Let o Pr –1 = r and o Pr = r + ∆ r\nAngle x o Pr – 1 = θ and angle Pr – 1 o pr = ∆ θ\nLet N Pr – 1 be perpendicular to o Pr.\n\nNow N Pr – 1 = r ∆ θ and N Pr = ∆ r\n\nHence (Pr – 1 Pr)2 = (N Pr)2 + (N Pr – 1)2\n = (∆ r)2 + (r ∆ θ)2\n  2  ∆r  2  = (∆ θ)2  r +    when the limit ∆ θ → 0\n   ∆θ \n\n  2 2  ∆r  2  2 S =  r +    (∆θ)\n   ∆θ \n\n β 2\n 2  dr  r +   dθ S = ∫ α  dθ\n\nwhere α and β are the values of θ corresponding to at the end points of the curve.\n\nExample 6\nFind the length of the equiangular spiral r = a ek θ from θ = 0 to θ = 2π.\n\nSolution\nThe equation of the curve is given in polar form. The length of arc of a curve in polar\nform is given by\n\n 103\n\nβ 2\n 2  dr  r +   dθ S = ∫ α  dθ\n\n 2 2π kθ kθ 2  dae  (ae ) + =   dθ ∫ dθ 0  \n 2π\n a 2 e 2 kθ + (ae kθk )dθ = ∫\n 0\n 2π\n a e 2 kθ 1( + k 2 ) dθ = ∫\n 0\n 2π\n a 1 + k 2 e kθdθ = ∫\n 0\n 2π\n 2  e kθ  a 1 + k\n = k   0\n a 2 2 kπ = 1 + k (e − )1\n k\n\n Exercise 10\n 1 1",
+   "status": "flagged"
+  },
+  {
+   "id": 929,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1324",
+   "text": "What is the length of the circumference of the cardioid r = a (1 + cos θ).\n\n Summary\n\n You have learnt the following from this chapter.\n a). The length of an arc S of a curve is\n b 2\n  dy  S = 1+   dx i). In Cartesian form\n dx  a∫ \n\n t 2 2 2\n  dx   dy  S =   +   dt ii). In parametric form\n  dt   dt  t∫1\n\n β 2\n 2  dr  r +   dθ iii). In polar form S = ∫ α  dθ\n The limits being the end points of the curve\n\n b). To apply the formula for various problems\n\n Further Reading\n\n Additional pure mathematics\n Harwood Clarke\n Heinemann Educational Books Ltd.\n London.\n\n 105\n\nCHAPTER 11\n Volume and Surface Area of Solid of Revolution\n\n11.1 Introduction\n\nConsider an area under a curve between two ordinates. When this area is rotated\nabout the axis of x the resulting solid is called a Solid of Revolution. A section of\nthis solid by a plane perpendicular to the axis of x is a circle. When the area under a\nline of length l parallel to the axis of x is rotated you will obtain a right circular\ncylinder of height l.\nThe area under a line through the origin when rotated about the axis of x a right\ncircular cone is obtained. We shall now find the volume and surface area of a\nsolid of revolution, given the equation of the curve and the bounding ordinates.\n\n11.2 Objectives of the chapter\n\nBy the end of this chapter you shall be able to:\n • derive the formulae for the volume and the surface area of the solid of\n revolution.\n • apply these formulae for finding the volumes and surface areas of common\n solids.\n\n11.3 The formula for the volume of a solid of revolution\nThe curve y = f (x) bounded by the ordinate at x = a and x = b is rotated 3600 or more\nabout the x-axis a solid of revolution is generated.\nThe volume of this solid is given by\n x = b\n y 2 dx V = π ∫\n x = a\n\n P Q\n M\n N\n\n A S R B\n\n Figure 1\n\n 106\n\nConsider the curve y = f (x) between the ordinates AN and BM. Let P be (x, y)\nand Q be (x + ∆x, y + ∆y) on the curve. PS and QR are perpendicular to x-axis\nand the distance RS =∆x where ∆x → 0.\n\nWhen the area ANMBA is rotated about x axis, the elementary area PSRQ rotates\nabout OX, forming a slice of radius y and thickness ∆x thus an elementary cylinder of\nvolume πy 2 ∆x is generated.\nThe volume generated by the area ANMB is\n\nV = Limits of the sum of the volume generated by such elementary areas as PSRQ.\n πy 2 ∆ x where x varies from x = a to x = b. = lim ∑\n ∆ → 0\n x = b\n πy2 dx V = ∫\n x = a\n b\n π y2 dx V = ∫\n x = a\n\nSimilarly if a curve is rotated about the y axis between the lines y = c and y = d, the\nvolume generated is given by\n y = d\n x 2 dyV = π ∫\n y = c\n\nExample 1\nFind the volume of a cone of height h and base radius r.\nSolution\n\n A\n\n r\n\n 0 h (h, 0)\n\n Figure 2\n\nA cone is formed by the revolution of the area under the line OA about the x-axis.\n\n 107\n\nr r\nThe gradient of the line OA is and the equation of the line OA is y = x.\n h h\nIf V is the volume of the cone\n x = h\n y 2 dxV = π ∫\n x = 0\n r 2 2 = π x dx 2 ∫ h\n h\n πr 2  x 3 \n =\n h 2 3   0\n πr 2 h 3\n =\n h 2 3\n = 1π2r h units\n 3\nExample 2\n\nFind the volume of a hemisphere of radius r units.\n 4 3 V = πrHence show that the volume of a sphere of radius r is given by\n 3\n\nSolution\n\n x2 + y2 = r2\n\n 0 r\n\n Figure 3\n\nA hemisphere is formed by the revolution of the area of a quadrant of a circle x2 + y2\n= r2 about the x-axis.\n\n 108\n\nThe volume of the hemisphere\n r\n y 2 dx = π ∫\n x = 0\n\n r\n = π (r 2 − x 2 )dx ∫\n 0\n 3 r\n 2 x = π( r x − )\n 3 x = 0\n\n  3 r 3 \n = π r −   3 \n\n 2πr 3\n =\n 3\n\n 2π3r 4π3r\nHence the volume of sphere = twice =\n 3 3\n\nExample 3\nFind the volume obtained by rotating the area under the curve y = 1+ x between x= 1\nand x = 2 about the axis of x.\n\nSolution\n 2\n y 2 dxVolume = π ∫\n x =1\n 2 2\n 1 + x ) dx = π ∫ (\n x =1\n\n 2\n = π (x 2 + 2 x + 1)dx ∫\n 1\n\n 109\n\nx = 2\n  x 3 2 \n = π + x + x   3  x =1\n\n  8   1   = π  + 4 + 2  −  + 1 + 1   3   3  \n\n 19\n = π\n 3\n\n11.4 The Formula for the Surface Area of a Solid of Revolution\n\nWhen an arc AB rotates about the axis of x a surface of revolution is generated. If\narc AP = s and arc AQ = s + ∆ s, arc PQ = ∆ s.\n\n P Q\n\n A y B\n\n x-axis\n 0 S R\n\n Figure 4\n\nWhen the elementary area PSRQ rotates about x axis the curved surface area of\nthe cylinder of radius y and height ∆ s = 2πy∆ s, where ∆ s – 0.\nHence the total surface area generated by the arc AB about x-axis.\n =Limit ∑ 2 π∆ s from x = a to x = b.\n Limit ∆x → 0\n ∆y → 0\n\n 2\n  ∆y \n 2πy 1 +   ∆ x . From x = a to x = b since (∆ s)2 = (∆ x)2 + (∆ y)2 (see 10.2)∑  ∆x \n\n 110\n\n2\n x = b  dy  y 1 +   dx= ∫ 2π x = a  dx \n\n ydsThis formula can be remembered as surface area is S = 2π∫\nIn parametric form\n t = t 2  dx  2  dy  2\n dt   dt Surface areas = 2πt∫= t 1 y   +   dt\n\nExample 4\nFind the total surface area of a sphere of radius r.\n\nSolution\n\nA sphere is obtained by the revolution of a semi circle about its diameter.\n r\n 2πydsTotal surface area of a hemisphere = 2 ∫\n 0\nThe equation of the circle is x2 + y2 = r2\nThen y2 = r2 – x2 differentiating with respect to x\n dy\n2 y = −2 x\n dx\ndy x  dy  2 x 2 x 2 + y 2\n = − then 1 +   = 1 + 2 = 2\n dx y  dx  y y\n  dy  2 r 2\nBut x2 + y2 = r2, Hence 1 +   = 2\n  dx  y\nThen surface area of the sphere\n r  dy  2 2πy 1 +   dx = 2 ∫ x = 0  dx \n r r\n 2 2πy. dx = ∫ 0 y\n r\n dx = 2 × 2πa ∫\n o\n r = 4πr [x ]o\n\n 111\n\n= 4π2r\n\nExample 5\n 3t\nFind the surface area generated by the loop of the curve x=t2, y = t − about the\n 3\naxis.\n\nSolution\n 3\nThe curve cuts the x- axis at y=0 or t −t = 0 , Hence t=0 or t = 3 or x=0 or x=3.\n 3\n\n 3t\nEliminating t from x=t2 and y = t − we have the Cartesian equation of the\n 3\ncurve,\n 29 y 2 = x (3 − x )\n\n ds  2  dx  2  dy  2  =   +   since (d s)2 = (d x)2 + (d y)2\n dt   dt   dt \n 2 2 = 4t 2 + (1 − t )\n 2 2 = (1 + t )\n ds\n = 1 + 2t\n dt\n\nThe required surface area = 2π∫yds\n 3 t 3  2= 2π −t (1 + t )dt ∫   t = 0 3 \n 3 2t 3 t 5 \n t + − dt= 2π∫  0  3 3 \n  t 3 2 t 4 6 6 \n= 2π + −\n 2 6 18   0\n=π(3 + 3 − 3)\n= 3π Sqr units\n\n 112\n\nExample 6\n Show that the curved surface area of a cone radius r, height h and slant height l is\nπrl .\n A\n\n l\n r\n\n O B\n h\n Figure 6\n Solution\n A cone is formed by the revolution of the area under the line OA. OB = height h,\n AB is the radius r and OA is the slant height l.\n r r\n Gradient of OA is and hence the equation of OA is y = x\n h h\n h  dy  2\n Surface area S = 2πx∫= 0 y 1 +  dx  d s\n h r r 2\n x 1+ dx = 2 ∫ h h x = 0\n r h l\n x dx since h2 + r2 = l2 = 2π ∫ h o h\n h\n r l  x 2 \n = 2π\n h h  2  0\n = π r l\n\n Exercise 11",
+   "status": "flagged"
+  },
+  {
+   "id": 939,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "The area between the line y = x and the curve y = x2 is rotated about the axis\n of x. Find the volume formed.\n\n Summary\n\n You have learnt the following from this chapter.",
+   "status": "auto_validated"
+  },
+  {
+   "id": 940,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "The formulae for the volume of a solid of revolution obtained by rotating a\n curve about x - axis between the ordinate at x = a and x = b is:\n b\n y 2 dx V = π∫\n a\n About y – axis between the lines x = c and x = d is:\n\n 114\n\nd\n x 2 dy V = πc∫",
+   "status": "auto_validated"
+  },
+  {
+   "id": 941,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1325",
+   "text": "The formula for the surface area of a solid of revolution about x – axis is:\n yds if s is known. S = 2π∫\n t = t 2  dx   dy  2 y   +   dt if the equation of the curve is in parametric S = 2π ∫ t = t1  dt   dt \n form.",
+   "status": "flagged"
+  },
+  {
+   "id": 942,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Application of the formulae for any solid of revolution.\n\n Further Reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 943,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Additional pure mathematics By L. Harwood Clarke.\n Heinemann Educational Books Ltd London.",
+   "status": "auto_validated"
+  },
+  {
+   "id": 944,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Advanced calculus By Watson Fulks.\n John Wiley and sons New York. Brisbane. Toronto.\n\n 115\n\nCHAPTER 12\n Numerical integration:\nTrapezoidal and Simpson Rule\n\n12.1 Introduction\n\nIn chapter eight we have learnt how to find the area under a curve using definite\nintegral. Suppose that the equation of the curve is not known or the known function\nof x cannot be integrated. In such cases an approximation for the area under a curve\nmay be found by several numerical methods. In this chapter we shall consider two\nimportant methods namely Trapezoidal rule and Simpson rule to find approximate\nareas under a curve.\n\n12.2 Objectives of the chapter:\n\nBy the end of this chapter you should be able to\n • establish the Trapezoidal rule.\n • derive the formula for the area under a parabola.\n • establish Simpson’s rule.\n • apply the Trapezoidal rule and Simpson’s rule.\n\n12.3: Area of a trapezium\n\nA quadrilateral in which one pair of opposite sides are parallel is called a trapezium.\nThe area of a trapezium is the mean of parallel sides multiplied by the perpendicular\ndistance between them.\n\n C\n B\n\n y2\n y1\n\n A D\n\nIn the above figure A B C D is a trapezium in which A B is parallel to DC.\nIf AB=y1, x = y2 and the distance AD = h the area of the trapezium is\n\n 116\n\nh ( 1y + 2y ) h= or ( y1 + y 2 )\n 2 2\n\nthis is the basic principle for trapezoidal rule\n\n 12.4: Trapezoidal rule\n\n D\n C\n\n y0 y1 y2 y3 yn-1 yn\n\n O A B\n\nConsider a curve DC with end ordinates y0 and yn cutting x axis at A and B\n\nrespectively. Divide the interval between A and B into n equal parts and erect\n\nordinates at each point of division including the end points A and B. We wish to find\n\n AB\nthe area ABCD under the curve DC. Let = h .\n n\n\nThe area under curve is found by joining the ends of consecutive ordinates and by\ntreating each trapezium so formed as an approximation for the area under the\ncorresponding portion of the graph.\n\n h\nThe area of the first trapezium is ( y 0 + y1 )\n 2\n h\n of the second is ( y1 + y 2 )\n 2\n h\n of the third is ( y 2 + y 3 )\n 2\n ………………………………….\n h\n of the nth trapezium is ( y n −1 + y n )\n 2\nwhere h is the distance between consecutive ordinates.\nThen an approximation for total area under the curve DC is\n\n 117\n\n1 A = h[( y 0 + y1 ) + ( y1 + y 2 ) + ( y 2 + y3 ) + .........( y n −1 + y n ])\n 2\n 1\n A= h ( y 0 + 2 y1 + 2 y 2 + 2 y3 + ........ + 2 y n −1 + y n )\n 2\n This is the trapezoidal rule\n\nYou can observe the following:\n\nIn finding the total sum,\ni) y0 and yn remain the same\n ii) y1, y2, …. yn-1 are multiplied by two\n h b − a\n iii) The total sum is multiplied by , where h = , to get the area under the\n 2 n\n curve\n\nExample 1\nFind an appropriate value for between x = 0 and x = 6 ∫ydx\n\n y0 y1 y2 y3 y4 y5 y6\n\n 0 1 2 3 4 5 6\n\nGiven that OA is divided into 6 equal parts at and the corresponding ordinals are\ngiven below:\n\n x0 = 0 y0 = 8\n\n x1 = 1 y1 = 12\n\n x2 = 2 y2 = 14\n\n x3 = 3 y3 = 11\n\n 118\n\nx4 = 4 y4 = 9\n\n x5 = 5 y5 = 3\n\n x6 = 6 y6 = 1\n\nSolution\n 6 − 0\nx=0 to 6 is divided into 6 equal parts; hence h =\n 6\n = 1\n hTotal area = [ y 0 + 2 y1 + 2 y 2 + 2 y3 + 2 y 4 + 2 y5 + y 6 ]\n 2\n\n y0 = 8 y0 = 8\n\n y1 = 12 2y1 = 24\n\n y2 = 14 2y2 = 28\n\n y3 = 11 2y3 = 22\n\n y4 = 9 2y4 = 18\n\n y5 = 3 2y5 = 6\n\n y6 = 1 y6 = 1\n\n Total Sum = 107\n\n hTotal area = [ y 0 + 2 y1 + 2 y 2 + 2 y3 + 2 y 4 + 2 y5 + y 6 ]\n 2\n 1\n = (107)\n 2\n = 53.5 sq units\n\nExample 2\n 1\nConsider the curve y = in the figure given below between x = 1 and x = 2. The\n x\ninterval is divided into 5 equal parts. The ordinates at these points are y0, y1, y2, y3,\ny4, y5 which are given below:\n\n 119\n\ny = 1/x\n\n 0 1 2\n\ny0 y1 y2 y3 y4 y5\n\n1.0000 0.8333 0.7143 0.6250 0.5556 0.5000\n\n 2 1 1\na) Calculate dx using trapezoidal rule with 5 intervals (Assume dx is ∫ ∫ 1 x x\n not known)\n\n 1\nb) Suppose that you know dx = ln x + c x∫\n Calculate the area under the curve.\n\nc) Calculate the percentage error.\n\nSolution\ny0 =1.0000 y0 = 1.0000\n\ny1 = 0.8333 2y1 = 1.6666\n\ny2 = 0.7143 2y2 = 1.4286\n\ny3 = 0.6250 2y3 = 1.2500\n\ny4 = 0.5556 2y4 = 1.1112\n\ny5 =0.5000 y5 = 0.5000\n\n Total Sum = 6.9564\n\n 2 − 1\nh = = 2.0\n 5\n\n 120\n\n2 1 h\nThen dx = [ y 0 + 2 y1 + 2 y 2 + 2 y3 + 2 y 4 + 2 y5 ]\n 2 x∫1",
+   "status": "auto_validated"
+  },
+  {
+   "id": 945,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1326",
+   "text": "= [.69564 ]\n 2\n\n 1\n = x .69564\n 10\n\n = 0.69564\n\n = 0.6956 to four decimals.\n\n 2 1 x = 2\n b) Now, dx = [ln x ]x =1 x∫1\n\n = ln 2 – ln 1\n\n = 0.6931 – 0\n\n = 0.6931\n\nc) To calculate the percentage error.\n\n .0 6931 ~ .0 6956\nThe percentage error = x100\n .0 6931\n = 0.0025 x 100\n = 0.25%\n\n True value ~ Approximat value\n[Percentage error = x100 %]\n True value\n\nExample3\n\na) Find the distance traveled in a straight line by a particle in 6 seconds given\n that the velocity m per sec is connected with the time t sec as follows\n\nt 0 1 2 3 4 5 6\n\nv 10 12 15 16 11 5 3\n\nb) Sketch the time velocity graph\n(In velocity – time graph, area under graph represents the distance traveled)\n\n 121\n\nSolution\n\n y\n\n Velocity\n\n y0 y1 y2 y3 y4 y5 y6\n x\n 0 1 2 3 4 5 6\n Time\n\n Figure\n\n 6\nWe are required to find dx or area under the curve between t = 0 and 6 y∫\n 0\n\ny0 =10 y0 = 10\n\ny1 = 12 2y1 = 24\n\ny2 = 15 2y2 = 30\n\ny3 = 16 2y3 = 32\n\ny4 = 11 2y4 = 22\n\ny5 = 5 2y5 = 10\n\ny6 = 3 y6 = 3\n\n Total Sum 131\n\n 6 − 0\n h = = 1 unit\n 6\n\nTotal area under curve (distance travele)\n\n 122\n\nh = [ y 0 + 2 y1 + 2 y 2 + 2 y3 + 2 y 4 + 2 y5 + y 6 ]\n 2\n 1\n = (131)\n 2\n = 65.5 metre\n\n12.5 Principle of Simpsons Rule\nThe Trapezoidal Rule we have learnt is obtained by treating each part of the curve\nas a straight line, y = b x + c. Suppose that we now find a better approximation for\neach part of the curve in the form y = ax2 + b x + c which is a parabola.\n\nFormula for the area under the curve y = ax2 + b x + c between x = -h and x = h\n\n A\n y = ax2 + bx + c\n B\n C\n\n y0 y1 y2\n\n -h 0 h\nIf the curve is y = ax2 + bx + c the exact area under the curve ABC is\n h\nA = ax 2 + bx + c ∫\n − h\n  ax h 3 bx 2 \n = + + cx   3 2  − h\n 2 ah 3\n = + 2ch (1)\n 3\n\nNow we shall find the area under the curve ABC in terms of the ordinates y0, y1, y2\n\nThe curve is y = ax2 + bx + c\nWhen x = - h y0 = ah2 - bh + c\nWhen x = 0 y1 = c (2)\nWhen x = h y2 = ah2 + bh + c\n\nNow y0 + y2 = (ah2 – bh +c) + (ah2 + bh + c)\n\n 123\n\n= 2ah2 + 2c\n = 2ah2 + 2y1 using (2) (3)\nFrom (3) 2ah2 =y0 + y2 – 2y1 (4)\n\nThe actual area by integration, from (1) is\n 2 ah 3\nA = + 2ch (1)\n 3\n 2 ah 2\n = h ( + 2ch )\n 3\n h\n = (2ah2 + 6c) (5)\n 3\n h\n = (y0 – 2y1 + y2 + 6y1) using (2) and (4) in (5)\n 3\n h\nA = (y0 + 4y1 + y2)\n 3\nThus the area under the parabola ABC in terms of the ordinates is\n h\nA = (y0 + 4y1 + y2)\n 3\n12.6 Simpsons Rule for finding approximate area under a curve\n\n y\n\n B\n\n A\n\n y0 y1 y2 y3 y4 yn-2 yn-1 yn\n\n x\n 0 a b\n\nAs we have seen\n 1\nThe area between y0 and y2 = h(y0 + 4y1 + y2)\n 3\n\n 124\n\n1\n The area between y2 and y4 = h(y2 + 4y3 +y4)\n 3\n 1\n The area between y4 and y6 = h(y4 + 4y5 + y6)\n 3\n ………………………………………………………\n 1\n The area between yn-2 and yn = h(yn-2 + 4yn-1 + yn)\n 3\n The total area under the curve AB is therefore\n 1\n A = h(y0 + 4y1 + 2y2 + 4y3 +……..+ 4yn-1 + yn)\n 3\n\n This is Simpsons Rule\n You must understand the following to apply Simpsons rule.\n i). Divide the interval (a ≤ x ≥ b) into even number of equal intervals, h =\n b −a\n n\n ii). In the addition, the first and the last ordinates y0 and yn remain the same\niii). Add four times the ordinates y1, y3, y5, ,,,,,, and two times the ordinates y2, y4, y6,\n (alternatively four times odd and two times even ordinates respectively) are\n added.\niv). The total sum is multiplied by one third of the width of equal interval (or multiply\n h\n the sum by )\n 3\n To apply Simsons Rule the number of divisions of the interval must be even\n In other words n should be an even positive integer to apply Simpsons Rule.\n\n Example 4\n 6\n Find ydx , given the following values, using ∫\n 0\n i) Simpsons Rule for the interval (0 ≤ x≤ 6)\n\n ii) Trapezoidal Rule for the interval (0 ≤ x ≤6)\n\n X 0 1 2 3 4 5 6\n Y 8 12 14 11 9 3 1\n\n Solution\n i) Area under curve using Simpsons Rule\n\n Y0 = 8 Y0 = 8\n\n 125\n\nY1 = 12 4Y1 = 48\n\n Y2 = 14 2Y2 = 28\n\n Y3 = 11 4Y3 = 44\n\n Y4 = 9 2Y4 = 18\n\n Y5 = 3 4Y5 = 12\n\n Y6 = 1 Y6 = 1\n\n Total Sum 159\n\n 6 − 0\nh = = 1\n 6\n\nApproximate area in therefore.\n 1\nA = h(y0 + 4y1 + 2y2 + 4y3 + 2y4 + 4y5 + y6)\n 3\n 1\n = (1)(159)\n 3\n = 53 sq units\n\nii) Area under curve using Trapezoidal Rule (≤",
+   "status": "flagged"
+  },
+  {
+   "id": 946,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1327",
+   "text": "Y0 = 8 Y0 = 8\n\n Y1 = 12 2Y1 = 24\n\n Y2 = 14 2Y2 = 28\n\n Y3 = 11 2Y3 = 22\n\n Y4 = 9 2Y4 = 18\n\n Y5 = 3 2Y5 = 6\n\n Y6 = 1 Y6 = 1\n\n 126\n\nTotal Sum 107\n\n 6 − 0\n h = = 1\n 6\n\nApproximate area is therefore\n 1\n A = h (y0 + 2y1 + 2y2 + 2y3 + 2y4 + 4y5 + y6 )\n 2\n\n 1\n = (1) (107)\n 2\n = 53.5 sq units\n\nExercise 12",
+   "status": "flagged"
+  },
+  {
+   "id": 948,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "What is the area of a trapezium whose ordinates are y0 and y1 and the distance\n between them is h.",
+   "status": "auto_validated"
+  },
+  {
+   "id": 949,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Three consecutive ordinates are y0 , y1, and y2, and each equal interval is h\n units.\n What is the area between the curve, x-axis and the ordinates y0 and y2\n y\n\n A B C\n\n y0 y1 y2\n x\n 0\n x0 x1 x2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 951,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "127\n\n1\n In the figure above, the equation of the curve is y = 2 . Find the area 1 + x\n\n under the curve between x = 0 and x = 1 using\n\n i) Trapezoidal Rule with ten equal parts\n\n ii) Simpsons Rule with 10 equal parts",
+   "status": "auto_validated"
+  },
+  {
+   "id": 952,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1328",
+   "text": "A car starts from rest and its velocity in meter per second over the first ten\n\n seconds is given by the following table:\n\n t 0 1 2 3 4 5 6 7 8 9 10\n\n v 2 2.4 2.8 3.2 4.0 4.2 4.5 6.0 6.2 6.3 6.4\n\n Find the distance traveled by the car at the end of 10 seconds.\n\n 3\n x 2 + x )dx using7. Find an approximate value for ( ∫\n 0\n\n i) Simpsons Rule by taking 10 equal intervals\n\n ii) Trapezoidal Rule by taking 10 equal intervals\n\n iii) Integration\n\n 1\n − x 2 e dx8. Evaluate ∫ by Simpsons Rule taking ten intervals.\n 0",
+   "status": "flagged"
+  },
+  {
+   "id": 953,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "superseded by clean reconstruction q1329",
+   "text": "The distance moved by a body starting from rest is given by the following\n\n table.\n\n Time t sec 0 1 2 3 4 5 6\n\n Distance s met 0 5 17 34 57 84 115\n\n Plot a velocity-time graph and estimate the speed after 6 seconds.\n\n 128\n\nSummary\n\nYou have learnt the following from this chapter:\n h",
+   "status": "flagged"
+  },
+  {
+   "id": 954,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Area of trapezium = ( y 0 + y 1 ) y0 and y1 are the ordinates and h 2\n\n is the distance between y1 and y2.",
+   "status": "auto_validated"
+  },
+  {
+   "id": 955,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Area under a parabola y = ax2 + bx + c when there are two intervals bounded\n h\n ( y 0 + 4 y 1 + y 2 ) . by y0, y1 and y2 = 3",
+   "status": "auto_validated"
+  },
+  {
+   "id": 956,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Area under a curve using Trapezoidal Rule is\n h\n = ( y0 + 2 y1 + 2 y2 + 2 y3 + ........ + 2 ny −1 + ny )\n 2",
+   "status": "auto_validated"
+  },
+  {
+   "id": 957,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Area under a curve using Simpson’s Rule is\n h\n A = ( y 0 + 4 y 1 + 2 y 2 + 4 y 2 + 2 y 3 + ....... + y n ) .\n 3\n\n where n should be an even integer.",
+   "status": "auto_validated"
+  },
+  {
+   "id": 958,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Applying the Trapezoidal Rule and Simpsons Rule for finding the\n\n approximate area under a curve between x = a and x = b\n\nFurther Reading",
+   "status": "auto_validated"
+  },
+  {
+   "id": 959,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Mathematics of Physics and Modern Engineering\n\n By Sokolnikoff\n\n Mc Graw – Hill Bok company, INC New York Toronto London",
+   "status": "auto_validated"
+  },
+  {
+   "id": 960,
+   "paper": "sma200-doc-776f3d92",
+   "reason": "textbook prose / formula fragment / merged exercise list",
+   "text": "Additional Pure Mathematics\n\n By L. Harwood Clarke\n\n Heinmann Educational Books Ltd\n\n London\n\n 129",
+   "status": "auto_validated"
+  }
+ ],
+ "repaired": [
+  {
+   "id": 880,
+   "before": "****\n\na) Evaluate the integral \\(\\int (2x + 1)(x^2 + x + 1)^3 dx\\) **[3 marks]**\nb) Given that \\(f(x) = \n\n$$\n\\begin{cases}\nx + 1, & \\text{if } 0 \\le x < 1 \\\\ 2 - x, & \\text{if } 1 \\le x \\le 2\n\\end{cases}\n$$\n\n\\), find \\(\\int_0^2 f(x)dx\\) **[5 marks]**\nc) Find \\(\\frac{dh}{dx}\\) if \\(h(x) = \\int_1^{\\sqrt{x}} \\frac{s^2}{s^2+1} ds\\) **[5 marks]**\nd) Find the area bounded by the line \\(y = x - 1\\) and the parabola \\(y^2 = 2x + 6\\). **[6 marks]**\ne) Evaluate \\(\\int \\frac{\\sqrt{x+4}}{x} dx\\) **[7 marks]**\nf) Determine whether \\(\\int_2^\\infty \\frac{1}{(x+3)^{\\frac{3}{2}}} dx\\) is convergent. If it is convergent, evaluate it. **[4 marks]**",
+   "after": "a) Evaluate the integral \\(\\int (2x + 1)(x^2 + x + 1)^3 dx\\) **[3 marks]** b) Given that \\(f(x) = $$ \\begin{cases} x + 1, & \\text{if } 0 \\le x < 1 \\\\ 2 - x, & \\text{if } 1 \\le x \\le 2 \\end{cases} $$ \\), find \\(\\int_0^2 f(x)dx\\) **[5 marks]** c) Find \\(\\frac{dh}{dx}\\) if \\(h(x) = \\int_1^{\\sqrt{x}} \\frac{s^2}{s^2+1} ds\\) **[5 marks]** d) Find the area bounded by the line \\(y = x - 1\\) and the parabola \\(y^2 = 2x + 6\\). **[6 marks]** e) Evaluate \\(\\int \\frac{\\sqrt{x+4}}{x} dx\\) **[7 marks]** f) Determine whether \\(\\int_2^\\infty \\frac{1}{(x+3)^{\\frac{3}{2}}} dx\\) is convergent. If it is convergent, evaluate it. **[4 marks]**"
+  },
+  {
+   "id": 884,
+   "before": "a) Use the Trapezoidal Rule with $n = 5$ to approximate the integral $\\int_{1}^{2} \\frac{1}{x} \\, dx$. **[4 marks]**\n\nb) i) Use the Simpson's Rule with $n = 10$ to approximate the integral $\\int_{0}^{1} e^{x^2} \\, dx$. **[6 marks]**\nii) Estimate the error involved in this approximation. **[5 marks]**\n\nc) Evaluate the improper integral $\\int_{-\\infty}^{\\infty} \\frac{1}{1 + x^2} \\, dx$ **[5 marks]**\n\n*\\#NDUTA NA SPAS*",
+   "after": "a) Use the Trapezoidal Rule with $n = 5$ to approximate the integral $\\int_{1}^{2} \\frac{1}{x} \\, dx$. **[4 marks]** b) i) Use the Simpson's Rule with $n = 10$ to approximate the integral $\\int_{0}^{1} e^{x^2} \\, dx$. **[6 marks]** ii) Estimate the error involved in this approximation. **[5 marks]** c) Evaluate the improper integral $\\int_{-\\infty}^{\\infty} \\frac{1}{1 + x^2} \\, dx$ **[5 marks]** *\\#"
+  }
+ ],
+ "published": [
+  {
+   "id": 1239,
+   "before": "pending"
+  },
+  {
+   "id": 1242,
+   "before": "pending"
+  },
+  {
+   "id": 1244,
+   "before": "pending"
+  },
+  {
+   "id": 1245,
+   "before": "pending"
+  },
+  {
+   "id": 1248,
+   "before": "pending"
+  },
+  {
+   "id": 1249,
+   "before": "pending"
+  },
+  {
+   "id": 1252,
+   "before": "pending"
+  },
+  {
+   "id": 1253,
+   "before": "pending"
+  },
+  {
+   "id": 1296,
+   "before": "pending"
+  },
+  {
+   "id": 1300,
+   "before": "pending"
+  },
+  {
+   "id": 1302,
+   "before": "pending"
+  },
+  {
+   "id": 1303,
+   "before": "pending"
+  },
+  {
+   "id": 1304,
+   "before": "pending"
+  },
+  {
+   "id": 1306,
+   "before": "pending"
+  },
+  {
+   "id": 1307,
+   "before": "pending"
+  },
+  {
+   "id": 1317,
+   "before": "pending"
+  },
+  {
+   "id": 1321,
+   "before": "pending"
+  },
+  {
+   "id": 1322,
+   "before": "pending"
+  },
+  {
+   "id": 1326,
+   "before": "pending"
+  },
+  {
+   "id": 1327,
+   "before": "pending"
+  },
+  {
+   "id": 1328,
+   "before": "pending"
+  },
+  {
+   "id": 1329,
+   "before": "pending"
+  }
+ ]
+}

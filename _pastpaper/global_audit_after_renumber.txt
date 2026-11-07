@@ -1,0 +1,76 @@
+﻿ASC 100   topics= 6 rendered=  23 failing_topics=0
+EET 100   topics= 5 rendered=  52 failing_topics=0
+SCS 209   topics= 8 rendered=   0 failing_topics=0
+SMA 102   topics= 8 rendered=  47 failing_topics=0
+  SMA 103 / The Hyperbola: 1 hidden
+     q572 n=4 same_paper_number_rows=[573]
+SMA 103   topics= 7 rendered=  42 failing_topics=1
+SMA 190   topics= 8 rendered=   3 failing_topics=0
+SMA 200   topics=12 rendered=   0 failing_topics=0
+  SMA 230 / Vector Algebra: 4 hidden
+     q2370 n=3 same_paper_number_rows=[2384]
+     q2392 n=3 same_paper_number_rows=[2406]
+  SMA 230 / Dot and Cross Product: 1 hidden
+     q2459 n=1 same_paper_number_rows=[2445]
+SMA 230   topics= 6 rendered=  32 failing_topics=2
+  SMA 300 / The Real Number System: 12 hidden
+     q252 n=2 same_paper_number_rows=[297, 353, 357]
+     q297 n=2 same_paper_number_rows=[252, 353, 357]
+  SMA 300 / Topology of the Real Numbers: 6 hidden
+     q300 n=1 same_paper_number_rows=[347, 352]
+     q347 n=1 same_paper_number_rows=[300, 352]
+  SMA 300 / Sequences: 2 hidden
+     q354 n=3 same_paper_number_rows=[358]
+     q370 n=3 same_paper_number_rows=[374]
+  SMA 300 / Series: 5 hidden
+     q355 n=4 same_paper_number_rows=[359, 362]
+     q359 n=4 same_paper_number_rows=[355, 362]
+SMA 300   topics= 6 rendered=  69 failing_topics=4
+  SMA 330 / Errors And Approximations In Numerical C: 3 hidden
+     q1694 n=1 same_paper_number_rows=[1704]
+     q1726 n=1 same_paper_number_rows=[1831]
+  SMA 330 / Polynomials and Interpolation: 3 hidden
+     q1682 n=1 same_paper_number_rows=[1714]
+     q1715 n=1 same_paper_number_rows=[1841]
+  SMA 330 / Numerical Integration: 3 hidden
+     q1689 n=5 same_paper_number_rows=[1713]
+     q1722 n=5 same_paper_number_rows=[1840]
+  SMA 330 / Composite Formulae And Romberg Integrati: 3 hidden
+     q1687 n=3 same_paper_number_rows=[1710]
+     q1720 n=3 same_paper_number_rows=[1837]
+  SMA 330 / Iteration Techniques For Non Linear Equa: 6 hidden
+     q1684 n=1 same_paper_number_rows=[1695, 1707]
+     q1695 n=1 same_paper_number_rows=[1684, 1707]
+  SMA 330 / Newton Raphson And Secant Method: 6 hidden
+     q1683 n=1 same_paper_number_rows=[1706]
+     q1697 n=3 same_paper_number_rows=[1698]
+SMA 330   topics=10 rendered=  25 failing_topics=6
+SMA 335   topics=13 rendered= 479 failing_topics=0
+SST 101   topics=15 rendered=   0 failing_topics=0
+SST 200   topics= 5 rendered=  16 failing_topics=0
+  SST 202 / Classes And Objects: 1 hidden
+     q2312 n=5 same_paper_number_rows=[2309]
+  SST 202 / Arrays: 1 hidden
+     q2306 n=3 same_paper_number_rows=[2310]
+SST 202   topics= 7 rendered=   4 failing_topics=2
+SST 204   topics=11 rendered= 198 failing_topics=0
+SST 301   topics= 9 rendered=  22 failing_topics=0
+  SST 304 / Random And Mean Vectors: 5 hidden
+     q1383 n=2 same_paper_number_rows=[1422, 1406]
+     q1379 n=1 same_paper_number_rows=[1389, 1415, 1418]
+  SST 304 / Determination Of Parameters Of Mvn Distr: 2 hidden
+     q1381 n=1 same_paper_number_rows=[1391, 1416]
+     q1416 n=1 same_paper_number_rows=[1391, 1381]
+  SST 304 / Multinomial Distribution: 1 hidden
+     q1385 n=3 same_paper_number_rows=[1397]
+SST 304   topics= 4 rendered=  26 failing_topics=3
+SST 305   topics= 9 rendered=  75 failing_topics=0
+SST 401   topics=11 rendered=   0 failing_topics=0
+SST 408   topics= 9 rendered=   0 failing_topics=0
+SST 409   topics=11 rendered=   0 failing_topics=0
+SST 411   topics= 9 rendered=   0 failing_topics=0
+SST 412   topics= 7 rendered=   0 failing_topics=0
+SST 413   topics=11 rendered=   0 failing_topics=0
+SST404    topics= 7 rendered=   0 failing_topics=0
+UCU 110   topics= 6 rendered=  18 failing_topics=0
+FAILING TOPICS: 18

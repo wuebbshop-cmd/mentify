@@ -1,0 +1,722 @@
+﻿rows=242 distinct=240
+rows per distinct statement: {1: 238, 2: 2}
+
+x2 topics=[None] ids=[853, 876]
+   evaluate the following integrals i) $\int \frac{(2x - 6)dx}{(x^2 - 6x + 13)^2}$ **[5 marks]** ii) $\int \frac{dx}{\sqrt{9 + 16x - 4x^2}
+
+x2 topics=[None] ids=[850, 873]
+   using the fundamental theorem of calculus part 1, find $\frac{dy}{dx}$ given $y = \int_{2}^{3x} \sin(t^2) dt$. **[4 marks]** b) by usin
+
+x1 topics=[None] ids=[951]
+   127 1 in the figure above, the equation of the curve is y = 2 . find the area 1 + x under the curve between x = 0 and x = 1 using i) tr
+
+x1 topics=[None] ids=[757]
+   2 2 ∫ cot 4 xdx x −162. ∫ 2 dx cos x 22. ∫ 2 dx3. x + 25 ∫ 1 + sin x dx 2 23. ∫ 24. sin 5 xdx x −25 ∫ 2 dx5. cos 5 xdx ∫ 24. ∫ 4 − x 2 
+
+x1 topics=[None] ids=[771]
+   2 cos a cos b = cos (a + b) + cos (a – b)
+
+x1 topics=[None] ids=[770]
+   2 sin a cos b = sin (a + b) + sin (a – b)
+
+x1 topics=[None] ids=[772]
+   2 sin a sin b = cos (a+b) – cos (a – b)
+
+x1 topics=[None] ids=[892]
+   2 tan( 2 x + 3 ) dx ∫6. 1 ( x − 1) ( x − 2 ) ∫ 0 2 x 2 + 8 x + 15 dx 19. π 2 ∫ cos x + 4 x + 3 x 1 ( x + 3 ) dx7. 3 2 π ∫ 0 x + 2 x + s
+
+x1 topics=[None] ids=[921]
+   2 using (ax + b) formula 2 1 3 = [9 x + 1]0 27 2 = [(3 + 1) − (1)] 27 2 = units 9 example 5 π find the length of the arc from θ = 0 to 
+
+x1 topics=[None] ids=[739]
+   2 x + 5 + ex − 5 − cos ec 2 5 x + ( 2 x + 3) 5 ]dx ∫  1 10 14. ( ax + b ) + cos( ax + b ) dx ∫ +  ax + b   1 1 2 1 15. sec x ta
+
+x1 topics=[None] ids=[715]
+   3 cos x − 4 cos ecx cot x + 5 cos ec 2 x )dx ∫  15 1 4 x 7  4. x + 15 + 8 x − 3e + + 7 x + 8  dx ∫   x x  ( x 2 + 7 x + 10)
+
+x1 topics=[None] ids=[714]
+   3 sin x − 4 sec x tan x + 5 sec 2 x )dx ∫
+
+x1 topics=[None] ids=[736]
+   4x – 3)3 8. cos (5x + 4) 9. sin (3 – 4x)
+
+x1 topics=[None] ids=[945]
+   = [.69564 ] 2 1 = x .69564 10 = 0.69564 = 0.6956 to four decimals. 2 1 x = 2 b) now, dx = [ln x ]x =1 x∫1 = ln 2 – ln 1 = 0.6931 – 0 = 
+
+x1 topics=[None] ids=[952]
+   a car starts from rest and its velocity in meter per second over the first ten seconds is given by the following table: t 0 1 2 3 4 5 6
+
+x1 topics=[None] ids=[709]
+   a dx = + c , a is any positive constant ∫ ln a e x dx = e x + c 4. ∫ for example x 2 x 2 dx = + c ∫ ln 2 x 5 x 5 dx = + c ∫ ln 5 1.8 (c
+
+x1 topics=[None] ids=[723]
+   a dx = + c , ∫ ln a e x dx = e x + c 4. ∫
+
+x1 topics=[None] ids=[1328]
+   a particle starts from rest and its velocity \(v\) in metres per second over the first \(8\) seconds is recorded at one-second interval
+
+x1 topics=[None] ids=[960]
+   additional pure mathematics by l. harwood clarke heinmann educational books ltd london 129
+
+x1 topics=[None] ids=[943]
+   additional pure mathematics by l. harwood clarke. heinemann educational books ltd london.
+
+x1 topics=[None] ids=[888]
+   additional pure mathematics by l. harwood clarke. heinemann educational books ltd london. 62 chapter 7 definite integral and the fundam
+
+x1 topics=[None] ids=[741]
+   adjustment of the derivative sometimes the integrand may not have the exact derivative of the function u present. in such cases we shal
+
+x1 topics=[None] ids=[740]
+   advanced calculus by watson fulks john wiley & sons new york brisbane. toronto 22 chapter 3 integration using substitutions. 3.1 introd
+
+x1 topics=[None] ids=[747]
+   advanced calculus by watson fulks john wiley & sons new york brisbane. toronto 33 chapter 4 integration by parts in chapter three you h
+
+x1 topics=[None] ids=[920]
+   advanced calculus by watson fulks john wiley and sons new york. brisbane toronto. 94 chapter 10 length of an arc of a curve 10.1 introd
+
+x1 topics=[None] ids=[944]
+   advanced calculus by watson fulks. john wiley and sons new york. brisbane. toronto. 115 chapter 12 numerical integration: trapezoidal a
+
+x1 topics=[None] ids=[751]
+   advanced calculus watson fulks john wiley & sons new york. brisbane. toronto. 41 chapter 5 integration using trigonometric identities. 
+
+x1 topics=[None] ids=[942]
+   application of the formulae for any solid of revolution. further reading
+
+x1 topics=[None] ids=[749]
+   apply the formula to integrate product of two functions.
+
+x1 topics=[None] ids=[958]
+   applying the trapezoidal rule and simpsons rule for finding the approximate area under a curve between x = a and x = b further reading
+
+x1 topics=[None] ids=[954]
+   area of trapezium = ( y 0 + y 1 ) y0 and y1 are the ordinates and h 2 is the distance between y1 and y2.
+
+x1 topics=[None] ids=[957]
+   area under a curve using simpson’s rule is h a = ( y 0 + 4 y 1 + 2 y 2 + 4 y 2 + 2 y 3 + ....... + y n ) . 3 where n should be an even 
+
+x1 topics=[None] ids=[956]
+   area under a curve using trapezoidal rule is h = ( y0 + 2 y1 + 2 y2 + 2 y3 + ........ + 2 ny −1 + ny ) 2
+
+x1 topics=[None] ids=[955]
+   area under a parabola y = ax2 + bx + c when there are two intervals bounded h ( y 0 + 4 y 1 + y 2 ) . by y0, y1 and y2 = 3
+
+x1 topics=[None] ids=[872]
+   calculate the trapezoidal and simpson’s approximation to 1 2 i. dx with n  10 . 2 0 1 x ii. compare the results with exact solution
+
+x1 topics=[None] ids=[907]
+   classify the following into improper integrals of the first kind and improper integrals of the second kind. ∞ 2 ∞ − x x + 1 e sin x a).
+
+x1 topics=[None] ids=[862]
+   compulsory - ] (a) find the following indefinite integrals: (3 marks each) 1. x~ 1dx j x2 dx ii. j jx3 +3 (b) evaluate the following de
+
+x1 topics=[None] ids=[1320]
+   consider the curve \( y = x^3 - 3x^2 + 2x \). (a) find the points where the curve crosses the \(x\)-axis. (b) sketch the curve for \(0 
+
+x1 topics=[None] ids=[1309]
+   consider the integral $$ i = \int_{0}^{1} \frac{2}{1+x^2}\,dx. $$ (i) use the trapezoidal rule with \( n = 10 \) subintervals to approx
+
+x1 topics=[None] ids=[733]
+   cos (4x + 3) 2. sin 3 x 1
+
+x1 topics=[None] ids=[759]
+   cos 10x sin 4x dx ∫ ∫ 4 x + 12 x + 9 dx
+
+x1 topics=[None] ids=[774]
+   cos 3x = -3 cos x + 4 cos3 x ii). the technique of integration using the following formulae: dx 1 − 1 x = tan + c 1. 2 2 ∫ x + a a a 1 
+
+x1 topics=[None] ids=[729]
+   cos ec 2 xdx = − cot x + c , ∫ further reading
+
+x1 topics=[None] ids=[713]
+   cos ecx cot xdx = − cos ecx + c , since (cos ecx + c ) = − cos ecx cot x ∫ dx 2 d 2 10. cos ec xdx = − cot x + c , since cot s = − cos 
+
+x1 topics=[None] ids=[728]
+   cos ecx cot xdx = − cos ecx + c , ∫
+
+x1 topics=[None] ids=[732]
+   cos ecx cot xdx ∫ cos ec ( ax + b ) cot( ax + b ) dx = − cos ec ( ax + b ) + c ∫ a − cos ecπx cos ecπx cot πxdx = + c e.g. ∫ π 2.5 proo
+
+x1 topics=[None] ids=[710]
+   cos xdx = sin x + c , since d (sin x + c ) = cos x ∫ dx 8
+
+x1 topics=[None] ids=[724]
+   cos xdx = sin x + c , ∫
+
+x1 topics=[None] ids=[769]
+   cot2 x = cosec2 x - 1
+
+x1 topics=[None] ids=[911]
+   define absolute convergence and conditional convergence of an improper b integral f ( x ) dx ∫ a 1 dx
+
+x1 topics=[None] ids=[916]
+   define f(x)dx and f(x)dx ∫ ∫ - ∞ - ∞
+
+x1 topics=[None] ids=[910]
+   define the cauchy’s principal value of the improper integral f ( x ) dx if f ∫ a (x) has a singularity at c where a < c < b
+
+x1 topics=[None] ids=[867]
+   determine the surface area obtained by rotating the curve 𝒙= √𝟐𝒚−𝒚𝟐, 𝟎≤𝒚≤𝟏 about the 𝒚 axis 2
+
+x1 topics=[None] ids=[870]
+   determine the volume of the solid generated by revolving the region bounded by 𝒚= 𝒙 and 𝒚= 𝟔−𝒙𝟐 about the 𝒙 axis
+
+x1 topics=[None] ids=[743]
+   dx 2 ∫ (2x - 4x +1)5 ex dx 8. x ∫ e 1- (lnx)2
+
+x1 topics=[None] ids=[756]
+   dx 20. ∫ ∫ x + 16 1 − cos x dx
+
+x1 topics=[None] ids=[758]
+   dx 26. ∫ ∫ 3 x + 5 x + 1 (cos ax − sin ax dx
+
+x1 topics=[None] ids=[784]
+   dx ∫ ( 3x + )1 hint: a3 + b3 = (a + b) (a2 – a b + b2) ( x + )3
+
+x1 topics=[None] ids=[775]
+   dx ∫ ( x + 3)( x − 4) x
+
+x1 topics=[None] ids=[716]
+   dx ∫ ( x + 5) x 2 + 6 x + 7
+
+x1 topics=[None] ids=[717]
+   dx ∫ ( x − )1 3 x 2 + 4 x 3 + 8 x 5 + 9 x + 2
+
+x1 topics=[None] ids=[780]
+   dx ∫ ( x − 1)( x + 22) 3 x + 7
+
+x1 topics=[None] ids=[777]
+   dx ∫ ( x − 1)( x − 2)( x − )3 5 x 2 − 10 x + 11
+
+x1 topics=[None] ids=[779]
+   dx ∫ ( x − 22) 5 x + 4
+
+x1 topics=[None] ids=[776]
+   dx ∫ 2 ( 25 − x ) 3 x 2 − 21x + 24
+
+x1 topics=[None] ids=[782]
+   dx ∫ 2 ( x − 3)( x + )1 61 x 3 + 2 x 2 − 10 x − 9
+
+x1 topics=[None] ids=[778]
+   dx ∫ 2 ( x − 3)( x + 4) x − 5
+
+x1 topics=[None] ids=[783]
+   dx ∫ 2 ( x − 9) ( x − 2)
+
+x1 topics=[None] ids=[719]
+   dx ∫ 2 x
+
+x1 topics=[None] ids=[718]
+   dx ∫ 2 x ( x 2 + 3 x + 1)( x 3 + 7 x 2 + 2)
+
+x1 topics=[None] ids=[887]
+   dx ∫ 3 x − 1 summary you have learnt the following from this chapter: i). splitting a fraction into partial fractions. 2 x + 1 a b type
+
+x1 topics=[None] ids=[886]
+   dx ∫ 3 x −8 a3 - b3 = (a - b) (a2 + a b + b2) 2 x + 1
+
+x1 topics=[None] ids=[893]
+   dx ∫ 7 x + 3 1 π 2 cos 2 3 xdx11. ∫ 0 70 summary you have learnt the following from this chapter: a). the fundamental theorem of the in
+
+x1 topics=[None] ids=[781]
+   dx ∫ x ( x + 2)( x − )1 2 x 3 − x − 1
+
+x1 topics=[None] ids=[744]
+   dx ∫ x tan5 x sec2 xdx 10. ∫ sec2 x tan2 xdx 11. ∫ sec 4 x tan xdx 12. ∫ summary you have learnt the following from this chapter:
+
+x1 topics=[None] ids=[742]
+   e xdx ∫ x (x 2 - 3) 5 dx 4. ∫ x + 1 dx 5. 2 ∫ x + 2x - 5 2x 3x2 - 5 dx 6. ∫ x -1
+
+x1 topics=[None] ids=[735]
+   e-2x 5. e3x-2 6. 2 x − 5
+
+x1 topics=[None] ids=[896]
+   evaluate (x 3 − 3 x 2 + 2 x )dx . interpret your result. ∫ 0 solution a) the following table shows some points on the curve. x 0 1 2 0.
+
+x1 topics=[None] ids=[859]
+   evaluate 1. $\int_{1}^{2} \frac{1}{(x^2-2x+4)^{\frac{3}{2}}} dx$ **[6 marks]** 2. $\int \frac{6-x}{2x^2-x-15} dx$ **[5 marks]** 3. $\in
+
+x1 topics=[None] ids=[882]
+   evaluate i. $\int_{1}^{2} \frac{1}{(x^2 - 2x + 4)^2} dx$ **[6 marks]** ii. $\int \frac{6 - x}{2x^2 - x - 18} dx$ **[5 marks]** iii. $\i
+
+x1 topics=[None] ids=[915]
+   evaluate ln(sin x ) dx ∫ 0 ∞ cos 2 xdx converges12. prove that ∫ 0 (hint: make the substitution u = x2) a ∞
+
+x1 topics=[None] ids=[1319]
+   evaluate the following definite integrals: 1. \(\displaystyle\int_{1}^{2} \frac{dx}{7x+3}\) 2. \(\displaystyle\int_{0}^{\pi/2} \cos^{2}
+
+x1 topics=[None] ids=[871]
+   evaluate the following improper integrals 3 dx i.  2 0 9  x  dx ii.  2 0 x  4
+
+x1 topics=[None] ids=[1308]
+   evaluate the following improper integrals: (i) $\displaystyle \int_{0}^{3} \frac{dx}{\sqrt{9-x^2}}$ (ii) $\displaystyle \int_{0}^{\inft
+
+x1 topics=[None] ids=[1245]
+   evaluate the following integral: $$ \int \left[ (4x-1)^7 + e^{3x+2} + \frac{2}{5-2x} + \sec^2(3x) + \sin(2-5x) \right] \, dx $$
+
+x1 topics=[None] ids=[1247]
+   evaluate the following integrals using an appropriate substitution: 1. \(\displaystyle\int x\,e^{x^2}\,dx\) 2. \(\displaystyle\int \fra
+
+x1 topics=[None] ids=[1246]
+   evaluate the following integrals using appropriate substitutions: 1. \(\displaystyle\int \tan^5 x \sec^2 x \, dx\) 2. \(\displaystyle\i
+
+x1 topics=[None] ids=[1248]
+   evaluate the following integrals using integration by parts: 1. \(\displaystyle \int x e^{3x}\,dx\) 2. \(\displaystyle \int x^2 \ln x\,
+
+x1 topics=[None] ids=[1242]
+   evaluate the following integrals using the extension formulae for first-degree expressions: 1. $\displaystyle\int (3x+5)^7\,dx$ 2. $\di
+
+x1 topics=[None] ids=[1243]
+   evaluate the following integrals using the extension of the basic integration formulae: (a) \(\displaystyle\int (5x+2)^{12}\,dx\) (b) \
+
+x1 topics=[None] ids=[1253]
+   evaluate the following integrals: (a) $\displaystyle \int \frac{2x+3}{(x-1)(x+2)}\,dx$ (b) $\displaystyle \int \frac{x^2+2x+3}{(x+1)(x^
+
+x1 topics=[None] ids=[1249]
+   evaluate the following integrals: (a) $\displaystyle \int \frac{\cos^2 x}{1+\sin x}\,dx$ (b) $\displaystyle \int \sin 4x \cos 6x\,dx$ (
+
+x1 topics=[None] ids=[1295]
+   evaluate the following integrals: (a) \(\displaystyle\int \frac{(2x-4)\,dx}{(x^2-4x+13)^2}\) **[5 marks]** (b) \(\displaystyle\int \fra
+
+x1 topics=[None] ids=[1313]
+   evaluate the following integrals: (a) \(\displaystyle\int \frac{(2x-6)\,dx}{(x^2-6x+13)^2}\) [5 marks] (b) \(\displaystyle\int \frac{dx
+
+x1 topics=[None] ids=[1244]
+   evaluate the following integrals: 1. $\displaystyle\int \left( (2x+1)^{10} + e^{3-2x} + \frac{1}{4-x} - \csc^2(5x) \right) dx$ 2. $\dis
+
+x1 topics=[None] ids=[1301]
+   evaluate the following integrals: 1. $\displaystyle\int_{1}^{2} \frac{1}{(x^2-2x+4)^{3/2}}\,dx$ **[6 marks]** 2. $\displaystyle\int \fr
+
+x1 topics=[None] ids=[1238]
+   evaluate the indefinite integral $$ \int \left( 3\cos x - 4\csc x\cot x + 5\csc^2 x \right)\,dx. $$
+
+x1 topics=[None] ids=[1239]
+   evaluate the indefinite integral $$ \int \left( 3x^2 + 4\sec x \tan x - 5\csc^2 x + \frac{6}{x} + 7 \right) \, dx. $$
+
+x1 topics=[None] ids=[1237]
+   evaluate the indefinite integral $$ \int \left( 3x^4 + 2e^x + \frac{6}{x} + 5\sec^2 x - 4\csc x\cot x \right) \, dx. $$ show all steps 
+
+x1 topics=[None] ids=[1241]
+   evaluate the indefinite integral $$ \int \left( \frac{x^3 + 5x^2 + 6x}{x^2 + 2x} \right) \, dx $$
+
+x1 topics=[None] ids=[1252]
+   evaluate the indefinite integral $$ \int \sin^3(4x)\,\sin x\,dx. $$
+
+x1 topics=[None] ids=[1251]
+   evaluate the integral $$ \int \frac{dx}{\sqrt{9 - x^2}} $$ using the substitution \( x = 3\sin\theta \). show all steps clearly.
+
+x1 topics=[None] ids=[1250]
+   evaluate the integral $$ \int \frac{dx}{\sqrt{x^2 - 9}} $$ and state the domain of $x$ for which your answer is valid.
+
+x1 topics=[None] ids=[1299]
+   evaluate the integral $\displaystyle\int (2x+1)(x^2+x+1)^3\,dx$. [3 marks] (b) given that $$ f(x)=\begin{cases} x+1, & \text{if } 0\le 
+
+x1 topics=[None] ids=[857]
+   evaluate the integral $\int (2x+1)(x^2+x+1)^3 \, dx$ **[3 marks]** b) given that $f(x) = $$ \begin{cases} x+1, & \text{if } 0 \le x < 1
+
+x1 topics=[None] ids=[880]
+   evaluate the integral \(\int (2x + 1)(x^2 + x + 1)^3 dx\) **[3 marks]** b) given that \(f(x) = $$ \begin{cases} x + 1, & \text{if } 0 \
+
+x1 topics=[None] ids=[914]
+   find cauchy’s principal value of dx −x1∫ π 2
+
+x1 topics=[None] ids=[722]
+   find dx ∫  2   ( x + 2 x )  12 e 2 x + e 5 x − e x dx 12. find x ∫ e you have learnt the following from this chapter i). integrat
+
+x1 topics=[None] ids=[902]
+   find the area between the curve x2 = y and the line y = 2.
+
+x1 topics=[None] ids=[852]
+   find the area bounded by the curves $y = \cos x$ and $y = \sin x$ and the $y - \text{axis}$. **[4 marks]** b) find the volume generated
+
+x1 topics=[None] ids=[875]
+   find the area bounded by the curves $y = \cos x$ and $y = \sin x$ and the $y-$axis. **[4 marks]** b) find the volume generated when the
+
+x1 topics=[None] ids=[1312]
+   find the area bounded by the curves $y=\cos x$ and $y=\sin x$ and the $y$-axis. **[4 marks]** 2. find the volume generated when the reg
+
+x1 topics=[None] ids=[1321]
+   find the area common to the circle $x^2+y^2=25$ and the ellipse $x^2+4y^2=40$.
+
+x1 topics=[None] ids=[906]
+   find the area common to the circle x2 + y2 = 16 and the ellipse x2 + 3y2 = 24. summary you have learnt the following from this chapter:
+
+x1 topics=[None] ids=[905]
+   find the area common to the circle x2 + y2 = 25 and the parabola 3x2 = 16y.
+
+x1 topics=[None] ids=[904]
+   find the area common to the two curves y2 = 12x and x2 + y2 = 24x.
+
+x1 topics=[None] ids=[898]
+   find the area enclosed by the curve x2y = 36, the x – axis and the lines x = 6 and x = 9.
+
+x1 topics=[None] ids=[900]
+   find the area enclosed by the curve y = x (x –4) and the axis of x.
+
+x1 topics=[None] ids=[899]
+   find the area enclosed by the curve y = x , the x – axis and the ordinates x = 1 and x =4.
+
+x1 topics=[None] ids=[901]
+   find the area in the first quadrant enclosed by the line y = x and the curve y = x3.
+
+x1 topics=[None] ids=[903]
+   find the area in the positive quadrant enclosed by the curves y = x2 and y = x3.
+
+x1 topics=[None] ids=[895]
+   find the area included between the curve y = x3 - 3x2 + 2x and the axis of x from x = 0 to x = 2. 2
+
+x1 topics=[None] ids=[868]
+   find the area of the region between y  cos x and y = 𝒄𝒐𝒔(𝟐𝒙) over [0, 3] 
+
+x1 topics=[None] ids=[1294]
+   find the area of the region in the second quadrant bounded by the curves $y=\cos x$, $y=\sin x$ and the $y$-axis. **[4 marks]** (b) the
+
+x1 topics=[None] ids=[897]
+   find the area under the curve y = x + 3x2 between x = 1 and x = 2.
+
+x1 topics=[None] ids=[1304]
+   find the following indefinite integrals: 1. $\displaystyle\int x\sqrt{x-1}\,dx$ 2. $\displaystyle\int \frac{x^2}{\sqrt{x^3+3}}\,dx$ 2. 
+
+x1 topics=[None] ids=[869]
+   find the length of the arc from  0 to  of the curve given by x  cos , 4 y  3sin  .
+
+x1 topics=[None] ids=[1305]
+   find the length of the arc of the curve \(f(x)=x^{3/2}-1\) from \(x=0\) to \(x=4\). (6 marks) (b) find the surface area of the solid ge
+
+x1 topics=[None] ids=[1323]
+   find the length of the arc of the curve given by the parametric equations $$ x = 4\cos\theta, \quad y = 4\sin\theta $$ from \(\theta = 
+
+x1 topics=[None] ids=[926]
+   find the length of the arc of the curve x = a (cos θ + θ sin θ) y = a (sin θ – θ cos θ)
+
+x1 topics=[None] ids=[923]
+   find the length of the arc of the curve y = ln sec x from x = 0 to x = 3
+
+x1 topics=[None] ids=[1322]
+   find the length of the arc of the parabola $y^2 = 4ax$ cut off by its latus rectum.
+
+x1 topics=[None] ids=[922]
+   find the length of the arc of y = ln sec x from x = - π to x = π 6 6 π
+
+x1 topics=[None] ids=[928]
+   find the length of the spiral of archimedes r = a θ from θ = 0 to θ = π.
+
+x1 topics=[None] ids=[938]
+   find the surface area generated when the eclipse + = 1 revolves about a 2 b 2 major axis.
+
+x1 topics=[None] ids=[1325]
+   find the surface area of the solid generated by revolving the curve given parametrically by \(x = t^2\), \(y = 2t\), for \(0 \le t \le 
+
+x1 topics=[None] ids=[936]
+   find the surface area of the solid generated by the revolution of the loop of the curve. 3ay2 = x (x – a) 2.
+
+x1 topics=[None] ids=[935]
+   find the surface area of the solid generated by the revolution of the loop of the curve. 3t x = t2, y = about the x – axis. 3
+
+x1 topics=[None] ids=[1307]
+   find the total area of the region enclosed between the curves $y=\cos x$ and $y=\cos(2x)$ over the interval $[0,2\pi]$.
+
+x1 topics=[None] ids=[1324]
+   find the total length of the cardioid given in polar coordinates by $$ r = a(1 + \cos\theta), \qquad a > 0. $$
+
+x1 topics=[None] ids=[930]
+   find the volume generated by revolving about the x – axis that part of the 1 curve y = 2x which its between the origin and x = 3. 3
+
+x1 topics=[None] ids=[933]
+   find the volume of the spheroid generated by rotating the eclipse + 4 9 about the mirror axis.
+
+x1 topics=[None] ids=[934]
+   find the volume when the loop of the curve y2 = x (2x – 1) 2 revolves about the x – axis.
+
+x1 topics=[None] ids=[748]
+   formula for integration by parts dv du v dx∫ u dx = uv − ∫ dx dx
+
+x1 topics=[None] ids=[885]
+   frank a., and elliot m., schaum’s outline of calculus, 6th edition, mcgraw-hill education, 2012 instructional materials whiteboard/chal
+
+x1 topics=[None] ids=[1318]
+   given that $f$ is continuous on $[a,b]$ and $g$ is an indefinite integral (primitive) of $f$, state the fundamental theorem of the inte
+
+x1 topics=[None] ids=[720]
+   if ( 2 x −)9 dx = 0 find the values of x ∫
+
+x1 topics=[None] ids=[721]
+   if (3 x 2 + 2 x − 12) dx = 0 find the values of x ∫  x 3 + 5 x 2 + 6 x 
+
+x1 topics=[None] ids=[1240]
+   if \(\int (3x^2 + 2x - 12)\,dx = 0\), find the possible values of \(x\).
+
+x1 topics=[None] ids=[889]
+   if f is integrable in [a ≤ x ≤ b ] and c is a point between a and b b c b f ( x ) dx ∫ f ( x ) dx = ∫ f ( x ) dx + ∫ a a c
+
+x1 topics=[None] ids=[890]
+   if f(x) is integrable in [a ≤ x ≤ b ] and c is any constant then b b + c f ( x − c ) dx ∫ f ( x ) dx = ∫ a a + c b − c f ( x + c ) dx =
+
+x1 topics=[None] ids=[950]
+   if y0 = 2 units, y1, = 3 units and y2 = 5 units calculate the area included by the curve abc, the ordinates y0, y2 and x-axis. i) if ab
+
+x1 topics=[None] ids=[959]
+   mathematics of physics and modern engineering by sokolnikoff mc graw – hill bok company, inc new york toronto london
+
+x1 topics=[None] ids=[864]
+   optional - ] 3 (a) find the length of the arc of the curve f(x) = x2 - 1; 0:; x :; 4. (6 marks) (b) find the surface area of the solid 
+
+x1 topics=[None] ids=[865]
+   optional- ] (a) evaluate the following integrals: 1. j 1 dx. (4 marks) xv4x2 - 1 (4 marks) ii. j e2xsin 2xdx. cos3 x dx. (4 marks) iii.
+
+x1 topics=[None] ids=[866]
+   optional-] (a) using the first fundamental theorem of calculus evaluate f'(x) x3 if f(x) sin t2dt (3 marks) =l (b) show that with the s
+
+x1 topics=[None] ids=[863]
+   optional-] b (a) use the limiting formula jb f(x)dx = lim b - f(a+i - a) a n~oo n ati=1 n for the area under the curve to evaluate the 
+
+x1 topics=[None] ids=[937]
+   prove that the area of the curved surface of a sphere of radius a intercepted between two parallel planes at distances b and c from the
+
+x1 topics=[None] ids=[730]
+   pure mathematics (first coure) by j. k backhouse and others longman group ltd harlow, essex, u.k 13 chapter 2 integration of functions 
+
+x1 topics=[None] ids=[737]
+   sec 3x tan 3x 11. cosec 2x cot 2x find the integrals of the following
+
+x1 topics=[None] ids=[712]
+   sec x tan xdx = sec x + c , since (sec x + c ) = sec x tan x ∫ dx d
+
+x1 topics=[None] ids=[727]
+   sec x tan xdx = sec x + c , ∫
+
+x1 topics=[None] ids=[1314]
+   show that $$ \int_{0}^{\frac{\pi}{2}} \sin^n x \, dx = \frac{n-1}{n} \int_{0}^{\frac{\pi}{2}} \sin^{n-2} x \, dx $$ for $n \ge 2$. henc
+
+x1 topics=[None] ids=[854]
+   show that $\int_{0}^{\frac{\pi}{2}} \cos^m x dx = \frac{m - 1}{m} \int_{0}^{\frac{\pi}{2}} \cos^{m - 2} x dx$. hence evaluate $\int_{0}
+
+x1 topics=[None] ids=[877]
+   show that $\int_{0}^{\frac{\pi}{2}} \cos^m x dx = \frac{m-1}{m} \int_{0}^{\frac{\pi}{2}} \cos^{m-2} x dx$. hence evaluate $\int_{0}^{\f
+
+x1 topics=[None] ids=[912]
+   show that 5 is divergent . ∫ x 0 ∞ dx
+
+x1 topics=[None] ids=[913]
+   show that 5 is divergent. ∫ x 1 ∞ cos3xdx is absolutely convergent.8. show that ∫e −x 0 ∞ sin x dx is absolutely convergent or not.9. t
+
+x1 topics=[None] ids=[919]
+   show that dx converges. ∫ x 0 summary you have learnt the following from the chapter: i. definition of improper integrals of first and 
+
+x1 topics=[None] ids=[924]
+   show that the length of the arc of the parabola y2 = 4 ax cut off by the line 3y = 15 8x is a (ln 2 + ). 16
+
+x1 topics=[None] ids=[1296]
+   show that, for an integer $m\ge 2$, $$ \int_{0}^{\frac{\pi}{2}} \cos^m x\,dx = \frac{m-1}{m}\int_{0}^{\frac{\pi}{2}} \cos^{m-2} x\,dx. 
+
+x1 topics=[None] ids=[738]
+   sin 13 x + cos 4 x + e 2 x) dx ∫
+
+x1 topics=[None] ids=[891]
+   sin 3 xdx ∫ 13. 0 x ∫ −π 1 π ( x + 3 )( x − 2 ) dx 22. ∫ 1 + sin x 0 dx 14. 2 ∫ 0 cos x 3 2 (x 5 + 2 x 2 )dx x 2 e x dx3. 15. ∫ ∫ 2 1 2
+
+x1 topics=[None] ids=[773]
+   sin 3x = 3 sin x – 4 sin3 x
+
+x1 topics=[None] ids=[734]
+   sin x 2
+
+x1 topics=[None] ids=[711]
+   sin xdx = − cos x + c , since d (cos x + c ) = − sin x ∫ dx 2 x 7. xdx = tan x + c , since d (tan x + c ) = sec ∫ sec2 dx d
+
+x1 topics=[None] ids=[725]
+   sin xdx = − cos x + c , ∫
+
+x1 topics=[None] ids=[927]
+   sketch the arc of the cycloid x = a (θ - sin θ) y = a (1 – cos θ) 104 from θ = 0 to θ = 2π. find its length.
+
+x1 topics=[None] ids=[925]
+   sketch the astroid given by x = a cos3 t, y = a sin3 t and find the length of its circumference.
+
+x1 topics=[None] ids=[894]
+   sketch the curve y = x 3 − 3 x 2 + 2 x from x = 0 to x = 3.
+
+x1 topics=[None] ids=[932]
+   sketch the curve y = x2 – x – 2. the part of the curve lying between the points where it cuts the x- axis is rotated about that axis. f
+
+x1 topics=[None] ids=[947]
+   state the formula for i). trapezoidal rule ii). simpsons rule
+
+x1 topics=[None] ids=[768]
+   tan 2 x = sec 2 x − 1
+
+x1 topics=[None] ids=[917]
+   test the following integrals for convergence ∞ 3 x a). sin x dx b). dx ∫ ∫ lnx 0 1 ∞ 2 π x x dx d). dx c). 2 2 ∫ ∫ (1 + x ) sinx 0 0 93
+
+x1 topics=[None] ids=[918]
+   test whether the principal value for the integral 4 exists. ∫ x − 2 ∞ sin x cos 4 x
+
+x1 topics=[None] ids=[939]
+   the area between the line y = x and the curve y = x2 is rotated about the axis of x. find the volume formed. summary you have learnt th
+
+x1 topics=[None] ids=[856]
+   the curve $y = 1 + \cos x$ is rotated about $x$- axis. find the volume contained by the surface of revolution and planes $x = \frac{-\p
+
+x1 topics=[None] ids=[879]
+   the curve $y = 1+\cos x$ is rotated about $x$- axis. find the volume contained by the surface of revolution and planes $x = \frac{-\pi}
+
+x1 topics=[None] ids=[1316]
+   the curve $y = 2 + \sin x$ is rotated about the $x$-axis. find the volume contained by the surface of revolution and the planes $x = -\
+
+x1 topics=[None] ids=[1298]
+   the curve $y = 2 + \sin x$ is rotated about the $x$-axis. find the volume of the solid generated between the planes $x = 0$ and $x = \p
+
+x1 topics=[None] ids=[1329]
+   the distance $s$ (in metres) travelled by a body starting from rest is recorded at one-second intervals as follows: | $t$ (s) | 0 | 1 |
+
+x1 topics=[None] ids=[953]
+   the distance moved by a body starting from rest is given by the following table. time t sec 0 1 2 3 4 5 6 distance s met 0 5 17 34 57 8
+
+x1 topics=[None] ids=[931]
+   the equation of the circle x2 + y2 = 9 is rotated about x- axis between the limits –3 and 3. find the volume of the sphere by integrati
+
+x1 topics=[None] ids=[746]
+   the following are the formulae learnt: u ′ dx = ln u + c a) ∫ u 32 u′ u-n+1 dx = + c b) n ∫ u 1- n n un+1 u u′dx= + c c) ∫ 1+ n eu u′ d
+
+x1 topics=[None] ids=[941]
+   the formula for the surface area of a solid of revolution about x – axis is: yds if s is known. s = 2π∫ t = t 2  dx   dy  2 y   +
+
+x1 topics=[None] ids=[750]
+   the formula ∫ ln x dx = x ln x – x + c where x > 0. further reading
+
+x1 topics=[None] ids=[940]
+   the formulae for the volume of a solid of revolution obtained by rotating a curve about x - axis between the ordinate at x = a and x = 
+
+x1 topics=[None] ids=[1327]
+   the values of a function $f(x)$ at equally spaced points $x=0,1,2,3,4,5,6$ are given in the table below. | $x$ | 0 | 1 | 2 | 3 | 4 | 5 
+
+x1 topics=[None] ids=[1326]
+   the velocity \(v\) (in metres per second) of a particle moving in a straight line is recorded at one-second intervals as follows: | \(t
+
+x1 topics=[None] ids=[949]
+   three consecutive ordinates are y0 , y1, and y2, and each equal interval is h units. what is the area between the curve, x-axis and the
+
+x1 topics=[None] ids=[851]
+   use four strips to find an approximate value for the definite integral $\int_{1}^{3} x^3 dx$ using i) the trapezium rule **[3 marks]** 
+
+x1 topics=[None] ids=[874]
+   use four strips to find an approximate value for the definite integral $\int_{1}^{5} x^3 \, dx$ using i) the trapezium rule **[3 marks]
+
+x1 topics=[None] ids=[1293]
+   use four strips to find an approximate value for the definite integral \(\displaystyle\int_{1}^{3} x^3\,dx\) using 1. the trapezium rul
+
+x1 topics=[None] ids=[1311]
+   use four strips to find an approximate value for the definite integral \(\displaystyle\int_{1}^{5} x^3\,dx\) using 1. the trapezium rul
+
+x1 topics=[None] ids=[1302]
+   use integration by parts to evaluate the following indefinite integrals: 1. $\displaystyle\int x\cos 3x\,dx$ [2 marks] 2. $\displaystyl
+
+x1 topics=[None] ids=[860]
+   use integration by parts to evaluate the following indefinite integrals: 1. $\int x \sin 4x \, dx$ **[2 marks]** 2. $\int x\sqrt{x+4} \
+
+x1 topics=[None] ids=[883]
+   use integration by parts to evaluate the following indefinite integrals: i) $\int x \sin 4x \, dx$ **[2 marks]** ii) $\int x \sqrt{x + 
+
+x1 topics=[None] ids=[858]
+   use part 1 of the fundamental theorem of calculus to evaluate $\frac{dy}{dx}$ given $y = \int_{2x}^{3x} \frac{u^2-1}{u^2+1} \, du$ **[5
+
+x1 topics=[None] ids=[1300]
+   use part 1 of the fundamental theorem of calculus to find $\dfrac{dy}{dx}$ given $$ y = \int_{x}^{2x} \frac{t^2-1}{t^2+1}\, dt. $$ 2. b
+
+x1 topics=[None] ids=[881]
+   use part i of the fundamental theorem of calculus to evaluate \(\frac{dy}{dx}\) given \(y = \int_{2x}^{3x} \frac{u^2 - 1}{u^2 + 1} du\)
+
+x1 topics=[None] ids=[1317]
+   use part i of the fundamental theorem of calculus to find $\frac{dy}{dx}$ given $$ y = \int_{2x}^{3x} \frac{u^2 - 1}{u^2 + 1}\,du. $$ [
+
+x1 topics=[None] ids=[1297]
+   use the trapezoidal rule and simpson's rule with seven ordinates to estimate the area bounded by the curve $xy=12$, the $x$-axis, and t
+
+x1 topics=[None] ids=[1315]
+   use the trapezoidal rule and simpson's rule with seven ordinates to estimate the area bounded by the curve $xy=12$, the $x$-axis, and t
+
+x1 topics=[None] ids=[884]
+   use the trapezoidal rule with $n = 5$ to approximate the integral $\int_{1}^{2} \frac{1}{x} \, dx$. **[4 marks]** b) i) use the simpson
+
+x1 topics=[None] ids=[861]
+   use the trapezoidal rule with $n = 5$ to approximate the integral $\int_{1}^{2} \frac{1}{x} dx$. **[4 marks]** b) 1. use the simpson's 
+
+x1 topics=[None] ids=[1303]
+   use the trapezoidal rule with $n=4$ to approximate $\displaystyle\int_{1}^{2}\frac{1}{x}\,dx$. give your answer correct to four decimal
+
+x1 topics=[None] ids=[855]
+   use trapezoidal and simpson's rules and seven ordinates to find the area bounded by the curve $xy = 12$, the $x$ - axis and ordinates a
+
+x1 topics=[None] ids=[878]
+   use trapezoidal and simpson's rules and seven ordinates to find the area bounded by the curve $xy=12$, the $x$-axis and ordinates at $x
+
+x1 topics=[None] ids=[1306]
+   using the first fundamental theorem of calculus, find $f'(x)$ if $$ f(x)=\int_{1}^{x^3} \sin(t^2)\,dt. $$ (b) show that with the substi
+
+x1 topics=[None] ids=[1310]
+   using the fundamental theorem of calculus part 1, find $\frac{dy}{dx}$ given $y = \int_{1}^{4x} \cos(t^2)\, dt$. [4 marks] 2. by using 
+
+x1 topics=[None] ids=[1292]
+   using the fundamental theorem of calculus part 1, find $\frac{dy}{dx}$ given $y = \int_{1}^{4x} \cos(t^2)\,dt$. [4 marks] 2. by using a
+
+x1 topics=[None] ids=[948]
+   what is the area of a trapezium whose ordinates are y0 and y1 and the distance between them is h.
+
+x1 topics=[None] ids=[929]
+   what is the length of the circumference of the cardioid r = a (1 + cos θ). summary you have learnt the following from this chapter. a).
+
+x1 topics=[None] ids=[745]
+   when the integrand contains a function and its derivative you can integrate using the substitution:
+
+x1 topics=[None] ids=[909]
+   when will you say that the improper integral 3 converges or diverges. ∫ x − 2 92 b
+
+x1 topics=[None] ids=[908]
+   when will you say that the improper integral f ( x ) dx converges or ∫ a diverges. 2 dx
+
+x1 topics=[None] ids=[726]
+   xdx = tan x + c , ∫ sec2
+
+x1 topics=[None] ids=[946]
+   y0 = 8 y0 = 8 y1 = 12 2y1 = 24 y2 = 14 2y2 = 28 y3 = 11 2y3 = 22 y4 = 9 2y4 = 18 y5 = 3 2y5 = 6 y6 = 1 y6 = 1 126 total sum 107 6 − 0 h
+
+x1 topics=[None] ids=[753]
+   ∫ 2 2 = cosh if x > a a x − a −1 − x  = cosh   if –x > a  a  dx − 1 x
+
+x1 topics=[None] ids=[754]
+   ∫ 2 2 = sin a x − a example 14 dx 1 − 1 x = tanprove that 2 2 ∫ x + a a a proof − 1 x let x = a tan θ so that θ = tan a 49 then x2 + a2
+
+x1 topics=[None] ids=[752]
+   ∫ 2 2 = sinh + c a x + a dx − 1 x
+
+x1 topics=[None] ids=[763]
+   ∫ cos 3x cos 11x dx
+
+x1 topics=[None] ids=[760]
+   ∫ cos 4x sin 9x dx 28. ∫ 2 9 x − 6 x + 1 dx dx 29. ∫ 210. 2 9 x + 6 x + 1 ∫ 5 x + 9 x − 8 dx
+
+x1 topics=[None] ids=[762]
+   ∫ cos 8x cos 5x dx
+
+x1 topics=[None] ids=[765]
+   ∫ sin 12x sin 5x dx
+
+x1 topics=[None] ids=[764]
+   ∫ sin 4x sin 10x dx
+
+x1 topics=[None] ids=[761]
+   ∫ sin 5x cos 7x dx 30. ∫ 2 25 − x
+
+x1 topics=[None] ids=[766]
+   ∫ sin3 4x sin dx
+
+x1 topics=[None] ids=[767]
+   ∫ sin3 5x dx 54 summary you have learnt the following from this chapter: i). the technique of integration of trigonometric expressions 
+
+x1 topics=[None] ids=[731]
+   ∫ x dx = + c ∫ a ( n + )1 n + 1 10 ( 2 x + )311 (n ≠ -1) ( 2 x + )3 dx = + c e.g.∫ 112. 1 1 ln( ax + b ) dx = ln x + dx = + c 2. ∫ ∫ x 
+
+x1 topics=[None] ids=[755]
+   ∫cos3 8x dx 2 dx sin x

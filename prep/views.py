@@ -528,7 +528,7 @@ def _get_course_topics_summary(course):
     Uses indexed queries instead of scanning and parsing hundreds of pages of raw text per topic,
     reducing course page latency from ~35s down to <0.5s.
     """
-    cache_key = f"prep_course_topics_summary_v7_{course.pk}"
+    cache_key = f"prep_course_topics_summary_v8_{course.pk}"
     cached_bundle = cache.get(cache_key)
     if cached_bundle is not None:
         return cached_bundle
@@ -548,25 +548,27 @@ def _get_course_topics_summary(course):
         .values_list("topic_id", "cnt")
     )
 
-    # 2. Bulk inspect notes levels that are validated and displayed in-app
+    # 2. Count only complete, validated note levels that can be shown to learners.
+    # The cache key is an implementation detail and must not decide a note's level:
+    # older cache-key formats and regenerated notes do not all encode it consistently.
     from services.prep_ai_router import NOTE_VALIDATION_STATE
     cache_entries = PrepContentCache.objects.filter(
         topic_id__in=topic_ids,
         content_type="topic_notes",
-        payload__validation_state=NOTE_VALIDATION_STATE,
-    ).exclude(
-        payload__review_status="skipped_no_source",
-    ).values_list("topic_id", "cache_key")
+    ).values_list("topic_id", "payload")
 
     levels_by_topic = {tid: set() for tid in topic_ids}
-    for tid, ckey in cache_entries:
-        ck = str(ckey or "")
-        if ":level_1:" in ck or "_level_1_" in ck or ck.endswith("_level_1"):
-            levels_by_topic[tid].add("level_1")
-        elif ":level_2:" in ck or "_level_2_" in ck or ck.endswith("_level_2"):
-            levels_by_topic[tid].add("level_2")
-        elif ":level_3:" in ck or "_level_3_" in ck or ck.endswith("_level_3"):
-            levels_by_topic[tid].add("level_3")
+    for tid, payload in cache_entries:
+        payload = payload if isinstance(payload, dict) else {}
+        if (
+            payload.get("validation_state") != NOTE_VALIDATION_STATE
+            or payload.get("review_status") == "skipped_no_source"
+        ):
+            continue
+        level = str(payload.get("level") or "")
+        content = str(payload.get("content") or payload.get("notes") or "").strip()
+        if level in {"level_1", "level_2", "level_3"} and content:
+            levels_by_topic[tid].add(level)
 
     topics_data = []
     total_questions = 0
@@ -917,6 +919,9 @@ def _resolve_course_category_meta(course: PrepCourse) -> dict:
 @never_cache
 def prep_dashboard(request):
     """Mentify Prep Hub Main Landing Page with real database metrics."""
+    if not request.user.is_authenticated:
+        return redirect("/accounts/login/?next=/prep/")
+
     today_credits_used = 0
     week_credits_used = 0
     if request.user.is_authenticated:
@@ -939,17 +944,6 @@ def prep_dashboard(request):
         ).order_by("-enrollments__created_at")
         history_qs = PrepHistory.objects.filter(user=request.user).order_by("-created_at")[:5]
         display_courses = enrolled_courses
-    else:
-        wallet = None
-        user_credits = 0
-        recent_credit_transactions = []
-        enrolled_courses = PrepCourse.objects.none()
-        history_qs = PrepHistory.objects.none()
-        # Signed-out visitors are not enrolled in anything. We previously listed 6
-        # unrelated active courses here, which read as a broken enrolment list.
-        # The template now renders a sign-in prompt instead.
-        display_courses = PrepCourse.objects.none()
-
     recent_courses = []
     for c in display_courses:
         clean_title = c.title

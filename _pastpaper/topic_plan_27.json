@@ -1,0 +1,2954 @@
+[
+ {
+  "id": 66,
+  "current": 45,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "consistency"
+   ]
+  },
+  "parts": [
+   "Define strong consistency as used in theory of estimation."
+  ]
+ },
+ {
+  "id": 67,
+  "current": 51,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "mse"
+   ]
+  },
+  "parts": [
+   "Let \\(\\hat{\\theta}\\) be an estimator of \\(\\theta\\). Show that \\(MSE(\\hat{\\theta})\\) can be expressed in terms of variance and bias of \\(\\hat{\\theta}\\)."
+  ]
+ },
+ {
+  "id": 68,
+  "current": 51,
+  "targets": [
+   47
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ]
+  },
+  "parts": [
+   "A random sample \\(X_1, X_2, \\dots, X_n\\) has a probability density function $$f(x, \\lambda) =$$ $$\\begin{cases} \\lambda x^{\\lambda-1}, & x > 0, \\quad 0 < \\lambd"
+  ]
+ },
+ {
+  "id": 69,
+  "current": 46,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\dots, X_n\\) be a random sample from a population with mean \\(\\theta\\). Show that the sample mean \\(\\bar{X} = \\sum_{i=1}^n X_i/n\\) is unbiased e"
+  ]
+ },
+ {
+  "id": 70,
+  "current": 51,
+  "targets": [
+   47
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\dots, X_n\\) be i.i.d as \\(Binomial(n, \\theta)\\). Let \\(T = \\sum_{i=1}^n X_i\\). Verify that \\(T\\) is sufficient for \\(\\theta\\)."
+  ]
+ },
+ {
+  "id": 71,
+  "current": 51,
+  "targets": [
+   45,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "consistency"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\dots, X_n\\) be i.i.d random sample with a probability density function given by f\\left(x \\mid \\mu, \\sigma^2\\right) = \\frac{1}{\\sigma\\sqrt{2\\pi}"
+  ]
+ },
+ {
+  "id": 72,
+  "current": 51,
+  "targets": [
+   51
+  ],
+  "evidence": {
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "State without proving the Cramer-Rao lower bound theorem including any three regularity conditions assumed in proving it."
+  ]
+ },
+ {
+  "id": 73,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let x ,x ,...,x be a random sample from a Bernoulli distribution with parameter \u03b8. If \u03b4(x) 1 2 n is an unbiased estimator of \u03b8. Find the lower bound of the vari"
+  ]
+ },
+ {
+  "id": 74,
+  "current": 53,
+  "targets": [
+   47
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ]
+  },
+  "parts": [
+   "Let $x_{1}, x_{2}, \\ldots, x_{n}$ denote a random sample from a Beta distribution $$ f(x, \\alpha, \\beta) = \\frac{\\Gamma(\\alpha+\\beta)}{\\Gamma\\alpha\\,\\Gamma\\beta"
+  ]
+ },
+ {
+  "id": 75,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "lower bound",
+    "minimum variance",
+    "best unbiased"
+   ]
+  },
+  "parts": [
+   "Let $x_{1}, x_{2}, x_{3}, \\ldots, x_{n}$ be a random sample, and take $\\phi(\\theta) = \\theta^{1-\\theta}$. Find (a) Fisher's information $I(\\theta)$ **(3 marks)*"
+  ]
+ },
+ {
+  "id": 76,
+  "current": 50,
+  "targets": [
+   50
+  ],
+  "evidence": {
+   "50": [
+    "least squares"
+   ]
+  },
+  "parts": [
+   "Use matrix notation to fit a straight line to fit a straight line to the sample units given below by the method of least squares. x 6 -4 10 8 4 13 2 y 20 18 6 2"
+  ]
+ },
+ {
+  "id": 77,
+  "current": 51,
+  "targets": [
+   45,
+   47
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ]
+  },
+  "parts": [
+   "Suppose that $x_{1}, x_{2}, \\ldots, x_{n}$ form a random sample from a Poisson distribution with mean $\\lambda > 0$. Given the estimator $$ \\delta(X) = \\begin{c"
+  ]
+ },
+ {
+  "id": 79,
+  "current": 45,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "define an unbiased"
+   ]
+  },
+  "parts": [
+   "Define an unbiased estimator as used in the theory of estimation."
+  ]
+ },
+ {
+  "id": 80,
+  "current": 45,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "efficien",
+    "unbias"
+   ]
+  },
+  "parts": [
+   "Define the relative efficiency of one unbiased estimator $\\hat{\\theta}_1$ with respect to another unbiased estimator $\\hat{\\theta}_2$ of the same parameter $\\th"
+  ]
+ },
+ {
+  "id": 81,
+  "current": 45,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "consistency"
+   ]
+  },
+  "parts": [
+   "Define mean square consistency as used in the theory of estimation."
+  ]
+ },
+ {
+  "id": 183,
+  "current": 51,
+  "targets": [
+   45,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "(a) Let \\(X_1, X_2\\) and \\(X_3\\) be a random sample of size 3 from a distribution with mean \\(\\mu\\) and standard deviation \\(\\sqrt{3}\\). Consider the following "
+  ]
+ },
+ {
+  "id": 184,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population mean -5 and variance $\\theta$ whose density function is given by $$f(x, \\theta) = \\b"
+  ]
+ },
+ {
+  "id": 185,
+  "current": 51,
+  "targets": [
+   45,
+   50
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "50": [
+    "regression line",
+    "least square"
+   ]
+  },
+  "parts": [
+   "- [(a)] A random sample $X_1, X_2, \\dots, X_n$ of size $n$ is taken from a normal population whose probability density function given by $$f(x) = \\begin{cases} "
+  ]
+ },
+ {
+  "id": 186,
+  "current": 48,
+  "targets": [
+   47,
+   48
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a uniform distribution over the interval $(\\lambda - \\theta, \\lambda + \\theta)$. Find the mo"
+  ]
+ },
+ {
+  "id": 187,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) The diameters of copper shafts produced by a certain manufacturing process should have a mean diameter of $0.51$ mm. The diameter is known to have a standar"
+  ]
+ },
+ {
+  "id": 188,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   48,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "method of moments"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2 \\text{ and } X_3$ be a random sample of size 3 from a distribution with mean $\\theta$ and standard deviation 2. Consider the following two est"
+  ]
+ },
+ {
+  "id": 189,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population whose density function with parameter $\\theta > 0$ is given by $$f(x) = \\begin{cases"
+  ]
+ },
+ {
+  "id": 190,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "(a) A random sample $X_1, X_2, \\dots, X_n$ of size $n$ is taken from a normal population whose probability density function given by $$f(x, \\theta) = \\begin{cas"
+  ]
+ },
+ {
+  "id": 191,
+  "current": 53,
+  "targets": [
+   47,
+   48,
+   53
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "moment estimator"
+   ],
+   "53": [
+    "interval estimat",
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\ldots, X_n$ be a random sample of size n from a uniform distribution over the interval $(\\theta - \\lambda, \\lambda + \\theta)$. Find the mome"
+  ]
+ },
+ {
+  "id": 192,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) What does it mean when we say that ``the sample mean is an unbiased estimator of the population mean, \\(\\mu\\)''. (3 marks) (b) Assume that a sample of conti"
+  ]
+ },
+ {
+  "id": 193,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a population whose density function is $$f(x) = \\begin{cases} \\theta^x(1 - \\theta)^{1-x}, & "
+  ]
+ },
+ {
+  "id": 194,
+  "current": 51,
+  "targets": [
+   45,
+   48
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "48": [
+    "method of moments",
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "a) Let $X_1, X_2, \\ldots, X_n$ be i.i.d as $B(k, p)$ (binomial with parameters $k$ and $p$) where both $k$ and $p$ are unknown. Find by method of moments the es"
+  ]
+ },
+ {
+  "id": 196,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, ..., X_n$ be i.i.d as Poisson with parameter $\\lambda$. Obtain the maximum likelihood estimator of $\\lambda$. (5 marks) (a) Check for i. Unbiased"
+  ]
+ },
+ {
+  "id": 206,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, ..., X_n$ be i.i.d as Poisson with parameter $\\lambda$. Obtain the maximum likelihood estimator of $\\lambda$. (5 marks) (a) Check for i. Unbiased"
+  ]
+ },
+ {
+  "id": 197,
+  "current": 53,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "interval estimat",
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 10"
+  ]
+ },
+ {
+  "id": 207,
+  "current": 46,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "interval estimat",
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 10"
+  ]
+ },
+ {
+  "id": 217,
+  "current": 46,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "interval estimat",
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 10"
+  ]
+ },
+ {
+  "id": 198,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   48,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "method of moments"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Let \\(X_1, X_2\\) and \\(X_3\\) be a random sample of size 3 from a distribution with mean \\(\\theta\\) and standard deviation 2. Consider the following two esti"
+  ]
+ },
+ {
+  "id": 199,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a population whose density function with parameter $\\theta > 0$ is given by $$f(x) = \\begin{case"
+  ]
+ },
+ {
+  "id": 200,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "(a) A random sample $X_1, X_2, \\ldots, X_n$ of size $n$ is taken from a normal population whose probability density function given by $$f(x, \\theta) = \\begin{ca"
+  ]
+ },
+ {
+  "id": 201,
+  "current": 48,
+  "targets": [
+   47,
+   48
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\dots, X_n$ be a random sample of size n from a uniform distribution over the interval $(\\theta - \\lambda, \\lambda + \\theta)$. Find the momen"
+  ]
+ },
+ {
+  "id": 202,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "interval estimat",
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 10"
+  ]
+ },
+ {
+  "id": 203,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) What does it mean when we say that \"the sample mean is an unbiased estimator of the population mean, $\\mu$\". (3marks) (b) Assume that a sample of continuous"
+  ]
+ },
+ {
+  "id": 204,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\ldots, X_n$ be a random sample of size n from a population whose density function is $$f(x) = \\begin{cases} \\theta^x(1 - \\theta)^{1-x}, & x "
+  ]
+ },
+ {
+  "id": 205,
+  "current": 53,
+  "targets": [
+   45,
+   48,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "48": [
+    "method of moments",
+    "moment estimator"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "a) Let $X_1, X_2, \\ldots, X_n$ be i.i.d as $B(k, p)$ (binomial with parameters k and p), where both k and p are unknown. Find by method of moments the estimator"
+  ]
+ },
+ {
+  "id": 208,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   48,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "method of moments"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Let \\(X_1, X_2\\) and \\(X_3\\) be a random sample of size 3 from a distribution with mean \\(\\theta\\) and standard deviation 2. Consider the following two esti"
+  ]
+ },
+ {
+  "id": 209,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population whose density function with parameter $\\theta > 0$ is given by $$f(x) = \\begin{cases"
+  ]
+ },
+ {
+  "id": 210,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "(a) A random sample $X_1, X_2, \\dots, X_n$ of size $n$ is taken from a normal population whose probability density function given by $$f(x, \\theta) = \\begin{cas"
+  ]
+ },
+ {
+  "id": 211,
+  "current": 48,
+  "targets": [
+   47,
+   48
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\ldots, X_n$ be a random sample of size n from a uniform distribution over the interval $(\\theta - \\lambda, \\lambda + \\theta)$. Find the mome"
+  ]
+ },
+ {
+  "id": 212,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "interval estimat",
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 10"
+  ]
+ },
+ {
+  "id": 213,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) What does it mean when we say that ``the sample mean is an unbiased estimator of the population mean, \\(\\mu\\)''. (3 marks) (b) Assume that a sample of conti"
+  ]
+ },
+ {
+  "id": 214,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\dots, X_n$ be a random sample of size n from a population whose density function is $$f(x) = \\begin{cases} \\theta^x(1 - \\theta)^{1-x}, & x ="
+  ]
+ },
+ {
+  "id": 215,
+  "current": 53,
+  "targets": [
+   45,
+   48
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "48": [
+    "method of moments",
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "a) Let $X_{1}, X_{2}, \\dots, X_{n}$ be i.i.d. as $B(k, p)$ (binomial with parameters $k$ and $p$), where both $k$ and $p$ are unknown. Find, by the method of mo"
+  ]
+ },
+ {
+  "id": 216,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\ldots, X_n\\) be i.i.d as Poisson with parameter \\(\\lambda\\). Obtain the maximum likelihood estimator of \\(\\lambda\\). (5 marks) (a) Check for i."
+  ]
+ },
+ {
+  "id": 218,
+  "current": 50,
+  "targets": [
+   45,
+   49,
+   50
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "50": [
+    "least squares"
+   ]
+  },
+  "parts": [
+   "a) Define the following terms as used in Estimation theory i) Point estimation [2 marks] ii) Unbiased estimator [2 marks] iii) Consistent estimator [2 marks] b)"
+  ]
+ },
+ {
+  "id": 219,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "51": [
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "a) Let \\( T^* = t^*(x_1, x_2, \\ldots, x_n) \\) be an estimator of \\( g(\\theta) \\). Discuss the two qualifying conditions for \\( T^* \\) to be a uniform minimum va"
+  ]
+ },
+ {
+  "id": 220,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "consistency",
+    "unbias",
+    "mean squared error"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "a) Define the term strong consistency as used in theory of estimation. $$[2 \\text{ marks}]$$ b) Discuss the Cramer-Rao lower bound. $$[3 \\text{ marks}]$$ c) Let"
+  ]
+ },
+ {
+  "id": 221,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "best unbiased"
+   ]
+  },
+  "parts": [
+   "a) Highlight three shortcomings of the Cramer-Rao lower bound as a method of finding the best unbiased estimator. [3 marks] b) A random variable \\(X\\) has a pro"
+  ]
+ },
+ {
+  "id": 222,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   48,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "method of moments"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance",
+    "best unbiased"
+   ]
+  },
+  "parts": [
+   "a) Let \\(X_1, X_2, \\dots, X_n\\) be a random sample from a Poisson distribution with parameter \\(\\lambda\\). Verify that $$T = \\sum_{i=1}^n X_i$$ is a sufficient "
+  ]
+ },
+ {
+  "id": 223,
+  "current": 52,
+  "targets": [
+   45,
+   47,
+   52
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) Measurements on the percentage of enrichment of 12 fuel rods were reported by the following statistics: $\\sum x = 34.72$ and $\\sum x^2 = 101.14$ Estimate th"
+  ]
+ },
+ {
+  "id": 224,
+  "current": 48,
+  "targets": [
+   47,
+   48
+  ],
+  "evidence": {
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a uniform distribution over the interval $(\\theta - \\lambda, \\lambda + \\theta)$. Find the mom"
+  ]
+ },
+ {
+  "id": 225,
+  "current": 49,
+  "targets": [
+   49,
+   50
+  ],
+  "evidence": {
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "50": [
+    "least square"
+   ]
+  },
+  "parts": [
+   "a) Let $X_1, X_2, \\dots, X_n$ be a random sample from a geometric distribution with $$f(x, p) = \\begin{cases} p(1-p)^{x-1} & , x = 1, 2, 3, \\dots \\\\ 0 & , elsew"
+  ]
+ },
+ {
+  "id": 226,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that $\\bar{x}$ is an unbiased",
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be independent exponential observations with p.d.f. given by $$f(x, \\theta) = \\begin{cases} \\frac{1}{\\theta} e^{-\\frac{x}{\\theta}}, "
+  ]
+ },
+ {
+  "id": 227,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent samples",
+    "difference between the means"
+   ]
+  },
+  "parts": [
+   "a) Let $X_1, X_2, \\ldots, X_n$ be a random sample from a normal with unknown mean $\\mu$ and variance $\\sigma^2$. For a random sample of 25 it was found that $$\\"
+  ]
+ },
+ {
+  "id": 228,
+  "current": 52,
+  "targets": [
+   45,
+   48,
+   52
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "48": [
+    "method of moments"
+   ],
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "a) Let \\(x_1, x_2, \\dots, x_n\\) denote a random sample of size \\(n\\) from a distribution with mean \\(\\mu\\) and variance \\(\\sigma^2\\). An estimator of \\(\\mu\\) is"
+  ]
+ },
+ {
+  "id": 229,
+  "current": 51,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ]
+  },
+  "parts": [
+   "Let \\(X\\) be a uniform random variable with p.d.f given by $$f(x) = \\begin{cases} \\frac{1}{\\theta}, & 0 \\leq x \\leq \\theta \\\\ 0, & \\text{otherwise} \\end{cases}$"
+  ]
+ },
+ {
+  "id": 230,
+  "current": 49,
+  "targets": [
+   49
+  ],
+  "evidence": {
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "A random sample of size three(\\(x_1 = 0.4, x_2 = 0.7, x_3 = 0.9\\)) is taken from a continuous distribution with p.d.f. given by $$f(x) = \\begin{cases} \\theta x^"
+  ]
+ },
+ {
+  "id": 231,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "51": [
+    "efficient estimator"
+   ]
+  },
+  "parts": [
+   "a) Let \\(y = \\alpha + \\beta x\\). Write down the linear regression estimators of \\(\\alpha\\) and \\(\\beta\\). Show that the estimators are unbiased.(5 marks) b) Wha"
+  ]
+ },
+ {
+  "id": 232,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent samples",
+    "difference between the means"
+   ]
+  },
+  "parts": [
+   "a) To assess the accuracy of a laboratory scale, a standard weight that is known to weigh 1 gram is repeatedly weighed 4 times. The resulting measurements (in g"
+  ]
+ },
+ {
+  "id": 233,
+  "current": 52,
+  "targets": [
+   45,
+   48,
+   49,
+   52
+  ],
+  "evidence": {
+   "45": [
+    "consistent",
+    "unbias",
+    "efficien"
+   ],
+   "48": [
+    "moment estimator"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "a) The following data represent the amount of corrosion coating (in ounces) needed to paint 6 metal plates: \\quad 8.2, \\quad 8.8, \\quad 7.7, \\quad 7.9, \\quad 8."
+  ]
+ },
+ {
+  "id": 234,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "a) Let $x_1, x_2, \\ldots, x_n$ be a random sample from a population with p.d.f $f(x, \\theta)$. When is an estimator of $\\theta$ said to be unbiased? (2 marks) b"
+  ]
+ },
+ {
+  "id": 235,
+  "current": 52,
+  "targets": [
+   45,
+   48,
+   49,
+   50
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "48": [
+    "method of moment"
+   ],
+   "49": [
+    "maximum likelihood"
+   ],
+   "50": [
+    "regression line",
+    "least square"
+   ]
+  },
+  "parts": [
+   "a) Explain the i. method of moment estimation (2 marks) ii. method of maximum likelihood estimation (2 marks) b) Let $x_1, x_2, \\ldots, x_n$ be a random sample "
+  ]
+ },
+ {
+  "id": 236,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\dots, X_n$ be a random sample of size n from a population whose p.d.f is $f(x, \\theta)$ where $\\theta$ is unknown. Let $T=t(X_1, X_2, \\dots,"
+  ]
+ },
+ {
+  "id": 237,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "a) A random sample of 18 venture-capital investments in the fiber optics sector yields the following data, in US dollars: $$ \\begin{array}{ccccccccc} 2.04 & 5.4"
+  ]
+ },
+ {
+  "id": 238,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   53
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "a) Let \\(T_1\\) and \\(T_2\\) be two unbiased estimators of \\(\\theta\\). Suppose \\(\\text{var}(T_1) = 2\\) and \\(\\text{Var}(T_2) = 3\\). Define \\(T_3 = \\alpha T_1 + (1"
+  ]
+ },
+ {
+  "id": 239,
+  "current": 51,
+  "targets": [
+   45,
+   48
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "48": [
+    "method of moments"
+   ]
+  },
+  "parts": [
+   "a) Describe briefly the concept of obtaining an estimator by the method of moments. b) Let $X$ be a random variable from a uniform distribution on $(0, b)$. Usi"
+  ]
+ },
+ {
+  "id": 240,
+  "current": 53,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "(a) A random sample $X_1, X_2, \\dots, X_n$ of size $n$ is taken from a normal distribution with mean $\\mu$ and variance $\\theta$. Find the maximum likelihood es"
+  ]
+ },
+ {
+  "id": 241,
+  "current": 51,
+  "targets": [
+   45,
+   50,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "efficien"
+   ],
+   "50": [
+    "least square"
+   ],
+   "51": [
+    "minimum variance",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "(a) Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a gamma distribution with $\\alpha = 2$ and $\\beta = \\theta$ whose density function is given b"
+  ]
+ },
+ {
+  "id": 242,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "(a) The capability of a specific gauge can be studied by measuring the weight of paper. The repeated measurements of one sheet of paper are given as follows: | "
+  ]
+ },
+ {
+  "id": 243,
+  "current": 45,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "consistency"
+   ]
+  },
+  "parts": [
+   "Define **strong consistency** as used in the theory of estimation. State the formal condition in terms of an estimator $\\hat{\\theta}_n$ of a parameter $\\theta$."
+  ]
+ },
+ {
+  "id": 260,
+  "current": 51,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "mean squared error",
+    "mse"
+   ]
+  },
+  "parts": [
+   "Let $\\hat{\\theta}$ be an estimator of a parameter $\\theta$. Show that the mean squared error of $\\hat{\\theta}$ can be expressed as the sum of its variance and t"
+  ]
+ },
+ {
+  "id": 261,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "factorization theorem",
+    "sufficien"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\dots, X_n\\) be a random sample from a distribution with probability density function $$ f(x; \\theta) = \\begin{cases} \\theta x^{\\theta - 1}, & 0"
+  ]
+ },
+ {
+  "id": 262,
+  "current": 46,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A machine produces metal shafts whose diameters are normally distributed with unknown mean $\\mu$ and known standard deviation $\\sigma = 0.05$ cm. A random sampl"
+  ]
+ },
+ {
+  "id": 263,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "51": [
+    "cramer-rao",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample from a Poisson distribution with probability mass function $$ f(x;\\theta) = \\frac{e^{-\\theta}\\theta^x}{x!}, \\quad "
+  ]
+ },
+ {
+  "id": 264,
+  "current": 51,
+  "targets": [
+   45,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\dots, X_n\\) be a random sample from a normal distribution with unknown mean \\(\\mu\\) and known variance \\(\\sigma^2\\). (a) Find the maximum likel"
+  ]
+ },
+ {
+  "id": 265,
+  "current": 51,
+  "targets": [
+   51
+  ],
+  "evidence": {
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "State the Cramer-Rao lower bound theorem for a regular statistical model, and list any three regularity conditions that are assumed in its proof. No proof is re"
+  ]
+ },
+ {
+  "id": 266,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a Bernoulli distribution with parameter $\\theta$, where $0 < \\theta < 1$. Suppose $\\delta(\\mathbf{X})$ is an"
+  ]
+ },
+ {
+  "id": 267,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "pivotal",
+    "independent random samples from two"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_{n_1}$ and $Y_1, Y_2, \\ldots, Y_{n_2}$ be independent random samples from two normal distributions $N(\\mu_1, \\sigma^2)$ and $N(\\mu_2, \\"
+  ]
+ },
+ {
+  "id": 268,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from the geometric distribution with probability mass function $$ f(x;\\theta) = (1-\\theta)^{x-1}\\theta, \\quad x ="
+  ]
+ },
+ {
+  "id": 269,
+  "current": 50,
+  "targets": [
+   50
+  ],
+  "evidence": {
+   "50": [
+    "least squares"
+   ]
+  },
+  "parts": [
+   "Use matrix notation to fit a straight line $y = \\beta_0 + \\beta_1 x$ to the following sample data by the method of least squares: $$ \\begin{array} {c|ccccccc} x"
+  ]
+ },
+ {
+  "id": 270,
+  "current": 51,
+  "targets": [
+   45,
+   47
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a Poisson distribution with mean $\\lambda > 0$, so that $P(X_i = x) = \\frac{e^{-\\lambda} \\lambda^x}{x!}$ for"
+  ]
+ },
+ {
+  "id": 271,
+  "current": 46,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A machine produces metal shafts. A random sample of $n=25$ shafts has a sample mean diameter of $\\bar{x}=12.05$ mm. The population standard deviation is known t"
+  ]
+ },
+ {
+  "id": 288,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, X_3$ be a random sample of size $3$ from a distribution with mean $\\mu$ and variance $\\sigma^2$. Consider the following three estimators of $\\mu$"
+  ]
+ },
+ {
+  "id": 289,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "independent random samples are taken from each"
+   ]
+  },
+  "parts": [
+   "A study compares the tensile strength (in MPa) of two types of alloy, A and B. Independent random samples are taken from each alloy. The sample sizes are $n_A ="
+  ]
+ },
+ {
+  "id": 290,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent populations",
+    "independent random samples are taken from each"
+   ]
+  },
+  "parts": [
+   "A study compares the lifespan (in days) of two independent populations of mosquitoes: wild type and transgenic. Independent random samples are taken from each p"
+  ]
+ },
+ {
+  "id": 291,
+  "current": 50,
+  "targets": [
+   50
+  ],
+  "evidence": {
+   "50": [
+    "least squares"
+   ]
+  },
+  "parts": [
+   "Use matrix notation to fit a straight line $y = \\beta_0 + \\beta_1 x$ to the following five data points by the method of least squares. $$ \\begin{array} {c|ccccc"
+  ]
+ },
+ {
+  "id": 292,
+  "current": 52,
+  "targets": [
+   52
+  ],
+  "evidence": {
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A random sample of $n=25$ steel rods from a normal population has a sample mean diameter of $\\bar{x}=10.02$ mm. The population standard deviation is known to be"
+  ]
+ },
+ {
+  "id": 293,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent random samples"
+   ]
+  },
+  "parts": [
+   "Two independent random samples are drawn from two normally distributed populations, $X_1$ and $X_2$, which are assumed to have a common unknown variance $\\sigma"
+  ]
+ },
+ {
+  "id": 302,
+  "current": 51,
+  "targets": [
+   45,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population with probability density function $$ f(x; \\theta) = \\begin{cases} \\dfrac{1}{\\sqrt{2\\"
+  ]
+ },
+ {
+  "id": 303,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent random samples"
+   ]
+  },
+  "parts": [
+   "Two independent random samples of size $n_1 = n_2 = 7$ are drawn from two normally distributed populations with a common unknown variance $\\sigma^2$. The sample"
+  ]
+ },
+ {
+  "id": 304,
+  "current": 52,
+  "targets": [
+   52
+  ],
+  "evidence": {
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A random sample of 12 fuel rods from a normal population gave the following summary statistics on percentage enrichment: $$ \\sum_{i=1}^{12} x_i = 34.82, \\qquad "
+  ]
+ },
+ {
+  "id": 305,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A random sample of 100 boys has a mean height of 152.3 cm and a standard deviation of 6 cm, while a random sample of 120 girls of the same age has a mean height"
+  ]
+ },
+ {
+  "id": 306,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent processes",
+    "two independent random samples"
+   ]
+  },
+  "parts": [
+   "A researcher compares the average tensile strength of steel rods produced by two independent processes, $X_1$ and $X_2$. Assume that the strengths are normally "
+  ]
+ },
+ {
+  "id": 307,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "minimum variance",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a gamma distribution with shape parameter $\\alpha = 2$ and scale parameter $\\beta = \\theta$, whos"
+  ]
+ },
+ {
+  "id": 308,
+  "current": 46,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A quality-control engineer measures the shaft diameter (in millimetres) of a random sample of 6 shafts produced by a machine and obtains the readings $$ 102.5,\\"
+  ]
+ },
+ {
+  "id": 309,
+  "current": 46,
+  "targets": [
+   46
+  ],
+  "evidence": {
+   "46": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A quality-control engineer is investigating the mean diameter of shafts produced by a manufacturing process. The diameters are assumed to be normally distribute"
+  ]
+ },
+ {
+  "id": 310,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "51": [
+    "minimum variance",
+    "cramer-rao"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a Poisson distribution with probability mass function $$ f(x;\\theta)=\\frac{e^{-\\theta}\\theta^x}{x!},\\qquad x"
+  ]
+ },
+ {
+  "id": 311,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a Poisson distribution with probability mass function $$ f(x;\\theta)=\\frac{e^{-\\theta}\\theta^{x}}{x!},\\qquad"
+  ]
+ },
+ {
+  "id": 312,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao",
+    "minimum variance",
+    "mvue",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\dots, X_n\\) be a random sample from a Bernoulli distribution with probability mass function $$ f(x;\\theta) = \\theta^x (1-\\theta)^{1-x}, \\quad x"
+  ]
+ },
+ {
+  "id": 313,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   48,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "48": [
+    "method of moments"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample from a Bernoulli distribution with probability mass function $$ f(x;\\theta) = \\theta^x (1-\\theta)^{1-x}, \\quad x ="
+  ]
+ },
+ {
+  "id": 314,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population whose probability density function is $$ f(x;\\theta) = \\begin{cases} \\dfrac{1}{\\thet"
+  ]
+ },
+ {
+  "id": 315,
+  "current": 51,
+  "targets": [
+   45,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that it is an unbiased",
+    "unbias"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a normal distribution with probability density function $$ f(x; \\theta) = \\frac{1}{\\sqrt{2\\pi\\the"
+  ]
+ },
+ {
+  "id": 316,
+  "current": 48,
+  "targets": [
+   48
+  ],
+  "evidence": {
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a uniform distribution on the interval $(\\theta - \\lambda, \\theta + \\lambda)$, where $\\lambda > "
+  ]
+ },
+ {
+  "id": 317,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent populations",
+    "independent random samples are taken from each"
+   ]
+  },
+  "parts": [
+   "A study compares the mean lifespan (in days) of two independent populations of mosquitoes: wild type and transgenic. Independent random samples are taken from e"
+  ]
+ },
+ {
+  "id": 318,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "independent random samples are taken from each"
+   ]
+  },
+  "parts": [
+   "A researcher compares the tensile strength of two types of steel wire produced by two different processes. Independent random samples are taken from each proces"
+  ]
+ },
+ {
+  "id": 319,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistency"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let \\(X_1, X_2, \\ldots, X_n\\) be a random sample from a Poisson distribution with unknown mean \\(\\lambda > 0\\), so that the probability mass function is $$ f(x;"
+  ]
+ },
+ {
+  "id": 320,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent types",
+    "independent random samples are taken from each"
+   ]
+  },
+  "parts": [
+   "A study compares the mean tensile strength of two independent types of steel wire, A and B. Independent random samples are taken from each type. The sample from"
+  ]
+ },
+ {
+  "id": 321,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that $\\hat{\\theta}$ is an unbiased",
+    "consistent",
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a population with probability density function $$ f(x;\\theta) = \\begin{cases} \\dfrac{1}{\\theta} "
+  ]
+ },
+ {
+  "id": 322,
+  "current": 51,
+  "targets": [
+   45,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that it is an unbiased",
+    "unbias"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a normal distribution with probability density function $$ f(x; \\theta) = \\frac{1}{\\sqrt{2\\pi\\th"
+  ]
+ },
+ {
+  "id": 323,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "pivotal",
+    "confidence interval",
+    "two independent processes"
+   ]
+  },
+  "parts": [
+   "A researcher compares the tensile strength of steel rods produced by two independent processes. Let $X_1$ denote the strength of a rod from Process 1 and $X_2$ "
+  ]
+ },
+ {
+  "id": 324,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a Bernoulli distribution with probability mass function $$ f(x;\\theta) = \\theta^x (1-\\theta)^{1-"
+  ]
+ },
+ {
+  "id": 325,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent groups"
+   ]
+  },
+  "parts": [
+   "A study compares the lifespan (in days) of two independent groups of mosquitoes: wild type and transgenic. The summary statistics are given below. | Group | Sam"
+  ]
+ },
+ {
+  "id": 326,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a Poisson distribution with unknown parameter $\\lambda > 0$, so that the probability mass function is $$ p(x"
+  ]
+ },
+ {
+  "id": 327,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that it is an unbiased",
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle",
+    "likelihood function"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "A random sample $X_1, X_2, \\dots, X_n$ of size $n$ is taken from a population with probability density function $$ f(x;\\theta) = \\begin{cases} \\dfrac{1}{\\theta}"
+  ]
+ },
+ {
+  "id": 328,
+  "current": 48,
+  "targets": [
+   48
+  ],
+  "evidence": {
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a uniform distribution over the interval $(\\lambda - \\theta, \\lambda + \\theta)$, where $\\theta >"
+  ]
+ },
+ {
+  "id": 329,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population with probability density function $$ f(x; \\theta) = \\begin{cases} \\dfrac{1}{\\theta} "
+  ]
+ },
+ {
+  "id": 330,
+  "current": 51,
+  "targets": [
+   45,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that it is an unbiased",
+    "unbias"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue",
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a normal population with probability density function $$ f(x; \\theta) = \\frac{1}{\\sqrt{2\\pi\\theta"
+  ]
+ },
+ {
+  "id": 331,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "pivotal",
+    "confidence interval",
+    "two independent processes"
+   ]
+  },
+  "parts": [
+   "A researcher compares the tensile strength of steel rods produced by two independent processes. Let $X_1$ denote the strength of a rod from process 1 and $X_2$ "
+  ]
+ },
+ {
+  "id": 332,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "maximum likelihood",
+    "mle"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a Poisson distribution with unknown parameter $\\lambda > 0$, so that the probability mass function is $$ f(x"
+  ]
+ },
+ {
+  "id": 1168,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "Two independent normal populations have unknown but equal variances. A random sample of size $n_1=12$ from the first population gave $\\bar{x}_1=48.5$ and $s_1^2"
+  ]
+ },
+ {
+  "id": 1169,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent populations",
+    "independent random samples are taken from each"
+   ]
+  },
+  "parts": [
+   "A study compares the lifespan (in days) of two independent populations of insects: wild type and transgenic. Independent random samples are taken from each popu"
+  ]
+ },
+ {
+  "id": 1170,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a Bernoulli distribution with probability mass function $$ f(x;\\theta) = \\theta^x (1-\\theta)^{1-"
+  ]
+ },
+ {
+  "id": 1171,
+  "current": 51,
+  "targets": [
+   45,
+   48,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "48": [
+    "method of moments",
+    "moment estimator"
+   ],
+   "51": [
+    "cramer-rao",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a binomial distribution $B(k, p)$, where both $k$ (a positive integer) and $p \\in (0,1)$ are unknown. You ma"
+  ]
+ },
+ {
+  "id": 1172,
+  "current": 48,
+  "targets": [
+   48
+  ],
+  "evidence": {
+   "48": [
+    "moment estimator"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a uniform distribution on the interval $(\\alpha-\\beta,\\ \\alpha+\\beta)$, where $\\alpha\\in\\mathbb{R"
+  ]
+ },
+ {
+  "id": 1173,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "Two independent normal populations have unknown but equal variances. A random sample of size $n_1=12$ from the first population gave $\\bar{x}_1=24.5$ and $s_1^2"
+  ]
+ },
+ {
+  "id": 1174,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population with probability mass function $$ f(x;\\theta) = \\begin{cases} \\theta^x (1-\\theta)^{1"
+  ]
+ },
+ {
+  "id": 1175,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent types"
+   ]
+  },
+  "parts": [
+   "A study compares the lifespan (in days) of two independent types of mosquitoes: wild type and transgenic. The summary statistics are: | | $n$ | $\\bar{x}$ | $s$ "
+  ]
+ },
+ {
+  "id": 1176,
+  "current": 48,
+  "targets": [
+   48
+  ],
+  "evidence": {
+   "48": [
+    "method of moments"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a uniform distribution on the interval $(\\alpha-\\beta,\\, \\alpha+\\beta)$, where $\\alpha\\in\\mathbb{"
+  ]
+ },
+ {
+  "id": 1177,
+  "current": 49,
+  "targets": [
+   49
+  ],
+  "evidence": {
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample from a geometric distribution with probability mass function $$ f(x, p) = \\begin{cases} p(1-p)^{x-1}, & x = 1, 2, "
+  ]
+ },
+ {
+  "id": 1178,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "show that $\\bar{x}$ is an unbiased",
+    "unbias"
+   ],
+   "51": [
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be independent exponential observations with probability density function $$ f(x;\\theta) = \\begin{cases} \\dfrac{1}{\\theta} e^{-x/\\th"
+  ]
+ },
+ {
+  "id": 1179,
+  "current": 52,
+  "targets": [
+   52
+  ],
+  "evidence": {
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A random sample of 10 children from a certain population was taken and their weights (in kg) were recorded. The sample mean weight was found to be \\(38.4\\text{ "
+  ]
+ },
+ {
+  "id": 1180,
+  "current": 51,
+  "targets": [
+   45
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ]
+  },
+  "parts": [
+   "Let $X$ be a continuous random variable with probability density function $$ f(x)=\\begin{cases} \\dfrac{1}{\\theta}, & 0\\le x\\le \\theta, 0, & \\text{otherwise}, \\e"
+  ]
+ },
+ {
+  "id": 1181,
+  "current": 49,
+  "targets": [
+   49
+  ],
+  "evidence": {
+   "49": [
+    "maximum likelihood"
+   ]
+  },
+  "parts": [
+   "A random sample of size three, \\(x_1 = 0.4,\\; x_2 = 0.7,\\; x_3 = 0.9\\), is taken from a continuous distribution with probability density function $$ f(x) = \\beg"
+  ]
+ },
+ {
+  "id": 1182,
+  "current": 51,
+  "targets": [
+   45,
+   47,
+   49,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "47": [
+    "sufficien"
+   ],
+   "49": [
+    "likelihood function"
+   ],
+   "51": [
+    "lower bound",
+    "minimum variance",
+    "mvue"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a Poisson distribution with probability mass function $$ f(x;\\lambda)=\\frac{e^{-\\lambda}\\lambda^x"
+  ]
+ },
+ {
+  "id": 1183,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias",
+    "consistent"
+   ],
+   "51": [
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a normal population with mean $\\mu$ and variance $\\sigma^2$, where both $\\mu$ and $\\sigma^2$ are unknown. (a"
+  ]
+ },
+ {
+  "id": 1184,
+  "current": 52,
+  "targets": [
+   52
+  ],
+  "evidence": {
+   "52": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A random sample of 12 fuel rods from a production process is tested, and the percentage of enrichment is measured. The summary statistics are $$ \\sum_{i=1}^{12}"
+  ]
+ },
+ {
+  "id": 1185,
+  "current": 51,
+  "targets": [
+   45,
+   51
+  ],
+  "evidence": {
+   "45": [
+    "unbias"
+   ],
+   "51": [
+    "cramer-rao",
+    "minimum variance",
+    "mvue",
+    "lower bound"
+   ]
+  },
+  "parts": [
+   "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population with probability density function $f(x, \\theta)$, where $\\theta$ is an unknown param"
+  ]
+ },
+ {
+  "id": 1186,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval"
+   ]
+  },
+  "parts": [
+   "A random sample of 18 components produced by Machine A gave a sample mean lifetime of $\\bar{x}_1 = 1250$ hours with sample variance $s_1^2 = 1600$. An independe"
+  ]
+ },
+ {
+  "id": 1225,
+  "current": 53,
+  "targets": [
+   53
+  ],
+  "evidence": {
+   "53": [
+    "confidence interval",
+    "two independent populations",
+    "two independent random samples"
+   ]
+  },
+  "parts": [
+   "A study compares the lifespan (in days) of two independent populations of mosquitoes: wild type and transgenic. Two independent random samples are taken, and th"
+  ]
+ }
+]

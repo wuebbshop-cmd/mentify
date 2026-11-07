@@ -29,3 +29,26 @@ class DashboardNavigationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Banked Questions")
+
+    def test_anonymous_prep_entry_goes_directly_to_sign_in(self):
+        self.client.logout()
+
+        response = self.client.get(reverse("prep:dashboard"))
+
+        self.assertRedirects(
+            response,
+            f"{reverse('accounts:login')}?next={reverse('prep:dashboard')}",
+            fetch_redirect_response=False,
+        )
+
+    def test_root_always_renders_the_main_mentify_page(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "home.html")
+
+        self.client.logout()
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "home.html")

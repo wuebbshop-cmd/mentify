@@ -16,6 +16,27 @@ from services.prep_export_service import (
 
 
 class PrepPdfArtifactConnectionTests(SimpleTestCase):
+    def test_renderer_version_changes_the_artifact_signature(self):
+        from services import prep_pdf_artifacts
+
+        payload = {"kind": "notes", "content": "Validated notes"}
+        original_version = prep_pdf_artifacts.PDF_ARTIFACT_RENDER_VERSION
+        try:
+            prep_pdf_artifacts.PDF_ARTIFACT_RENDER_VERSION = "brand-footer-v1"
+            old_signature = prep_pdf_artifacts._digest({
+                **payload,
+                "render_version": prep_pdf_artifacts.PDF_ARTIFACT_RENDER_VERSION,
+            })
+            prep_pdf_artifacts.PDF_ARTIFACT_RENDER_VERSION = "brand-footer-v2"
+            new_signature = prep_pdf_artifacts._digest({
+                **payload,
+                "render_version": prep_pdf_artifacts.PDF_ARTIFACT_RENDER_VERSION,
+            })
+        finally:
+            prep_pdf_artifacts.PDF_ARTIFACT_RENDER_VERSION = original_version
+
+        self.assertNotEqual(old_signature, new_signature)
+
     def test_worker_refreshes_expired_database_connection_after_render(self):
         from services.prep_pdf_artifacts import _process_artifact
 
@@ -102,7 +123,7 @@ $$
             document.close()
 
     @patch("services.prep_export_service._render_html_with_playwright", return_value=b"")
-    def test_notes_pdf_preserves_validated_source_and_uses_shared_renderer(self, _render_pdf):
+    def test_notes_pdf_preserves_validated_source_and_branding(self, _render_pdf):
         html = _build_topic_notes_html("TST 101", "Export Topic", self.notes_source)
         self.assertIn("normalizeLegacyMathBlocks", html)
         self.assertIn("Export Sentinel Heading", html)
@@ -114,6 +135,8 @@ $$
         self.assertGreater(len(pdf_bytes), 1000)
         self.assertIn("Export Sentinel Heading", pdf_text)
         self.assertIn("Export Table Sentinel", pdf_text)
+        self.assertIn("Mentify Prep", pdf_text)
+        self.assertIn("mentify.study/prep/", pdf_text)
 
     @patch("services.prep_export_service._render_html_with_playwright", return_value=b"")
     def test_paper_questions_and_answers_export_separately(self, _render_pdf):
@@ -143,6 +166,10 @@ $$
         self.assertNotIn("ANSWER_SENTINEL", questions_text)
         self.assertIn("ANSWER_SENTINEL", answers_text)
         self.assertNotIn("QUESTION_SENTINEL", answers_text)
+        self.assertIn("Mentify Prep", questions_text)
+        self.assertIn("mentify.study/prep/", questions_text)
+        self.assertIn("Mentify Prep", answers_text)
+        self.assertIn("mentify.study/prep/", answers_text)
 
     def test_paper_export_requires_content_selection(self):
         with self.assertRaises(ValueError):

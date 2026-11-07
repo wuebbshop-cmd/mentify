@@ -1,0 +1,70 @@
+﻿
+q1050 Moment Generating Function And Pro -> ['Distribution Functions', 'Mode And Median', 'Moments And Variance P']
+   a) let X be a discretefandom variable with probability distributiongiven by 1,2,3,4,5 f(x):«+2),x= =2s otherwise () Sket
+   ev 180:distribution function;181:mode,median;183:compute the variance
+
+q1058 Moment Generating Function And Pro -> ['Normal Distribution An']
+   The number of sales in a certain shop is normally distributed with mean Ksh.36,000/= and standard deviation Ksh.10,000/=
+   ev 187:normally
+
+q1074 Moment Generating Function And Pro -> ['Distribution Functions', 'Expectation', 'Moments And Variance P']
+   (a) Given some pdf in tabular form: compute mean and standard deviation; and probability/proportion. (b) Given function 
+   ev 180:f(x);182:given some pdf in tabular form: compute mean;183:given some pdf in tabular form: compute mean and s
+
+q1101 Change Of Variable -> ['Random Variables', 'Distribution Functions']
+   (a) State two conditions for a real valued function \(f(x)\) to be a probability distribution function of a continuous r
+   ev 179:state two conditions;180:distribution function
+
+q1107 Change Of Variable -> ['Moments And Variance P']
+   (c) Let \(X\) be a continuous random variable with probability density function $$ f(x) = \begin{cases} \tfrac{1}{2}(x+1
+   ev 183:compute the variance
+
+q1790 Moment Generating Function And Pro -> ['Distribution Functions', 'Expectation', 'Moments And Variance P']
+   -- **** b) Let \(X\) have a probability density function (p.d.f) $$ f(x) = \begin{cases} \frac{1}{8}x &, \quad 0 < x < 4
+   ev 180:distribution function;182:find the mean;183:find the mean and variance
+
+q1798 Normal Distribution And Probabilit -> ['Poisson Distribution A']
+   c) Assume that the number of typos per page has the Poisson distribution. Let \(X\) equal the number of typos on a print
+   ev 186:poisson
+
+q1804 Change Of Variable -> ['Mode And Median', 'Expectation', 'Moments And Variance P']
+   a) A continuous random variable has the density function $$ f(x) = \begin{cases} kx^2(1-x) & 0 \leq x \leq 1 \\ 0, & \te
+   ev 181:mode;182:find \(k\) hence find mean;183:find \(k\) hence find mean, variance
+
+q1808 Moment Generating Function And Pro -> ['Normal Distribution An']
+   (a) The weight of an electric component is normally distributed with a mean of 6 ounces and a standard deviation of 0.25
+   ev 187:normally
+
+q1823 Moment Generating Function And Pro -> ['Distribution Functions']
+   A continuous random variable has the density function $$ f(x) = \begin{cases} kx^2(1-x) & -1 \leq x \leq 1 \\ 0, & \text
+   ev 180:distribution function
+
+q1909 Change Of Variable -> ['Random Variables']
+   Let $X$ be a continuous random variable with probability density function $f(x)$. State two conditions that $f(x)$ must 
+   ev 179:state two conditions,valid probability density
+
+q1916 Moment Generating Function And Pro -> ['Random Variables']
+   (c) The time taken to perform a particular task, t hours has the probability density function $$ f(t) = \begin{cases} 10
+   ev 179:determine:
+(i) the value of k
+
+q1928 Moment Generating Function And Pro -> ['Gamma, Exponential And']
+   (d) On the average, a certain computer part lasts ten years. If the length of time that the computer part lasts is \(X\)
+   ev 188:exponentially distributed
+
+q1981 Moment Generating Function And Pro -> ['Distribution Functions', 'Expectation', 'Moments And Variance P']
+   -- ** b) Let \(X\) have a probability density function (p.d.f) $$ f(x) = \begin{cases} \frac{1}{8}x &, \quad 0 < x < 4, 
+   ev 180:distribution function;182:find the mean;183:find the mean and variance
+
+q1997 Normal Distribution And Probabilit -> ['Special Discrete Proba']
+   b) In a game, players select sticks at random from a box containing a large number of sticks of different lengths. The l
+   ev 185:uniform distribution
+
+q2291 Moment Generating Function And Pro -> ['Random Variables']
+   (c) The time taken to perform a particular task, t hours has the probability density function $$ f(t) = \begin{cases} 10
+   ev 179:determine:
+ 
+
+(i) the value of k
+
+distinct questions whose current topic is dropped: 16

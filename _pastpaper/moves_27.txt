@@ -1,0 +1,102 @@
+﻿
+q67 Method of Minimum Variance -> ['Properties of Estimato']
+   Let \(\hat{\theta}\) be an estimator of \(\theta\). Show that \(MSE(\hat{\theta})\) can be expressed in t
+   ev 45:mse
+
+q68 Method of Minimum Variance -> ['Sufficient Statistics']
+   A random sample \(X_1, X_2, \dots, X_n\) has a probability density function $$f(x, \lambda) =$$ $$\begin{
+   ev 47:sufficien
+
+q69 Confidence Interval Estimation -> ['Properties of Estimato']
+   Let \(X_1, X_2, \dots, X_n\) be a random sample from a population with mean \(\theta\). Show that the sam
+   ev 45:unbias
+
+q70 Method of Minimum Variance -> ['Sufficient Statistics']
+   Let \(X_1, X_2, \dots, X_n\) be i.i.d as \(Binomial(n, \theta)\). Let \(T = \sum_{i=1}^n X_i\). Verify th
+   ev 47:sufficien
+
+q71 Method of Minimum Variance -> ['Properties of Estimato', 'Maximum Likelihood Est']
+   Let \(X_1, X_2, \dots, X_n\) be i.i.d random sample with a probability density function given by f\left(x
+   ev 45:consistency;49:maximum likelihood
+
+q74 Interval Estimation: Confidence In -> ['Sufficient Statistics']
+   Let $x_{1}, x_{2}, \ldots, x_{n}$ denote a random sample from a Beta distribution $$ f(x, \alpha, \beta) 
+   ev 47:sufficien
+
+q77 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics']
+   Suppose that $x_{1}, x_{2}, \ldots, x_{n}$ form a random sample from a Poisson distribution with mean $\l
+   ev 45:unbias;47:sufficien
+
+q183 Method of Minimum Variance -> ['Properties of Estimato', 'Maximum Likelihood Est']
+   (a) Let \(X_1, X_2\) and \(X_3\) be a random sample of size 3 from a distribution with mean \(\mu\) and s
+   ev 45:unbias,efficien;49:maximum likelihood
+
+q184 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   Let $X_1, X_2, \dots, X_n$ be a random sample of size $n$ from a population mean -5 and variance $\theta$
+   ev 45:unbias,consistent;47:sufficien;49:maximum likelihood
+
+q185 Method of Minimum Variance -> ['Properties of Estimato', 'Least Squares Estimati']
+   - [(a)] A random sample $X_1, X_2, \dots, X_n$ of size $n$ is taken from a normal population whose probab
+   ev 45:unbias;50:regression line,least square
+
+q189 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   Let $X_1, X_2, \dots, X_n$ be a random sample of size $n$ from a population whose density function with p
+   ev 45:unbias,consistent;47:sufficien;49:maximum likelihood
+
+q194 Method of Minimum Variance -> ['Properties of Estimato', 'Moment Estimation']
+   a) Let $X_1, X_2, \ldots, X_n$ be i.i.d as $B(k, p)$ (binomial with parameters $k$ and $p$) where both $k
+   ev 45:unbias,consistent;48:method of moments,moment estimator
+
+q197 Interval Estimation: Confidence In -> ['Confidence Interval Es']
+   (a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in deg
+   ev 46:interval estimat,confidence interval
+
+q199 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   Let $X_1, X_2, \ldots, X_n$ be a random sample of size $n$ from a population whose density function with 
+   ev 45:unbias,consistent;47:sufficien;49:maximum likelihood
+
+q209 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   Let $X_1, X_2, \dots, X_n$ be a random sample of size $n$ from a population whose density function with p
+   ev 45:unbias,consistent;47:sufficien;49:maximum likelihood
+
+q215 Interval Estimation: Confidence In -> ['Properties of Estimato', 'Moment Estimation']
+   a) Let $X_{1}, X_{2}, \dots, X_{n}$ be i.i.d. as $B(k, p)$ (binomial with parameters $k$ and $p$), where 
+   ev 45:unbias,consistent;48:method of moments,moment estimator
+
+q229 Method of Minimum Variance -> ['Properties of Estimato']
+   Let \(X\) be a uniform random variable with p.d.f given by $$f(x) = \begin{cases} \frac{1}{\theta}, & 0 \
+   ev 45:unbias,consistent
+
+q235 Interval Estimation -> ['Properties of Estimato', 'Moment Estimation', 'Maximum Likelihood Est', 'Least Squares Estimati', 'Interval Estimation: C']
+   a) Explain the i. method of moment estimation (2 marks) ii. method of maximum likelihood estimation (2 ma
+   ev 45:unbias;48:method of moment;49:maximum likelihood;50:regression line,least square;53:\bar{y}
+
+q239 Method of Minimum Variance -> ['Properties of Estimato', 'Moment Estimation']
+   a) Describe briefly the concept of obtaining an estimator by the method of moments. b) Let $X$ be a rando
+   ev 45:unbias,consistency;48:method of moments
+
+q240 Interval Estimation: Confidence In -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   (a) A random sample $X_1, X_2, \dots, X_n$ of size $n$ is taken from a normal distribution with mean $\mu
+   ev 45:unbias,consistency;47:sufficien;49:maximum likelihood
+
+q260 Method of Minimum Variance -> ['Properties of Estimato']
+   Let $\hat{\theta}$ be an estimator of a parameter $\theta$. Show that the mean squared error of $\hat{\th
+   ev 45:mean squared error,mse
+
+q270 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics']
+   Let $X_1, X_2, \ldots, X_n$ be a random sample from a Poisson distribution with mean $\lambda > 0$, so th
+   ev 45:unbias;47:sufficien
+
+q314 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   Let $X_1, X_2, \dots, X_n$ be a random sample of size $n$ from a population whose probability density fun
+   ev 45:unbias,consistent;47:sufficien;49:maximum likelihood
+
+q329 Method of Minimum Variance -> ['Properties of Estimato', 'Sufficient Statistics', 'Maximum Likelihood Est']
+   Let $X_1, X_2, \dots, X_n$ be a random sample of size $n$ from a population with probability density func
+   ev 45:unbias,consistent;47:sufficien;49:maximum likelihood
+
+q1180 Method of Minimum Variance -> ['Properties of Estimato']
+   Let $X$ be a continuous random variable with probability density function $$ f(x)=\begin{cases} \dfrac{1}
+   ev 45:unbias,consistent
+
+distinct questions whose current topic is dropped: 25

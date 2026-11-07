@@ -346,6 +346,7 @@ class PrepTopic(models.Model):
         if self.course_id:
             cache.delete(f"prep_pub_course_page_{self.course_id}")
             cache.delete(f"prep_course_detail_topics_{self.course_id}")
+            cache.delete(f"prep_course_topics_summary_v8_{self.course_id}")
 
 
 class PrepTopicChatSession(models.Model):
@@ -744,6 +745,7 @@ class PrepContentCache(models.Model):
         if self.course_id:
             cache.delete(f"prep_pub_course_page_{self.course_id}")
             cache.delete(f"prep_course_detail_topics_{self.course_id}")
+            cache.delete(f"prep_course_topics_summary_v8_{self.course_id}")
 
 
 class PrepNoteGenerationGuard(models.Model):

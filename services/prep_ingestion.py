@@ -2253,17 +2253,16 @@ def learner_visible_assessment_questions(question_records, deduplicate: bool = T
 
     from services.prep_ai_router import normalize_math_delimiters
     seen_texts = set()
-    seen_prefixes = set()
     final_questions = []
     for q in candidates:
         norm = _normalise_document_text(normalize_math_delimiters(q.question_latex or ""))
         if norm and len(norm) > 25:
-            prefix = norm[:60]
-            if norm in seen_texts or (len(prefix) >= 50 and prefix in seen_prefixes):
+            # Compare whole statements only. A shared opening sentence is common in exam
+            # papers ("Determine the order, degree and linearity of ...") and matching on a
+            # truncated prefix hid distinct questions from learners.
+            if norm in seen_texts:
                 continue
             seen_texts.add(norm)
-            if len(prefix) >= 50:
-                seen_prefixes.add(prefix)
         final_questions.append(q)
 
     final_questions.sort(

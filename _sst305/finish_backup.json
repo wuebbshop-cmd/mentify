@@ -1,0 +1,43 @@
+{
+ "218": {
+  "question_latex": "a) Define the following terms as used in Estimation theory\n\ni) Point estimation [2 marks]\n\nii) Unbiased estimator [2 marks]\n\niii) Consistent estimator [2 marks]\n\nb) Let $X_1, X_2$, and $X_3$ be a random sample of size 3 from a population $N(\\mu, \\sigma)$. $T_1, T_2, T_3$ are the 3 estimators used to estimate mean value $\\mu$. Given that\n\n$$\\begin{aligned}\nT_1 &= X_1 + X_2 - X_3 \\\\\nT_2 &= 2X_1 - 4X_2 + 3X_3 \\\\\nT_3 &= (\\lambda X_1 + X_2 + X_3)/2\n\\end{aligned}$$\n\ni) Establish whether $T_1$ and $T_2$ are unbiased. [4 marks]\n\nii) Determine the value of $\\lambda$ such that $T_3$ is unbiased for $\\mu$. [2 marks]\n\nc) Suppose $x_1, x_2, x_3, \\ldots, x_n$ is a random sample from a distribution defined by\n\n$$f(x, \\theta) =\n\\begin{cases}\n\\frac{e^{-\\lambda}\\lambda^x}{x!}, & 0 < \\theta < 1, \\quad x = 0, 1, 2, \\ldots, n \\\\\n0, & \\text{elsewhere}\n\\end{cases}$$\n\nUsing the Maximum Likelihood method obtain the estimator for $\\lambda$. [6 marks]\nd) Let $x_1, x_2, x_3, \\ldots, x_n$ be a random sample from a population with mean $\\theta$ and variance $\\sigma^2$. Show that the sample mean is a weakly consistent estimator of $\\theta$. [6 marks]\n\n**Page 1 of**\n\ne) Use matrix notation to fit a straight line to the 5 sample units given below by the method of least squares.\n\n[6 \\text{ marks}]\n\n$$| \\( x \\) | -2 | -1 | 0 | 1 | 2 |\n|---|---|---|---|---|---|\n| \\( y \\) | 0 | 0 | 1 | 1 | 3 |$$"
+ },
+ "pending": {
+  "1168": {
+   "question_latex": "Two independent normal populations have unknown but equal variances. A random sample of size $n_1=12$ from the first population gave $\\bar{x}_1=48.5$ and $s_1^2=36.0$. An independent random sample of size $n_2=15$ from the second population gave $\\bar{x}_2=42.0$ and $s_2^2=25.0$. Construct a $95\\%$ confidence interval for the difference between the population means $\\mu_1-\\mu_2$. Interpret your interval.",
+   "verification_status": "pending"
+  },
+  "1170": {
+   "question_latex": "Let $X_1, X_2, \\ldots, X_n$ be a random sample of size $n$ from a Bernoulli distribution with probability mass function\n\n$$\nf(x;\\theta) = \\theta^x (1-\\theta)^{1-x}, \\quad x = 0, 1, \\; 0 < \\theta < 1,\n$$\n\nand $f(x;\\theta)=0$ elsewhere.\n\n(a) Show that $T = 1 - \\bar{X}$, where $\\bar{X} = \\frac{1}{n}\\sum_{i=1}^n X_i$, is an unbiased estimator of $1-\\theta$ and determine its variance. Hence, or otherwise, find the Cramér–Rao lower bound for the variance of any unbiased estimator of $1-\\theta$. (8 marks)\n(b) Show that $T = 1 - \\bar{X}$ is a minimum variance unbiased estimator (MVUE) of $1-\\theta$. (7 marks)\n(c) Show that $T = 1 - \\bar{X}$ is also a uniformly minimum variance unbiased estimator (UMVUE) of $1-\\theta$. (5 marks)",
+   "verification_status": "pending"
+  },
+  "1171": {
+   "question_latex": "Let $X_1, X_2, \\ldots, X_n$ be a random sample from a binomial distribution $B(k, p)$, where both $k$ (a positive integer) and $p \\in (0,1)$ are unknown. You may use the facts that for $X \\sim B(k,p)$, $E(X)=kp$ and $\\operatorname{Var}(X)=kp(1-p)$.\n\n(a) Use the method of moments to derive estimators $\\hat{k}$ and $\\hat{p}$ for $k$ and $p$. Give the estimators explicitly in terms of the sample mean $\\bar X$ and the sample variance $S^2 = \\frac{1}{n}\\sum_{i=1}^n (X_i-\\bar X)^2$. (10 marks)\n(b) Now suppose that $k$ is known. Show that the moment estimator of $p$ is unbiased and find its variance. (6 marks)\n(c) Still assuming $k$ is known, state the Cramer-Rao lower bound for the variance of any unbiased estimator of $p$ based on the sample, and compare it with the variance of the moment estimator obtained in part (b). (4 marks)",
+   "verification_status": "pending"
+  },
+  "1169": {
+   "question_latex": "A study compares the lifespan (in days) of two independent populations of insects: wild type and transgenic. Independent random samples are taken from each population, and both populations are assumed to be normally distributed with a common but unknown variance. The sample summaries are as follows:\n\n| Population | Sample size | Sample mean | Sample standard deviation |\n| --- | --- | --- | --- |\n| Wild type | $n_1 = 80$ | $\\bar{x}_1 = 20.78$ | $s_1 = 12.99$ |\n| Transgenic | $n_2 = 90$ | $\\bar{x}_2 = 15.54$ | $s_2 = 10.78$ |\n\nAssuming the two populations have equal variances, construct a $95\\%$ confidence interval for the difference in population means $\\mu_1 - \\mu_2$.",
+   "verification_status": "pending"
+  },
+  "1173": {
+   "question_latex": "Two independent normal populations have unknown but equal variances. A random sample of size $n_1=12$ from the first population gave $\\bar{x}_1=24.5$ and $s_1^2=16.0$. An independent random sample of size $n_2=15$ from the second population gave $\\bar{x}_2=20.1$ and $s_2^2=20.0$. Construct a $95\\%$ confidence interval for the difference between the population means $\\mu_1-\\mu_2$. State the assumptions required for your interval to be valid.",
+   "verification_status": "pending"
+  },
+  "1174": {
+   "question_latex": "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a population with probability mass function\n\n$$\nf(x;\\theta) = \\begin{cases}\n\\theta^x (1-\\theta)^{1-x}, & x = 0, 1, \\\\\n0, & \\text{elsewhere},\n\\end{cases}\n$$\n\nwhere $0 < \\theta < 1$ is an unknown parameter.\n\n(a) Show that $T = 1 + \\frac{1}{n}\\sum_{i=1}^n X_i$ is an unbiased estimator of $\\theta + 1$. **(6 marks)**\n(b) Show that $T$ is a minimum variance unbiased estimator (MVUE) of $\\theta + 1$. **(9 marks)**\n(c) Show that $T$ is also a uniformly minimum variance unbiased estimator (UMVUE) of $\\theta + 1$. **(5 marks)**",
+   "verification_status": "pending"
+  },
+  "1175": {
+   "question_latex": "A study compares the lifespan (in days) of two independent types of mosquitoes: wild type and transgenic. The summary statistics are:\n\n| | $n$ | $\\bar{x}$ | $s$ |\n| --- | --- | --- | --- |\n| Wild type | 88 | 20.784 | 12.99 |\n| Transgenic | 99 | 16.546 | 10.78 |\n\nAssume that the lifespans in each population are normally distributed and that the two populations have a common but unknown variance. Obtain a 95\\% confidence interval for the difference between the true mean lifespans of wild type and transgenic mosquitoes ($\\mu_1 - \\mu_2$).",
+   "verification_status": "pending"
+  },
+  "1184": {
+   "question_latex": "A random sample of 12 fuel rods from a production process is tested, and the percentage of enrichment is measured. The summary statistics are \n\n$$\n\\sum_{i=1}^{12} x_i = 34.82, \\qquad \\sum_{i=1}^{12} x_i^2 = 101.1486.\n$$\n\n Assume that the percentage of enrichment is normally distributed with unknown mean \\(\\mu\\) and unknown variance \\(\\sigma^2\\).\n\n(a) Compute the sample mean and the sample variance. (4 marks)\n(b) Construct a \\(99\\%\\) confidence interval for the population mean percentage of enrichment \\(\\mu\\). Interpret your interval. (8 marks)\n(c) Construct a \\(95\\%\\) confidence interval for the population variance \\(\\sigma^2\\). (8 marks)",
+   "verification_status": "pending"
+  },
+  "1182": {
+   "question_latex": "Let $X_1, X_2, \\dots, X_n$ be a random sample of size $n$ from a Poisson distribution with probability mass function\n\n$$\nf(x;\\lambda)=\\frac{e^{-\\lambda}\\lambda^x}{x!},\\qquad x=0,1,2,\\dots,\\ \\lambda>0.\n$$\n\n(a) Find the Fisher information $I(\\lambda)$ contained in a single observation, and hence state the Cramér–Rao lower bound for the variance of any unbiased estimator of $\\lambda$ based on the sample. (6 marks)\n(b) Show that $T=\\sum_{i=1}^{n}X_i$ is a sufficient statistic for $\\lambda$, and explain why $T$ is also complete. (5 marks)\n(c) Using the fact that $T\\sim \\mathrm{Poisson}(n\\lambda)$, show that $\\bar X=T/n$ is an unbiased estimator of $\\lambda$ and that its variance attains the Cramér–Rao lower bound. Hence state the minimum variance unbiased estimator (MVUE) of $\\lambda$. (5 marks)\n(d) State the necessary and sufficient condition, in terms of the likelihood function, for an unbiased estimator to be an MVUE, and verify that $\\bar X$ satisfies this condition. (4 marks)",
+   "verification_status": "pending"
+  }
+ }
+}

@@ -1,6 +1,6 @@
 # Past Paper Question Audit — Level 100 to 300 Courses
 
-**Audit time:** 2026-11-07 14:26 E. Africa Standard Time  
+**Audit time:** 2026-11-07 22:55 E. Africa Standard Time  
 **Scope:** Every course whose code number falls in the 100, 200 or 300 band (for example SMA 330 is a 300-level course) and which has at least one past paper or one extracted question. Level 400 courses are deliberately excluded and will be audited separately.
 **Method:** Read-only database audit. For each course the report lists every active topic with the number of questions that are currently learner-visible, broken down by question type, together with the questions that are hidden because they are flagged or still pending verification. No question, paper or cache record was modified.
 
@@ -16,18 +16,18 @@
 
 - Courses in scope: **18**
 - Published past papers: **138**
-- Extracted questions: **2294**
-- Learner-visible questions: **1282**
-- Hidden questions: **1012** (flagged 749, pending 263)
-- Verification breakdown: verified **129**, auto-validated **695**, reconstructed **458**
-- Questions not attributed to any topic: **472**
-- Visible questions with an empty solution: **478**
+- Extracted questions: **3262**
+- Learner-visible questions: **2958**
+- Hidden questions: **304** (flagged 180, pending 81)
+- Verification breakdown: verified **134**, auto-validated **1815**, reconstructed **1052**
+- Questions not attributed to any topic: **156**
+- Visible questions with an empty solution: **1539**
 
 | Band | Courses | Questions | Visible | Hidden | Visible share |
 |---|---|---|---|---|---|
 | 100 | 7 | 386 | 256 | 130 | 66% |
-| 200 | 5 | 976 | 583 | 393 | 60% |
-| 300 | 6 | 932 | 443 | 489 | 48% |
+| 200 | 5 | 1566 | 1537 | 29 | 98% |
+| 300 | 6 | 1310 | 1165 | 145 | 89% |
 
 ## Where to begin
 
@@ -35,22 +35,18 @@ Courses ranked by the absolute number of hidden questions, which is the volume o
 
 | Rank | Course | Questions | Visible | Hidden | Flagged | Pending | Not mapped to a topic |
 |---|---|---|---|---|---|---|---|
-| 1 | SST 204 — Probability and Statistics 1 | 551 | 324 | 227 | 170 | 57 | 5 |
-| 2 | SMA 335 — ORDINARY DIFFERENTIAL EQUATIONS 1 | 362 | 138 | 224 | 149 | 75 | 36 |
-| 3 | SST 305 — Theory of Estimation | 145 | 66 | 79 | 70 | 9 | 0 |
-| 4 | SMA 200 — CALCULUS 2 | 242 | 164 | 78 | 56 | 22 | 242 |
-| 5 | SMA 230 — VECTOR ANALYSIS | 133 | 55 | 78 | 59 | 19 | 26 |
-| 6 | SMA 300 — Real Analysis I | 161 | 96 | 65 | 65 | 0 | 7 |
-| 7 | SST 101 — INTRODUCTION TO PROBABILITY & STA… | 108 | 60 | 48 | 39 | 9 | 108 |
-| 8 | SMA 102 — BASIC MATHEMATICS | 94 | 48 | 46 | 31 | 15 | 0 |
-| 9 | SMA 330 — NUMERICAL ANALYSIS 1 | 126 | 81 | 45 | 27 | 18 | 18 |
-| 10 | SST 304 — MULTIVARIATE STATISTICAL METHODS 1 | 83 | 38 | 45 | 31 | 14 | 8 |
-| 11 | SST 301 — Programming Language for Statisti… | 55 | 24 | 31 | 21 | 10 | 0 |
-| 12 | UCU 110 — COMMUNICATION SKILLS | 39 | 18 | 21 | 11 | 10 | 0 |
-| 13 | SST 202 — OBJECT ORIENTED PROGRAMMING | 28 | 18 | 10 | 7 | 3 | 16 |
-| 14 | SMA 103 — ANALYTICAL GEOMETRY | 59 | 51 | 8 | 6 | 2 | 0 |
-| 15 | ASC 100 — INTRODUCTION TO SOCIOLOGY | 30 | 23 | 7 | 7 | 0 | 0 |
-| 16 | SST 200 — INTRODUCTION TO COMPUTER INTERACT… | 22 | 22 | 0 | 0 | 0 | 6 |
+| 1 | SST 101 — INTRODUCTION TO PROBABILITY & STA… | 108 | 60 | 48 | 39 | 9 | 108 |
+| 2 | SMA 102 — BASIC MATHEMATICS | 94 | 48 | 46 | 31 | 15 | 0 |
+| 3 | SMA 330 — NUMERICAL ANALYSIS 1 | 126 | 81 | 45 | 27 | 18 | 18 |
+| 4 | SST 304 — MULTIVARIATE STATISTICAL METHODS 1 | 83 | 38 | 45 | 31 | 14 | 8 |
+| 5 | SST 301 — Programming Language for Statisti… | 55 | 24 | 31 | 21 | 10 | 0 |
+| 6 | SMA 335 — ORDINARY DIFFERENTIAL EQUATIONS 1 | 607 | 583 | 24 | 0 | 0 | 0 |
+| 7 | UCU 110 — COMMUNICATION SKILLS | 39 | 18 | 21 | 11 | 10 | 0 |
+| 8 | SST 204 — Probability and Statistics 1 | 1237 | 1218 | 19 | 0 | 0 | 0 |
+| 9 | SST 202 — OBJECT ORIENTED PROGRAMMING | 28 | 18 | 10 | 7 | 3 | 16 |
+| 10 | SMA 103 — ANALYTICAL GEOMETRY | 59 | 51 | 8 | 6 | 2 | 0 |
+| 11 | ASC 100 — INTRODUCTION TO SOCIOLOGY | 30 | 23 | 7 | 7 | 0 | 0 |
+| 12 | SST 200 — INTRODUCTION TO COMPUTER INTERACT… | 22 | 22 | 0 | 0 | 0 | 6 |
 
 ## Course-by-course status
 
@@ -161,37 +157,35 @@ Papers **3** · Questions **39** · Visible **18** · Flagged **11** · Pending 
 
 ### SMA 200 - CALCULUS 2
 
-Papers **8** · Questions **242** · Visible **164** · Flagged **56** · Pending **22** · Not mapped to a topic **242**
+Papers **8** · Questions **179** · Visible **179** · Flagged **0** · Pending **0** · Not mapped to a topic **0**
 
 | Topic | Question status |
 |---|---|
-| Integration Of Functions Using Basic Formulae | NO QUESTIONS |
-| Integration Of Functions Using The Extension Of The Basic | NO QUESTIONS |
-| Integration Using Substitutions | NO QUESTIONS |
-| Integration By Parts | NO QUESTIONS |
-| Integration Using Trigonometric Identities | NO QUESTIONS |
-| Integration Using Partial Fractions | NO QUESTIONS |
-| Definite Integrals And The Fundamental Theorem Of The | NO QUESTIONS |
-| Area Under A Curve | NO QUESTIONS |
-| Improper Integrals | NO QUESTIONS |
-| Length Of Arc Of A Curve | NO QUESTIONS |
-| Volume And Surface Area Of Solids Of Revolution | NO QUESTIONS |
-| Numerical Integration (Trapezoidal And Simpsons Rules) | NO QUESTIONS |
-| (not mapped to any topic) | VISIBLE 164 of 242 (auth/adapt/gen 131/33/0); 105 without solution; 56 flagged, 22 pending |
+| Integration Of Functions Using Basic Formulae | VISIBLE 18 of 18 (auth/adapt/gen 4/14/0); 3 without solution |
+| Integration Of Functions Using The Extension Of The Basic | VISIBLE 3 of 3 (auth/adapt/gen 0/3/0) |
+| Integration Using Substitutions | VISIBLE 8 of 8 (auth/adapt/gen 0/8/0) |
+| Integration By Parts | VISIBLE 8 of 8 (auth/adapt/gen 1/7/0) |
+| Integration Using Trigonometric Identities | VISIBLE 17 of 17 (auth/adapt/gen 1/16/0) |
+| Integration Using Partial Fractions | VISIBLE 6 of 6 (auth/adapt/gen 1/5/0) |
+| Definite Integrals And The Fundamental Theorem Of The | VISIBLE 32 of 32 (auth/adapt/gen 3/29/0) |
+| Area Under A Curve | VISIBLE 24 of 24 (auth/adapt/gen 14/10/0); 11 without solution |
+| Improper Integrals | VISIBLE 10 of 10 (auth/adapt/gen 5/5/0); 3 without solution |
+| Length Of Arc Of A Curve | VISIBLE 15 of 15 (auth/adapt/gen 8/7/0); 7 without solution |
+| Volume And Surface Area Of Solids Of Revolution | VISIBLE 21 of 21 (auth/adapt/gen 11/10/0); 7 without solution |
+| Numerical Integration (Trapezoidal And Simpsons Rules) | VISIBLE 17 of 17 (auth/adapt/gen 4/13/0); 3 without solution |
 
 ### SMA 230 - VECTOR ANALYSIS
 
-Papers **13** · Questions **133** · Visible **55** · Flagged **59** · Pending **19** · Not mapped to a topic **26**
+Papers **13** · Questions **100** · Visible **100** · Flagged **0** · Pending **0** · Not mapped to a topic **0**
 
 | Topic | Question status |
 |---|---|
-| Vector Algebra | VISIBLE 23 of 53 (auth/adapt/gen 5/18/0); 2 without solution; 24 flagged, 6 pending |
-| Dot and Cross Product | VISIBLE 5 of 11 (auth/adapt/gen 1/4/0); 1 without solution; 5 flagged, 1 pending |
-| Reciprocal System of Vectors | VISIBLE 8 of 33 (auth/adapt/gen 2/6/0); 1 without solution; 16 flagged, 9 pending |
-| Ordinary Differentiation of Vectors | NO QUESTIONS |
-| Vector Integration and Integral Theorems | VISIBLE 2 of 10 (auth/adapt/gen 0/2/0); 5 flagged, 3 pending |
+| Vector Algebra | VISIBLE 1 of 1 (auth/adapt/gen 0/1/0) |
+| Dot and Cross Product | VISIBLE 20 of 20 (auth/adapt/gen 6/14/0); 5 without solution |
+| Reciprocal System of Vectors | VISIBLE 15 of 15 (auth/adapt/gen 0/15/0) |
+| Ordinary Differentiation of Vectors | VISIBLE 41 of 41 (auth/adapt/gen 15/26/0); 11 without solution |
+| Vector Integration and Integral Theorems | VISIBLE 23 of 23 (auth/adapt/gen 8/15/0); 6 without solution |
 | Curvilinear Coordinates | NO QUESTIONS |
-| (not mapped to any topic) | VISIBLE 17 of 26 (auth/adapt/gen 17/0/0); 5 without solution; 9 flagged, 0 pending |
 
 ### SST 200 - INTRODUCTION TO COMPUTER INTERACTIVE STATISTICS
 
@@ -223,36 +217,34 @@ Papers **6** · Questions **28** · Visible **18** · Flagged **7** · Pending *
 
 ### SST 204 - Probability and Statistics 1
 
-Papers **17** · Questions **551** · Visible **324** · Flagged **170** · Pending **57** · Not mapped to a topic **5**
+Papers **17** · Questions **1237** · Visible **1218** · Flagged **0** · Pending **0** · Not mapped to a topic **0**
 
 | Topic | Question status |
 |---|---|
-| Random Variables | VISIBLE 14 of 27 (auth/adapt/gen 2/12/0); 1 without solution; 13 flagged, 0 pending |
-| Distribution Functions | VISIBLE 20 of 25 (auth/adapt/gen 19/1/0); 18 without solution; 3 flagged, 2 pending |
-| Mode And Median | VISIBLE 26 of 54 (auth/adapt/gen 16/10/0); 14 without solution; 19 flagged, 9 pending |
-| Expectation | NO QUESTIONS |
-| Moments And Variance Properties | VISIBLE 29 of 67 (auth/adapt/gen 18/11/0); 18 without solution; 25 flagged, 13 pending |
-| Moment Generating Function And Probability Generating Function | VISIBLE 101 of 168 (auth/adapt/gen 70/31/0); 59 without solution; 49 flagged, 18 pending |
-| Special Discrete Probability Distributions | VISIBLE 23 of 34 (auth/adapt/gen 16/7/0); 15 without solution; 9 flagged, 2 pending |
-| Poisson Distribution And Binomial Approximation | VISIBLE 16 of 26 (auth/adapt/gen 6/10/0); 4 without solution; 10 flagged, 0 pending |
-| Normal Distribution And Probability Computation | VISIBLE 42 of 90 (auth/adapt/gen 21/21/0); 18 without solution; 35 flagged, 13 pending |
-| Gamma, Exponential And Beta Distributions | VISIBLE 20 of 20 (auth/adapt/gen 20/0/0); 20 without solution |
-| Change Of Variable | VISIBLE 28 of 35 (auth/adapt/gen 21/7/0); 20 without solution; 7 flagged, 0 pending |
-| (not mapped to any topic) | VISIBLE 5 of 5 (auth/adapt/gen 5/0/0); 1 without solution |
+| Random Variables | VISIBLE 91 of 92 (auth/adapt/gen 61/30/0); 57 without solution |
+| Distribution Functions | VISIBLE 81 of 83 (auth/adapt/gen 77/4/0); 67 without solution |
+| Mode And Median | VISIBLE 61 of 62 (auth/adapt/gen 42/19/0); 38 without solution |
+| Expectation | VISIBLE 262 of 264 (auth/adapt/gen 177/85/0); 170 without solution |
+| Moments And Variance Properties | VISIBLE 264 of 269 (auth/adapt/gen 185/79/0); 165 without solution |
+| Moment Generating Function And Probability Generating Function | VISIBLE 158 of 161 (auth/adapt/gen 94/64/0); 88 without solution |
+| Special Discrete Probability Distributions | VISIBLE 56 of 56 (auth/adapt/gen 35/21/0); 29 without solution |
+| Poisson Distribution And Binomial Approximation | VISIBLE 42 of 44 (auth/adapt/gen 29/13/0); 19 without solution |
+| Normal Distribution And Probability Computation | VISIBLE 140 of 142 (auth/adapt/gen 105/35/0); 92 without solution |
+| Gamma, Exponential And Beta Distributions | VISIBLE 36 of 37 (auth/adapt/gen 34/2/0); 26 without solution |
+| Change Of Variable | VISIBLE 27 of 27 (auth/adapt/gen 20/7/0); 20 without solution |
 
 ### SMA 300 - Real Analysis I
 
-Papers **9** · Questions **161** · Visible **96** · Flagged **65** · Pending **0** · Not mapped to a topic **7**
+Papers **9** · Questions **143** · Visible **143** · Flagged **0** · Pending **0** · Not mapped to a topic **0**
 
 | Topic | Question status |
 |---|---|
-| The Real Number System | VISIBLE 36 of 59 (auth/adapt/gen 1/29/6); 23 flagged, 0 pending |
-| Topology of the Real Numbers | VISIBLE 22 of 39 (auth/adapt/gen 2/17/3); 17 flagged, 0 pending |
-| Sequences | VISIBLE 13 of 19 (auth/adapt/gen 1/9/3); 6 flagged, 0 pending |
-| Series | VISIBLE 18 of 29 (auth/adapt/gen 0/10/8); 11 flagged, 0 pending |
-| Countable and Uncountable Sets | VISIBLE 3 of 3 (auth/adapt/gen 0/0/3) |
-| Functions | VISIBLE 4 of 5 (auth/adapt/gen 0/1/3); 1 flagged, 0 pending |
-| (not mapped to any topic) | HIDDEN - 0 of 7 visible (7 flagged) |
+| The Real Number System | VISIBLE 42 of 42 (auth/adapt/gen 1/34/7) |
+| Topology of the Real Numbers | VISIBLE 31 of 31 (auth/adapt/gen 1/26/4) |
+| Sequences | VISIBLE 25 of 25 (auth/adapt/gen 2/20/3) |
+| Series | VISIBLE 28 of 28 (auth/adapt/gen 0/20/8) |
+| Countable and Uncountable Sets | VISIBLE 8 of 8 (auth/adapt/gen 0/5/3) |
+| Functions | VISIBLE 9 of 9 (auth/adapt/gen 0/6/3) |
 
 ### SMA 330 - NUMERICAL ANALYSIS 1
 
@@ -274,24 +266,23 @@ Papers **12** · Questions **126** · Visible **81** · Flagged **27** · Pendin
 
 ### SMA 335 - ORDINARY DIFFERENTIAL EQUATIONS 1
 
-Papers **16** · Questions **362** · Visible **138** · Flagged **149** · Pending **75** · Not mapped to a topic **36**
+Papers **16** · Questions **607** · Visible **583** · Flagged **0** · Pending **0** · Not mapped to a topic **0**
 
 | Topic | Question status |
 |---|---|
-| Differential Equations And Their Solutions | VISIBLE 81 of 189 (auth/adapt/gen 33/48/0); 24 without solution; 78 flagged, 30 pending |
-| Equations Of First Order – Variables Separable And Homogeneous Equations | VISIBLE 41 of 137 (auth/adapt/gen 21/20/0); 14 without solution; 58 flagged, 38 pending |
-| First Order Exact Equations And Integrating Factors | NO QUESTIONS |
-| First Order Linear Equations And Equations Reducible To This Form (Bernouli… | NO QUESTIONS |
-| Second Order Homogeneous Linear Equations With Constant Coefficients | NO QUESTIONS |
-| Second Order Nonhomogeneous Linear Equations With Constant Coefficients | NO QUESTIONS |
-| Determination Of Particular Integrals Using Short Methods | NO QUESTIONS |
-| Second Order Equations With Variable Coefficients | NO QUESTIONS |
-| Linear Equations Of Order N | NO QUESTIONS |
-| Reduction Of Nth Order Equations To A First Order System Of N Equations | NO QUESTIONS |
+| Differential Equations And Their Solutions | VISIBLE 75 of 78 (auth/adapt/gen 58/17/0); 54 without solution |
+| Equations Of First Order – Variables Separable And Homogeneous Equations | VISIBLE 139 of 142 (auth/adapt/gen 97/42/0); 87 without solution |
+| First Order Exact Equations And Integrating Factors | VISIBLE 72 of 73 (auth/adapt/gen 56/16/0); 54 without solution |
+| First Order Linear Equations And Equations Reducible To This Form (Bernouli… | VISIBLE 52 of 53 (auth/adapt/gen 40/12/0); 36 without solution |
+| Second Order Homogeneous Linear Equations With Constant Coefficients | VISIBLE 70 of 74 (auth/adapt/gen 60/10/0); 58 without solution |
+| Second Order Nonhomogeneous Linear Equations With Constant Coefficients | VISIBLE 55 of 58 (auth/adapt/gen 48/7/0); 45 without solution |
+| Determination Of Particular Integrals Using Short Methods | VISIBLE 1 of 1 (auth/adapt/gen 1/0/0) |
+| Second Order Equations With Variable Coefficients | VISIBLE 7 of 7 (auth/adapt/gen 5/2/0); 5 without solution |
+| Linear Equations Of Order N | VISIBLE 23 of 26 (auth/adapt/gen 18/5/0); 15 without solution |
+| Reduction Of Nth Order Equations To A First Order System Of N Equations | VISIBLE 13 of 13 (auth/adapt/gen 8/5/0); 7 without solution |
 | Singular Points Of Differential Equations And Power Series Solutions Near S… | NO QUESTIONS |
-| Power Series Solutions Of First And Second Order Equations | NO QUESTIONS |
-| Application Of Differential Equations | NO QUESTIONS |
-| (not mapped to any topic) | VISIBLE 16 of 36 (auth/adapt/gen 11/5/0); 2 without solution; 13 flagged, 7 pending |
+| Power Series Solutions Of First And Second Order Equations | VISIBLE 14 of 16 (auth/adapt/gen 9/5/0); 9 without solution |
+| Application Of Differential Equations | VISIBLE 62 of 66 (auth/adapt/gen 47/15/0); 45 without solution |
 
 ### SST 301 - Programming Language for Statistics 1
 
@@ -323,19 +314,19 @@ Papers **5** · Questions **83** · Visible **38** · Flagged **31** · Pending 
 
 ### SST 305 - Theory of Estimation
 
-Papers **7** · Questions **145** · Visible **66** · Flagged **70** · Pending **9** · Not mapped to a topic **0**
+Papers **7** · Questions **296** · Visible **296** · Flagged **0** · Pending **0** · Not mapped to a topic **0**
 
 | Topic | Question status |
 |---|---|
-| Properties of Estimators | VISIBLE 4 of 5 (auth/adapt/gen 0/1/3); 1 flagged, 0 pending |
-| Confidence Interval Estimation | VISIBLE 4 of 7 (auth/adapt/gen 0/4/0); 3 flagged, 0 pending |
-| Sufficient Statistics | NO QUESTIONS |
-| Moment Estimation | VISIBLE 4 of 8 (auth/adapt/gen 0/4/0); 4 flagged, 0 pending |
-| Maximum Likelihood Estimation | VISIBLE 2 of 4 (auth/adapt/gen 0/2/0); 2 flagged, 0 pending |
-| Least Squares Estimation | VISIBLE 2 of 4 (auth/adapt/gen 0/2/0); 2 flagged, 0 pending |
-| Method of Minimum Variance | VISIBLE 31 of 70 (auth/adapt/gen 1/30/0); 35 flagged, 4 pending |
-| Interval Estimation | VISIBLE 3 of 8 (auth/adapt/gen 0/3/0); 4 flagged, 1 pending |
-| Interval Estimation: Confidence Intervals for the Difference Between Means … | VISIBLE 16 of 39 (auth/adapt/gen 1/15/0); 19 flagged, 4 pending |
+| Properties of Estimators | VISIBLE 86 of 86 (auth/adapt/gen 49/34/3); 46 without solution |
+| Confidence Interval Estimation | VISIBLE 7 of 7 (auth/adapt/gen 3/4/0); 3 without solution |
+| Sufficient Statistics | VISIBLE 43 of 43 (auth/adapt/gen 30/13/0); 29 without solution |
+| Moment Estimation | VISIBLE 22 of 22 (auth/adapt/gen 16/6/0); 15 without solution |
+| Maximum Likelihood Estimation | VISIBLE 32 of 32 (auth/adapt/gen 17/15/0); 16 without solution |
+| Least Squares Estimation | VISIBLE 14 of 14 (auth/adapt/gen 12/2/0); 12 without solution |
+| Method of Minimum Variance | VISIBLE 50 of 50 (auth/adapt/gen 21/29/0); 21 without solution |
+| Interval Estimation | VISIBLE 7 of 7 (auth/adapt/gen 3/4/0); 3 without solution |
+| Interval Estimation: Confidence Intervals for the Difference Between Means … | VISIBLE 35 of 35 (auth/adapt/gen 16/19/0); 16 without solution |
 
 ## Notes on interpretation
 

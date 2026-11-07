@@ -1,0 +1,207 @@
+﻿statuses: {'auto_validated': 131, 'flagged': 56, 'pending': 22, 'reconstructed': 33}
+rows failing the rendering gate: 54
+issue frequency: {'unreadable private-use glyphs from source extraction': 23, 'question text is too short to be a complete assessment item': 3, 'question refers to a following table or visual that is missing': 4, 'question text appears truncated or is an incomplete list fragment': 3, 'question text begins with a stray Markdown bold marker': 19, 'unclosed LaTeX environment': 6, 'inline-math expression crosses a physical line break': 1, 'an inline-math delimiter is adjacent to prose but has no matching delimiter': 1, 'question text contains OCR replacement of zero with capital O': 1, 'question text contains corrupted variable exponent notation': 3, 'compound inline math is joined directly to surrounding prose': 1}
+
+q713 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   cos ecx cot xdx = − cos ecx + c , since (cos ecx + c ) = − cos ecx cot x ∫ dx 2 d 2 10. cos ec xdx = − cot x + c , since cot s = − cos ec x ∫ dx Note that we shall consider integration of tan x, cot x, sec x and cosec x 
+   ...ln 4 Exercise 1 Using the ten basic formula for integration find  5 3 4 x x  1. 2 x + 5 − + 2e + 4 + 1 dx ∫   x x 
+
+q715 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   (3 cos x − 4 cos ecx cot x + 5 cos ec 2 x )dx ∫  15 1 4 x 7  4. x + 15 + 8 x − 3e + + 7 x + 8  dx ∫   x x  ( x 2 + 7 x + 10)
+
+q719 [flagged] paper=776f3d92 issues=['question text is too short to be a complete assessment item']
+   dx ∫ 2 x
+
+q721 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   If (3 x 2 + 2 x − 12) dx = 0 find the values of x ∫  x 3 + 5 x 2 + 6 x 
+
+q722 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   Find dx ∫  2   ( x + 2 x )  12 e 2 x + e 5 x − e x dx 12. Find x ∫ e You have learnt the following from this chapter i). Integration is the reverse or converse process of differentiation. ii). The meaning of “integ
+   ...Ten Basic Formula for Integration, namely n x n + 1 x dx = + c if n ≠ -1 1. ∫ n + 1 1 dx = ln x + c = ln Ax 2. ∫ x x a x
+
+q730 [flagged] paper=776f3d92 issues=['question refers to a following table or visual that is missing']
+   Pure mathematics (First Coure) By J. K Backhouse and others Longman Group Ltd Harlow, Essex, U.K 13 CHAPTER 2 Integration of Functions Containing First Degree Expressions – Extension of the Basic Formula. 2.1 Introductio
+   ...ension formulae with an example – Applicable for first degree in x only n x n + 1 n ( ax + b ) n + 1 ( ax + b ) dx = + c
+
+q732 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   cos ecx cot xdx ∫ cos ec ( ax + b ) cot( ax + b ) dx = − cos ec ( ax + b ) + c ∫ a − cos ecπx cos ecπx cot πxdx = + c e.g. ∫ π 2.5 Proof of the Ten Extension Formulae We shall prove some of he Ten Extension formulae usin
+   ...2  1( − x )11 e 2 − 3 x 1( − x ) + e + − cos ec 7 x dx = + − ln(3 − x ) + cot 7 x + c ∫  3 − x  − 11 − 3 Exercise 2
+
+q734 [flagged] paper=776f3d92 issues=['question text is too short to be a complete assessment item']
+   Sin x 2
+
+q739 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   [2 x + 5 + ex − 5 − cos ec 2 5 x + ( 2 x + 3) 5 ]dx ∫  1 10 14. ( ax + b ) + cos( ax + b ) dx ∫ +  ax + b   1 1 2 1 15. sec x tan x + cos ec x  dx ∫   2 2 2   2 1 1 16. (3 − 2 x ) + 2 + + sin(3 − 2 x ) dx ∫
+   ... have learnt the following from this chapter • to integrate expressions using the Ten Extension Formulae Further Reading
+
+q744 [flagged] paper=776f3d92 issues=['question text appears truncated or is an incomplete list fragment']
+   dx ∫ x tan5 x sec2 xdx 10. ∫ sec2 x tan2 xdx 11. ∫ sec 4 x tan xdx 12. ∫ Summary You have learnt the following from this chapter:
+
+q745 [flagged] paper=776f3d92 issues=['question text appears truncated or is an incomplete list fragment']
+   When the integrand contains a function and its derivative you can integrate using the substitution:
+
+q747 [flagged] paper=776f3d92 issues=['question text appears truncated or is an incomplete list fragment']
+   Advanced Calculus By Watson Fulks John Wiley & sons New York Brisbane. Toronto 33 CHAPTER 4 Integration by parts In chapter three you have learnt to integrate an expression containing two functions one of which is the de
+   ...5 ∫ x cos 3x dx 11 ∫ x2 sin xdx 6 ∫ ex sin x dx 12 ∫ x-3 lnx dx Summary You have learnt the following from this chapter:
+
+q751 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   Advanced Calculus Watson Fulks John Wiley & Sons New York. Brisbane. Toronto. 41 CHAPTER 5 Integration Using Trigonometric Identities. 5.1 Introduction You have learnt some four important techniques of Integration so far
+   ...ssions in the denominator. dx 1 − 1 x = tan + c 1. 2 2 ∫ x + a a a dx 1 x − a = ln + c 2. 2 2 ∫ x − a 2 a x + a dx − 1 x
+
+q753 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   ∫ 2 2 = cosh if x > a a x − a −1 − x  = cosh   if –x > a  a  dx − 1 x
+
+q754 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   ∫ 2 2 = sin a x − a Example 14 dx 1 − 1 x = tanProve that 2 2 ∫ x + a a a Proof − 1 x Let x = a tan θ so that θ = tan a 49 Then x2 + a2 = a2 tan2 θ + a2 = a2 (1 + tan2 θ) = a2 sec2 θ dx = d (a tan θ) = a sec2 θ d θ dx a 
+   ... 1 − 4 x − 5 3 3 = cosh + c if -x > or x < - . 2 3 4 4 53 Exercise 5 18. ∫cos3 5x dx Find the integrals of the following
+
+q766 [flagged] paper=776f3d92 issues=['question text is too short to be a complete assessment item']
+   ∫ sin3 4x sin dx
+
+q774 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   cos 3x = -3 cos x + 4 cos3 x ii). The technique of integration using the following formulae: dx 1 − 1 x = tan + c 1. 2 2 ∫ x + a a a 1 1 x − a + ln + c 2. 2 2 ∫ x − a 2 a x + a dx − 1 x ∫ 2 2 = sinh a x + a 3. dx − 1 x ∫
+   ... )1   1 2  = 3 + + dx ∫  (3 x − 2) (3 x + )1  1 2 = 3 x + ln( x − 2) + ln( x + )1 + C 3 3 Exercise 6 Find x − 11
+
+q850 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Using the Fundamental Theorem of Calculus Part 1, find $\frac{dy}{dx}$ given $y = \int_{2}^{3x} \sin(t^2) dt$. **[4 marks]** b) By using an appropriate algebraic substitution, evaluate the following indefinite inte
+   ...arks]** d) Obtain a reduction formula for $I_n = \int x^n e^x \, dx$. Hence evaluate $\int x^3 e^x \, dx$. **[6 marks]**
+
+q851 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker', 'unclosed LaTeX environment']
+   ** a) Use four strips to find an approximate value for the definite integral $\int_{1}^{3} x^3 dx$ using i) The Trapezium rule **[3 marks]** ii) The Simpson's rule **[3 marks]** iii) which gives a better approximation. E
+   ...dx$ **[4 marks]** *INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION* Page 1 of 2 \end{document}
+
+q852 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Find the area bounded by the curves $y = \cos x$ and $y = \sin x$ and the $y - \text{axis}$. **[4 marks]** b) Find the volume generated when the area bounded by the $x$ and $y - \text{axes}$, the line $x = 1$ and t
+   ...ely is $6 + \frac{1}{8}\ln\left(\frac{7}{5}\right)$. **[6 marks]** d) Evaluate $\int \sin^3 x \cos^2 x dx$ **[5 marks]**
+
+q853 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Evaluate the following integrals i) $\int \frac{(2x - 6)dx}{(x^2 - 6x + 13)^2}$ **[5 marks]** ii) $\int \frac{dx}{\sqrt{9 + 16x - 4x^2}}$ **[9 marks]** b) Evaluate the improper integral $\int_{-1}^{1} x^{-\frac{2}{
+   ...sqrt{9 + 16x - 4x^2}}$ **[9 marks]** b) Evaluate the improper integral $\int_{-1}^{1} x^{-\frac{2}{3}} dx$ **[6 marks]**
+
+q854 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Show that $\int_{0}^{\frac{\pi}{2}} \cos^m x dx = \frac{m - 1}{m} \int_{0}^{\frac{\pi}{2}} \cos^{m - 2} x dx$. hence evaluate $\int_{0}^{\frac{\pi}{2}} \cos^5 x dx$ **[8 marks]** b) Use the Fundamental Theorem of C
+   ...*Anastasia NDUTA** **FOR FEMALE DELEGATE** **INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION**
+
+q855 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Use trapezoidal and Simpson's rules and seven ordinates to find the area bounded by the curve $xy = 12$, the $x$ - axis and ordinates at $x = 1$ and $x = 4$ **(9 Marks)** b) The ordinates of a curve $y = f(x)$ are 
+   ...{1}{x} dx $$ by i) The trapezoidal approximation with $n=10$. **(3 Marks)** ii) Simpson's rule with $n=10$ **(3 Marks)**
+
+q856 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker', 'unclosed LaTeX environment']
+   ** a) The curve $y = 1 + \cos x$ is rotated about $x$- axis. Find the volume contained by the surface of revolution and planes $x = \frac{-\pi}{2}$ and $x = \frac{\pi}{2}$ **(7 Marks)** b) Find the area of surface formed
+   ...\text{TH}}\) JUNE 2021** **TIME: 4.30 P.M - 6.30 P.M** **INSTRUCTIONS:** Answer question ONE and any other TWO questions
+
+q857 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker', 'inline-math expression crosses a physical line break', 'an inline-math delimiter is adjacent to prose but has no matching delimiter']
+   ** a) Evaluate the integral $\int (2x+1)(x^2+x+1)^3 \, dx$ **[3 marks]** b) Given that $f(x) = $$ \begin{cases} x+1, & \text{if } 0 \le x < 1 \\ 2-x, & \text{if } 1 \le x \le 2 \end{cases} $$ $, find $\int_0^2 f(x) \, dx
+   ...ether $\int_2^\infty \frac{1}{(x+3)^{\frac{3}{2}}} \, dx$ is convergent. If it is convergent, evaluate it. **[4 marks]**
+
+q858 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker', 'unclosed LaTeX environment']
+   ** a) Use Part 1 of the Fundamental Theorem of Calculus to evaluate $\frac{dy}{dx}$ given $y = \int_{2x}^{3x} \frac{u^2-1}{u^2+1} \, du$ **[5 marks]** b) By using an appropriate algebraic substitution, evaluate each of t
+   ...id obtained by rotating the region bounded by $y = \sqrt{x}$, $x = 8$ and the $x$-axis about the $x$-axis. **[6 marks]**
+
+q859 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Evaluate 1. $\int_{1}^{2} \frac{1}{(x^2-2x+4)^{\frac{3}{2}}} dx$ **[6 marks]** 2. $\int \frac{6-x}{2x^2-x-15} dx$ **[5 marks]** 3. $\int \frac{dx}{x\sqrt{x^2+9}}$ **[5 marks]** b) Find the length of arc of the para
+   ...x\sqrt{x^2+9}}$ **[5 marks]** b) Find the length of arc of the parabola $y = x^2$ from $x = 0$ to $x = 1$. **[4 marks]**
+
+q860 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Use integration by parts to evaluate the following indefinite integrals: 1. $\int x \sin 4x \, dx$ **[2 marks]** 2. $\int x\sqrt{x+4} \, dx$ **[2 marks]** b) Use integration by parts to evaluate the following defin
+   ...s from rest with acceleration $(30 - 6t) \, m/s^2$ at time $t$. When and where will it come to rest again? **[5 marks]**
+
+q861 [flagged] paper=83a8d27b issues=['question text begins with a stray Markdown bold marker']
+   ** a) Use the Trapezoidal Rule with $n = 5$ to approximate the integral $\int_{1}^{2} \frac{1}{x} dx$. **[4 marks]** b) 1. Use the Simpson's Rule with $n = 10$ to approximate the integral $\int_{0}^{1} e^{x^2} dx$. **[6 
+   ...S** **FEMALE DELEGATE ASPIRANT** ***INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** Page 2 of 2*
+
+q862 [flagged] paper=cad1c495 issues=['question text contains OCR replacement of zero with capital O', 'question text contains corrupted variable exponent notation']
+   . - [Compulsory - ] (a) Find the following indefinite integrals: (3 marks each) 1. x~ 1dx J X2 dx ii. J Jx3 +3 (b) Evaluate the following definite integrals: (3 marks) :.22' d ~ x i. 0 VI + 4X2 1 ll.12x2(lnx)dx. 4 1ll.1 
+   ...ction f(x) =1~ +1 a u2 + 1 a u2 + 1 stant for x > O. (3 marks) (g) Evaluate the improper integral -;dx. (2 marks) /4 1 x
+
+q868 [flagged] paper=ebb20b06 issues=['unreadable private-use glyphs from source extraction']
+   Find the area of the region between y  cos x and y = 𝒄𝒐𝒔(𝟐𝒙) over [0, 3] 
+
+q869 [flagged] paper=ebb20b06 issues=['unreadable private-use glyphs from source extraction']
+   Find the length of the arc from  0 to  of the curve given by x  cos , 4 y  3sin  .
+
+q871 [flagged] paper=ebb20b06 issues=['unreadable private-use glyphs from source extraction']
+   Evaluate the following improper integrals 3 dx i.  2 0 9  x  dx ii.  2 0 x  4
+
+q872 [flagged] paper=ebb20b06 issues=['unreadable private-use glyphs from source extraction']
+   Calculate the trapezoidal and Simpson’s approximation to 1 2 i. dx with n  10 . 2 0 1 x ii. Compare the results with exact solution
+
+q873 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker']
+   ** a) Using the Fundamental Theorem of Calculus Part 1, find $\frac{dy}{dx}$ given $y = \int_{2}^{3x} \sin(t^2) dt$. **[4 marks]** b) By using an appropriate algebraic substitution, evaluate the following indefinite inte
+   ...arks]** d) Obtain a reduction formula for $I_n = \int x^n e^x \, dx$. Hence evaluate $\int x^3 e^x \, dx$. **[6 marks]**
+
+q874 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker', 'unclosed LaTeX environment']
+   ** a) Use four strips to find an approximate value for the definite integral $\int_{1}^{5} x^3 \, dx$ using i) The Trapezium rule **[3 marks]** ii) The Simpson's rule **[3 marks]** iii) which gives a better approximation
+   ...an^5 x \, dx$ **[4 marks]** **INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** \end{document}
+
+q875 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker', 'compound inline math is joined directly to surrounding prose']
+   ** a) Find the area bounded by the curves $y = \cos x$ and $y = \sin x$ and the $y-$axis. **[4 marks]** b) Find the volume generated when the area bounded by the $x$ and $y-$axes, the line $x = 1$ and the curve $y = e^x$
+   ...ely is $6 + \frac{1}{8}\ln\left(\frac{7}{5}\right)$. **[6 marks]** d) Evaluate $\int \sin^3 x \cos^2 x dx$ **[5 marks]**
+
+q876 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker']
+   ** a) Evaluate the following integrals i) $\int \frac{(2x - 6)dx}{(x^2 - 6x + 13)^2}$ **[5 marks]** ii) $\int \frac{dx}{\sqrt{9 + 16x - 4x^2}}$ **[9 marks]** b) Evaluate the improper integral $\int_{-1}^{1} x^{-\frac{2}{
+   ...sqrt{9 + 16x - 4x^2}}$ **[9 marks]** b) Evaluate the improper integral $\int_{-1}^{1} x^{-\frac{2}{3}} dx$ **[6 marks]**
+
+q877 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker']
+   ** a) Show that $\int_{0}^{\frac{\pi}{2}} \cos^m x dx = \frac{m-1}{m} \int_{0}^{\frac{\pi}{2}} \cos^{m-2} x dx$. hence evaluate $\int_{0}^{\frac{\pi}{2}} \cos^5 x dx$ **[8 marks]** b) Use the Fundamental Theorem of Calcu
+   ...{2x} \tan^{-1}(t) dt$. Hence evaluate $F'''(\sqrt{3})$. **[7 marks]** c) Evaluate $\int x \tan^{-1} x dx$. **[5 marks]**
+
+q878 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker']
+   ** a) use trapezoidal and Simpson's rules and seven ordinates to find the area bounded by the curve $xy=12$, the $x$-axis and ordinates at $x=1$ and $x=4$ **(9 Marks)** b) the ordinates of a curve $y=f(x)$ are given at t
+   ...{x} \, dx $$ by i) The trapezoidal approximation with $n=10$. **(3 Marks)** ii) Simpson's rule with $n=10$ **(3 Marks)**
+
+q879 [flagged] paper=bdcb3fac issues=['question text begins with a stray Markdown bold marker', 'unclosed LaTeX environment']
+   ** a) The curve $y = 1+\cos x$ is rotated about $x$- axis. Find the volume contained by the surface of revolution and planes $x = \frac{-\pi}{2}$ and $x = \frac{\pi}{2}$ **(7 Marks)** b) Find the area of surface formed b
+   ...t{TH}}\) JUNE 2021** **TIME: 4.30 P.M - 6.30 P.M** **INSTRUCTIONS:** **Answer question ONE and any other TWO questions**
+
+q881 [flagged] paper=bdcb3fac issues=['unclosed LaTeX environment']
+   **** a) Use Part I of the Fundamental Theorem of Calculus to evaluate \(\frac{dy}{dx}\) given \(y = \int_{2x}^{3x} \frac{u^2 - 1}{u^2 + 1} du\) **[5 marks]** b) By using an appropriate algebraic substitution, evaluate ea
+   ...id obtained by rotating the region bounded by $y = \sqrt{x}$, $x = 8$ and the $x$-axis about the $x$-axis. **[6 marks]**
+
+q890 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   If f(x) is integrable in [a ≤ x ≤ b ] and c is any constant then b b + c f ( x − c ) dx ∫ f ( x ) dx = ∫ a a + c b − c f ( x + c ) dx = ∫ a − c [a ≤ x ≤ b ]5. If f(x) is integrable in and m is any constant then 64 b mb 
+   ...  5  0 1 1 = − (0 − 0 ) − (0 − 0 ) 2 2 = 0 69 Exercise 7 π sin 2 5 xdx 12. ∫Evaluate the following 0 π 2 x 2 + 3 x + 8
+
+q893 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   dx ∫ 7 x + 3 1 π 2 cos 2 3 xdx11. ∫ 0 70 Summary You have learnt the following from this chapter: a). The fundamental Theorem of the Integral calculus If f ( x ) dx = G ( x ) then ∫ b f ( x ) dx = G ( b ) − G ( a ) ∫ a b
+   ...xA = ∫ x = a 4 2x 2dx= ∫ 1 75 x = 4  2 x 3  = 3   x =1  128   2 =   −    3   3  =42 sq units Example 3
+
+q896 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction', 'question refers to a following table or visual that is missing']
+   Evaluate (x 3 − 3 x 2 + 2 x )dx . Interpret your result. ∫ 0 Solution a) The following table shows some points on the curve. X 0 1 2 0.5 1.5 2 Y 0 0 0 0.375 -0.375 0 The graph is shown in the figure 0 1 2 Figure 7 b) Par
+   ... the curve (y = x2). 4 2= (4 x − x )dx ∫ 0  4 x 4 2 x 3  =  −   2 3  0 = 32 – 64/3 = 32/3 sq units 80 Exercise 8
+
+q906 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   Find the area common to the circle x2 + y2 = 16 and the ellipse x2 + 3y2 = 24. Summary You have learnt the following from this chapter: i. The area enclosed by a curve y = f (x), the x – axis, the ordinate x = a and the 
+   ... 1 =  3  − +   + 3 where  3 ε  24  − 81  3 ε ε → 0 = ∞ Thus even the principal value does not exist. Exercise 9
+
+q920 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   Advanced Calculus By Watson Fulks John Wiley and sons New York. Brisbane Toronto. 94 CHAPTER 10 Length of an Arc of a Curve 10.1 Introduction If you ask a secondary school student to measure the length of an arc of a cur
+   ... dx 100 1 2 3  d 32  = ∫ 1 +  2 x  dx 0  dx  1 3 1 + 9 x dx = ∫ 0 1 3 1 9 x + 1 ) 2 dx = ∫ ( 0 (9 x + 1 ) 32 = 3
+
+q921 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   2 using (ax + b) formula 2 1 3 = [9 x + 1]0 27 2 = [(3 + 1) − (1)] 27 2 = units 9 Example 5 π Find the length of the arc from θ = 0 to θ = of the curve given by x = 3 cos θ, 4 y = 3 sin θ. Solution The equation of the cu
+   ... + k 2 ) dθ = ∫ 0 2π a 1 + k 2 e kθdθ = ∫ 0 2π 2  e kθ  a 1 + k = k   0 a 2 2 kπ = 1 + k (e − )1 k Exercise 10 1 1
+
+q929 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   What is the length of the circumference of the cardioid r = a (1 + cos θ). Summary You have learnt the following from this chapter. a). The length of an arc S of a curve is b 2  dy  S = 1+   dx i). In Cartesian form 
+   ... x 1+ dx = 2 ∫ h h x = 0 r h l x dx since h2 + r2 = l2 = 2π ∫ h o h h r l  x 2  = 2π h h  2  0 = π r l Exercise 11
+
+q941 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction']
+   The formula for the surface area of a solid of revolution about x – axis is: yds if s is known. S = 2π∫ t = t 2  dx   dy  2 y   +   dt if the equation of the curve is in parametric S = 2π ∫ t = t1  dt   dt  f
+   ...t = t 2  dx   dy  2 y   +   dt if the equation of the curve is in parametric S = 2π ∫ t = t1  dt   dt  form.
+
+q945 [flagged] paper=776f3d92 issues=['unreadable private-use glyphs from source extraction', 'question text contains corrupted variable exponent notation']
+   = [.69564 ] 2 1 = x .69564 10 = 0.69564 = 0.6956 to four decimals. 2 1 x = 2 b) Now, dx = [ln x ]x =1 x∫1 = ln 2 – ln 1 = 0.6931 – 0 = 0.6931 c) To calculate the percentage error. .0 6931 ~ .0 6956 The percentage error =
+   ...= h(y0 + 4y1 + 2y2 + 4y3 + 2y4 + 4y5 + y6) 3 1 = (1)(159) 3 = 53 sq units ii) Area under curve using Trapezoidal Rule (≤
+
+q946 [flagged] paper=776f3d92 issues=['question text contains corrupted variable exponent notation']
+   Y0 = 8 Y0 = 8 Y1 = 12 2Y1 = 24 Y2 = 14 2Y2 = 28 Y3 = 11 2Y3 = 22 Y4 = 9 2Y4 = 18 Y5 = 3 2Y5 = 6 Y6 = 1 Y6 = 1 126 Total Sum 107 6 − 0 h = = 1 6 Approximate area is therefore 1 A = h (y0 + 2y1 + 2y2 + 2y3 + 2y4 + 4y5 + y6
+   ...oximate area is therefore 1 A = h (y0 + 2y1 + 2y2 + 2y3 + 2y4 + 4y5 + y6 ) 2 1 = (1) (107) 2 = 53.5 sq units Exercise 12
+
+q952 [flagged] paper=776f3d92 issues=['question refers to a following table or visual that is missing']
+   A car starts from rest and its velocity in meter per second over the first ten seconds is given by the following table: t 0 1 2 3 4 5 6 7 8 9 10 v 2 2.4 2.8 3.2 4.0 4.2 4.5 6.0 6.2 6.3 6.4 Find the distance traveled by t
+   ...al Rule by taking 10 equal intervals iii) Integration 1 − x 2 e dx8. Evaluate ∫ by Simpsons Rule taking ten intervals. 0
+
+q953 [flagged] paper=776f3d92 issues=['question refers to a following table or visual that is missing']
+   The distance moved by a body starting from rest is given by the following table. Time t sec 0 1 2 3 4 5 6 Distance s met 0 5 17 34 57 84 115 Plot a velocity-time graph and estimate the speed after 6 seconds. 128 Summary 
+   ...locity-time graph and estimate the speed after 6 seconds. 128 Summary You have learnt the following from this chapter: h

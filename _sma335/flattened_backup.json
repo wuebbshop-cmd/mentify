@@ -1,0 +1,26 @@
+{
+ "995": {
+  "question_latex": "Form the differential equation associated the relation y = x3 + c1e2x + c2e3x,\n where 𝑐1 and 𝑐2 are arbitrary constant. \n\n 1",
+  "verification_status": "auto_validated"
+ },
+ "1003": {
+  "question_latex": "a) Solve the linear differential equation d~x + 2y tan 2x = 4sec2x\n\n (5 marks) if y = 2 when x =%.\n\nd) Verify that u(x,y) is an integrating factor for the differential equation =+ x y\n\n - y2dx + (x2 + xy)dy = 0. Hence or otherwise solve the d.e. (5 marks)",
+  "verification_status": "auto_validated"
+ },
+ "1004": {
+  "question_latex": "b) Show that the differential equation (x2 + 3xy + Y 2 )dx - X2dy = is °\n homogeneous, hence or otherwise solve it. (5 marks)\n\n (5 marks) c) Solve the Bernoulli equation X2y' + 2xy - i =°",
+  "verification_status": "auto_validated"
+ },
+ "1010": {
+  "question_latex": "a) Determine a particular solution to y\" - 4y' -I2y = 3e5'\n\n using the method of undetermined coefficients. (7 marks)\n\nc) Solve the differential equation dy Id = 4x - 2y + 4 (6 marks)\n Idx 2x+ y-2\n\n Page 3 of3\n\n •",
+  "verification_status": "auto_validated"
+ },
+ "1011": {
+  "question_latex": "b) Use the variation of parameters method to solve the differential equation.\n y\" +2y'-3y = 2x-I7 (7 marks)",
+  "verification_status": "auto_validated"
+ },
+ "1012": {
+  "question_latex": "c) The scientific law states that the acceleration of a particle during upward motion under\n gravity is − g. write down this law as a differential equation\n\n (3 marks)\n dy x − y + 3d) Solve the differential equation =, given that it is non-homogeneous.(4\n dx 2 x − 2 y + 5\n\n marks)\n\n dy 3e) Solve the Bernoulli’s equation + y = xy (4 marks)\n dx2\n\n d 2 y dy 2 x",
+  "verification_status": "auto_validated"
+ }
+}

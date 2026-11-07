@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 NOTE_LEVELS = ("level_1", "level_2", "level_3")
 MAX_ATTEMPTS = 3
 STALE_JOB_MINUTES = 30
+# Bump this whenever the generated PDF layout changes. It makes previously
+# stored artifacts stale so the worker rebuilds them with the current renderer.
+PDF_ARTIFACT_RENDER_VERSION = "brand-footer-v1"
 
 
 def _digest(payload) -> str:
@@ -148,6 +151,7 @@ def _load_artifact_source(artifact: PrepTopicPdfArtifact) -> tuple[str, dict]:
         notes = get_published_topic_note_levels(topic, validated_only=True).get(artifact.level, "")
         payload = {
             "kind": "notes",
+            "render_version": PDF_ARTIFACT_RENDER_VERSION,
             "topic_id": topic.pk,
             "course_code": topic.course.code,
             "course_title": topic.course.title,
@@ -174,6 +178,7 @@ def _load_artifact_source(artifact: PrepTopicPdfArtifact) -> tuple[str, dict]:
         })
     payload = {
         "kind": "questions",
+        "render_version": PDF_ARTIFACT_RENDER_VERSION,
         "topic_id": topic.pk,
         "course_code": topic.course.code,
         "course_title": topic.course.title,

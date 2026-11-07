@@ -94,8 +94,6 @@ def promote_if_admin_email(user):
 
 def home(request):
     """Public landing page."""
-    if request.user.is_authenticated:
-        return _post_login_redirect(request, request.user)
     return render(request, "home.html")
 
 

@@ -63,11 +63,15 @@ _TRUNCATE_RES = [
 # These must be deleted in place, never used to truncate: the question continues
 # after them on the next page.
 _INLINE_FOOTER_RES = [
-    re.compile(r"\{?\**\s*INVOLVEMENT\s+IN\s+ANY\s+EXAMINATION\s+IRREGULARITY\s*"
-               r"SHALL\s+LEAD\s+TO\s+DISCONTINUATION\s*\**\}?", re.IGNORECASE),
+    re.compile(r"\{?\**\s*INVOLVEMENT\s+IN\s+(?:ANY\s+)?EXAMINATION\s+IRREGULARITY\s*"
+               r"SHALL\s+LEAD\s+TO\s+D\s*ISCONTINUATION\s*\**\}?", re.IGNORECASE),
     re.compile(r"\{?\**\s*Page\s+\d+\s+of\s+\d+\s*\**\}?", re.IGNORECASE),
-    re.compile(r"\{?\**\s*Scanned\s+with\s+CamScanner\s*\**\}?", re.IGNORECASE),
+    re.compile(r"\{?\**\s*Scanned\s+(?:with|by)\s+CamScanner\s*\**\}?", re.IGNORECASE),
+    re.compile(r"\{?\**\s*CamScanner\s*\**\}?", re.IGNORECASE),
     re.compile(r"\{?\**\s*VISIT\s+US\s+FOR\s*:[^\n]*", re.IGNORECASE),
+    # Delegate advertisement stamped across the scan of some papers.
+    re.compile(r"^\s*[A-Za-z]+\s*NDUTA\s*$", re.IGNORECASE | re.MULTILINE),
+    re.compile(r"^\s*Incoming\s+FEMALE\s+DELEGATE\s*$", re.IGNORECASE | re.MULTILINE),
 ]
 
 # Leading extraction debris with no meaning: bold runs left by the extractor and
@@ -143,7 +147,7 @@ def repair_cases_rows(text: str) -> str:
             needs_separator = (
                 bool(stripped)
                 and not is_last
-                and not stripped.endswith("\\\\")
+                and "\\\\" not in stripped
                 and "\\end{" not in stripped
             )
             rebuilt.append(stripped + (" \\\\" if needs_separator else ""))

@@ -1,0 +1,46 @@
+{
+ "74": {
+  "question_latex": "Let x ,x ,...,x denote a random sample from a Beta distribution f(x,α,β) = Γ(α+β)xα−1(1−\n 1 2 n ΓαΓβ \n x)β−1 with parameter α > 0,β > 0 unknown. Show that the family of Beta distribution with\n parameter α and β unknown belongs to a two parameter exponential family, hence determine\n jointly sufficient statistic for α and β []",
+  "verification_status": "flagged"
+ },
+ "75": {
+  "question_latex": "Let x ,x ,x ,...............x be a random sample, take ϕ(θ) = D . Find \n 1 2 3 n 1−θ \n (a) Fisher’s information I(θ) [] \n \n (b) Gramer-Rao lower bound for d(x). [3marks] \n (c) Minimum variance best unbiased estimator of θ [3marks]",
+  "verification_status": "flagged"
+ },
+ "77": {
+  "question_latex": "Suppose that x ,x ,...,x form a random sample from a Poisson distribution with mean λ > 0.\n 1 2 n \n Given the estimator \n (cid:40) \n 1, x = 0 \n δ(X) = \n 0, x > 0 \n (a) Show that E(δ(X)) = e−λ [] \n (b) Find an unbiased estimator of e−λ with a smaller value than δ(X). (Hint: you may use\n T = \n (cid:80)n \n X as a sufficient statistic in this case) [4marks] \n i=1 i \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n 1",
+  "verification_status": "flagged"
+ },
+ "194": {
+  "question_latex": "a) Let $X_1, X_2, \\ldots, X_n$ be i.i.d as $B(k, p)$ (binomial with parameters $k$ and $p$) where both $k$ and $p$ are unknown. Find by method of moments the estimators of $k$ and $p$. (10 marks)\n[You may find it useful: If $X$ is $B(n, p)$, then $E(X) = np$ and variance of $X$ is $np(1-p)$]\n\nb) In a) above, assume $k$ is known. Show whether the moment estimator of $p$ is",
+  "verification_status": "auto_validated"
+ },
+ "195": {
+  "question_latex": "Unbiased \nii. Consistent (6marks)",
+  "verification_status": "flagged"
+ },
+ "207": {
+  "question_latex": "**\n\n(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 102.2 on 6 different samples of the liquid. If he knows that the standard deviation for this procedure is 1.2 degrees, what is the interval estimation for the population mean at a 99.12% confidence level?\n(5 marks).\n\n(b) A researcher measured the wing-length to the nearest millimeter of a random sample of 50 house flies and following table:\n\nVISIT US FOR:\nKey Cutting, Past Papers C.P.A,\nSetbooks, Binding & Latest Handouts",
+  "verification_status": "flagged"
+ },
+ "215": {
+  "question_latex": "a) Let $X_1, X_2, \\dots, X_n$ be i.i.d as $B(k, p)$ (binomial with parameters k and p), where both k and p are unknown. Find by method of moments the estimators of k and p. (10 marks)\n[You may find this useful: If $X$ is $B(n,p)$, then $E(X) = np$ and variance of X is $np(1-p)$]\n\nb) In a) above, assume k is known. Show whether the moment estimator of p is\n\n| **Wing length(mm)** | **Number of house flies** |\n| --- | --- |\n| 3.5-3.9 | 5 |\n| 4.0-4.4 | 14 |\n| 4.5-4.9 | 23 |\n| 5.0-5.4 | 7 |\n| 5.5-5.9 | 1 |\n\nAssuming that the wing length is normally distributed, obtain a 99\\% confidence interval for:\n\n (i) The mean wing length of the house flies\n\n (ii) The variance of the wing length of the house flies (10 marks)\n\n(c) For data on the life span in days of 88 wild type and 99 transgenic mosquitoes, we have the following summary\n\n| | **observations** | **mean** | **Standard deviation** |\n| --- | --- | --- | --- |\n| Wild type | 88 | 20.784 | 12.99 |\n| transgenic | 99 | 16.546 | 10.78 |\n\nObtain the 95\\% confidence interval for the difference of means. (5 marks)\n\ni. Unbiased (4marks)\nii. Consistent. (6marks)",
+  "verification_status": "flagged"
+ },
+ "217": {
+  "question_latex": "}\n\n(a) Suppose a student measuring the boiling temperature of a certain liquid observes the readings (in degrees Celsius) 102.5, 101.7, 103.1, 100.9, 100.5, and 102.2 on 6 different samples of the liquid. If he knows that the standard deviation for this procedure is 1.2 degrees, what is the interval estimation for the population mean at a 99.12\\% confidence level? (5 marks).\n(b) A researcher measured the wing-length to the nearest millimeter of a random sample of 50 house flies and following table:",
+  "verification_status": "flagged"
+ },
+ "228": {
+  "question_latex": "a) Let \\(x_1, x_2, \\dots, x_n\\) denote a random sample of size \\(n\\) from a distribution with mean \\(\\mu\\) and variance \\(\\sigma^2\\). An estimator of \\(\\mu\\) is to be obtained using \\(\\hat{\\mu} = a_1x_1 + a_2x_2 + \\dots + a_nx_n\\), where \\(a_1, a_2, \\dots, a_n\\) are constants. What condition must the \\(a_i\\)'s satisfy so that \\(\\hat{\\mu}\\) is an unbiased estimator? When \\(\\hat{\\mu}\\) is an unbiased estimator and if all the \\(a_i\\)'s are equal, show that \\(\\hat{\\mu}\\) is a consistent estimator. (9 marks)\nb) Derive maximum-likelihood estimators for parameter \\(p\\) based on a Binomial \\((10, p)\\) and a sample of size \\(n\\).\nCompute your estimators if the observed sample is \\((3, 6, 2, 0, 0, 3)\\) (9 marks)\nc) Derive method of moments estimator for \\(\\lambda\\) based on a Poisson distribution with parameter \\(\\lambda\\) and sample of size \\(n\\). (7 marks)\nd) The weight of 10 children was taken. The sample mean weight was found to be \\(38.4\\text{kgs}\\). If it is known that the variance is \\(30\\text{kgs}\\), obtain the \\(98\\%\\) confidence interval for the population mean. Assume that the underlying population is normal with mean \\(\\mu\\) and variance \\(\\sigma^2\\). (5 marks)",
+  "verification_status": "flagged"
+ },
+ "234": {
+  "question_latex": "a) Let $x_1, x_2, \\ldots, x_n$ be a random sample from a population with p.d.f $f(x, \\theta)$. When is an estimator of $\\theta$ said to be unbiased? (2 marks)\nb) Let $X$ be a random variable that is normally distributed with mean $\\mu$ and variance $\\delta^2$. Suppose $x_1, x_2, \\ldots, x_n$ be a random sample from this population. Show that\ni. $\\bar{x}$ is an unbiased estimator of $\\mu$ (3 marks)\nii. it's variance attains the Cramer-Rao lower bound. (10 marks)\niii. $\\bar{x}$ is a consistent estimator (5 marks)",
+  "verification_status": "flagged"
+ },
+ "237": {
+  "question_latex": "(a) A random sample of 18 venture-capital investments in the fiber optics sector\nyields the following data, in US$:\n$\n\n$$\n\\begin{array}\n{ccccccccc} 2.04 & 5.48 & 5.60 & 5.96 & 6.27 & 10.51 & 4.13 & 5.58 & 5.74 \\\\ 6.67 & 8.63 & 6.71 & 4.98 & 6.66 & 7.71 & 8.64 & 9.21 & 5.95\n\\end{array}\n$$\n\n$\n\n(i) determine a 95% confidence interval for the mean amount, $\\mu$, of all\nventure capital investments in the fiber optics sector. Assume that the\npopulation standard deviation is US$ 2.04. \n(ii) Interpret your findings in part (i). (1mark)\n(iii) Find a 99% confidence interval for $\\mu$. (3marks)\n(iii) Which confidence interval yields a more precise estimate of $\\mu$?\nExplain your answer. (1mark).\n\n(b) Measurements on the percentage of enrichment of 12 fuel rods were reported as\nfollows:\n$\n\n$$\n\\begin{array}\n{cccccccccccc} 2.94 & 3 & 2.9 & 2.75 & 3 & 2.95 & 2.75 & 2.95 & 2.92 & 2.81 \\\\ 3.05 & 2.8\n\\end{array}\n$$\n\n$\nIf $\\sum X = 34.82$ and $\\sum X^2 = 101.1486$, find a 99% two sided confidence interval.\n\non the mean percentage of enrichment of fuel rods. Can we state the mean percentage of enrichment is 2.95\\%? Why? (5 marks)\n\n(c) A random of 100 boys have a mean height of 152.3 cm and a standard deviation of 6cm, while a random sample of 120 girls of the same age have a mean height of 148.6cm and a standard deviation of 5cm.\nConstruct a 95\\% confidence interval on the mean difference in overall height between boys and girls, $\\mu_1 - \\mu_2$, where $\\mu_1$ and $\\mu_2$ are the mean heights of boys and girls respectively. Assume the populations of heights of boys and girls have unequal variances.\n (5 marks)\n\n```latex\n\\documentclass{article}\n\\usepackage{amsmath}\n\\usepackage{amssymb}\n\\usepackage[margin=1in]{geometry}\n\n\\begin{document}\n\n **a higher education institution** \\\\\n UNIVERSITY EXAMINATIONS 2018/2019 \\\\\n FIRST SEMESTER \n \\\\\n **SST 305: THEORY OF ESTIMATION**\n\n**DATE:** \\underline{ Wednesday, 21\\(^{\\text{st}}\\) November 2018 } **TIME:** ** 2.00 p.m. - 4.00 p.m. **\n\n**INSTRUCTIONS:** \\\\\nAttempt Question One and any other two questions.\n```",
+  "verification_status": "flagged"
+ }
+}

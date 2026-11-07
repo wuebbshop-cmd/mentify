@@ -1,0 +1,5950 @@
+[
+ {
+  "id": 987,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   293
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "293": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Give the order of each of the given differential equations. i) $xy\\dfrac{d^{3}y}{dx^{3}} - y^{2}\\sin x = 0$ **(2 marks)** ii) $\\left[1 + \\left(\\dfrac{dy}{dx}\\right)^{2",
+   "(b) b) Solve $x\\dfrac{dy}{dx} = 5x^{4} + 4x^{2} + 2x$ by direct integration. **(4 marks)**"
+  ]
+ },
+ {
+  "id": 989,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   293
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "172": [
+    "f"
+   ],
+   "287": [
+    "e"
+   ],
+   "293": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(c) c) Find the general solution to (D 3 \u2212 3 D + 2 ) y = 0 (4 marks) a",
+   "(d) d) Find the general and singular solution of y = px + (4 marks) p",
+   "(e) e) Test for exactness and hence solve the following differential equation (4 x + 3 y + 1)dx + (3 x + 2 y + 1)dy = 0 (4 marks)",
+   "(f) f) Reduce the given differential equation to homogenous form and solve it (2 x + 3 y \u2212 5 ) dy + (3 x + 2 y \u2212 5 ) = 0 (10 marks) dx"
+  ]
+ },
+ {
+  "id": 990,
+  "current": 171,
+  "targets": [
+   171
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Form the differential equation associated with ay 2 = x 2 (3 marks)"
+  ]
+ },
+ {
+  "id": 991,
+  "current": 172,
+  "targets": [
+   290,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Use the method of undetermined coefficient to solve d 2 y dy 2 2 \u2212 \u2212 2 y = 4 x (7 marks) dx dx",
+   "(c) c) Find the orthogonal trajectories of the family x 2 + 3 y 2 = cy. Find that member of the orthogonal trajectories which passes through the point 2,1( ). (10 marks)"
+  ]
+ },
+ {
+  "id": 992,
+  "current": 172,
+  "targets": [
+   172,
+   287
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(b) b) Find a suitable integrating factor and solve the equation xydx \u2212 (x 2 + 2 y 2 )dy = 0 (7 marks)",
+   "(c) c) Apply the method of separation of variables to solve dy 3 + xy = xy (7 marks) dx"
+  ]
+ },
+ {
+  "id": 993,
+  "current": 171,
+  "targets": [
+   171,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "289": [
+    "a"
+   ],
+   "297": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Verify that $Ax^{2} + By^{2} = 1$ is the solution of the differential equation $$ xy\\frac{d^{2}y}{dx^{2}} + x\\left(\\frac{dy}{dx}\\right)^{2} - y\\frac{dy}{dx} = 0 . $$ *",
+   "(b) b) If the population of a country doubles in 50 years, in how many years will it triple under the assumption that the rate of increase is proportional to the number of in"
+  ]
+ },
+ {
+  "id": 994,
+  "current": 172,
+  "targets": [
+   171
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 2 x \u22122 xa) Find the differential equation of the family y = Ae + Be (4 marks) b) Define and solve the given first order differential equation. 2 2 dy 2 2 x (x \u2212 1) + x (x"
+  ]
+ },
+ {
+  "id": 995,
+  "current": 171,
+  "targets": [
+   171
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Form the differential equation associated with the relation $$ y = x^{3} + c_{1}e^{2x} + c_{2}e^{3x}, $$ where $c_{1}$ and $c_{2}$ are arbitrary constants."
+  ]
+ },
+ {
+  "id": 996,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ y\\left(1 + x^{2}\\right)^{1/2}\\,dy + x\\sqrt{1 + y^{2}}\\,dx = 0 . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 997,
+  "current": 172,
+  "targets": [
+   288
+  ],
+  "evidence": {
+   "288": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve $$ \\sin^{-1}x\\,\\frac{dy}{dx} + y = 0, \\qquad y\\left(\\tfrac{1}{2}\\right) = \\frac{\\sqrt{1 - x^{2}}}{2} . $$ **(4 marks)**"
+  ]
+ },
+ {
+  "id": 998,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ y' = \\frac{xy^{2} - y}{x + x^{2}y^{2}} . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 999,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve $$ (x + y)\\,dy + (x - y)\\,dx = 0 . $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1000,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of variation of parameters to solve $$ y'' - 2y' + y = \\frac{e^{x}}{1 + x^{2}} . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1001,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   289,
+   292,
+   294,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b",
+    "g"
+   ],
+   "172": [
+    "f"
+   ],
+   "287": [
+    "c"
+   ],
+   "289": [
+    "d"
+   ],
+   "292": [
+    "g"
+   ],
+   "294": [
+    "f"
+   ],
+   "297": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(a) a) Distinguish clearly between the following terms as used in differential equations. i) Order and degree ii) General solution and particular solution **(3 marks)**",
+   "(b) b) Form the differential equation by eliminating the arbitrary constants in $$ y = Ax^{2} + Bx^{2}\\ln x . $$ **(4 marks)**",
+   "(c) c) Show that $$ (2x\\cos y + 3x^{2}y)\\,dx + (x^{3} - x^{2}\\sin y - y)\\,dy = 0 $$ is exact, hence or otherwise find its general solution. **(4 marks)**",
+   "(d) d) Find the particular solution of the initial value problem $$ -2\\frac{d^{2}y}{dx^{2}} + 4\\frac{dy}{dx} + 13y = 0, \\qquad y(0) = -1, \\quad y'(0) = -4 . $$ **(6 marks)**",
+   "(e) e) The population of a certain town is known to grow at a rate proportional to the number of people present. If after 10 years the population has doubled, and after three",
+   "(f) f) Find the solution of the homogeneous system $$ \\frac{dx}{dt} = 2x + 3y, \\qquad \\frac{dy}{dt} = 2x + y . $$ **(5 marks)**",
+   "(g) g) Show that $y = x^{-2}$ is a solution to the differential equation $$ x^{2}y'' + 5xy' + 4y = 0, \\qquad x \\neq 0 . $$ **(3 marks)**"
+  ]
+ },
+ {
+  "id": 1003,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   288
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "287": [
+    "d"
+   ],
+   "288": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the linear differential equation $$ \\frac{dy}{dx} + 2y\\tan 2x = 4\\sec 2x, \\qquad y = 2 \\text{ when } x = \\frac{\\pi}{8} . $$ **(5 marks)**",
+   "(d) d) Verify that $u(x,y) = \\dfrac{1}{x^{2}y}$ is an integrating factor for the differential equation $$ -y^{2}\\,dx + (x^{2} + xy)\\,dy = 0 . $$ Hence or otherwise solve the "
+  ]
+ },
+ {
+  "id": 1004,
+  "current": 172,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Show that the differential equation $$ (x^{2} + 3xy + y^{2})\\,dx - x^{2}\\,dy = 0 $$ is homogeneous, hence or otherwise solve it. **(5 marks)**",
+   "(c) c) Solve the Bernoulli equation $$ x^{2}y' + 2xy = y^{3} . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1005,
+  "current": 171,
+  "targets": [
+   293,
+   297
+  ],
+  "evidence": {
+   "293": [
+    "a"
+   ],
+   "297": [
+    "b",
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the general solution of the differential equation $$ (D^{4} - 2D^{3} + 7D^{2} + 18D + 26)y = 0, $$ given that one of the roots is $-1 + i$ and that complex roots ",
+   "(b) b) The rate at which a body cools is proportional to the difference between the temperature of the body and that of the surrounding air. If a body in air at $25^{\\circ}\\m",
+   "(c) c) Find the orthogonal trajectories of the family of curves $$ y(x - 1) = c . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1006,
+  "current": 171,
+  "targets": [
+   293
+  ],
+  "evidence": {
+   "293": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Find the general solution of the differential equation $$ (D^4 - 2D^3 + 7D^2 + 18D + 26)y = 0, $$ given that one of the roots of the auxiliary equation is \\(-1+i\\) and th"
+  ]
+ },
+ {
+  "id": 1007,
+  "current": 171,
+  "targets": [
+   289,
+   296
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ],
+   "296": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Find the power series solution of the differential equation $$ (x^{2} - 1)\\frac{d^{2}y}{dx^{2}} + x\\frac{dy}{dx} - y = 0 $$ about the point $x = 0$. **(10 marks)**"
+  ]
+ },
+ {
+  "id": 1009,
+  "current": 172,
+  "targets": [
+   172,
+   294
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ],
+   "294": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Determine the solution of the homogeneous system. d~t +2y+3x = 0 = 0 \u00bb:+3x-2y subject to the initial conditions x(O) = 4 and y(O) =0. (10 marks)"
+  ]
+ },
+ {
+  "id": 1010,
+  "current": 171,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "290": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine a particular solution to $$ y'' - 4y' - 12y = 3e^{5x} $$ using the method of undetermined coefficients. **(7 marks)**",
+   "(c) c) Solve the differential equation $$ \\frac{dy}{dx} = \\frac{4x - 2y + 4}{2x + y - 2} . $$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1011,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Use the method of variation of parameters to solve the differential equation $$ y'' + 2y' - 3y = 2x - 17 . $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1012,
+  "current": 172,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "c",
+    "d"
+   ],
+   "288": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(c) c) The scientific law states that the acceleration of a particle during upward motion under gravity is $-g$. Write down this law as a differential equation. **(3 marks)**",
+   "(d) d) Solve the differential equation $$ \\frac{dy}{dx} = \\frac{x - y + 3}{2x - 2y + 5}, $$ given that it is non-homogeneous. **(4 marks)**",
+   "(e) e) Solve the Bernoulli's equation $$ \\frac{dy}{dx} + y = xy^{3} . $$ **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1013,
+  "current": 171,
+  "targets": [
+   172,
+   291,
+   293
+  ],
+  "evidence": {
+   "172": [
+    "g"
+   ],
+   "291": [
+    "f"
+   ],
+   "293": [
+    "f"
+   ]
+  },
+  "parts": [
+   "(f) f) Determine the particular integral for the equation 2 \u2212 5 + 6 y = e (5 marks) dx dx d 4 y d 3 y d 2 y",
+   "(g) g) Solve the linear equation 4 + 2 3 + 2 = sin 3 x (5 marks) dx dx dx"
+  ]
+ },
+ {
+  "id": 1014,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the differential equation 3 \u2212 2 \u2212 = e (6 marks) dx dx dx d 2 y dy 3 5",
+   "(b) b) Solve the differential equation x 2 \u2212 + 4 x y = x (7 marks) dx dx 3 x x 2 (7 marks)c) Solve the differential equation ( D \u2212 4 ) y = e"
+  ]
+ },
+ {
+  "id": 1015,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) xy a) Show that is a homogeneous function in x and y only (5 marks) x 2 + y 2"
+  ]
+ },
+ {
+  "id": 1016,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "b",
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation(3 x + 2 y \u2212 5 )dx + (2 x + 3 y \u2212 5 )dy = 0 (8 marks)",
+   "(c) c) Solve the equation ( D \u2212 1)( D + 3)( D \u2212 5 ) y = cosh x (7 marks)"
+  ]
+ },
+ {
+  "id": 1017,
+  "current": 171,
+  "targets": [
+   287
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "b",
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that this equation is not exact (4 marks)",
+   "(b) b) Calculate an integrating factor of the form x n where nis a positive integer (3 marks)",
+   "(c) c) Using the integrating factor in (b) above solve the differential equation (13 marks)"
+  ]
+ },
+ {
+  "id": 1018,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine the differential equation whose solution is $$ y = A\\cos 8x + B\\sin 8x . $$ **(4 marks)**",
+   "(b) b) Solve the differential equation $$ \\frac{dy}{dx} = \\sin x . $$ **(3 marks)**",
+   "(c) c) Solve the differential equation $$ \\frac{dy}{dx} + y\\cot x = \\operatorname{cosec} x . $$ **(5 marks)**",
+   "(d) d) Solve the differential equation $$ (2D^{2} + 2D + 3)y = x^{3} . $$ **(8 marks)**"
+  ]
+ },
+ {
+  "id": 1019,
+  "current": 171,
+  "targets": [
+   289
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Find the general solution to the differential equation $$ (D^{2} - 6D + 25)y = 0 . $$ **(3 marks)**"
+  ]
+ },
+ {
+  "id": 1020,
+  "current": 171,
+  "targets": [
+   289
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Find the general solution of the differential equation $$ (D^2 - 6D + 25)y = 0, $$ where \\(D = \\frac{d}{dx}\\)."
+  ]
+ },
+ {
+  "id": 1021,
+  "current": 289,
+  "targets": [
+   289
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the initial value problem $$ y'' + y' - 6y = 0, \\qquad y(0) = 1, \\quad y'(0) = 0 . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1022,
+  "current": 171,
+  "targets": [
+   171
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Define the Wronskian of two functions, hence determine whether the functions $t$ and $e^{2t}$ are linearly independent or not. **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1023,
+  "current": 172,
+  "targets": [
+   289
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 4) Use the method of undetermined parameters to solve the differential equation $$ y'' - 2y' - 3y = 3x^{2} + 4x - 5 . $$ **(6 marks)** 5) Solve the differential equation "
+  ]
+ },
+ {
+  "id": 1025,
+  "current": 171,
+  "targets": [
+   293
+  ],
+  "evidence": {
+   "293": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 6) Solve the differential equation $$ (D^{4} + 2D^{3} - 7D^{2} + 2D + 70)y = 0 $$ given that one of the roots of the auxiliary equation is $-3 + i$. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1027,
+  "current": 171,
+  "targets": [
+   171
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) i) Differentiate between a primitive equation and a differential equation. **(3 marks)** ii) Form the differential equation from the equation $$ y = c_{1}\\cos bx + c_{"
+  ]
+ },
+ {
+  "id": 1028,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Solve the differential equations i) $y' = y^{2} + 1$. **(4 marks)** ii) $(2y^{4} + x^{4})\\,dx - xy^{3}\\,dy = 0$. **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1029,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the following differential equations: (i) $\\dfrac{dy}{dx} = y^2 + 1$ **[4 marks]** (ii) $\\left(2y^4 + x^4\\right)\\,dx - xy^3\\,dy = 0$ **[4 marks]**"
+  ]
+ },
+ {
+  "id": 1030,
+  "current": 172,
+  "targets": [
+   289,
+   290,
+   296,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "d"
+   ],
+   "290": [
+    "c"
+   ],
+   "296": [
+    "d"
+   ],
+   "297": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(c) c) Use the method of undetermined coefficients to solve the equation $$ y'' + 9y = e^{-x} . $$ **(4 marks)**",
+   "(d) d) Find a series solution about the point $x = 0$ of the differential equation $$ y'' - y^{4} = 0 $$ using the power series method. **(5 marks)**",
+   "(e) e) Determine the orthogonal trajectory obtained from the family of curves $$ cy^{2} + x^{2} = 4 . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1033,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Explain each of the following terms. i) Degree and order of a differential equation. **(3 marks)** ii) The general solution of a differential equation of order $n$.",
+   "(b) b) Show that the transformation $y = vx$ reduces the equation given below into a separable equation, and hence solve it. $$ (x^{3} + y^{3})\\,dx - 3xy^{2}\\,dy = 0 . $$ **(",
+   "(c) c) Test for exactness and hence solve $$ (y^{3} + 2x)\\,dx + (3xy^{2} + 1)\\,dy = 0 . $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1036,
+  "current": 171,
+  "targets": [
+   293,
+   297
+  ],
+  "evidence": {
+   "293": [
+    "a",
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the differential equation $$ (D^{4} - 6D^{3} + 7D^{2} + 16D + 60)y = 0 $$ given that one of the roots is of the form $4 - 2i$. **(6 marks)**",
+   "(b) b) Solve the initial value problem $$ y''' - 2y'' - 5y' + 6y = 0 $$ subject to the conditions $y(0) = 4$, $y'(0) = 11$ and $y''(0) = 17$. **(6 marks)**",
+   "(c) c) A certain radioactive material is known to decay at a rate proportional to the amount present. If initially $500\\,\\mathrm{mg}$ of the material is present and after 3 y"
+  ]
+ },
+ {
+  "id": 1037,
+  "current": 171,
+  "targets": [
+   293,
+   297
+  ],
+  "evidence": {
+   "293": [
+    "a",
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Solve the differential equation $$ (D^4 - 6D^3 + 7D^2 + 16D + 60)y = 0, $$ given that one root of the auxiliary equation is of the form \\(4 - 2i\\). [6 marks]",
+   "(b) (b) Solve the initial value problem $$ y''' - 2y'' - 5y' + 6y = 0, $$ subject to the conditions \\(y(0)=4,\\; y'(0)=11,\\; y''(0)=17\\). [6 marks]",
+   "(c) (c) A certain radioactive material decays at a rate proportional to the amount present. Initially, \\(500\\,\\mathrm{mg}\\) of the material is present, and after \\(3\\) years,"
+  ]
+ },
+ {
+  "id": 1039,
+  "current": 172,
+  "targets": [
+   288,
+   290
+  ],
+  "evidence": {
+   "288": [
+    "c"
+   ],
+   "290": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use the method of undetermined coefficients to solve the differential equation $$ y'' + 9y = 81x^{2} + 18x + 45 . $$ **(8 marks)**",
+   "(b) b) Use the method of variation of parameters to solve the differential equation $$ y'' + 4y' + 4y = 4x^{2}e^{-2x} . $$ **(7 marks)**",
+   "(c) c) Solve the Bernoulli equation $$ xy' + y = xy^{3} . $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1042,
+  "current": 172,
+  "targets": [
+   171,
+   289,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "b",
+    "c"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine whether $y = \\dfrac{1}{x}$ is a solution of the differential equation $$ y' + y^{2} = 0 . $$ **(3 marks)**",
+   "(b) b) The solution to the differential equation $$ y'' - 2xy' - 2y = 0 $$ is of the form $y = c_{1}y_{1} + c_{2}y_{2}$, where $y_{1}$ and $y_{2}$ are two linearly independen",
+   "(c) c) Solve the differential equations i) $4y'' - 12y' + 9y = 0$ **(5 marks)** ii) $y'' - 2y' + 3y = 0$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1085,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Solve the differential equations i) $y' = y^{2} + 1$. **(4 marks)** ii) $(2y^{4} + x^{4})\\,dx - xy^{3}\\,dy = 0$. **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1086,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the following differential equations: (i) $\\dfrac{dy}{dx} = y^2 + 1$ **[4 marks]** (ii) $\\left(2y^4 + x^4\\right)\\,dx - xy^3\\,dy = 0$ **[4 marks]**"
+  ]
+ },
+ {
+  "id": 1087,
+  "current": 172,
+  "targets": [
+   289,
+   290,
+   296,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "d"
+   ],
+   "290": [
+    "c"
+   ],
+   "296": [
+    "d"
+   ],
+   "297": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(c) c) Use the method of undetermined coefficients to solve the equation $$ y'' + 9y = e^{-x} . $$ **(4 marks)**",
+   "(d) d) Find a series solution about the point $x = 0$ of the differential equation $$ y'' - y^{4} = 0 $$ using the power series method. **(5 marks)**",
+   "(e) e) Determine the orthogonal trajectory obtained from the family of curves $$ cy^{2} + x^{2} = 4 . $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1090,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Explain each of the following terms. i) Degree and order of a differential equation. **(3 marks)** ii) The general solution of a differential equation of order $n$.",
+   "(b) b) Show that the transformation $y = vx$ reduces the equation given below into a separable equation, and hence solve it. $$ (x^{3} + y^{3})\\,dx - 3xy^{2}\\,dy = 0 . $$ **(",
+   "(c) c) Test for exactness and hence solve $$ (y^{3} + 2x)\\,dx + (3xy^{2} + 1)\\,dy = 0 . $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1093,
+  "current": 171,
+  "targets": [
+   293,
+   297
+  ],
+  "evidence": {
+   "293": [
+    "a",
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the differential equation $$ (D^{4} - 6D^{3} + 7D^{2} + 16D + 60)y = 0 $$ given that one of the roots is of the form $4 - 2i$. **(6 marks)**",
+   "(b) b) Solve the initial value problem $$ y''' - 2y'' - 5y' + 6y = 0 $$ subject to the conditions $y(0) = 4$, $y'(0) = 11$ and $y''(0) = 17$. **(6 marks)**",
+   "(c) c) A certain radioactive material is known to decay at a rate proportional to the amount present. If initially $500\\,\\mathrm{mg}$ of the material is present and after 3 y"
+  ]
+ },
+ {
+  "id": 1094,
+  "current": 171,
+  "targets": [
+   293,
+   297
+  ],
+  "evidence": {
+   "293": [
+    "a",
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Solve the differential equation $$ (D^4 - 6D^3 + 7D^2 + 16D + 60)y = 0 $$ given that one root of the auxiliary equation is of the form \\(4 - 2i\\). [6 marks]",
+   "(b) (b) Solve the initial value problem $$ y''' - 2y'' - 5y' + 6y = 0 $$ subject to the conditions \\(y(0) = 4\\), \\(y'(0) = 11\\), and \\(y''(0) = 17\\). [6 marks]",
+   "(c) (c) A certain radioactive material decays at a rate proportional to the amount present. Initially, 500 mg of the material is present, and after 3 years, 20\\% of the origi"
+  ]
+ },
+ {
+  "id": 1096,
+  "current": 172,
+  "targets": [
+   288,
+   290
+  ],
+  "evidence": {
+   "288": [
+    "c"
+   ],
+   "290": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use the method of undetermined coefficients to solve the differential equation $$ y'' + 9y = 81x^{2} + 18x + 45 . $$ **(8 marks)**",
+   "(b) b) Use the method of variation of parameters to solve the differential equation $$ y'' + 4y' + 4y = 4x^{2}e^{-2x} . $$ **(7 marks)**",
+   "(c) c) Solve the Bernoulli equation $$ xy' + y = xy^{3} . $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1099,
+  "current": 172,
+  "targets": [
+   171,
+   289,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "b",
+    "c"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine whether $y = \\dfrac{1}{x}$ is a solution of the differential equation $$ y' + y^{2} = 0 . $$ **(3 marks)**",
+   "(b) b) The solution to the differential equation $$ y'' - 2xy' - 2y = 0 $$ is of the form $y = c_{1}y_{1} + c_{2}y_{2}$, where $y_{1}$ and $y_{2}$ are two linearly independen",
+   "(c) c) Solve the differential equations i) $4y'' - 12y' + 9y = 0$ **(5 marks)** ii) $y'' - 2y' + 3y = 0$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1117,
+  "current": 172,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "c"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use separation of variables to solve the differential equation $$ dy - (y - y^2)dx = 0 \\quad; y(2) = 0 \\qquad \\text{(5 marks)} $$",
+   "(b) b) Solve the following differential equations using the method specified \\(y'' - 7y' = (3 - 36x)e^{6x}\\) (Undetermined coefficients) (5 marks)",
+   "(c) c) The rate at which a body cools is proportional to the difference between the temperatures of the body and that of the surrounding air. If a body in air at \\(20^\\circ C"
+  ]
+ },
+ {
+  "id": 1118,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of separation of variables to solve the initial value problem $$ \\frac{dy}{dx}=y-y^2,\\qquad y(2)=0. $$ Give the solution in explicit form."
+  ]
+ },
+ {
+  "id": 1119,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the orthogonal trajectory of the family of curves $$ x^2 + y^2 = cx \\qquad \\text{(5 marks)} $$",
+   "(b) b) Solve the differential equation below by variation of parameters $$ y'' - 2y' + y = \\frac{1}{x}e^x \\qquad \\text{(5 marks)} $$",
+   "(c) c) A particles moves in a straight line so that its distance from a fixed point on the line satisfies the differential equation $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x"
+  ]
+ },
+ {
+  "id": 1120,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = cx. $$",
+   "(b) (b) Solve the differential equation $$ y'' - 2y' + y = \\frac{e^x}{x} $$ using the method of variation of parameters.",
+   "(c) (c) A particle moves in a straight line so that its displacement \\(x(t)\\) from a fixed point satisfies $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x = 0. $$ Given that the p"
+  ]
+ },
+ {
+  "id": 1121,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A small amount of a certain one-celled organism is placed in a beaker of liquid substance (food) and is left stirred. The organism is known to satisfy the differential",
+   "(b) (b) Test for homogeneousness hence solve the de $$ (x^3 + y^3)dx - 3xy^2dy = 0 \\qquad \\text{(4 marks)} $$",
+   "(c) (c) Use Integrating Factor to convert the differential equation $$ (x^2 + 2y^2)dy + (xy^3 + 2y^4 - 4x)dy = 0 \\text{ to exact. Hence solve the differential equation} \\qqua"
+  ]
+ },
+ {
+  "id": 1123,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "289": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Test for exactness of the equation $(2x^2 - y)dx + (3y^2 - x)dy = 0$, hence solve using an appropriate integrating factor. **(7 marks)**",
+   "(b) b. Find the general solution of the differential equation $y'' - 2y' = 4e^{2x} - 18x$. **(7 marks)**",
+   "(c) c. Find the general solution to $\\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1124,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "289": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) Test the differential equation $$ (2x^2 - y)\\,dx + (3y^2 - x)\\,dy = 0 $$ for exactness. If it is not exact, find an integrating factor that depends only on $x$ or onl",
+   "(b) (b) Find the general solution of the differential equation $$ y'' - 2y' = 4e^{2x} - 18x. $$ **(7 marks)**",
+   "(c) (c) Find the general solution of the differential equation $$ \\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}. $$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1125,
+  "current": 171,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a. Find the differential equation of a circle whose radius is 5 units. **(3 marks)**",
+   "(b) b. Solve: $\\frac{dy}{dx} = \\frac{2y^2 - x^2}{2yx}$ **(5 marks)**",
+   "(c) c. Solve the differential equation $\\frac{dy}{dx} + xy = xy^2$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1126,
+  "current": 171,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the differential equation of a circle whose radius is 5 units. (3 marks)",
+   "(b) (b) Solve: $\\dfrac{dy}{dx} = \\dfrac{2y^2 - x^2}{2yx}$. (5 marks)",
+   "(c) (c) Solve the differential equation $\\dfrac{dy}{dx} + xy = xy^2$. (7 marks)"
+  ]
+ },
+ {
+  "id": 1127,
+  "current": 172,
+  "targets": [
+   171,
+   289,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "289": [
+    "a",
+    "b"
+   ],
+   "290": [
+    "c",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a. Determine the order, degree and linearity of the differential equation $\\sqrt{y''} + 2y' = x$ **(3 marks)**",
+   "(b) b. Solve the initial value problem $y'' - 4y' - 12y = 0, \\quad y(0) = -1, \\quad y'(0) = -4$ **(6 marks)**",
+   "(c) c. Use the method of variation of parameters to solve the differential equation $$ y'' - 3y' + 2y = \\frac{e^x}{1 + e^x} $$ **(6 marks)**",
+   "(d) d. Use the method of undetermined coefficients to solve the differential equation $$ (D^2 - 6D + 25)y = 75x^2 - 136x + 80 $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1129,
+  "current": 171,
+  "targets": [
+   289,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "c"
+   ],
+   "297": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. If the population of a country doubles in 50 years, how many years will it triple under the assumption that the rate of increase is proportional to the number of inhab",
+   "(b) b. If $\\ddot{x} + 4\\dot{x} + 29x = \\cos 5t$, find $x$ in terms of $t$ and show that when $t$ is large the motion of the particles is approximately simple harmonic with a ",
+   "(c) c. Solve $(x^2 + 1)y'' + xy' - 4y = 0$. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1131,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b",
+    "c",
+    "d",
+    "e",
+    "f"
+   ],
+   "287": [
+    "g"
+   ]
+  },
+  "parts": [
+   "(a) a. Write the Wronskian, hence determine if the functions \\(f_1(x) = x^2\\), \\(f_2(x) = x^3\\) and \\(f_3(x) = x^{-2}\\) are linearly independent or not. [5 marks]",
+   "(b) b. Determine \\(c_1\\) and \\(c_2\\) so that \\(y(x) = c_1 e^{2x} + c_2 e^x + 2\\sin x\\) will satisfy the conditions \\(y(0) = 0\\) and \\(y'(0) = 1\\). [5 marks]",
+   "(c) c. Find the differential equation representing a circle of radius \\(r\\) and centre \\((1, 2)\\). [3 marks]",
+   "(d) d. Solve the differential equation \\((\\sin x + \\cos x)dy + (\\cos x - \\sin x)dx = 0\\) [3 marks]",
+   "(e) e. The slope of a curve at any point is the reciprocal of twice the ordinate of the point. The curve also passes through the point \\((4, 3)\\). Find the equation of the cu",
+   "(f) f. Show that \\((x^2 + y^2)dx - 3xy^2dy = 0\\) is homogeneous. [4 marks]",
+   "(g) g. If \\(x^m y^n\\) is an integrating factor for \\(\\frac{dy}{dx} - \\frac{y + x^2 y^3}{x} = 0\\), find the values of \\(m\\) and \\(n\\). [6 marks]"
+  ]
+ },
+ {
+  "id": 1133,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b",
+    "d"
+   ],
+   "172": [
+    "c",
+    "e"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a. Determine the order, degree and linearity of the differential equation $$ xy'' = \\sqrt[3]{y + y' + y''} $$ **(3 marks)**",
+   "(b) b. Form the differential equation for \\(y = a \\cos 3x + b \\sin 3x\\) where \\(a\\) and \\(b\\) are arbitrary constants **(2 marks)**",
+   "(c) c. Determine \\(c_1\\) and \\(c_2\\) so that \\(y(x) = c_1 \\sin 2x + c_2 \\cos 2x + 1\\) will satisfy the conditions $$ y\\left(\\frac{\\pi}{8}\\right) = 0 \\quad \\text{and} \\quad y\\",
+   "(d) d. Explain what is meant by the Wronskian of the terms \\(u_1\\), \\(u_2\\), and \\(u_3\\), hence use the Wronskian to show that if the solutions of a differential equation are",
+   "(e) e. Solve the differential equation \\((\\sin x + \\cos x)dy + (\\cos x - \\sin x)dx = 0\\) **(3 marks)** 1. A metallic bar at \\(420^\\circ\\text{F}\\) is placed in a room at \\(85^"
+  ]
+ },
+ {
+  "id": 1135,
+  "current": 171,
+  "targets": [
+   172,
+   288,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "288": [
+    "a"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. A Bernoulli equation is any differential equation of the form \\(\\frac{dy}{dx} + p(x)y = q(x)y^n\\). Show that the substitution \\(z = y^{1-n}\\) transforms the differenti",
+   "(b) b. Use the method of undetermined coefficients to find a general solution to the differential equation \\(y'' - 3y' - 4y = (-11\\cos x + 23\\sin x)e^x\\). **(7 marks)**",
+   "(c) c. Solve the differential equation \\(\\frac{dy}{dx} = \\frac{x-2y-4}{2x+y-3}\\), and show that the general solution reduces to \\(x^2 - y^2 - 4xy - 8x + 6y = C\\) **(8 marks)*"
+  ]
+ },
+ {
+  "id": 1137,
+  "current": 172,
+  "targets": [
+   172,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "d"
+   ],
+   "289": [
+    "a"
+   ],
+   "297": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Solve the differential equation \\(y'' + 4y' + 5y = 0\\), \\(y(0)=1, y'(0)-5\\). **(5 marks)**",
+   "(b) b. Find the orthogonal trajectory of the family of curves \\(y=cx^2\\) **(4 marks)**",
+   "(c) c. Solve the differential equation \\(x\\frac{dy}{dx} = y + \\sqrt{x^2 - y^2}\\), \\(y(x_0)=0\\) **(6 marks)**",
+   "(d) d. Use integrating factor method to solve the differential equation \\(\\frac{dy}{dx} - \\frac{3y}{x+1} = (x+1)^5\\) **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1138,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ x\\frac{dy}{dx} = y + \\sqrt{x^2 - y^2}, \\qquad y(1)=0. $$"
+  ]
+ },
+ {
+  "id": 1139,
+  "current": 172,
+  "targets": [
+   172,
+   287
+  ],
+  "evidence": {
+   "172": [
+    "a"
+   ],
+   "287": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Solve the differential equation \\(4e^{2x}\\tan y dx + (1 - e^{2x})\\sec^2 y dy = 0\\) **(6 marks)**",
+   "(b) b. Given the differential \\((2xy+3y^2)dx + (x^2+6xy-3y^2)dy=0\\), verify its exactness, hence solve it. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1140,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ 4e^{2x}\\tan y\\,dx+(1-e^{2x})\\sec^{2}y\\,dy=0. $$"
+  ]
+ },
+ {
+  "id": 1141,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "g"
+   ],
+   "287": [
+    "d"
+   ],
+   "289": [
+    "e"
+   ],
+   "297": [
+    "f"
+   ]
+  },
+  "parts": [
+   "(a) a) Eliminate the arbitrary constant and obtain the corresponding differential equation $$ xy = Ae^x + Be^{-2x} + x^2 $$ **(4 Marks)**",
+   "(d) d) Test for the differential equation below for exactness and hence determine the general solution if \\((x + \\sin y)dx + (y^2 + x \\cos y)dy = 0\\). **(4 Marks)**",
+   "(e) e) Find the general solution of the equation $$ y'' + 4y' + 13y = 0 $$ **(3 Marks)**",
+   "(f) f) A radioactive substance disintegrates at a rate proportional to the amount present. If 30\\% of a radioactive substance disintegrates in 10 days, how long will it take ",
+   "(g) g) Show that the following pair of functions are linearly independent $$ \\cos^2 x; \\cos 2x $$ **(3 Marks)**"
+  ]
+ },
+ {
+  "id": 1142,
+  "current": 172,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) i) Solve the differential equation $$ 3e^x \\tan y \\, dx + (1 + e^x) \\sec^2 y \\, dy = 0 $$ $$ y(0) = \\frac{\\pi}{4} $$ ii) Solve the homogeneous differential equation $$",
+   "(c) c) Solve the Bernoulli equation \\(\\frac{dy}{dx} + y = xy^3\\) satisfying \\(y=1, x=0\\). **(4 Marks)**"
+  ]
+ },
+ {
+  "id": 1143,
+  "current": 171,
+  "targets": [
+   287,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "b"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A mug of coffee at $100^{\\circ}C$ is placed in a room at a constant temperature of $30^{\\circ}C$. If after 10 minutes the temperature of the coffee is $70^{\\circ}C$. F",
+   "(b) b) Using a suitable integrating Factor; Solve the differential equation $$ (xy^2 - e^{\\frac{1}{x}})dx - x^2 y dy = 0 $$ **(7 Marks)**"
+  ]
+ },
+ {
+  "id": 1144,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) State Newton's law of cooling as a first-order ordinary differential equation, and find an expression for the temperature $T(t)$ of the tea at any time $t$ minutes.",
+   "(b) (b) Determine how long it takes for the tea to cool to $45^{\\circ}\\mathrm{C}$."
+  ]
+ },
+ {
+  "id": 1145,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Solve the homogeneous equation $(\\sqrt{xy} + x)dy + ydx = 0$. **(5 Marks)**"
+  ]
+ },
+ {
+  "id": 1146,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the homogeneous differential equation $$ (\\sqrt{xy} + x)\\,dy + y\\,dx = 0. $$"
+  ]
+ },
+ {
+  "id": 1147,
+  "current": 172,
+  "targets": [
+   290,
+   293
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "293": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the initial value problem $y''' + 4y' = t$ $$ y(0) = y'(0) = 0, y''(0) = 1 $$ **(10 Marks)**",
+   "(b) b) Use the method of undetermined coefficients to solve the equation $$ \\frac{d^2y}{dx^2} - 2\\frac{dy}{dx} + y = xe^x \\sin x $$ **(10 Marks)**"
+  ]
+ },
+ {
+  "id": 1149,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Use the method of variation of parameters to solve $$ y'' + 4y = 4\\sec^2 2x $$ **(9 Marks)**"
+  ]
+ },
+ {
+  "id": 1151,
+  "current": 171,
+  "targets": [
+   289,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation $$ \\frac{d^4y}{dx^4} - 8\\frac{d^2y}{dx^2} + 16y = 0 $$ **(6 Marks)**",
+   "(c) c) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = 2ax $$ **(5 Marks)**"
+  ]
+ },
+ {
+  "id": 1153,
+  "current": 171,
+  "targets": [
+   172,
+   292,
+   296
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "292": [
+    "a"
+   ],
+   "296": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the given differential equation using power series about the ordinary point $x = 0$ $$ y'' - xy' + x^2 y = 0 $$ **(14 Marks)**",
+   "(b) b) Solve the differential equation $$ \\frac{dy}{dx} + \\sqrt{\\frac{1-y^2}{1-x^2}} = 0 $$ **(6 Marks)**"
+  ]
+ },
+ {
+  "id": 1154,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   292,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "b"
+   ],
+   "172": [
+    "a"
+   ],
+   "292": [
+    "b"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the differential equation $$ \\frac{dy}{dx}+\\sqrt{\\frac{1-y^2}{1-x^2}}=0 $$ by separation of variables, and state the general solution. **(6 Marks)**",
+   "(b) b) Solve the differential equation $$ y''-xy'+x^2y=0 $$ using a power series about the ordinary point \\(x=0\\). Find the recurrence relation for the coefficients and write"
+  ]
+ },
+ {
+  "id": 1155,
+  "current": 171,
+  "targets": [
+   171,
+   289,
+   293,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "c",
+    "d"
+   ],
+   "289": [
+    "b"
+   ],
+   "293": [
+    "a"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the order and the degree of the differential equation $$ \\left(\\frac{d^3y}{dx^3} - \\frac{d^2y}{dx^2}\\right)^{\\frac{3}{2}} = \\left(2x + y\\frac{d^2y}{dx^2}\\right)^4",
+   "(b) b) Determine the general series solution of the equation \\((x^2 + 1)\\frac{d^2y}{dx^2} + x\\frac{dy}{dx} - 4y = 0\\) [8 marks]",
+   "(c) c) i) Explain what is meant by the Wronskian of terms \\(u_1\\), \\(u_2\\) and \\(u_3\\). Why is the Wronskian important? [3 marks]",
+   "(d) d) Use the Wronskian to show that if the solutions of a differential equation are \\(e^{3x}\\) and \\(xe^{3x}\\) then they are linearly independent. Give the general solution"
+  ]
+ },
+ {
+  "id": 1156,
+  "current": 171,
+  "targets": [
+   171,
+   293,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "293": [
+    "whole"
+   ],
+   "296": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. Find the order and the degree of the differential equation $$ \\left(\\frac{d^3y}{dx^3} - \\frac{d^2y}{dx^2}\\right)^{\\frac{3}{2}} = \\left(2x + y\\frac{d^2y}{dx^2}\\right)^4"
+  ]
+ },
+ {
+  "id": 1433,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the 2\\textsuperscript{nd} order differential equation $\\frac{d^2y}{dx^2} - \\frac{dy}{dx} = x^3$"
+  ]
+ },
+ {
+  "id": 1434,
+  "current": null,
+  "targets": [
+   289
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the initial value problem $9y'' - 12y' + 4y = 0$, $y(0) = 2$, $y'(0) = -1$"
+  ]
+ },
+ {
+  "id": 1435,
+  "current": null,
+  "targets": [
+   297
+  ],
+  "evidence": {
+   "297": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Cobalt-60 is a radioactive element that is used in medical radiology. It has a half-life of 5.3 years. Suppose that an initial sample of Cobaly-60 has a mass of 100 grams"
+  ]
+ },
+ {
+  "id": 1436,
+  "current": null,
+  "targets": [
+   293
+  ],
+  "evidence": {
+   "293": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve $(D^4 + 2D^2 + 1)y = 0$"
+  ]
+ },
+ {
+  "id": 1437,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of undetermined coefficients to solve $y'' - y' = x$"
+  ]
+ },
+ {
+  "id": 1439,
+  "current": 172,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "c"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use separation of variables to solve the differential equation $$ dy - (y - y^2)dx = 0 \\quad; y(2) = 0 \\qquad \\text{(5 marks)} $$",
+   "(b) b) Solve the following differential equations using the method specified \\(y'' - 7y' = (3 - 36x)e^{6x}\\) (Undetermined coefficients) (5 marks)",
+   "(c) c) The rate at which a body cools is proportional to the difference between the temperatures of the body and that of the surrounding air. If a body in air at \\(20^\\circ C"
+  ]
+ },
+ {
+  "id": 1440,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of separation of variables to solve the initial value problem $$ \\frac{dy}{dx}=y-y^2,\\qquad y(2)=0. $$ Give the solution in explicit form."
+  ]
+ },
+ {
+  "id": 1441,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the orthogonal trajectory of the family of curves $$ x^2 + y^2 = cx \\qquad \\text{(5 marks)} $$",
+   "(b) b) Solve the differential equation below by variation of parameters $$ y'' - 2y' + y = \\frac{1}{x}e^x \\qquad \\text{(5 marks)} $$",
+   "(c) c) A particles moves in a straight line so that its distance from a fixed point on the line satisfies the differential equation $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x"
+  ]
+ },
+ {
+  "id": 1442,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = cx. $$",
+   "(b) (b) Solve the differential equation $$ y'' - 2y' + y = \\frac{e^x}{x} $$ by the method of variation of parameters.",
+   "(c) (c) A particle moves in a straight line so that its displacement \\(x(t)\\) from a fixed point satisfies $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x = 0. $$ If the particle "
+  ]
+ },
+ {
+  "id": 1443,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A small amount of a certain one-celled organism is placed in a beaker of liquid substance (food) and is left stirred. The organism is known to satisfy the differential",
+   "(b) (b) Test for homogeneousness hence solve the de $$ (x^3 + y^3)dx - 3xy^2dy = 0 \\qquad \\text{(4 marks)} $$",
+   "(c) (c) Use Integrating Factor to convert the differential equation $$ (x^2 + 2y^2)dy + (xy^3 + 2y^4 - 4x)dy = 0 \\text{ to exact. Hence solve the differential equation} \\qqua"
+  ]
+ },
+ {
+  "id": 1445,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "289": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Test for exactness of the equation $(2x^2 - y)dx + (3y^2 - x)dy = 0$, hence solve using an appropriate integrating factor. **(7 marks)**",
+   "(b) b. Find the general solution of the differential equation $y'' - 2y' = 4e^{2x} - 18x$. **(7 marks)**",
+   "(c) c. Find the general solution to $\\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1446,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "289": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) Test the equation $(2x^2 - y)\\,dx + (3y^2 - x)\\,dy = 0$ for exactness. If it is not exact, find an integrating factor that depends only on $x$ or only on $y$, and hen",
+   "(b) (b) Find the general solution of the differential equation $y'' - 2y' = 4e^{2x} - 18x$. **(7 marks)**",
+   "(c) (c) Find the general solution of the differential equation $\\dfrac{dy}{dx} = \\dfrac{2x - 2y + 3}{x - y + 1}$. **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1447,
+  "current": 171,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a. Find the differential equation of a circle whose radius is 5 units. **(3 marks)**",
+   "(b) b. Solve: $\\frac{dy}{dx} = \\frac{2y^2 - x^2}{2yx}$ **(5 marks)**",
+   "(c) c. Solve the differential equation $\\frac{dy}{dx} + xy = xy^2$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1448,
+  "current": 171,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the differential equation of a circle whose radius is 5 units. **(3 marks)**",
+   "(b) (b) Solve: $\\dfrac{dy}{dx} = \\dfrac{2y^2 - x^2}{2yx}$. **(5 marks)**",
+   "(c) (c) Solve the differential equation $\\dfrac{dy}{dx} + xy = xy^2$. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1449,
+  "current": 172,
+  "targets": [
+   171,
+   289,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "289": [
+    "a",
+    "b"
+   ],
+   "290": [
+    "c",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a. Determine the order, degree and linearity of the differential equation $\\sqrt{y''} + 2y' = x$ **(3 marks)**",
+   "(b) b. Solve the initial value problem $y'' - 4y' - 12y = 0, \\quad y(0) = -1, \\quad y'(0) = -4$ **(6 marks)**",
+   "(c) c. Use the method of variation of parameters to solve the differential equation $$ y'' - 3y' + 2y = \\frac{e^x}{1 + e^x} $$ **(6 marks)**",
+   "(d) d. Use the method of undetermined coefficients to solve the differential equation $$ (D^2 - 6D + 25)y = 75x^2 - 136x + 80 $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1451,
+  "current": 171,
+  "targets": [
+   289,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "c"
+   ],
+   "297": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. If the population of a country doubles in 50 years, how many years will it triple under the assumption that the rate of increase is proportional to the number of inhab",
+   "(b) b. If $\\ddot{x} + 4\\dot{x} + 29x = \\cos 5t$, find $x$ in terms of $t$ and show that when $t$ is large the motion of the particles is approximately simple harmonic with a ",
+   "(c) c. Solve $(x^2 + 1)y'' + xy' - 4y = 0$. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1453,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b",
+    "c",
+    "d",
+    "e",
+    "f"
+   ],
+   "287": [
+    "g"
+   ]
+  },
+  "parts": [
+   "(a) a. Write the Wronskian, hence determine if the functions \\(f_1(x) = x^2\\), \\(f_2(x) = x^3\\) and \\(f_3(x) = x^{-2}\\) are linearly independent or not. [5 marks]",
+   "(b) b. Determine \\(c_1\\) and \\(c_2\\) so that \\(y(x) = c_1 e^{2x} + c_2 e^x + 2\\sin x\\) will satisfy the conditions \\(y(0) = 0\\) and \\(y'(0) = 1\\). [5 marks]",
+   "(c) c. Find the differential equation representing a circle of radius \\(r\\) and centre \\((1, 2)\\). [3 marks]",
+   "(d) d. Solve the differential equation \\((\\sin x + \\cos x)dy + (\\cos x - \\sin x)dx = 0\\) [3 marks]",
+   "(e) e. The slope of a curve at any point is the reciprocal of twice the ordinate of the point. The curve also passes through the point \\((4, 3)\\). Find the equation of the cu",
+   "(f) f. Show that \\((x^2 + y^2)dx - 3xy^2dy = 0\\) is homogeneous. [4 marks]",
+   "(g) g. If \\(x^m y^n\\) is an integrating factor for \\(\\frac{dy}{dx} - \\frac{y + x^2 y^3}{x} = 0\\), find the values of \\(m\\) and \\(n\\). [6 marks]"
+  ]
+ },
+ {
+  "id": 1455,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b",
+    "d"
+   ],
+   "172": [
+    "c",
+    "e"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a. Determine the order, degree and linearity of the differential equation $$ xy'' = \\sqrt[3]{y + y' + y''} $$ **(3 marks)**",
+   "(b) b. Form the differential equation for \\(y = a \\cos 3x + b \\sin 3x\\) where \\(a\\) and \\(b\\) are arbitrary constants **(2 marks)**",
+   "(c) c. Determine \\(c_1\\) and \\(c_2\\) so that \\(y(x) = c_1 \\sin 2x + c_2 \\cos 2x + 1\\) will satisfy the conditions $$ y\\left(\\frac{\\pi}{8}\\right) = 0 \\quad \\text{and} \\quad y\\",
+   "(d) d. Explain what is meant by the Wronskian of the terms \\(u_1\\), \\(u_2\\), and \\(u_3\\), hence use the Wronskian to show that if the solutions of a differential equation are",
+   "(e) e. Solve the differential equation \\((\\sin x + \\cos x)dy + (\\cos x - \\sin x)dx = 0\\) **(3 marks)** 1. A metallic bar at \\(420^\\circ\\text{F}\\) is placed in a room at \\(85^"
+  ]
+ },
+ {
+  "id": 1457,
+  "current": 171,
+  "targets": [
+   172,
+   288,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "288": [
+    "a"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. A Bernoulli equation is any differential equation of the form \\(\\frac{dy}{dx} + p(x)y = q(x)y^n\\). Show that the substitution \\(z = y^{1-n}\\) transforms the differenti",
+   "(b) b. Use the method of undetermined coefficients to find a general solution to the differential equation \\(y'' - 3y' - 4y = (-11\\cos x + 23\\sin x)e^x\\). **(7 marks)**",
+   "(c) c. Solve the differential equation \\(\\frac{dy}{dx} = \\frac{x-2y-4}{2x+y-3}\\), and show that the general solution reduces to \\(x^2 - y^2 - 4xy - 8x + 6y = C\\) **(8 marks)*"
+  ]
+ },
+ {
+  "id": 1459,
+  "current": 172,
+  "targets": [
+   172,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "d"
+   ],
+   "289": [
+    "a"
+   ],
+   "297": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Solve the differential equation \\(y'' + 4y' + 5y = 0\\), \\(y(0)=1, y'(0)-5\\). **(5 marks)**",
+   "(b) b. Find the orthogonal trajectory of the family of curves \\(y=cx^2\\) **(4 marks)**",
+   "(c) c. Solve the differential equation \\(x\\frac{dy}{dx} = y + \\sqrt{x^2 - y^2}\\), \\(y(x_0)=0\\) **(6 marks)**",
+   "(d) d. Use integrating factor method to solve the differential equation \\(\\frac{dy}{dx} - \\frac{3y}{x+1} = (x+1)^5\\) **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1460,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ x\\frac{dy}{dx} = y + \\sqrt{x^2 - y^2}, \\qquad y(1)=0. $$"
+  ]
+ },
+ {
+  "id": 1461,
+  "current": 172,
+  "targets": [
+   172,
+   287
+  ],
+  "evidence": {
+   "172": [
+    "a"
+   ],
+   "287": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Solve the differential equation \\(4e^{2x}\\tan y dx + (1 - e^{2x})\\sec^2 y dy = 0\\) **(6 marks)**",
+   "(b) b. Given the differential \\((2xy+3y^2)dx + (x^2+6xy-3y^2)dy=0\\), verify its exactness, hence solve it. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1462,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ 4e^{2x}\\tan y\\,dx + (1 - e^{2x})\\sec^2 y\\,dy = 0. $$"
+  ]
+ },
+ {
+  "id": 1463,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "g"
+   ],
+   "287": [
+    "d"
+   ],
+   "289": [
+    "e"
+   ],
+   "297": [
+    "f"
+   ]
+  },
+  "parts": [
+   "(a) a) Eliminate the arbitrary constant and obtain the corresponding differential equation $$ xy = Ae^x + Be^{-2x} + x^2 $$ **(4 Marks)**",
+   "(d) d) Test for the differential equation below for exactness and hence determine the general solution if \\((x + \\sin y)dx + (y^2 + x \\cos y)dy = 0\\). **(4 Marks)**",
+   "(e) e) Find the general solution of the equation $$ y'' + 4y' + 13y = 0 $$ **(3 Marks)**",
+   "(f) f) A radioactive substance disintegrates at a rate proportional to the amount present. If 30\\% of a radioactive substance disintegrates in 10 days, how long will it take ",
+   "(g) g) Show that the following pair of functions are linearly independent $$ \\cos^2 x; \\cos 2x $$ **(3 Marks)**"
+  ]
+ },
+ {
+  "id": 1464,
+  "current": 172,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) i) Solve the differential equation $$ 3e^x \\tan y \\, dx + (1 + e^x) \\sec^2 y \\, dy = 0 $$ $$ y(0) = \\frac{\\pi}{4} $$ ii) Solve the homogeneous differential equation $$",
+   "(c) c) Solve the Bernoulli equation \\(\\frac{dy}{dx} + y = xy^3\\) satisfying \\(y=1, x=0\\). **(4 Marks)**"
+  ]
+ },
+ {
+  "id": 1465,
+  "current": 171,
+  "targets": [
+   287,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "b"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A mug of coffee at $100^{\\circ}C$ is placed in a room at a constant temperature of $30^{\\circ}C$. If after 10 minutes the temperature of the coffee is $70^{\\circ}C$. F",
+   "(b) b) Using a suitable integrating Factor; Solve the differential equation $$ (xy^2 - e^{\\frac{1}{x}})dx - x^2 y dy = 0 $$ **(7 Marks)**"
+  ]
+ },
+ {
+  "id": 1466,
+  "current": 171,
+  "targets": [
+   172,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b",
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) State Newton's law of cooling and set up the initial value problem for the temperature $T(t)$ of the tea at time $t$ minutes.",
+   "(b) (b) Solve the differential equation to find an expression for $T(t)$ at any time $t$.",
+   "(c) (c) Determine how long it takes for the tea to cool to $40^{\\circ}\\mathrm{C}$."
+  ]
+ },
+ {
+  "id": 1467,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Solve the homogeneous equation $(\\sqrt{xy} + x)dy + ydx = 0$. **(5 Marks)**"
+  ]
+ },
+ {
+  "id": 1468,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the homogeneous differential equation $$ (\\sqrt{xy} + x)\\,dy + y\\,dx = 0. $$"
+  ]
+ },
+ {
+  "id": 1469,
+  "current": 172,
+  "targets": [
+   290,
+   293
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "293": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the initial value problem $y''' + 4y' = t$ $$ y(0) = y'(0) = 0, y''(0) = 1 $$ **(10 Marks)**",
+   "(b) b) Use the method of undetermined coefficients to solve the equation $$ \\frac{d^2y}{dx^2} - 2\\frac{dy}{dx} + y = xe^x \\sin x $$ **(10 Marks)**"
+  ]
+ },
+ {
+  "id": 1471,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Use the method of variation of parameters to solve $$ y'' + 4y = 4\\sec^2 2x $$ **(9 Marks)**"
+  ]
+ },
+ {
+  "id": 1473,
+  "current": 171,
+  "targets": [
+   289,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation $$ \\frac{d^4y}{dx^4} - 8\\frac{d^2y}{dx^2} + 16y = 0 $$ **(6 Marks)**",
+   "(c) c) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = 2ax $$ **(5 Marks)**"
+  ]
+ },
+ {
+  "id": 1475,
+  "current": 171,
+  "targets": [
+   172,
+   292,
+   296
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "292": [
+    "a"
+   ],
+   "296": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the given differential equation using power series about the ordinary point $x = 0$ $$ y'' - xy' + x^2 y = 0 $$ **(14 Marks)**",
+   "(b) b) Solve the differential equation $$ \\frac{dy}{dx} + \\sqrt{\\frac{1-y^2}{1-x^2}} = 0 $$ **(6 Marks)**"
+  ]
+ },
+ {
+  "id": 1477,
+  "current": 171,
+  "targets": [
+   171,
+   289,
+   293,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "c",
+    "d"
+   ],
+   "289": [
+    "b"
+   ],
+   "293": [
+    "a"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the order and the degree of the differential equation $$ \\left(\\frac{d^3y}{dx^3} - \\frac{d^2y}{dx^2}\\right)^{\\frac{3}{2}} = \\left(2x + y\\frac{d^2y}{dx^2}\\right)^4",
+   "(b) b) Determine the general series solution of the equation \\((x^2 + 1)\\frac{d^2y}{dx^2} + x\\frac{dy}{dx} - 4y = 0\\) [8 marks]",
+   "(c) c) i) Explain what is meant by the Wronskian of terms \\(u_1\\), \\(u_2\\) and \\(u_3\\). Why is the Wronskian important? [3 marks]",
+   "(d) d) Use the Wronskian to show that if the solutions of a differential equation are \\(e^{3x}\\) and \\(xe^{3x}\\) then they are linearly independent. Give the general solution"
+  ]
+ },
+ {
+  "id": 1478,
+  "current": 171,
+  "targets": [
+   171,
+   288,
+   289,
+   293,
+   296
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "c"
+   ],
+   "288": [
+    "c"
+   ],
+   "289": [
+    "b"
+   ],
+   "293": [
+    "a"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Consider the differential equation $$ \\left(\\frac{d^3y}{dx^3} - \\frac{d^2y}{dx^2}\\right)^{3/2} = \\left(2x + y\\frac{d^2y}{dx^2}\\right)^4. $$ (i) State the order and the",
+   "(b) b) Find the general series solution of the differential equation $$ (x^2+1)\\frac{d^2y}{dx^2} + x\\frac{dy}{dx} - 4y = 0 $$ about the ordinary point \\(x=0\\), giving the fir",
+   "(c) c) (i) Define the Wronskian of three functions \\(u_1, u_2, u_3\\) and explain its role in determining linear independence. [3 marks] (ii) Use the Wronskian to show that th"
+  ]
+ },
+ {
+  "id": 1479,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the 2\\textsuperscript{nd} order differential equation $\\frac{d^2y}{dx^2} - \\frac{dy}{dx} = x^3$"
+  ]
+ },
+ {
+  "id": 1480,
+  "current": 289,
+  "targets": [
+   289
+  ],
+  "evidence": {
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the initial value problem $$ 9y'' - 12y' + 4y = 0, \\qquad y(0) = 2, \\quad y'(0) = -1 . $$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1481,
+  "current": 297,
+  "targets": [
+   297
+  ],
+  "evidence": {
+   "297": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Cobalt-60 is a radioactive element that is used in medical radiology. It has a half-life of 5.3 years. Suppose that an initial sample of Cobalt-60 has a mass of 100 grams"
+  ]
+ },
+ {
+  "id": 1482,
+  "current": 293,
+  "targets": [
+   293
+  ],
+  "evidence": {
+   "293": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve $$ (D^{4} + 2D^{2} + 1)y = 0 . $$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1483,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of undetermined coefficients to solve $y'' - y' = x$"
+  ]
+ },
+ {
+  "id": 1485,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "g"
+   ],
+   "172": [
+    "b",
+    "c",
+    "d",
+    "h"
+   ],
+   "289": [
+    "e"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) 16 kgs of cane sugar in water is being converted into dextrose at a rate which is proportional to the amount unconverted. Find the differential equation expressing the",
+   "(b) b) A curve is defined by the condition that the sum of the $x$- and $y$- intercepts of its tangents is always equal to 2. Express the condition by means of a differential",
+   "(c) c) Solve the differential equation $xy\\,dy - (x^2 + y^2)\\,dx = 0$ and find the particular solution for which $y=0$ when $x=1$. **(4 marks)**",
+   "(d) d) Given $\\dfrac{dy}{dx} = \\dfrac{ax + by + c}{dx + ey + f}$ and $a/d \\neq b/e$, reduce the equation to homogenous form. **(4 marks)**",
+   "(e) e) Show that the solution of the equation $(D^2 - 4)y = 0$ is $y = a\\cos h 2x + b\\sin h 2x$. **(4 marks)**",
+   "(g) g) The equation of a family of parabolas is \\(y^2 = 4A(A+x)\\). Find the differential equation arising from this primitive. **(4 marks)**",
+   "(h) h) Solve the equation \\(\\dfrac{dy}{dx} = \\dfrac{2x+3y+2}{4x-6y-3}\\) **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1486,
+  "current": 172,
+  "targets": [
+   171
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) f) Obtain the first order differential equation associated with $y = cx^2 + c^2$. **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1487,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   288,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "d"
+   ],
+   "287": [
+    "c"
+   ],
+   "288": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the equation \\((D^2+4D+13)y = 0\\). **(3 marks)**",
+   "(b) b) Solve the equation \\(x\\dfrac{dy}{dx} + y = y^2 x^2 \\ln x\\) **(5 marks)**",
+   "(c) c) Show that the differential equation \\(dx + \\{1+(x+y)\\tan y\\}dy = 0\\) has an integrating factor of the form \\((x+y)^n\\) where \\(n\\) is a constant. Solve the equation. *",
+   "(d) d) If \\(\\dfrac{dy}{dx} = (x+y)^2\\) find the particular integral for which \\(y = \\frac{1}{2}\\) when \\(x = \\frac{1}{2}\\)."
+  ]
+ },
+ {
+  "id": 1488,
+  "current": 171,
+  "targets": [
+   290,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) If \\(\\ddot{x} + 4\\dot{x} + 29x = \\cos 5t\\), find \\(x\\) in terms of \\(t\\) and deduce that when \\(t\\) is large the motion of the particle represented by this equation is",
+   "(b) b) Solve the differential equation \\((D^2+6D+8)y = x^3 e^{-2x}\\) **(8 marks)**"
+  ]
+ },
+ {
+  "id": 1489,
+  "current": 172,
+  "targets": [
+   288
+  ],
+  "evidence": {
+   "288": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the differential equation \\(\\dfrac{dy}{dx} + Py = Q\\) by first solving the reduced equation for which \\(Q = 0\\). **(8 marks)**",
+   "(b) b) Solve the differential equation \\((1-xy)y' - y = 0\\) in powers of \\(x\\). **(12 marks)**"
+  ]
+ },
+ {
+  "id": 1491,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Use variation of parameters method to solve the differential equation \\(\\frac{d^2y}{dx^2} + y = \\sec x\\) **[5marks]**"
+  ]
+ },
+ {
+  "id": 1493,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "e"
+   ],
+   "172": [
+    "b"
+   ],
+   "287": [
+    "f"
+   ],
+   "288": [
+    "c"
+   ],
+   "297": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation \\(\\frac{dy}{dx} = \\frac{y}{x} + x \\sin \\frac{y}{x}\\) **[5 marks]**",
+   "(c) c) Obtain the general solution of the Bernoulli equation \\(x^2 dy + y(x + y)dx = 0\\) **[5marks]**",
+   "(d) d) The rate at which the ice melts is proportional to the amount of ice at the instant. Find the amount of ice left after 2 hours if half the amount melts in 30 minutes. ",
+   "(e) e) Show that the functions \\(1, x, x^2\\) are linearly independent. Hence form the differential equation out of them. **[5 marks]**",
+   "(f) f) Show that \\(\\frac{1}{y^3}\\) is the integrating factor of the differential equation \\((y^4 + 2y)dx + (xy^3 + 2y^4 - 4x)dy = 0\\). Hence solve **[5marks]**"
+  ]
+ },
+ {
+  "id": 1494,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "172": [
+    "a"
+   ],
+   "287": [
+    "e"
+   ],
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Solve the differential equation $$ \\frac{dy}{dx} = \\frac{y}{x} + x\\sin\\!\\left(\\frac{y}{x}\\right). $$ [5 marks]",
+   "(b) (b) Obtain the general solution of the Bernoulli equation $$ x^2\\,dy + y(x+y)\\,dx = 0. $$ [5 marks]",
+   "(c) (c) The rate at which a block of ice melts is proportional to the amount of ice present at that instant. If half the original amount melts in 30 minutes, find the fractio",
+   "(d) (d) Show that the functions \\(1,\\; x,\\; x^2\\) are linearly independent, and hence form the differential equation of which they are solutions. [5 marks]",
+   "(e) (e) Show that \\(\\dfrac{1}{y^3}\\) is an integrating factor of the differential equation $$ (y^4+2y)\\,dx + (xy^3+2y^4-4x)\\,dy = 0, $$ and hence solve it. [5 marks]"
+  ]
+ },
+ {
+  "id": 1495,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Obtain the general solution of the equation \\((2x + y + 1)dx + (4x + 2y - 1)dy = 0\\). **(5 marks)with**"
+  ]
+ },
+ {
+  "id": 1496,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Obtain the general solution of the differential equation $$ (2x + y + 1)\\,dx + (4x + 2y - 1)\\,dy = 0. $$"
+  ]
+ },
+ {
+  "id": 1497,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "172": [
+    "b",
+    "c"
+   ],
+   "289": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(b) b) Find the solution of the homogeneous equation \\(x^3 \\frac{dy}{dx} = y^3 + y^2 \\sqrt{y^2 - x^2}\\), satisfying \\(y(4) = 5\\). **[6 marks]**",
+   "(c) c) A string with \\(3\\text{ kg}\\) mass is held stretched \\(0.6\\text{ m}\\) beyond its natural length by a force of \\(20\\text{ Newton}\\). If the string begins at its equilib",
+   "(d) d) Find the solution of the second order initial value problem \\(\\frac{d^2y}{dx^2} - 2\\frac{dy}{dx} + y = 0\\), satisfying \\(y(0) = 2, \\frac{dy}{dx}|_{(0)} = 5\\). **[4 mar"
+  ]
+ },
+ {
+  "id": 1499,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "288": [
+    "b",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that the differential equation \\(\\frac{dy}{dx} = \\frac{2 + ye^{xy}}{2y - xe^{xy}}\\) is exact and hence solve. **[6 marks]**",
+   "(b) b) Solve the initial value problem \\(xy' + 2y = x^3, \\quad y(1) = \\frac{6}{5}\\) **[5 marks]**",
+   "(c) c) A manufacturing company has found that the cost \\(C\\) of operating and maintain the equipment is related to the length \\(m\\) of intervals between overhauls by the equa",
+   "(d) d) Obtain the particular solution of \\(\\frac{dy}{dx} + 2xy = -xy^4\\) satisfying \\(y = 1\\) when \\(x = 0\\). **[4 marks]**"
+  ]
+ },
+ {
+  "id": 1500,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "288": [
+    "b",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that the differential equation $$ \\frac{dy}{dx} = \\frac{2 + y e^{xy}}{2y - x e^{xy}} $$ is exact and hence solve it. **[6 marks]**",
+   "(b) (b) Solve the initial value problem $$ x y' + 2y = x^3, \\quad y(1) = \\frac{6}{5}. $$ **[5 marks]**",
+   "(c) (c) A manufacturing company has found that the cost \\(C\\) of operating and maintaining equipment is related to the length \\(m\\) of intervals between overhauls by the equa",
+   "(d) (d) Obtain the particular solution of $$ \\frac{dy}{dx} + 2xy = -xy^4 $$ satisfying \\(y = 1\\) when \\(x = 0\\). **[4 marks]**"
+  ]
+ },
+ {
+  "id": 1501,
+  "current": 171,
+  "targets": [
+   171,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "290": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) By eliminating the arbitrary constants, find the differential equation associated to i) \\(y = e^{-4x}(c_1 \\cos 5x + c_2 \\sin 5x)\\). **[3 marks]** ii) \\((x - a)^2 + (y ",
+   "(c) c) Solve the differential equation \\(y'' - 2y' + y = x^{-2}e^x\\) using the method of variation of parameters. **[6 marks]**"
+  ]
+ },
+ {
+  "id": 1502,
+  "current": 171,
+  "targets": [
+   171,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) By eliminating the arbitrary constants, find the differential equation associated with (i) \\(y = e^{-3x}(A \\cos 4x + B \\sin 4x)\\). [3 marks] (ii) \\((x - h)^2 + (y - k",
+   "(b) (b) Solve the differential equation \\(y'' - 4y' + 4y = x^{-2}e^{2x}\\) using the method of variation of parameters. [6 marks]"
+  ]
+ },
+ {
+  "id": 1503,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Use the method of undetermined coefficients to solve \\(y'' + y' - 6y = (28x - 24)e^{4x}\\) **[6 marks]**"
+  ]
+ },
+ {
+  "id": 1505,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   287,
+   289,
+   290,
+   293
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "289": [
+    "a"
+   ],
+   "290": [
+    "d"
+   ],
+   "293": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(a) (a) Prove that $y = c_1 \\sin 2x + c_2 x$ is a solution to the d.e $$ (1 - x \\cot x)y'' - xy' + y = 0 $$ **[4 marks]**",
+   "(b) (b) A metal bar at a temp of $100^0\\text{C}$ is placed in a room at constant temperature of $0^0\\text{C}$. If after 20 minutes the temperature of the bar is $50^0\\text{C}",
+   "(c) (c) Find the general solution to the equation below - [(i)] using an appropriate integrating factor. - [(ii)] using separation of variables. $$ (x + 1)\\frac{dy}{dx} = \\fr",
+   "(d) (d) Use variation of parameters solve $y'' - 7y' = (3 - 36x)e^{4x}$ **[6 marks]**",
+   "(e) (e) Use methods of undetermined coefficients to solve the d.e $$ (D^4 - 10D^3 + 35D^2 - 50D + 24)y = 0 $$ **[7 marks]**"
+  ]
+ },
+ {
+  "id": 1507,
+  "current": 172,
+  "targets": [
+   172,
+   287
+  ],
+  "evidence": {
+   "172": [
+    "a"
+   ],
+   "287": [
+    "a",
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that the d.e below are homogeneous hence solve them - [(i)] $(x^3 + y^3)dx - 3xy^2dy = 0$ - [(ii)] $y' = \\frac{x^2 + 2y^2}{xy}$ **[10 marks]** withb) Show that th",
+   "(c) c) Show that \\(\\frac{1}{(xy)^n}\\) is an integrating factor for the d.e \\(ydx + xdy = 0\\) **[3 marks]**"
+  ]
+ },
+ {
+  "id": 1508,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Show that each of the following differential equations is homogeneous, and hence solve it: (i) $(x^3 + y^3)\\,dx - 3xy^2\\,dy = 0$ (ii) $y' = \\dfrac{x^2 + 2y^2}{xy}$"
+  ]
+ },
+ {
+  "id": 1509,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   288
+  ],
+  "evidence": {
+   "171": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "288": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use appropriate integrating factor to solve the d.e $$ y' + y = \\sin x \\quad; \\quad y(\\pi) = 1 $$ **[7marks]**",
+   "(b) b) Solve the Bernoulli equation \\(y' - \\frac{3}{x}y = x^4 y^{\\frac{1}{3}}\\) **[7 marks]**",
+   "(c) (c) Define the term Wronskian. Use the wronskian to find a d.e whose independent solution are; \\(y_1 = e^{3x}, y_2 = e^{2x}, y_3 = e^x\\) **[6marks]**"
+  ]
+ },
+ {
+  "id": 1510,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   288
+  ],
+  "evidence": {
+   "171": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "288": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) Use an appropriate integrating factor to solve the differential equation $$ y' + y = \\sin x, \\qquad y(\\pi) = 1. $$",
+   "(b) (b) Solve the Bernoulli equation $$ y' - \\frac{3}{x}y = x^4 y^{1/3}. $$",
+   "(c) (c) Define the term Wronskian. Use the Wronskian to find a differential equation whose independent solutions are $$ y_1 = e^{3x}, \\quad y_2 = e^{2x}, \\quad y_3 = e^x. $$"
+  ]
+ },
+ {
+  "id": 1511,
+  "current": 172,
+  "targets": [
+   290,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "c"
+   ],
+   "297": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the differential equation of the orthogonal trajectories of the family of curves $$ x^{2} + y^{2} = C . $$ **(8 marks)**",
+   "(b) (b) A small amount of a certain one-celled organism is placed in a beaker of liquid substance (food) and is kept stirred. The growth of the organism is known to satisfy t",
+   "(c) (c) Solve the following differential equation using variation of parameters $$ y'' - y' - 2y = \\sin x . $$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1512,
+  "current": 172,
+  "targets": [
+   172,
+   289,
+   293
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "289": [
+    "a"
+   ],
+   "293": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) Use variation parameters to solve \\(y'' - 2y' + y = \\frac{1}{x}e^x\\) **[7marks]**",
+   "(b) (b) Solve the D.E \\((D^4 - 6D^2 + 11D + 6)y = 0\\) **[7marks]**",
+   "(c) (c) Solve \\(y' = y - y^2\\) **[6marks]**"
+  ]
+ },
+ {
+  "id": 1514,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b",
+    "c",
+    "d",
+    "e",
+    "f"
+   ],
+   "287": [
+    "g"
+   ]
+  },
+  "parts": [
+   "(a) a. Define the Wronskian, hence determine if the functions \\(f_1(x) = x^2\\), \\(f_2(x) = x^3\\) and \\(f_3(x) = x^{-2}\\) are linearly independent or not. **(5 marks)**",
+   "(b) b. Determine \\(c_1\\) and \\(c_2\\) so that \\(y(x) = c_1 e^{2x} + c_2 e^x + 2\\sin x\\) will satisfy the conditions \\(y(0) = 0\\) and \\(y'(0) = 1\\) **(5 marks)**",
+   "(c) c. Find the differential equation representing a circle of radius \\(r\\) and centre \\((1, 2)\\). **(3 marks)**",
+   "(d) d. Solve the differential equation \\((\\sin x + \\cos x)dy + (\\cos x - \\sin x)dx = 0\\). **(3 marks)**",
+   "(e) e. The slope of a curve at any point is the reciprocal of twice the ordinate of the point. The curve also passes through the point \\((4, 3)\\). Find the equation of the cu",
+   "(f) f. Show that \\((x^3 + y^3)dx - 3xy^2dy = 0\\) is homogenous. **(4 marks)**",
+   "(g) g. If \\(x^k y^m\\) is an integrating factor for \\(\\frac{dy}{dx} = \\frac{y + x^4 y^2}{x}\\), find the values of \\(k\\) and \\(m\\). **(6 marks)** *[Handwritten notes:]* \\(x^{k+"
+  ]
+ },
+ {
+  "id": 1515,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "172": [
+    "whole"
+   ],
+   "287": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. Define the Wronskian. Hence determine whether the functions \\(f_1(x)=x^2\\), \\(f_2(x)=x^3\\) and \\(f_3(x)=x^{-2}\\) are linearly independent on \\((0,\\infty)\\). (5 marks) "
+  ]
+ },
+ {
+  "id": 1516,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "289": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. Test for exactness of the equation \\((2x^2 - y^3)dx + 3xy^2dy = 0\\), hence solve using an appropriate integrating factor. **(7 marks)**",
+   "(b) b. Find the general solution of the differential equation \\(y'' - 3y' = 4e^{5x} - 18x\\), **(7 marks)**",
+   "(c) c. Find the general solution to \\(\\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}\\) **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1518,
+  "current": 171,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a. Find the differential equation of a circle whose radius is 5 units. **(8 marks)**",
+   "(b) b. Solve \\(\\frac{dy}{dx} = \\frac{2y^2 - x^2}{2yx}\\) **(5 marks)**",
+   "(c) c. Solve the differential equation \\(\\frac{dy}{dx} + xy = xy^2\\) **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1519,
+  "current": 171,
+  "targets": [
+   288
+  ],
+  "evidence": {
+   "288": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. Find the differential equation of all circles of radius 5 units. **(8 marks)** 2. Solve the differential equation $$ \\frac{dy}{dx} = \\frac{2y^2 - x^2}{2xy}. $$ **(5 ma"
+  ]
+ },
+ {
+  "id": 1520,
+  "current": 172,
+  "targets": [
+   171,
+   289,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "289": [
+    "a",
+    "b"
+   ],
+   "290": [
+    "c",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a. Determine the order, degree and linearity of the differential equation \\(\\sqrt{y''} + 2y' = x\\) **(3 marks)**",
+   "(b) b. Solve the initial value problem \\(y'' - 4y' - y = 0\\), \\(y(0) = -1\\), \\(y'(0) = -4\\) **(6 marks)**",
+   "(c) c. Use the method of variation of parameters to solve the differential equation $$ y'' - 3y' + 2y = \\frac{1}{1 + e^{-t}} $$ **(6 marks)**",
+   "(d) d. Use the method of undetermined coefficients to solve the differential equation $$ (D^2 - 6D + 25)y = 75x^2 - 136x + 80 $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1522,
+  "current": 171,
+  "targets": [
+   289,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "c"
+   ],
+   "297": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a. If the population of a country doubles in 50 years. In how many years will it triple under the assumption that the rate of increase is proportional to the number of in",
+   "(b) b. If \\(\\ddot{x} + 4\\dot{x} + 29x = \\cos 5t\\), find \\(x\\) in terms of \\(t\\) and deduce that when \\(t\\) is large the motion of the particles is approximately simple harmon",
+   "(c) c. Solve \\((x^2 + 1)y'' + xy' - 4\\) **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1524,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   288,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "172": [
+    "c",
+    "f",
+    "h"
+   ],
+   "288": [
+    "a"
+   ],
+   "289": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the equation $x\\frac{dy}{dx} + y = y^2 x \\ln x$ **(4 marks)**",
+   "(b) b) Solve the equation $(D^2 + 4)y = 0$ **(4 marks)**",
+   "(c) c) Solve the equation $(2x + 3y + 2)dx - (4x + 6y - 3)dy = 0$. **(4 marks)**",
+   "(d) d) Obtain the differential equation associated with the primitive $y = A \\sin 2x + B \\sin x + C$. **(4 marks)**",
+   "(f) f) Find the general solution of the equation $(1 + x^2)\\frac{dy}{dx} = \\frac{1 + y^2}{xy}$. **(4 marks)**",
+   "(h) h) Find the differential equation associated with $y = A \\cos 3t + B \\sin 3t$. **(2 marks)**"
+  ]
+ },
+ {
+  "id": 1525,
+  "current": 172,
+  "targets": [
+   171,
+   172
+  ],
+  "evidence": {
+   "171": [
+    "g"
+   ],
+   "172": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(e) e) Given $\\frac{dy}{dx} = \\frac{4x + 5y + 6}{x + 2y + 3}$, reduce the equation to homogeneous form. **(4 marks)**",
+   "(g) g) Find the first order differential equation associated with $y = cx^2 + c^2$. **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1526,
+  "current": 171,
+  "targets": [
+   171,
+   172
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use Wronskian to show that the functions \\(e^x\\), \\(e^{2x}\\) and \\(e^{3x}\\) are linearly independent. Determine the differential equation which has these as independen",
+   "(b) b) Solve the equation \\(\\frac{dy}{dx} - \\frac{y}{1-xy} = 0\\) in powers of \\(x\\). **(12 marks)**"
+  ]
+ },
+ {
+  "id": 1527,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the constant \\(n\\) so that \\((x+y)^n\\) is an integrating factor of \\(\\{1+(x+y)\\tan y\\}\\frac{dy}{dx} + 1 = 0\\), solve the equation. **(7 marks)**",
+   "(b) b) Solve the equation \\((D^2 + 6D + 8)y = x^2e^{-3x}\\) **(8 marks)**",
+   "(c) c) Air in a stadium \\(150\\text{ m} \\times 50\\text{ m} \\times 12\\text{ m}\\) tested \\(0.2\\%\\text{ CO}_2\\). Fresh air containing \\(0.05\\%\\text{ CO}_2\\) was then admitted by "
+  ]
+ },
+ {
+  "id": 1528,
+  "current": 171,
+  "targets": [
+   172,
+   293
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "293": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that if \\(y = c_1y_1 + c_2y_2 + c_3y_3\\) is the complementary function of \\((D^3 + P_1D^2 + P_2D + P_3)y = Q\\) then with \\(L_1, L_2, L_3\\) functions of \\(x\\), \\(y",
+   "(c) c) Solve the equation \\(\\frac{dy}{dx} + y\\cot x = 2\\cos x\\) **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1529,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Solve the equation \\((D^2 - 2D)y = e^x \\sin x\\) using the method of variation of parameters or otherwise. **(8 marks)**"
+  ]
+ },
+ {
+  "id": 1530,
+  "current": 171,
+  "targets": [
+   172,
+   292
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "c",
+    "d",
+    "e",
+    "f"
+   ],
+   "292": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Evaluate $\\displaystyle \\lim_{x \\to 1} \\frac{1 + \\cos \\pi x}{x^2 - 2x + 1}$ **(5 marks)**",
+   "(b) b) Given $x^2 y + y^3 = 2$ find (i) $y'$ and $y''$ at the point $(1,1)$",
+   "(c) c) If $f'(x) = 0$ at all points of the interval $(a, b)$, prove that $f(x)$ must be a constant in the interval. **(2 marks)**",
+   "(d) d) Verify the theorem of the mean for $f(x) = 2x^2 - 7x + 10$ on the interval $[a, b]$. **(2 marks)**",
+   "(e) e) Find $\\displaystyle \\lim_{x \\to 0} (\\cos x)^{\\frac{1}{x^2}}$ **(5 marks)**",
+   "(f) f) if $U = z^3 \\sin \\left(\\frac{y}{x}\\right)$ where $x = 3r^2 + 2s$, $y = 4r - 2s^4$, $z = 2r^2 - 3s^2$ Find $\\displaystyle \\frac{\\partial u}{\\partial r}$. **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1531,
+  "current": null,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b",
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) If $A = (3x^2 - 6yz)i + (2y + 3xz)j + (1 - 4xyz^2)k$, evaluate $\\int A \\cdot dr$ from $(0, 0, 0)$ to $(1, 1, 1)$ along the straight line $(0, 0, 0)$ to $(0, 0, 1)$, th",
+   "(b) b) Verify Green's theorem in the plane for $\\oint_C (2xy - x^2)dx + (x + y^2)dy$ where C is the closed curve of the region bounded by the curves $y = x^2$ and $y^2 = x$. ",
+   "(c) c) State Stoke's Theorem. **(2 marks)**"
+  ]
+ },
+ {
+  "id": 1532,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b",
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Given $x = 2r - s$ and $y = r + 2s$ find $\\frac{\\partial^2 u}{\\partial x \\partial y}$ in terms of r, s.",
+   "(b) b) Find the shortest distance from the origin to the hyperbola $x^2 + 8xy + 7y^2 = 225, z = 0$.",
+   "(c) c) Find the relative maxima and minima of the function $f(x, y) = x^3 + y^3 - 3x - 12y + 20$."
+  ]
+ },
+ {
+  "id": 1533,
+  "current": null,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Verify Stokes theorem for $A = 3yi - xzj + yz^2k$, where S is the surface of the paraboloid $2z = x^2 + y^2$ bounded by $z = 2$ and C is its boundary. ****",
+   "(b) b) Evaluate the triple integral $$ v = \\iiint r^2 \\sin \\theta \\, dr \\, d\\theta \\, d\\phi \\quad \\text{for } r = 0 \\text{ to } \\theta = 0 \\text{ to } \\alpha \\text{ and } \\ph"
+  ]
+ },
+ {
+  "id": 1534,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "b"
+   ],
+   "172": [
+    "a",
+    "d"
+   ],
+   "287": [
+    "e",
+    "f"
+   ],
+   "289": [
+    "b",
+    "c"
+   ],
+   "297": [
+    "g"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the particular solution of the differential equation \\(\\frac{dy}{dx} + 4x = y\\) when \\(y(0) = 4\\). **4 marks**",
+   "(b) b) Show that \\(f(x) = e^x + 2x^2 + 6x + 7\\) is a solution of the differential equation $$ \\frac{d^2y}{dx^2} - 3\\frac{dy}{dx} + 2y = 4x^2 $$ **3 marks**",
+   "(c) c) Solve the equation \\(3\\frac{d^2y}{dx^2} + 4\\frac{dy}{dx} + 9y = 0\\) **4 marks**",
+   "(d) d) Solve \\((x^2 - 3y^2)dx + 2xydy = 0\\) **4 marks**",
+   "(e) e) Find a suitable integrating factor that makes the equation \\((2x^2 + y)dx + (x^2y - x)dy = 0\\) to be exact and hence solve the equation. **4 marks**",
+   "(f) f) Let \\(\\frac{dy}{dx} = \\frac{y^2 - 2x^2 - 6xy}{3x^2 - 2xy + y^2}\\). i. Show that the equation is exact. **3 marks** ii. Hence or otherwise, solve the equation. **2 mark",
+   "(g) g) The population \\(x\\) of a certain city satisfies the law \\(\\frac{dy}{dx} = \\frac{1}{100}x\\) where time \\(t\\) is measured in years. Given that the population of this ci"
+  ]
+ },
+ {
+  "id": 1536,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Consider the equation $$ x^3 \\frac{d^3 y}{dx^3} - 4x^2 \\frac{d^2 y}{dx^2} + 8x \\frac{dy}{dx} - 8y = 4 \\ln x $$ Use a suitable substitution to convert the equation into",
+   "(b) b) Find the differential equation representing all circles of radius 5 **7mks**"
+  ]
+ },
+ {
+  "id": 1537,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) Consider the differential equation $$ x^3 \\frac{d^3 y}{dx^3} - 4x^2 \\frac{d^2 y}{dx^2} + 8x \\frac{dy}{dx} - 8y = 4 \\ln x. $$ Use the substitution \\(x = e^t\\) to trans",
+   "(b) (b) Find the differential equation representing all circles of radius 5. **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1538,
+  "current": 171,
+  "targets": [
+   288,
+   296
+  ],
+  "evidence": {
+   "288": [
+    "a"
+   ],
+   "296": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Given the $$ \\frac{d^2 y}{dx^2} - 3 \\frac{dy}{dx} + 2y = 2x^2 + e^x + 2xe^x + 4e^{3x} $$ i. Assume a solution of the form \\(y = e^{mx}\\), find a solution of the result",
+   "(b) b) Find the power series solution near \\(x = 0\\) for the differential equation \\(\\frac{dy}{dx} - y = x^2\\) **7mks**"
+  ]
+ },
+ {
+  "id": 1539,
+  "current": 171,
+  "targets": [
+   172,
+   296
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b",
+    "c"
+   ],
+   "296": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) (a) Assume a solution of the homogeneous equation of the form \\(y=e^{mx}\\) and find the roots of the resulting auxiliary equation. **(2 marks)**",
+   "(b) (b) Hence write down the complementary solution \\(y_c\\). **(1 mark)**",
+   "(c) (c) Use the method of undetermined coefficients to find a particular solution \\(y_p\\) of the non-homogeneous equation. **(10 marks)**",
+   "(d) (d) Find the power series solution near \\(x=0\\) for the differential equation $$ \\frac{dy}{dx} - y = x^2. $$ **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1540,
+  "current": 172,
+  "targets": [
+   172,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "a"
+   ],
+   "297": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use the method of variation of parameters to solve the differential equation $$ \\frac{d^2 y}{dx^2} + y = \\csc x \\text{ subject to the conditions } y(0) = y\\left(\\frac{",
+   "(b) b) The rate at which radioactive nuclei decay is proportional to the number of nuclei that are present in a given sample. Half of the original number of radioactive nucle"
+  ]
+ },
+ {
+  "id": 1542,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   293,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "287": [
+    "whole"
+   ],
+   "293": [
+    "whole"
+   ],
+   "297": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. Write the order, degree and state whether the differential equation is linear or non-linear $$ \\sqrt{\\frac{d^3y}{dx^3} + y} = x - \\left(\\frac{dy}{dx}\\right)^2 \\text{(2"
+  ]
+ },
+ {
+  "id": 1543,
+  "current": 171,
+  "targets": [
+   171,
+   293
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "293": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) For the differential equation $$ \\sqrt{\\frac{d^3y}{dx^3}+y}=x-\\left(\\frac{dy}{dx}\\right)^2, $$ determine its order, its degree, and state whether it is linear or non-line"
+  ]
+ },
+ {
+  "id": 1544,
+  "current": 172,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "290": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(c) c) Solve \\((1 - x^2)\\frac{dy}{dx} - xy = 1\\) **(5 marks)**",
+   "(d) d) Use the method of undetermined coefficients to solve; \\(y'' - 7y' = (12 - 36x)e^{4x}\\) **(8 marks)**"
+  ]
+ },
+ {
+  "id": 1546,
+  "current": 171,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the differential equation of the family of curves \\(y = ae^{2x} + be^{3x}\\), where a and b are parameters. **(3 marks)**",
+   "(b) b) Solve \\((x + y)dy + (x - y)dx = 0\\) **(5 marks)**",
+   "(c) c) A manufacturing company has found that the cost C of operating and maintaining the equipment is related to the length m of the intervals between overhauls by the equat",
+   "(d) d) A heated metal piece at \\(150^\\circ\\text{C}\\) cools to \\(100^\\circ\\text{C}\\) in 10 minutes when placed in a \\(25^\\circ\\text{C}\\) room. Find",
+   "(a) a. how long will it take for the metal piece to reach a temperature of \\(50^\\circ\\text{C}\\). **(5 marks)**",
+   "(b) b. the temperature of the metal piece after 20 minutes. **(2 marks)**"
+  ]
+ },
+ {
+  "id": 1548,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve \\(\\frac{dy}{dx} = \\frac{y^2+4y+5}{x^2-2x+2}\\) **(3 marks)**",
+   "(b) b) Find the particular solution to the differential equation; \\(\\sin^{-1}x \\, dy = \\frac{y}{\\sqrt{1-x^2}} \\, dx = 0\\), given that \\(y = 2\\) when \\(x = \\frac{1}{2}\\). **(5",
+   "(c) c) Solve \\((D^2 - 6D + 25)y = 0\\). **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1549,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Solve the differential equation $$ \\frac{dy}{dx} = \\frac{y^2+4y+5}{x^2-2x+2}. $$ **(3 marks)**",
+   "(b) (b) Find the particular solution of the differential equation $$ \\sin^{-1}x\\,dy = \\frac{y}{\\sqrt{1-x^2}}\\,dx, $$ given that \\(y=2\\) when \\(x=\\frac{1}{2}\\). **(5 marks)**",
+   "(c) (c) Solve the differential equation $$ (D^2 - 6D + 25)y = 0, $$ where \\(D=\\frac{d}{dx}\\). **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1550,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) d) Use the method of variation of parameters to solve; \\(y'' - 2y' + y = \\frac{e^x}{x}\\) **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1551,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ (x+y)\\,dy + (x-y)\\,dx = 0 $$ by using the substitution \\(y = vx\\), and give the general solution in the form \\(\\ln(x^2+y^2) + 2\\tan^{-1"
+  ]
+ },
+ {
+  "id": 1552,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the differential equation \\(y' - \\frac{3y}{x} = x^4 y^{\\frac{1}{3}}\\). **(5 marks)**",
+   "(b) b) Solve \\(\\frac{dy}{dx} = \\frac{x+2y+1}{2x+4y+3}\\) **(6 marks)**",
+   "(c) c) Solve the differential equation; \\(\\frac{d^2y}{dx^2} + \\tan x \\frac{dy}{dx} = \\cos x\\), \\(y(0) = y'(0) = 1\\). **(9 marks)**"
+  ]
+ },
+ {
+  "id": 1553,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) $y' - \\dfrac{3y}{x} = x^4 y^{1/3}$ **(5 marks)**",
+   "(b) (b) $\\dfrac{dy}{dx} = \\dfrac{x+2y+1}{2x+4y+3}$ **(6 marks)**",
+   "(c) (c) $\\dfrac{d^2y}{dx^2} + \\tan x \\, \\dfrac{dy}{dx} = \\cos x$, with $y(0)=1$ and $y'(0)=1$. **(9 marks)**"
+  ]
+ },
+ {
+  "id": 1554,
+  "current": 172,
+  "targets": [
+   171,
+   287,
+   288,
+   293
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "287": [
+    "whole"
+   ],
+   "288": [
+    "whole"
+   ],
+   "293": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. Determine the order, degree and linearity of the differential equation \\(\\dfrac{d^3y}{dx^3} + 3x\\sqrt[5]{\\dfrac{d^4y}{dx^4}} = 2xy\\dfrac{dy}{dx}\\) **(3 marks)** 2. Det"
+  ]
+ },
+ {
+  "id": 1555,
+  "current": 171,
+  "targets": [
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "c"
+   ],
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that \\((2x \\cos y + 3x^2 y)dx + (x^3 - x^2 \\sin y - y)dy = 0\\) is exact and hence solve (5 marks)",
+   "(b) b) Determine the general solution of \\((x^2 + 1)\\frac{dy}{dx} + 3xy = 6x\\) (5 marks)",
+   "(c) c) The size \\(P\\) of the population of a habitation is modelled as a continuous function of the real variable \\(t\\), where \\(t\\) is in years. The rate of increase of \\(P\\"
+  ]
+ },
+ {
+  "id": 1556,
+  "current": 171,
+  "targets": [
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "c"
+   ],
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that the differential equation $$ (2x\\cos y + 3x^2 y)\\,dx + (x^3 - x^2\\sin y - y)\\,dy = 0 $$ is exact and hence find its general solution. **(5 marks)**",
+   "(b) (b) Determine the general solution of the differential equation $$ (x^2 + 1)\\frac{dy}{dx} + 3xy = 6x. $$ **(5 marks)**",
+   "(c) (c) The size \\(P\\) of the population of a habitation is modelled as a continuous function of the real variable \\(t\\), where \\(t\\) is in years. The rate of increase of \\(P"
+  ]
+ },
+ {
+  "id": 1557,
+  "current": 172,
+  "targets": [
+   172,
+   288,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "d"
+   ],
+   "288": [
+    "c"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine the solution to the initial value problem \\(\\frac{dy}{dx} = \\frac{9x^2 - \\sin x}{\\cos y + 5e^y}\\) given that \\(y(0) = \\pi\\) (4 marks)",
+   "(b) b) Use the method of variation of parameters to solve the differential equation \\(y'' - y' - 2y = 4x^2 - 12x + 41\\) (7 marks)",
+   "(c) c) Solve the Bernoulli equation \\(xy' - (3x + 6)y = -9xe^{-x}y^{\\frac{4}{3}}\\) (4 marks)",
+   "(d) d) The total cost of production \\(y\\) and the level of output \\(x\\) are related to the marginal cost of production by the equation \\((6x^2 + 2y^2)dx - (x^2 + 4xy)dy = 0\\)"
+  ]
+ },
+ {
+  "id": 1558,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the initial value problem $$ \\frac{dy}{dx}=\\frac{6x^2+\\cos x}{\\sin y+4e^y},\\qquad y(0)=\\frac{\\pi}{2}. $$"
+  ]
+ },
+ {
+  "id": 1559,
+  "current": 171,
+  "targets": [
+   287,
+   294,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "b"
+   ],
+   "294": [
+    "a"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) An object moves along the \\(y\\) axis is such a way that at each time \\(t\\), its velocity is given by the differential equation \\(\\frac{dy}{dt} = y^2 \\ln t\\). If the ob",
+   "(b) b) Determine the general solution to \\(\\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}\\) (5 marks) $$ (5x^4 + 3x^2y^2 - 2xy^3)\\,dx + (2x^3y - 3x^2y^2 - 5y^4)\\,dy = 0 $$ Is ",
+   "(c) c) Find the orthogonal trajectory of the family of \\(y^2 = 4Cx\\) **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1560,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "b"
+   ],
+   "287": [
+    "a",
+    "c"
+   ],
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that the differential equation $$ (2x\\cos y + 3x^2 y)\\,dx + (x^3 - x^2\\sin y - y)\\,dy = 0 $$ is exact and hence find its general solution. **(5 marks)**",
+   "(b) (b) Determine the general solution of the first-order linear differential equation $$ (x^2+1)\\frac{dy}{dx} + 3xy = 6x. $$ **(5 marks)**",
+   "(c) (c) The size \\(P\\) of a population is modelled as a continuous function of time \\(t\\) (in years). The rate of increase of \\(P\\) is directly proportional to \\(P\\). (i) Wri"
+  ]
+ },
+ {
+  "id": 1561,
+  "current": 172,
+  "targets": [
+   171,
+   288,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "288": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the solution of the second order initial value problem $$ 4\\frac{d^2y}{dx^2} - 8\\frac{dy}{dx} + 3y = 0, \\text{ satisfying } y(0) = 2, \\, y'(0) = 0.5 $$ **(5 marks",
+   "(b) b) Solve the Bernoulli's equation $$ \\frac{dy}{dx} + \\frac{2}{3(x+1)}y = \\frac{x^2}{y^2} $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1562,
+  "current": 171,
+  "targets": [
+   287
+  ],
+  "evidence": {
+   "287": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Find the integrating factor of the differential equation $$ (x^2 + y^2)\\,dx + 3xy\\,dy = 0. $$ Hence use it to solve the differential equation. **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1563,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) i. Clearly state the difference between an *ordinary differential equation* and a *partial differential equation* **(2 mark)** ii. Classify the differential equation $",
+   "(b) b) By eliminating the arbitrary constants, find the differential equation associated to $$ y = Ax^2 + Bx + C $$ **(4 marks)**"
+  ]
+ },
+ {
+  "id": 1564,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. 1. Clearly state the difference between an *ordinary differential equation* and a *partial differential equation*. (2 marks) 2. Classify the differential equation $$ \\"
+  ]
+ },
+ {
+  "id": 1565,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "172": [
+    "c",
+    "e",
+    "f"
+   ],
+   "289": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(c) c) Solve the differential equation using separation of variables technique. $$ (x+1)\\frac{dy}{dx} = x(y^2 + 1) $$ **(5 marks)**",
+   "(d) d) Find the solution of the second order initial value problem $$ 4\\frac{d^2y}{dx^2} - 8\\frac{dy}{dx} + 3y = 0, \\text{ satisfying } y(0) = 2, y'(0) = 0.5. $$ **(5 marks)*",
+   "(e) e) A manufacturing company has found that the cost C of operating and maintaining the equipment is related to the length \\(m\\) of intervals between overhauls by the equat",
+   "(f) f) Show that the differential equation \\((x^2 - y^2)dx + 2xydy = 0\\) is homogeneous; Use the transformation \\(y = vx\\) to solve the equation. **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1566,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation using the separation of variables technique: $$ (x+2)\\frac{dy}{dx}=x(y^2+1). $$"
+  ]
+ },
+ {
+  "id": 1567,
+  "current": 171,
+  "targets": [
+   287,
+   288
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a). Show that $\\frac{1}{y^4}$ is the integrating factor of the differential equation $(3x^2 - y^2)dy - 2xydx = 0$. Hence solve the differential equation. **(7 marks)**",
+   "(b) b). Show that the differential equation $(5x^4 + 3x^2y^2 - 2xy^3)dx + (2x^3y - 3x^2y^2 - 5y^4)dy = 0$ is exact. Hence solve it. **(7 marks)**",
+   "(c) c. Solve the Bernoulli's equation $\\frac{dy}{dx} - \\frac{y}{x} = -\\frac{5}{2}x^2y^3$ **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1569,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Use the method of undetermined coefficients to solve $y'' - 3y' + 2y = e^x \\sin x$ **(8 marks)**"
+  ]
+ },
+ {
+  "id": 1571,
+  "current": 171,
+  "targets": [
+   288,
+   297
+  ],
+  "evidence": {
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the linear differential equation $\\frac{dy}{dx} + \\frac{4y}{x} = x^4$ **(6 marks)**",
+   "(c) c) The rate at which a body cools is proportional to the difference between the temperature of the body and that of the surrounding air. If a body in air at $25^0C$ will "
+  ]
+ },
+ {
+  "id": 1573,
+  "current": 171,
+  "targets": [
+   171,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "287": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) By eliminating the arbitrary constants, find the differential equation associated to $y = Ae^{2x} + Be^{-5x}$ **(6 marks)**",
+   "(c) c) Find the value of $\\lambda$, for which the differential equation $(xy^2 + \\lambda x^2y)dx + x^2(x + y)dy = 0$ is exact. Solve the equation using this value of $\\lambda"
+  ]
+ },
+ {
+  "id": 1574,
+  "current": 171,
+  "targets": [
+   171,
+   287
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "287": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) (a) By eliminating the arbitrary constants $A$ and $B$, find the differential equation associated with the family of curves $$ y = A e^{2x} + B e^{-5x}. $$",
+   "(b) (b) Find the value of $\\lambda$ for which the differential equation $$ (xy^2 + \\lambda x^2 y)\\,dx + x^2(x + y)\\,dy = 0 $$ is exact. Hence solve the equation using this va"
+  ]
+ },
+ {
+  "id": 1575,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Solve the differential equation $y'' - y' + y = e^{2x}$, using the method of variation of parameters **(9 marks)**"
+  ]
+ },
+ {
+  "id": 1577,
+  "current": 171,
+  "targets": [
+   287
+  ],
+  "evidence": {
+   "287": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Given the differential equation $(2x^2 + y^3)dx + 3xy^2dy = 0$, **(6 marks)** (i) Test for exactness, (ii) Hence solve it"
+  ]
+ },
+ {
+  "id": 1578,
+  "current": 171,
+  "targets": [
+   287
+  ],
+  "evidence": {
+   "287": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Given the differential equation $$ (2x^2 + y^3)\\,dx + 3xy^2\\,dy = 0, $$ (i) Test whether the equation is exact. (ii) Hence solve the equation."
+  ]
+ },
+ {
+  "id": 1579,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "e"
+   ],
+   "172": [
+    "a",
+    "b"
+   ],
+   "287": [
+    "g"
+   ],
+   "289": [
+    "e"
+   ],
+   "297": [
+    "f",
+    "h"
+   ]
+  },
+  "parts": [
+   "(a) a) Differentiate between **Ordinary differential equation** and **Partial differential equation** of differential equations. **(2 marks)**",
+   "(b) b) Form a differential equation from the function \\(y = x + \\frac{A}{x}\\). **(3 marks)**",
+   "(e) e) Find the order, degree and linearity of differential equation $$ \\left( \\frac{d^2y}{dx^2} \\right)^{\\frac{1}{3}} = \\frac{dy}{dx} + y + 2 $$ **(3 marks)**",
+   "(f) f) The rate at which a body cools is proportional to the difference between the temperature of the body and that of the surrounding air. If a body in air at \\(20^\\circ C\\",
+   "(g) g) Show that \\(\\frac{1}{y^3}\\) is the integrating factor of the differential equation $$ (y^4 + 2y)dx + (xy^3 + 2y^4 - 4x)dy = 0. $$ **(5 marks)**",
+   "(h) h) A population growth is modeled by the differential equation \\(\\frac{dP}{dt} = kP\\), where \\(P\\) is the population, \\(t\\) is the time measured in days and \\(k\\) is the "
+  ]
+ },
+ {
+  "id": 1580,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   289,
+   290,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "e"
+   ],
+   "172": [
+    "a",
+    "b",
+    "c"
+   ],
+   "287": [
+    "g"
+   ],
+   "289": [
+    "e"
+   ],
+   "290": [
+    "d"
+   ],
+   "297": [
+    "f",
+    "h"
+   ]
+  },
+  "parts": [
+   "(a) (a) Distinguish between an ordinary differential equation and a partial differential equation. **(2 marks)**",
+   "(b) (b) Form a differential equation from the relation \\(y = x + \\dfrac{A}{x}\\), where \\(A\\) is an arbitrary constant. **(3 marks)**",
+   "(c) (c) Solve the differential equation \\(\\dfrac{dy}{dx} = \\dfrac{2x}{y+1}\\) by separation of variables. **(3 marks)**",
+   "(d) (d) Solve \\((D^2 - 3D + 2)y = e^x\\), where \\(D \\equiv \\dfrac{d}{dx}\\). **(5 marks)**",
+   "(e) (e) Determine the order, degree, and linearity of the differential equation $$ \\left( \\frac{d^2y}{dx^2} \\right)^{\\frac{1}{3}} = \\frac{dy}{dx} + y + 2. $$ **(3 marks)**",
+   "(f) (f) Newton's law of cooling states that the rate at which a body cools is proportional to the difference between its temperature and that of the surrounding air. A body a",
+   "(g) (g) Show that \\(\\dfrac{1}{y^3}\\) is an integrating factor of the differential equation $$ (y^4 + 2y)\\,dx + (xy^3 + 2y^4 - 4x)\\,dy = 0. $$ **(5 marks)**",
+   "(h) (h) A population grows according to the differential equation \\(\\dfrac{dP}{dt} = kP\\), where \\(P\\) is the population at time \\(t\\) days and \\(k\\) is a positive constant. "
+  ]
+ },
+ {
+  "id": 1581,
+  "current": 172,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "290": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(c) c) Solve \\(\\frac{dy}{dx} = \\frac{2x}{y+1}\\) by the method of separation of variables. **(3 marks)**",
+   "(d) d) Solve \\((D^2 - 3D + 2)y = e^x\\) **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1583,
+  "current": 172,
+  "targets": [
+   287,
+   288,
+   289
+  ],
+  "evidence": {
+   "287": [
+    "b"
+   ],
+   "288": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the initial value problem; **(5 marks)** $$ \\frac{d^2y}{dx^2} - 6\\frac{dy}{dx} + 25y = 0, \\quad y(0) = -3, \\quad y'(0) = -1 $$",
+   "(b) b) Given that \\(x^3y' + xy = 1, x > 0, y(1) = 2\\), use the method of Integrating factors to solve the differential equations **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1584,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Show that \\(y = C_1 \\sin x + C_2 x\\) is a solution of the differential equation **(5 marks)** $$ (1 - x\\cot x)y'' - xy' + y = 0 $$"
+  ]
+ },
+ {
+  "id": 1585,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Verify that \\(y = e^x\\) is a solution for the differential equation **(3 marks)** $$ (x - 1)\\frac{d^2y}{dx^2} - x\\frac{dy}{dx} + y = 0 $$",
+   "(b) b) Solve the differential equation \\(\\frac{dy}{dx} = \\frac{-2x + 5y}{2x + y}\\) using the substitution \\(y = vx\\). **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1586,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Use variation of parameters method to solve \\((D^2 + 1)y = \\sec x \\tan x\\) **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1587,
+  "current": 171,
+  "targets": [
+   172,
+   288,
+   293,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "288": [
+    "a"
+   ],
+   "293": [
+    "d"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the linear differential equation \\(\\frac{dy}{dx} + \\frac{y}{x} = x^3 - 3\\). **(5 marks)**",
+   "(b) b) Show that the differential equation",
+   "(c) c) Determine the orthogonal trajectories of the family of curves \\(x^2 + y^2 = cx\\) **(5 marks)**",
+   "(d) d) Solve \\((D^4 + 2D^3 - 7D^2 + 2D + 70)y = 0\\) if one of the roots of the characteristic equation is \\(-3 - i\\) **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1588,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Use the method of undetermined coefficients to solve \\(y'' - 4y = xe^x + \\cos 2x\\) **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1590,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "289": [
+    "b",
+    "d"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation \\(y'' + \\tan x y' = \\cos x\\), given that \\(y(0) = y'(0) = 1\\) **(6 marks)**",
+   "(c) c) Determine the general solution of the differential equation \\(y' = x^2 + 3x\\) and the particular solution that satisfies \\(y = 2\\) when \\(x = 1\\) **(4 marks)**",
+   "(d) d) Solve the differential equation \\(y'' - 2y' - 8y = 0\\) **(3 marks)**"
+  ]
+ },
+ {
+  "id": 1591,
+  "current": 171,
+  "targets": [
+   172,
+   289
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "289": [
+    "a",
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Solve the differential equation $$ y'' + \\tan x \\, y' = \\cos x, $$ given that \\( y(0) = 1 \\) and \\( y'(0) = 1 \\).",
+   "(b) (b) Determine the general solution of the differential equation $$ y' = x^2 + 3x, $$ and find the particular solution that satisfies \\( y = 2 \\) when \\( x = 1 \\).",
+   "(c) (c) Solve the differential equation $$ y'' - 2y' - 8y = 0. $$"
+  ]
+ },
+ {
+  "id": 1592,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   288,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "288": [
+    "d"
+   ],
+   "289": [
+    "a"
+   ],
+   "297": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(a) (a) State the order, degree and linearity of the following differential equation $$ 4\\frac{d^2y}{dx^2} + 8\\left(\\frac{d^4y}{dx^4}\\right)^3 - 4y = 2e^{3x} \\text{(3 Marks)}",
+   "(b) (b) By eliminating the arbitrary constants, find the differential equation associated to $$ y = Ax + B\\ln x \\text{(5 marks)} $$",
+   "(c) (c) Show that the equation \\((3y^2 + 2xy + 2x)dx + (6xy + x^2 + 3)dy = 0\\) **(6 Marks)** Is exact. Hence solve the differential equation",
+   "(d) (d) Solve the Bernoulli equation \\(\\frac{dy}{dx} + 2xy = -xy^4\\) satisfying \\(y = 1, x = 0\\) (5 marks)",
+   "(e) (e) A radioactive substance disintegrates at a rate proportional to the amount present. If 30\\% of a radioactive substance disintegrates in 10 days, how long will it take"
+  ]
+ },
+ {
+  "id": 1594,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) (f) Show that the differential equation \\(x^2dy + y(x + y)dx = 0\\) is homogeneous. Use \\(v = \\frac{y}{x}\\) to solve the equation. **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1595,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Show that the differential equation $$ x^2\\,dy + y(x+y)\\,dx = 0 $$ is homogeneous. Hence, using the substitution \\(v=\\dfrac{y}{x}\\), solve the equation."
+  ]
+ },
+ {
+  "id": 1596,
+  "current": 171,
+  "targets": [
+   287,
+   288
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that \\(x^3y^2\\) is an integrating factor of the differential equation $$ (6x^2y + 4y^3)dx + (3x^3 + 5xy^2)dy = 0. $$ Hence use it to solve the differential equat",
+   "(b) (b) Show that the differential equation $$ (ye^{xy} + 2x)dx + (xe^{xy} - 3y + 5)dy = 0 $$ Is exact. Hence solve it. **(5 marks)**",
+   "(c) (c) Solve the Bernoulli's equation $$ \\frac{dy}{dx} + \\frac{2}{3(x+1)}y = \\frac{x^2}{y^2} \\text{(5 marks)} $$"
+  ]
+ },
+ {
+  "id": 1598,
+  "current": 172,
+  "targets": [
+   172,
+   290,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "a"
+   ],
+   "290": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Use separation of variables to solve the differential equation $$ dy - (y - y^2)dx = 0 \\quad; \\quad y(2) = 0 $$ **(5 marks)**",
+   "(b) b) Solve the following differential equations using the method specified \\(y'' - 7y' = (3 - 3x)e^x\\) (Undetermined coefficients) **(5 marks)**",
+   "(c) c) The rate at which a body cools is proportional to the difference between the temperature of the body and that of the surrounding air. If a body in air at \\(20^\\circ C\\"
+  ]
+ },
+ {
+  "id": 1599,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of separation of variables to solve the initial value problem $$ \\frac{dy}{dx}=y-y^2,\\qquad y(2)=0. $$ Give the solution in explicit form."
+  ]
+ },
+ {
+  "id": 1600,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the orthogonal trajectory of the family of curves $$ x^2 + y^2 = cx $$ **(5 marks)**",
+   "(b) b) Solve the differential equation below by variation of parameters $$ y'' - 2y' + y = \\frac{3}{x}e^x $$ **(5 marks)**",
+   "(c) c) A particle moves in a straight line so that its distance from a fixed point on the line satisfies the differential equation $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x "
+  ]
+ },
+ {
+  "id": 1601,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = cx. $$ (5 marks)",
+   "(b) (b) Solve the differential equation $$ y'' - 2y' + y = \\frac{3}{x}e^x $$ by the method of variation of parameters. (5 marks)",
+   "(c) (c) A particle moves in a straight line so that its displacement \\(x(t)\\) from a fixed point satisfies $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x = 0. $$ Given that the p"
+  ]
+ },
+ {
+  "id": 1602,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A small amount of a certain one-celled organism is placed in a beaker of liquid substance (food) and is left stirred. The organism is known to satisfy the differential",
+   "(b) (b) Test for homogeneousness hence solve the de $$ (x^3 + y^3)dx - 3xy^2dy = 0 $$ **(4 marks)**",
+   "(c) (c) Use Integrating Factor to convert the differential equation $$ (y^4 + 2y)dx + (xy^3 + 2y^4 - 4x)dy = 0 $$ to exact. Hence solve the differential equation **(5 marks)*"
+  ]
+ },
+ {
+  "id": 1603,
+  "current": 171,
+  "targets": [
+   287,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "whole"
+   ],
+   "297": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) A small amount of a certain one-celled organism is placed in a beaker of liquid food and left stirred. The population $p(t)$ of the organism during the initial phase of g"
+  ]
+ },
+ {
+  "id": 1604,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "g"
+   ],
+   "287": [
+    "d"
+   ],
+   "289": [
+    "e"
+   ],
+   "297": [
+    "f"
+   ]
+  },
+  "parts": [
+   "(a) a) Eliminate the arbitrary constant and obtain the corresponding differential equation $$ xy = Ae^x + Be^{-2x} + x^2 $$ **(4 Marks)**",
+   "(d) d) Test for the differential equation below for exactness and hence determine the general solution if \\((x + \\sin y)dx + (y^2 + x \\cos y)dy = 0\\). **(4 Marks)**",
+   "(e) e) Find the general solution of the equation $$ y'' + 4y' + 13y = 0 $$ **(3 Marks)**",
+   "(f) f) A radioactive substance disintegrates at a rate proportional to the amount present. If 30\\% of a radioactive substance disintegrates in 10 days, how long will it take ",
+   "(g) g) Show that the following pair of functions are linearly independent $$ \\cos^2 x; \\cos 2x $$ **(3 Marks)"
+  ]
+ },
+ {
+  "id": 1605,
+  "current": 172,
+  "targets": [
+   172,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) i) Solve the differential equation $$ 3e^x \\tan y \\, dx + (1 + e^x) \\sec^2 y \\, dy = 0 $$ $$ y(0) = \\frac{\\pi}{4} $$ **(4 Marks)** 3. ii) Solve the homogeneous differe",
+   "(c) c) Solve the Bernoulli equation \\(\\frac{dy}{dx} + y = xy^3\\) satisfying \\(y = 1, x = 0\\). **(4 Marks)"
+  ]
+ },
+ {
+  "id": 1606,
+  "current": 171,
+  "targets": [
+   287,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "b"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A mug of coffee at \\(100^{\\circ}C\\) is placed in a room at a constant temperature of \\(30^{\\circ}C\\). If after 10 minutes the temperature of the coffee is \\(70^{\\circ}",
+   "(b) b) Using a suitable Integrating Factor Solve the differential equation $$ (xy^2 - e^{\\frac{1}{x^3}})dx - x^2 y dy = 0 $$ (7 Marks)"
+  ]
+ },
+ {
+  "id": 1607,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) State Newton's law of cooling as a first-order ordinary differential equation, and find an expression for the temperature \\(T(t)\\) of the tea at any time \\(t\\).",
+   "(b) (b) Determine how long it takes for the tea to cool to \\(40^{\\circ}\\mathrm{C}\\).",
+   "(c) (c) Using a suitable integrating factor, solve the differential equation $$ \\left(xy^{2}-e^{1/x^{3}}\\right)\\,dx-x^{2}y\\,dy=0. $$"
+  ]
+ },
+ {
+  "id": 1608,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Solve the homogeneous equation \\((\\sqrt{x}ydy + x)dy + ydx = 0\\). (5 Marks)"
+  ]
+ },
+ {
+  "id": 1610,
+  "current": 172,
+  "targets": [
+   289,
+   290
+  ],
+  "evidence": {
+   "289": [
+    "a"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the initial value problem \\(y'' + 4y' = t\\) $$ y(0) = y'(0) = 0, y''(0) = 1 $$ (10 Marks)",
+   "(b) b) Use the method of undetermined coefficients to solve the equation $$ \\frac{d^2y}{dx^2} - 2\\frac{dy}{dx} + y = xe^x \\sin x $$ (10 Marks)"
+  ]
+ },
+ {
+  "id": 1612,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Use the method of variation of parameters to solve $$ y'' + 4y = 4\\sec^2 2x $$ (9 Marks)"
+  ]
+ },
+ {
+  "id": 1614,
+  "current": 171,
+  "targets": [
+   289,
+   297
+  ],
+  "evidence": {
+   "289": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation $$ \\frac{d^4y}{dx^4} - 8\\frac{d^2y}{dx^2} + 16y = 0 $$ (6 Marks)",
+   "(c) c) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = 2ax $$ (5 Marks)"
+  ]
+ },
+ {
+  "id": 1616,
+  "current": 171,
+  "targets": [
+   292,
+   296
+  ],
+  "evidence": {
+   "292": [
+    "whole"
+   ],
+   "296": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Solve the given differential equation using power series about the ordinary point \\(x = 0\\) $$ y'' - xy' + x^2 y = 0 $$ (14 Marks)"
+  ]
+ },
+ {
+  "id": 1617,
+  "current": 171,
+  "targets": [
+   292,
+   296
+  ],
+  "evidence": {
+   "292": [
+    "whole"
+   ],
+   "296": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ y'' - x y' + x^2 y = 0 $$ using a power series about the ordinary point \\(x=0\\). Give the general solution in the form $$ y(x)=a_0\\,y_1"
+  ]
+ },
+ {
+  "id": 1618,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) solve the differential equation $$ \\frac{dy}{dx} + \\sqrt{\\frac{1-y^2}{1-x^2}} = 0 $$ (6 Marks)"
+  ]
+ },
+ {
+  "id": 1619,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ \\frac{dy}{dx}+\\sqrt{\\frac{1-y^{2}}{1-x^{2}}}=0. $$ Give the general solution in implicit form."
+  ]
+ },
+ {
+  "id": 1620,
+  "current": 172,
+  "targets": [
+   171,
+   172,
+   289,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "d"
+   ],
+   "172": [
+    "b",
+    "c"
+   ],
+   "289": [
+    "d"
+   ],
+   "290": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Use variation of parameters method to solve the differential equation \\(\\dfrac{d^2y}{dx^2} + y = \\sec x\\)",
+   "(b) b) Find the solution of the homogeneous equation $x^2 \\frac{dy}{dx} - y^2 = y \\sqrt{y^2 - x^2}$, satisfying $y(4) = 5$. **[6 marks]**",
+   "(c) c) A string with 3 kg mass is stretched 0.49 m beyond its natural length by a force of 25 Newton. If the string begins at an equilibrium position but a positive given an ",
+   "(d) d) Find the solution of the second order initial value problem $\\frac{d^2y}{dx^2} - 2\\frac{dy}{dx} + y = 0$, satisfying $y(0) = 2, \\frac{dy}{dx}\\big|_{x=0} = -5$. **[4 ma"
+  ]
+ },
+ {
+  "id": 1621,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "e"
+   ],
+   "172": [
+    "b"
+   ],
+   "287": [
+    "f"
+   ],
+   "288": [
+    "c"
+   ],
+   "297": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(b) b) Solve the differential equation \\(\\dfrac{dy}{dx} = \\dfrac{y}{x} + x \\sin \\dfrac{y}{x}\\) **[5 marks]**",
+   "(c) c) Obtain the general solution of the Bernoulli equation \\(x^2 dy + y(x+y)dx = 0\\) **[5 marks]**",
+   "(d) d) The rate at which the ice melts is proportional to the amount of ice at the instant. Find the amount of ice left after 2 hours if half the quantity melts in 30 minutes",
+   "(e) e) Show that the functions \\(1, x, x^2\\) are linearly independent. Hence form the differential equation out of them **[5 marks]**",
+   "(f) f) Show that \\(\\dfrac{1}{y^3}\\) is the integrating factor of the differential equation \\((y^4 + 2y)dx + (xy^3 + 2y^4 - 4x)dy = 0\\). Hence solve **TWO (20 marks)** 2. Obta"
+  ]
+ },
+ {
+  "id": 1622,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "288": [
+    "b",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that the differential equation $\\frac{dy}{dx} = \\frac{2 + ye^{xy}}{2y - xe^{xy}}$ is exact and hence solve. **[6 marks]**",
+   "(b) b) Solve the initial value problem $xy' + 2y = x^3, \\quad y(1) = \\frac{6}{5}$. **[5 marks]**",
+   "(c) c) A manufacturing company has found that the cost $C$ of operating and maintain the equipment is related to the length $m$ of intervals between overhauls by the equation",
+   "(d) d) Obtain the particular solution of $\\frac{dy}{dx} + 2xy = -xy^3$ satisfying $y = 1$ when $x = 0$. **[4 marks]**"
+  ]
+ },
+ {
+  "id": 1623,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   288
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "287": [
+    "a"
+   ],
+   "288": [
+    "b",
+    "d"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that the differential equation $$ \\frac{dy}{dx} = \\frac{2 + y e^{xy}}{2y - x e^{xy}} $$ is exact and hence find its general solution. [6 marks]",
+   "(b) (b) Solve the initial value problem $$ x y' + 2y = x^3, \\quad y(1) = \\frac{6}{5}. $$ [5 marks]",
+   "(c) (c) The cost \\(C\\) of operating and maintaining a piece of equipment is related to the length \\(m\\) of the interval between overhauls by the differential equation $$ m^2 ",
+   "(d) (d) Obtain the particular solution of $$ \\frac{dy}{dx} + 2xy = -x y^3 $$ satisfying \\(y = 1\\) when \\(x = 0\\). [4 marks]"
+  ]
+ },
+ {
+  "id": 1624,
+  "current": 171,
+  "targets": [
+   171,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "290": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) By eliminating the arbitrary constants, find the differential equation associated to i) $y = e^{-4x}(c_1 \\cos 5x + c_2 \\sin 5x)$. **[3 marks]** ii) $(x - a)^2 + (y - b",
+   "(c) c) Solve the differential equation $y'' - 2y' + y = x^{-2}e^x$ using the method of variation of parameters. **[6 marks]**"
+  ]
+ },
+ {
+  "id": 1625,
+  "current": 171,
+  "targets": [
+   171,
+   290
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) 1. By eliminating the arbitrary constants, find the differential equation associated with 1. $y = e^{-2x}(c_1 \\cos 3x + c_2 \\sin 3x)$. [3 marks] 2. $(x - a)^2 + (y - b)^2"
+  ]
+ },
+ {
+  "id": 1626,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Use the method of undetermined coefficients to solve $y'' + y' - 6y = (28x - 24)e^{4x}$. **[6 marks]**"
+  ]
+ },
+ {
+  "id": 1627,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the homogeneous differential equation $$ x^2 \\frac{dy}{dx} - y^2 = y \\sqrt{y^2 - x^2}, $$ satisfying the initial condition \\( y(4) = 5 \\)."
+  ]
+ },
+ {
+  "id": 1628,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "e"
+   ],
+   "172": [
+    "a",
+    "b"
+   ],
+   "287": [
+    "g"
+   ],
+   "289": [
+    "e"
+   ],
+   "297": [
+    "f",
+    "h"
+   ]
+  },
+  "parts": [
+   "(a) a) Differentiate between Ordinary differential equation and Partial differential equation of differential equations. **(2 marks)**",
+   "(b) b) Form a differential equation from the function $y = x + \\frac{A}{x}$. **(3 marks)**",
+   "(e) e) Find the order, degree and linearity of differential equation $$ \\left(\\frac{d^2y}{dx^2}\\right)^{\\frac{3}{2}} = \\frac{dy}{dx} + y + 2 $$ **(3 marks)**",
+   "(f) f) The rate at which a body cools is proportional to the difference between the temperature of the body and that of the surrounding air. If a body in air at $20^\\circ\\tex",
+   "(g) g) Show that $\\frac{1}{y}$ is the integrating factor of the differential equation $$ (y^4 + 2y)dx + (xy^3 + 2y^4 - 4x)dy = 0. $$ **(5 marks)**",
+   "(h) h) A population growth is modeled by the differential equation $\\frac{dP}{dt} = kP$, where $P$ is the population, $t$ is the time measured in days and $k$ is the positive"
+  ]
+ },
+ {
+  "id": 1630,
+  "current": 172,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "c"
+   ],
+   "290": [
+    "d"
+   ]
+  },
+  "parts": [
+   "(c) c) Solve $\\frac{dy}{dx} = \\frac{2x}{y+1}$ by the method of separation of variables. **(3 marks)**",
+   "(d) d) Solve $(D^2 - 5D + 2)y = e^x$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1632,
+  "current": 172,
+  "targets": [
+   287,
+   288,
+   289
+  ],
+  "evidence": {
+   "287": [
+    "b"
+   ],
+   "288": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Solve the Initial value problem; **(5 marks)** $$ \\frac{d^2y}{dx^2} - 6\\frac{dy}{dx} + 25y = 0, \\quad y(0) = -3, \\quad y'(0) = -1 $$",
+   "(b) b) Given that \\(x^2y' + xy = 1, x > 0, y(1) = 2\\), use the method of Integrating factors to solve the differential equations **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1634,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Show that \\(y = C_1\\sin x + C_2x\\) is a solution of the differential equation **(5 marks)** $$ (1 - x\\cot x)y'' - xy' + y = 0 $$"
+  ]
+ },
+ {
+  "id": 1635,
+  "current": 171,
+  "targets": [
+   171,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "289": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Show that \\(y = C_1\\sin x + C_2 x\\) is a solution of the differential equation $$ (1 - x\\cot x)y'' - xy' + y = 0, $$ where \\(C_1\\) and \\(C_2\\) are arbitrary constants."
+  ]
+ },
+ {
+  "id": 1636,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Verify that \\(y = e^x\\) is a solution for the differential equation $$ (x - 1)\\frac{d^2y}{dx^2} - x\\frac{dy}{dx} + y = 0 (3 \\text{ marks}) $$",
+   "(b) b) Solve the differential equation \\(\\frac{dy}{dx} = \\frac{-2x+5y}{2x+y}\\) using the substitution \\(y = vx\\). **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1638,
+  "current": 172,
+  "targets": [
+   290
+  ],
+  "evidence": {
+   "290": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Use variation of parameters method to solve \\((D^2 + 1)y = \\sec x \\tan x\\). **(7 marks)**"
+  ]
+ },
+ {
+  "id": 1639,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the differential equation $$ \\frac{dy}{dx}=\\frac{-2x+5y}{2x+y} $$ using the substitution \\(y=vx\\)."
+  ]
+ },
+ {
+  "id": 1640,
+  "current": 171,
+  "targets": [
+   288
+  ],
+  "evidence": {
+   "288": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) a) Solve the linear differential equation \\(\\frac{dy}{dx} + \\frac{y}{x} = x^3 - 3\\) **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1641,
+  "current": 171,
+  "targets": [
+   288
+  ],
+  "evidence": {
+   "288": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Solve the linear differential equation $$ \\frac{dy}{dx} + \\frac{y}{x} = x^3 - 3, $$ giving the general solution."
+  ]
+ },
+ {
+  "id": 1642,
+  "current": 172,
+  "targets": [
+   287
+  ],
+  "evidence": {
+   "287": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) b) Show that the differential equation $$ (5x^{4} + 3x^{2}y^{2} - 2xy^{3})\\,dx + (2x^{3}y - 3x^{2}y^{2} - 5y^{4})\\,dy = 0 $$ is exact. Hence solve it. **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1644,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b",
+    "d"
+   ],
+   "172": [
+    "c",
+    "e"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a. Determine the order, degree and linearity of the differential equation $$ xy'' = \\sqrt{y} + y' + y^3 $$ **(3 marks)**",
+   "(b) b. Form the differential equation for \\(y = a \\cos 3x + b \\sin 3x\\) where \\(a\\) and \\(b\\) are arbitrary constants. **(3 marks)**",
+   "(c) c. Determine \\(c_1\\) and \\(c_2\\) so that \\(y(x) = c_1 \\sin 2x + c_2 \\cos 2x + 1\\) will satisfy the conditions $$ y\\left(\\frac{\\pi}{4}\\right) = 0 \\quad \\text{and} \\quad y'",
+   "(d) d. Explain what is meant by the Wronskian of the terms \\(u_1\\), \\(u_2\\), and \\(u_3\\), hence use the Wronskian to show that if the solutions of a differential equation are",
+   "(e) e. Solve the differential equation \\((\\sin x + \\cos x)dy + (\\cos x - \\sin x)dx = 0\\) **(3 marks)"
+  ]
+ },
+ {
+  "id": 1645,
+  "current": 172,
+  "targets": [
+   171,
+   288,
+   289
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "288": [
+    "b"
+   ],
+   "289": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the solution of the second order initial value problem $$ 4\\frac{d^2y}{dx^2} - 8\\frac{dy}{dx} + 3y = 0, \\text{ satisfying } y(0) = 2, \\; y'(0) = 0.5 $$ **(5 marks",
+   "(b) b) Solve the Bernoulli's equation $$ \\frac{dy}{dx} + \\frac{2}{3(x+1)}y = \\frac{x^2}{y^2} $$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1646,
+  "current": 171,
+  "targets": [
+   287
+  ],
+  "evidence": {
+   "287": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) c) Find the integrating factor of the differential equation $$ (x^2 + y^2)\\,dx + 3xy\\,dy = 0, $$ Hence use it to solve the differential equation. **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1647,
+  "current": 171,
+  "targets": [
+   171,
+   172,
+   287,
+   288,
+   289,
+   293
+  ],
+  "evidence": {
+   "171": [
+    "a"
+   ],
+   "172": [
+    "b",
+    "f"
+   ],
+   "287": [
+    "c"
+   ],
+   "288": [
+    "g"
+   ],
+   "289": [
+    "h"
+   ],
+   "293": [
+    "a",
+    "e"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine the order, degree and linearity of the differential equation $\\dfrac{d^3y}{dx^3} + 3x\\sqrt[5]{\\dfrac{d^4y}{dx^4}} = 2xy\\dfrac{dy}{dx}$ **(3 marks)**",
+   "(b) b) Determine the differential equation of the family of curves, $y = Ae^{2x} + Be^{3x}$, where $A$ and $B$ are parameters **(3 marks)**",
+   "(c) c) Determine the value of $A$ such that the equation $(x^2 + 3xy)dx + (Ax^2 + 4y)dy = 0$ is exact **(3 marks)**",
+   "(e) e) For what values of $k$, if any, is $y = ce^{kx}$ a solution to the differential equation $$ y''' + 2y'' - 19y' - 20y = 0 $$ **(5 marks)**",
+   "(f) f) Suppose a chef baking a cake places the dough at temperature $21^\\circ\\text{C}$ in an oven kept at a constant temperature of $175^\\circ\\text{C}$. It is observed that t",
+   "(g) g) Solve the Bernoulli differential equation $y' + xy = xy^2$ **(4 marks)**",
+   "(h) h) Determine the particular solution to the initial value problem $4y'' - 8y' + 3y = 0$ given that $y(0) = 2$ and $y'(0) = \\dfrac{1}{2}$ **(5 marks)**"
+  ]
+ },
+ {
+  "id": 1649,
+  "current": 172,
+  "targets": [
+   171,
+   172
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) d) Show that $(x^3 + y^3)dx - 3xy^2dy = 0$ is homogeneous and hence state the order of the equation **(3 marks)**"
+  ]
+ },
+ {
+  "id": 1650,
+  "current": 172,
+  "targets": [
+   171,
+   172
+  ],
+  "evidence": {
+   "171": [
+    "whole"
+   ],
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Show that the differential equation $$ (x^3 + y^3)\\,dx - 3xy^2\\,dy = 0 $$ is homogeneous, and hence state the order of the equation."
+  ]
+ },
+ {
+  "id": 1651,
+  "current": 171,
+  "targets": [
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "c"
+   ],
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) a) Show that \\((2x \\cos y + 3x^2 y)dx + (x^3 - x^2 \\sin y - y)dy = 0\\) is exact and hence solve (3 marks)",
+   "(b) b) Determine the general solution of \\((x^2 + 1)\\frac{dy}{dx} + 3xy = 6x\\) (5 marks)",
+   "(c) c) The size \\(P\\) of the population of a habitation is modelled as a continuous function of the real variable \\(t\\), where \\(t\\) is in years. The rate of increase of \\(P\\"
+  ]
+ },
+ {
+  "id": 1652,
+  "current": 171,
+  "targets": [
+   287,
+   288,
+   297
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "c"
+   ],
+   "288": [
+    "b"
+   ],
+   "297": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that the differential equation $$ (2x\\cos y + 3x^2 y)\\,dx + (x^3 - x^2\\sin y - y)\\,dy = 0 $$ is exact and hence find its general solution. (3 marks)",
+   "(b) (b) Determine the general solution of the differential equation $$ (x^2 + 1)\\frac{dy}{dx} + 3xy = 6x. $$ (5 marks)",
+   "(c) (c) The size \\(P\\) of the population of a habitation is modelled as a continuous function of the real variable \\(t\\), where \\(t\\) is in years. The rate of increase of \\(P"
+  ]
+ },
+ {
+  "id": 1653,
+  "current": 172,
+  "targets": [
+   172,
+   288,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "d"
+   ],
+   "288": [
+    "c"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Determine the solution to the initial value problem \\(\\frac{dy}{dx} = \\frac{9x^2 - \\sin y}{\\cos y + 5e^x}\\) given that \\(y(0) = \\pi\\) (4 marks)",
+   "(b) b) Use the method of variation of parameters to solve the differential equation \\(y'' - y' - 2y = 4x^2 - 12x + 41\\) (7 marks)",
+   "(c) c) Solve the Bernoulli equation \\(xy' - (3x + 6)y = -9xe^{-x}y^4\\) (4 marks)",
+   "(d) d) The total cost of production \\(y\\) and the level of output \\(x\\) are related to the marginal cost of production by the equation \\((6x^2 + 2y^2)dx - (x^2 + 4xy)dy = 0\\)"
+  ]
+ },
+ {
+  "id": 1655,
+  "current": 171,
+  "targets": [
+   172,
+   294
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "294": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) An object moves along the \\(y\\) axis is such a way that at each time \\(t\\), its velocity is given by the differential equation \\(\\frac{dy}{dt} = y^2 \\ln t\\). If the ob",
+   "(b) b) Determine the general solution to \\(\\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}\\) (5 marks)"
+  ]
+ },
+ {
+  "id": 1656,
+  "current": 171,
+  "targets": [
+   172,
+   294
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "294": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) An object moves along the \\(y\\)-axis such that at each time \\(t\\), its velocity is given by the differential equation \\(\\frac{dy}{dt} = y^2 \\ln t\\). If the object is ",
+   "(b) (b) Determine the general solution of the differential equation \\(\\frac{dy}{dx} = \\frac{2x - 2y + 3}{x - y + 1}\\)."
+  ]
+ },
+ {
+  "id": 1657,
+  "current": 171,
+  "targets": [
+   171,
+   287,
+   288,
+   289,
+   297
+  ],
+  "evidence": {
+   "171": [
+    "a",
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "288": [
+    "d"
+   ],
+   "289": [
+    "a"
+   ],
+   "297": [
+    "e"
+   ]
+  },
+  "parts": [
+   "(a) (a) State the order, degree and linearity of the following differential equation $$ 4\\frac{d^2y}{dx^2} + 2\\left(\\frac{d^4y}{dx^4}\\right)^5 - 4y = 2e^x \\text{(3 Marks)} $$",
+   "(b) (b) By eliminating the arbitrary constants, find the differential equation associated to $$ y = Ax + B\\ln x \\text{(5 marks)} $$",
+   "(c) (c) Show that the equation \\((3y^2 + 2xy + 2x)dx + (6xy + x^2 + 3)dy = 0\\) **(6 Marks)** Is exact. Hence solve the differential equation",
+   "(d) (d) Solve the Bernoulli equation \\(\\frac{dy}{dx} + 2xy = -xy^4\\) satisfying \\(y=1, x=0\\) (5 marks)",
+   "(e) (e) A radioactive substance disintegrates at a rate proportional to the amount present. If 30\\% of a radioactive substance disintegrates in 10 days, how long will it take"
+  ]
+ },
+ {
+  "id": 1659,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) (f) Show that the differential equation \\(x^2dy + y(x + y)dx = 0\\) is homogeneous. Use \\(v = \\frac{y}{x}\\) to solve the equation. **(6 marks)**"
+  ]
+ },
+ {
+  "id": 1660,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Show that the differential equation $$ (x^2 + y^2)\\,dx - 2xy\\,dy = 0 $$ is homogeneous. Hence use the substitution \\( v = \\frac{y}{x} \\) to solve the equation."
+  ]
+ },
+ {
+  "id": 1661,
+  "current": 171,
+  "targets": [
+   287,
+   288
+  ],
+  "evidence": {
+   "287": [
+    "a",
+    "b"
+   ],
+   "288": [
+    "c"
+   ]
+  },
+  "parts": [
+   "(a) (a) Show that \\(x^3y^2\\) is an integrating factor of the differential equation $$ (6x^2y + 4y^3)dx + (3x^3 + 5xy^2)dy = 0. $$ Hence use it to solve the differential equat",
+   "(b) (b) Show that the differential equation $$ (ye^{xy} + 2x)dx + (xe^{xy} - 3y + 5)dy = 0 $$ is exact. Hence solve it. **(5 marks)**",
+   "(c) (c) Solve the Bernoulli's equation $$ \\frac{dy}{dx} + \\frac{2}{3(x+1)}y = \\frac{x^2}{y^2} \\text{(5 marks)} $$"
+  ]
+ },
+ {
+  "id": 1663,
+  "current": 172,
+  "targets": [
+   172,
+   290
+  ],
+  "evidence": {
+   "172": [
+    "a",
+    "c"
+   ],
+   "290": [
+    "b"
+   ]
+  },
+  "parts": [
+   "(a) a) Use separation of variables to solve the differential equation $$ dy - (y - y^2)dx = 0 \\quad; \\quad y(2) = 0 $$ **(5 marks)**",
+   "(b) b) Solve the following differential equations using the method specified \\(y'' - 7y' = (3 - 36x)e^{3x}\\) (Undetermined coefficients) **(5 marks)**",
+   "(c) c) The rate at which a body cools is proportional to the difference between the temperatures of the body and that of the surrounding air. If a body in air at \\(20^\\circ C"
+  ]
+ },
+ {
+  "id": 1664,
+  "current": 172,
+  "targets": [
+   172
+  ],
+  "evidence": {
+   "172": [
+    "whole"
+   ]
+  },
+  "parts": [
+   "(-) Use the method of separation of variables to solve the initial value problem $$ \\frac{dy}{dx}=y-y^2,\\qquad y(2)=0. $$ Give the solution in explicit form."
+  ]
+ },
+ {
+  "id": 1665,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) Find the orthogonal trajectory of the family of curves $$ x^2 + y^2 = cx $$ **(5 marks)**",
+   "(b) b) Solve the differential equation below by variation of parameters $$ y'' - 2y' + y = \\frac{1}{x}e^x $$ **(5 marks)**",
+   "(c) c) A particles moves in a straight line so that its distance from a fixed point on the line satisfies the differential equation $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x"
+  ]
+ },
+ {
+  "id": 1666,
+  "current": 171,
+  "targets": [
+   290,
+   294,
+   297
+  ],
+  "evidence": {
+   "290": [
+    "b"
+   ],
+   "294": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) Find the orthogonal trajectories of the family of curves $$ x^2 + y^2 = cx. $$ (5 marks)",
+   "(b) (b) Solve the differential equation $$ y'' - 2y' + y = \\frac{e^x}{x} $$ by the method of variation of parameters. (5 marks)",
+   "(c) (c) A particle moves in a straight line so that its displacement \\(x(t)\\) from a fixed point satisfies $$ \\frac{d^2x}{dt^2} + 4\\frac{dx}{dt} + 4x = 0. $$ If the particle "
+  ]
+ },
+ {
+  "id": 1667,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) a) A small amount of a certain one-celled organism is placed in a beaker of liquid substance (food) and is left stirred. The organism is known to satisfy the differential",
+   "(b) (b) Test for homogeneousness hence solve the de $$ (x^3 + y^3)dx - 3xy^2dy = 0 $$ **(4 marks)**",
+   "(c) (c) Use Integrating Factor to convert the differential equation $$ (y^4 + 2y)dx + (xy^3 + 2y^4 - 4x)dy = 0 $$ to exact. Hence solve the differential equation **(5 marks)*"
+  ]
+ },
+ {
+  "id": 1668,
+  "current": 171,
+  "targets": [
+   172,
+   287,
+   297
+  ],
+  "evidence": {
+   "172": [
+    "b"
+   ],
+   "287": [
+    "c"
+   ],
+   "297": [
+    "a"
+   ]
+  },
+  "parts": [
+   "(a) (a) A small amount of a certain one-celled organism is placed in a beaker of liquid food and left stirred. The population $p(t)$ satisfies the differential equation $$ \\f",
+   "(b) (b) Test the differential equation $$ (x^3+y^3)\\,dx-3xy^2\\,dy=0 $$ for homogeneity, and hence solve it. **(4 marks)**",
+   "(c) (c) Use an integrating factor to convert the differential equation $$ (y^4+2y)\\,dx+(xy^3+2y^4-4x)\\,dy=0 $$ into an exact equation, and hence solve the differential equati"
+  ]
+ }
+]

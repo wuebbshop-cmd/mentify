@@ -1,0 +1,62 @@
+{
+ "993": {
+  "question_latex": "2 2 d 2 y  dy  2 dy\na) Verify that Ax + By = 1 is the solution to xy 2 + x   − y = 0 (10 marks)\n dx  dx  dx\n\n Examination Irregularity is punishable by expulsion Page 2 of 3\n\n \n\nb) If the population of a country doubles in 50 years. In how many years will it triple\n\n under the assumption that the rate of increase is proportional to the number of\n\n inhabitants? (10 marks)",
+  "verification_status": "flagged",
+  "topic_id": null
+ },
+ "996": {
+  "question_latex": "Solve the differential equation 𝑦(1 + 𝑥2) 2𝑑𝑦+ 𝑥√1 + 𝑦2𝑑𝑥= 0",
+  "verification_status": "auto_validated",
+  "topic_id": 171
+ },
+ "997": {
+  "question_latex": "Solve sin−1𝑥𝑑𝑦+ 𝑦 𝑑𝑥= 0, 𝑦(1 = 2 √1−𝑥2 2)\n\n 𝑥𝑦2−𝑦",
+  "verification_status": "auto_validated",
+  "topic_id": null
+ },
+ "998": {
+  "question_latex": "Solve the differential equation 𝑦′ = 𝑥+𝑥2𝑦2",
+  "verification_status": "auto_validated",
+  "topic_id": 171
+ },
+ "999": {
+  "question_latex": "Solve (𝑥+ 𝑦)𝑑𝑦+ (𝑥−𝑦)𝑑𝑥= 0 \n\n 𝑒𝑥",
+  "verification_status": "auto_validated",
+  "topic_id": null
+ },
+ "1000": {
+  "question_latex": "Use the method of variation of parameters to solve 𝑦′′ −2𝑦′ + 𝑦= 1+𝑥2",
+  "verification_status": "auto_validated",
+  "topic_id": 172
+ },
+ "1021": {
+  "question_latex": "Solve the initial value problem y   y   6 y  0, y 0  1, y  0  0",
+  "verification_status": "flagged",
+  "topic_id": null
+ },
+ "1022": {
+  "question_latex": "Define the Wronskian of two functions hence using determine if the functions t and e 2 t\n\n are linear independent or not.",
+  "verification_status": "auto_validated",
+  "topic_id": null
+ },
+ "1480": {
+  "question_latex": "Solve the initial value problem $9y'' - 12y' + 4y = 0$, $y(0) = 2$, $y'(0) = -1$ ****",
+  "verification_status": "auto_validated",
+  "topic_id": null
+ },
+ "1481": {
+  "question_latex": "Cobalt-60 is a radioactive element that is used in medical radiology. It has a half-life of 5.3 years. Suppose that an initial sample of Cobaly-60 has a mass of 100 grams. How long will it take for 90\\% of the sample to decay? ****",
+  "verification_status": "auto_validated",
+  "topic_id": null
+ },
+ "1482": {
+  "question_latex": "Solve $(D^4 + 2D^2 + 1)y = 0$ ****",
+  "verification_status": "auto_validated",
+  "topic_id": null
+ },
+ "1511": {
+  "question_latex": "**\n\n(a) Find the d.e for orthogonal trajectory of the family of curves given by \\(x^2 + y^2 = C\\)\n**[8marks]**\n\n(b) A small amount of a certain one celled organism is placed in a beaker of liquid substance (food) and is kept stirred. The organism growth is known to satisfy the d.e \\(\\frac{dp}{dt} = kp\\). Where \\(p\\) is the population during the initial phase of its growth. If the population triples in two hours, determine the natural growth rate \\(k\\) and the doubling time.\n**[6 marks]**\n\n(b) Solve the following de using variation of parameters\n\n$$\ny'' - y' - 2y = \\sin x\n$$\n\n**[6marks]**",
+  "verification_status": "flagged",
+  "topic_id": null
+ }
+}
