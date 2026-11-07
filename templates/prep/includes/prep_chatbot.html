@@ -33,6 +33,9 @@
     border: 2px solid #ffffff;
     border-radius: 50%;
   }
+  .prep-chatbot-dismiss {
+    display: none;
+  }
 
   .prep-chatbot-window {
     position: fixed;
@@ -315,6 +318,24 @@
       width: 50px;
       height: 50px;
     }
+    .prep-chatbot-dismiss {
+      position: fixed;
+      right: 10px;
+      bottom: 58px;
+      z-index: 10000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 50%;
+      background: var(--surface, #ffffff);
+      color: var(--text-muted, #64748b);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+      cursor: pointer;
+    }
     .prep-chatbot-window {
       bottom: 0;
       right: 0;
@@ -350,6 +371,9 @@
   <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
     <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
   </svg>
+</button>
+<button type="button" id="prepChatDismissBtn" class="prep-chatbot-dismiss" aria-label="Hide Mentify Prep Assistant for this session" title="Hide assistant">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
 </button>
 
 <!-- Chat Window Drawer -->
@@ -407,6 +431,7 @@
 <script>
 (function() {
   const triggerBtn = document.getElementById('prepChatTrigger');
+  const dismissBtn = document.getElementById('prepChatDismissBtn');
   const chatWindow = document.getElementById('prepChatWindow');
   const closeBtn = document.getElementById('prepChatCloseBtn');
   const clearBtn = document.getElementById('prepChatClearBtn');
@@ -415,6 +440,20 @@
   const sendBtn = document.getElementById('prepChatSendBtn');
 
   if (!triggerBtn || !chatWindow) return;
+
+  const dismissStorageKey = 'mentify_prep_chat_dismissed';
+  function hideAssistantForSession() {
+    chatWindow.classList.remove('active');
+    triggerBtn.style.display = 'none';
+    if (dismissBtn) dismissBtn.style.display = 'none';
+    try { sessionStorage.setItem(dismissStorageKey, 'true'); } catch (e) {}
+  }
+  try {
+    if (window.innerWidth <= 640 && sessionStorage.getItem(dismissStorageKey) === 'true') {
+      hideAssistantForSession();
+    }
+  } catch (e) {}
+  if (dismissBtn) dismissBtn.addEventListener('click', hideAssistantForSession);
 
   let history = [];
 
@@ -432,11 +471,13 @@
     if (chatWindow.classList.contains('active')) {
       if (window.innerWidth <= 640) {
         triggerBtn.style.display = 'none';
+        if (dismissBtn) dismissBtn.style.display = 'none';
       }
       inputEl.focus();
       scrollToBottom();
     } else {
       triggerBtn.style.display = 'flex';
+      if (dismissBtn && window.innerWidth <= 640) dismissBtn.style.display = 'inline-flex';
     }
   }
 

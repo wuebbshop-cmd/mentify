@@ -32,6 +32,9 @@
     border: 2px solid var(--white, #ffffff);
     border-radius: 50%;
   }
+  .mentify-chatbot-dismiss {
+    display: none;
+  }
 
   .mentify-chatbot-window {
     position: fixed;
@@ -292,6 +295,24 @@
       width: 50px;
       height: 50px;
     }
+    .mentify-chatbot-dismiss {
+      position: fixed;
+      right: 10px;
+      bottom: 58px;
+      z-index: 10000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 50%;
+      background: var(--bg-surface, #ffffff);
+      color: var(--text-muted, #64748b);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+      cursor: pointer;
+    }
     .mentify-chatbot-window {
       bottom: 0;
       right: 0;
@@ -327,6 +348,9 @@
   <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
   </svg>
+</button>
+<button type="button" id="mentifyChatDismissBtn" class="mentify-chatbot-dismiss" aria-label="Hide Mentify Assistant for this session" title="Hide assistant">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
 </button>
 
 <!-- Chat Window Drawer -->
@@ -381,12 +405,27 @@
 <script>
 (function() {
   const triggerBtn = document.getElementById('mentifyChatTrigger');
+  const dismissBtn = document.getElementById('mentifyChatDismissBtn');
   const chatWindow = document.getElementById('mentifyChatWindow');
   const closeBtn = document.getElementById('mentifyChatCloseBtn');
   const clearBtn = document.getElementById('mentifyChatClearBtn');
   const messagesContainer = document.getElementById('mentifyChatMessages');
   const inputEl = document.getElementById('mentifyChatInput');
   const sendBtn = document.getElementById('mentifyChatSendBtn');
+
+  const dismissStorageKey = 'mentify_chat_dismissed';
+  function hideAssistantForSession() {
+    chatWindow.classList.remove('active');
+    triggerBtn.style.display = 'none';
+    if (dismissBtn) dismissBtn.style.display = 'none';
+    try { sessionStorage.setItem(dismissStorageKey, 'true'); } catch (e) {}
+  }
+  try {
+    if (window.innerWidth <= 640 && sessionStorage.getItem(dismissStorageKey) === 'true') {
+      hideAssistantForSession();
+    }
+  } catch (e) {}
+  if (dismissBtn) dismissBtn.addEventListener('click', hideAssistantForSession);
 
   let history = [];
 
@@ -404,11 +443,13 @@
     if (chatWindow.classList.contains('active')) {
       if (window.innerWidth <= 640) {
         triggerBtn.style.display = 'none';
+        if (dismissBtn) dismissBtn.style.display = 'none';
       }
       inputEl.focus();
       scrollToBottom();
     } else {
       triggerBtn.style.display = 'flex';
+      if (dismissBtn && window.innerWidth <= 640) dismissBtn.style.display = 'inline-flex';
     }
   }
 
