@@ -1,0 +1,46 @@
+{
+  "838": {
+    "question_latex": "Obtaintheequationofthelineofbestfitbyleastsquaresmethodforthefollowingdate:\n\n X 0 1 2 3 4 5 6\n\n Y 2 1 3 2 4 3 5",
+    "verification_status": "auto_validated"
+  },
+  "839": {
+    "question_latex": "Thefollowingtableshowsclassesandfrequencies.\n\n Class 5–7 8–10 11–13 14–16 17–19 20–22 23–25\n\n Frequenc 2 4 8 7 5 3 1\n y\n\n Calculate:\n\n (a) Themedianandmode.\n (b) TheFirstandthirdquartiles.\n (c) 7thand84thpercentiles\n (d) meanandstandarddeviationusingassumedmeanA=12\n (e) BothPearson’scoefficientsofskewness\n\n (f) Bowley’scoefficientofskewness.",
+    "verification_status": "auto_validated"
+  },
+  "834": {
+    "question_latex": "-**\n\nConsider the following frequency distribution table.\n\n| Class Interval | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 | 50-60 |\n| --- | --- | --- | --- | --- | --- | --- |\n| Frequency | 5 | 10 | 14 | 10 | 6 | 5 |\n\n(a) Find the mean and the standard deviation (s.d) by changing both the location(use an assumed mean of 35) and the scale(use common class width) **(7marks)**\n\n(b) Find (i) \\quad mode\n (ii) \\quad median\n (iii) \\quad interquartile range\n (iv) \\quad coefficient of variation based on s.d\n (v) \\quad coefficient of skewnessbased on quartiles. **(13marks)**",
+    "verification_status": "auto_validated"
+  },
+  "815": {
+    "question_latex": "A random sample of 100 is drawn from a database. The distribution of the lengths of European names is\nas follows:\n\n Number of letters 3 4 5 6 7 8 9 10 11 12\n Frequency 3 10 18 20 18 12 8 4 5 2\n\n a) Calculate the first four moments about the mean\n b) Calculate the coefficient of skewnes and comment\n c) Calculate the coefficient of kurtosis and comment.",
+    "verification_status": "auto_validated"
+  },
+  "816": {
+    "question_latex": "The age, x years and heights, y cm of 10 boys were as follows:\n\n Age (x) 6.6 6.8 6.9 7.8 7.8 8.2 10. 11.4 12. 13.5\n 1 8\n Height(y 119 116 11 124 12 123 135 151 141 140\n ) 6 2\n\n i. Calculate the regression equation of y on x.\n ii. Estimate the height of a boy of 9.0 years.",
+    "verification_status": "auto_validated"
+  },
+  "810": {
+    "question_latex": "A bar chart shows the distribution of students’ favorite programming languages in a class:\nPython (45%), R (25%), Java (20%), and C++ (10%). Draw a vertical bar chart for this data.",
+    "verification_status": "auto_validated"
+  },
+  "811": {
+    "question_latex": "A bar chart is used to summarize survey results on students’ preferred study times: Morning,\nAfternoon, Evening, and Night. Discuss two possible misrepresentations that could occur if the\nchart is poorly constructed (e.g., unequal bar widths, non-zero baseline). Explain why these\nissues affect the interpretation of data.",
+    "verification_status": "auto_validated"
+  },
+  "812": {
+    "question_latex": "Two bar charts represent student club membership in different faculties. In the , the numbers are: Debate (40), Music (35), Sports (50). In the , the\nnumbers are: Debate (60), Music (70), Sports (55). Draw side-by-side bar charts to compare the\ndistributions. Comment on the similarities and differences in club popularity between the two\nfaculties.",
+    "verification_status": "auto_validated"
+  },
+  "813": {
+    "question_latex": "The marks obtained by 40 students in a mathematics test are grouped as follows.\n\n Marks Frequency\n 0 – 10 3\n 10 – 20 7\n 20 – 30 10\n 30 – 40 8\n 40 – 50 12\n\nConstruct a histogram to represent the data.",
+    "verification_status": "auto_validated"
+  },
+  "785": {
+    "question_latex": "During the last year entrance examination into a certain university in the United States, students were graded scored between 0 and 100. The scores of the candidates are recorded in the table below:\n\n| Class Boundaries | Number of students |\n| :--- | :--- |\n| 0 -- 10 | 10 |\n| 10 -- 20 | 15 |\n| 20 -- 30 | 10 |\n| 30 -- 40 | 21 |\n| 40 -- 50 | 33 |\n| 50 -- 60 | 40 |\n| 60 -- 70 | 25 |\n| 70 -- 80 | 12 |\n| 80 -- 90 | 8 |\n| 90 -- 100 | 1 |\n\n(a) Calculate the arithmetic mean using\n\n(i) The direct method **(4 marks)**\n\n(ii) An assumed mean of 40 **(4 marks)**\n\n(iii) The coding method **(4 marks)**\n\n(b) Calculate $Q_1$, $Q_2$, $Q_3$ **(6 marks)**\n\n(c) Calculate the semi-interquartile range **(2 marks)**",
+    "verification_status": "auto_validated"
+  },
+  "786": {
+    "question_latex": "Two students were graded in 11 subjects and the results are recorded in the table below\n\n| \\multirow{2}{*}{**SUBJECTS**} | \\multicolumn{2}{c|}{**SCORES**} | |\n| --- | --- | --- |\n| | **Benny** | **Flora** |\n| 1 | 3 | 6 |\n| 2 | 11 | 10 |\n| 3 | 12 | 10 |\n| 4 | 10 | 4 |\n| 5 | 12 | 4 |\n| 6 | 10 | 5 |\n| 7 | 4 | 8 |\n| 8 | 10 | 9 |\n| 9 | 2 | 1 |\n| 10 | 0 | 6 |\n| 11 | 4 | 5 |\n\n(a) Calculate the coefficient of variation for Benny **(4 marks)**\n\n(b) Calculate the coefficient of variation for Flora. **(4 marks)**\n\n(c) Which of the two teams is least consistent? **(4 marks)**\n\n(d) Calculate the second moment about the mean for Benny **(4 marks)**\n\n(e) Calculate the second moment about the mean for Flora. **(4 marks)**",
+    "verification_status": "auto_validated"
+  }
+}

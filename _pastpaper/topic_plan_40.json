@@ -1,0 +1,1385 @@
+[
+  {
+    "id": 1268,
+    "targets": [
+      143,
+      145,
+      146,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1272,
+    "targets": [
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      148,
+      153
+    ],
+    "evidence": {
+      "141": [
+        "\\bcontinuous\\b|\\bdiscrete\\b|\\bnominal\\b|\\bordinal\\b|\\btypes of data\\b"
+      ],
+      "142": [
+        "\\bsurvey\\b|\\bquestionnaire\\b|\\bdata collection\\b|\\bcollected data\\b"
+      ],
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1276,
+    "targets": [
+      144,
+      145,
+      146
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1280,
+    "targets": [
+      142,
+      143,
+      144,
+      145,
+      146,
+      148,
+      153
+    ],
+    "evidence": {
+      "142": [
+        "\\bfamilies was surveyed\\b|\\bdata were (?:collected|recorded)\\b"
+      ],
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 829,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 834,
+    "targets": [
+      143,
+      144,
+      145,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b",
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1269,
+    "targets": [
+      143,
+      144,
+      148,
+      152,
+      153
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bquartile\\b|\\bmeasures of central tendency\\b"
+      ],
+      "148": [
+        "\\bstratified\\b|\\bsystematic sample\\b|\\bcluster sample\\b|\\bpopulation\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1273,
+    "targets": [
+      144,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 835,
+    "targets": [
+      142,
+      146,
+      148
+    ],
+    "evidence": {
+      "142": [
+        "\\bsurvey\\b|\\bquestionnaire\\b|\\bdata collection\\b|\\bcollected data\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b",
+        "\\bstratified\\b|\\bsystematic sample\\b|\\bcluster sample\\b|\\bpopulation\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1270,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1274,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1277,
+    "targets": [
+      144,
+      151,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "151": [
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 821,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 826,
+    "targets": [
+      143,
+      144,
+      145,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b",
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1278,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1281,
+    "targets": [
+      144,
+      146,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "146": [
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1271,
+    "targets": [
+      146,
+      154
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b"
+      ],
+      "154": [
+        "\\breal[- ]life\\b|\\beveryday situation\\b|\\bpractical application\\b|\\bapplications?\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1275,
+    "targets": [
+      146
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1279,
+    "targets": [
+      146
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1282,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1285,
+    "targets": [
+      143,
+      144,
+      145,
+      146,
+      148
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1289,
+    "targets": [
+      140,
+      141,
+      143,
+      144,
+      145,
+      146,
+      148,
+      151
+    ],
+    "evidence": {
+      "140": [
+        "\\bparameter\\b.*\\bstatistic\\b"
+      ],
+      "141": [
+        "\\bcontinuous\\b|\\bdiscrete\\b|\\bnominal\\b|\\bordinal\\b|\\btypes of data\\b"
+      ],
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b",
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b",
+        "\\bstratified\\b|\\bsystematic sample\\b|\\bcluster sample\\b|\\bpopulation\\b"
+      ],
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1286,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1290,
+    "targets": [
+      151,
+      152
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1291,
+    "targets": [
+      143,
+      144,
+      145,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b",
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1287,
+    "targets": [
+      143,
+      144,
+      146,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bquartile\\b|\\bmeasures of central tendency\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1288,
+    "targets": [
+      140,
+      141,
+      144,
+      146,
+      153,
+      154
+    ],
+    "evidence": {
+      "140": [
+        "\\bdistinguish between categorical data and numerical data\\b"
+      ],
+      "141": [
+        "\\bcategorical\\b|\\bnumerical data\\b|\\bqualitative\\b|\\bquantitative\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ],
+      "154": [
+        "\\breal[- ]life\\b|\\beveryday situation\\b|\\bpractical application\\b|\\bapplications?\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 841,
+    "targets": [
+      144,
+      148
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1284,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b",
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1254,
+    "targets": [
+      143,
+      145,
+      146,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1257,
+    "targets": [
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      148,
+      153
+    ],
+    "evidence": {
+      "141": [
+        "\\bcontinuous\\b|\\bdiscrete\\b|\\bnominal\\b|\\bordinal\\b|\\btypes of data\\b"
+      ],
+      "142": [
+        "\\bsurvey\\b|\\bquestionnaire\\b|\\bdata collection\\b|\\bcollected data\\b"
+      ],
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1261,
+    "targets": [
+      144,
+      145,
+      146,
+      148
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1265,
+    "targets": [
+      143,
+      144,
+      145,
+      146,
+      148,
+      153
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 800,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 805,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b",
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1255,
+    "targets": [
+      143,
+      144,
+      145,
+      152,
+      153
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bquartile\\b|\\bmeasures of central tendency\\b"
+      ],
+      "145": [
+        "manual review override"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1258,
+    "targets": [
+      144,
+      148,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 806,
+    "targets": [
+      142,
+      146,
+      148
+    ],
+    "evidence": {
+      "142": [
+        "\\bsurvey\\b|\\bquestionnaire\\b|\\bdata collection\\b|\\bcollected data\\b"
+      ],
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b",
+        "\\bstratified\\b|\\bsystematic sample\\b|\\bcluster sample\\b|\\bpopulation\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1256,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1259,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1262,
+    "targets": [
+      144,
+      151,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "151": [
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 792,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 797,
+    "targets": [
+      143,
+      144,
+      145,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b",
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 807,
+    "targets": [
+      144,
+      146,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "146": [
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1263,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 793,
+    "targets": [
+      146,
+      154
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ],
+      "154": [
+        "\\breal[- ]life\\b|\\beveryday situation\\b|\\bpractical application\\b|\\bapplications?\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 808,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1260,
+    "targets": [
+      146
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1264,
+    "targets": [
+      146
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 815,
+    "targets": [
+      144,
+      148,
+      152,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 816,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1267,
+    "targets": [
+      151,
+      153
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 838,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "manual review override"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 839,
+    "targets": [
+      143,
+      144,
+      145,
+      152
+    ],
+    "evidence": {
+      "143": [
+        "manual review override"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "152": [
+        "\\bskewness\\b|\\bkurtosis\\b|\\bpeakedness\\b|\\bshape\\b|\\bsymmetric\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1283,
+    "targets": [
+      146
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 809,
+    "targets": [
+      141,
+      143
+    ],
+    "evidence": {
+      "141": [
+        "\\bcategorical\\b|\\bnumerical data\\b|\\bqualitative\\b|\\bquantitative\\b"
+      ],
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 810,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "manual review override"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 811,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "manual review override"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 812,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "manual review override"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 813,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1266,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 961,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b",
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 962,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 963,
+    "targets": [
+      144
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 1330,
+    "targets": [
+      143
+    ],
+    "evidence": {
+      "143": [
+        "\\bstem[- ]and[- ]leaf\\b|\\bhistogram\\b|\\bfrequency polygon\\b|\\bogive\\b",
+        "\\bfrequency distribution\\b|\\bfrequency table\\b|\\bgrouped data\\b|\\bcumulative frequency\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 785,
+    "targets": [
+      143,
+      144,
+      145
+    ],
+    "evidence": {
+      "143": [
+        "\\bclass boundaries\\b|\\bclass intervals?\\b|\\bconstruct a table\\b|\\btabulate\\b"
+      ],
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bquartile deviation\\b|\\binterquartile range\\b|\\bsemi-interquartile\\b|\\brange\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 786,
+    "targets": [
+      144,
+      145,
+      153
+    ],
+    "evidence": {
+      "144": [
+        "\\bmean\\b|\\bmedian\\b|\\bmode\\b|\\baverage\\b|\\barithmetic mean\\b|\\bgeometric mean\\b"
+      ],
+      "145": [
+        "\\bvariance\\b|\\bstandard deviation\\b|\\bcoefficient of variation\\b|\\bdispersion\\b"
+      ],
+      "153": [
+        "\\bmoment(s)?\\b|\\bmoment about\\b|\\bcentral moment\\b|\\bmoment coefficient\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 787,
+    "targets": [
+      151
+    ],
+    "evidence": {
+      "151": [
+        "\\bcorrelation\\b|\\bregression\\b|\\bleast squares\\b|\\bscatter diagram\\b|\\bscatter plot\\b",
+        "\\brank correlation\\b|\\bspearman\\b|\\bpearson\\b|\\bcovariance\\b|\\brelationship\\b"
+      ]
+    },
+    "current": null
+  },
+  {
+    "id": 788,
+    "targets": [
+      146,
+      148
+    ],
+    "evidence": {
+      "146": [
+        "\\bprobability\\b|\\bevent(s)?\\b|\\bconditional probability\\b|\\bbayes\\b",
+        "\\bmutually exclusive\\b|\\bindependent events?\\b|\\bwith replacement\\b|\\bwithout replacement\\b",
+        "\\bdice\\b|\\bdie\\b|\\bcoin(s)?\\b|\\bballs?\\b|\\bour?\\b"
+      ],
+      "148": [
+        "\\bsampling\\b|\\bsample\\b|\\bsampled\\b|\\brandom sample\\b|\\brandomly selected\\b"
+      ]
+    },
+    "current": null
+  }
+]
