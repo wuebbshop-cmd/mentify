@@ -1,5 +1,7 @@
 from unittest.mock import patch
+from io import StringIO
 
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -255,3 +257,16 @@ class FreeCreditEntitlementTests(TestCase):
         self.assertFalse(user.prep_notifications.filter(
             title="Use your student email for the full free allowance"
         ).exists())
+
+    def test_backfill_command_notifies_existing_standard_accounts_once(self):
+        standard_user, _wallet = self.create_user_and_wallet("existing.standard@gmail.com")
+        student_user, _wallet = self.create_user_and_wallet("existing@students.ku.ac.ke")
+
+        output = StringIO()
+        call_command("backfill_standard_email_credit_notices", stdout=output)
+        call_command("backfill_standard_email_credit_notices", stdout=output)
+
+        title = "Use your student email for the full free allowance"
+        self.assertEqual(standard_user.prep_notifications.filter(title=title).count(), 1)
+        self.assertFalse(student_user.prep_notifications.filter(title=title).exists())
+        self.assertIn("created", output.getvalue())

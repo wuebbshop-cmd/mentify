@@ -4820,6 +4820,10 @@ def prep_download_document(request, doc_id):
 def prep_notifications_api(request):
     """Returns unread count and latest notifications for the current student."""
     from django.utils.timesince import timesince
+    from services.credit_service import notify_standard_account_credit_limit
+
+    # Covers accounts that existed before the allowance notice was introduced.
+    notify_standard_account_credit_limit(request.user)
 
     notifs = PrepNotification.objects.filter(user=request.user).order_by("-created_at")[:15]
     unread_count = PrepNotification.objects.filter(user=request.user, is_read=False).count()
