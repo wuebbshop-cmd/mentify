@@ -1,6 +1,7 @@
 import time
 from datetime import timedelta
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import OperationalError, close_old_connections, connection, transaction
 from django.db.models import Case, Exists, OuterRef, Q, Value, When
@@ -28,6 +29,14 @@ class Command(BaseCommand):
         max_notes = max(0, options["max_notes"])
         processed_notes = 0
         last_expiry_sweep = 0.0
+        automatic_note_preparation = getattr(
+            settings, "PREP_AUTOMATIC_NOTE_PREPARATION", True
+        )
+        if not automatic_note_preparation:
+            self.stdout.write(
+                "Automatic topic-note preparation is disabled for this environment; "
+                "existing jobs will not be processed."
+            )
         while True:
             if not connection.in_atomic_block:
                 close_old_connections()
@@ -35,10 +44,15 @@ class Command(BaseCommand):
                 if time.time() - last_expiry_sweep >= 3600:
                     self._expire_due_credits()
                     last_expiry_sweep = time.time()
-                self._recover_stale_jobs()
+                if automatic_note_preparation:
+                    self._recover_stale_jobs()
                 self._recover_stale_documents()
-                notes_job = self._claim_topic_notes_job()
-                job = None if notes_job else self._claim_job()
+                notes_job = self._claim_topic_notes_job() if automatic_note_preparation else None
+                job = (
+                    None
+                    if notes_job or not automatic_note_preparation
+                    else self._claim_job()
+                )
             except OperationalError:
                 if once:
                     raise

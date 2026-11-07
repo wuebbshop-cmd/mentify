@@ -94,6 +94,11 @@ CSRF_COOKIE_SAMESITE = "Lax"
 # Render uses dedicated worker services defined in render.yaml; disable in-process threads
 ENABLE_LOCAL_PREP_WORKERS = False
 
+# Shared topic notes are prepared manually from the local environment, then
+# published for deployment. A learner cache miss must never consume AI tokens
+# or enqueue a production generation job.
+PREP_AUTOMATIC_NOTE_PREPARATION = False
+
 # ─── Production Logging to stdout / stderr for Render ─────────────────────────
 LOGGING = {
     "version": 1,

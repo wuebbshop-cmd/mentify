@@ -1,5 +1,6 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from django.conf import settings
 from django.db import close_old_connections, connection
 from django.utils import timezone
 
@@ -13,11 +14,23 @@ NOTE_LEVELS_IN_PRIORITY_ORDER = ("level_2", "level_1", "level_3")
 _NOTE_PRECOMPUTE_EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="prep-notes-worker")
 
 
+def automatic_note_preparation_enabled() -> bool:
+    """Whether this process may create or execute AI topic-note jobs."""
+    return bool(getattr(settings, "PREP_AUTOMATIC_NOTE_PREPARATION", True))
+
+
 def enqueue_course_note_precompute(course, *, auto_run: bool = True):
     """
     Create or safely requeue the durable all-level notes preparation job.
     Automatically enqueues all topic jobs and submits them to the background worker pool.
     """
+    if not automatic_note_preparation_enabled():
+        logger.info(
+            "[Prep] Automatic note preparation is disabled; course %s was not queued.",
+            course.pk,
+        )
+        return None, False
+
     job, created = PrepNotePrecomputeJob.objects.get_or_create(course=course)
     should_run = created
     if not created and job.status not in {"pending", "running"}:
@@ -56,6 +69,9 @@ def enqueue_course_note_precompute(course, *, auto_run: bool = True):
 
 def enqueue_course_topic_note_jobs(course) -> int:
     """Expand a published course into idempotent jobs for each topic and note level."""
+    if not automatic_note_preparation_enabled():
+        return 0
+
     from services.prep_ai_router import _topic_notes_cache_signature
 
     queued = 0
@@ -93,8 +109,16 @@ def enqueue_course_topic_note_jobs(course) -> int:
     return queued
 
 
-def enqueue_topic_note_job(topic: PrepTopic, level: str, source_signature: str) -> PrepTopicNotesJob:
+def enqueue_topic_note_job(topic: PrepTopic, level: str, source_signature: str) -> PrepTopicNotesJob | None:
     """Ensure this topic-level has a current job, recovering completed jobs with no published cache."""
+    if not automatic_note_preparation_enabled():
+        logger.info(
+            "[Prep] Automatic note preparation is disabled; topic %s / %s was not queued.",
+            topic.pk,
+            level,
+        )
+        return None
+
     from prep.models import PrepNoteGenerationGuard
 
     job, created = PrepTopicNotesJob.objects.get_or_create(
@@ -136,6 +160,13 @@ def process_single_topic_notes_job(job: PrepTopicNotesJob) -> bool:
     """
     Generate, validate, and persist notes for one specific PrepTopicNotesJob.
     """
+    if not automatic_note_preparation_enabled():
+        logger.info(
+            "[Prep] Automatic note preparation is disabled; job %s was not processed.",
+            job.pk,
+        )
+        return False
+
     from services.prep_ai_router import (
         _note_completion_issues,
         _note_validation_options,
@@ -313,6 +344,13 @@ def _supersede_stale_topic_notes_job(job: PrepTopicNotesJob, topic: PrepTopic, c
 
 def process_course_notes_in_background(course_id: int):
     """Background worker thread function that runs through all pending jobs for a course."""
+    if not automatic_note_preparation_enabled():
+        logger.info(
+            "[Prep] Automatic note preparation is disabled; course %s was not processed.",
+            course_id,
+        )
+        return
+
     if not connection.in_atomic_block:
         close_old_connections()
     try:

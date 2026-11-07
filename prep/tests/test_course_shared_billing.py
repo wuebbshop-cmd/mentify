@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.core.management import call_command
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 
 from accounts.models import User
@@ -29,6 +29,22 @@ from services.prep_note_precompute import (
 
 
 class NoteWorkerQueueStatusTests(SimpleTestCase):
+    @override_settings(PREP_AUTOMATIC_NOTE_PREPARATION=False)
+    def test_worker_does_not_claim_note_jobs_when_automatic_preparation_is_disabled(self):
+        from prep.management.commands.run_prep_note_worker import Command
+
+        command = Command()
+        with (
+            patch.object(command, "_expire_due_credits"),
+            patch.object(command, "_recover_stale_documents"),
+            patch.object(command, "_claim_topic_notes_job") as claim_topic_job,
+            patch.object(command, "_claim_job") as claim_course_job,
+        ):
+            command.handle(once=True, poll_seconds=1.0, max_notes=0)
+
+        claim_topic_job.assert_not_called()
+        claim_course_job.assert_not_called()
+
     def test_course_precompute_stays_pending_while_topic_notes_are_pending(self):
         from prep.management.commands.run_prep_note_worker import Command
 

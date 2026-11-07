@@ -1886,6 +1886,31 @@ $$
         self.assertEqual(poll_response.json()["status"], "pending")
         self.assertEqual(note_service.call_count, 1)
 
+    @override_settings(PREP_AUTOMATIC_NOTE_PREPARATION=False)
+    @patch("prep.views.get_or_generate_topic_notes")
+    def test_missing_topic_notes_do_not_queue_or_generate_when_cache_only(self, note_service):
+        PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
+        note_service.return_value = {
+            "notes": "",
+            "generation_required": True,
+            "cached": False,
+        }
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("prep:api_topic_notes"),
+            data=json.dumps({"topic_id": self.topic.pk, "level": "level_1"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["success"])
+        self.assertIn("not published", response.json()["error"])
+        self.assertFalse(
+            PrepTopicNotesJob.objects.filter(topic=self.topic, level="level_1").exists()
+        )
+        note_service.assert_called_once()
+
     def test_failed_topic_notes_job_returns_safe_json_error(self):
         PrepCourseEnrollment.objects.get_or_create(user=self.user, course=self.course)
         job = PrepTopicNotesJob.objects.create(

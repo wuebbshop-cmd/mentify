@@ -395,6 +395,12 @@ TOGETHER_MAX_PAGES_PER_RUN = int(os.environ.get("TOGETHER_MAX_PAGES_PER_RUN", 15
 # Automatically start worker threads in development when running runserver
 ENABLE_LOCAL_PREP_WORKERS = os.environ.get("ENABLE_LOCAL_PREP_WORKERS", "true").lower() in ("1", "true")
 
+# Local preparation may generate and validate shared topic notes. Production
+# overrides this to keep learner requests strictly cache-only.
+PREP_AUTOMATIC_NOTE_PREPARATION = os.environ.get(
+    "PREP_AUTOMATIC_NOTE_PREPARATION", "true"
+).lower() in ("1", "true")
+
 # ─── Dedicated Background Worker Web Service (Option B) ───────────────────────
 # When WORKER_SERVICE_URL is set (e.g. to https://eduai-worker.onrender.com),
 # heavy document extraction jobs are delegated via internal webhook to the worker web service,

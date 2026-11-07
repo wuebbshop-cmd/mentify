@@ -5,6 +5,7 @@ import unicodedata
 import datetime
 import logging
 from functools import wraps
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
@@ -3658,8 +3659,8 @@ def prep_adapt_question_api(request):
 @_json_api_error_boundary
 def prep_topic_notes_api(request):
     """
-    Retrieve or generate syllabus topic notes for a specific level (1, 2, or 3).
-    Checks PrepContentCache ($0). If missing, generates via DeepSeek-V3 and caches.
+    Retrieve published syllabus topic notes for a specific level (1, 2, or 3).
+    Learner requests are cache-only when automatic preparation is disabled.
     """
     if request.method != "POST":
         return JsonResponse({"success": False, "error": "POST method required."}, status=405)
@@ -3721,8 +3722,9 @@ def prep_topic_notes_api(request):
             note_content = cached_res.get("notes", "") or cached_res.get("content", "")
 
     if not note_content:
-        # Notes are absent / awaiting background preparation
-        if topic_obj:
+        # Production is intentionally cache-only: only the local preparation
+        # workflow may generate a missing shared level.
+        if topic_obj and getattr(settings, "PREP_AUTOMATIC_NOTE_PREPARATION", True):
             from services.prep_ai_router import _topic_notes_cache_signature
             from services.prep_note_precompute import enqueue_topic_note_job
 
@@ -3731,9 +3733,19 @@ def prep_topic_notes_api(request):
             )
             enqueue_topic_note_job(topic_obj, level, sig)
         label = NOTE_LEVEL_LABELS.get(level, level)
+        if not getattr(settings, "PREP_AUTOMATIC_NOTE_PREPARATION", True):
+            error = (
+                f"{label} notes are not published for this topic yet. "
+                "No credits were deducted."
+            )
+        else:
+            error = (
+                f"{label} notes are currently being prepared in the background or awaiting review. "
+                "No credits were deducted."
+            )
         return JsonResponse({
             "success": False,
-            "error": f"{label} notes are currently being prepared in the background or awaiting review. No credits were deducted.",
+            "error": error,
             "level": level,
             "credits_deducted": 0,
             "credits_balance": get_available_credits(wallet),

@@ -188,7 +188,7 @@ class Command(BaseCommand):
                     from services.prep_note_precompute import enqueue_topic_note_job
 
                     job = enqueue_topic_note_job(topic, level, signature)
-                    if job.status == "pending":
+                    if job and job.status == "pending":
                         totals["queued"] += 1
                 elif dry_run:
                     messages.append(
