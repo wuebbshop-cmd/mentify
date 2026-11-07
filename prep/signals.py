@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.signals import user_logged_in
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
@@ -10,6 +11,14 @@ def create_prep_trial_wallet(sender, instance, created, **kwargs):
     """Start the exactly 72-hour trial at account creation."""
     if created:
         PrepWallet.get_or_create_wallet(instance)
+
+
+@receiver(user_logged_in)
+def notify_standard_email_credit_allowance(sender, request, user, **kwargs):
+    """Explain the reduced free allowance once after a standard-email sign-in."""
+    from services.credit_service import notify_standard_account_credit_limit
+
+    notify_standard_account_credit_limit(user)
 
 
 @receiver(pre_save, sender=PrepTopic)

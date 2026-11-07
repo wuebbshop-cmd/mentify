@@ -1,0 +1,414 @@
+LESSON 1
+           Differential Equations and Their Solutions
+
+1.1 Introduction
+The subject of differential equations constitutes a very important and useful branch of
+modern mathematics.  In this lesson we shall consider some definition of ordinary
+differential equations.
+
+1.2 Objectives of the lesson
+By the end of this lesson you should be able to.
+     define a differential equation
+     define the order and the degree of a differential equation.
+    form the differential equation and solve simple differential equations.
+
+1.3 Definition of ordinary differential equation
+                                              dy   d 2 y
+An equation containing any derivatives such as        ,       2  ,  is called an ordinary                                              dx   dx
+differential equation.
+Examples of differential equations
+    dy
+1.     = 5x
+    dx
+    dy
+2.    + 3x + 5 = 0
+    dx
+    d 2 y     dy
+3.        2 + 8    + 9y = 0    dx      dx
+    d 2 y
+4.        2 + y = sin x    dx
+are ordinary differential equations.
+
+1.4 Definition of Partial Differential Equations
+A differential equation involving partial derivatives of a dependent variable, with respect
+to more than one independent variable, is called a partial differential equation.
+For example,
+ ∂      2       2        2    ( 2 x + 5 y + 3 xy ) = 0
+∂x
+ ∂                            2  3    (sin x + 5 y cos x + x y ) = 0
+∂x
+ ∂ 2     3       2       2
+    2 ( x + 3 x y + y ) = 0 are called partial differential equations.  This means when you∂y
+differentiate a term with respect to x, y is treated as constant similarly x is treated as a
+constant when we differentiate a term with respect to y.
+
+--- Page 4 ---
+∂      2  3         2 ∂   3       2  2Then     (3 y x ) = 3 y    x = 9 x y
+     ∂x            ∂x
+ ∂       2             ∂    2    ( 7 y sin x ) = 7 sin x   y = 14 y sin x
+∂y                ∂x
+
+              d 2 y  d 3 y        d n y
+1.5 Meaning of     2  ,     3 ………     n               dx   dx         dx
+d 2 y                         dy
+     2 means that we differentiate     again with respect to x. dx                          dx
+
+d 2 y    d  dy 
+     2 = dx     dx  dx 
+
+d 3 y    d  d 2 y 
+    3 =           2 dx    dx  dx   
+
+         d n y
+similarly      n is defined.         dx
+
+1.6 The order of a differential equation
+The order of a differential equation is the order of the highest differential coefficient
+present in the equation.
+For example the equation,
+
+ d 3 y    d 2 y    dy
+7    3 + 8     2 + 9   + 8y = ex  dx      dx     dx
+
+         dy  d 2 y  d 3 y                               d 3 y
+contains,       ,     2  ,     3  the highest differential coefficient is     3  . Hence the order of         dx  dx    dx                                  dx
+the equation is three.
+
+         d 2 y    dy 10Consider 3     2 +       + 8y = 0
+          dx   dx 
+                                                   d 2 y
+The highest differential coefficient present in this equation is      2  . Hence the order of                                                      dx
+the equation is two.
+
+1.7 The degree of a differential equation
+The degree of a differential equation is the degree (or power) of the highest differential
+coefficient present, when the differential coefficient are free from radicals and fractional
+exponents.
+
+--- Page 5 ---
+For example consider the equation,
+d 3 y     d 2 y 10     dy  7
+    3 +       2    + 3     + 8 y = 0 dx       dx        dx 
+
+                                    d 3 y                  d 3 y
+The highest order present in this equation is     3  . The degree of this     3  is one. Hence                                      dx                    dx
+the degree of the differential equation is just one.
+
+Example 1
+Consider,
+ d 3 y  5    d                  2 y 11   dy  20
+     3   +     2   +       + y = x dx      dx       dx 
+                                    d 3 y
+Here the highest differential coefficient is      3  or the order of the equation is 3. The                                      dx
+degree of this highest differential coefficient is five and hence the degree of this equation
+is five.
+
+Example 2
+                        3
+          d 2 y                         2    dy
+Consider,              + 5   + 3 y = 0                                     2              dx      dx
+                                           d 2 y
+The highest differential coefficient present here is      2  .  First it should be free from                                              dx
+radicals and fractional exponents.
+          3
+ d 2 y           2     dy
+     2   = −5   − 3 y dx        dx
+
+ d 2 y  3      dy      2
+      2  = − 5   − 3 y  dx              dx           
+Then the degree of the equation is three.
+Consider,
+       dy  2  3 +      = 2 x
+       dx 
+                                           dy  2       2Removing the radical it is written as 3 +      = 4 x  .
+                                           dx 
+Hence the degree of the equation is two.
+
+1.8 The solution of a differential equation
+
+--- Page 6 ---
+The solution of a differential equation is an equation between x and y, which will satisfy
+the differential equation.
+
+Example 3
+                                         d 2 y    dy
+a) Show that y = x2 is a solution of the equation, 3     2 + 5   = 10x + 6                                            dx     dx
+b)  Check whether y = x2 + c where c is any constant is also a solution of the equation.
+
+Solution
+Let y = x2                             (1)
+    dy
+      = 2x                          (2)
+    dx
+    d 2 y
+           2 = 2                         (3)    dx
+
+substituting (1), (2) and (3) in the given equation
+3(2) + 5 (2x) = 6 + 10x thus the equation is satisfied
+
+1.9 General and particular solution of a differential equation.
+         dy
+Consider   = 2                     (1)
+         dx
+Then dy = 2dx
+Integrating,                2 dx            ∫            dy = ∫
+          y = 2x + c where c is any arbitrary constant
+we say that y = 2x + c is the general solution of the equation (1)
+
+Geometrically, y = 2x + c is a family of straight lines parallel to y = 2x
+The solution y = 2x + c, represents a family of straight lines. This family y = 2x + c is
+                                      dy
+called the general solution of the equation   = 2.
+                                      dx
+When c takes a particular value (say c = 3) we get a particular member of the family, y =
+2x + 3.  It is a particular solution.
+
+A particular solution is one where a value is given to c.
+                                             dy
+In the above example, the order of the equation   = 2, is one.  Hence the general
+                                             dx
+solution of this equation contains one arbitrary constant c.
+
+In general, the solution of an  nth order  differential equation will have n arbitrary
+constants.  For example the general solution of a second order equation will have two
+arbitrary constants. When we give particular values for these constants we get particular
+solutions of the equation.
+
+--- Page 7 ---
+Example 4
+                    dyConsider the equation   = 3x2
+                    dx
+dy = 3x2 dx
+integrating both sides,
+         x 2 dx∫  dy = 3∫
+y = x3 + c
+The general solution of the equation is a family of curves. When c takes the value, say
+c = 2, y = x3 + 2 is a particular curve of the family and it is called a particular solution of
+the equation
+
+1.10 Forming Differential Equations
+Differential  Equations  are  often formed by  expressing  certain  scientific laws  or
+relationships in mathematical terms. We can also form them by eliminating the constants
+in an equation.  If n constants are eliminated we will get an nth order equations.
+
+Example 5
+The scientific law states that the acceleration of a particle during upward motion under
+gravity is -g. Write down this law as a differential equation.
+
+Solution
+                     dx
+Velocity of a particle is
+                          dt
+                         d 2 x
+Acceleration of the particle is     2  where x is distance traveled by the particle at time t                                 dt
+from a fixed origin.
+     d 2 x
+Then     2 = -g is the required differential equation.       dt
+Can you account for the minus sign on the right hand side?
+
+Example 6
+Form the differential equation from
+y = cx2 + sin x by eliminating the constant c.
+
+Solution
+The expression
+y = cx2 + sin x
+contains only one constant c.  Then we can get differential equation of first order by
+differentiating the expression once and eliminating the constant c.
+Let y = cx2 + sin x    (1)
+dy
+   = 2cx + cos x     (2)
+ dx
+To eliminate one constant we need two equations (In general to eliminate n constants we
+need n + 1 equations).
+
+--- Page 8 ---
+From (1) we can find c and the value of c is substituted in (2)
+From (1), cx2 = y – sin x
+              y − sin x
+          c =        2                 x
+putting this value of c in (2)
+dy     y − sin x 
+   = 2        2    x + cos x dx            x         
+dy  2
+   =   ( y − sin x ) + cos x is the required differential equation whose general solution is,
+ dx   x
+y = cx2 + sin x
+
+Example 7
+Find the differential equation whose solution is y = A cos 8x + B sin 8x.
+
+Solution
+To eliminate two constants A and B we need three equations.  In addition to the given
+equation we need two more.  These two equations are obtained by differentiating the
+given expression twice.
+       Let y = A cos 8x + B sin 8x                                         (1)
+         dy      y ′ =   = −8 A sin 8 x + 8 B cos 8 x                                      (2)
+         dx
+       d 2 y
+    y ′′ =     2 = − 64 A cos 8 x − 64 B sin 8 x                                    (3)        dx
+        d 2 y
+                 2 = −64( A cos 8 x + B sin 8 x )         dx
+        d 2 y
+                 2 = −64 y using (1) in (3)         dx
+
+This is the required differential equation.
+
+1.11 Solving simple differential equations
+We are going to see several methods to solve a differential equation or finding solutions
+of differential equations. Before that we shall see here the method of finding solutions of
+some simple equations using integration.
+
+Example 8
+                 dy
+Solve the equation,   = sin x.
+                 dx
+
+Solution
+Now dy = sin x dx
+Integrating both sides
+
+--- Page 9 ---
+sin xdx ∫  dy = ∫
+then, y = - cos x + c
+y + cos x = c is the required general solution of the equation.
+
+Example 9
+The differentia equation of a family of circles is given by,
+ dy    x
+   +   = 0
+ dx    y
+a)  Find the equation to the family of circles.
+b)  If one of the family passes thro the point (1, 2) find its equation.
+
+Solution
+    dy    x
+Let    +   = 0
+    dx    y
+    dy     x
+      = -  = 0
+    dx     y
+y dy = - x dx
+
+Integrating both sides,
+          xdx ∫  ydy = − ∫
+ y 2  − x 2
+   =    + c
+ 2    2
+x2 + y2 = A (where A = 2c)
+This is the equation of all the circles of the family.
+If it passes through (1, 2)
+
+                                           (1, 2)
+
+
+
+
+
+x = 1, y = 2 should satisfy
+x2 + y2 = A
+12 + 22 = A or A = 5
+Hence the particular solution or the equation of the particular circle is x2 + y2 = 5
+
+Exercise 1
+1.  Find the order and degree of the following differential equations.
+       d 2 y     dy  3       2
+    a)       2 + 7     + 8 y = sin x
+       dx      dx 
+
+--- Page 10 ---
+ d 2 y  3      dy  8
+    b)        2   + 10    + 9 y = cos x          dx         dx 
+                     1
+          d 3 y                      2    dy  2
+    c)        3   +      + y = 0          dx       dx 
+          dy  3    dy    d)       + 4   + 6 y = xe
+          dx     dx
+
+          dy  3   d 2 y            2 x
+    e)       − 3    2 + 7 y = e
+          dx     dx
+       d 2 v dv     dv  2
+     f)       2   + x     + v = 0
+       dx  dx     dx 
+
+2.  Find the differential equation by eliminating the constant c in the following
+    a) y = 3x2 + 5x + c
+    b) y = sin x + c
+    c) 2y = 5x2 + c
+    d) y = Ax
+    e) y = A sin x
+
+3.  Find the second order differential equation by eliminating the constants A and B .
+    a) y = Ax + B
+    b) y = Aex + B
+
+4.  Show that the differential equation associated with the primitive y = Ax2 + Bx + C is
+    d 3 y
+          3 = 0    dx
+
+5.  Obtain the differential equation associated with the primitive y = Ae2x + Bex + c
+
+                                                         d 2 y   dy
+6.  Show that the differential equation associated with y = Aex + B is      2 =       .                                                             dx    dx
+
+
+7.  Find
+      ∂      2       2  a)      (3 x + 5 y + 8 xy )
+     ∂x
+      ∂      2       2  b)      (3 x + 5 y + 8 xy )
+     ∂y
+      ∂ 2      3       2       2
+  c)       2 (8 x + 9 x − 7 y )     ∂x
+
+--- Page 11 ---
+∂ 2      3       2       2
+  d)      2 (8 x + 9 x − 7 y )     ∂y
+
+8.  Find the general solution of the following equations
+      dya)      = 2x2 + 3x + 5
+      dx
+      dyb)      = 2ex + sin x
+      dx
+      dyc)      = x3 + 5x + 1
+      dx
+                                       dy    x
+9.  Find the family of circles represented by    +   = 0
+                                       dx    y
+    Find the particular circle of the family which passes through the point (2, -2).
+
+
+Summary
+
+
+You have learnt the following from this lesson:
+
+  1.    Definitions of ordinary and particular differential equations.
+
+  2.   The order and degree of a differential equation.
+
+  3.   The meaning of the general and particular solutions of a differential equation.
+
+  4.   Formation of differential equations by eliminating the arbitrary constants.
+
+  5.   Finding the solution of simple differential equations.
+
+
+
+Further Reading
+1.  Differential Equations
+By Shepley L. Ross
+John Wiley & sons
+   New York Toronto. Singapore.
+
+2.  Mathematics method for Science Students
+   By G. Stephenson
+   Addison Wesley Longman Limited
+    Edinburgh Gate, Harlow, England, 1973.
+
+3.  Differential equations
+   By Dr. D. Sengottaiyan
+   Oxford publications
+   London Nairobi.
+
+--- Page 12 ---

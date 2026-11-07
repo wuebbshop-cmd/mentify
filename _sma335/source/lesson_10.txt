@@ -1,0 +1,1114 @@
+LESSON 10
+ Reduction of nth order Equations to a First order system of n
+               equations and solve the system.
+
+10.1Introduction
+You have already studied different methods of solving nth order differential equations. In
+this LESSON you will know a new method of solving an nth order equation.
+
+First we reduce an nth order equation into a First order system of n linear (simultaneous)
+equations using new variables and then we solve the n linear equations using the matrix
+method. We revise a section of matrix algebra to find the Eigen values and the Eigen
+vectors of a square matrix and use them to solve the n linear simultaneous equations. In
+this LESSON we also solve nth order equations by reducing the order of the equations.
+
+10.2Objectives of the LESSON
+   •  by the end of this LESSON you should be able to: -
+   •  reduce an nth order equation to a first order system of n equations.
+   •   write the first order system of equations in matrix form.
+   •  determine the Eigen values and the Eigen vectors of the matrix obtained.
+   •  determine the solution of the  nth order homogeneous and non homogenous
+       equation using the Eigen values and the Eigen vectors of the matrix.
+
+10.3Reduction of nth order equations to a first order system
+We introduce the new variables:
+                                   y ′ = u
+                               u ′ = v ( = y ′′)
+                                   v ′ = w( = y ′′′)
+                       w′ = z ( = y 1v
+                  ………….
+and reduce the nth order equation to a system of n linear equations. The following
+examples will illustrate the method of reducing the equations to a first order system.
+
+Example 1
+Reduce the fourth order equation
+      d 4 y   d 3 y   d 2 y    dy              x         − 5               + 7                     + 9   − 6 y = e             (A)              4                         3                                     2       dx     dx     dx     dx
+        or y 1v = 5 y ′′′ − 7 y ′′ − 9 y ′ + 6 y + e x                 (B)
+to a system of four linear equations.
+
+Solution
+We introduce the new variables
+
+--- Page 91 ---
+dy              y ′ =   = u
+                 dx
+                d 2 y
+            u ′ =     2 = v                 dx
+                                                              (2)
+                d 3 y
+              v ′ =     3 = w                 dx
+                d 4 y
+         w′ =     4                 dx
+
+Then the fourth order equation (1) becomes, a first order system of four equations as
+shown below:
+             y ′  =          u               (1)
+           u ′  =           v             (2)
+             v ′  =       w             (3)
+        w′  =  5 w − 7 v − 9u + 6 y + e x  (4 )
+
+Thus we have reduced the fourth order equation (A) or (B) to a first order system of four
+equations (1) to (4).
+
+Example 2
+Reduce the third order equation
+      d 3 y   d 2 y    dy              3        + 8              − 10   + 7 y = 2 x                   (1)              3                         2      dx     dx     dx
+to a first order system of 3 equations.
+
+Solution
+Using the new variables
+          y ′ = u
+        u ′ = v
+      and v ′ = y ′′′
+      d 3 y   d 2 y    dy              3        + 8              − 10   + 7 y = 2 x   becomes the system:              3                         2      dx     dx     dx
+
+       y ′ = u
+      u ′ = v
+      v ′ = − 8v + 10u + 7 y + 2 x 3  from equation (1)
+Example 3
+Reduce the equation
+       y ′′′′ = − y into a system of four linear equations.
+
+--- Page 92 ---
+Solution
+       Let
+             y ′  =  u
+           u ′  =  v
+             v ′  = w
+        w′  =    ...
+Then  y′′′ = −y is reduced to the following four linear equations.
+             y ′  =  u    (1)
+           u ′  =   v   (2)
+             v ′  =  w   (3)
+        w′  =  − y  (4)
+
+10.4 System of equations in matrix form
+We shall study some three important theorems (without proof) before we consider the
+solution of a system of equations. Consider the system of equations X ′ = AX where A is
+                            x1 
+                              
+a square matrix and X =  x2 . The following theorems give a relationship connecting                                                                                      x3 
+the Eigen values and the Eigen vectors of the matrix A and the solutions of the system.
+
+
+A system of n linear equations are written conveniently in a matrix form as
+     X ′ = AX if the equations are homogeneous or X ′ = AX + B if the equations are
+      non homogeneous. Here A and B are matrices.
+       Consider the two linear equations
+            dx
+            = 4 y + 3 x                       (1)
+               dt
+             dy
+      and      = − 2 x − 3 y                       (2)
+             dx
+The system of equations (1) and (2) can be written in a matrix form.
+               dx 
+                                                        3   4  x                 dt                   =                                             (3)               dy     −2  − 3  y                   
+               dt 
+
+Note that the order of left side is x and then y. Hence each row of the matrix should be in
+the same order x and y. The column vector multiplying the matrix should also be of the
+same order x and y.
+
+--- Page 93 ---
+ x ′       x 
+                                   = A           More over (3) can be written as                                                             or  X ′ = Ax                                       y ′      y                                                        
+
+                                                                                                       ′                         x        3   4             x ′     x 
+            Here X =    , A =          and X ′ =     =                         y      −2  −3            y ′     y                                                           
+
+
+Note
+Generally when we write X ′ = AX,
+                                                  ′                     x1′     x1 
+                                               x2′     x2                             
+                     x3′     x3 
+         X ′ =     =    
+                     .      .  
+                     .      .  
+                                                                               xn′     xn 
+                                           x1 
+                                             
+                                     x2                                             
+                                           x3 
+                       X =    A is a square matrix of order n x n and           .                                             
+                                           .  
+                                                                                                                                     xn 
+
+Example 4
+
+Consider the first order system of three equations:
+             y ′  =       u          (1)
+           u ′  =        v         (2)
+            v ′  =  − 8v + 9u + 7 y  (3)
+
+
+These three equations can be written in matrix form as,
+               y ′     0  1  0  y 
+                                            u ′ = 0  0  1   u     or    X ′ = AX                                
+                                              v ′    7  9  −8   v                                
+
+--- Page 94 ---
+ y ′        0  1  0         y 
+                                                      where X ′ = u ′   , A = 0  0  1    , X = u                                                
+                                     v ′       7  9  −8         v                                                 
+How do you write the first row of the matrix A?
+ y′ = u is written as y′ = oy +1u +ov
+Each row of the matrix should be written in the same order y, u, and v. Their coefficients
+should be written in each row in the order y, u and v.
+
+The second row is u′ = v is written as u′ = oy +ou +1v. The third row v′ = - 8v + 9u +
+7y.  Writing this third row as v′ = 7y + 9u –8v, the coefficient of the third row of the
+matrix is 7, 9, and –8.
+
+
+The following examples will illustrate the method of writing a system of equations into a
+matrix form.
+
+Example 5
+Consider the system of equations,
+         X 1′ = X 1 − X 2 − 4 X 3                               (1)
+         X 2′ = − 2 X 2 + 3 X 3                                  (2)
+          X 3′ = X 3 + 8X 2                                       (3)
+
+Write down the three equations in matrix form.
+
+Solution
+Right hand side of the three equations should be in the same order as the left side namely
+X1, X2, X3
+Then,
+         X 1′ = X 1 − X 2 − 4 X 3                               (4)
+         X 2′ = 0 − 2 X 2 + 3 X 3                               (5)
+         X 3′ = 0 + 8 X 2 + X 3                                 (6)
+
+The system of three linear equations (4), (5) and (6) is written in matrix form as
+X ′ = AX
+                     1 −1 −4             X 1′                              X 1                                                                                          A =                 0 −2  3         X 2′                                                                 2where X ′ =                                                     and X =  X                                                                                 ,                                                         X 3′       0  8  1            X 3 
+
+Example 6
+Consider the equation
+
+--- Page 95 ---
+d 4 y   d 3 y    dy
+    − 3    + 2   − 8 y = 0
+ dx 4    dx 3    dx
+
+  a) Reduce the equation to a first order system of four equations.
+  b) Write down the system in matrix form.
+
+    Solution
+  Let          y′ = u
+              u′ = v
+                v′ = w and
+        w′ = y ′′′
+     d 4 y   d 3 y   d 2 y
+Then     4 − 3    3 + 5    2 + 8 y = 0 becomes      dx     dx     dx
+                y′ = u                                       (1)
+              u′ = v                                       (2)
+                v′ = w                                       (3)
+            w′ = 3w + 5v – 2u – 8y                     (4)
+or
+                y′ = oy + iu + ov + ow                      (5)
+              u′ = oy + ou + iv + ow                      (6)
+                v′ = oy + ou + ov + iw                      (7)
+            w′ = – 8y - 2u – 5v + 3w                   (8)
+
+The system of equations (5), (6), (7) and (8) can be written as
+X ′ = AX
+                      0  1  0  0              y ′                                  y                                              u ′      0  0  1  0            u                  A                                                                                X =     X ′ =               = 0  0  0  1Where       v ′  ,                                    and       v 
+                                                                                                                            w′    −8 −2 −5 3                             w                                              
+
+10.5 Solution of First order system of equations using matrix form.
+
+It is assumed that the reader is familiar with some knowledge of matrix. However we
+
+shall explain a particular section of matrix namely determination of Eigen values and
+
+Eigen vectors of a square matrix. They are required to find the solution of the first order
+
+system of equations.
+
+
+10.6 Characteristic equation and the Eigen value of a square matrix.
+
+--- Page 96 ---
+Let A be a square matrix of order n x n and I be the unit matrix of the same order. The
+determinant |A – mI| = 0                                                  (1)
+where m is a constant is called the characteristic equation of A
+
+In equation (1) m is unknown and m is called the Eigen value of the matrix A.
+For example consider the matrix
+                    3   4 
+         A =             −2  − 3                                    
+                          3   4      1  0    3 − m    4
+         A − mI =        − m      =            = 0                                                              −2  −3     0  1    − 2  −−3 m                                           
+
+                        3 − m    4
+The determinant A − mI = 0 or            = 0                     (2)
+                       −2  −−3 m
+is called the characteristic equation of the matrix A and m is called the Eigen values of A.
+
+Expanding the determinant in (2) we have m2 – 1 = 0 or m1 = 1, m2 = -1.
+
+Thus the Eigen values of the matrix A are m1 = 1 and m2 = -1
+
+10.7 Eigen vector of a matrix
+      a                       3 − m    4    a                              =                                0 , for one Eigen       Let   be a column vector and          b                      −2  −−3 m  b                            
+                       a
+       value(say m1 = 1).  Then the vector      is called the Eigen vector of A
+                       b
+       corresponding to one value of m.
+
+In this example corresponding to the Eigen value m1 = 1
+
+ 3 − 1   4   0     2   4 a  0
+          =                          =         or                          gives 2a + 4b = 0 and –2a – 4b = 0. −2 −−3 1   0    −2   4  b    0            − 
+
+Both the equations are the same as a + 2b = 0. we can choose any value for a and find the
+                                                               2       2 
+corresponding value for b; here if a = 2, b = -1. Hence the vector     or k     where                                            −1     −1                                                                         
+k ≠ 0 is an Eigen vector.  Similarly, corresponding to the Eigen value m2 = -1 the Eigen
+        a1            3 −−(  1)     4      a1                                 = 0vector     is given from                         
+        b1             −2  −−−3  (  1)  b1 
+
+--- Page 97 ---
+4   4  a1                =         or                                    0 or
+        −2 −2  b1 
+
+       4 a1 + 4b1 = 0 
+                   or a1 + b1 = 0
+      −2 a1 − 2b1 = 0 
+  If     a = 1, b = - 1
+                                                          1 
+ Thus the second Eigen vector corresponding to m2 = - 1 is     .                                        −1                                                            
+ Conclusion
+         p  q 
+  If A =            is a square matrix, then
+          r   s                             
+      p − m   q
+  i).             = 0 or (p – m) (s – m) – qr = 0       (1)
+          r     s − m
+  (1) is called the characteristic equation of A.
+
+ ii).   Solving the equation (1) we get the values of m and these values are called the
+      Eigen values of A.
+                  a
+iii).   Let m1 is one Eigen value and  is the Eigen vector corresponding to m1. Then
+                  b
+      p − m1    q  =a              a              0 gives the Eigen vector   
+          r     s − m1 b              b
+
+ Example 7
+                  12  −15 
+        Let A =           be a square matrix              4   −4                          
+      i.   Write down the characteristic equation of A.
+     ii.    Calculate the Eigen values of A.
+    iii.   Determine the Eigen vectors of A.
+   iv.   Check using the Wronskian whether the two Eigen vectors are independent.
+
+  Solution
+                     12  −15 
+            i.   Let A =                           4   −4                             
+       The characteristic equation is
+              12 − m   − 15
+                         = 0
+                4    − 4 − m
+                or (12 – m) (-4 – m) + 60 = 0
+
+--- Page 98 ---
+or m2 – 8m + 12 = 0
+              or (m – 2) (m – 6) = 0
+
+        ii.   m1 = 2 and m2 = 6 are the Eigen values of A.
+
+                                                 a 
+       iii.   Let the Eigen vector corresponding to m1 = 2 be                                                                                                                                                                                                                                                  b 
+
+         a                     12 − 2   − 15  a 
+                     is obtained from                                      = 0         b                      4   − 4 − 2  b 
+         10  − 15  a 
+       or            = 0                                                                    4  − 6  b 
+        10 a  − 15b = 0 
+       or              or both the equation are reduced to 2a – 3b = 0 or 2a = 3b.
+         4 a  − 6b = 0 
+         If we choose b = 2, a = 3.
+                                                                        a     3 
+      Hence the Eigen vector corresponding to m1 = 2 is given by       =       .                                                                        b     2 
+                                                                   a1 
+       Let the Eigen vector corresponding to m2 = 6 be      .  It is obtained from
+                                                                   b1 
+                 12 − 6   − 15   a1 
+                                    = 0
+                  4  −−4  6  b1 
+
+              6 a1  − 15b1 = 0 
+              or              or 2a 1 – 5b1 = 0 or 2a1 = 5b1
+              4 a1  −101 b = 0 
+                    if b = 2 then a = 5
+                                                                        a1   5
+      Hence the Eigen vector corresponding to m2 = 6 is given by     =  .
+                                                                        b1   2
+                                       3    5
+      iv.     If the two Eigen vectors       and    are independent then the Wronskian of                                       2    2
+             3  5        3  5
+                   or W =       should not be zero.                  
+             2  2        2  2
+
+     W = (6 – 10) = -4 which is not zero.
+
+
+Note:   If the Eigen vectors are  distinct (not repeated) then they are always
+        independent.
+
+--- Page 99 ---
+10.8 Solution of the First order system of Equations.
+
+In order to solve the First order System of equations we use the fundamental Theorem
+which states the relationship between the solution of the First order system of equations
+X1 = AX and the Eigen values and the Eigen vectors of the matrix A.
+
+Theorem
+Let the first order system of equations be represented in matrix form as X′ = AX.
+where A is a square matrix of order n x n.  If the Eigen values of A are m1, m2….mn (all
+distinct) and their corresponding Eigen vectors are respectively
+                 a1     b1              l1 
+                                       
+             a 2    b2                    l 2                                       
+                  .  ,    .  ………….  . 
+                                       
+                  .      .              . 
+                                                        an     bn              ln 
+then the general solution of the equation X′ = AX is
+                 a1           b1              l1 
+                                             
+             a 2         b2                     l 2                                             
+                                                                                                   n t                                                                    2 t + .....C n  .  e m     X = C1   .  e m                                          1t + C 2   .  e m
+                                             
+                  .            .              . 
+                                                              an           bn              l n 
+
+Theorem 1: Eigen values are distinct and real
+If m1, m2 and m3…  (all  distinct) are the Eigen values and  v1,  v2, and v3 are the
+corresponding Eigen vectors respectively then the general solution of X ′ = AX  is given
+by
+                                                                   3 t    X = c1v1e m                               1t + c2 v2 e m                                                 2 t + c3 v3 e m
+
+Theorem 2 Eigen values real and repeated
+If the Eigen values m1 and m2 are repeated so that m1 = m2 = m, then one solution of the
+system X ′ = AX  is given by
+          X 1 = v1e mt
+and the second solution is
+                                  mt    a   mt
+          X 2 = v1te  +      e                               b 
+
+          a
+where the vector     is to be determined by substituting X2 in the equation X 2′ = AX 2 .
+          b
+Then the general solution is
+
+--- Page 100 ---
+mt           mt    a   mt
+        X = c1 v1 e  + c 2 v1te  +    e
+                                     b 
+
+Theorem 3  The solution of the nonhomogeneous systems.
+
+If X ′ = AX + B is a nonhomogeneous system of equations where A is a constant matrix
+and B is a vector function of t, we must find a particular solution Xp of the system and
+add it to the general solution Xc of the associated homogeneous system X ′ = AX
+
+                                                              2 t
+                                          then         If   X c = c1v1e m                                           1t + c2 v2 e m
+                                                                2 t
+                                       where g1 and g2 are to be determined        X p = g1 v1 e m                                             1t + g 2 v 2 e m
+using the vector function B.
+
+Example 8
+Consider the first order system
+             dx
+              = 3 x + 4 y                         (1)
+                dt
+
+             dy
+              = − 2 x − 3 y                        (2)
+                dt
+
+These two equations of the first order system is first written in matrix form as
+                                  X′ = AX                                      (3)
+
+                          ′              x         3   4             x 
+where X ′ =         , A =          and X =        .                                           
+              y         −2  − 3             y 
+
+The Eigen values of A are m1 = 1, m2 = -1(see example 2.7)
+
+                                                                              2        1 
+The Eigen vectors corresponding to Eigen values m1 = 1 and m2 = -1 are     and    
+                                                                              − 1        − 1 
+respectively.
+Since they are not repeated they are independent.
+Then the general solution of the system (1) and (2) is given by
+                         2     t       1   − t    x 
+          X = C1     e + C 2     e  =                          −1          −1        y 
+       x = 2C1e t + C 2 e − t
+Hence
+       y = −C1e t − C 2 e − t
+
+--- Page 101 ---
+Example 9
+                                            4  − 1 
+Consider the system X1 = AX where A =                                                   
+                                            − 4  4 
+Determine the following
+     i).The characteristic equations A
+     ii).The Eigen values of A.
+    iii).The Eigen vector corresponding to each Eigen value.
+    iv).Show that the two solutions are independent using the Wronskian of the two
+        solutions.
+     v).Write down the general solution of the equation X′ = AX.
+
+Solution
+                                     4 − m   −1
+  i).   The characteristic equation of A is           = 0 or m2 – 8m + 12 = 0 or
+                                  −4   4 − m
+       (m – 2) (m – 6) = 0
+
+ ii).   The Eigen values of A are m1 = 2 and m2 = 6.
+                                                               a 
+iii).     If the Eigen vector of A corresponding to m1 = 2 is       , then                                                               b 
+
+         2  − 1 =a   0             
+         − 4  2 b
+       or 2a – b = 0
+
+         If we choose a = 1, b = 2
+
+   1
+Then  is one Eigen vector when m = 2. Similarly, when m2 = 6 and the Eigen vector
+   2
+    a        −2  −1  ais     then      = 0 gives –2a – b = 0. We choose a = 1, b = -2.                        b        −4  −2 b
+
+       1 
+Then − 2  is the second Eigen vector corresponding to the Eigen values m1 = 2
+          1    2 t              1   6 t                                        eand m2-= 6 are            x1 = c1  e  and x 2 = c 2               2                  2 
+
+                                  1e 2 t   1e 6 t
+The Wronskian of x1 and x2 are                w = w ( x1 , x2 ) =     2 t         6 t                                  2 e   −2 e
+for all values of t.
+
+--- Page 102 ---
+ 1  1 
+       then w =            for t = 0             2  −2                             
+           = −≠4  0
+Hence  x1  and  x2  are  independent  and  the  general  solution  of  X ′ = AX is
+    1    2 t      1   6 t
+X = c1  e + c2     e       2       −2               
+
+   Example 10
+   Consider the system of equations
+                x′ = x – y – z                 (1)
+                y′ = 3y + 3z                  (2)
+                 z′ = 3y + z                    (3)
+
+        a)       Write the system of equations in matrix form X ′ = AX .
+       b)      What is the characteristic form of equation and the Eigen value of the
+                 matrix
+        c)       Calculate the Eigen vectors of the matrix?
+       d)       Write down the three solutions of the system
+        e)     Show that the three solutions are independent.
+         f)       Write down the general solution of the equation
+
+Solution.
+                                                                                                                                               ′                                                                                         x 
+                                                                                                      a)  The matrix form of the system is given by: X ′ = AX where X ′ =  y    ,                                                                                          
+                                                                                                                                                                                   z 
+                      1  −1  − 1             x 
+                                                        A = 0  3   3  and X =  y                      (1)                                              
+                                                                    0  3   1             z 
+                                                  1 − m   −1   −1
+           b) The characteristic equation of A is given by   0   1 − m   3  = 0 or
+                                                    0     3   1 − m
+                (1- m)(m – 4)(m + 2) = 0
+
+The Eigen values of A are m = 1, m = 4, m = -2
+
+                       a                 0  − 1  −1  a 
+                                                                                           c)  For m1 = 1, the Eigen vector  b  are given by  0  0   3   b = 0                                                                             
+                                                                       c                 0  3   0  c 
+
+--- Page 103 ---
+or –a – b = 0, 3c = 0, 3b = 0. Hence b = 0, c = 0, a is arbitrary,
+                              1
+                                              Eigen vector corresponding to m1 is  0                              
+                                                            0
+             1
+                                 0  te           d) Hence X1 =    is one solution.
+                          0
+                                                                      −3  − 1  −1  a1 
+                                                                                               The Eigen vector corresponding to m2 = 4 is given by  0  −3  3   b1 = 0                                                                                   
+                                                                                                                                                       0   3  −3  c1  
+          3a + b + c = 0
+          -3b + 3c = 0             or b = c
+                                                  2 
+                                                      4 t                                               e                                   −3                                      x2 =Choosing b= c = –3, a= 2 from which we obtain                                                              as second solution. Now                                                                                                      
+                                                                                       −3                                                    
+                                 3  − 1  −1  a
+                                             considering m3 = -2, we have  0  3   3   b = 0                                             
+                                                                              0  3   3  c
+
+Or 3a – b – c = 0, 3b + 3c = 0
+                                               0 
+                                                    2 tChoosing b = 1, c = -1, a = 0, we have x3 =  1  e−  as the third solution.                                                 
+                                                                                  − 1                                                 
+            e) Now  the Wronskian  of  the  three  solutions when  t = 0  is  given
+                    1   2   0 
+                               
+            by  0  − 3  1  = 6 ≠ 0 .   Then  the  three  solutions  are  independent.
+                                              0  − 3  − 1                               
+                        x   1         2          0 
+                               t          4 t          −2 t            Hence  y = c1 0 e + c2 −3 e + c3  1  e                                                
+                                                                         z      0       −3       − 1                                                
+
+
+
+Example 11:
+Consider the first order system of equations,
+
+--- Page 104 ---
+dx
+   = 3 x + 4 y
+ dt
+dy
+   = − 2 x − 3 y
+ dt
+    a)  Write down the equations in matrix form.
+    b) Write down the characteristic equation of the matrix
+    c)  Determine the Eigen values of the matrix
+    d) Find the Eigen vectors corresponding to each of the two Eigen values.
+    e)  Write the general solution of the system.
+     f)  Verify your general solution is correct.
+
+Solution
+       dx
+        = 3 x + 4 y
+Let     dt                                   (1)
+
+      dy
+        = − 2 x − 3 y                      (2)
+        dt
+    a) The system of equations (1) and (2) is written in the matrix form as X ′ = AX
+                              ′                x                3   4            x 
+   where X ′ =     ,     A =          ,   X =                  y           −2  −3           y                                                   
+
+                               3 − m    4
+    b) The characteristic equation of A is            = 0                   (4)
+                             −2  −−3 m
+                 where m is the Eigen value.
+    c) To obtain the Eigen values we expand the determinant (4) and solve for m.
+
+    (3 – m)(-3 – m) – 3 = 0
+   m2 – 1 = 0 or (m – 1)(m + 1) = 0
+   The Eigen values are m1 = 1 and m2 = -1.
+
+                      x 
+    d) Eigen vector    corresponding to m1 = 1  is given from the characteristic
+                      y 
+       equation (4) for m = 1
+        3 − 1   4 =a  0                      −2 −−3 1  b    0               
+                      0                           a           2   4 =       or                                                    −2  −4  b    0                
+             2a + 4b = 0
+      and   –2a – 4b = 0
+
+--- Page 105 ---
+Both the equations give a + 2b = 0.  If we take any value for a,. say a = 2, b = -1.
+                                                               2 
+      Hence the Eigen vector corresponding to m = 1  is k     where k  is any                                            −1                                                                 
+        constant. We can take conveniently by the Eigen vector corresponding to m1 = 1
+            2                   2 
+       as −1   .  Then X1 = −1  et when m1 =  1. Similarly the Eigen vector                                     
+                                                  0                                                                                     4   4                                              a                               =       corresponding to m2 = -1 is obtained from                                                                                                                                                                                                       −2  −2  b    0                                                          
+Or    4a + 4b = 0
+       -2a – 2b = 0
+both the equations give a + b = 0.  Taking a = 1, b = -1.  Hence the Eigen vector
+             a     1 
+                      =                                                           1 corresponding to m2 = -1 is b     −1  or x2 =                                      −1                                                  
+
+                                      2            1 
+    e) The two Eigen vectors are x1 =     and x2 =     when m2 = -1. Hence the                           −1         −1                                                     
+                                 1       t      1       t
+       general solution of the system (1) and (2) is given by x = c1  e + c2     e−                                                  2       −1                                           
+      where c1 and c2 are arbitrary constants.
+        1       t      1       t         1           1       t
+     f)   If x = c1  e + c2     e−   is the solution  te  and     e−  should be             2       −1                 2        −1                                       
+                           1          1       t
+       independent.  In other words the Wronskian of  te and     e−  should not                                         2       −1                                      
+      be zero for all t or when t = 0
+                         1  1              1           1       t               =  w                                                       = −.3   Because w ≠ 0 ,  te  and     e−  are            x1 ( 0 ) , x2 ( 0 )                    2  −1                      2        −1                                                        
+                                1       t      1   − t   independent and the general solution of the system is x ( t ) = c1                                                           e + c2     e                                                 2       −1                                          
+
+   Example 11.
+   Consider the system of equations
+   x11 = x1 − x2 − x3 
+       1           
+   x2 = x2 + 3 x3                  (1)
+       1              x3 = 3 x2 + x3               
+  i).   Write down the first order system (1) into matrix form.
+
+--- Page 106 ---
+ii).   Determine the characteristic equation of the matrix.
+iii).   Find the Eigen values of the matrix.
+iv).    Calculate the Eigen vectors of the matrix.
+ v).   Write down the general solution of the system and verify the general solution
+       using the Wronskian.
+
+Solution.
+  i).   The matrix form of (1) is x′ = AX
+
+   where
+                       ′
+           x1        1  − 1  − 1        x1                                         
+   X ′ =  x 2  , A =  0  1   3 , X =  x 2 
+                                                   x 3        0  3   1        x 3 
+
+ ii).   The characteristic equation of A is given by
+                1 − m   −1   − 1
+                  0   1 − m   3  = 0                                  (2)
+                  0     3   1 − m
+   expanding the third order determinant we get (1 – m)(m – 4)(m + 2) = 0
+
+iii).   The Eigen values are m1 =1, m2 = 4, m3 = -2.
+iv).   The Eigen vectors corresponding to the Eigen value m1 =1 is
+                      1 − 1  −1   − 1   x 
+                                                           0   1 − 1   3    y = 0                               (3)                                         
+                                                           0    3   1 − 1   z                                         
+                       0  − y  − z  0
+                                     or           0   0   3 z = 0       or    –x – z = 0     or    x = z                                    
+                                                           0  3 y   0  0
+                   3z = 0        or     z = 0
+                  3y = 0        or    y = 0
+                  Then 0x – y – z = 0, 0x = 0
+                   x is arbitrary.
+
+Let x = 1. Then Eigen vector corresponding to m1 = 1 is given by
+             1
+                 t                  x1 = 0 e                                                  (4)             
+                          0
+Eigen vector corresponding to m2 = 4 is given by
+
+--- Page 107 ---
+ 1 − 4  −1   − 1   x 
+                                                                          0   1 − 4   3    y = 0                      (5)                                                  
+                                                                          0    3   1 − 4   z                                                  
+                           -3x – y – z = 0
+                             -3x2 + 3y3 = 0 or y = z
+                           -3y + 3z =0   or    y = z
+                           -3x – y – z = 0        or     -3x – 2y = 0
+                         Taking x = 2, y = 3.
+
+                                                           2 
+                                                                                                      −3      The Eigen vector corresponding to m2 = 4 is given by                                                               
+                                                                                                      −3                                                             
+                                  2 
+                                      4 t                  Hence x2 = − 3 e                                         (6)                                    
+                                                            −3                                    
+      Eigen vector corresponding to m3 = -2 is given by
+                      3  −1  −1  x 
+                                                0  3   3   y = 0                                     (7)                               
+                                                     0  3   3  z 
+                  3x – y – z = 0,      3y + 3z = 0,
+
+                     using y = -z, 3x + z – z = 0, hence x = 0
+                                                      0 
+                                                           2 t
+                                                                                     (8)                   Taking y = 1, z = -1. Hence x3 =  1  e−
+                                                                                              −1                                                        
+      The general solution could be x = c1x1 + c2x2 + c3x3
+            1          2          0 
+              4 t          4 t            2t           Or x = c1 0 e + c2 −3 e + c3  1  e−                      (9)                                  
+                                                     0       −3       −1                                  
+
+       provided that x1, x2 and x3 are independent. Wronskian of x1, x2, x3 when t = 0 is
+given by
+                           1  2   0
+                           0  −3  1 = 6 which is not zero.
+                           0  −3  − 1
+
+--- Page 108 ---
+Since the Wronskian w ≠ 0 the solution are linearly independent and hence the
+equation (9) is the general solution of the system of equation (1)
+
+10.9 Real and Repeated Eigen values of the matrix.
+
+Example
+Consider the system
+
+          X ′ = AX                                                            (1)
+                                       x1 
+                       0  1                 where  A =                                                      2                              , X =  x                                                                 −4  4                                                  x3 
+                                                          p 
+The Eigen value m = 2, 2, repeated. The Eigen vector    is obtained from
+                                                          q 
+                 − 2  1  p = 0 or − 2 p + q = 0,  − 4 p + 2 q = 0                        
+                 − 4  2  q 
+Choosing p = 1 and q = 2
+
+                   1 Then the Eigen vector    is repeated. Hence we obtain the first solution:                         
+            2
+                      1    2 t
+          X 1 =    e                                                        (2)
+                      2 
+
+By the main Theorem, the second solution is of the form,
+
+                     1    2 t    a    2t
+         X 2 =    te  +    e                                           (3)
+                     2         b 
+        a 
+where    is to be found.
+    b
+
+Since X2 must satisfy the system X ′ = AX we have X 2′ = AX 2 .  Differentiating (3) we
+have
+       1    2 t 1       2 t    a      2 t                ′ =     X 1        e  +  2 te  +    .2 e                                       (4)
+       2   2          b 
+
+          0   1 1    2 t    0   1  a    2t        ′ =AX 2              e  +          e                                      (5)       − 4  4  2      − 4  4  b                           
+
+Equating (4) and (5) and canceling the term involving te2t we have
+
+--- Page 109 ---
+1       a     0   1  a 
+   + 2    =                  2     b    − 4  4  b                 
+
+1     2 a      0 + b   
+   +     =                    2    2 b    − 4 a + 4 b                   
+
+ 1       b       2 a 
+      =                      −        2     − 4 a + 4b    2b 
+
+ 1     − 2 a  +  b 
+      =                              2     − 4 a  +  2b 
+
+Then –2a + b = 1 and –4a + 2b = 2. We can choose a = 0, b = 1
+
+           a  0
+           =Therefore             and from (3)
+           b  1
+      1    2 t    0   2 t
+x 2 =     te  +      e    is the second solution.      2        1 
+
+The general solution of the problem is
+X = c1 x1 + c 2 x 2
+    1    2 t   1     2 t 0     2t
+   = c1  e  + c 2  te  +  e
+    2     2    1
+
+          10.10 Eigen values are complex conjugates
+
+     When the Eigen values are complex numbers the procedure is exactly the same.
+Only the final answer is separated into real and imaginary parts using Euler’s notation:
+e iθ = cosθ+ i sinθ
+                         and
+e − iθ = cosθ− i sinθ
+The following example illustrates this method.
+
+Example 12
+ Consider the system
+                     x′ = AX                                            (1)
+                                                                                                ′
+                                2  − 5        x1        x1 
+                  where A =                , X =       , X ′ =                                       2  − 4        x 2        x 2 
+
+--- Page 110 ---
+Solution
+                              2  −5 
+                    Let A =                               2  −4                                    
+The characteristic equation is
+                      2 − m   −5                         =                                                             0      or    m2 + 2m + 2 = 0      (2)                   2  −−4 m                                    
+Solving m2 + 2m + 2 = 0 we have m1 = -1 + i and m2 = -1- i
+        a
+The Eigen vector  corresponding to m1 = -1 + i is given by
+        b
+                      3 − i   −5 =a   0                                                  2  −−3   i  b                               
+                                      ( 3 − i ) a
+(3 – i )a – 5b = 0      or    b =                 . Choosing a = 5, b = 3 - i  . Thus the Eigen
+                           5
+                       5  
+vector is      −3   i                                               (3)                                
+                           5     ( −+1  i ) t
+Hence the first solution is                   x1 =       e                                 (4)                     3 − i                               
+                                                                       5  
+Corresponding to the second Eigen value m2 = -1 – i  the Eigen vector is +3   i  (work                                                                           
+                                        5     ( −−1  i ) t
+out yourself) Thus the second solution is                             x2 =       e          .                               3 + i                                            
+             5   5
+When t = 0, W =       = 10i ≠ 0  . Hence x1 and x2 are independent             3  3 + i
+
+The general solution is
+             5     ( −+1  i ) t      5     ( −−1  i ) t
+      x = c1       e    + c2       e                                   (5)           3 − i           3 +                                i
+             5   5
+When t = 0, W =       = 10i ≠ 0 Hence x1 and x2 are independent             3  3 + i
+
+                                               ieθ = cosθ+ i sinθ e − iθ = cosθ− i sinθ
+Now let us use Euler’s notation namely                                   ,
+
+--- Page 111 ---
+e ( −−1  i ) = e − t .ite
+
+     = e − t ( cos t + i sin t )
+                                                              (6)
+
+    = e − t .e − it
+
+     = e − t ( cos t − i sin t )
+
+Using (6) and (7) in the general solution (5) we have
+               5    − t     it      5    − t   − it
+     X = c1           e   .e + c 2           e   .e            3 − i          3 + i                                  
+             − t    5      it      5    − it      = e              c1       e + c2       e               3 − i        3 + i                                    
+             − t    5                      5                     = e              c1       (cos t + i sin t ) + c2       (cos t − i sin t )              3 − i                 3 + i                                                          
+             − t             5cos t                    5sin t           = e              (             c1 + c2 )                                         + i ( c1 − c2 )                                    3cos t + sin t          − cos t + 3sin t                                                                              
+                    3         0          0         3                       − t
+     X = e   b1     cos t −        sin t  + b2        cos t +     sin t                     5         − 1          − 1         5      
+       the two solutions are independent since the Wronskian at t = 0 is –5 hence () is the
+       general solution.
+
+2.11 Solution of the First Order Nonhomogeneous System of Equation
+
+The first order non-homogeneous system of equation is of the form
+           x′ = AX +B                                                (1)
+where A is a constant n x n matrix. B is a vector function of t. the solution of the system
+consists of two parts namely the complementary function (CF) and particular integral
+(PI).   The  complementary  function XC  is  obtained  by  solving  the  associated
+homogeneous system.
+     x′ = AX                                                            (2)
+we need to find the particular integral Xp and add it to the general solution of the system
+x′ = AX. Thus the general solution of the homogeneous system is
+            X = Xc + Xp                                         (3)
+
+--- Page 112 ---
+The following example will illustrate the method of solving a non-homogeneous first
+order system.
+
+Example 14:
+Consider the system
+        x ′     0  1  x    e t 
+        =                    +                                (4)                                
+        y ′     − 2  3  y                           1 
+
+we write this system in matrix form as
+
+           x′ = AX +B                                        (5)
+
+                                                                      ′            0  1           te         x 
+where A =         and B =     , x ′ =            − 2  3                                        1         y 
+
+                             0 − m   1
+  i).   The characteristic equation of A is           = ( m − 1)( m − 2) = 0                           − 2   3 − m
+
+ ii).   The Eigen values of A are m1 = 1, and m2 = 2
+
+            1   1
+iii).   The Eigen vectors are ,  (you can find out)
+            1   2
+
+iv).   The general solution of x′ = AX is given by
+
+      1      t   1    2 t
+   x = c1  e + c2  e                                      (6)
+      1    2
+
+                           x    1      t   1    2 t
+   Hence the c.f is given by                          = c1  e + c2  e       (7)
+                           y  c   1    2
+
+   The particular integral PI is given by a similar expression
+
+        x    1      t   1    2 t
+                 = g1  e + g 2  e                              (8)
+        y    1    2
+where g1 and g2 are functions of t depending on the vector B.
+
+--- Page 113 ---
+ x        1   t      1   2 t
+since      = g1     e + g 2      e       y  p      1        2 
+
+ x  i       1   t    1   t  1       1   2 t    1   2 t  1
+      = g1     e +     e g1 + 2 g 2      e  +      e g 2 y  p      1     1            2       2 
+
+The particular integral should also satisfy the equation X′ = AX + B.
+             x 
+Using X =        in X ′ = AX + B we have             y  p
+    1   t      1  1   t        1   2 t      1  1   2 t
+g1     e + g1     e + 2 g 2      e  + g 2      e    1        1         2          2 
+         0   1   1         t    1      2 t    e t 
+    =                      g1e +      g 2 e   +               − 2  3   1         2         1 
+         0   1  1         t    0   1  1      2 t    e t 
+    =                     g1e +                     g 2 e  +               − 2  3  1         − 2  3  2          1 
+         1         t          2 t    e t 
+    =      g1e + 2 g 2 e  +               1                  1 
+
+canceling the common term in both sides we have
+   1  1    t      1  1   2 t    e t 
+g1     e + g 2      e  =          1         2       1 
+                     1  1  g11   e t     e t 
+or, in matrix form              1     2 t  =                           1  2  g 2  e      1 
+we can solve the simultaneous equation (6) using Crammer’s Rule.
+
+            e t  1
+          1   t   1  2              t
+Thus g1 e =      = 2 e − 1
+           1  1
+           1  2
+g11 = 2 − e − t
+       1  e t
+   1  2 t   1  1                   t
+g 2 e  =     = 1 − e
+        1
+or g 12 = e −−2 t  e − t
+                  1          1                          − t                                t  1  − 2 tIntegrating 1g and g 2 we have g1 = 2t + e  and g 2 = e −−  e
+                                                2
+
+--- Page 114 ---
+Hence the general solution of X ′ = AX + B is
+         1   t      1   2 t           − t  1   t     − t  1  − 2 t  1   2 t                                  e +  e  −  e   X ′ = C1     e + C 2      e  + (                      2t + e  )                                                                                                                           e         1        2                1        2      2 
+
+            1   t      1   2 t    1     − t       1   − t  1                                                   e  −  or X ′ = C1     e + C 2      e  +     (                          2te  + 1) +                 1        2       1             2     2 
+
+Exercise 10
+Write down the given equations (1 to 4) by a system of first order equations.
+   d 2 y    dy
+1.       2 − 5   + 8 y = x + 3    dx     dx
+2.  y ′′ + 4 y ′ + 5 y = xe
+3.  y ′′′ + 2 y ′′ + 3 y ′ + 4 y =  f ( x )
+4.  y ′′′′ − 2 y = 0
+
+In exercise 5 through 7, write the given system of differential equations as a matrix
+equation.
+    dx
+5.    = 2 x + 3 y
+     dt
+
+    dy
+      = x − y
+     dt
+
+    dx
+6.    = 2 x − y + z + t
+     dt
+
+    dy
+      = x + 2 y − z + 1
+     dt
+
+    dz                      2 t     = 2 x − y + z = e
+     dt
+
+    dx
+7.    = 2 x − y + te
+     dt
+
+    dy
+      = x + y + t
+     dt
+
+                                                                   x1 
+                                                 4  − 1          
+8.  Consider the system X ′ = AX where A =                    , X ′ =  x 2                                                  − 4  4                                                                              x3 
+
+--- Page 115 ---
+a)        Find the characteristic equation of the matrix A.
+    b)        Find the Eigen values and the Eigen vectors corresponding to each Eigen
+       values.
+    c)        Find the general solution of the system of equation after verifying that the
+      two solutions are independent.
+                                     1  − 1  − 1
+9.  Consider the system X ′ = AX where A = 0  1   3
+                                     0  3   1
+    a)       Show that the Eigen values of A are 1, 4 and –2.
+                                                        1    2        0 
+                                                                        
+    b)        Prove that the Eigen vectors of A are  0  ,  − 3  and  1 
+                                                                                                                   0   − 3      −1                                                                        
+    c)        Write down the three solutions of the equation X ′ = AX .
+                                               1   2   0 
+                                                          
+    d)      Show that the Wronskian of  0  − 3  1  ≠ 0 and hence write down the
+                                                                                              0  − 3  − 1                                                          
+       general solution of X ′ = AX .
+
+                                                           8  − 3             x1 
+10. Solve the system of equations X ′ = AX where A =                   and X =        .                                                           16  − 8             x 2 
+                                                                                  ′
+                                                 x1     12  − 15  x1 
+11. Find the general solution of the equation,         =                           using matrix                                                 x 2     4  − 4  x 2 
+    algebra.
+                                                           1  2  − 1 
+                                                                      
+12. Solve the system of equations X ′ = AX where A =  0  − 1  3  X
+                                                                                                                                 0  0   2 
+13. Solve the following First order non-homogeneous equations.
+                                2   1        3  e 2 t 
+   X ′ = AX + B where A =                 , B =        2 t                                 − 4  2        t  e  
+                ′
+        x     0   1  x    0 
+14. If       =                     +      te , find the particular integral of the equation.        y     − 2  3  y    3 
+
+Summary of the lesson
+You have learnt the following from this LESSON.
+      i.               Reducing a nth order equation to a system of n linear equations.
+      ii.               Writing the n linear equations in matrix form as
+                      a.  X ′ = AX for homogeneous equations
+                    b.  X ′ = AX + B for nonhomogeneous equations
+                  where A = n × n matrix
+
+--- Page 116 ---
+B = Corresponding matrix to the nonhomogeneous part of
+                         he equations
+                                     x1                                        
+                                     x2 
+                                                          X =    .                                       
+                                      . 
+                                       
+                                     nx 
+                                                                ′
+                                      x1                                         
+                                      x2 
+                                                            X ′ =    .                                        
+                                       . 
+                                        
+                                      nx 
+                     c.  Determination of Eigen values and Eigen vectors of the matrix A
+                   d. The important theorems connecting the relations between the
+                   Eigen vectors of the matrix and the solution of the system of
+                     equations
+                     e.  Solving homogeneous and nonhomogeneous equations of the
+                   system of equations when the Eigen values are:
+                                                   i.  Real and distinct
+                                                 ii.  Real and repeated
+                                                iii. Complex conjugate
+
+Further Reading
+ 1.                           Differential Equations
+   By Frank Ayres JR. Ph.D
+    Schaum’s outline series
+   McGraw - Hill Book Company
+   New York, Toronto, Sydney
+
+ 2.                           Differential Equations
+   By Dr. D Sengottaiyan
+    Oxford Publications
+    London – Nairobi.
+
+--- Page 117 ---

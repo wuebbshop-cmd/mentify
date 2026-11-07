@@ -1,0 +1,635 @@
+--- Page 1 ---
+
+ SCSSCS 209209 IntroductionIntroduction
+
+StatisticsStatistics && ProgrammingProgramming (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+INTERNET TECHNOLOGY
+
+Internet
+
+A global computer network providing a variety of information and communication facilities,
+consisting of interconnected networks using standardized communication protocols.
+"The guide is also available on the internet"
+
+What is Internet definition?
+
+The Internet is a vast network that connects computers all over the world. Through the Internet,
+people can share information and communicate from anywhere with an Internet connection.
+
+The Internet provides different online services. Some examples include: Web – a collection of billions of
+webpages that you can view with a web browser. Email – the most common method of sending and
+receiving messages online. Social media – websites and apps that allow people to share comments,
+photos, and videos.
+
+NOTE:
+
+Internet
+
+The Internet is a global wide area network that connects computer systems across the world. It
+includes several high-bandwidth data lines that comprise the Internet "backbone." These lines are
+connected to major Internet hubs that distribute data to other locations, such as web servers and
+ISPs.
+
+In order to connect to the Internet, you must have access to an Internet service provider (ISP),
+which acts as the middleman between you and the Internet. Most ISPs offer broadband Internet
+access via a cable, DSL, or fiber connection. When you connect to the Internet using a public
+Wi-Fi signal, the Wi-Fi router is still connected to an ISP that provides Internet access. Even
+cellular data towers must connect to an Internet service provider to provide connected devices
+with access to the Internet.
+
+The Internet provides different online services. Some examples include:
+
+  Web – a collection of billions of webpages that you can view with a web browser
+  Email – the most common method of sending and receiving messages online
+  Social media – websites and apps that allow people to share comments, photos, and
+ videos
+  Online gaming – games that allow people to play with and against each other over the
+ Internet
+
+ 1
+
+ 
+
+--- Page 3 ---
+
+  Software updates – operating system and application updates can typically downloaded
+ from the Internet
+
+In the early days of the Internet, most people connected to the Internet using a home computer
+and a dial-up modem. DSL and cable modems eventually provided users with "always-on"
+connections. Now mobile devices, such as tablets and smartphones, make it possible for people
+to be connected to the Internet at all times. The Internet of Things has turned common appliances
+and home systems into "smart" devices that can be monitored and controlled over the Internet.
+As the Internet continues to grow and evolve, you can expect it to become an even more integral
+part of daily life.
+
+TECHNOLOGY
+
+ 1. The application of scientific knowledge for practical purposes, especially in industry.
+
+ "Advances in computer technology"
+
+ o Machinery and equipment developed from the application of scientific knowledge.
+
+ "It will reduce the industry's ability to spend money on new technology"
+
+ o The branch of knowledge dealing with engineering or applied sciences.
+
+What is the simple definition of technology?
+
+Technology is the application of scientific knowledge to the practical aims of human life or, as it is
+sometimes phrased, to the change and manipulation of the human environment.
+
+The use of scientific knowledge to solve practical problems, especially in industry and
+commerce.
+
+The specific methods, materials, and devices used to solve practical problems.
+
+Electronic or digital products and systems considered as a group.
+
+Technology is a science or knowledge put into practical use to solve problems or invent useful
+tools.
+
+Technology refers to methods, systems, and devices which are the result of scientific knowledge
+being used for practical purposes.
+Technology is changing fast. They should be allowed to wait for cheaper technologies to be
+developed. nuclear weapons technology.
+
+ 2
+
+ 
+
+--- Page 4 ---
+
+INTERNET TECHNOLOGY
+
+https://www.w3.org/People/Frystyk/thesis/WWW.html
+
+Internet Technologies is a technical field that covers the necessary skills to develop applications on the
+Internet or Internet based systems, harnessing e-commerce, cloud, mobile, and Web based
+technologies.
+
+That group of technologies that allow users to access information and communication over the World
+Wide Web (Web browsers, ftp, e-mail, associated hardware, Internet service providers, and so forth).
+
+What is Internet technology Short answer?
+
+The Internet is a vast network that connects computers all over the world. Through the Internet,
+people can share information and communicate from anywhere with an Internet connection.
+
+What are the main Internet technologies?
+
+Common Internet protocols include TCP/IP (Transmission Control Protocol/Internet Protocol), UDP/IP
+(User Datagram Protocol/Internet Protocol), HTTP (HyperText Transfer Protocol) and FTP (File
+Transfer Protocol).
+
+What is network and Internet technology?
+
+The Network is a collection of computer systems and devices that are linked together using LAN, WAN,
+CAN, or HAN whereas the Internet is a global system to link various types of electric devices worldwide.
+
+Why is Internet and technology important?
+
+Today, the internet has become unavoidable in our daily life. Appropriate use of the internet makes our
+life easy, fast and simple. The internet helps us with facts and figures, information and knowledge for
+personal, social and economic development.
+
+What is internet and examples?
+
+The Internet provides different online services. Some examples include: Web – a collection of billions of
+webpages that you can view with a web browser. Email – the most common method of sending and
+receiving messages online. Social media – websites and apps that allow people to share comments,
+photos, and videos.
+
+What is technology with example?
+
+Technology is the way we apply scientific knowledge for practical purposes. It includes machines (like
+computers) but also techniques and processes (like the way we produce computer chips). It might seem
+like all technology is only electronic, but that's just most modern technology.
+
+What is difference between Internet and Internet?
+
+ 3
+
+ 
+
+--- Page 5 ---
+
+The “I” is capitalized to differentiate the Internet as the global network from any generic inter-
+connecting of smaller computer networks. The capital “I” in the word Internet reflects the perceived
+status and formal recognition of the global network as a unique entity.
+
+Internet and World Wide Web
+
+The World Wide Web, or web for short, are the pages you see when you're at a device and you're
+online. But the internet is the network of connected computers that the web works on, as well as what
+emails and files travel across.
+
+What is Internet and World Wide Web?
+
+The World Wide Web (WWW) is a combination of all resources and users on the Internet that are using
+the HyperText Transfer Protocol (HTTP). >From the World Wide Web Consortium (W3C) "The World
+Wide Web is the universe of. Network-accessible information, an. embodiment of human knowledge”
+
+What is called World Wide Web?
+
+The World Wide Web -- also known as the web, WWW or W3 -- refers to all the public websites or
+pages that users can access on their local computers and other devices through the internet. These
+pages and documents are interconnected by means of hyperlinks that users click on for information.
+
+What is World Wide Web with examples?
+
+The World Wide Web is another way to describe the Internet, which is a network of computers which
+are connected and that share information and allow communication around the world. An example of
+the World Wide Web is the Internet.
+
+Why is it called World Wide Web?
+
+The first web browser - or browser-editor rather - was called Worldwide Web as, after all, when it was
+written in 1990 it was the only way to see the web. Much later it was renamed Nexus in order to save
+confusion between the program and the abstract information space (which is now spelled World Wide
+Web with spaces).
+
+What is WWW short answer?
+
+Answer: The World Wide Web (abbreviated WWW or the Web) is an information space where
+documents and other web resources are identified by Uniform Resource Locators (URLs), interlinked by
+hypertext links, and can be accessed via the Internet.
+
+What are the types of World Wide Web?
+
+The World-Wide Web
+
+  Basic World-Wide Web Model.
+  Universal Resource Identifies.
+  Hypertext Transfer Protocol.
+  Hypertext Markup Language.
+  Interactive World-Wide Web Model.
+
+ 4
+
+ 
+
+--- Page 6 ---
+
+Web - Basic Concepts
+
+What is Internet?
+
+The Internet is essentially a global network of computing resources.
+
+You can think of the Internet as a physical collection of routers and circuits as a set of shared
+resources.
+
+Some common definitions given in the past include −
+
+  A network of networks based on the TCP/IP communications protocol.
+  A community of people who use and develop those networks.
+
+Internet-Based Services
+
+Some of the basic services available to Internet users are −
+
+  Email − A fast, easy, and inexpensive way to communicate with other Internet users
+ around the world.
+  Telnet − Allows a user to log into a remote computer as though it were a local system.
+  FTP − Allows a user to transfer virtually every kind of file that can be stored on a
+ computer from one Internet-connected computer to another.
+  UseNet news − A distributed bulletin board that offers a combination news and
+ discussion service on thousands of topics.
+  World Wide Web (WWW) − A hypertext interface to Internet information resources.
+
+What is WWW?
+
+WWW stands for World Wide Web. A technical definition of the World Wide Web is − All the
+resources and users on the Internet that are using the Hypertext Transfer Protocol (HTTP).
+
+A broader definition comes from the organization that Web inventor Tim Berners-Lee helped
+found, the World Wide Web Consortium (W3C): The World Wide Web is the universe of
+network-accessible information, an embodiment of human knowledge.
+
+In simple terms, The World Wide Web is a way of exchanging information between computers
+on the Internet, tying them together into a vast collection of interactive multimedia resources.
+
+What is HTTP?
+
+HTTP stands for Hypertext Transfer Protocol. This is the protocol being used to transfer
+hypertext documents that makes the World Wide Web possible.
+
+ 5
+
+ 
+
+--- Page 7 ---
+
+A standard web address such as Yahoo.com is called a URL and here the prefix http indicates its
+protocol
+
+What is URL?
+
+URL stands for Uniform Resource Locator, and is used to specify addresses on the World Wide
+Web.
+
+A URL is the fundamental network identification for any resource connected to the web (e.g.,
+hypertext pages, images, and sound files).
+
+A URL will have the following format −
+
+protocol://hostname/other_information
+
+The protocol specifies how information is transferred from a link.
+
+The protocol used for web resources is HyperText Transfer Protocol (HTTP). Other protocols
+compatible with most web browsers include FTP, telnet, newsgroups, and Gopher.
+
+The protocol is followed by a colon, two slashes, and then the domain name. The domain name
+is the computer on which the resource is located.
+
+Links to particular files or subdirectories may be further specified after the domain name. The
+directory names are separated by single forward slashes.
+
+What is Website?
+
+Currently you are on our website Tutorialspoint.com which is a collection of various pages
+written in HTML markup language. This is a location on the web where people can find tutorials
+on latest technologies. Similarly, there are millions of websites available on the web.
+
+Each page available on the website is called a web page and first page of any website is called
+home page for that site.
+
+What is Web Server?
+
+Every Website sits on a computer known as a Web server. This server is always connected to the
+internet.
+
+Every Web server that is connected to the Internet is given a unique address made up of a series
+of four numbers between 0 and 256 separated by periods. For example, 68.178.157.132 or
+68.122.35.127.
+
+When you register a Web address, also known as a domain name, such as tutorialspoint.com you
+have to specify the IP address of the Web server that will host the site.
+
+ 6
+
+ 
+
+--- Page 8 ---
+
+We will see different type of Web servers in a separate chapter.
+
+What is Web Browser?
+
+Web Browsers are software installed on your PC. To access the Web you need a web browsers,
+such as Netscape Navigator, Microsoft Internet Explorer or Mozilla Firefox.
+
+Currently you must be using any sort of Web browser while you are navigating through my site
+tutorialspoint.com. On the Web, when you navigate through pages of information this is
+commonly known as browsing or surfing.
+
+We will see different type of Web browsers in a separate chapter.
+
+What is SMTP Server?
+
+SMTP stands for Simple Mail Transfer Protocol Server. This server takes care of delivering
+emails from one server to another server. When you send an email to an email address, it is
+delivered to its recipient by a SMTP Server.
+
+What is ISP?
+
+ISP stands for Internet Service Provider. They are the companies who provide you service in
+terms of internet connection to connect to the internet.
+
+You will buy space on a Web Server from any Internet Service Provider. This space will be used
+to host your Website.
+
+What is HTML?
+
+HTML stands for Hyper Text Markup Language. This is the language in which we write web
+pages for any Website. Even the page you are reading right now is written in HTML.
+
+This is a subset of Standard Generalized Mark-Up Language (SGML) for electronic publishing,
+the specific standard used for the World Wide Web.
+
+What is Hyperlink?
+
+A hyperlink or simply a link is a selectable element in an electronic document that serves as an
+access point to other electronic resources. Typically, you click the hyperlink to access the linked
+resource. Familiar hyperlinks include buttons, icons, image maps, and clickable text links.
+
+ 7
+
+ 
+
+--- Page 9 ---
+
+What is DNS?
+
+DNS stands for Domain Name System. When someone types in your domain name,
+www.example.com, your browser will ask the Domain Name System to find the IP that hosts
+your site. When you register your domain name, your IP address should be put in a DNS along
+with your domain name. Without doing it your domain name will not be functioning properly.
+
+What is W3C?
+
+W3C stands for World Wide Web Consortium which is an international consortium of
+companies involved with the Internet and the Web.
+
+The W3C was founded in 1994 by Tim Berners-Lee, the original architect of the World Wide
+Web.
+
+The organization's purpose is to develop open standards so that the Web evolves in a single
+direction rather than being splintered among competing factions.
+
+The W3C is the chief standards body for HTTP and HTML.
+
+ The World-Wide Web
+
+The official description of the World-Wide Web (WWW, W3) is a "wide-area hypermedia
+information retrieval initiative aiming to give universal access to a large universe of documents".
+
+It is a way of viewing all the on-line information available on the Internet as a seamless,
+browsable continuum.
+
+This section introduces the general concept of the World-Wide Web and the basic elements in
+the model. The content of the section is as follows:
+
+ 1. Basic World-Wide Web Model
+ 2. Universal Resource Identifies
+ 3. Hypertext Transfer Protocol
+ 4. Hypertext Markup Language
+ 5. Interactive World-Wide Web Model
+
+Basic World-Wide Web Model
+
+ 8
+
+ 
+
+--- Page 10 ---
+
+The basic idea behind the World-Wide Web is based on a client server application and hypertext
+documents as illustrated in the figure below.
+
+The model is simplified in that it only contains elements that exists within the World-Wide Web
+concept. Later the model will be expanded to a generic resource accessing model.
+
+The Client
+ The client is the user's interface to the Internet.
+
+ Whatever type of service requested this interface stays the same, so users do not need to
+ understand the differences between the many different access schemes in common use on
+ the Internet.
+
+ This principle is the same as is seen from other popular applications such as Microsoft
+ Windows, Machintosh etc. where the user is always presented to the same GUI interface.
+
+Uniform Resource Identifier URI
+ The user initiates a request by specifying a Uniform Resource Identifier or a "hyperlink".
+ This link can specify any accessible information or resource on the Internet as long as it
+ can be uniquely identified as an object.
+
+ The word "Web" refers to the combination of accessible objects and the links pointing to
+ them throughout the Internet.
+
+The Server
+ The server is responsible for handling the request sent from the client.
+
+ This can either be a local accessible resource or the server can request the resource from
+ another server in which case the first server temporarily turns into a client.
+
+ 9
+
+ 
+
+--- Page 11 ---
+
+Hypertext Transport Protocol HTTP
+ The client sends the user request to a WWW server using the Hypertext Transfer Protocol
+ (HTTP). This is a typical client-server application based on a stateless connection
+ between the client requesting the URI and the server handling the request.
+
+Hypertext Markup Language HTML
+On a successful request, a data object is returned from the server to the client.
+
+The object is written in the Hypertext Markup Language (HTML) which is a hypertext language
+with the possibility of containing hyperlinks that the user can follow.
+
+The model basically reflects the first version of the World-Wide Web as it is described in the
+HTTP Protocol version 0.9 and HTML version 1.0.
+
+However, the WWW specifications have been rapidly changing during the last 3-4 years, even
+though the current model is still based on a client-server approach.
+
+From being a HTML and HTTP based model, the World-Wide Web is now capable of handling
+virtually any existing data format on the Internet using a large set of access methods apart from
+HTTP such as FTP, Gopher, WAIS, and Telnet etc.
+
+In other words, the World-Wide Web represents a generic information exchange tool capable of
+accessing information throughout the Internet.
+
+Though, before the more advanced model is presented, it is necessary to get an overview of the
+basic elements in the WWW model mentioned above.
+
+Universal Resource Identifies
+
+In order to address a data object or more general, a resource, in the model above it is necessary to
+define a name space that not only contains information about hosts but also about resources
+available on each host.
+
+The World-Wide Web model defines Uniform Resource Identifiers or URIs that specifies a
+syntax for encoding the names and addresses of data objects on the Internet and how they can be
+accessed.
+
+The set of URIs covers
+
+ 10
+
+ 
+
+--- Page 12 ---
+
+Universal Resource Identifier (URI)
+ A generic set of all addresses in the address space of all resources on the Internet. They
+ describe a hierarchical naming scheme that together with the HTTP protocol makes a
+ significant difference between the World-Wide Web model and other Internet access
+ schemes such as FTP that has a flat address space.
+Uniform Resource Locator (URL)
+ The term "URI" has been introduced by the IETF and is a a general description of all
+ URL that are not persistent. In practice the URLs consist of the current set of Internet
+ protocols supported by the WWW, i.e., HTTP, FTP, Gopher, WAIS, etc., followed by a
+ directory path, a file name, and possibly a search directive.
+Uniform Resource Name (URN)
+ However, the ultimate goal for URIs is to be a persistent naming scheme independent of
+ the mean of access, i.e., the protocol used and of the physical structure of resources on
+ the specific host. The only way to obtain this is to have a naming scheme like the Internet
+ Domain Name Service. URNs are currently under consideration in IETF but little is
+ known about the status of the research.
+Uniform Resource Citation (URC)
+ This is Meta information about a URI. They consist of pairs of attribute/value which can
+ contain information on the author, publisher etc. The URC are currently not used.
+
+Hypertext Transfer Protocol
+
+The Hypertext Transport Protocol (HTTP) is a generic stateless presentation layer protocol with
+elements from other Internet presentation layer protocols.
+
+The HTTP protocol is built on a client-server model where the client initiates a request and the
+server replies with a response.
+
+The basic format of the HTTP protocol is based on the MIME Protocol with a set of HTTP
+Headers possibly followed by a message body containing a data object in any 7-bit or 8-bit
+accepted by the client.
+
+The client specifies what data format it can handle by having a list of accept headers in the
+request.
+
+The basic WWW-model indicates that the client initiates a request and the server responds by
+sending a data object to the client.
+
+However, often the client wants to post a data object to the server, e.g. to post a mail message to
+an email address, to a news group, or to create a new file on the remote server.
+
+The HTTP protocol provides two methods for the client to transfer a data object to the server.
+Though, the client is not guaranteed that the request can be fulfilled - even on a successful return
+code. The action can at all times be cancelled by the responsible person of the remote server.
+
+ 11
+
+ 
+
+--- Page 13 ---
+
+One of the characteristics of the HTTP protocol is that it is a superset of the other Presentation
+Layer supported by the WWW-model.
+
+This means that messages generated by other protocols can be handled by the HTTP protocol by
+wrapping a set of HTTP/MIME headers around the message. This is an essential feature for the
+concept of Proxy servers.
+
+The current version 1.0 of the HTTP protocol is built on top of the TCP Protocol that is a
+connection oriented protocol with a 3 way handshake connection establishment.
+
+This causes a substantial overhead in a client-server oriented environment like the HTTP
+protocol.
+
+It would therefore be an excessive optimization if the HTTP protocol was moved to a lighter
+Transport Layer protocol such as the Transactional TCP Protocol which still provides a reliable
+stream transport service.
+
+Hypertext Markup Language
+
+The Hypertext Markup language (HTML) is the users interface to create information on the
+World-Wide Web. The description of the World-Wide Web has until now focused on the
+technology that due to specifications and conventions provide the functionality necessary to
+request and serve information across the Internet.
+
+HTML is defined to be the hypertext language of communication which actually flows over the
+network.
+
+There is no requirement that files are stored in HTML. Servers may store files in any other
+formats and then generate a HTML on the fly upon a client request.
+
+This gives the possibility of having virtual documents instead of static documents on rapidly
+changing information like weather reports etc. HTML can be used to represent:
+
+  Hypertext news, mail, online documentation, and collaborative hypermedia
+  Menus and options
+  Database query results
+  Simple structured documents with aligned multimedia elements like images, audio and
+ movies.
+  URI-Links to other resources on the Internet.
+
+HTML is built on top of the International Standard ISO 8879 Standard Generalized Markup
+Language (SGML).
+
+SGML is a system for defining structured document types and markup languages to represent
+instances of the document types.
+
+ 12
+
+ 
+
+--- Page 14 ---
+
+That is, HTML is a Document Type Definition (DTD) used on top of a SGML parser. Every
+SGML based document contains three elements as illustrated in the figure:
+
+HTML is now superseded by HTML+ that is an enriched DTD with possibilities of handling
+tables, math, images etc.
+
+Currently many browsers support a subset of the HTML+ specifications in addition to the basic
+HTML features.
+
+Interactive World-Wide Web Model
+
+The description of the Universal Resource Identifiers, the Hypertext Transfer Protocol, and the
+Hypertext Markup Language now calls for an update of the Basic WWW-model as illustrated in
+the figure.
+
+ 13
+
+ 
+
+--- Page 15 ---
+
+This model is a generic resource exchange model based on a client-server concept.
+
+Instead of the limited model with data flowing only from the server to the client, the client is
+capable of posting data to the server if the server allows this kind of service.
+
+Furthermore, the format of the data transferred in the message body can have any format from 7-
+bit ASCII text to 8-bit binary data.
+
+The transfer carrier can be any protocol supported by the World-Wide Web but the main
+protocol is HTTP as it can be used to encapsulate the other protocols supported, even a FTP
+message that is a highly state dependent protocol.
+
+ 14

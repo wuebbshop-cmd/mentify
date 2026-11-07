@@ -1,0 +1,844 @@
+Lesson 13
+            Application of Differential Equations
+13.1 Introduction
+Differential Equations originate from the mathematical formulation of great variety of
+problems in science and engineering.  In this lesson we consider problems that give rise
+to some of the types of first and second order ordinary differential equations and the
+system of equations studied in the previous lessons.  First we formulate the problems
+mathematically and obtain a differential equation and then we solve the equation and
+interpret the solutions.
+
+13.2 Objective of the lesson
+By the end of this lesson you will be able to:
+•  formulate the differential equations from the given physical statements.
+•  solve the  first and second order differential equations and system of equations
+   formed.
+
+13.3 Application of Differential Equation for Rate of Growth and Decay.
+In many problems the rate at which a quantity changes is a known function of the amount
+present at the time and we must find the quantity at any particular time after the initial
+observation.
+                                                         dx
+If x denotes the amount of the quantity present at time t, then     denotes the rate at
+                                                                     dt
+which the quantity changes. Suppose the amount of quantity grows or decays at a rate
+proportion to the amount present, we form the differential equation,
+dx
+   = + kx if the amount of the quantity grows
+ dt
+     = -kx if the amount of the quantity decays.
+
+The following examples illustrate these types of problems.
+
+Example 1
+The rate at which radio active nuclei decay is proportional to the number of such nuclei
+that are present in a given sample. Half of the original number of radio – active nuclei
+have undergone disintegration in a period of 1000 years (half- life).
+a)    What percentage of the original radioactive nuclei will remain after 3000 years?
+b)     In how many years will only one–tenth of the original number remain?
+
+
+Solution
+Formulation of the problem
+
+--- Page 140 ---
+dx
+Let x be the amount (number) of radioactive nuclei present after  t years.  Then
+                                                                                          dt
+represents the rate at which the nuclei decay.
+
+
+Since the nuclei decay at a rate proportional to the amount present we have
+       dx
+        = -kx                             (1)
+        dt
+where k is positive (since x is decreasing we have kx is negative)
+Using separation of variables,
+       dx
+        = − kdt
+        x
+Integrating both sides we have
+        dx
+              k                   dt        ∫   = −                 ∫         x
+        ln x + ln c = -kt
+        ln (cx) = -kt
+      cx = e-kt
+       or x = Ae-kt                           (2)
+Let x0 be the amount present initially, (when t = 0)
+It is given that x = x0 when t = 0
+Then x0 = A. Hence (2) becomes x = x0e-kt
+using the initial condition that
+           x0       x =   when t = 1000 we have
+          2
+       x0          1000 k        = x0 e−
+       2
+                      1000
+       or  e− k    = 0.5             (    )
+                               1
+                             1000                     (3)       or e −=k   ( 0.5 )
+substitution of (3) in (2) we have
+                            1
+                          1000                        (4)       x = x0 ( 0.5 )
+Equation (4) gives the amount of radioactive nuclei that are present at any particular time
+t in terms of the original number of nuclei present, that is x0, when t = 0.
+
+a)    To find the percentage of x0 that remains after 3000 years.
+     we let t = 3000 in the equation       (4)
+                                    3000
+      Then  x = x0 ( 0.5 )                   3                                   1000 = x0 ( 0.5 )
+              1
+           =  x0
+              8
+                          1
+      Then after 3000 years =  x0 will remain
+                          8
+
+--- Page 141 ---
+1
+       or =  x0 x 100% will remain.
+          8
+       or 12.5 percent of the original amount will be present after 3000 years.
+    b)    To find the number of years t when there is only 10 percent of x0 will remain.
+                10
+     we let  x =    x0 in the solution (4) and find t.
+               100
+                                                                    t            x0                                    1000      Thus            = x0 ( 0.5 )
+           10
+                                          t    1       or ( 0.5 )1000 =
+                 10
+                   t      1       1        or       ln    = ln                              
+         1000    2       10 
+                       1 
+            1000ln                           10   1000ln10       or t =          =        = 3330years(Approximately)
+                     1          ln 2
+                  ln   
+                     2 
+   Hence after 3330 years the amount of radioactive nuclei will be 10% of the original
+   amount.
+
+Example 2
+   The population of a city increases at a rate proportional to the number of inhabitants
+    at any time.  If the population of the city is 30000 in 1990 and 35000 in 2000 what
+    will be the population of the city in 2010?
+
+Solution
+   Let x be the number of individuals in the city at time t.  If we assume that the rate of
+   change of the population is proportional to the number of individuals in the city at
+   any time t we get the differential equation
+             dx
+              = kx                              (1)
+                dt
+   where k is a positive constant since the population is increasing
+  We have the initial condition that t = t0 when x = x0
+   From (1) we have
+        dx
+                kdt        ∫   = ∫         x
+       or ln x + ln c = kt
+       or ln (cx) = kt
+      Then cx = ekt
+       or x = Aekt                           (2)
+Applying the initial condition that x = x0 when t = t0 we have
+
+                                 0       x 0 = Ae kt
+
+                                                  0                                              (3)      Then A = x 0 e − k t
+        substitution of (3) in (2) gives
+
+--- Page 142 ---
+0                            .e kt      x = x 0 e − kt
+                      k ( t − t 0 )      x = x 0 e                            (4)
+The equation (4)  is the required solution of the equation (1) satisfying the given
+conditions.
+
+Example 3
+                                           dx   1
+The population x of a certain city satisfies the law   =    x
+                                                     dt  100
+where time t is measured in years. Given that the population of this city is 200 000 in
+1980,
+(a)    Find the equation connecting the population x and time t. (> 1980).
+b)     Determine in what year does the population double.
+
+Solution
+a)     Let x be the population at time t after 1980. The differential equation governing
+       the population x and time t in years is given by
+             dx   1
+              =    x                   (1)
+                dt  100
+       using variables separable method,
+             dx    dt
+              =
+               x   100
+        Integrating both sides
+                                         t
+                ln x + ln a =
+                      100
+
+                                   t
+                ln ax =
+                  100
+
+
+
+             x = Ae 0.01t
+When t = 0, x = 200 000
+       Therefore 200 000 = A
+       Therefore x = 200 000 e 0.01t         (2)
+b)       It is required to find t when x = 400 000
+      from the equation (2) we get
+            400 000 = 200 000 e0.01t
+             e 0.01t = 2
+               0.01t = ln 2
+                    ln 2
+                      t =    = 69.3 years
+                 0.01
+       In 2049.3 the population will become double.
+
+--- Page 143 ---
+Example 4
+The rate at which radioactive nuclei decay is proportional to the number of nuclei that are
+present in a given sample.   Half of the original number of radioactive nuclei have
+undergone disintegration in a period of 50 years.
+a)    What percentage of the original radioactive nuclei will remain after 150 years?
+b)     In how many years will 75% of the original number remain?
+
+Formulation of the problem
+                                                          dx
+Let x be the amount of radioactive nuclei present after t years and    represents the rate
+                                                                       dt
+at which the nuclei decay.  Since the nuclei decay at a rate proportional to the amount
+        dx
+present.      is proportional to x.
+         dt
+The amount x is positive and x is decreasing.
+Hence the constant of proportionality is negative
+         dx
+Therefore   = − kx                                  (1)
+            dt
+Solving using the method of variables separable
+       dx
+        = − kdt
+        x
+        ln x + ln a = − kt
+        ln ax = − kt
+        ln ax = e − kt
+       ax = e − kt
+       x = ce − kt
+
+Let m denote the amount initially present (when t = 0)
+    m = c e0 = c
+Hence the solution of the equation is
+       x = me− kt                                     (2)
+                      m
+It is further given that when t = 50,  x =             (3)
+                                 2
+       using (3) in (2)
+
+--- Page 144 ---
+m         − k ( 50 )        = me
+       2
+            − 50 k   1       e    =
+             2
+             − k  50   1        e     =        (    )               2
+                            1
+                         50            − k     1        e  =                  
+                2 
+Hence (2) becomes
+                                               t
+       x = m e− k                 (    )
+
+                                               t
+                         50                1        x = m.                                (4)                 
+                2 
+This is the relation between x, m and t.
+a)       If t = 150, we must find x
+        substitute this in (4)
+                                    150
+                                     50                        1               x = m.                         
+                        2 
+           = m 1                       
+                     8 
+           = 0.125 m
+      Thus 12.5% of the original number remain after 150 years.
+b)       If x = 75% of m. we must find t from (4)
+                                                                             t
+                                          50                      1               0.75 m = m                             
+                            2 
+                                                  t
+                           50                 1                 = 0.75                  
+                 2 
+                       t
+                   ln 0.5 = ln 0.75
+            50
+                       ln 0.75
+                      t = 50
+                       ln 0.5
+           = 20.75 years.
+
+      Thus in 20.75 years 75% of the original number remains.
+
+13.4 Mixture problems
+      Suppose a substance is allowed to flow into a container having a certain mixture
+        at a certain rate and the mixture is kept uniform by stirring, sometimes this
+       uniform mixture may simultaneous flow out of the container at a different rate.
+
+--- Page 145 ---
+Our aim is to determine the quantity of the substance m present in the mixture at
+      any time t.
+      The basic equation to form here is
+             dx
+              = Rate In – Rate out
+                dt
+      The following example will illustrate the problems of such kind
+
+Example 5
+A tank initially contains 200 litres of pure water.  Starting at time t = 0 a brine
+        containing 0.2 kg of salt dissolved per litre flows into the tank at the rate of
+       10 litres per minute. The mixture is kept uniform by stirring and the well
+         stirred mixture simultaneously flows out of the tank at the same rate.
+       a)   How many kg of salt enters into the tank per minute?
+       b)   How many kg of salt flows out of the tank per minute?
+        c)   How much salt is in the tank at any time t?
+       d)   How much salt is present at the end of 25 minutes?
+        e)   How much salt is present after a very long time?
+
+
+Formulation of the problem
+Let x denote the amount of salt (in kg) in the tank at a general time t > 0. Then Rate
+         of change of x = IN – OUT
+                  dx
+              or    = IN − OUT
+                      dt
+        a)    To find IN
+    The brine contains 0.2 kg per litre. It flows in at the rate of 3 litres per minute.
+           Hence in 1 minute 3 litres x 0.2 kg = 0.6 kg of salt is going into the
+              tank.
+b)     To find OUT
+       At tine t, x kg of salt is present in 50 litres of water.
+                                      x
+       Hence 1 litre of the brine has   kg
+                                 50
+        3 litres of brine goes out.
+                  x   3 x
+       That is 3   =   kg goes out per minute.
+               50  50
+               dx
+       Hence    = IN − OUT gives
+                   dt
+             dx       3 x
+              = 0.6 −                    (1)
+                dt       50
+The initial condition is that
+when t = 0, no of kg of sat in the tank is 0 kg
+Then when t = 0, x = 0 or x(0) = 0
+From the equation (1) we have
+                    dx  30 − 3 x
+                   =
+                        dt    50
+
+--- Page 146 ---
+dx  30 − 3 x   3 (10 − x )                   =      =
+                        dt    50       50
+                           dx    3dt
+                   or        =
+                        10 − x   50
+Integrating both sides we have
+                dx     3dt
+               ∫     = ∫             10 − x    50
+                                     3                   or − ln (10 − x ) + ln c =     t
+                                     50
+                                   3                        ln (10 − x ) − ln c = −     t
+                                  50
+                                                      3
+                                                                                                    t                                               −                                (10 − x )                                                     50                   or       = e
+                          c
+                                                3
+                                          −    t
+                  10 − x = ce 50
+                                                   3
+                                             −    t
+                   or x = 10 − ce 50                              (3)
+
+using the initial condition that
+when t = 0, x = 0 we have
+0 = 10  - c or c = 10
+substituting c = 10 in (3) we have
+                                            3 t
+                                      −
+                x = 10 − 10 e  50
+                                  − 3 t 
+              or x = 10  1 − e  50                                (4)
+                                     
+                               − 15 
+c)      If t = 25, x = 10  1 − e 50 
+                                 
+13.5 Electric Circuit problems (First order equations)
+      In an electric circuit in series there are
+         i.   Inductance L, measured in henries
+        ii.   The resistance R, measured in Ohms
+       iii.   The current in the circuit I measured in amperes and
+      iv.   The electromotive force EMF, E measured in Volts
+
+
+The basic differential equation in an electric circuit is given by Kirchhoff’s Law.
+                    di      1
+            L  + Ri +  q = E                 (1)
+                    dt    C
+Let us consider R and L constants. The following is the Electric circuit.
+
+--- Page 147 ---
+we can solve the equation (1) which is a linear of first order in i (current) and t
+                  (time)
+       The following examples illustrate the method of solving such problems:
+
+Example 6
+A circuit has in series a constant electro motive force 40v, a resistor of 10Ωand an
+        inductance 0.2 Henry the initial current is 0,
+          a.  Sketch the circuit.
+         b.  State the basic equation in electric circuit.
+           c. By solving the basic equation find the current i on the circuit at time t > 0.
+         d. What is the steady current after a long time?
+
+Solution
+
+         a)            Circuit diagram showing the Electromotive force E, V from Battery,
+               Resistor R Ω and the inductance L Henry
+                             R =10Ω
+
+
+
+
+           E = 40v
+
+
+
+
+
+                              L = 0.2H
+
+b)     The basic differential equation is
+                    di
+            L  + Ri = E                 (1)
+                    dt
+c)      Let L = 0.2H, R = 10 Ω and E = 40V
+         Substituting these values in the equation (1) we have
+                               di
+                          0.2  + 10i = 40
+                               dt
+                               di
+                      or   + 50i = 200 (Divide by 0.2)          (2)
+                               dt
+        This is a linear equation of first order in i and t.
+                                                       ∫ 50 dt     50 t       The integrating factor is e   = e
+                      dy
+       The solution of   + py = ϕis
+                       dx
+                             ∫ pdx          ∫ pdx                          e   dx (see lesson 5)                ye   = ∫ ϕ
+       Hence the solution of (2) is
+                            200 e 50 t dt                             ie 50 t = ∫
+
+--- Page 148 ---
+50 t      e 50 t                      or ie  = 200   + c
+                                 50
+                             ie 50 t = 4 e 50 t + c
+                       4e 50 t    c
+            Then   i =   50 t +  50 t                          e     e
+                      or i = 4 + ce−50 t
+        using the initial condition that i = 0 when t = 0, we have
+                     0 = 4 + c and hence c = -4.
+        putting c = -4 in 3 we have
+                                      i = 4 − 4 e−50 t
+       Hence i = 4 1 − e −50 t                          (         )
+        This equation gives the value of current at any time t > 0.
+d)     when t →∞  e −50 t → 0
+       Hence i = 4 ampere, after a long time.
+
+         13.6 Application of Differential Equations of second order in electrical circuit.
+ If an electric circuit contains the capacitors c in addition to Electromotive force E, resistance
+     R and inductance L we have the Basic equation
+            di      1
+       L  + Ri +  q = E           (1)
+            dt       c
+since current I is the rate of change of coulomb q we have
+                 dq
+                         i =                            (2)
+                     dt
+substituting (2) in (1) we have
+          d  dq      dq   q       L       + R     +  = E                           
+            dt  dt      dt   c
+         d 2 q    dq  q
+       L    2 + R   +  = E         (3)            dt       dt   c
+Equation (3) is a second order linear equation in the dependent variable q from which the
+        charge q can be determined.
+
+         13.7 Application of system of equations on elastic springs
+      On a smooth horizontal table-top an object A1 is connected to a fixed point P by a mass-
+          less spring S1 of natural length L1. An object A2 is then connected to A1 by a mass-less
+         spring S2 of natural length L2 in such a way that the fixed point P and the centers of
+         gravity A1 and A2 all lie in a straight line (see figure below)
+                              A1                           A2
+                           S1                         S2
+             P
+
+
+       B                                               C
+
+                                              a1                             a2
+                                     O1                    O2
+
+--- Page 149 ---
+The Object A1 is then displaced a distance a1 to the left of its equilibrium position O1 the
+    object A2 is displaced a distance a2 to the right of its equilibrium position O2 and at time t
+    =0, the two objects are released. To find the position of the two objects at any further
+    time.
+
+   Problems of this kind can be solved using the system of simultaneous situations as seen
+   from the following examples.
+
+   Example 7
+   Two masses M1 and M2 suspended from two springs as shown in the figure below. The
+    coefficients of stiffness of the springs are K1 and K2 respectively. The displacements of
+    the masses from their position of equilibrium are x and y.  It can be established that the
+    following equations must hold.
+
+                   d 2 y
+         M 2     2 = − k 2 ( y − x )                        dt
+                  d 2 x
+         M 1    2 = k 2 ( y − x ) − k1 x                        dt
+
+
+   Formulation of the problem
+    Let us assume that no external forces act upon the system and the masses of the system
+   A1 and A2 be m1 and m2. Let the spring contact of S1 and S2 be K1 and K2 respectively.
+
+          Let x1 denote the displacement of A1 from its equilibrium position O1 at time t ≥
+            0. Let x1 is positive when A1 is to the right of O1.
+
+           In the same way let x2 denote the displacement of A2 from its equilibrium position
+         O2 at time t ≥ 0.
+
+          Let x2 be the positive when A2 is to the right of O2
+
+                     A1                           A2
+                 S1                         S2
+     P
+
+
+B                                               C
+
+                                x1                           x2
+                            O1                    O2
+
+--- Page 150 ---
+Apply Newton’s
+
+Consider the forces acting on A1 at time t ≥ 0. There are two forces, F1 exerted by spring
+S1 with magnitude K1(x1) (by Hook’s Law) and F2 exerted by S2 with magnitude
+             K2(x2 – x1).
+Now applying Newton’s Second Law to the object A1 we have,
+               d 2 x1         m1     2 = − k1 x1 + k 2 ( x2 − 1x )                    dt
+in the same way the force F3 exerted by spring S2 is given by F3 = -k(x2 – x1) and by
+Newton’s Second Law
+         d 2 x2    m2     2 = − k 2 ( x2 − 1x )            dt
+The initial conditions are
+       x1 (0) = a  and  x1′ (0) = 0;  x2 (0) = a2 and x2′ (0) = 0
+Thus the mathematical formulation of the problem consists of the differential equations
+         d 2 x1    m1     2 + ( k1 + k 2 ) x1 − k 2 x2 = 0            dt
+             d 2 x2       m2     2 − k 2 x1 + k 2 x2 = 0                  dt
+They form  a system  of homogeneous  linear  differential  equations  with  constant
+coefficients.
+
+Example 8
+                 A1                           A2
+           S1                         S2
+ P
+
+
+                 O1                          O2
+
+
+Suppose two masses A1 and A2 are connected by two springs S1 and S2 and placed on a
+smooth table as in the figure. Let A1 and A2 are displaced to the right with distances x1
+and x2 respectfully.
+
+Let k1 and k2 be the spring constants of S1 and S2 respectfully.  Then the differential
+equations of the system at the time t is given by
+
+
+                         00
+         m1 x + ( k1 + k 2 ) x1 − k 2 x2 = 0                                          (1)
+
+
+                                  00
+            m2 x − k 2 x1 + k 2 x2 = 0                                          (2)
+
+--- Page 151 ---
+If the masses if of A1 and A2 are one unit each, and the spring constants k1 = 3 and k2 =
+2, write down the system of two equations.
+
+Taking the initial conditions
+x1 (0) = −1,   x1′ (0) = 0,  x2 (0) = 2,  x2′ (0) = 0
+find the displacements x1 and x2 at time t > 0
+
+Solution
+The system of equations (1) and (2) became
+            d 2 x1                         2 + 5 x1 − 2 x2 = 0                 dt
+            d 2 x2                          2 − 2 x1 + 2 x2 = 0                 dt
+or          (D2 + 5)x1 – 2x2 = 0                                                (3)
+               -2x1 + (D2 + )x2 = 0                                                (4)
+
+
+Applying the operator (D2 + 2) to (3) and multiplying the equation (4) by 2 and adding
+we get
+              [(D2 + 2)(D2 + 5) – 4]x1 = 0
+or           (D4 + 7D2 + 6)x1 = 0
+
+The auxiliary equation of (5) is
+             (m2 + 6)(m2 + 1) = 0
+             m = ± − 6     or   m = ± − 1
+Hence the general solution is
+                     x1 = c1 sin t + c2 cos t + c3 sin  6t + c4 cos  6t                     (5)
+In the same way multiplying equation (3) by 2, applying the operator (D2 + 5) to the
+equation (4) and adding we obtain (D4 + 7D2 + 6)x 2 = 0 whose general solution is
+       x2 = k1 sin t + k 2 cos t + k 3 sin  6t + k 4 cos  6t                                    (6)
+Here there are 8 constants but the determinant of the operator coefficient
+     D 2 + 5   −2         4        2                  = D + 7 D + 6
+       −2  D 2 + 2
+is of order 4 since D4 is the highest power of D.  There must be certain relationships
+between the C’s and K’s.
+
+Substituting the values of x1 and x2 in the equations (5) and (6) in the given equations we
+have
+                                      1              1
+                  k1 = 2 c1 ,  k 2 = 2 c2 ,  k 3 = −  c3  and  k 4 = −   4c
+                                      2              2
+Hence we have
+
+--- Page 152 ---
+x1 = c1 sin t + c2 cos t + c3 sin  6t + c4 cos  6t
+                                    1          1
+                  x2 = 2c1 sin t + 2 c2 cos t −  c3 sin  6t −  c4 cos  6t
+                                    2          2
+If we apply the conditions
+                               3      8
+                              x1 =  cos t −  cos  6t
+                               5      5
+                               5      4
+                              x2 =  cos t +  cos  6t
+                               5      5
+                      dx1              x1 = − 1,     = 0
+                           dt
+                 c2 + c4 =  1we have                    −                                             (7)
+              c1 +  6 c3 = 0  
+                    dx2if we apply x2 = 2 and    = 0 we have
+                         dt
+                 1     
+            2 c2 −  c4 = 2
+                 2                                                                                                                    (8)
+                   6                2 c1 −   = 0                  2        
+From (7) and (8) we get
+                       3               8
+              c1 = 0,  c 2 =    ,  c3 = 0,   c4 = −
+                       5               5
+Thus the particular solution of this problem is
+                3      8
+              x1 =  cos t −  cos  6t
+                5      5
+                5      4
+              x2 =  cos t +  cos  6t
+                5      5
+Note that these system of equations can also be solved using matrix method shown in the
+previous lesson.
+
+Example 9
+A circuit has in series an electromotive force given by E = 100 sin 40t, a resistor of 10Ω
+and an inductor of 0.5 Henry.  If the initial current is zero
+      i.    Draw the circuit
+      ii.     Write down the equation
+      iii.    Solve the equation and find the current i at time t > 0.
+
+
+
+Solution
+      i.     The circuit diagram
+
+--- Page 153 ---
+R =10Ω
+
+
+
+
+                = 100sin 40t (volt)                    C
+
+
+
+
+                      L = 0.5H
+
+       Volt = Current x Resistance.
+Or     E = iR gives E = 10i
+
+                       di       di
+          E = L   = 5.0
+                       dt       dt
+                  di      1
+           L  + Ri +  q = E    (from equation 1)
+                  dt    C
+             1 di
+      Hence     + 10i + 0 = 100 sin 40t
+             2 dt
+             di
+        or    + 20i = 200 sin 40t                           (2)
+             dt
+
+The initial condition is i = 0 when t = 0. Equation (2) is of the form
+             dy
+              + Py = Q (first order linear equation)
+             dx
+                   Qe spdxwhose solution is ye spdx = ∫
+Hence the solution of the equation (2) is
+                         ∫ 20 dt                       20 dt                    200 sin 40t .e   dt                 ie   = ∫
+                                                t .e 20 t dt                 ie 20 t = 200 sin 40 ∫
+Integrating and simplifying we have
+                      i = 2(sin 40t − 2 cos 40t ) + Ce −20 t
+Applying the condition that i = 0 when t = 0 we have
+                      i = 2 5 sin( 40t + φ) + 4e − 20 t
+where φ is determined from
+                            −1 1      φ= cos    = .111 radian
+                     5
+Hence the current at time t is given by
+                      i = .4 47 sin( 40t − .1 11) + 4e − 20 t
+
+If the initial current is zero and the initial charge on the capacitor is 0.01, find the current
+at any time t > 0, assuming the differential equation
+
+--- Page 154 ---
+d 2 i     di  1   dE
+           L    2 + R  +    i =                  dt      dt  C     dt
+
+
+Exercise 13
+  1.   The population of a country doubles in 50 years. Assume that the rate of increase
+       is proportional to the number of inhabitants.
+           a.        State  this information in a  differential equation,  if x denotes the
+            population at time t.
+          b.       Solve  the   differential  equation  using   that  the  constant  of
+             proportionality is k
+           c.     Show that x = Ce kt
+          d.      At time t = 0, x = x0. show that x = x0 e kt
+           e.     Show that in 79 years later the population will become three times the
+             original population
+  2.   The population of a town doubles in 30 years.  In how many years will it treble
+     under the assumption that the rate of increase is proportional to the number of
+      inhabitants?
+  3.    In a certain culture of yeast the amount of active ferment glows  at a rate
+     proportional to the amount present.  If the amount doubles in 1 hour, how many
+                                                     3
+     times the original amount may be anticipated at the end of 2   hours.
+                                                     4
+  4.    In a certain culture of Bacteria the rate of increase is proportional to the number
+      present.
+         a.   It is found that the number doubles in 2 hours. How many bacteria may
+          expected at the end of 12 hours?
+                                                                 dx             2  5.   The human population of a certain island satisfies the logistic law   = kx − λx
+                                                                               dt
+     where k and λ are given by k = 0.03 and λ = 3 x 10-8
+      a.  If the population in 1980 is 200,000 find a formula for the population in future
+          years.
+      b. What will be the population expected in the year 2010?
+      c. What is the limiting value of the population as t → ∞ ?
+
+  6.  A radio active element decomposes or decays at the rate proportional to the
+     amount present.   If half the original amount disappears in 1600 years find the
+     percentage lost in 100 years.
+  7.  A large tank initially contains 50 litres of brine in which there is dissolved 1.2 kg
+     of salt. Brine containing 0.2 kg of dissolved salt per litre flows into the tank at the
+      rate of 5 litres per minute. The mixture is kept uniform by stirring and the stirred
+     mixture simultaneously flows out at the slower rate of 3 litres per minute. Let x be
+      the amount of salt in the tank at time t > 0. How mush salt is in the tank at any time
+        t > 0
+  8.  A circuit has in series a constant electromotive force of 40v, a resister of 10 Ω and
+     an inductor of 0.2 Henry. If the initial current is zero, find the current at time t > 0.
+
+--- Page 155 ---
+9.  A circuit has in series a constant electromotive force of 100v, a resistor of 10 Ω
+   and capacitor of 2 x 10-4 farads. The switch is closed at time t = 0 and the charge on
+    the capacitor at this instant is zero. Find the charge and the current at time > 0.
+10.
+                             R
+
+
+
+
+                                                                    c
+
+
+
+
+
+                             L
+             In the figure given above
+         E = 100 sin 200t volts
+        R = 40 Ω
+         L = 0.25 Henry
+        C = 4 x 10-4 farad.
+    If the initial current is zero and the initial charge on the capacitor is 0.01 coulomb
+                                                  d 2 i     di  1   dE
+    find the current at any time t > 0. (Assume the equation L    2 + R  +   i =     )                                                                 dt      dt  c     dt
+11. A circuit has in series an electromotive force given by E = 100 sin 60 volts, a
+                                                   1
+    resistor of 2 Ω, an inductor of 0.1 H and a capacitor of      farads.  If the initial
+                                                  260
+    current and the initial charge on the capacitor are both zero, find the charge on the
+    capacitor at any t > 0.
+                          d 2 q    dq  1
+    (Hint: Using the formula, L    2 + R   +  q = E we have                                 dt       dt   c
+   d 2 q    dq
+         2 + 20   + 2600 q = 1000 sin 60t the complementary function is q = e-10t     dt       dt
+    (c1 sin 50t + c2 cos 50t. The particular integral is q = A sin 60 t + B cos 60t. Apply
+    the condition to the general solution to get
+   q = 0.77e-10t cos (50t – 0.88) – 0.64 cos (60t – 0.69)
+
+12. A circuit has in series a constant electromotive force 100v, a resistor of 10 Ω and
+   a capacitor of 2 x 10-4 farads. The switch is closed at time t = 0 and the charge on
+    the capacitor at this instant is zero.
+      a.  sketch the circuit diagram
+      b.  write down the basic equation containing i.
+      c.  derive the second order equation in q.
+      d.  solve the equation to find q at time t > 0
+                                      dq
+      e.  Hence find i at time t > 0 using i =
+                                                 dt
+
+--- Page 156 ---
+Summary
+ We have learnt the following from this lesson.
+       i).  Application of differential equations for
+       ii).  First order equations for growth of population and decay of radio active
+          materials.
+      iii).  For mixture problems of liquids.
+     iv).  Second order equations for electrical circuits.
+
+    Further Reading
+7.             Differential Equations
+   By Frank Ayres, Ph. D
+   Schaum’s outlines series
+  Mc Graw Hill Book company
+  New York, Toronto, Sydney.
+
+8.             Differential Equations
+   By Shepley L. Ross
+   John Wiley and sons
+  New York. Toronto. Singapore
+
+9.             Differential Equations
+   By Dr. Sengottaiyan Ph. D
+   Oxford Publications,
+   Harrow. London. Nairobi.
+
+
+
+
+
+ Microsoft Equation
+        3.0

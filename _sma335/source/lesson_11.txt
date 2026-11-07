@@ -1,0 +1,370 @@
+LESSON 11
+   Singular Points of Differential Equations and Power Series Solutions near Singular
+                                           points.
+
+11.1 Introduction
+In this lesson we are going to learn about the singular points of a differential equation and
+nature of power series solutions near different types of singular points.
+
+11.2 Objectives of the lesson
+By the end of this lesson you should be able to:
+   •  define ordinary points and the singular points of a differential equation.
+   •   classify the singular points into Regular Singular points and Irregular Singular
+       points of the differential equation.
+   •   write the nature of power series solution which may exist at an Ordinary point,
+       Regular Singular points and Irregular singular points of the given differential
+       equations.
+
+11.3Power series solutions
+We have learnt that many types of differential equations have solutions that can be
+
+        expressed as finite linear combinations of known elementary functions.
+
+       However, many equations may not have solutions that can be found in the
+
+        usual methods we have studied so for.  In such case we must seek other
+
+       means of expression for the solutions of such equations. One such method
+
+         of obtaining solutions is infinite series form. The solution so obtained is
+
+         called as Power Series Solution of the given differential equation.
+
+
+Definition of power series solutions.
+All  differential equations either  first order or higher order need not possess
+
+         solutions.  Under certain conditions some equations may have solutions
+
+       which can be expressed as an infinite series of the form.
+    y = C0 + C1 (x – x0) + C2 (x – x0)2 + ………+ Cn (x – x0)n +…… to ∞ or
+          ∞
+    y =        C n ( x − x0) n                                                             (5.1)    ∑
+              n = 0
+     where C0, C1, C2………..are constants
+     Solutions of the form (5.1) are called Power Series Solutions of the differential
+      equations.
+
+In order to confirm whether an equation does have solution of a power series or not
+
+      we must know certain basic definitions that will be seen now
+
+--- Page 118 ---
+11.4Definition of Analytic Function at a point
+   A function f (x) is said to be analytic at x0 if its Taylor series about x0
+       ∞   f n ( x0 )           n                    ( x − x0 )  exists and converges to f (x) for all x in some open interval  ∑        n = 0  n!
+     including x0.
+
+     Sometimes we say that any function that can be differentiable at the point x0 is
+      called an analytic function at x0
+      Alternatively we can say that f (x) is analytic at the point x0 if the function does not
+    become infinite when x = x0.
+
+11.5Definition: Normalized form of a second order equation.
+     Consider a second order equation
+
+        d 2 y       dy
+    a0 ( x )    2 + a1 ( x )   + a 2 ( x ) y = 0                                   (1)         dx        dx
+     where a0 (x) ≠ 0
+    when each term of the equation is divided by a0 (x) we have
+     d 2 y  a1 ( x ) dy  a2 ( x )        +       +      y = 0
+     dx 2   a0 ( x ) dx  a0 ( x )
+                           d 2 y       dy
+                            + p1 ( x )   + p 2 ( x ) y = 0          (2)     This equation is represented as       2                             dx        dx
+                 a1 ( x )         a2 ( x )     where p1 ( x ) =           , p2 ( x ) =
+                 a0 ( x )         a0 ( x )
+     Equation (2) is called the normalized form of a second order equation. In the
+                                d 2 y
+     normalized form, the coefficient of     2  is unity.                                  dx
+    Example 1
+                                            2    d 2 y     dy
+     Write down the equation ( x − )1     2 + 3 x   + xy = 0 into the normalized form.                                dx      dx
+     Solution
+                            2    d 2 y     dy
+     Let equation ( x − )1     2 + 3 x   + xy = 0                      dx      dx
+     Dividing throughout by (x2 – 1) the equation becomes
+     d 2 y   3 x  dy    xy
+        +                +                            y = 0                                              (5.3)             2                    2                                   2      dx    x − 1 dx   x − 1
+     Equation (5.3) is said to be in the normalized form
+
+--- Page 119 ---
+d 2 y       dy                                                 3 x             xy
+           2       + p1 ( x )   + p 2 ( x ) y = 0    where p1( x ) =   2                                                                                                          , p2 ( x ) =   2      .     dx        dx                                 x − 1          x − 1
+
+11.6Definition of an ordinary point and singular point of the differential equation
+    The point x0 is called an ordinary point of the equation (5.3) if both of the functions
+     p1 and p2 are analytic at x0.
+       If either p1 or p2 or both of these functions is not analytic at x0 then x0 is called a
+
+     singular point of the normalized equation (5.3).
+
+
+    Example 2
+     Determine the singular points of the equation
+           2    d 2 y     dy       ( x − 9)             + 3 x   + ( x + )3 y = 0                                         (1)                       2            dx      dx
+     Solution
+
+    The normalized form of the equation (1) is
+     d 2 y      3 x     dy      ( x + 3) y
+        +             +             y = 0                              (2)            2     dx     ( x + 3)( x − )3 dx   ( x + 3)( x − )3
+                    3 x               1
+     Here p1 ( x ) =                       , p 2 ( x ) =       y
+                        ( x + 3)( x − 3)             ( x − 3)
+     p1 (x) becomes infinite (not analytic) at x = -3 and x = 3.
+    Hence x = -3 and x = 3 are singular points for the equation (1) or (2) p2 becomes
+
+      infinite at x = 3. Hence x = 3 and x = -3 are singular points for the equation (1) or
+
+      (2).
+
+    Example 3
+     Determine if the equation
+     d 2 y        dy       2        + ( x − 2 )   + ( x + )1 y = 0 has any singular points.            2     dx         dx
+
+     Solution
+    The equation is already in the normalized form. P1 = (x-2) and p2 = (x2+1). Both of
+
+    them are polynomials and hence they are analytic. Then the equation has no
+
+      singular points.
+
+
+11.7Definition of Regular Singular points and Irregular Singular points.
+     Consider the second order equation
+
+--- Page 120 ---
+d 2 y     dy
+    + p1   + p 2 y = 0                                                  (1)     2 dx      dx
+Suppose equation (1) has a singular point at x0.
+If both (x – x0) p1 and (x – x0)2 p2 are analytic then the singular point x0 is said to be
+
+a regular singular point.
+
+
+Example 4
+Locate and classify the singular point of the equation                         (1)
+
+Solution
+Dividing each term of the equation (1) by x2 – 8x or x (x – 8)
+
+d 2 y    x + 2  dy     1
+    +         +        y = 0
+ dx 2   x ( x − 8) dx   x ( x − 8)
+           x + 2             1
+Here p1 =        and  p 2 =
+          x ( x − 8)           x ( x − 8)
+p1 is not analytic since p1 becomes infinite when x = 0 and x = 8
+p2 also becomes infinite when x = 0 hence x= 0 and x = 8 are singular points
+
+Nature of the singular point at x = x0 = 0
+              x ( x + 2)    ( x + 2)
+Here xp1 ( x ) =       =          is analytic at x = 0
+              x ( x − 8)    ( x − 8)
+  2           x       x
+x p 2 ( x ) =       =        is analytic at x = 0
+          x ( x − 8)   x − 8
+Hence x = 0 is a regular singular point.
+
+Nature of the singular point at x = 8
+                  ( x − 8)( x + 2)
+( x − 8) p1 ( x ) =
+                x ( x − 8)
+                   ( x + 2)
+         =        which is analytic at x = 8
+                 x
+
+         2           ( x − 8) 2
+( x − 8) p 2 ( x ) =
+               x ( x − 8)
+              x − 8
+         =      which is analytic at x = 8
+                x
+Hence x = 8 is also a regular singular point.
+
+--- Page 121 ---
+Example 5
+
+     Locate and classify the singular point of the equation
+           4       3     2 d 2 y         dy      2       ( x − 2 x + x )    + 2( x − )1   + x y = 0
+                  dx 2         dx
+
+     Solution
+    The normalized form of the equation is
+     d 2 y     2( x − )1    dy        x 2 y
+        +              +            = 0
+     dx 2   x 2 ( x 2 − 2 x + )1 dx   x 2 ( x 2 − 2 x + )1
+       d 2 y   2( x − )1  dy     y
+     or    +          +      = 0
+        dx 2   x 2 ( x − )1 2 dx   ( x − )1 2
+       d 2 y     2    dy     y
+     or    +          +      = 0
+        dx 2   x 2 ( x − )1 dx   ( x − )1 2
+                x + 2             1
+     then p1 =   2      and  p 2 =          2 . Hence x = 0 and x =1 are singular points.               x ( x − )1              ( x − )1
+
+Nature of the singular point at x = 0
+                   2 x
+       ( x − 0) p1 ( x ) =   2                   x ( x − )1
+                    2
+             =        which is not analytic at x = 0
+                   x ( x − )1
+                 2          x 2 y
+       ( x − 0) p2 ( x ) =          2 is analytic at x = 0.                           ( x − )1
+
+    Hence x = 0 is an irregular singular point since x2p2 (x) is not analytic
+
+Nature of the singular point at x = 1
+
+                        ( x − )1 × 2
+       ( x − )1 p1 ( x ) =    2                   x ( x − )1
+                  2
+             =    which is analytic at x = 1
+                   x 2
+
+                 2                    2    1
+       ( x − )1 p 2 ( x ) = ( x − )1 ×         2                                     ( x − )1
+             = 1 which is analytic at x = 1
+
+      Hence x = 1 is a regular singular point.
+
+--- Page 122 ---
+11.8 Existence Theorem and the nature of Power Series solutions
+     Consider the equation (normalized form)
+    d 2 y     dy
+       + p1   + p 2 y = 0                                                  (1)           2     dx      dx
+
+     I.  If the point x0 is an ordinary point of the equation (1), it has two nontrivial
+
+       solutions of the form
+
+          ∞
+    y =        C n ( x − x0) n    ∑
+              n = 0
+
+    II.  If the point x0 is a regular singular point of the equation (1) it has at least one
+
+       nontrivial solution of the form.
+
+                  ∞
+            C n ( x − x0 ) n    y = x − x0 r ∑
+                        n = 0
+           ∞
+        C n ( x − x0) n + r where r is a constant (real or complex). This     or y = ∑
+              n = 0
+     solution is valid in some deleted interval 0 < x − x0 < R where R>0 about x0.
+
+
+  III.  If the point x0 is an irregular singular point, we are not assured about the
+
+       existence of solution of the equation. It may or may not have the power
+
+        series solution near the irregular point at x0.
+
+    Hence before we assume a power series solution at x0 for the normalized
+     equation we must examine the nature of the point x0 and proceed.
+
+    Example 6
+
+    What kind of power series solution exists for the equation
+         2 d 2 y    dy       2      2     x     + x   + ( x − n  ) y = 0
+       dx 2    dx
+     where n is a non-negative constant. (This equation is called Bessel’s equation).
+
+     Solution
+    The normalized form of the equation is
+    d 2 y  1 dy   ( x 2 − n 2 )
+       +    +          y = 0
+     dx 2   x dx      x 2
+   Now x = 0 is a singular point of the equation
+
+--- Page 123 ---
+1             x 2 − n 2     n 2
+     Here p1 ( x ) =   and p 2 ( x ) =      2   = 1 −   2                  x               x         x
+
+     Nature of the singular point at x = 0
+              1
+    xp1 ( x ) = x ×  = 1 which is analytic at x = 0
+                x
+        2        x 2 ( x 2 − n 2      2      2
+    x p 2 ( x ) =         2    = x − n  which is also analytic at x = 0                  x
+hence x = 0 is a regular singular point.  The Bessel’s equation has at least one
+
+         nontrivial solution of the form.
+
+        ∞
+       C n ( x − x0) n + r    y = ∑
+           n = 0
+     where r is a constant real (positive or negative or fraction) or complex.
+
+Exercise 11
+Express the following equations in the normalized form
+           d 2 y    dy  1
+    1.  ( x − )1     2 + x   +   y = 0           dx     dx   x
+            2    d 2 y     dy
+    2.  ( x − )1     2 + 3 x   + xy = 0            dx      dx
+            3    d 2 y       dy
+    3.  ( x − )1     2 + sin x   + 8 y = 0            dx        dx
+         d 2 y       dy  1
+    4.  sin x     2 + cos x   +   y = 0          dx        dx   x
+
+Locate and Classify the singular points if any in the following equations: State the nature
+of power series solution near each of the singular points.
+
+             2 d 2 y    dy
+    5. 2 x       2 − x   + ( x − 5) y = 0         dx     dx
+           2         2 d 2 y          dy
+    6.  x  ( x − )1       2 + 2 ( x − 2 )   + ( x + )1 y = 0               dx           dx
+           2 d 2 y    dy     2  5 
+    7.  x       2 − x   −  x +    y = 0
+        dx     dx        4 
+
+--- Page 124 ---
+2 d 2 y       2      dy
+    8.  x       2 + ( x − 3 x )   + 3 y = 0        dx            dx
+            2     d 2 y         dy
+    9.  ( x − 3 x )     2 + ( x + 2 )   + y = 0              dx          dx
+            4        3      2 d 2 y         dy      2
+    10. ( x − 2 x + x  )     2 + 2 ( x − )1   + x y = 0                   dx           dx
+           2 d 2 y    dy       2      2
+    11. x       2 + x   + ( x − p  ) y = 0        dx     dx
+   where p is a constant (Bessel’s Equation)
+
+    12. Consider the Legendre’s equation
+                2 d 2 y     dy       1( − x  )    − 2 x   + p ( p + )1 y = 0
+            dx 2     dx
+     Show that x = 0 is an ordinary point for the Legendre’s equation.
+
+    13. Define
+                     i.      an ordinary point
+                   ii.       singular point
+                  iii.       regular singular point.
+               iv.      an irregular singular point of a normalized equation of the form.
+
+           d 2 y     dy
+             + p1   + p 2 y = 0                      2           dx      dx
+
+Summary
+You have learnt the following from this lesson.
+       i).   normalized form of a second order linear equation
+       ii).   an ordinary point and a singular point of a second order linear equation
+      iii).   a regular singular point and an irregular singular point for a second order
+            linear equation.
+     iv).   The form of power series near an ordinary point and near a Regular Singular
+            point.
+     v).   The power series solution may or may not exist near an Irregular Singular
+            point.
+
+Further Reading
+1.  Differential Equations
+   By Frank Ayres Ph. D
+   Schaum’s Outline series
+   McGraw – Hill Book Company
+  New York. Toronto. Singapore.
+
+--- Page 125 ---
+2.  Differential Equations
+   By Dr. D. Sengottaiyan
+   Oxford Publications
+   London Nairobi.
+
+--- Page 126 ---

@@ -1,0 +1,409 @@
+LESSON 5
+ Second Order Homogeneous Linear Equations with constant
+                            coefficients.
+
+5.1 Introduction
+In  the previous  lessons you have  learnt  different methods  of  solving  first  order
+differential equations.  In this lesson you will learn the method of solving second order
+homogeneous linear equations with constant coefficients.
+
+5.2 Objectives of the lesson.
+By the end of this lesson you should be able to
+      define homogenous and nonhomogeneous differential equations of second order.
+      define linear and non linear differential equations.
+     determine the characteristic equation
+     solve the second order homogeneous linear equations with constant coefficients
+       using its characteristic equations.
+
+5.3 Definition of second order homogenous Linear equation with constant coefficients.
+A second order homogeneous differential equation in the dependent variable y and the
+independent variable x is an equation that can be expressed in the form,
+         d 2 y    dy
+      a 0     2 + a1   + a 2 y = 0                     (1)         dx     dx
+where a0 ≠ 0 and a0, a1, a2 are functions of x only or constants.  If a0, a1, a2 are constants,
+equation (1) is called a second order homogenous equation with constant coefficients.
+
+5.4 Homogenous and nonhomogeneous equations
+              d 2 y    dy
+The equation a 0     2 + a1   + a 2 y = 0 (1) is called a second order homogenous equation               dx     dx
+                d 2 y  dy
+since all the terms,     2  ,    and y are of the same first degree.                 dx   dx
+If the equation (1) contains any additional functions of x it is usually written on the right
+side of the equation and the equation is called a nonhomogeneous equation of second
+order.
+
+For example,
+   d 2 y    dy
+a 0     2 + a1   + a 2 y = F ( x )   dx     dx
+
+  d 2 y    dy
+2    2 + 5   − 6 y = xe  dx     dx
+d 2 y   dy                      2
+     2 − 3   + 7 y = sin x + x  are nonhomogenous second order equations where as dx     dx
+
+--- Page 44 ---
+d 2 y   dy
+     2 − 3   + 7 y = 0 is a homogeneous equation. dx     dx
+
+5.5 Linear and non linear equations
+                              d n y    d n −1 y
+An nth order differential equation a 0     n + a1     n −1 + ...a n y = F ( x ) is said to be linear if                                dx      dx
+the following conditions are satisfied.
+               dy  d 2 y    d n y
+The degree of y,       ,     2 ,….     n  is all unity (one).               dx  dx      dx
+                   dy  d 2 y    d n y
+The coefficients of y,       ,     2 ,….     n  , and F are all functions of x only.                   dx  dx      dx
+                                                                              d 3 y    dy 
+There should not be any term containing product of derivatives such as      3         or                                                                              dx     dx 
+   dy
+ y2      .
+   dx
+A non linear differential equation is one that does not satisfy the three conditions above.
+The following examples will illustrate the meaning of linear and non linear differential
+equations.
+
+Example 1
+   d 3 y     d 2 y    dy                                              d 2 y
+5 x    3 + 8 xy     2 − 9   + xy = xe is not a linear equation since the second term     2  has   dx       dx     dx                                                 dx
+y in the coefficient. This is a non linear equation
+
+Example 2
+  d 2 y     dy  2                                               dy
+3    2 − 2     + 8 y = ln x is not a linear equation since the degree of      is not unity.  It
+  dx      dx                                                 dx
+is a non linear equation.
+
+Example 3
+  d 2 y     dy
+5    2 − 8 x   + 2 y = xy is not a linear equation since the right hand side is not a function  dx      dx
+of x only. This is a non – linear equation.
+
+5.6 Operator Notation for a Second order linear equation with constant coefficients.
+For the differential equations we can use convenient notations, D, D2, D3… instead of
+ d   d 2   d 3
+      ,     2  ,     3 … respectively.dx  dx   dx
+                      d 2 y   dy
+Then the linear equation 5    2 − 3   + 8 y = 0 is written as                       dx     dx
+5D2y – 3Dy + 8y = 0 or (5D2 – 3D + 8)y = 0
+In general
+
+--- Page 45 ---
+  d 2 y    dy       
+  a 0     2 + a1   + a 2 y  = 0   dx     dx       
+is written as
+(a0D2 + a1 D + a2)y = 0 or f(D)y = 0. where f(D) = a0 D2 + a1D + a2
+
+5.7 Method of solving the homogeneous second order linear Equation with constant
+    coefficients
+Consider the equation,
+         d 2 y    dy
+      a 0     2 + a1   + a 2 y = 0                             (1)         dx     dx
+where a0, a1 and a2 are constants.
+
+In an attempt to find a solution of the equation (1), we would naturally inquire whether
+there is any familiar type of function f such that its derivatives are constant multiples of
+the same function f. The answer is “yes” for the exponential function y = emx .
+Now  y = emx                                               (2)
+       y ′ = me mx                                            (3)
+       y ′′ = m 2 e mx                                           (4)
+
+Substituting (2), (3) and (4) in (1) we have
+                              mx = 0                             (5)          (a 0 m                 2 + a1 m + a 2 )e
+since emx ≠ 0, we have a 0 m 2 + a1 m + a 2 = 0                  (6)
+This equation (6) is called the auxiliary equation or the characteristic equation of (1).
+
+If y = emx is a solution of (1) then the constant m must satisfy (6). We can write the
+auxiliary equation and solve it for m. Three cases arise, according as the roots of (6) are;
+      real and distinct
+      real and repeated or
+     complex conjugate
+
+5.8 Real and distinct roots of characteristic equations.
+Suppose the roots of (6) are two real and distinct numbers m1 and m2
+                       1 xThen y = e m
+                     2 x are two independent solutions.and y = e m
+(using the Wronskian Determinant we can show that they are independent).
+
+Example 4
+Consider the equation,
+d 2 y    dy
+     2 − 5   + 6 y = 0 dx     dx
+The auxiliary equation is
+m 2 −m5  + 6 = 0
+
+--- Page 46 ---
+or (m − 2 )(m − 3 ) = 0
+Hence m1 = 2, m2 = 3
+
+The roots are real and distinct. Thus e 2 x and e 3 x are independent solutions. The general
+solution is written as y = c1e 2 x + c 2 e 3 x  if the Wronskian of e2 x and e3 x are independent.
+                                               e 2 x   e 3 x        5 x       5 x     5 xWe can verify that the Wronskian determinant w =         = 3e  − 2 e  = e  ≠ 0 .
+                                          2 e 2 x  3e 3 x
+Hence y = c1e 2 x + c 2 e 3 x is the general solution.
+
+5.9 Real and Repeated roots of characteristic equations.
+Suppose the characteristic equation has repeated roots m and m. Now y = c1e mx  is one
+root of the equation since the second solution should be different from y = c1e mx we must
+find the second solution using the substitution, y = e mx v where v is to be found.
+
+Let    y = e mx v .                                            (1)
+       dy     mx dv      mx        = e    + me  v                                 (2)
+       dx      dx
+      d 2 y     mx d 2 v  dv     mx       mx dv      2  mx
+               2 = e       2 +      .me  + me    + m e  v       dx       dx   dx            dx
+                    mx d 2 v        mx dv      2  mx
+          = e       2 + 2 me    = m e  v                (3)                dx         dx
+Substituting (1), (2) and (3) in the given equation, we have
+               d 2 v
+          = emx     2 = 0                dx
+       dv
+Let w =    then
+       dx
+        dw
+        emx   = 0
+          dx
+  dw              mxor    = 0 since e  ≠ 0 or w = 0 where c is an arbitrary constant. If we choose c = 1
+   dx
+    dv
+w =   = 1 or v = x + c0
+    dx
+Hence the second solution is y = e mx ( x + 0c ) choosing c 0 = 0 we have the second solution
+ y = xe mx .
+Thus the general solution is y = c1e mx + c 2 xe mx if Wronskian determinant is ≠ 0
+
+5.10 Theorem
+Consider the second order homogeneous differential equation,
+      d 2 y    dy
+   a 0     2 + a1   + a 2 y = 0 where a0, a1 and a2 are constants.      dx     dx
+
+--- Page 47 ---
+i.     If the auxiliary equation a 0 m 2 + a1 m + a 2 = 0 has the two roots real and distinct (m1
+                                                                                                                               2 x .     and m2) then the solution of the equation is y = c1e m                                                                                                                1 x + c 2 e m
+ ii.    If the auxiliary equation has repeated real roots m and m then the general solution is
+      y = c1e mx + c2 xe mx .
+iii.    If the auxiliary equation has Conjugate roots  m = a ± ib  then the solution  is
+      y = e ax ( c1 cos bx + c 2 sin bx ) .
+
+  Example 5
+  Solve the equation,
+         d 2 y    dy
+                   2 + 10   + 25 y = 0         dx      dx
+  Solution
+      d 2 y    dy
+  Let     2 + 10   + 25 y = 0                   (1)      dx      dx
+  The auxiliary equation m2 + 10m + 25 = 0 or (m + 5)2 has two equal roots –5, -5.
+   (repeated).
+  Hence the general solution of (1) is
+   y = c1e − 5 x + c 2 xe −5 x
+  Note that e −5 x and xe −5 x are independent from the Wronskian determinant.
+
+  Example 6
+  Solve the equation
+    d 2 y    dy
+  4    2 − 12   + 5 y = 0    dx      dx
+  Solution
+       d 2 y    dy
+  Let 4    2 − 12   + 5 y = 0                                   (1)        dx      dx
+  The characteristic equation of (1) is 4m2 – 12m + 5 = 0.    (2)
+  The roots of the characteristic equation (2) are
+            12 ±  144 − 4( 4)(5)
+      m =
+                  2( 4)
+             12 ±  64
+          =
+                8
+             12 ± 8
+          =
+               8
+               1    1
+      m = 2  and
+               2    2
+                                                      5         1
+                                                               x          x
+  Hence the general solution is y = c1e 2 + c 2 e 2  .
+
+  5.11 The characteristic equation has conjugate complex roots.
+        a + ib and a – ib
+
+--- Page 48 ---
+consider the equation
+         d 2 y    dy
+      a 0     2 + a1   + a 2 y = 0                             (1)         dx     dx
+The characteristic equation of (1) is
+      a 0 m 2 + a1 m + a 2 = 0                                  (2)
+
+Suppose the roots of the equation (2) be m1 = a + ib and m2 = a – ib.
+The general solution of (1) is
+       y = c1e ( a + ib ) x + c 2 e ( a − ib ) x
+Since they are not repeated.
+or y = c1e ax .e ibx + c 2 e ax .e − ibx
+    = e ax ( c1e ibx + c 2 e − ibx )
+    = eax (c1 (cos bx + i sin bx ) + c 2 (cos bx − i sin bx ))
+    = eax [( c1 + c 2 ) cos bx + i ( c1 − c 2 ) sin bx ]
+   y = e ax [ A cos bx + B sin bx ] is the general solution.
+where a is the real part and b is the imaginary part of the roots and A and B are arbitrary
+constants.
+
+Example 7
+Solve the equation,
+d 2 y    dy
+     2 − 4   + 13 y = 0                                (1) dx     dx
+
+Solution
+    d 2 y    dy
+Let     2 − 4   + 13 y = 0    dx     dx
+The characteristic equation of (1) is m2 – 4m + 13 = 0
+                 4 ±  16 − 41()(13)       4 ± 6i
+Whose roots are m =                   or m =       or m = 2 ± 3i
+                        2               2
+Hence the general solution of (1) is y = e 2 x ( c1 cos 3 x + c 2 sin 3 x ) .
+
+Example 8
+                  d 2 y
+Solve the equation      2 + y = 0  (This  is the equation concerning simple Harmonic                   dx
+motion of a particle)
+Solution
+    d 2 y
+Let     2 + y = 0    dx
+The characteristic equation is
+m 2 + 1 = 0 whose roots are
+m = ±1 .
+
+--- Page 49 ---
+Hence the general solution of (1) is y = e ox ( A cos x + B sin x ) or y = A cos x + B sin x .
+
+Example 9
+Solve the initial value problem
+      d 2 y    dy
+               2 − 6   + 25 y = 0 , y (0) = -3, ′y( 0) = −1       dx     dx
+Solution
+The auxiliary equation is
+m 2 −m6  + 25 = 0 whose roots are m = 3± 4i
+Hence the general solution may be written
+       y = e 3 x ( c1 cos 4 x + c 2 sin 4 x )
+using y = −3 when x = 0 , we have − 3 = c1 )1( + c 2 ( 0 ) or c1 = −3
+Then y = e 3 x ( −3 cos 4 x + c 2 sin 4 x )
+and y ′ = e 3 x ( 3.4 sin 4 x + 4c 2 sin 4 x ) + ( − 3 cos 4 x + c 2 sin 4 x )(3e 3 x )
+using ′y = −1 hen x = 0 we have
+      − 1 = 3( 0 + 4 c 2 ) + ( −3 + 0 )(3)
+      − 1 = 4 c 2 − 9 or c 2 = 2
+Hence the general solution is y = e 3 x ( 2 sin 4 x − 3 cos 4 x ) .
+
+5.12  Solution  of Higher order homogeneous  linear Equations with  constant
+      coefficients.
+All the results used for the equation
+   d 2 y    dy
+a 0     2 + a1   + a 2 y = 0   dx     dx
+in the previous sections can be used for higher order homogeneous linear equations with
+constant coefficients. The method is illustrated in the following examples:
+
+Example 10
+Solve the equation,
+      d 3 y   d 2 y    dy
+               3 + 6    2 + 11  − 6 y = 0                        (1)       dx     dx     dx
+Solution
+The characteristic equation of (1) is
+    m 2 − 6 m 2 + 11m − 6 = 0                              (2)
+using remainder theorem or factor theorem, (2) becomes (m – 1) (m – 2) (m – 3) = 0
+whose roots are m = 1, m = 2, m = 3.
+Hence the general solution may be written as
+ y = c1e x + c 2 e 2 x + c3 e 3 x
+xe , e 2 x , e3 x is not zero (you can verify this)
+
+Example 11
+Solve the equation
+
+--- Page 50 ---
+d 5 y   d 4 y  d 3 y
+    5 − 2    4 +     3 = 0 dx     dx    dx
+
+Solution
+The auxiliary equation of (1) is
+m 5 − 2 m 4 + m 3 = 0
+or m 3 ( m 2 −m2  + )1 = 0
+  m 3 ( m − 1)( m − )1 = 0
+whose roots are m = 0, 0, 0, 1, 1
+Hence the general solution of (1) is
+ y = c1e 0 x + c 2 xe 0 x + c3 x 2 e 0 x + c 4 e x + c5 xe x
+or y = c1 + c 2 x + c3 x 2 + c 4 e x + c5 xe x .
+
+Exercise 5
+Solve  the  following  second  order homogeneous  linear  Equations  (with  constant
+coefficients) (1 – 8)
+   d 2 y    dy
+1.       2 − 5   + 6 y = 0    dx     dx
+
+   d 2 y   dy
+          2 − 8   + 16 y = 0
+2.  dx     dx
+
+   d 2 y
+          2 + 9 y = 0
+3.  dx
+
+     ( D 2 − 2 D + 10) y = 04.
+
+     ( D 2 + 2 D − 15) y = 05.
+
+     ( D 3 + 4 D ) y = 06.
+
+     ( D 2 − 2 D + 5) 2 y = 07.
+
+     ( D 2 + 25) y = 08.
+
+Solve the initial value problems (9 to 12)
+   d 2 y  dy
+          2 −   − 12 y = 09.  dx   dx                , y ( 0) = ,3 y ′( 0) = 5
+
+   d 2 y    dy
+          2 + 6   + 9 y = 010. dx     dx               , y ( 0) = ,2 y ′( 0) = −3
+
+--- Page 51 ---
+d 2 y    dy
+          2 − 4   + 29 y = ,0 y ( 0) = ,0 y ′( 0) = 5
+11. dx     dx
+
+   d 2 y    dy
+          2 + 6   + 13 y = ,0 y ( 0) = ,3 y ′( 0) = − 1
+12. dx     dx
+
+
+Summary of the lesson
+You have learnt the following from this lesson.
+Definitions of
+       i. Homogeneous equation
+     ii. Nonhomogeneous equation
+    iii.  Linear equation
+    iv. Non linear equation.
+                           d 2 y    dy
+The characteristic equation of a 0     2 + a1   + a 2 y = 0 is a0m2 + a1m + a2 = 0                             dx     dx
+Solving  the second  order homogeneous  linear  differential  equation with  constant
+                      d 2 y    dy
+coefficients of the form a 0     2 + a1   + a 2 y = 0 where a0, a1, a2 are constants. When the                       dx     dx
+characteristic equation has
+       i.  Distinct real roots
+     ii.  Repeated real roots
+    iii.  Conjugate complex roots of the form a ± ib
+
+Further Reading:
+1.          Differential Equations
+   By Frank Ayres, Ph. D
+   Schaum’s outlines series
+  Mc Graw Hill Book company
+  New York, Toronto, Sydney.
+
+2.          Differential Equations
+   By Shepley L. Ross
+   John Wiley and sons
+  New York. Toronto. Singapore
+
+3.        Ordinary Differential Equations
+   By Dr. Sengottaiyan Ph. D
+   Oxford Publications,
+   Harrow. London. Nairobi.
+
+--- Page 52 ---
+Microsoft Equation
+       3.0
+
+--- Page 53 ---

@@ -2978,6 +2978,60 @@
   let publishedNotesByLevel = {};
   let notesUnavailableMessage = "No validated notes are available for this topic yet.";
 
+  function notesUnavailableStorageKey(level) {
+    return `prep_notes_unavailable_dismissed_${topicId}_${level}`;
+  }
+
+  function clearNotesUnavailableDismissal(level) {
+    try {
+      sessionStorage.removeItem(notesUnavailableStorageKey(level));
+    } catch (storageErr) {}
+  }
+
+  function showNotesUnavailable(level, message) {
+    notesUnavailableMessage = message || notesUnavailableMessage;
+    const loadingEl = document.getElementById('notes-loading');
+    const bodyEl = document.getElementById('notes-body');
+    const statusBadge = document.getElementById('notes-status-badge');
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (bodyEl) bodyEl.style.opacity = '1';
+    if (statusBadge) statusBadge.textContent = '';
+    if (!bodyEl) return;
+
+    let dismissed = false;
+    try {
+      dismissed = sessionStorage.getItem(notesUnavailableStorageKey(level)) === '1';
+    } catch (storageErr) {}
+    bodyEl.replaceChildren();
+    if (dismissed) return;
+
+    const notice = document.createElement('div');
+    notice.className = 'alert alert-error';
+    notice.setAttribute('role', 'status');
+    notice.style.cssText = 'margin:0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;';
+    const copy = document.createElement('div');
+    const title = document.createElement('strong');
+    title.textContent = 'Notes are not ready yet.';
+    const detail = document.createElement('p');
+    detail.style.margin = '8px 0 0';
+    detail.textContent = notesUnavailableMessage;
+    copy.append(title, detail);
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.setAttribute('aria-label', 'Dismiss notes availability notice');
+    dismiss.title = 'Dismiss';
+    dismiss.style.cssText = 'border:0;background:transparent;color:inherit;cursor:pointer;font-size:1.25rem;line-height:1;padding:0 2px;';
+    dismiss.innerHTML = '&times;';
+    dismiss.addEventListener('click', () => {
+      try {
+        sessionStorage.setItem(notesUnavailableStorageKey(level), '1');
+      } catch (storageErr) {}
+      notice.remove();
+    });
+    notice.append(copy, dismiss);
+    bodyEl.appendChild(notice);
+  }
+
   function formatTopicTutorErrorMessage(message) {
     if (!message || typeof message !== 'string') {
       return "The topic tutor could not complete this request. Please try again.";
@@ -3866,6 +3920,7 @@
       if (data.success && data.notes) {
         if (statusBadge) { statusBadge.textContent = ''; }
         publishedNotesByLevel[level] = data.notes;
+        clearNotesUnavailableDismissal(level);
         try {
           localStorage.setItem(notesStorageKey, JSON.stringify(data.notes));
           sessionStorage.setItem(notesStorageKey, JSON.stringify(data.notes));
@@ -3889,8 +3944,7 @@
         }
         setupNotesPagination(data.notes);
       } else {
-        alert(data.error || 'Failed to load notes for this level.');
-        loadNotesLevel('level_2');
+        showNotesUnavailable(level, data.error || 'No validated notes are available for this topic level yet.');
       }
     })
     .catch(err => {
@@ -3903,9 +3957,8 @@
           window.location.href = "{% url 'prep:billing' %}";
         }
       } else {
-        alert(err.message || 'Unable to load notes. Please try again.');
+        showNotesUnavailable(level, err.message || 'Notes are temporarily unavailable. Please try again later.');
       }
-      loadNotesLevel('level_2');
     });
   }
 

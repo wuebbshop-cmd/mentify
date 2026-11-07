@@ -2788,9 +2788,10 @@ def prep_history(request):
 @never_cache
 def prep_billing(request):
     """Credit Balance & M-Pesa Top-Up Page connected to PrepWallet."""
-    from services.credit_service import get_plan_upload_limit
+    from services.credit_service import get_free_credit_entitlement, get_plan_upload_limit
     if request.user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(request.user)
+        free_credit_entitlement = get_free_credit_entitlement(request.user)
         user_credits = get_available_credits(wallet)
         if wallet.current_plan == "pro":
             plan_display = "Pro (Exam Master)"
@@ -2826,6 +2827,11 @@ def prep_billing(request):
         upload_limit = 0
         uploads_used = 0
         uploads_remaining = 0
+        free_credit_entitlement = {
+            "trial_credits": 100,
+            "freemium_credits": 20,
+            "is_student": True,
+        }
 
     context = {
         "active_tab": "billing",
@@ -2842,20 +2848,21 @@ def prep_billing(request):
         "upload_limit": upload_limit,
         "uploads_used": uploads_used,
         "uploads_remaining": uploads_remaining,
+        "free_credit_entitlement": free_credit_entitlement,
         "plans": [
             {
                 "id": "freemium_plan",
                 "name": "Freemium",
                 "price": "KES 0 / mo",
                 "price_num": 0,
-                "credits": "20 Credits/mo",
+                "credits": "10-20 Credits/mo",
                 "tagline": "Permanent free access — cached notes and past Q&A always available",
                 "is_popular": False,
                 "theme_color": "#64748b",
                 "theme_bg": "rgba(100, 116, 139, 0.08)",
                 "badge_label": "FREE",
                 "features": [
-                    "20 Free Credits Every Month (auto-refresh)",
+                    "10-20 Free Credits Every Month (auto-refresh)",
                     "Cached Lecture Notes (Read Only)",
                     "Past Exam Questions & Answers",
                     "AI Tutor & Generated Questions (uses credits)",

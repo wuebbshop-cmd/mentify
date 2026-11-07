@@ -6,7 +6,11 @@ from django.urls import reverse
 from django.utils import timezone
 
 from prep.models import PrepNotification, PrepWallet
-from services.credit_service import expire_wallet_credits, grant_freemium_monthly
+from services.credit_service import (
+    expire_wallet_credits,
+    get_free_credit_entitlement,
+    grant_freemium_monthly,
+)
 
 
 class Command(BaseCommand):
@@ -25,13 +29,13 @@ class Command(BaseCommand):
             if expired:
                 expired_wallets += 1
 
-            # 1. Trial timer expired -> auto-transition to Freemium with 20 fresh credits
+            # 1. Trial timer expired -> auto-transition to the account's free allowance.
             if wallet.current_plan == "trial" and wallet.plan_expires_at and wallet.plan_expires_at <= now:
                 grant_freemium_monthly(wallet)
                 trials_to_freemium += 1
                 wallet.refresh_from_db(fields=["current_plan", "plan_expires_at", "updated_at"])
 
-            # 2. Freemium 30-day cycle expired -> grant next monthly batch of 20 credits
+            # 2. Freemium cycle expired -> grant the account's next monthly allowance.
             elif wallet.current_plan == "freemium" and wallet.plan_expires_at and wallet.plan_expires_at <= now:
                 grant_freemium_monthly(wallet)
                 freemium_refreshed += 1
@@ -49,6 +53,9 @@ class Command(BaseCommand):
                     reminder_window = "2 days"
 
                 if reminder_window:
+                    entitlement = get_free_credit_entitlement(wallet.user)
+                    trial_credits = int(entitlement["trial_credits"])
+                    freemium_credits = int(entitlement["freemium_credits"])
                     title = f"Free trial ends in {reminder_window}"
                     exists = PrepNotification.objects.filter(
                         user=wallet.user,
@@ -60,8 +67,8 @@ class Command(BaseCommand):
                             user=wallet.user,
                             title=title,
                             message=(
-                                f"Your 100-credit free trial ends in {reminder_window}. "
-                                "After your trial, you will automatically move to our Free Plan (20 credits/mo), "
+                                f"Your {trial_credits}-credit free trial ends in {reminder_window}. "
+                                f"After your trial, you will automatically move to our Free Plan ({freemium_credits} credits/mo), "
                                 "or subscribe to Basic/Plus/Pro for full access."
                             ),
                             category="general",

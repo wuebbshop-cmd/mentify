@@ -1,0 +1,2741 @@
+--- Page 1 ---
+
+ SCSSCS 209209 lecturelecture notesnotes
+
+StatisticsStatistics && ProgrammingProgramming (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+ HTML BASICS
+
+ https://www.elated.com/first-10-html-tags/
+
+ HTML (HyperText Markup Language) is the code that is used to structure a
+ web page and its content. For example, content could be structured within
+ a set of paragraphs, a list of bulleted points, or using images and data
+ tables.
+
+ HTML stands for Hyper Text Markup Language. HTML is the standard
+ markup language for creating Web pages. HTML describes the structure of
+ a Web page. HTML consists of a series of elements. HTML elements tell
+ the browser how to display the content.
+
+ HyperText Markup Language (HTML) is the basic scripting language used
+ by web browsers to render pages on the World Wide Web. HyperText
+ allows a user to click a link and be redirected to a new page referenced by
+ that link.
+
+ HTML is a markup language, made up of a series of elements that are
+ denoted by tags. The most basic tag is the `html` tag, which defines the
+ start and end of an HTML document. All other tags must be nested within
+ this tag.
+
+ Basic HTML tags:
+
+ Your First 10 HTML Tags
+
+ <html> … </html> — The root element.
+ <head> … </head> — The document head.
+ <title> … </title> — The page title.
+ <body> … </body> — The page's content.
+ <h1> … </h1> — A section heading.
+ <p> … </p> — A paragraph.
+ <a> … </a> — A link.
+ <img> — An image.
+
+ NOTE:
+
+ 1
+
+ 
+
+--- Page 3 ---
+
+Your First HTML Tags
+
+Just starting out with HTML? Here are 10 essential HTML tags that you’ll need to
+know when building your web pages.
+
+If you learn how these tags work then you’ll have enough knowledge to put
+together a basic page.
+
+At the end of the tutorial you’ll find code for an example web page that includes all
+10 tags, so that you can see how to use them.
+
+Tags and elements
+
+An HTML tag is a special word or letter surrounded by angle brackets, < and >.
+You use tags to create HTML elements, such as paragraphs or links.
+
+Many elements have an opening tag and a closing tag — for example,
+a p (paragraph) element has a <p> tag, followed by the paragraph text, followed
+by a closing </p> tag.
+
+Some elements don’t have a closing tag. These are called empty elements. For
+example, the br element for inserting line breaks is simply written <br>.
+
+If you’re working with XHTML then you write empty elements using self-
+closing tags — for example, <br />.
+
+Now let’s look at those 10 tags!
+
+1. <html> … </html> — The root element
+
+All web pages start with the html element. It’s also called the root
+element because it’s at the root of the tree of elements that make up a web page.
+
+ 2
+
+ 
+
+--- Page 4 ---
+
+The html element sits at the root of the tree of elements in a web page.
+To create the html element, you write an opening <html> tag followed by a
+closing </html> tag. Everything else in your web page then goes between these 2
+tags:
+
+<html>
+
+ (all other page elements go here)
+
+</html>
+
+2. <head> … </head> — The document head
+
+The head element contains information about the web page, as opposed to the
+web page content itself. There are many elements that you can put inside
+the head element, such as:
+
+  title (described below)
+
+  link, which you can use to add style sheets and favicons to your page
+
+  meta, for specifying things like character sets, page descriptions, and
+ keywords for search engines
+
+ 3
+
+ 
+
+--- Page 5 ---
+
+  script, for adding JavaScript code to the page
+
+Here’s a typical head element:
+
+<head>
+
+ <title>The Adventures of My Cat Lucky</title>
+
+ <meta http-equiv="Content-Type" content="text/html;
+charset=utf-8">
+
+ <meta name="description" content="The adventures of
+my favourite pet cat Lucky, with stories, pictures and
+movies.">
+
+ <meta name="keywords" content="cat,Lucky,pet,animal">
+
+ <link rel="stylesheet" type="text/css"
+href="/style.css">
+
+ <link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+3. <title> … </title> — The page title
+
+The title element contains the title of the page. The title is displayed in the
+browser’s title bar (the bar at the top of the browser window), as well as in
+bookmarks, search engine results, and many other places.
+
+The title should describe the page’s content succinctly and accurately. Try to give
+each page of your site its own unique title.
+
+ 4
+
+ 
+
+--- Page 6 ---
+
+Here’s an example:
+
+<title>The Adventures of My Cat Lucky</title>
+
+4. <body> … </body> — The page’s content
+
+The body element appears after the head element in the page. It should contain
+all the content of your web page: text, images, and so on. All web pages have 1
+single body element, with the exception of frameset pages, which
+contain frame elements instead.
+
+Here’s the general format of the body element:
+
+<body>
+
+ (all page content goes here)
+
+</body>
+
+5. <h1> … </h1> — A section heading
+
+Headings let you break up your page content into readable chunks. They work
+much like headings and subheadings in a book or a report.
+
+HTML actually supports 6 heading elements: h1, h2, h3, h4, h5, and h6. h1 is
+for the most important headings, h2 is for less important subheadings, and so on.
+Typically you won’t need to use more than h1, h2 and h3, unless your page is
+very long and complex.
+
+ 5
+
+ 
+
+--- Page 7 ---
+
+Here’s an example of an h1 heading element:
+
+<h1>The Adventures of My Cat Lucky</h1>
+
+6. <p> … </p> — A paragraph
+
+The p element lets you create paragraphs of text. Most browsers display
+paragraphs with a vertical gap between each paragraph, nicely breaking up the text.
+
+While you can create “paragraphs” of text just by using <br> tags to insert blank
+lines between chunks of text, it’s better to use p elements instead. Not only is it
+neater, but it gives browsers, search engines and other non-humans a better idea of
+how your page is structured.
+
+Here’s an example of a paragraph:
+
+<p>My cat Lucky has a lot of adventures. Yesterday she
+caught a mouse, and this morning she caught two!</p>
+
+A good rule of thumb when writing text for the web is to make sure that each
+paragraph contains a single point, topic or thought. If you want to talk about 2
+different things, use 2 paragraphs.
+
+7. <a> … </a> — A link
+
+One of the most important elements in a web page, the a element lets you create
+links to other content. The content can be either on your own site or on another
+site.
+
+ 6
+
+ 
+
+--- Page 8 ---
+
+To create a link, you wrap <a> and </a> tags around the content you want to use
+for the link, and supply the URL to link to in the <a> tag’s href attribute.
+
+Here’s how to create some text that links to www.example.com:
+
+<a href="http://www.example.com/">Visit this great
+website!</a>
+
+8. <img> — An image
+
+The img element lets you insert images into your web pages. To insert an image,
+you first upload the image to your web server, then use an <img> tag to reference
+the uploaded image filename. Here’s an example:
+
+<img src="myphoto.jpg" alt="My Photo">
+
+The alt attribute is required for all img tags. It’s used by browsers that don’t
+display images to give alternative text to the visitor.
+
+Find out more about using images in web pages.
+
+9. <div> … </div> — A block-level container for content
+
+The div element is a generic container that you can use to add more structure to
+your page content. For example, you might group several paragraphs or headings
+that serve a similar purpose together inside a div element.
+Typically, div elements are used for things like:
+
+  Page headers and footers
+
+ 7
+
+ 
+
+--- Page 9 ---
+
+  Columns of content and sidebars
+
+  Highlighted boxes within the text flow
+
+  Areas of the page with a specific purpose, such as ad spots
+
+  Image galleries
+
+By adding class and/or id attributes to your div elements, you can then
+use CSS to style and position the divs. This is the basis for creating CSS-based
+page layouts.
+
+Here’s an example that uses a div to contain the content for a sidebar in the page:
+
+<div id="sidebar">
+
+ <h1>Sidebar Heading</h1>
+
+ <p>Sidebar text</p>
+
+ <p>More sidebar text</p>
+
+</div>
+
+10. <span> … </span> — An inline container for content
+
+The span element is similar to div in that it’s used to add structure to your
+content. The difference is that div is a block-level element, while span is an
+inline element:
+
+  Block-level elements, such as div, h1, and p, are elements that are designed
+ to hold relatively large or stand-alone blocks of content, such as paragraphs
+ of text. A block-level element always starts on a new line.
+
+ 8
+
+ 
+
+--- Page 10 ---
+
+  Inline elements, such as span, a, and img, are designed to hold smaller
+ pieces of content — such as a few words or a sentence — within a larger
+ block of content. Adding an inline element doesn’t cause a new line to be
+ created. Block-level elements can contain inline elements, but inline elements
+ can’t contain block-level elements.
+
+As with a div, you often add a class and/or id attribute to a span so that you
+can style it using CSS.
+
+The following example uses span elements to indicate product names within a
+paragraph. These product names could then be highlighted using CSS. A custom
+search engine could also potentially use the information provided by
+the span elements to identify the products within the page.
+
+<p>Some of our products include <span
+class="product">SuperWidgets</span>, <span
+class="product">MegaWidgets</span>, and <span
+class="product">WonderWidgets</span>.</p>
+
+Bringing it all together
+
+Now that you’ve learned these 10 essential HTML tags, let’s put them all together
+in a single web page:
+
+<html>
+
+ <head>
+
+ <title>The Adventures of My Cat Lucky</title>
+
+ 9
+
+ 
+
+--- Page 11 ---
+
+ <meta http-equiv="Content-Type" content="text/html;
+charset=utf-8">
+
+ <meta name="description" content="The adventures of
+my favourite pet cat Lucky, with stories, pictures and
+movies.">
+
+ <meta name="keywords"
+content="cat,Lucky,pet,animal">
+
+ <link rel="stylesheet" type="text/css"
+href="/style.css">
+
+ <link rel="shortcut icon" href="/favicon.ico">
+
+ </head>
+
+ <body>
+
+ <h1>The Adventures of My Cat Lucky</h1>
+
+ <div id="mainContent">
+
+ <p>My cat Lucky has a lot of adventures.
+Yesterday she <a href="mouse.html">caught a mouse</a>,
+and this morning she caught two!</p>
+
+ <p>Here's a picture of Lucky:</p>
+
+ <img src="lucky.jpg" alt="Lucky">
+
+ </div>
+
+ <div id="sidebar">
+
+ 10
+
+ 
+
+--- Page 12 ---
+
+ <h2>Buy our stuff!</h2>
+
+ <p>Some of our products include <span
+class="product">SuperWidgets</span>, <span
+class="product">MegaWidgets</span>, and <span
+class="product">WonderWidgets</span>.</p>
+
+ </div>
+
+ </body>
+
+</html>
+
+HTML <BODY> TAG
+
+Body attributes
+
+https://www.w3schools.com/tags/tag_body.asp
+
+Example
+
+A simple HTML document:
+
+<html>
+<head>
+ <title>Title of the document</title>
+</head>
+
+<body>
+ <h1>This is a heading</h1>
+ <p>This is a paragraph.</p>
+</body>
+
+</html>
+
+More "Try it Yourself" examples below.
+
+ 11
+
+ 
+
+--- Page 13 ---
+
+ Definition and Usage
+
+ The <body> tag defines the document's body.
+
+ The <body> element contains all the contents of an HTML document, such as
+ headings, paragraphs, images, hyperlinks, tables, lists, etc.
+
+ Note: There can only be one <body> element in an HTML document.
+
+ Browser Support
+
+Element
+
+<body> Yes Yes Yes Yes
+
+ Global Attributes
+
+ The <body> tag also supports the Global Attributes in HTML.
+
+ Event Attributes
+
+ The <body> tag also supports the Event Attributes in HTML.
+
+ More Examples
+
+ Example
+
+ Add a background image to a document (with CSS):
+
+ <html>
+ <head>
+ <style>
+ body {
+ background-image: url(w3s.png);
+ }
+ </style>
+ </head>
+
+ 12
+
+ 
+
+--- Page 14 ---
+
+<body>
+
+<h1>Hello world!</h1>
+<p><a href="https://www.w3schools.com">Visit
+W3Schools.com!</a></p>
+
+</body>
+
+Try it Yourself »
+
+Example
+
+Set the background color of a document (with CSS):
+
+<html>
+<head>
+<style>
+body {
+ background-color: #E6E6FA;
+}
+</style>
+</head>
+<body>
+
+<h1>Hello world!</h1>
+<p><a href="https://www.w3schools.com">Visit
+W3Schools.com!</a></p>
+
+</body>
+
+Try it Yourself »
+
+Example
+
+Set the color of text in a document (with CSS):
+
+<html>
+<head>
+<style>
+body {
+ color: green;
+
+ 13
+
+ 
+
+--- Page 15 ---
+
+}
+</style>
+</head>
+<body>
+
+<h1>Hello world!</h1>
+<p>This is some text.</p>
+<p><a href="https://www.w3schools.com">Visit
+W3Schools.com!</a></p>
+
+</body>
+</html>
+
+Try it Yourself »
+
+Example
+
+Set the color of unvisited links in a document (with CSS):
+
+<html>
+<head>
+<style>
+a:link {
+ color:#0000FF;
+}
+</style>
+</head>
+<body>
+
+<p><a href="https://www.w3schools.com">W3Schools.com</a
+></p>
+<p><a href="https://www.w3schools.com/html/">HTML
+Tutorial</a></p>
+
+</body>
+</html>
+
+Try it Yourself »
+
+ 14
+
+ 
+
+--- Page 16 ---
+
+Example
+
+Set the color of active links in a document (with CSS):
+
+<html>
+<head>
+<style>
+a:active {
+ color:#00FF00;
+}
+</style>
+</head>
+<body>
+
+<p><a href="https://www.w3schools.com">W3Schools.com</a
+></p>
+<p><a href="https://www.w3schools.com/html/">HTML
+Tutorial</a></p>
+
+</body>
+</html>
+
+Try it Yourself »
+
+Example
+
+Set the color of visited links in a document (with CSS):
+
+<html>
+<head>
+<style>
+a:visited {
+ color:#FF0000;
+}
+</style>
+</head>
+<body>
+
+<p><a href="https://www.w3schools.com">W3Schools.com</a
+></p>
+
+ 15
+
+ 
+
+--- Page 17 ---
+
+<p><a href="https://www.w3schools.com/html/">HTML
+Tutorial</a></p>
+
+</body>
+</html>
+
+Try it Yourself »
+
+Related Pages
+
+HTML tutorial: HTML Elements
+
+HTML DOM reference: Body Object
+
+HTML DOM reference: document.body Property
+
+Default CSS Settings
+
+Most browsers will display the <body> element with the following
+default values:
+
+Example
+
+body {
+ display: block;
+ margin: 8px;
+}
+
+body:focus {
+ outline: none;
+}
+
+ 16
+
+ 
+
+--- Page 18 ---
+
+CELL PADDING
+
+CSS padding Property
+
+Example
+
+Set the padding for all four sides of a <p> element to 35 pixels:
+
+p {
+ padding: 35px;
+}
+Try it Yourself »
+
+More "Try it Yourself" examples below.
+
+Definition and Usage
+
+https://www.w3schools.com/cssref/pr_padding.php#:~:text=An%20element's
+%20padding%20is%20the,padding%2Dbottom
+
+An element's padding is the space between its content and its border.
+
+The padding property is a shorthand property for:
+
+  padding-top
+  padding-right
+  padding-bottom
+  padding-left
+
+Note: Padding creates extra space within an element, while margin creates
+extra space around an element.
+
+This property can have from one to four values.
+
+If the padding property has four values:
+
+  padding:10px 5px 15px 20px;
+ o top padding is 10px
+ o right padding is 5px
+ o bottom padding is 15px
+ o left padding is 20px
+
+ 17
+
+ 
+
+--- Page 19 ---
+
+If the padding property has three values:
+
+  padding:10px 5px 15px;
+ o top padding is 10px
+ o right and left padding are 5px
+ o bottom padding is 15px
+
+If the padding property has two values:
+
+  padding:10px 5px;
+ o top and bottom padding are 10px
+ o right and left padding are 5px
+
+If the padding property has one value:
+
+  padding:10px;
+ o all four paddings are 10px
+
+Note: Negative values are not allowed.
+
+Show demo ❯
+
+ Default 0
+ value:
+
+ Inherited: no
+
+ Animatable: yes, see individual properties. Read about animatableTry it
+
+ Version: CSS1
+
+ JavaScript object.style.padding="100px 20px"Try it
+ syntax:
+
+ 18
+
+ 
+
+--- Page 20 ---
+
+Browser Support
+
+The numbers in the table specify the first browser version that fully supports the
+property.
+
+ Property
+
+ padding 1.0 4.0 1.0 1.0
+
+ ADVERTISEMENT
+
+CSS Syntax
+
+padding: length|initial|inherit;
+
+Property Values
+
+ Value Description
+
+ length Specifies the padding in px, pt, cm, etc. Default value is 0. Read about length units
+
+ % Specifies the padding in percent of the width of the containing element
+
+ initial Sets this property to its default value. Read about initial
+
+ inherit Inherits this property from its parent element. Read about inherit
+
+ 19
+
+ 
+
+--- Page 21 ---
+
+More Examples
+
+Example
+
+Set the padding for a <p> element to 35 pixels for top and bottom, and to 70
+pixels for right and left:
+
+p {
+ padding: 35px 70px;
+}
+Try it Yourself »
+
+Example
+
+Set the padding for a <p> element to 35 pixels for top, 70 pixels for right and
+left, and to 50 pixels for bottom:
+
+p {
+ padding: 35px 70px 50px;
+}
+Try it Yourself »
+
+Example
+
+Set the padding for a <p> element to 35 pixels for top, 70 pixels for right, 50
+pixels for bottom, and to 90 pixels for left:
+
+p {
+ padding: 35px 70px 50px 90px;
+}
+Try it Yourself »
+
+Related Pages
+
+CSS tutorial: CSS Padding
+
+CSS tutorial: CSS Box Model
+
+HTML DOM reference: padding property
+
+ 20
+
+ 
+
+--- Page 22 ---
+
+NOTE:
+
+Padding of cells in HTML:
+
+Definition: Cell Padding in HTML is a property that specifies the space between the
+border of a table cell and its content. In simpler terms, it defines the whitespace
+between the cell edge and the content inside the cell.
+
+An element's padding is the space between its content and its border. The padding property is a
+shorthand property for: padding-top. Padding-right. Padding-bottom.
+
+NOTE:
+
+ Cell Padding and Cell Spacing in HTML
+
+Introduction
+
+HTML tables play a crucial role in structuring and presenting data on web
+pages. To enhance the visual appeal and layout of tables, two essential
+properties, cell padding and cell spacing, come into play in HTML.
+
+Cell Padding in HTML
+
+  Definition: Cell Padding in HTML is a property that specifies the space
+ between the border of a table cell and its content. In simpler terms, it
+ defines the whitespace between the cell edge and the content inside
+ the cell.
+
+  This property proves valuable in improving the aesthetics and
+ readability of a table by providing a cushioning effect around the cell
+ content.
+
+Syntax:
+
+<table cellpadding="value">. </table>
+HTML
+Example:
+<!DOCTYPE html>
+<html>
+ <head>
+ <style>
+ table {
+ width: 100%;
+
+ 21
+
+ 
+
+--- Page 23 ---
+
+ border-collapse: collapse;
+ }
+
+ th, td {
+ border: 2px solid #3498db;
+ padding: 15px;
+ text-align: center;
+ }
+
+ th {
+ background-color: #3498db;
+ color: #fff;
+ }
+ </style>
+ </head>
+
+ <body>
+ <h1>Student Grades</h1>
+ <table>
+ <tr>
+ <th>Student ID</th>
+ <th>Subject</th>
+ <th>Grade</th>
+ </tr>
+ <tr>
+ <td>001</td>
+ <td>Mathematics</td>
+ <td>A</td>
+ </tr>
+ <tr>
+ <td>002</td>
+ <td>Science</td>
+ <td>B+</td>
+ </tr>
+ <tr>
+ <td>003</td>
+ <td>History</td>
+ <td>C</td>
+ </tr>
+ </table>
+ </body>
+</html>
+HTML
+
+ 22
+
+ 
+
+--- Page 24 ---
+
+Explanation:
+
+  The border-collapse: collapse; property ensures that there is no
+ spacing between the table cells.
+
+  padding: 15px; adds padding around each cell content for better
+ readability.
+
+  background-color: #3498db; color: #fff; styles the header cells with a
+ blue background and white text for clarity.
+
+Cell Spacing in HTML:
+
+  Definition: Cellspacing is a property that defines the space between
+ cells. It adds whitespace between the edges of adjacent cells,
+ contributing to a well-organized and visually appealing table layout.
+
+  Proper cell spacing aids in distinguishing between different cells,
+ improving the overall clarity of the table.
+
+Syntax:
+<table cellspacing="value">. </table>
+HTML
+Example:
+<!DOCTYPE html>
+<html>
+
+ 23
+
+ 
+
+--- Page 25 ---
+
+ <head>
+ <style>
+ table {
+ width: 100%;
+ border-spacing: 20px;
+ }
+
+ th, td {
+ border: 2px solid #e74c3c;
+ padding: 10px;
+ text-align: center;
+ }
+
+ th {
+ background-color: #e74c3c;
+ color: #fff;
+ }
+ </style>
+ </head>
+
+ <body>
+ <h1>Product Information</h1>
+ <table>
+ <tr>
+ <th>Product ID</th>
+ <th>Product Name</th>
+ <th>Price</th>
+ </tr>
+ <tr>
+ <td>001</td>
+ <td>Laptop</td>
+ <td>$800</td>
+ </tr>
+ <tr>
+ <td>002</td>
+ <td>Smartphone</td>
+ <td>$400</td>
+ </tr>
+ <tr>
+ <td>003</td>
+ <td>Headphones</td>
+ <td>$50</td>
+ </tr>
+ </table>
+ </body>
+</html>
+HTML
+
+ 24
+
+ 
+
+--- Page 26 ---
+
+Explanation:
+
+  border-spacing: 20px; sets the space between cells to 20 pixels,
+ providing a clear separation.
+
+  The styling is similar to the Cell Padding example, ensuring a
+ consistent and clean design.
+
+Additional Styling with CSS:
+
+Padding Property:
+
+  The CSS padding property provides further control over the padding
+ inside the cells. It can be applied individually for each side of the cell.
+
+  This property allows for fine-tuning, ensuring that the spacing around
+ the cell content meets specific design requirements.
+
+Example:
+In the following CSS snippet, we apply a padding of 15 pixels to both headers
+and data cells, contributing to a balanced and visually pleasing layout.
+th, td {
+ padding: 15px;
+}
+HTML
+These properties, when used judiciously, empower web developers to create
+tables that are not only structurally sound but also visually appealing and
+user-friendly. Experimenting with different values for cell padding and cell
+
+ 25
+
+ 
+
+--- Page 27 ---
+
+spacing can significantly impact the overall design of HTML tables on a
+webpage.
+
+Conclusion
+
+In this section, we explored the significance of cell padding and cell spacing
+properties in HTML tables. These properties, along with additional styling
+using CSS, contribute to creating visually appealing and well-organized
+tables on web pages. The balance between cell padding, cell spacing, and
+overall styling is crucial for an optimal table design that enhances both
+aesthetics and user experience.
+
+ Frequently Asked Questions
+
+ 1. What is the purpose of the cell padding property in
+HTML tables?
+ 2. How can I set individual cell padding for headers
+and data cells using CSS?
+ 3. Is there a shorthand notation for setting both cell
+padding and cell spacing in an HTML table?
+
+ELEMENT
+What is an element in HTML?
+
+In HTML, an element is a section of an HTML document. Some HTML elements
+represent visible components on a web page, such as text, images, or buttons, while
+others denote different sections of the page or provide meta-information about the
+document. In the code itself, HTML elements are created with tags.
+
+The <dfn> tag stands for the "definition element", and it specifies a term that is going to be defined
+within the content. The nearest parent of the <dfn> tag must also contain the definition/explanation for
+the term. The term inside the <dfn> tag can be any of the following:
+
+NOTE:
+
+HTML <dfn> Tag
+
+Example
+
+Mark up a term with <dfn>:
+
+ 26
+
+ 
+
+--- Page 28 ---
+
+<p><dfn>HTML</dfn> is the standard markup language for creating web
+pages.</p>
+Try it Yourself »
+
+More "Try it Yourself" examples below.
+
+Definition and Usage
+
+The <dfn> tag stands for the "definition element", and it specifies a term that is
+going to be defined within the content.
+
+The nearest parent of the <dfn> tag must also contain the definition/explanation
+for the term.
+
+The term inside the <dfn> tag can be any of the following:
+
+1. Just as the content of the <dfn> element:
+
+Example
+
+<p><dfn>HTML</dfn> is the standard markup language for creating web
+pages.</p>
+Try it Yourself »
+
+2. Or, with the title attribute added:
+
+Example
+
+<p><dfn title="HyperText Markup Language">HTML</dfn> is the
+standard markup language for creating web pages.</p>
+Try it Yourself »
+
+3. Or, with an <abbr> tag inside the <dfn> element:
+
+Example
+
+<p><dfn><abbr title="HyperText Markup
+Language">HTML</abbr></dfn> is the standard markup language for
+creating web pages.</p>
+Try it Yourself »
+
+4. Or, with the id attribute added. Then, whenever a term is used, it can
+refer back to the definition with an <a> tag:
+
+ 27
+
+ 
+
+--- Page 29 ---
+
+ Example
+
+ <p><dfn id="html-def">HTML</dfn> is the standard markup language
+ for creating web pages.</p>
+
+ <p>This is some text. </p>
+ <p>This is some text. </p>
+ <p>Learn <a href="#html-def">HTML</a> now.</p>
+
+ https://www.w3schools.com/tags/tag_dfn.asp#:~:text=The%20tag%20stands%20for,1.
+
+ CATEGORIES OF OPERATORS IN JAVASCRIPT
+
+ Just like other programming languages, JavaScript offers various operators
+ to perform distinct functions. JavaScript operators can be categorized into 5
+ types: Arithmetic, Assignment, Comparison, Logical and Conditional.
+ What are the 4 types of JavaScript operators?
+
+ There are different types of JavaScript operators:
+
+ Arithmetic Operators.
+ Assignment Operators.
+ Comparison Operators.
+ Logical Operators.
+ Conditional Operators.
+ Type Operators.
+
+ NOTE:
+
+ JAVASCRIPT ARITHMETIC OPERATORS
+
+ Arithmetic operators are used to perform arithmetic between variables and/or
+ values.
+
+ Given that y = 5, the table below explains the arithmetic operators:
+
+ 28
+
+ 
+
+--- Page 30 ---
+
+Oper Name Example Results
+
++ Addition x = y + 2 y=5, x=7
+
+- Subtraction x=y-2 y=5, x=3
+
+* Multiplication x=y*2 y=5, x=10
+
+** Exponentiation x=y**2 y=5, x=25
+ ES2016
+
+/ Division x = y / 2 y=5, x=2.5
+
+% Remainder x = y % 2 y=5, x=1
+
+++ Pre increment x = ++y y=6, x=6
+
+++ Post increment x = y++ y=6, x=5
+
+-- Pre decrement x = --y y=4, x=4
+
+-- Post decrement x = y-- y=4, x=5
+
+ 29
+
+ 
+
+--- Page 31 ---
+
+For a tutorial about arithmetic operators, read our JavaScript Arithmetic
+Tutorial.
+
+JavaScript Assignment Operators
+
+Assignment operators are used to assign values to JavaScript variables.
+
+Given that x = 10 and y = 5, the table below explains the assignment
+operators:
+
+ Oper Example Same As Result Try it
+
+ = x = y x = y x = 5 Try it
+
+ += x += y x = x + y x = 15 Try it
+
+ -= x -= y x = x - y x = 5 Try it
+
+ *= x *= y x = x * y x = 50 Try it
+
+ /= x /= y x = x / y x = 2 Try it
+
+ %= x %= y x = x % y x = 0 Try it: x: 45 size.x = 45 x = 45 Try it
+
+For a tutorial about assignment operators, read our JavaScript Assignment
+Tutorial.
+
+ 30
+
+ 
+
+--- Page 32 ---
+
+JavaScript String Operators
+
+The + operator, and the += operator can also be used to concatenate (add)
+strings.
+
+Given that t1 = "Good ", t2 = "Morning", and t3 = "", the table below
+explains the operators:
+
+ Oper Example t1 t2 t3
+
+ + t3 = t1 + t2 "Good " "Morning" "Good Morning"
+
+ += t1 += t2 "Good Morning" "Morning"
+
+Comparison Operators
+
+Comparison operators are used in logical statements to determine equality or
+difference between variables or values.
+
+Given that x = 5, the table below explains the comparison operators:
+
+ Oper Name Comparing Returns
+
+ == equal to x == 8 false
+
+ == equal to x == 5 true
+
+ 31
+
+ 
+
+--- Page 33 ---
+
+ === equal value and type x === "5" false
+
+ === equal value and type x === 5 true!= not equal x!= 8 true!== not equal value or type x!== "5" true!== not equal value or type x!== 5 false
+
+ > greater than x > 8 false
+
+ < less than x < 8 true
+
+ >= greater or equal to x >= 8 false
+
+ <= less or equal to x <= 8 true
+
+For a tutorial about comparison operators, read our JavaScript Comparisons
+Tutorial.
+
+Conditional (Ternary) Operator
+
+The conditional operator assigns a value to a variable based on a condition.
+
+ 32
+
+ 
+
+--- Page 34 ---
+
+ Syntax Example Try it
+
+ (condition)? x: y (z < 18)? x: y Try it
+
+Logical Operators
+
+Logical operators are used to determine the logic between variables or values.
+
+Given that x = 6 and y = 3, the table below explains the logical operators:
+
+ Oper Name Example T
+
+ && AND (x < 10 && y > 1) is true T
+
+ || OR (x === 5 || y === 5) is false T! NOT!(x === y) is true T
+
+The Nullish Coalescing Operator (??)
+
+The?? operator returns the first argument if it is
+not nullish (null or undefined).
+
+Otherwise it returns the second argument.
+
+Example
+
+ 33
+
+ 
+
+--- Page 35 ---
+
+let name = null;
+let text = "missing";
+let result = name?? text;
+
+Try it Yourself »
+
+The nullish operator is supported in all browsers since March 2020:
+
+ Chrome 80 Edge 80 Firefox 72 Safari 13.1
+
+ Feb 2020 Feb 2020 Jan 2020 Mar 2020
+
+The Optional Chaining Operator (?.)
+
+The?. operator returns undefined if an object is undefined or null (instead of
+throwing an error).
+
+Example
+
+// Create an object:
+const car = {type:"Fiat", model:"500", color:"white"};
+// Ask for car name:
+document.getElementById("demo").innerHTML = car?.name;
+
+Try it Yourself »
+
+The optional chaining operator is supported in all browsers since March 2020:
+
+ Chrome 80 Edge 80 Firefox 72 Safari 13.1
+
+ Feb 2020 Feb 2020 Jan 2020 Mar 2020
+
+JavaScript Bitwise Operators
+
+ 34
+
+ 
+
+--- Page 36 ---
+
+Bit operators work on 32 bits numbers. Any numeric operand in the operation is
+converted into a 32 bit number. The result is converted back to a JavaScript
+number.
+
+ Oper Name Example Same as Result Decimal
+
+ & AND x = 5 & 1 0101 & 0001 0001 1
+
+ | OR x = 5 | 1 0101 | 0001 0101 5
+
+ ~ NOT x = ~ 5 ~0101 1010 10
+
+ ^ XOR x = 5 ^ 1 0101 ^ 0001 0100 4
+
+ << Left shift x = 5 << 1 0101 << 1 1010 10
+
+ >> Right shift x = 5 >> 1 0101 >> 1 0010 2
+
+ >>> Unsigned right x = 5 >>> 1 0101 >>> 1 0010 2
+
+Note
+
+The table above uses 4 bits unsigned number. Since JavaScript uses 32-bit
+signed numbers, ~ 5 will not return 10. It will return -6.
+
+~00000000000000000000000000000101 (~5)
+will return
+11111111111111111111111111111010 (-6)
+
+ 35
+
+ 
+
+--- Page 37 ---
+
+The typeof Operator
+
+The typeof operator returns the type of a variable, object, function or
+expression:
+
+Example
+
+typeof "John" // Returns string
+typeof 3.14 // Returns number
+
+Try it Yourself »
+
+Please observe:
+
+  The data type of NaN is number
+  The data type of an array is object
+  The data type of a date is object
+  The data type of null is object
+  The data type of an undefined variable is undefined
+
+Example
+
+typeof "John"
+typeof 3.14
+typeof NaN
+typeof false
+typeof [1, 2, 3, 4]
+typeof {name:'John', age:34}
+typeof new Date()
+typeof function () {}
+typeof myCar
+typeof null
+
+Try it Yourself »
+
+Note
+
+You cannot use typeof to define if a JavaScript object is an array or a date.
+
+Both array and date return object as type.
+
+ 36
+
+ 
+
+--- Page 38 ---
+
+The delete Operator
+
+The delete operator deletes a property from an object:
+
+Example
+
+const person = {
+ firstName:"John",
+ lastName:"Doe",
+ age:50,
+ eyeColor:"blue"
+};
+delete person.age;
+
+Try it Yourself »
+
+The delete operator deletes both the value of the property and the property
+itself.
+
+After deletion, the property cannot be used before it is added back again.
+
+The delete operator is designed to be used on object properties. It has no effect
+on variables or functions.
+
+Note
+
+The delete operator should not be used on the properties of any predefined
+JavaScript objects (Array, Boolean, Date, Function, Math, Number, RegExp, and
+String).
+
+This can crash your application.
+
+The Spread (. ) Operator
+
+The. operator expands an iterable into more elements:
+
+Example
+
+const q1 = ["Jan", "Feb", "Mar"];
+const q2 = ["Apr", "May", "Jun"];
+const q3 = ["Jul", "Aug", "Sep"];
+
+ 37
+
+ 
+
+--- Page 39 ---
+
+const q4 = ["Oct", "Nov", "May"];
+
+const year = [. q1,. q2,. q3,. q4];
+
+Try it Yourself »
+
+The. operator can be used to expand an iterable into more arguments for
+function calls:
+
+Example
+
+const numbers = [23,55,21,87,56];
+let maxValue = Math.max(. numbers);
+
+Try it Yourself »
+
+The in Operator
+
+The in operator returns true if a property is in an object, otherwise false:
+
+Object Example
+
+const person = {firstName:"John", lastName:"Doe", age:50};
+("firstName" in person);
+("age" in person);
+Try it Yourself »
+
+Note
+
+You cannot use in to check for array content like ("Volvo" in cars).
+
+Array properties can only be index (0,1,2,3. ) and length.
+
+See the examples below.
+
+Examples
+
+const cars = ["Saab", "Volvo", "BMW"];
+("Saab" in cars);
+Try it Yourself »
+const cars = ["Saab", "Volvo", "BMW"];
+(0 in cars);
+
+ 38
+
+ 
+
+--- Page 40 ---
+
+(1 in cars);
+(4 in cars);
+("length" in cars);
+
+Try it Yourself »
+
+Predefined Objects
+
+("PI" in Math);
+("NaN" in Number);
+("length" in String);
+Try it Yourself »
+
+The instanceof Operator
+
+The instanceof operator returns true if an object is an instance of a specified
+object:
+
+Example
+
+const cars = ["Saab", "Volvo", "BMW"];
+
+(cars instanceof Array) // Returns true
+(cars instanceof Object) // Returns true
+(cars instanceof String) // Returns false
+(cars instanceof Number) // Returns false
+
+Try it Yourself »
+
+The void Operator
+
+The void operator evaluates an expression and returns undefined. This
+operator is often used to obtain the undefined primitive value, using "void(0)"
+(useful when evaluating an expression without using the return value).
+
+Example
+
+<a href="javascript:void(0);">
+ Useless link
+</a>
+
+ 39
+
+ 
+
+--- Page 41 ---
+
+ <a href="javascript:void(document.body.style.backgroundColor='red');">
+ Click me to change the background color of body to red
+ </a>
+
+ Good Website technologies
+ What are the technologies used in a website?
+
+ The main language of the web is JavaScript, presented on most web pages and web
+ apps on the client-side. This means that the web technologies are mostly based on
+ JavaScript, while server-side technologies are varied (. NET, Java, PHP, Ruby, or even
+ server-side JavaScript Node. js).
+
+ So it's important to be visually appealing, polished and professional. Allow white space, uncluttered
+ layouts with quality photographs and graphics look and let your message shine through. (See
+ examples.) Equally important, the site must work quickly, correctly and as expected.
+ What is the best web technology?
+
+ React. React is one of the most popular front-end Web development technologies.  Vue. Js.
+ Ember. The next on the list of top front-end web technologies is Ember, one of the most
+ widely used web technologies among Expert engineers.  Backbone.
+ Angular.
+ Ruby on Rails.
+ Express.
+ Django.
+
+ What are the three core web technologies?
+
+ So, HTML, CSS, and JavaScript are the core web technologies every web developer
+ should master. They are used to format, design, and program different web pages
+ respectively.
+ What are all web technologies?
+
+ Some of the commonly used web development technologies include HTML, CSS, and
+ JavaScript for building the frontend. On the other hand, technologies like PHP, Ruby on
+ Rails, and Node. js are used for building the backend. Other technologies include
+ frameworks, databases, and web servers.
+ What factors make a good website?
+
+ 40
+
+ 
+
+--- Page 42 ---
+
+ Creating a good website requires careful consideration of numerous factors,
+ including design, navigation, search engine optimization, and user experience. Whether
+ you are a seasoned web developer or a first-time website creator, these tips will help
+ you create an effective and engaging website for your audience.
+ How to determine a good website?
+
+ The 6 most important characteristics of a good website include:
+
+1. A clear purpose.
+2. Quality content.
+3. Outstanding UX and UI.
+4. Great performance.
+5. Multi-device optimization.
+6. High security.
+
+ What defines a good website design?
+
+ A good web design is easy to use, aesthetically pleasing, and suits the user group and
+ brand of the website. A well-designed website is simple and communicates clearly to
+ avoid confusing users. It wins and fosters the target audience's trust, removing as many
+ potential points of user frustration as possible.
+
+ NOTE:
+
+ LIST OF TOP WEB TECHNOLOGIES FOR DEVELOPERS
+
+ (2024)
+
+ Web Development / 02.02.2024
+
+ https://www.konstantinfo.com/blog/web-technologies/
+
+ Do you know – Google’s algorithm indicates website speed as a major
+
+ contributor to rank web pages”
+
+ There are multiple factors that contribute to the success of any
+ website. The latest web technologies play a major role here. It
+ affects the responsiveness, design, functionality, and overall SEO of
+ the site. It is worth noting that your website is the online gateway to
+ your business for users and not having an efÏcient site leads to a
+ reduction in profits. Thus, it is essential for any businessman to be
+
+ 41
+
+ 
+
+--- Page 43 ---
+
+aware of the latest tech trends, tools, and technologies. In this
+article, we will be writing down a curated list of web technologies in
+2024. It includes top frontend, backend, and database technologies,
+followed by other significant information. Let us start with some
+basic web development stats!
+
+What Are Web Technologies?
+
+Web technology is the set of tools, frameworks, programming
+languages, libraries, and other third-party tools used to build a
+website or mobile application.
+
+There are three major web techs used in website development,
+namely, frontend, backend, and database technology.
+
+Web tech plays the most important in building the performance,
+functionality, responsiveness, and design of the site. Using an
+inefÏcient or outdated tech stack in your website might deliver
+issues like poor UI/UX, speed, non-optimized SEO, and more.
+
+Top 5 Front End Web Technologies
+
+Front-end technologies are the display part of any software, website,
+or application.
+
+From design to structure and links to graphics, frontend
+technologies play a pivotal role in user experience.
+
+So here are the top 5 Front End Web Technologies used widely by
+almost every Web development company for seamless user
+experience.
+
+ Name Features
+
+ React One-way Data Binding
+ Performance
+ Simplicity
+ Extension
+
+ 42
+
+ 
+
+--- Page 44 ---
+
+ Name Features
+
+ Components
+
+ Watchers
+ Data Binding
+ Components
+ Vue.js Animation/Transition
+ Lightweight
+ Virtual DOM
+
+ Build pipeline
+ Easy upgrades
+ Performance
+ Ember
+ Routing
+ Data layer
+
+ Collections
+ View Rendering
+ Router
+ Backbone.js
+ Lightweight
+ API Integration
+
+ Any app size
+ A great community
+ Angular Build productively
+ For everyone, everywhere
+
+1. React
+
+React is one of the most popular front-end Web development
+technologies.
+
+Based on an open Java Script library, this technology is also used by
+Facebook for its user interface.
+
+ 43
+
+ 
+
+--- Page 45 ---
+
+React’s front end technology codes are reusable, provide speedy
+debugging, support SSR Rendering and page loading metrics, SEO
+friendly and interactive interfaces, and smooth user experience. To
+make it more efÏcient, a Web development company can combine it
+with additional libraries.
+
+To Note: Server-side rendering (SSR) is an application's ability to convert HTML files
+
+on the server into a fully rendered HTML page for the client. The web browser submits a
+
+request for information from the server, which instantly responds by sending a fully
+
+rendered page to the client.
+
+This software is very useful for large businesses that require
+navigation panels and multiple options. Some of the popular front
+end applications developed using React include Reddit, BBC, Airbnb,
+Netflix, Uber, Instagram, discord, Trello, dropbox, etc.
+
+2. Vue.js
+
+Vue.js based on MVVM (model-view-viewmodel) technology is
+another popular frontend web technology. The platform provides
+detailed documentation, robust functionalities like code splitting and
+bundling, smooth interfaces, flexible, simple, and lightweight
+integration, and much more. If you want a short learning process,
+then this front end application can come in very handy.
+
+Popular applications that rely on this web development technology
+include Upwork, Adobe, Gitlab, Alibaba, etc.
+
+3. Ember
+
+The next on the list of top front-end web technologies is Ember,
+one of the most widely used web technologies among Expert
+engineers. Ember is best suitable for complex specifications and
+detailing. It runs on MVMM design and comes with various features
+
+ 44
+
+ 
+
+--- Page 46 ---
+
+like easy integration, testing tools, a plug-in option, single page web
+application, meticulous scoping, robust browser support, and much
+more.
+
+Ember has been the first choice of several well-known Web
+development companies in India for developing their user interface.
+The top applications using this technology include LinkedIn,
+Accenture, Digital Ocean, Square, Microsoft, etc.
+
+4. Backbone
+
+Backbone Js is another reliable partner of Web development
+companies for front-end development. It was started in 2010 by
+Jeremy Ashkenas.
+
+Based on MVP (Model-View-Presenter) and JavaScript Library,
+Backbone is most suitable for swift and robust one-page web
+applications.
+
+A development company creating simple and small apps can rely on
+this front-end technology.
+
+The top features of Backbone.js include modification of data into
+models, validation and storage in the browser, change tracker,
+preventing tangling of codes, designing, lightweight structure,
+support for APIs and abstract codes, etc. Walmart, Pinterest,
+MasterCard, etc. are some of the popular names that use Backbone
+front end technology.
+
+5. Angular
+
+Last but not least; Angular is another popular front end technology
+with a large community and the best support.
+
+It is one of the most reliable web technologies for building high
+performance mobile apps.
+
+ 45
+
+ 
+
+--- Page 47 ---
+
+The topmost benefits of using Angular include meticulous testing
+and detection of errors, MVC architecture, scalable and massive
+applications, two-way data binding, reusable codes, simple to use,
+allows parallel working, and much more.
+
+This technology is supported by Google and is also used by Gmail,
+Guardian, Amazon, Udemy, PayPal etc. for their front end designing.
+
+Top 5 Backend Web Technologies
+
+Backend technology comprises the not-so-visible part of a website
+or application. It includes server, database functionalities, backend
+codes, etc.
+
+They are like the support system of websites that detect any
+problem in operations. The top 5 backend technologies used widely
+by a Web development company include:
+
+ Name Features
+
+ Turbolinks
+ Actionpack Assertions
+ Rails API
+ Ruby on Rails Render from anywhere
+ Customized library
+ AJAX library
+
+ Request & Response Object
+ Error Handling
+ Routing
+ Express.js
+ Middlewares
+ Body Parsing
+
+ Django Portable
+ Speed
+ Security
+ Scalability
+
+ 46
+
+ 
+
+--- Page 48 ---
+
+ Name Features
+
+ Versatile
+
+ Very Fast
+ Asynchronous and Event Driven
+ Node.js No Buffering
+ License
+
+ Extensible and modular
+ Lightweight and minimalistic
+ Flask Jinja2 templating engine
+ WSGI compliant
+
+1. Ruby on Rails
+
+The first on the list is Ruby on Rails backend technology.
+
+With its easily readable and writable codes, this backend technology
+is a popular choice amongst backend developers.
+
+It has model-view-controller architecture for building seamless apps
+with efÏcient business features.
+
+The top features provided by Ruby on Rails include a wide range of
+plugins, simple development, vivid syntax, testing options,
+community support, time efÏcient, economical, flexible, and secure
+system.
+
+The top users of RoR backend web technology include CrunchBase,
+AirBnB, Dribble, GitHub, Shopify, Basecamp, etc.
+
+2. Express
+
+Express is one of the popular back end web development
+technologies and is based on MVC and Node.js framework, most
+
+ 47
+
+ 
+
+--- Page 49 ---
+
+suitable for simple and swift apps. The top features of such latest
+web development technologies include efÏcient performance, a wide
+range of HTTP support, flexible and scalable apps, reusable codes,
+economical, large community, etc.
+
+The top companies that rely on Express for their back end system
+include Uber, IBM, Twitter, Slack, PayPal, etc.
+
+3. Django
+
+Django is another widely used web development backend
+technology for large websites and apps.
+
+The best part of using Django is that it can be customized according
+to the needs and it works well even without any third party support.
+
+The Python system that supports Django makes it highly secure,
+fast, and efÏcient. This technology is scalable and incorporates
+almost every feature that a top Django development company will
+require for a secured website.
+
+The top benefits of using this technology include high security,
+scalability, authentication system, prevents SQL injection, scripting
+on various sites, wide range of plug-in, minimalistic coding needs,
+highly reusable, data support, a wide range of features, and much
+more. Some of the top apps that use Django this tech trend for
+backend development include Pinterest, Instagram, Spotify,
+Robinhood, Mozilla, Disqus, etc.
+
+4. Node.js
+
+ 48
+
+ 
+
+--- Page 50 ---
+
+Node.js is also a popular choice for back-end development amongst
+web developers. It has its own environment and supportive
+community.
+
+This technology is suitable for a wide range of applications including
+video streaming, messaging, cross platform, micro services, and
+much more.
+
+The top benefits of using this backend technology include scalability
+and rapid development, lightweight, easy divisions, flexible system,
+reusable codes, Asynchronous, etc.
+
+This technology is popular amongst Netflix, Facebook, Uber, Trello,
+eBay, PayPal, LinkedIn, and other such renowned applications.
+
+5. Flask
+
+Based on the Python Framework, Flask is another great option for
+backend development.
+
+The best part about Flask is that it is a simple and small framework
+and the developer does not need any library or tools for working on
+this backend technology.
+
+Another advantage is that it supports several features like secured
+cookies, unit testing, templating, solicitation handling, and much
+more.
+
+Its meticulous documentation, less time consuming, and modular
+design make it popular amongst new and small app developers.
+They can also use combined Flask apps and test their prototypes.
+
+In a nutshell, it can be said that Flask is flexible, easy to understand
+and use, simple, manageable, and independent. Owing to all these
+factors, Uber, Samsung, and Airbnb use this technology for backend
+development.
+
+Top Databases Web Technologies 2024
+
+ 49
+
+ 
+
+--- Page 51 ---
+
+ Name Features
+
+ Scalability and Performance
+ Availability
+ Oracle Backup and Recovery
+ Security
+
+ Sharding
+ Load balancing
+ Replication
+ MongoDB
+ Ad-hoc queries
+ Indexing appropriately
+
+ Easy to use
+ High Flexibility
+ Client/ Server Architecture
+ MySQL
+ Secure
+ Scalable
+
+ Fault-tolerance
+ MapReduce Support
+ Scalability
+ Cassandra
+ Query Language
+ Distributed
+
+ Table partitioning
+ AI-powered functionality
+ Common SQL engine
+ DB2
+ Machine learning algorithms
+ Data skipping
+
+1. Oracle
+
+Oracle is one of the most popular RDBMS and includes several top
+features such as JSON from SQL.
+
+ 50
+
+ 
+
+--- Page 52 ---
+
+It is an effective relational database management system, used
+widely for processing data and online transactions.
+
+This multi-model DBMS came up with the latest version recently,
+12c, where c is for Cloud. The version is better than the previous
+one consumes less memory, processes data fast, and is safer.
+
+Notably the tech trend is used by some of the most renowned
+companies globally including JP Morgan Chase, United Health, and
+Citigroup.
+
+2. MongoDB
+
+MongoDB is a NoSQL, cross-platform, document oriented, and open
+source database management system that supports LUW operating
+systems.
+
+The tool is widely used for high-volume data storage, and large sets
+of distributed data, and doesn’t need a table schema description.
+Moreover, top companies globally also use MongoDB for aggregate,
+server side JavaScript Execution, load balancing, and indexing.
+
+Some of the top companies that use MongoDB are ADP, Barclays,
+Adobe, and AstraZeneca.
+
+The database system also offers support in several languages
+including Python, Ruby, Swift, Java, and C++.
+
+3. MySQL
+
+MySQL is a popular database among developers for its stability,
+maturity, and robustness. The tool is written in C++ & C language
+and uses a structured query language. The latest version, MySQL
+8.0, comes with better features and recovery options and was
+released on April 25, 2019. Further, the RDBMS tool is highly
+
+ 51
+
+ 
+
+--- Page 53 ---
+
+compatible with all the major computing platforms, including
+Windows, UNIX, and Mac OS.
+
+MySQL DBMS was first released on May 23, 1995, and some of the
+top companies that employ it are Facebook, YouTube, Twitter,
+Wikipedia, and Flickr.
+
+4. Cassandra
+
+Cassandra is an open-source, NoSQL database management system
+that was launched by the non-profit organization Apache. The DBMS
+has an open core, distributed architecture with wide columns and is
+trusted by thousands of companies. Further, some of the companies
+that have deployed Cassandra are Twitter, Reddit, Netflix, etc.
+
+There are numerous activities and infrastructures within Cassandra.
+Databases like Cassandra and HBase are widely used and have
+distinct applications based on their respective kinds.
+
+5. DB2
+
+DB2 is another relational database management system that was
+released by IBM. The DBMS was first used exclusively for IBM but
+was released for other operating systems, including Linux, Windows,
+and more.
+
+The latest release, DB2 11.5, improves query execution
+performance. Notably, DB2 was the seventh most popular DBMS in
+2022 and the ranking was decided based on several factors.
+
+The relational approach is supported by the list of databases for
+mobile apps, which has expanded dramatically in recent years.
+
+ 52
+
+ 
+
+--- Page 54 ---
+
+Both non-relational formats like JSON and XML and object-relational
+features are now supported. This RDBMS tool is used mostly for
+analyzing, retrieving, and storing the data.
+
+The Final Say – Latest Web Development
+Technologies
+
+So, these were the top web development trends for web developers.
+
+A developer has to keep an eye on every new technology and tool to
+keep up with the market.
+
+Note that while it is important to be aware of the new tech coming
+into the market, it is a bit difÏcult to constantly switch tools for your
+site.
+
+Further, it is also required to have the right tools for your site that
+best suit your requirements and improve overall user experience.
+
+You can also hire web developers like Konstant if you need help in
+understanding a technology for your site.
+
+Top FAQs – Latest Web Technologies
+
+1. What is a tech stack?
+
+A tech stack is the combination of tools, programming languages,
+and frameworks used in the website or application development.
+
+The two major components are the front end and the backend.
+
+2. How to choose the tech stack for web
+development?
+
+There are a number of ways to choose the tech stack for website
+development.
+
+The most popular way is to consider a similar web or mobile app for
+your idea and analyze the tech used.
+
+ 53
+
+ 
+
+--- Page 55 ---
+
+ For instance, if you want an application like Skype, then check what
+ technology is used in the app!
+
+ 3. Why tech stack is important for web
+ development?
+
+ A tech stack plays an important role in web development and affects
+ the speed, security, and quality of the website or mobile application.
+
+ It is ideal to understand the pros and cons of the several
+ technologies.
+
+ 4. How to find the right web technology partner for
+ my website?
+
+ Hire web developers with relevant experience and expertise is
+ essential.
+
+ Konstant Info solutions has over 20+ years of experience and has
+ worked in a number of industries.
+
+ The company carries a good reputation in the market and is a top
+ rated company on Clutch, GoodFirms, ITFirms, and Business of Apps.
+
+ 5. What are the criteria for choosing a software
+ company?
+
+ There are multiple factors to consider before choosing a website
+ development company and some of the top factors include –
+
+ Past Client Portfolio
+ Client Reviews
+ Tech Stack Developers
+ Web Development Cost
+ Developer’s Location
+ Developer Experience
+
+ 54
+
+ 
+
+--- Page 56 ---
+
+ FUNCTIONS OF WEBSITES IN ORGANIZATIONS.
+ What are the four main purposes of websites?
+
+ What Is The Purpose Of A Website?
+
+ What Is A Website? A website is whatever the website owner wants it to be.  1) Make Money. The most common purpose of a business website is to make money.  2) Sell Products.  3) Sell Services.  4) Save Money.  5) Build An Online Presence.  6) Branding.  7) Showcase Authority And Establish Trust.
+
+ Creates a professional online presence. Helps your customers find you online. Helps your business
+ maintain a strong brand image. Prevents confusion between your brand and other brands.
+ What are the 5 key purposes of a website?
+
+ Essential Objectives of a Website
+
+ 5 Essential Objectives of a Website. In today's crowded marketplace, a website is the
+ first impression for any business or nonprofit.
+ Objective 1: Let People Find You.
+ Objective 2: Create an Online Presence.
+ Objective 3: Engage Your Audience.
+ Objective 5: Generate Revenue.
+
+ What are the four main purposes of websites?
+
+ What Is The Purpose Of A Website?
+
+ What Is A Website? A website is whatever the website owner wants it to be.
+ 1) Make Money. The most common purpose of a business website is to make money.
+ 2) Sell Products.
+ 3) Sell Services.
+ 4) Save Money.
+ 5) Build An Online Presence.
+ 6) Branding.
+ 7) Showcase Authority And Establish Trust.
+
+ 55
+
+ 
+
+--- Page 57 ---
+
+ What is the purpose of a company's website?
+
+ The primary purposes of a website are to establish an online presence for your
+ business, showcase your products or services, provide information about your
+ company, communicate with customers, and attract more visitors to your site.
+
+ NOTE:
+
+ https://seeresponse.com/blog/top-reasons-business-needs-website/#:~:text=The%20primary%20purposes
+ %20of%20a,more%20visitors%20to%20your%20site.
+
+ https://www.quora.com/Whats-the-main-purpose-of-a-website
+
+ PARTS OF A URL AS USED IN INTERNET
+
+ A URL consists of ten parts: the scheme, subdomain, top-level domain,
+ second-level domain, subdirectory, parameter, port, path, query, and
+ fragment.
+ What are the parts of a URL?
+
+ The basic parts of a URL
+
+ Scheme. The scheme, also known as the protocol, is the first part of a URL and
+ determines how different files on a web server are displayed and transferred to the user.
+ Subdomain. The subdomain determines which content should be displayed.
+ Second-level domain.
+ Top-level domain.
+ Subdirectory.
+
+ What are the parts of URL and IP address?
+
+ The 9 parts of a URL are the protocol (or scheme), subdomain, domain name, top level
+ domain, port, path, query, parameters, and fragment. The protocol, also known as the
+ scheme, is the first part of a URL. It represents the sets of rules that decide how files
+ are displayed, formatted, or transferred across the web.
+ What are the 4 components of a Web address?
+
+ 56
+
+ 
+
+--- Page 58 ---
+
+Components of a URL
+
+The four main components of URLs are the protocol, domain, path, and query.
+
+NOTE:
+
+DIFFERENT PARTS OF A URL
+
+We all use URLs in our day-to-day lives, whether we are technical or not. But what are
+the different parts of a URL? Read on the learn more.
+
+Usually, we see a URL and pay it no attention. URLs often go unnoticed, yet for
+
+developers, grasping their distinct components, functions, and optimal application is
+
+paramount.
+
+Effectively parsing a URL involves dissecting its scheme, domain, path, query
+
+parameters, and fragments. This comprehension empowers developers to construct
+
+dynamic web applications, implement robust routing systems, and enhance security
+
+measures.
+
+https://www.domain.com/path/to/something?
+query=parameter
+
+ 57
+
+ 
+
+--- Page 59 ---
+
+URL Architecture
+
+The architecture of a URL comprises multifaceted elements, commencing with the
+
+foundational Scheme or Protocol. Within this realm, an array of options emerges, each
+
+tailored to distinct purposes:
+
+  "http" serves as the bedrock for standard web applications.
+  "https" steps in to fortify security in web interactions.
+  "ftp" assumes the role of facilitating file transfers.
+  "sftp" enhances security while handling file transfers.
+
+Progressing from protocol to the core of navigation, the host or domain emerges as a
+
+pivotal determinant of how requests traverse the digital landscape.
+
+www.domain.com
+
+This process unfolds across three layers: the sub-domain, domain, and top-level
+
+domain.
+
+  www
+  domain
+ .com
+
+These segments, such as "www," the primary domain name, and the domain extension
+
+like ".com," collectively constitute the address's distinctive identity.
+
+Sometimes you see an optional port attached to a URL mainly used for local
+
+development or non-web URLs. This will tell whichever service you are working with
+
+that you want to talk through this specific channel.
+
+ 58
+
+ 
+
+--- Page 60 ---
+
+You can then add a path, which is a direction to the application or service to say where
+
+you want to go.
+
+Comprehending the intricate interplay of these URL components empowers developers
+
+to orchestrate seamless digital journeys.
+
+From protocol selection to domain navigation, port allocation to path definition, each
+
+aspect contributes to shaping efficient, secure, and user-friendly web experiences.
+
+This foundational knowledge bridges the gap between user intention and technological
+
+execution, underscoring the pivotal role of these components in the realm of web
+
+development.
+
+Fine-Tune with parameters
+
+Fine-tuning the functionality of a URL is facilitated through the judicious utilization of
+
+URL parameters. These versatile tools serve as the levers that enable nuanced
+
+customization of the experience at the destination.
+
+In the realm of web interactions, URL parameters are akin to dials and switches,
+
+allowing users to manipulate the information they encounter on a page. Imagine
+
+embarking on a search quest for a specific topic, such as "API Analytics." The URL for
+
+such an expedition might resemble:
+
+However, the power of parameters goes beyond mere keyword searches. They offer a
+
+mechanism for filtering and refining content. Suppose you desire to narrow your
+
+ 59
+
+ 
+
+--- Page 61 ---
+
+exploration to content originating exclusively from a particular publisher, "Treblle." By
+
+integrating a parameter, the URL transforms to:
+
+Intriguingly, parameters also grant the ability to reorder content presentation. Say you
+
+wish to peruse the latest news items first, effectively reversing the chronology. This
+
+aspiration is attainable by including a sorting parameter:
+
+However, the spectrum of parameter manipulation encompasses more than one
+
+orientation. For instance, the inclination to immerse oneself in the historical narrative
+
+might warrant a different sorting mechanism:
+
+These parameter-infused URLs serve as a testament to the profound role parameters
+
+play in shaping the digital experience. By orchestrating this symphony of parameters,
+
+users are bestowed with an interactive journey. Developers, in turn, wield these tools to
+
+design user interfaces that are intuitive, user-friendly, and capable of catering to diverse
+
+preferences.
+
+This level of customization amplifies engagement and empowers users by putting them
+
+at the helm of their digital odyssey. The artistry of URL parameters is that they deftly
+
+transform static web pages into dynamic, personalized experiences. Whether
+
+summoning specific topics, filtering by origin, or altering content order, parameters
+
+provide the agency to curate the digital milieu according to individual whims.
+
+In summation, the finesse of fine-tuning with URL parameters exemplifies the
+
+intersection of user intention and technological prowess. Within these unassuming
+
+ 60
+
+ 
+
+--- Page 62 ---
+
+query strings lie the potential to sculpt online interactions, enhancing user engagement,
+
+satisfaction, and immersion.
+
+The fragment at the end
+
+The conclusive segment of a URL holds a pivotal role—the fragment. Visualize a URL
+
+like:
+
+This component serves as a discreet directive, guiding your arrival to an exact location
+
+or section within a document or webpage.
+
+The fragment encapsulates precision in digital navigation. It's comparable to a GPS
+
+coordinate, pinpointing your intended destination on a sprawling digital map. Whether it
+
+leads to a specific paragraph in a lengthy article, a visual element on a multimedia
+
+page, or a module within a web application, the fragment acts as a virtual compass,
+
+streamlining your journey.
+
+For instance, if you're perusing a lengthy online article and wish to revisit a particular
+
+point later, appending a fragment to the URL would ensure that the page opens directly
+
+at that chosen juncture when revisited.
+
+In essence, the fragment elegantly streamlines the browsing experience, offering a
+
+direct route to desired content. By combining elements like protocol, domain,
+
+parameters, and the fragment, a URL emerges as a dynamic blueprint, enabling users
+
+to navigate the digital expanse with finesse and precision.
+
+That is how to unpack a URL.
+
+ 61
+
+ 
+
+--- Page 63 ---
+
+ Elements of a good website in web development
+ What are some important elements to focus on while developing a website?
+
+ The Top 10 Most Important Elements of a Website Design
+
+ 1 Navigation. The website design should be easy to navigate and the menu items
+ should easily accessible from any page.
+ 2 Visual Design.
+ 3 Content.
+ 4 Web Friendly.
+ 5 Interaction.
+ 6 Information Accessibility.
+ 7 Intuitiveness.
+ 8 Branding.
+
+ NOTE:
+
+ THE TOP 10 MOST IMPORTANT ELEMENTS OF A WEBSITE DESIGN
+
+ Web Design
+ Mark Palmer
+
+ If you are a business owner, your website is absolutely one of the
+ most important tools you have in your arsenal to get more - and better
+ - clients and customers.
+
+ So what separates a good website from a bad website, or a good one
+ from a great one? Here are 10 qualities that a great website will need.
+ Whether or not you end up retaining make space! as your Louisville
+ based web designers, you should find them helpful:
+
+ 1 Navigation
+
+ The website design should be easy to navigate and the menu items
+ should easily accessible from any page.
+
+ 62
+
+ 
+
+--- Page 64 ---
+
+The viewer should always know exactly where they are on the website
+and have easy access to where they would like to be.
+A site map is a great idea and will be used if available.
+
+This sounds elementary but most websites could be improved in this
+area.
+
+Remember, there is a ﬁne line between an interactive menu and an
+annoying one, so functionality should be the idea.
+
+2 Visual Design
+
+People are visually oriented creatures, and utilizing great graphics is a
+good way to make your website more appealing.
+
+Your website has about 1/10th of a second to impress your visitor -
+and potential customer - and let them know that your website - and
+business (by proxy) - is trustworthy and professional.
+
+However, it's important not to go overboard with too much.
+
+Scrolling text, animation, and ﬂash intros should be used sparingly in
+your web design and only to emphasize a point for maximum effect.
+
+3 Content
+
+This is the backbone of your website.
+
+Not only does your content play a major role in your search engine
+placement, it is the reason most visitors are seeking from your website
+in the first place.
+
+Your website text should be informative, easy to read, and concise.
+Well thought out web content and copy will do more than anything
+else to make your website design engaging, effective and popular.
+
+ 63
+
+ 
+
+--- Page 65 ---
+
+4 Web Friendly
+
+No matter how informative, beautiful, and easy to use your website
+design is, it's useless unless it's web-friendly.
+
+It is important that your web designers know the keys to making your
+website work on all the major browsers, and that they utilize Meta
+tags, alt tags, are fully versed in SEO (Search Engine Optimization).
+
+Many factors affect your search engine placement and visual
+appearance of your site, so make sure your web designers know their
+stuff.
+
+5 Interaction
+
+A truly effective website design engages your visitors immediately and
+continues to hold their attention through EVERY page, as well as
+inﬂuences them to contact you.
+
+This is called 'conversion', and is probably your website's ultimate
+goal.
+
+Again, there is a ﬁne line between ʻinteraction ʼ and ʻannoyance ʼ, so the
+level of interaction should never outweigh the beneﬁt.
+
+6 Information Accessibility
+
+Not all visitors to your website are interested in, or have the time to
+peruse the entire site.
+
+They may need to access only a phone number or address, or just a
+certain bit of info.
+
+For this reason it’s important to place key information in plain sight, in
+an area that’s easily accessible.
+
+ 64
+
+ 
+
+--- Page 66 ---
+
+Weʼve all had the experience of not being able to locate some needed
+information on a website, and the result is always a frustrated visitor.
+
+The experience is annoying at best, and a disgruntled visitor won’t
+stay on your site very long and is unlikely not to return, much less do
+business with you.
+
+7 Intuitiveness
+
+A great website anticipates what your visitor is thinking and caters
+directly to their needs, and has elements arranged in a way that
+makes sense.
+
+If a visitor is searching for one of your products or services on a
+search engine or directory where your site is listed, it's important that
+your website have a landing page that is directly relevant to what they
+searched for rather than forcing them to filter through all of your
+information. Remember, the shortest distance between two points is a
+straight line.
+
+8 Branding
+Your website should be a direct reﬂection of your business and your
+brand.
+
+Your visitor should immediately make a visual connection between
+your logo, print material, and brick-and-mortar location.
+
+A website that does this not only contributes to the memorability of
+your branding, but adds a level of credibility and enhanced image of
+that of your overall business.
+
+9 Turnaround Time
+
+The number one complaint of website design customers is the time it
+takes to get the site up and running.
+
+ 65
+
+ 
+
+--- Page 67 ---
+
+Unfortunately, a ﬁrm that takes unusually long to complete your
+website is par for the course.
+
+The longer it takes to complete the website, the more business - and
+value - you lose.
+
+A website that isn’t on the web isn’t and working properly isn't going to
+bring you any business!
+
+10 Conversion
+
+Your website can be the most important client generator your
+business can have, and must place the primary emphasis on bringing
+in new clients and making additional services available to existing
+clients through increased awareness of all the services you offer.
+
+Providing them with the tools they need to do business with you in an
+easy and enjoyable way will increase your website conversion and
+bring you the kind of success you seek.
+
+Remember, the relationship with your web designer will likely last as
+long as your business, so choose wisely! (I hope this helps!)
+
+ 66

@@ -161,17 +161,18 @@ OPERATING INSTRUCTION: Politely inform the student that this course is not curre
     if user and user.is_authenticated:
         try:
             from prep.models import PrepWallet, PrepCourseEnrollment
-            from services.credit_service import get_plan_upload_limit
+            from services.credit_service import get_free_credit_entitlement, get_plan_upload_limit
             wallet = PrepWallet.get_or_create_wallet(user)
+            free_credit_entitlement = get_free_credit_entitlement(user)
             enrolled = PrepCourseEnrollment.objects.filter(user=user).select_related("course")
             enrolled_codes = [e.course.code for e in enrolled]
             enrolled_str = ", ".join(enrolled_codes) if enrolled_codes else "None yet"
 
             plan_display = wallet.current_plan.title()
             if wallet.current_plan == "trial":
-                plan_display = "Free Trial (7 Days / 100 Starter Credits)"
+                plan_display = f"Free Trial (7 Days / {free_credit_entitlement['trial_credits']} Starter Credits)"
             elif wallet.current_plan == "freemium":
-                plan_display = "Freemium (20 Free Monthly Credits)"
+                plan_display = f"Freemium ({free_credit_entitlement['freemium_credits']} Free Monthly Credits)"
             elif wallet.current_plan == "plus":
                 plan_display = "Plus (Semester Pass - 450 Credits/mo)"
             elif wallet.current_plan == "pro":
@@ -217,8 +218,8 @@ If a user asks for a course or subject not in this list, clearly inform them tha
 {course_query_block}
 
 ### SUBSCRIPTION PLANS & BILLING (LATEST PRICING):
-- **Freemium (Free Forever)**: KES 0 / month ('FREE' badge). Includes 20 free credits refreshed every month, permanent free reading of cached lecture notes and authentic past exam questions with verified solutions. Document uploads cost 2–5 credits. Credit top-ups can be purchased anytime.
-- **Free Trial**: Every newly registered student receives 100 free starter credits upon signup ('Trial' badge, valid for 7 days), with complete access to explore all platform features.
+- **Freemium (Free Forever)**: KES 0 / month ('FREE' badge). Verified student email accounts receive 20 credits refreshed every month; standard accounts receive 10. Both retain permanent free reading of cached lecture notes and authentic past exam questions with verified solutions. Document uploads cost 2–5 credits. Credit top-ups can be purchased anytime.
+- **Free Trial**: Verified student email accounts receive 100 starter credits upon signup ('Trial' badge, valid for 7 days). Standard accounts receive 10 starter credits valid for 7 days.
 - **Basic (Starter Prep)**: KES 399 / month ('Basic' badge). Includes 250 credits/mo, 20 free PDF/document uploads/mo (then 2–5 credits), 100 practice exam questions, 5 handwritten/scanned uploads, full PDF & DOCX study pack downloads, all 3 explanation levels, standard queue.
 - **Plus (Semester Pass - Recommended / Most Popular)**: KES 499 / month ('Plus' badge). Includes 450 credits/mo, 40 free PDF/document uploads/mo (then 2–5 credits), 200 practice exam questions, 15 handwritten/scanned uploads, full study pack downloads, all 3 explanation levels, priority queue.
 - **Pro (Exam Master)**: KES 799 / month ('Pro' badge). Includes 750 credits/mo, Unlimited free document uploads, 350 practice exam questions, 30 handwritten/scanned uploads, full study pack downloads, all 3 explanation levels, top-priority queue & exam support.

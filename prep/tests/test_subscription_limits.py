@@ -10,8 +10,12 @@ from services.credit_service import (
     PlanLimitExceeded,
     enforce_subscription_limit,
     get_available_credits,
+    get_free_credit_entitlement,
     get_remaining_practice_question_allowance,
+    grant_freemium_monthly,
     grant_subscription,
+    is_student_email,
+    notify_standard_account_credit_limit,
 )
 
 
@@ -182,3 +186,72 @@ class SubscriptionLimitTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         route_math_request.assert_not_called()
+
+
+class FreeCreditEntitlementTests(TestCase):
+    def create_user_and_wallet(self, email):
+        user = User.objects.create_user(
+            username=email.replace("@", "_").replace(".", "_"),
+            email=email,
+            password="Valid123",
+        )
+        return user, PrepWallet.get_or_create_wallet(user)
+
+    def test_student_subdomain_receives_standard_trial_and_freemium_allowances(self):
+        user, wallet = self.create_user_and_wallet("5507.2022@students.ku.ac.ke")
+
+        entitlement = get_free_credit_entitlement(user)
+        self.assertTrue(entitlement["is_student"])
+        self.assertEqual(entitlement["trial_credits"], 100)
+        self.assertEqual(entitlement["freemium_credits"], 20)
+        self.assertEqual(wallet.credit_grants.get(source="trial").granted_credits, 100)
+
+        grant_freemium_monthly(wallet)
+        self.assertEqual(
+            wallet.credit_grants.filter(source="subscription").latest("id").granted_credits,
+            20,
+        )
+
+    def test_personal_address_receives_reduced_trial_and_freemium_allowances(self):
+        user, wallet = self.create_user_and_wallet("learner.personal@gmail.com")
+
+        entitlement = get_free_credit_entitlement(user)
+        self.assertFalse(entitlement["is_student"])
+        self.assertEqual(entitlement["trial_credits"], 10)
+        self.assertEqual(entitlement["freemium_credits"], 10)
+        self.assertEqual(wallet.credit_grants.get(source="trial").granted_credits, 10)
+
+        grant_freemium_monthly(wallet)
+        self.assertEqual(
+            wallet.credit_grants.filter(source="subscription").latest("id").granted_credits,
+            10,
+        )
+
+    def test_student_detection_does_not_accept_all_kenyan_or_institutional_domains(self):
+        self.assertTrue(is_student_email("student@students.uonbi.ac.ke"))
+        self.assertTrue(is_student_email("student@students.jkuat.ac.ke"))
+        self.assertTrue(is_student_email("student@students.must.ac.ke"))
+        self.assertTrue(is_student_email("student@college.edu"))
+        self.assertFalse(is_student_email("staff@ku.ac.ke"))
+        self.assertFalse(is_student_email("person@company.co.ke"))
+
+    def test_standard_email_receives_one_explanatory_credit_notification(self):
+        user, _wallet = self.create_user_and_wallet("standard.notice@gmail.com")
+
+        self.assertTrue(notify_standard_account_credit_limit(user))
+        self.assertFalse(notify_standard_account_credit_limit(user))
+
+        notification = user.prep_notifications.get(
+            title="Use your student email for the full free allowance"
+        )
+        self.assertIn("10 trial credits", notification.message)
+        self.assertIn("10 free credits every 30 days", notification.message)
+        self.assertIn("100-credit trial", notification.message)
+
+    def test_student_email_does_not_receive_the_standard_email_notification(self):
+        user, _wallet = self.create_user_and_wallet("notice@students.ku.ac.ke")
+
+        self.assertFalse(notify_standard_account_credit_limit(user))
+        self.assertFalse(user.prep_notifications.filter(
+            title="Use your student email for the full free allowance"
+        ).exists())

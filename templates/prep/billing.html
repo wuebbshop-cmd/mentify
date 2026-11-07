@@ -39,7 +39,7 @@
   <div>
     <div style="font-weight: 600; color: #2563eb; display: flex; align-items: center; gap: 8px;">
       <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2563eb;"></span>
-      Free Trial Active (100 Starter Credits)
+      Free Trial Active ({{ free_credit_entitlement.trial_credits }} Starter Credits)
     </div>
     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
       Explore all features: view complete lecture notes, generate practice questions, derive step-by-step proofs, and try up to 10 PDF/image uploads.
@@ -48,19 +48,19 @@
       {% endif %}
     </div>
   </div>
-  <span class="badge" style="background: #2563eb; color: #fff; font-size: 0.78rem; padding: 4px 10px;">Free 100-Credit Trial</span>
+  <span class="badge" style="background: #2563eb; color: #fff; font-size: 0.78rem; padding: 4px 10px;">Free {{ free_credit_entitlement.trial_credits }}-Credit Trial</span>
 </div>
 {% elif is_freemium %}
 <div style="background: rgba(100, 116, 139, 0.08); border: 1px solid rgba(100, 116, 139, 0.25); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
   <div>
     <div style="font-weight: 600; color: #475569; display: flex; align-items: center; gap: 8px;">
       <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #64748b;"></span>
-      Freemium Active (20 Free Monthly Credits)
+      Freemium Active ({{ free_credit_entitlement.freemium_credits }} Free Monthly Credits)
     </div>
     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
       Unlimited access to cached lecture notes and authentic past examination questions.
       {% if plan_expires_at %}
-        &bull; <strong>Next 20-Credit Refresh:</strong> {{ plan_expires_at|date:"M d, Y" }}
+        &bull; <strong>Next {{ free_credit_entitlement.freemium_credits }}-Credit Refresh:</strong> {{ plan_expires_at|date:"M d, Y" }}
       {% endif %}
     </div>
   </div>

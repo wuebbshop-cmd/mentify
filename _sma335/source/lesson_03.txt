@@ -1,0 +1,413 @@
+LESSON 3
+First Order Exact Equations and Integrating Factors
+
+In this lesson you will learn to solve a particular type of first order equation called an
+exact differential equation.
+
+3.2 Objectives of the lesson
+By the end of this lesson you should be able to
+  i).    define an exact differential equation.
+ ii).    learn the condition for an equation Mdx + Ndy = 0 to be exact.
+iii).    solve an exact differential equation.
+iv).    define an integrating factor.
+ v).   use the integrating factor to transform an equation into exact and then solve the
+       exact equation obtained.
+
+Let F(x, y) be such that
+∂F         ∂F
+   = M and    = N                                              (1)
+ ∂x          ∂y
+
+3.3 Total differential
+We know that
+     ∂F     ∂F
+dF =    dx +    dy                                                (2)
+     ∂x     ∂y
+   = Mdx + Ndy                                                   (3)
+
+From (2) and (3) we have
+∂M   ∂ 2 F
+    =                                                               (4)
+ ∂y   ∂ydx
+    ∂N   ∂ 2 F
+and    =                                                           (5)
+    ∂x   ∂xdy
+
+If F (x, y) is continuous in a domain D
+ ∂ 2 F   ∂ 2 F
+    =      or
+∂xdy  ∂y∂x
+
+∂M   ∂N
+    =
+ ∂y   ∂x
+
+--- Page 26 ---
+Theorem
+         ∂M      ∂N
+If M, N,      and       are continuous functions of x and y then a necessary and
+          ∂y       ∂x
+                                                  ∂M   ∂N
+sufficient condition that Mdx + Ndy = 0 to be exact is that    =       . The solution of
+                                                   ∂y   ∂x
+                                       ∂F     ∂F
+such equation is F (x, y) = constant where dF =    dx +    dy = Mdx + Ndy = 0.
+                                        ∂x     ∂y
+
+The following examples illustrates the methods of solving an exact equation.
+
+Example 1
+a) Show that the equation
+     (3 x 2 + 4 xy ) dx + ( 2 x 2 + 2 y ) dy = 0
+      dy    3 x 2 + 4 xy
+    or   = −     2        is exact      dx    2 x + 2 y
+b) Hence solve the equation
+
+Solution
+Let (3 x 2 + 4 xy ) dx + ( 2 x 2 + 2 y ) dy = 0                                (1)
+This is of the form Mdx + Ndy = 0
+where M = 3 x 2 + 4 xy , N = 2 x 2 + 2 y                                (2)
+∂M         ∂N
+    = 4 x and    = 4 x
+ ∂y          ∂x
+
+     ∂M   ∂N
+Since    =       ,
+      ∂y   ∂x
+Hence there exists a function F (x, y) such that the equation is exact.
+     ∂F     ∂F
+dF =    dx +    dy = Mdx + Ndy                                 (3)
+     ∂x     ∂y
+        ∂F
+From (3)    = M
+        ∂x
+Hence ∂F = M∂x
+     M∂xand F = ∫
+           (3 x 2 + 4 xy ) ∂x (Note that this is a partial Integration with respect to x)    = ∫
+F ( x , y ) = x 3 + 2 x 2 y + φ( y )                                          (4)
+y is treated as a constant. Hence constant of integration may be φ(y )
+
+             ∂F
+Again from (3)    = N
+             ∂y
+From (4) and (2) we have
+
+--- Page 27 ---
+∂      3       2                 2   = x + 2 x y + φy ) = 2 x + 2 y
+∂y
+or 0 + 2 x 2 + φ′( y ) = 2 x 2 + 2 y                                       (5)
+From (5) φ′( y ) = 2 y                                                 (6)
+                                        2                                       (7)Integrating we have φ( y ) = y
+No constant is needed
+
+Substituting (7) in (4) we have F ( x , y ) = x 3 + 2 x 2 y + y 2 = c is the required solution.
+
+
+Example 2
+Solve the equation (8 y − x 2 y ) dy + ( x + xy 2 ) dx = 0
+
+Solution
+( x + xy 2 ) dx + (8 y − x 2 y ) dy = 0                                      (1)
+This is of the form Mdx + Ndy = 0
+∂M         ∂N
+    = − 2 xy =
+ ∂y         ∂x
+Hence it is an exact equation and there exists a function F ( x , y ) such that
+     ∂F     ∂F
+dF =    dx +    dy = Mdx + Ndy = 0                              (2)
+     ∂x     ∂y
+and F = Constant is the solution.
+∂F                           2   dx = Mdx = ( x − xy ) dx
+ ∂x
+     ∂F          2Then      ( x − xy )
+     ∂x
+∂F = ( x − xy 2 ) ∂x
+                   ( x − xy 2 )∂xF = F ( x , y ) = ∫
+             x 2   x 2 y 2        =   −    + φ( y )                                      (3)
+           2    2
+
+         ∂F ( x , y )
+From (2),        = N ( x , y ) gives
+           ∂y
+        ∂     x 2   x 2 y 2                      2                  2   dφ           2          =    −    + Q ( x , y ) = 8 y − x y + φ′( y ) - x y +   = 8 y − x y
+                                                      dy        ∂y       2    2                        
+        dφ
+          = 8 y
+         dy
+        dφ= 8 ydy
+            8 ydy    φ= ∫
+        = 4y2 (No need for constant)
+
+--- Page 28 ---
+2                        x 2   x 2 y 2        2Substituting φ= 4y  in (3) we have F ( x , y ) =   −    + 4 y
+                                      2    2
+The solution is F ( x , y ) = constant.
+ x 2   x 2 y 2        2   −    + 4 y = constant
+ 2    2
+or x 2 − x 2 y 2 + 8 y 2 = c is the required solution of the equation.
+Since the solution is F = constant the required solution is, x 2 − 2 x 2 y + y 2 = c
+
+Example 3
+a) Show that the equation
+   3 x − ( xy − 2) dx + ( x 3 + 2 y ) dy = 0 is exact.
+b) Hence solve the equation
+
+Solution
+Let 3 x − ( xy − 2) dx + ( x 3 + 2 y ) dy = 0                                (1)
+This equation is the form Mdx + Ndy = 0
+where M = 3 x ( xy − 2) dx and N = ( x 3 + 2 y ) dy
+∂M        2     ∂N        2    = 3x  and    = 3x
+ ∂y          ∂x
+Hence the equation (1) is exact and there exists a function F such that
+     ∂F     ∂F
+dF =    dx +    dy = Mdx + Ndy                                  (2)
+     ∂x     ∂y
+∂F
+   = M gives
+ ∂x
+∂F        2   = 3 x y − 6 x
+ ∂x
+or ∂F = (3 x 2 y − 6 x ) ∂x
+           (3 x 2 y − 6 x )∂xor F = ∫
+      = x 3 y − 3 x 2 + φ( y )                                           (3)
+        ∂F
+From (2)    = N
+        ∂y
+       ∂    3         2                 3Hence     [x y − 3 x + φ( y ) ] = (x + 2 y )
+      ∂y
+or x 3 +φ′( y ) = x 3 2 y
+or φ′( y ) = 2 y
+Integrating we have φ( y ) = y 2                                      (4)
+Substituting (4) in (3) we have
+F = x 3 y − 3 x 2 + y 2 and the solution is F = constant
+Hence the required solution is
+x 3 y − 3 x 2 + y 2 = c
+
+--- Page 29 ---
+3.4 Integrating Factor
+Consider the equation,
+M ( x , y ) dx + N ( x , y ) dy = 0                                          (1)
+Suppose (1) is not an exact equation. When each of the terms of (1) is multiplied by a
+factor φ( x , y ) the equation (1) may become exact. In other words
+φ( x , y ) M ( x , y ) dx + φ( x , y ) N ( x , y ) dy = 0 may become an exact equation.
+
+The factor φ( x , y ) used to make Mdx + Ndy = 0 exact is called an Integrating
+factor.
+
+Finding the Integrating factor for the equation Mdx + Ndy = 0 is generally not easier;
+However there are some standard forms of Integrating factors which we shall see in the
+next section.
+
+3.5 Some important differentials and their integrating factors
+Consider the equation Mdx + Ndy = 0 (1)
+     ∂M  ∂N
+1)  If    −   = 0 (1) is an exact equation
+      ∂y   ∂x
+                     ∂M  ∂N
+                      −
+     ∂M  ∂N         ∂y   ∂x     If    −   ≠ 0 and         =  f (x ) , a function of x alone then
+      ∂y   ∂x         N
+       ∫fdx    e     is an integrating factor of (1).
+
+                      ∂M   ∂N
+                       −
+      ∂M  ∂N          ∂y   ∂x                                                      ∫−gdy2)  If    −   ≠ 0 and         = g (y ) , a function of y alone, then e       is an
+      ∂y   ∂x       M
+    integrating factor of (1).
+      1
+3)              is an integrating factor of (1) if Mx + Ny ≠ 0 .
+   Mx + Ny
+
+    1
+        2                                                 y   xdy − ydx
+4)  x   is an integrating factor for xdy – ydx since d    =        2
+                                                        x       x
+
+Example 4
+Consider the differential equation
+( 4 x + 3 y 2 ) dx + 2 xdy = 0
+a) Show that this equation is not exact.
+b) Find an integrating factor of the form xn where n is a positive integer.
+c)  Using your integrating factor found in (b) solve the equation.
+
+--- Page 30 ---
+Solution
+Let ( 4 x + 3 y 2 ) dx + 2 xdy = 0 .  It is of the form
+     Mdx + Ndy = 0 where
+    M = 4 x + 3 y 2 and N = 2xy
+       ∂M          ∂N
+         = 6 y and    = 2 y
+       ∂y          ∂x
+     ∂M   ∂N
+Since    ≠     the equation is not exact.
+      ∂y   ∂x
+At this stage, you can find the integrating factor.
+Let us try whether x2 is an integrating factor.
+Multiply the equation throughout by x2
+x 2 ( 4 x + 3 y 2 ) dx + x 2 2. xydy = 0
+Now M = 4 x 3 + 3 x 2 y 2 and N = 2 x 3 y
+∂M        2   ∂N    = 6 x y =
+ ∂y         ∂x
+There exists a function F(x,y) such that
+     ∂F     ∂F             3       2  2            3dF =    dx +    dy = ( 4 x + 3 x y ) dx + 2 x ydy = 0
+     ∂x     ∂y
+and F = constant will be the solution.
+∂F             3       2  2   dx = ( 4 x + 3 x y ) dx
+ ∂x
+  ∂F        3       2  2     = 4 x + 3 x y
+  ∂x
+  ∂F = ( 4 x 3 + 3 x 2 y 2 ) dx
+          ( 4 x 3 + 3 x 2 y 2 ) dx  F = ∫
+  F = x 4 + x 3 y 2 + φ( y ) = 0                                  (1)
+∂F              3   = N = 2 x y gives
+ ∂y
+ ∂ [x 4 + x 3 y 2 + φ( y ) ] = 2 x 3 y
+∂y
+              3   dφ       3      2 x y +   = 2 x y
+             dy
+     dφ
+         = 0 which gives φ = constant c0
+       dy
+From (1), F = x4 + x3y2 + c0. The solution is F = constant c1
+x4 + x3y2 + c0 = c1. Then if we call c1 – c0 = c, the required solution is x4 + x3y2 = c
+
+--- Page 31 ---
+Example 5
+a) Show that ydx – xdy = 0 is not exact.
+            1
+b) Show that x 2  is an integrating factor for the equation.
+c)  Solve the equation ydx – xdy = 0 using the integrating factor.
+
+Solution
+a)     Let ydx – xdy = 0
+   Comparing this with Mdx + Ndx = 0
+  M= y and N = -x
+   ∂M      ∂N
+      = 1      = − 1
+    ∂y       ∂x
+   Hence the given equation is not exact.
+                            1
+b)     Multiplying each term by x 2
+    1      1
+        2 ydx −   2 xdy = 0    x       x
+     y     1
+        2 dx −  dy = 0    x      x
+                                               y          1
+   This is of the form Mdx + Ndy = 0 where M =   2 and N = −                                               x            x
+             ∂M   1   ∂N
+               =   2 =             ∂y   x    ∂x
+             y     1
+     Now   dx −  dy = 0 is exact.
+            x 2     x
+                                             ∂F     ∂F
+c)     There Exists a Function F(x, y) such that dF =    dx +    dy Mdx + Ndy = 0
+                                             ∂x     ∂y
+   ∂F        y     ∂F        1
+      = M =    and    = N = −
+    ∂x        2x     ∂y         x
+   ∂F    y
+      =   2    ∂x   x
+         y
+   ∂F =   2 dx         x
+           y
+            dx   F = y ∫   2           x
+          x − 1
+   F = y   + φ( y )
+        − 1
+          y
+   F = −  + φ(y )                                          (1)
+          x
+
+--- Page 32 ---
+∂F
+      = N ( x , y )
+    ∂y
+    ∂   y           1      −  + φ( y ) = −
+   ∂y   x                   x
+        1  dφ   1
+      −  +   = −
+         x  dy     x
+     dφ
+         = 0
+       dy
+   φ( x , y ) = constant
+                       y
+   From (1) F(x, y) = −  + 0c . The solution is F(x, y) = c1
+                       x
+           y            y
+   Then, −  + c0 = c1 or  = c or y = cx is the solution.
+           x            x
+
+Exercise 3
+    1. Show that the equation
+             (3x + 2y)dx + (2x + y)dy = 0
+         is exact.
+    2.  a). Show that the equation
+            2xy + 1)dx + (x2 + 4y)dy = 0
+         is exact.
+        b). Solve the above equation
+
+    3.  Solve the equation
+             (2xy – 3)dx + (x2 + 4y)dy
+       given that y(1) = 2
+    4.  If the equation
+               (x2 + 3xy)dx + (Ax2 + 4y)dy = 0
+         is exact, determine the constant A and solve the resulting exact equation.
+          1   1       Ax + 1 
+    5.  If           +   2  dx +      3      dy = 0 is exact find the value of A and solve the                                   2            x    y         y   
+        resulting exact equation.
+    6. Show that the equation
+                   ( y sec2 x + sec x tan x )dx + ( tan x + 2 y )dy = 0
+         is exact and solve the equation.
+    7.  Verify that the differential equation
+                   (6 xy + 2 y                                  2 − 5 )dx + (3 x                                                    2 + 4 xy − 6 )dy = 0
+         is exact and solve the equation.
+    8. Show that the equation
+                 2 s − 1   −s  s 2 
+                        ds +     2      dt = 0                    t           t    
+         is exact and solve the equation
+
+--- Page 33 ---
+9.  a). Show that the equation
+                   dy
+            2 x ln x   + y = 0 is not exact
+                   dx
+                     y
+        b). Prove that     is an integrating factor for the equation.
+                     x
+         c). Solve the above equation in (a)
+    10. Show that the equation
+              y     dy            y       e  sin x   + (1 + e  ) cos x = 0
+             dx
+         is exact and hence solve the equation
+    11. Show that the equation
+          ( y              2 − x 2 )dy + 2 xydx = 0
+         is exact and solve the equation.
+    12. Show that
+          ( y 4 + 2 y 2 − x 3 + 5 x 2 y − 21xy 2 ) dy + (x 3 − 3 x 2 y + 5 xy 2 − 7 y 3 ) = 0
+                                dx
+    is exact and solve the equation.
+
+
+Summary
+You have learnt the following from this lesson.
+1.  Definition of axact differential equation.
+2.  Condition for the equation
+   M(x,y)dx + N(x, y)dy = 0 to be exact.
+3. Method of solving M(x,y)dx + N(x, y)dy = 0 when it is exact.
+4.  Definition of integrating factors.
+5. The use of integrating factors to solve the equation which is not exact.
+
+Further Reading
+1.  Differential Equations
+   By Frank Ayres, Ph. D
+   Schaum’s outline series
+   McGraw Hill Book Company
+  New York, Toronto, Sydney.
+
+2.  Differential Equations
+   By Dr. D. Sengottaiyan Ph.D
+   Oxford Publications
+   Harrow, London. Nairobi.
+
+--- Page 34 ---

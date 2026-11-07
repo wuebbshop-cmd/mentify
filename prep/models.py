@@ -1,3 +1,4 @@
+import re
 import uuid
 from django.db import models
 from django.conf import settings
@@ -849,7 +850,7 @@ class PrepWallet(models.Model):
 
     @classmethod
     def get_or_create_wallet(cls, user):
-        """Safely retrieve or create a wallet. New wallets start on a 7-day, 100-credit free trial."""
+        """Safely retrieve or create a wallet with an account-specific free trial."""
         wallet = cls.objects.filter(user=user).first()
         created = False
         if not wallet:

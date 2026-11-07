@@ -1,0 +1,597 @@
+Lesson 7
+  Determination of particular integrals using short methods
+
+7.1 Introduction
+In the previous lesson, you have found the particular integrals for non-homogeneous
+linear equations with constant coefficients of the form
+      d 2 y    dy
+               2 + a1   + a 2 y = Q                                               (1)       dx     dx
+or       (a 0 D                 2 + a1 D + a 2 ) y = Q
+or     f(D)y = Q
+where f(D) = a 0 D 2 + a1 D + a 2
+
+we have already seen that the particular integral of (Q) is
+        Q
+       y =
+                  f (D )
+where Q is particular types of functions such
+       as ( i ) e ax , ( ii ) sin( ax + b ) or cos( ax + b ), ( iii ) x n (, iv ) e ax u and ( v ) xu
+      where u is a function of x
+
+
+7.2 Objectives of the lesson
+By the end of this lesson, you should be able to determine the particular integrals
+   Q
+ y =      when Q is of the form
+       f (D )
+      i.    e ax
+      ii.      sin (ax + b) and cos (ax + b)
+      iii.      xn
+    iv.     eaxu when u is a function of x.
+    v.    xu when u is a function of x.
+
+7.3 The particular integral of
+
+Theorem 1
+
+               e ax     e ax
+                =         if   f ( a ) ≠ 0
+                       f ( D )     f ( a )
+
+Proof
+First we shall show that
+
+--- Page 62 ---
+i.           f ( D ) e ax =  f ( a ) e ax if y = e ax
+
+       Let f(D) = a 0 D 2 + a1 D + a 2
+                      ax       d    ax        ax          if y = e   , Dy =   e  = ae
+                     dx
+                           2    d 2    ax      2  ax
+          D y =     2 e  = a e                     dx
+                                                       ax                                                                   ax                f ( D ) y = a 0 (a                                   2 e ax ) + a1 (ae                                              ) + a 2 e
+                                                    ax            = (a 0 a                                2 + a1 a + a 2 )e
+                                         ax                  f ( D )e                          ax =  f (a )e
+              or f(D) = f(a)
+
+
+ii. Now consider the equation
+              d 2 y     dy             ax
+            a 0     2 + a1   + a 2 = e               dx      dx
+                                                       ax       or        (a 0 D                            2 + a1 D + a 2 ) y = e
+       or                   f(D)y = eax                             (2)
+
+The particular integral of (2) is written as
+
+            e ax
+       y =                 [Dividing by f(D)]
+                 f (D )
+           e ax
+       y =                        if  f ( a ) ≠ 0
+                 f (a )
+
+hence the result.
+
+If f(a) = 0, we must use a different method (See example 3)
+
+
+Example 1
+
+       Solve (D2 – 5D + 6)y = e4x
+
+Solution
+       Let (D2 – 5D + 6)y = e4x
+
+The characteristic equation is
+     m2 – 5m + 6 = 0
+
+--- Page 63 ---
+Or   (m – 3)(m – 2) = 0
+
+Then m1 = 3 and m2 = 2
+
+Hence the complementary function is
+           y = c1e 3 x + c 2 e 2 x
+                                     e 4 x        e 4 x        e 4 x
+A particular integral of the equation is y =     =    2       =                                                           f ( D )  D − 5 D + 6     f ( 4 )
+             e 4 x      e 4 x
+Then y =         =
+        16 − 20 + 6   2
+                                                                          3 x         2 x   e 4 x
+Hence the general solution of the equation is y = c 1 e  + c 2 e  +
+                                                      2
+
+Example 2
+       Solve (D + 2)(D + 3)(D – 4)y = e5x
+
+Solution
+       Let (D + 2)(D + 3)(D – 4)y = e5x                                            (1)
+The characteristic equation of (1) is (m + 2)(m + 3)(m – 4) = 0
+
+Then m1 = -2, m2 = -3, m3 = 4. The complementary function is
+       y = c 1 e − 2 x + c 2 e − 3 x + c 3 e 4 x
+                                  e 4 x            e 5 x
+A particular integral is given by y =     =
+                                                      f ( D )   ( D + 2 )( D + 3 )( D − 4 )
+Using the short method
+                                  e 4 x          e 5 x
+                              y =    =
+                                                       f (5 )   (5 + 2 )(5 + 3 )(5 − 4 )
+                                         e 5 x
+                               =
+                                             1.8.7
+                                         e 5 x
+                               =
+                                    56
+Hence the general solution is
+                          − 2 x        − 3 x         4 x   e 5 x
+            y = c1 e   + c 2 e   + c 3 e  +
+                                   56
+Example 3
+Solve (D2 – 5D + 6)y = e3x
+
+Solution
+Let (D2 – 5D + 6)y = e3x
+Or    (D – 3)(D – 2)y = e3x
+
+--- Page 64 ---
+The characteristic equation is (D – 3)(D – 2) = 0 whose roots are m1 = 3, m2 = 2.
+
+Hence the complementary function is
+            y = c1e3x + c2e2x
+                               e 3 x        e 3 x
+the particular integral is y =           =
+                                   ( D − 3 )( D − 2 )   0
+[f(a) = 0 since the nonhomogeneous term e3x is already in the complementary function
+c1e3x] Hence the short method does not apply. However we may write
+                      1     1     3 x              y =             e
+                     D − 3  D − 2
+                 1   e 3 x
+             =
+           D − 3 3 − 2
+                 1     3 x             =      e
+           D − 3
+                     e − 3 x .e 3 x dx             = e 3 x ∫
+           1     αx    −αx                         e  Qdx )(Note that:    Q = e  ∫       D − α
+                       dx               = e 3 x ∫
+               = xe 3 x
+
+Hence the general solution of the equation is
+      y = c1e 3 x + c 2 e 2 x + c3 xe 3 x
+
+Example 4
+Solve (D – 2)2y = 5e3x + 4e2x
+
+Solution
+The characteristic equation is (m – 2)2 = 0. Hence m1 = 2 and m2 = 2 (repeated)
+
+Hence the complementary function is y = c1e 2 x + c 2 xe 2 x
+
+                    5e 3 x + 4e 2 x
+A particular integral is y =             2                                ( D − 2 )
+
+One particular integral corresponding to 5e3x is given by
+
+--- Page 65 ---
+5e3x    5e3 x
+      y1 =         2 =        2               ( D − 2)   3( − )2
+       5e3x
+     =
+       12
+     = 5e3x
+
+The particular integral corresponding to 4e2x is given by
+      4e 2 x    4e 2 x
+ y 2 =           2 =       ( D − 2 )    0
+Hence the short method doesn’t apply however
+                  4 e 2 x
+            y 2 =                      ( D − 2 )( D − 2 )
+                1     1       2 x            =           4e
+          D − 2  D − 2          
+                1      2 x    − 2 x     2 x           =        [e   e   4.e  dx ]                          ∫          D − 2
+                1      2 x           =        [e  4. dx ]                            ∫          D − 2
+                1         2 x           =        [4 xe  ]
+          D − 2
+                4        2 x           =        [xe  ]
+          D − 2
+                     e − 2 x . xe 2 x dx           = .4e 2 x ∫
+                     xdx           = 4e 2 x ∫
+                           2 x x 2           = 4e   .
+                   2
+           = 2 x 2 e 2 x
+
+Hence the general solution is y 2 = c1e 2 x + c 2 xe 2 x + 5e 3 x + 2 x 2 e 2 x
+
+Formula
+          e ax      e ax     x r e ax
+         If     =              r =                f ( D )    ( D − a )      r!
+       4e 2 x    4 x 2   ax            =    eHence           2        ( D − 2)     !2
+
+--- Page 66 ---
+Example 5
+Solve the equation (D – 1)(D + 3)(D – 5)y = cosh x
+
+
+Solution
+                            e x + e − x
+Let (D – 1)(D + 3)(D – 5)y =
+                           2
+The complementary function is y = c1e x + c 2 e −3 x + c3 e 5 x
+
+                                        xe
+A particular integral corresponding to      is given by
+                                2
+                          e x
+              y =
+                2 ( D − 1)( D + 3)( D − 5)
+                  1         e x      
+             =
+                2( D − )1  1( + 3)(1 − 5) 
+                  1     e x  
+             =                                              2( D − )1 − 16                                  
+                 1     x    − x   x                         e   .e dx             =     e ∫              − 32
+                 1      x             = −   xe
+                 32
+                                         e− x
+The particular integral corresponding to       is given by
+                                  2
+                          e − x
+              y =
+                2( D − 1)( D + 3)( D − 5)
+                           e − x
+             =
+                2( −1 − 1)( −1 + 3)( −1 − 5)
+                 e − x
+             =
+                48
+Hence the general solution of the equation is
+                                 x       − 3 x        5 x  e − x   1      x
+             y = c1e + c2 e  + c3 e  +   −   xe
+                                48  32
+
+
+
+7.4 Non homogeneous term is of the form sin(ax + b)
+Theorem 2
+         d 2 y    dy
+      a 0     2 + a1   + a 2 y = sin( ax + b )         dx     dx
+
+--- Page 67 ---
+or     (a0D2 + a1D + a2)y = sin(ax + b)
+or                 f(D)y = sin (ax + b)
+
+         sin( ax + b )   sin( ax + b )                   2
+is             =           2           if  f ( −a ) ≠ 0                f ( D )           f ( − a )
+        (or replace D2 by –a2)
+
+Proof
+Suppose y = sin(ax + b)
+   2  d 2 y        2D =    = − a  sin( ax + b )
+     dx 2
+Then f(D2) = f(-a2)sin (ax + b)
+        1               1
+Hence        2 sin( ax + b ) =         2 sin( ax + b ) if f(-a2) = 0            f (D  )                    f (− a  )
+Note that D2 is replaced by –a2.
+
+In the same way,
+            1                cos( ax + b )
+                   cos( ax + b ) =                        2                                                       2                   f (D                       )                       f (− a                                                   )
+
+                    if f(-a2) = 0
+
+Example 6
+Solve (D2 + 9)y = sin 5x
+
+The characteristic equation is m2 + 9 = 0 whose roots are m1 = 3i, m2 = -3i
+The complementary function is
+Yc = c1cos3x + c2sin3x.
+
+A particular integral is
+                     sin 5 x    sin 5 x
+              y p =       2 =    2                              f (D  )  D + 9
+                                sin 5 x
+                    =       2                     − (5 ) + 9
+                              sin 5 x
+                    =
+                      − 16
+                                            1
+Hence the general solution is y = c1 cos 3 x + c 2 sin 3 x −   sin 5 x
+                                            16
+
+Example 7
+Solve the equation (D2 + 3D – 10)y = sin 2x
+
+--- Page 68 ---
+Solution
+Let (D2 + 3D – 10)y = sin 2x
+The characteristic equation is (m2 + 3D – 10) = 0 or (m – 2)(m + 5) = 0, Hence m1 = 2
+and m2 = -5
+
+The complementary function is y = c1e2x + c2e-5x
+The particular integral corresponding to sin 2x is given by
+        sin 2 x                              sin ax
+ y =    2                 . This is of the form y =        2   D + 3 D − 10                                      f ( D )
+Here, only D2 can be replaced by –22 = -4. Then
+                        sin 2 x       sin 2 x
+              y =          =
+              − 4 + 3 D − 10  3 D − 14
+                    1  sin 2 x
+                 =
+                    3    14 
+                                                         D − 3  
+                                  14                 D +     sin 2 x                    1        3                   =
+                    3    14     14 
+                                                         D − 3   D + 3  
+                               14                 D −     sin 2 x                    1     3                   =                    2
+                    3      2    14 
+                D −  3  
+                               14                 D −     sin 2 x                    1     3                   =
+                    3       196                      − 4 −
+                             9
+                        9       d       14                        =                  sin 2 x +   sin 2 x
+                    3(− 36 − 196 )  dx       3              
+                      3           14                        =        2 cos 2 x +   sin 2 x 
+                  − 232          3       
+                      3          7
+                 =      cos 2 x −       sin 2 x
+                  − 116       − 116
+
+7.5 Non-homogeneous term is of the form xn
+Theorem 3
+The particular integral of
+                 d 2 y     dy                n
+            = a 0     2 + a1   + a 2 y = x                  dx      dx
+ or           (a0D2 + a1D + a2)y = xn
+ or          f(D)y = xn
+
+--- Page 69 ---
+is now
+            x n              −1  n       y =     = [ f ( D ) ] x
+                  f ( D )
+      = [a 2 + a1 D + a 0 D 2 ]−1 x n
+                                       −1
+               −1    a1 D  a 0 D 2     n      = a 2  1 +    +        x                                            a 2    a 2    
+                                          −1
+               −1     a1 D  a0 D 2      n
+      = a 2  1 +     +                x
+                  a 2    a 2   
+
+      Using Binomial theorem: (1 + x)-1 = 1 – x + 2x2 - …
+            a1 D  a 0 D 2     
+      1 +     +     + ...  is expanded up to the term Dn and operate on xn            a 2    a 2      
+
+Example 8
+       Solve (2D2 + 2D + 3)y = x2
+
+Solution
+       Let (D2 + D + 3)y = x2
+
+The characteristic equation is 2m2 + 2m + 3 = 0 whose roots are
+                           4 − 4( 2)(3)
+             m = − 2 ±
+                             2( 2)
+                         1 − 16                       i 5          1    i 5
+                 = − 1 ±         or m1 = − 1 +     or m2 = −  −
+                          2                2           2   2
+Hence the complementary function is
+                                        1
+                                   −                                              x       5         5                                         2                                             1 cos    x + c 2 sin                              y = e       c                                      2         2 
+
+and a particular integral is
+                           1           2
+                     y =      2         x                      2 D + 2 D + 3
+Since the power of x is 2, we need up to the term D2 only.
+                 x 2
+Then  y =
+                2    2 D 2 
+         3 1 + D +                           3     3  
+                                     − 1
+          1    2 D  2 D 2     2
+Or     y =      1 +   +             x          3     3    3  
+
+--- Page 70 ---
+                    2 D  2 D 2     
+                                  2       +                    1                    2 D                    2 D  
+        =                 +               1 −                       +  3    3   − ... x                                                                                           2
+          3     3    3            !2                                                                               
+                            2 D 2     
+          1    2 D  2 D 2    3        2        =   1 −   −    +    + ... x
+          3    3    3      !2      
+                                         
+          1    2 D  2 D 2  4 D 2       2        =   1 −   −    +    + ... x
+          3    3    3    18           
+
+              1   2  2 dx 2   2 dx 2            =   x −    .   −
+              3     3  dx   27 dx  
+              1   2  2     2               =   x −  2. x −    ( 2)
+              3     3     27       
+              1   2  4    4           =  x −  x −      .
+              3    9   27
+the general solution is
+          1
+        −             x       5        5  1   2  4    4           2               1 cos   + c 2 sin   +  x −  x −        y = e       c               2        2   3    9   27 
+
+
+
+7.6 Nonhomogeneous term is of the form eaxu where u is a function of x.
+Theorem 4
+
+The particular integral of
+             (a0D2 + a1D + a2)y = eaxu
+      or     f(D)y = eaxu
+                e ax        ax    u     is given by y =     = e   .
+                        f ( D )              f ( D + a ) 
+
+Proof
+Suppose  y = e ax u
+                        ax          ax du     Dy = ae u + = e
+                       dx
+           = e ax ( au + Du )
+           = e ax ( D + a )u
+     D 2 y = ae ax ( D + a )u + e ax D ( D + a )u
+
+--- Page 71 ---
+= eax ( D + a 2) u
+         ( D ) e ax u = e ax ( D + a 2) u
+
+
+                              vLet v = f ( D + a )u  then u =                   F ( D + a )
+                    ax     v           axHence  f ( D ) e   .       = e v
+                         f ( D + a )
+       1     ax     1             ax    1      Then      e v =            f ( D ) e   .         v
+          f ( D )           f ( D )               f ( D + a )   
+                        eax
+           =
+            F ( D + a )
+
+Example 9
+Solve (D – 4)y = e3xx2
+
+Solution
+                   1     ax       ax    1We use the formula      e u = e              for finding a particular integral. The                                f ( D )               f ( D + a )u
+complementary function is y = c1e 2 x + c 2 e −2 x (you work out)
+
+A particular integral is given by
+               x 2 e 3 x       3 x     x 2     
+          y1 =    2   = e            2             D − 4                              ( D + 3 ) − 4 
+                                    3 x      x 2     
+                 = e       2                                                           D + 6 D + 5 
+                                              
+                                              
+                                    3 x       1          2                 = e                  x
+                                 6 D  D 2  
+                              5 1 +   +                                            5    5  
+                                                      −1
+                       e 3 x    6 D  D 2     2                 =    1 +   +      x
+                     5      5    5  
+
+--- Page 72 ---
+e 3 x    6 D  31   2   2                 =    1 −   +  D  x
+                     5      5   25       
+                       e 3 x   2  6     31                   =     x −  2. x +    2.
+                     5       5     25     
+                                    3 x  x 2  12 x   62                  = e     −   +
+                        5   25  125                                                                                          
+                                          2 x       − 2 x     3 x  x 2  12 x   62 
+The general solution is y = c1e  + c 2 e  + e       −   +                                                          5   25  125 
+
+
+7.7 Nonhomogeneous term is of the form xu where u is a function of x.
+Theorem 5
+The particular integral of (a0D2 + a1D + a2)y = xu
+Or f(D)y = xu (where u is a function of x) then the particular integral of f(D)y = xu is
+                  xu       1           f ′( D )
+              y =     = x     u −          2 u                             f ( D )       f ( D )     [ f ( D ) ]
+Consider (a0D2 + a1D + a2)y = xu or f(D)y = xu
+                               xu
+Then the particular integral is y =
+                                                   f (D )
+             Let
+                            y = xu
+                            y ′ = xu ′ + u
+                            y ′′ = xu ′′ + u ′ + u ′
+                        = xu ′′ + 2u ′
+            f ( D ) xu = xf ( D ) + F ′( D )u
+                      1
+let v = f ( D )u , then u =      v
+                                     f ( D )
+              1             1            1Hence  f ( D ). x.      v = xf ( D ).      v + f ′( D )      v
+                       f ( D )                 f ( D )                f ( D )
+
+                  1            1 or     xv = f ( D ). x.      v − f ′( D )      v
+                               f ( D )                f ( D )
+        xu       1       1         1 or        = x.     u −          f ′( D ).     u
+            f ( D )        f ( D )       f ( D )            f ( D )
+                1           f ′( D )
+          = x     u −          2 u                          f ( D )     [ f ( D ) ]
+
+--- Page 73 ---
+Theorem 5
+The particular integral of ( ao D 2 + a1 D + a 2 ) y = xu or f (D) = xu (where u is a
+                  xu       1           f ′( D )
+function of x) is y =     = x.     u −          2 u                             f ( D )        f ( D )     [ f ( D ) ]
+
+Example 10
+Solve (D2 – 1)y = xe3x.
+
+Solution
+Let (D2 – 1)y = x.e3x                                        (1)
+
+The characteristic equation is m2 - 1 = 0 whose roots are m1 = 1, m2 = -1. Hence the
+complementary function is
+                  y = c1ex + c2e-x.
+A particular integral is given by
+                          xe 3 x
+                     y1 = (D 2 − 1)                         (2)
+We use the formula:
+The particular integral of
+                          xv
+                     y1 =         is
+                                         f ( D )
+                                v         f ′( D )
+                     y1 = x      −          2 v                                                             f ( D )    [ f ( D ) ]
+then from(2) we have
+                              e 3 x      2 D.e 3 x
+                   y1 = x      2    −     2      2                                                        ( D − )1    ( D − )1
+                        e 3 x       e 3 x 
+                 = x.   − 2 D
+                      8               64 
+                        e 3 x   2      3 x                 = x   −    (3e  )
+                      8   64
+                                                          x       − x   xe 3 x   3   3 x
+Hence the general solution is y1 = c1e + c 2 e  +    −   e
+                                        8   32
+
+
+    Exercise 7
+Solve the following equations:
+            1.  (D2 + D + 1)y = e2x
+            2.  (D2 – 1)y = ex
+            3.  (D4 – 1)y = sin 2x
+            4.  (D2 + 4D + 4) = 2sin 2x ( you may use: 2sin 2x = e2x – e-2x)
+            5.  (D2 + 4)y = cos 2x + cos 4x
+
+--- Page 74 ---
+6.  (D2 – 1)y = x2
+            d 2 y    dy                      2
+            7.       2 − 2   + 3 y = cos x + x             dx     dx
+            d 2 y          − x               3
+            8.       2 + y = e  + cos x + x             dx
+            9.  (D2 – 2D + 1)y = x2e3x
+            d 2 y             2  3 x      x
+           10.     2 + 2 y = x e  + e cos 2 x             dx
+            d 2 y           2
+           11.     2 − y = x cos x             dx
+            d 2 y    dy
+           12.     2 − 2   + y = x sin x             dx     dx
+
+Summary
+You have learnt the following from this lesson.
+
+Particular integrals for the following:
+              1      ax     (i)     y =      e   when  f ( a ) ≠ 0 and  f ( a ) = 0
+                       f ( D )
+                 1                1                                     2
+     (ii)     a. y =        2  sin( ax + b ) =         2  sin( ax + b ) when f ( − a ) ≠ 0                           f ( D )                    f ( − a )
+                 1                1                                     2
+            b. y =        2  cos( ax + b ) =         2  cos( ax + b ) when f ( − a ) ≠ 0                           f ( D )                     f ( − a )
+              1      n                             −1     (iii)    y =      x  by expanding [ f ( D ) ]  up to Dn and operate
+                       f ( D )
+                1      ax       ax    1          (iv)    a. y =      e u = e          u
+                           f ( D )                      f ( D + a )    
+                1            1          f ′( D )
+            b. y =      xu = x      u −          2 u when u is a function of x.                           f ( D )                f ( D )       [ f ( D ) ]
+
+Further Reading
+    1.  Differential Equations
+     By Frank Ayres J.R Ph.D
+      Schaum’s outline series
+     McGraw – Hill Book Company
+     New Yolk. Toronto – Sydney
+
+    2.  Differential equations
+     By Dr. D. Sengottaiyan Ph.D
+      Oxford publications
+      Harrow – London-Nairobi.
+
+--- Page 75 ---

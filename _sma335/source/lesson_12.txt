@@ -1,0 +1,552 @@
+LESSON 12
+  Power series solutions of First and Second order Equations
+
+12.1 Introduction
+You have learnt from the previous lesson that power series solutions need not exist for all
+the differential equations and the nature of power series is different at ordinary points and
+singular points of the equation.
+
+In this lesson we shall find the power series solutions for the First and Second order
+equations if the conditions for the existence of power series solutions are satisfied.
+
+12.2 Objectives of the lesson
+By the end of this lesson you should be able to:
+   •  obtain the power series solutions of first and second order equations with variable
+        coefficients when the conditions for the existence of power series solution are
+        satisfied.
+
+12.3 Power series solution of the first order equation.
+                                         dy
+    The solution of the first order equation of the form.    =  f ( x , y ) exists and is
+                                         dx
+
+     unique if and only if the following three conditions are satisfied.
+
+     i).     f (x, y) is continuous and single valued in a domain D of the x y – plane.
+
+    ii).     f (x, y) is bounded or   f ( x , y ) ≤ M where M is the definite constant.  In other
+
+        words f (x, y) does not tend to infinity in the domain D.
+        ∂
+   iii).           f ( x , y ) exists and continuous at all points in the domain D.
+        ∂y
+
+         If f (x, y) satisfies all the three conditions the solution of the equation exists.
+
+Example 1
+                                         dy
+a). Obtain the power series solution of the same equation,   = y in ascending powers
+                                         dx
+    of x.
+                dy
+b). Solve the equation   = y using the method of separation of variables.
+                dx
+c). Verify that the two solutions are equivalent.
+
+Solution
+      dy                  dy
+a). Let   = y This is of the form   =  f ( x , y )                              (1)
+      dx                  dx
+
+--- Page 127 ---
+i).  Now f (x, y) is a polynomial and hence continuous and single valued in the whole
+       of x y plane as the domain.
+ ii).   Also it is bounded, since it is a polynomial.
+       ∂                                    dyiii).           f ( x , y ) = ∂y = 1 which exists. Then    = y has a power series solution of
+       ∂y         ∂y                        dx
+      the form.
+    y = c0 + c1 x + c2 x2 + c3 x3 + …………….                            (2)
+
+
+               ∞
+     Let y =          C nx n     ∑
+                    n =0
+               ∞
+            nC nx n −1         y1 = ∑
+                    n = 0
+    Substitution of y and y1 in the given equation
+       ∞             ∞
+              C nx 2  ∑      nC nx n −1 = ∑
+        n = 0                n =0
+     or c1 x0 + 2c2 x + 3c3 x2 + …….. = c0 x0 +c1x +c2 x2 + c3 x3 + ……….(3)
+     Equating coefficient of xr on both sides of (3)
+       (r + 1) cr+1 = cr…………..                                             (4)
+     Equation (4) is called the recurrence relation between the coefficients. From (4)
+
+     Let
+       r = 0, c1 = c0
+                          c1   c0       r = 1, 2 c2 = c1 or c2 =   =
+                       2   2
+                          c2   c0       r = 2, 3c3 = c2 or c3 =   =
+                       3   6
+                          c3   c0       r = 3, 4c4 = c3 or c4 =   =
+                       4   24
+
+   Now y = c0 + c1 x + c2 x 2 + c3 x 3 + c4 x 4 + .................... ....
+                       c0   2   c0   3   c0   4    Then y = c0 + c0 x +   x +   x +   x + ........................
+                     2     6     24
+                       x 2   x 3   x 4
+         y = c0 1[ + x +   +   +   + .......................]
+                     2   6   24
+                 x   x 2   x 3   x 4
+     or   y = c1[ +  +   +   +   + .......................]
+                       !1   !2    !3    !4
+
+b). Let us solve the same equation using method of separation of variables.
+      dy
+   Let   = y
+      dx
+
+--- Page 128 ---
+dy
+        = dx   Then
+        y
+       dy
+             dx      ∫   = ∫        y
+    In Ay = x or Ay = ex
+   y = c ex
+            x   x 2   x 3   x 4
+   y = c1[ +  +   +   +   + .......................]
+                !1   !2    !3   !4
+
+c). Hence the two solutions are equivalent Generally power series solution is obtained
+
+   only when it is difficult or impossible to solve the given equation and find elementary
+
+    functions as solution.
+
+
+12.4 Power series solution of second order Equations
+
+Method of obtaining the solution for the equation
+        d 2 y       dy
+    a0 ( x )    2 + a1 ( x )   + a 2 ( x ) y = 0                                   (1)         dx        dx
+     Before we assume a power series solution for the equation (1) we should check for
+
+     he singular points of the equation and confirm that the equation has a power series
+
+      solution such as
+
+                     ∞
+          ∞                          n + r
+    y =           n              C n x                                                 (2)        C nx  or y = ∑    ∑
+              n =0               n = 0
+
+       If the power series solution exists we assume the solution in any of the form in (2)
+     Next we find y1 and y11 from (2) and substitute in the given equation (1).
+
+     Since the resulting equation is identically equal to zero we equate the coefficient of
+      xr to zero and establish the recurrence relation between the coefficients from which
+
+    we find all the constants in term of co…………….
+
+Hence the expression for the solution y is obtained.
+
+    The method of solving the equation is illustrated in the following examples.
+
+--- Page 129 ---
+12.5 Power series solution at an ordinary point of the second order equation.
+
+Example 2
+
+a). Show that x = 0 is an ordinary point for the equation
+           2    d 2 y     dy       ( x − )1    + 3 x   + xy = 0
+           dx 2     dx
+b). Find the power series solution for the equation given in (a)
+
+Solution
+                                                    2    d 2 y     dy
+The normalized form of the equation ( x − )1     2 + 3 x   + xy = 0               (1)                                     dx      dx
+       d 2 y   3 x  dy    x
+       is      2 +   2     +   2    y = 0       dx    x − 1 dx   x − 1
+
+the singular points of the equation are obtained by solving x2 – 1= 0 or (x + 1) (x – 1) = 0
+
+and x = - 1 and x = 1 are the only singular points of the equation and all other points are
+
+ordinary points. Then x = 0 is an ordinary point for the equation (1)
+
+From  the existence theorem given in (10.8) two linearly independent power series
+solutions at x = 0 exist.
+They are in the form of
+          ∞
+     y =   ∑           c nx n .                  c0 ≠ 0                 (2)
+             n = 0
+6). Let the power series solution of (1) be
+
+
+          ∞
+     y =   c nx n .   ∑
+             n = 0
+         ∞
+    y′ =  nc  n−1              nx                                                                                     (3)       =∑n 0
+
+           ∞
+     y′′ =   n ( n − )1 c nx n − 2                                               (4)        =∑n 0
+
+       Substituting the series (2), (3) and (4) into the equation
+
+--- Page 130 ---
+(x2 - 1)y′′ + 3 xy ′ + xy = ,0   we have
+
+             ∞                   ∞            ∞
+       ( x 2 - 1)   n(n - 1)c n x n − 2 + 3 x   nc n x n −1 + x   c n x n = 0     ∑       ∑    ∑
+                  n - 0                         n − 0               n − 0
+
+
+          ∞                 ∞                   ∞            ∞
+     x 2                                                       nc n x n = 0   ∑           n(n - 1)c n x n − 2 − 1∑                         n ( n − )1c n x n − 2 + 3 x ∑                                            nc n x n −1 + x ∑
+              0                       n − 0                          0                  0
+
+        ∞             ∞               ∞         ∞
+         n(n-1)cn x n −                   n(n −)1cn xn−2 +                                3ncn xn +                                              cn x n−1 = 0       or ∑        ∑              ∑                  ∑
+           0                  0                     0             0
+
+
+          ∞                          ∞           ∞
+                                              n +            n(n - 1) c n + 3 nc n }x                                          n ( n − 1) c n x n − 2 = 0       or ∑ {              ∑                                     c n x n − 1 − ∑
+              0                                     0                0
+        ∞              ∞         ∞
+        n(n − )2cn x n +                        cn x n +1 −                             n(n − )1cn x n − 2 = 0    (5)`      or ∑         ∑             ∑
+           0                     0             0
+In (5) there are three infinite series
+      The coefficient of xr
+
+              In the first series is r(r + 2) cr when n = r,
+              In the second series is cr-1         when n = r - 1
+              In the third series is –(r + 2)(r +1) cr + 2 when n = r + 2
+Thus the coefficient of xr in the left side of (5) is
+
+
+         r(r + 2)cr + cr – 1 – (r + 2)(r + 1)cr + 2 = 0                                     (6)
+
+Since the equation is identically zero.
+
+From the equation (6)
+
+                   r ( r + 2 ) c r + c r −1           c r − 2 =                                                              (7)                         (r + 1)( r + 2 )
+equation (7) is the recurrence relation between the coefficients.
+
+                   0 + −c1Let r = 0 in (7)      c 2 =      = 0
+                     2
+
+--- Page 131 ---
+3c1 + c0Let r = 1 in (7)      c3 =      =
+                     6
+                    8c 2 + c1   c1Let r = 2 in (7)      c 4 =      =     since c2 = 0.
+                      12    12
+                   15c3 + c2  15(3c1 + c0 )  3c1  c0Let y = 3 in (7)      c5 =       =         =   +
+                     20       120     8   8
+
+Substituting the values of C0, C1, C2, C3, C4, C5 in (1) we have
+
+y = c0 + c1 x + c2 x2 + c3 x3 + c4 x4 + c5 x5 + ...
+                1   c0  3  c1   4   3c1  c0  5y = c0 + c1 x + 0 +   c1 +   x +   x +   +    x + ....
+                2   6    12     8   8 
+       1  3  1  5        1  3  1  4  3  5   
+y = c0 1+  x +  x +... + c1 x +  x +  x +  x +...                  (8)
+       6   8           2   12   8      
+
+equation (8) gives the general power series solution of the given equation. The solution
+
+has two independent constants C0 and C1
+
+
+12.6Power series solution at a regular singular point.
+Example 3
+    a. Show that the equation
+     2 x 2 y ′′ − xy ′ + 1( − x 2 ) y = 0                                             (1)
+
+       has a regular singular point at x = 0
+
+    b. What will be the nature of the power series solution of the equation (1)
+
+    c.  Solve the equation (1) in ascending powers of x.
+
+
+Solution
+a.     Let 2 x 2 y′′ − xy′ + 1( − x 2 ) y = 0
+
+         1    1 − x 2
+Then y ′′ −    y ′ +      2  y = 0        2 x     2 x
+Hence x = 0 is a singular point.
+This is of the form y ′′ + p 1 y ′ + p 2 y = 0
+
+--- Page 132 ---
+1         1 − x 2
+where p1 = −    and p 2 =      2          2 x         2 x
+                − 1   − 1
+           xp1 ( x ) = x      =    which is analytic
+                         2 x    2
+                 − 1   − 1
+            xp1 ( x ) = x      =    which is also analytic
+                          2 x    2
+   Hence x = 0is a regular singular point.
+
+
+b.    By existence the theorem there exists at least one non-trivial solution of the form
+          ∞
+     y =    ∑            c n x n + r where c0 ≠ o and y is a non – negative constant to be
+              n = 0
+   found.
+
+c.    To solve the equation
+        ∞
+   y =Let          c n x n + r                                                   (2)   ∑
+            0
+          ∞
+    y 1 =Then                ( n + r ) c n x n + r                                    (3)    ∑
+               0
+         ∞
+   y 1 =and               ( n + r )( n + r − )1 c n x n + r − 2                   (4)   ∑
+             0
+
+substituting these values of y, y1 and y11 in 2x2 y11 – x y1 + (1 – x2) y = 0, we have
+     ∞                                ∞                           ∞
+2 x 2                                                                c n x n + r = 0  ∑          ( n + r )( n + r − )1 c n x n + r − 2 − x ∑                                      c n ( n + r ) n + r − 1 + 1( − x 2 ) ∑
+        0                                              0                                      0
+
+or
+   ∞                          ∞                 ∞           ∞
+2      ( n + r )( n + r − )1 x n + r −                                                          c n x n + r + 2 = 0 ∑           ∑                              c n ( n + r ) n + r + ∑                                               c n x n + r − ∑
+    0                                     0                         0                0
+
+Combining the first three series together
+ ∞                                            ∞
+                                                         n + r =    2 ( n + r )( n + r − )1 − ( n + r ) + 1]c n x                                              c n x n + r + 2∑ [                  ∑
+  0                                                                0
+or
+
+--- Page 133 ---
+∞                                              ∞
+                                                           n + r =     ( 2 n + 2 r )( n + r − )1 − ( n + r − )1 ]c n x                                               c n x n + r + 2∑ [                  ∑
+  0                                                                  0
+
+   ∞                                   ∞
+      ( n + r − 1)( 2 n + 2 r − )1 c n x n + r =                                      c n x n + r + 2        (5)or ∑               ∑
+    0                                                  0
+
+This is an identity and the coefficient of xr (the smallest power of x ) on both sides should
+be equal.
+
+In the left side the coefficient of xr is obtained when n = 0 and it is (r-1) (2r – 1). In the
+right side the coefficient of xr is zero since the lowest power of x is xr+2.
+
+Hence (r – 1) (2r – 1) = 0
+
+This equation is called the indical equation in r.
+
+From the indical equation we get r = 1 or r = ½.
+
+To obtain the recurrence relation
+Equating the coefficient of xn + r on both sides of (5)
+
+(n + r – 1) (2n + 2r – 1) cn = cn – 2
+                       cn − 2Hence cn =
+               ( n + r − 1)( 2 n + 2 r − )1
+This is the recurrence relation between the constants c0, c1, c2 ………..
+                             c−1Let n = 1, in (b) c1 =                 = 0 since c-1 = 0
+                           ( n + r − 1)( 2 n + 2 r − )1
+
+                   c0Let n = 2, c2 =
+                   ( r + 1)( 2 r + )3
+                    c1Let n = 3, c3 =            = 0 since c1 = 0
+                   ( 2 + r )(5 + 2 r )
+
+                    c2                    c0Let n = 4, c4 =            =
+                   ( r + 3)( 2 r + 5)    ( r + 1)( r + 3)( 2 r + 3)( 2 r + 5)
+
+                    c3Let n = 3, c5 =            = 0
+                   ( r + 4)(9 + 2 r )
+Substitution of these values in
+ y = c o x r + c 1 x r + 1 + c 2 x r + 2 + c 3 x r + 3 + c 4 x r + 4 + ...
+
+--- Page 134 ---
+c0 x 2              3             c0 x 4= xr ( c0 + 0 x +           + 0 x +
+                  ( r + 1)( 2 r + 3)          ( r + 1)( r + 3)( 2 r + 3)( 2 r + 5)
+
+          r         x 2                   x 4
+= c0 x 1[ +           +                     + ...]
+             ( r + 1)( 2 r + 3)   ( r + 1)( r + 3)( 2 r + 3)( 2 r + 5)
+
+
+Putting r = 1 and r = ½
+
+           x 2      x 4
+ y = Ax 1[ +    +       + ...]
+           4.2   9.5.4.2
+
+               1    x 2     x 4
+and y = Bx 2 1[ +   +      + ...]
+                3.2   7.4.3.2
+
+Hence the general solution is
+
+
+                                                  1
+                                      x 2     x 4          x 2     x 4                                                  2 y = Ax1[ +   +      + ...] + y = Bx  1[ +   +      + ...]
+           5.2   9.5.4.2                    3.2   7.4.3.2
+
+where A and B are arbitrary constants.
+
+12.7Power series solutions of nonhomogeneous second order equations
+Consider the nonhomogeneous second order equation
+
+     d 2 y       dy
+a0 ( x )    2 + a1 ( x )   + a 2 ( x ) y =  f ( x )     dx        dx
+we shall test the corresponding homogeneous part
+
+     d 2 y       dy
+a 0 ( x )    2 + a1 ( x )   + a 2 ( x ) y = 0     dx        dx
+
+for singular points and apply the existence theorem for the power series solution. The
+method of solving  the non-homogeneous equation  is  similar  to  the homogeneous
+equations.  The method of finding power series solutions of (1) is illustrated in the
+following example.
+
+Example 4
+Solve the equation y ′′ − y = x at x = 0.                                 (1)
+
+--- Page 135 ---
+Solution
+It is verified that x = 0 is an ordinary point of the equation. Let the power series solution
+of (1) be
+
+                      ∞
+                 y =                       c nx n                                       (2)        ∑
+                                0
+            Then
+                       ∞
+                 y ′ =                      nc nx n −1                                   (3)         ∑
+                                 0
+                       ∞
+                 y ′′ =                     n ( n − )1c nx n − 2                         (4)         ∑
+                                 0
+Substituting the values of y, y/ and y// in (1)
+
+ ∞                 ∞
+   n ( n − )1c n x n − 2 −   c n x n = x∑      ∑
+  0                         0
+
+coefficient of xr in the first series is obtained when nn-2 = xr or when n = r + 2. Then
+
+                                                                                 rcr + 2 ( r + 2)( r + )1 is the coefficient of x on the second series the term containing xr
+is obtained using xn = xr or when n=r.  Then cr is the coefficient of xr.  Thus the
+coefficient of xr in the left side is c r + 2 ( r + 2)( r + )1 − c r .
+
+The coefficient of xr on the right side is zero except when r = 1.
+                        c1 + 1When r = 1, 6c3 − c1 = ,1 c3 =
+                       6
+               c rThen c r + 2 =                except when r = 1.              ( r + 1)( r + 2 )
+
+           c0If r = ,0 c 2 =
+           2
+           c1+1If r = ,1 c3 =
+           6
+            c 2   c0If r = ,2 c 4 =   =
+          12  24
+           c3   c1+1If r = ,3 c5 =   =
+          20  120
+
+--- Page 136 ---
+c 4    c0If r = ,4 c6 =   =
+           30  720
+Substituting the values of c1 , c 2 , c3 , c 4 c5 ...c 6 in (1)
+            c0   2  c1+1   3   c0   4  c1+1   5   c0    6 y = c0 + c1 x +   x +    x +   x +    x +    x + ...
+           2     3     24    120    720
+               x 2   x 4   x 6     
+ y = c 0  1 + c                1 x +   +   +    + ...               2   4   720    
+
+        x 3   x 5     
++ c1  x +   +   + ...         6  120    
+Thus the general solution of the nonhomogeneous equation is obtained.
+
+
+    Exercise 12
+1.     Define the following:
+         a). Analytic function.
+                                          d 2 y     dy
+                                          + p1   + p 2 y = 0        b). Ordinary point and singular point of the equation     2                                            dx      dx
+
+         c). A regular singular point and an irregular singular point.
+2.      State three conditions necessary for the existence of the solution of the equation
+      dy
+       =  f ( x , y )
+      dx
+
+3.      State the theorem for the existence of power series solution for the second order
+
+       equation at
+
+          i). An ordinary point of the equation.
+
+         ii). A regular singular point of the equation.
+
+        iii). An irregular singular point of the equation.
+4.     Solve (1 – xy) y1 – y = 0 in power of x.
+          dy        2
+5.     Solve   = 2 x + 3 y in power of x. Locate and classify the singular points of
+          dx
+       each of the differential equations.
+             2     d 2 y        dy
+6.       ( x − 3 x )     2 + ( x + 2 )   + y = 0              dx         dx
+
+--- Page 137 ---
+4       2     2 d 2 y               dy     2
+7.       ( x − 2 x + x )     2 + 2 ( x − 1)( x + 10 )   + x y = 0                   dx                dx
+8.     3x2 y11 – x y1 + (x-6) y = 0
+
+   Find power series solutions in powers of x of each of the differential equations in
+   problems 9 to 12.
+
+      d 2 y    dy
+9.            2 + x   + y = 0       dx     dx
+      d 2 y    dy        2
+10.          2 + x   + ( 2 x + )1 y = 0       dx     dx
+      d 2 y    dy
+11.          2 + x   + (3 x + 2) y = 0       dx     dx
+             3    d 2 y     2 dy
+12.     ( x + )1    2 + x   + xy = 0             dx      dx
+Find the power series solutions of each of the initial value problems in 13 and 14
+
+      d 2 y    dy
+13.          2 − x   − y = 0        y (0) = 1, y1 (0) = 0       dx     dx
+14.     (x2 + 1) y11 + x y1 +2 x y = 0 y (0) = 2, y1 (0) = 3
+
+Find power series solutions in powers of (x – 1) of each of the differential equations in
+problems 15 and 16
+
+            2 d 2 y    dy
+15.    x      2 + x   + y = 0         dx     dx
+       d 2 y  dy
+16.    x     2 +   + 2 y = 0       y (1) = 2, y1 (1) = 4        dx   dx
+17.   Show that for Legendre’s differential equation
+
+             2 d 2 y     dy    1( − x )            − 2 x   + n ( n + )1 y = 0 , x = 0 is an ordinary point where n is a non                    2          dx      dx
+    negative integer.
+
+                                            d 2 y        dy
+18.    Find the power series solution of the equation. 3 x     2 − ( x − 2)   − 2 y = 0                                               dx         dx
+     near x = 0.
+Summary
+You have learnt the following from this lesson
+
+--- Page 138 ---
+Nature of power series solution near an ordinary point, a regular singular point and an
+irregular singular point.
+
+Solving the first and the second order equation with constant or variable coefficients in a
+power series.
+
+Further Reading
+Differential Equations
+By Shepley L. Ross
+John Wiley and sons
+New York, Toronto, Singapore
+
+Advanced Differential Equations
+By Dr. D. Sengottaiyan
+Oxford Publications,
+Harrow, London, Nairobi.
+
+--- Page 139 ---

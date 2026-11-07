@@ -1,0 +1,573 @@
+LESSON 2
+Equations of First order – Variables Separable and Homogeneous Equations
+
+2.1. Introduction
+There are various methods for solving a first order linear differential equations.  The
+method of “Separation of Variables”  is the most fundamental.   If the differential
+equation is of the form,
+       dy                   f ( x )
+        = F ( x , y ) =
+       dx          g ( y )
+
+we say that the variables are separable and obtain the solution from
+       g(y)dy = f(x)dx
+by integrating both sides
+Hence                              f ( x ) dx       ∫       g ( y ) dy = ∫
+In this method, we must manage to transform the given equation in the form
+       g(y)dy = f(x)dx
+
+so that the variables g(y) and dy are on one side and f(x) and dx on the other side.
+Not all functions F(xy) are separable into the form f(x) dx = g (y) dy.
+
+2.2. Objective of the lesson
+By the end of this lesson you should be able to:
+      i.      solve the first order equation using the method of separation of variables
+      ii.     reduce a homogeneous equation to the variables separable form by using the
+            substitution y = vx and solve the equation.
+                    dy   ax + by + c
+      iii.    Transform   =             into a homogeneous equation of first order and
+                    dx   px + qy + r
+           solve this equation.
+
+2.3. Method of separation of variables
+As mentioned in the introduction, the first order linear equation
+       dx
+        = F ( x , y )
+       dy
+is to be transformed in the form
+       g(y)dy = f(x)dx                                                     (2)
+Only certain problems can be split into this form (2) and in such case we integrate each
+side to obtain the general solution. We put one constant C at the end.
+
+Example 1
+                 dy  2 x 2
+Solve the equation   =    3                 dx   y
+
+Solution
+We can transform the equation.
+
+--- Page 13 ---
+dy  2 x 2
+         =    3  into the form       dx   y
+       y3dy = 2x2dx
+Then             2 x 2 dx      ∫       y 3 dy = ∫
+       y 4   2 x 3
+        =    + C
+       4    3
+       y 4   2 x 3
+or       =    + C
+       4    3
+or     3 y 4 = 8 x 3 + 3 A , is the required solution
+
+Example 2
+      dy   xy 2 + x
+Solve   =     2      dx   yx + y
+
+Solution
+    dy   xy 2 + x
+Let   =     2    dx   yx + y
+We shall try to separate f(y) and dy on one side and f(x) and d(x) on the other side.
+
+
+                                 2          dy   x (1 + y                              )
+           =          2          dx   y (1 + x  )
+
+                                 2                x (1 + y                               )
+          ydy =  (1 + x 2 ) dx
+
+         ydy     x
+                   2 =       2 dx       1 + y   1 + x
+
+         ydy     xdx
+                                                                                     (2)        ∫       2 = ∫       2       1 + y    1 + x
+                                                                        ′
+we can make the integrals in the form of    dx whose integration is ln u. (2) becomes                             u∫                                   u
+      1   ydy   1   xdx
+          ∫       2 =   ∫       2      2  1 + y   2  1 + x
+     1           2   1          2         ln (1 + y  ) =   ln (1 + x  ) + C
+     2          2
+                      2                                     2         ln (1 + y                    ) = ln (1 + x                                  ) + C1 ,   (C1 = 2C)
+Whenever ln appears after integration we always call the constant as ln A and put
+A inside the logarithm to reduce the number of terms.
+                     2                                       2        ln (1 + y                    ) = ln A(1 + x                                    )
+Raising both sides to the base e,
+
+--- Page 14 ---
+2                                                       2                          ln (1+ y                                         )       ln A (1+ x                                                              )            e    = e
+       Then (1 + y2) = A(1 + x2) is the required solution.
+
+2.4. Solving homogeneous differential equation of first order.
+First we shall define a homogeneous equation of first order and then we shall see that the
+homogeneous equation can be solved using the method of separation of variables when
+we use the substitution y = vx
+
+2.5. Definition of homogeneous equation of first order
+         dyConsider   =  f ( x , y )
+         dx
+Suppose we put x = kx and y = ky.   If f(x,y) becomes knf(x,y) then  f(x,y) is called a
+homogeneous function in x and y. In this section we consider homogeneous equation of
+order 0 so that kn = k0 = 1. In other words we consider f(kx, ky) = f(x,y) as the particular
+homogeneous equation.
+
+For example
+                    xy               f ( x , y ) =   2      2                  x + y
+                    kx.ky            f (kx , ky ) =   2  2     2  2                 k x + k y
+                 k 2    xy   
+            =   2     2      2                  k   x + y  
+                   xy
+            =   2      2                 x + y
+            =  f ( x , y )
+                          0   xy                        xy                     =  f ( x , y ).  Hence    2      2  is a homogeneous function ofHere   f (kx , ky ) = k     2      2                   x + y                    x + y
+degree 0.
+
+                      dy2.6. Method of solving   =  f ( x , y ) when f(x,y) is a homogeneous function of x
+                      dx
+    and y
+        dy    Let   =  f ( x , y )
+        dx
+Put the substitution y = vx
+       dy       dv
+So that   = v + x      .
+       dx       dx
+As we shall see in the following examples the given homogeneous function will become
+
+--- Page 15 ---
+dv
+       v + x   =  f ( v )
+           dx
+           dv
+          x   =  f ( v ) − v
+           dx
+            x      f ( v ) − v
+            =
+           dx     dv
+         dv     dx
+or           =
+            f ( v ) − v   x
+          dv      dx
+Then        ∫       = ∫              f ( v ) − v     x
+Thus the variables v and x are separated and the equation is solved.
+
+Example 3
+                          xy
+             a. Show that    2      2  is a homogeneous function in x and y.                        x + y
+            b.  Using the substitution y = vx transform the equation,
+                    dy     xy
+                   =   2      2                    dx   x + y
+               into an equation containing v and x only.
+             c.  Hence solve the resulting equation using the method of separation of
+                      dy     xy
+                variables.   =   2      2                      dx   x + y
+
+Solution
+                      xy    a.  Let  f ( x , y ) =   2      2                   x + y
+                     k 2 ( xy )               f (kx , ky ) =   2   2      2                   k  (x + y  )
+              =  f ( x , y )
+                xy
+      Hence    2      2  is a homogeneous equation.              x + y
+
+
+                         dy       dv
+    b.  If we let y = vx, then   = v + x      .
+                         dx       dx
+       Substitution of this in the given equation, we get
+                 dv     xy
+              v + x   =   2      2 becomes                 dx   x + y
+
+--- Page 16 ---
+dv     x. xv
+              v + x   =   2     2  2                 dx   x + v x
+                 dv    v
+              v + x   =       2                 dx  1 + v
+                 dv    v
+                 x   =       2 − v                 dx  1 + v
+                                                2                 dv   v − v (1 − v                                            )
+                 x   =           2                 dx    1 + v
+                v − v − v 3
+           =         2               1 + v
+          dv   − v 3
+         x   =       2          dx  1 + v
+           x    − v 3
+           =        2          dx    (1 + v )dv
+                                 2          dx      (1 + v                              )dv
+           = −       3      (variables are separated )           x        v
+          dx       1   v 2 
+                         dv          ∫   = − ∫    3 +   3           x              v   v   
+                       − 3  1                    v  +   dv           ln A = − ∫                                                v 
+                v − 2
+            =   − ln v
+               2
+                1
+     ln Ax − ln v =     2               2v
+         Ax   1            y
+          ln   =     2 where v =            v   2v            x
+          Ax 2    x 2
+       ln            =     2           y    2 y
+This is the required solution.
+
+Example 4
+                                2 dy = 0Solve (x            3 + y 3 )dx − 3 xy
+
+Solution
+                                       2 dy = 0       Let (x                   3 + y 3 )dx − 3 xy
+                                                    2 dy                          (x                                3 + y 3 )dx = 3 xy
+                         dy   x 3 + y 3
+                        =        2  ’                         dx   3xy
+
+--- Page 17 ---
+x 3 + y 3
+       2   is a homogeneous function of degree 0. 3xy
+Let y = vx be the substitution.
+       dy       dv
+        = v + x
+       dx       dx
+           dv   x 2 + v 3 x 3
+       v + x   =        2  2           dx   3 x.v xthen
+           dv  1 + v 3
+       v + x   =      2           dx   3v
+           dv  1 + v 3
+          x   =      2 − v           dx   3v
+              1 + v 3 − v (3v 2 )
+            =           2                   3v
+            x  1− 2v 3
+           =     2           dx   3v dv
+          dx   3v 2 dv
+therefore     =         3            x   1 − 2v
+          dx    3v 2 dv
+          ∫   = ∫        3           x    1 − 2v
+              1  − 6v 2 dv
+        ln ( Ax ) =    ∫         3            − 2  1 − 2v
+               1            3        ln ( Ax ) = −  ln (1 − 2v ) (using the substitution u = 1 – 2v3)
+               2
+                                      1
+                                  3 −                                      2        ln ( Ax ) = ln (1 − 2 v )
+                                   1                                3 −            y                                   2 where v =         Ax = (1 − 2 v )
+                                   x
+                                      1
+                                 −
+                                      2                 2 y 3          Ax = −                                    1      3                         x  
+                                  −1
+                2  2      2 y 3        A x = −                                     1      3                         x  
+                2  2     x 3
+       A x =   3       3                x − 2 y
+                  2      x
+        A =   3       3                x − 2 y
+or          x = c (x                           3 − 2 y 3 )
+is the required solution.
+
+--- Page 18 ---
+Example 5
+Solve the equation   (x                               2 − 3 y 2 )dx + 2 xydy = 0
+
+Solution
+Let   (x          2 − 3 y 2 )dx + 2 xydy = 0
+                    dy      (x                                            2 − 3 y 2 )or                  = −
+                    dx      2 xy
+                    dy  3 y 2 − x 2
+                   =
+                    dx    2 xy
+                      3 y 2 − x 2if                         f ( x , y ) =
+                        2 xy
+                      3k 2 y 2 − k 2 x 2                         f (kx , ky ) =
+                         2 kxky
+                         k 2 (3 y                                               2 − x 2 )
+                   =      2                           k  (2 xy )
+                   =  f ( x , y )
+Hence the given equation is homogeneous.
+
+                    dy       dv
+Letting y = vx, so that   = v + x      , the given equation becomes
+                    dx       dx
+                    dv  3v 2 y 2 − x 2
+                v + x   =
+                    dx     2 xvx
+                      3v 2 − 1
+                   =
+                        2 v
+                   dv  3v 2 − 1
+                   x   =      − v
+                   dx    2v
+                   dv   v 2 − 1
+                   x   =
+                   dx    2v
+                    dx   2 v
+                   =   2   dv                     x   v − 1
+Integrating, we find ln (v                                  2 − 1) = ln cx
+Hence                v 2 − 1 = cx
+                      y 2
+                                   2 − 1 = cx                      x
+                    y 2 − x 2 = cx 3
+which is the required solution for the given equation.
+
+--- Page 19 ---
+2.7. First order equation reducible to homogeneous form.
+ Equation of the form
+                    dy   ax + by + c
+                   =                                                        (1)
+                    dx   px + qy + r
+or (ax + by + c)dx + (px +qy + r)dy = 0                                            (2)
+where a, b, c, p, q, r are constants.
+
+can  be  transformed  into  homogeneous  equations  of  first  order  by  a  suitable
+transformation and solved.
+
+          a   b
+Case 1.  If   ≠   then the transformation
+          p  q
+              x = X + h
+              y = Y + k
+where (h, k) is the solution of the system
+      ah + bk + c = 0
+      ph + qk + r = 0
+reduces the equation to the homogeneous equation
+      (aX + bY)dx + (pX + qY)dy = 0 in the new variables X and Y
+
+          a   b
+Case II.  If   =    then the transformation
+          p  q
+              z = ax + by reduces the equation to a separable equation in the variables
+            x and z.
+
+Example 6
+Solve the equation
+       (3x + 2y – 5)dx + (2x + 3y – 5)dy = 0
+
+Solution
+               x = X + h          dx = dX
+Taking                                                                             (1)
+               y = Y + k           dy = dY
+              dy  3 x + 2 y − 5
+              =          becomes
+              dx  2 x + 3 y − 5
+            dY    3 X + 2Y + 3h + 2 k − 5
+              = −
+           dX    2 X + 3Y + 2 h + 3k − 5
+choose h, k such that
+            3h + 2 k − 5 = 0 
+                                                                                     (2)
+            2 h + 3k − 5 = 0 
+solving the simultaneous equations (2) we have h = 1 and k = 1
+            dY    3 X + 2Y
+Hence          = −
+           dX    2 X + Y
+Putting     Y = vX
+
+--- Page 20 ---
+dY        dv
+              = v + X
+           dX       dX
+                dv    3 + 2v
+          X    = −     − v
+             dX    2 + 3v
+or
+                    3 + 4v + 3v 2
+                = −
+                       3v + 2
+             dX       (3v + 2 )dv
+or          −   = −    2            X    3v + 4v + 3
+Integrating
+                 ln(3v 2 + 4v + )3 = − 2 ln X + ln C
+                        2       C
+or           3v + 4v + 3 =    2                   X
+            3Y 2  4Y    C
+                         2 +   + 3 =    2           X   X     X
+or          3Y2 + 4XY + 3X2 = C
+or            3(y – 1)2 + 4(x – 1)(y – 1) + 3(x – 1)2 = c
+or            3(x2 + y2) + 4xy – 10(x + y) = c
+
+
+Example 7
+       dy      x − y + 3
+Solve    = −
+       dx    2 x − 2 y + 5
+
+Solution
+                                                   − 1  1
+Here Ratio of coefficients of x = ½ and ratio of coefficients of y =   =    . Hence we
+                                                   − 2  2
+put
+              x – y = z.
+
+             dx  dy   dz
+      Then    −   =
+             dx  dx   dx
+                 dy   dz         dy     dz
+      Or     1 −   =        or     = 1 −
+                 dx   dx         dx     dx
+                  dz    z − 3
+Then         1 −   =
+                 dx  2 z + 5
+              dz       z − 3
+or            = 1 −
+             dx     2 z + 5
+                 2 z + 5 − z − 3
+             =
+                   2 z + 5
+              dz       z + 2
+              = 1 −
+             dx     2 z + 5
+
+--- Page 21 ---
+2 z + 5
+or           dx = 1 −
+                         z + 2
+                 2 z + 4 + 1
+             =
+                        z + 2
+                          1               dx =  2 +       dv
+                         z + 2 
+Integrating both sides we have
+       or    x + c = 2z + ln(z + 2)
+       or    x + c = 2(x – y) + ln(x – y + )
+
+       or     the required solution is
+            2y – x + c = ln (x – y + 2)
+
+Example 8
+Solve the equation
+       (x – 2y + 1)dx + (4x – 3y – 6)dy = 0
+
+Solution
+             dy   x − 2 y + 1
+Let           =                                                                (1)
+             dx  4 x − 3 y − 6
+                                        1    − 2     1  2
+Here the ratio of the coefficients of x is given by   and    and  ≠
+                                        4     − 3     4  3
+
+Therefore we use the transformation
+               x = X + h 
+                      where h and k are to be determined from the equation
+               y = Y + k 
+            h – 2k + 1 = 0                                                      (2)
+            4h – 3k – 6 = 0                                                      (3)
+Solving the simultaneous equation (2) and (3) we have h = 3 and k = 2
+       x = X + 3            dx = dX
+Hence
+       y = Y + 2            dy = dY
+Using this substitution, equation (1) reduces to the homogeneous equation of order zero
+as:
+ dY     ( X − 3) − 2(Y − 2 ) + 1   X − 2Y   =                 =                                                      (4)
+dX   4( X + 3) − 3( y − 2 ) − 6  4 X − 3Y
+
+we use the substitution Y = vX for the first order homogeneous equation
+
+Y = vX gives
+
+--- Page 22 ---
+dV   1 − 2v
+                v + X    =
+                 dX   3v − 4
+                 dV   1 − 2v
+               or  X    =     − v
+                 dX   3v − 4
+                 dV  1 − 2v − 3v 2 + 4v
+               or  X    =
+                 dX       3v − 4
+                 dV  − 3v 2 + 2v + 1
+               or  X    =
+                 dX     3v − 4
+                X   3v 2 + 2v − 1
+               or       =
+                 dX  − (3v − 4 )dv
+                 dX     (3v − 4 )dv
+               or   −   =    2                X   3v + 2v − 1
+Integrating both sides we have
+                                    (3v − 4) dv
+          X − ln( AX ) =    2                        3v − 2v − 1
+                       1        2         3    3v − 3              − ln( AX ) =   ln(3v − 2 v − )1 −  ln        
+                       2              4    3v + 1 
+                                                                               3
+                                                           1
+                                                                               4                                              2            2      3v − 3                    = ln(3v − 2v − )1 − ln        
+                                                    3v + 1 
+                                            3                     1 
+                                                       4
+                              ÷ (3v 2 − 2v − )1 2                    ln ( AX ) = ln  3v − 3 
+                                 3v + 1                   
+                                                           
+                (3v + 1)                               5      c1 4or finally    ln           = ln   4                v − 1       x                        
+or        X 4 (3v + 1)                                 5 = c (v − )1
+               y
+Replacing v by   we have
+               x
+                   (3Y + X )                                 5 = C (Y − X )
+Finally replacing X by x – 3 and Y by y – 3, we obtain the solution of the original
+equation inn the form
+       3( y + 2 ) + ( x − 3 ) 5 = c ( y − 2 − x + 3 )
+        or    x + 3 y − 9 5 = C ( y − x + )1
+
+--- Page 23 ---
+Exercise 2
+Solve the following equations
+    1.  x 3 dx + ( y − )1 2 dy = 0
+    2.   (2 x + 3 y )dx + ( y − x )dy = 0
+                           2    3.  xydx + (1 + x                          )dy = 0
+    4.  y 2 dx − x 2 dy = 0
+
+Solve the following homogeneous equations.
+          dy      2      2    5.  2 xy   = x + y
+          dx
+    6.  x 2 ydx − (x                         3 + y 3 )dy = 0
+              2      2 dy    7.   (x − y  )   = 2 xy
+              dx
+         dy      2      2    8.  xy   = x + y
+         dx
+        dy
+    9.  x   = x − y
+        dx
+         dy       2    10. xy   = 3 x + xy
+         dx
+              2      2 dy    11. (x + y  )   = xy
+              dx
+        dy
+    12. y   = 2 x + y
+        dx
+
+   Solve the following equations reducing them to a homogeneous equation:
+
+       dy   x − y + 2
+    13.   =
+       dx    x + y
+       dy  2 x + y − 2
+    14.   =
+       dx   2 x + y + 1
+             dy    15. ( x + y )   = x + y − 2
+             dx
+       dy  2 x + 3 y − 8
+    16.   =
+       dx   5 x + y − 7
+
+--- Page 24 ---
+Summary
+
+You have learnt the following from this lesson:
+
+    1.        Solving a first order equation by the method of separation of variables.
+
+
+    2.         Putting y = vx will transform a homogeneous equation into an equation
+
+       with separation of variables.
+                             dy   ax + by − c
+    3.     We can transform   =             into a homogeneous equation of first
+                             dx   px + qy − r
+
+       order and solve the equation.
+
+
+Further Reading:
+  1.                 Pure Mathematics
+   By Backhouse and others
+   Longman
+
+  2.                   Differential Equations
+   By Shepley L. Ross
+   John Wiley and Sons
+  New yolk. Toronto. Singapore
+
+  3.                Frank Ayres, JR, Schaum’s outline series
+  Mc Graw-Hill Book Company
+  New York. Toronto. Sydney.
+
+--- Page 25 ---

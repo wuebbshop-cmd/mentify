@@ -1,0 +1,1694 @@
+--- Page 1 ---
+
+SCSSCS 209209 ConceptsConcepts OFOF InternetInternet 11
+
+ InternetInternet TechnologiesTechnologies (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+CONCEPTS OF INTERNET
+
+The Internet is essentially a global network of computing resources. You can think of the Internet as a
+physical collection of routers and circuits as a set of shared resources. A network of networks based on
+the TCP/IP communications protocol. A community of people who use and develop those networks.
+
+Internet and its concepts:
+
+Internet is called the network of networks. It is a global communication system that links together
+thousands of individual networks. In other words, internet is a collection of interlinked computer
+networks, connected by copper wires, fiber-optic cables, wireless connections, etc.
+
+Concepts of Internet technologies:
+
+INTERNET TECHNOLOGIES means technologies using one or more computer networks that utilize TCP/IP,
+IP or other architecture or that uses computer terminals, terminal servers, routers, multicasting
+technology or other data processing or transmission device (regardless of transmission speed
+experienced by the end user)
+
+Features of the Internet:
+
+Features of Internet
+
+  Accessibility. An Internet is a global service and accessible to all.
+  Easy to Use.
+  Interaction with Other Media.
+  Low Cost.
+  Extension of Existing IT Technology.
+  Flexibility of Communication.
+  Security.
+
+Main uses of the Internet:
+
+Top 10 uses of the Internet
+
+  Electronic mail. At least 85% of the inhabitants of cyberspace send and receive e-mail.  Research.
+  Downloading files.
+  Discussion groups.
+  Interactive games.
+  Education and self-improvement.
+  Friendship and dating.
+  Electronic newspapers and magazines.
+
+ 1
+
+ 
+
+--- Page 3 ---
+
+Purpose of Internet:
+
+The main purpose of the Internet is to provide global access to data and communications. Use of the
+Internet and networking is essential for advancing research in science, medicine, engineering and design
+as well as in maintaining global defense and surveillance.
+
+Types of Internet:
+
+Types of Internet Connections
+
+  Dial-Up. Dial-up access is cheap and slow and its modem connects once the computer
+ dials up a number.
+  DSL Connection.
+  Cable Internet.
+  Wireless Networks.
+  Satellite Connection.
+  Fiber Optics.
+
+NOTE:
+
+Top 10 uses of the Internet
+
+Based on a recent survey of Internet traffic, the 10 most popular uses of the Internet in
+descending order of use are:
+
+ 1. Electronic mail. At least 85% of the inhabitants of cyberspace send and receive e-mail.
+ Some 20 million e-mail messages cross the Internet every week.
+ 2. Research.
+ 3. Downloading files.
+ 4. Discussion groups. These include public groups, such as those on Usenet, and the private
+ mailing lists that ListServ manages.
+ 5. Interactive games. Who hasn’t tried to hunt down at least one game?
+ 6. Education and self-improvement. On-line courses and workshops have found yet
+ another outlet.
+ 7. Friendship and dating. You may be surprised at the number of electronic “personals”
+ that you can find on the World Wide Web.
+ 8. Electronic newspapers and magazines. This category includes late-breaking news,
+ weather, and sports. We’re likely to see this category leap to the top five in the next
+ several years.
+ 9. Job-hunting. Classified ads are in abundance, but most are for technical positions.
+ 10. Shopping. It’s difficult to believe that this category even ranks. It appears that
+ “cybermalls” are more for curious than serious shoppers.
+
+The survey shows that individuals, corporations, business people, and groups use Internet
+primarily as a communications vehicle as these users reduce their use of fax machines,
+
+ 2
+
+ 
+
+--- Page 4 ---
+
+telephones, and the postal service. E-mail should remain at the top of the list. The Internet has
+continued and will continue to change how we view the world. — By Diane Myers, Analyst
+Communications, End Use, In-Stat, Scottsdale, AZ. (602) 483-4442
+
+Types of Internet Connections in the US | 2022
+
+Are you planning to get an internet plan for your home or office? Before buying, you should
+understand the technology that goes behind.
+
+There are several ways of connecting a personal electronic device to the internet.
+
+With a wide range of connection speeds and hardware, internet connections change as fast as the
+technology changes.
+
+Before connecting to the internet, you need to choose a certain hardware called the Internet
+Service Provider, which a company owning dedicated computers is enabling you to access
+internet by charging a minimal monthly cost.
+
+Here is a list of most common internet connections in the United States, so you can do your
+homework before signing on the dotted line.
+
+ 3
+
+ 
+
+--- Page 5 ---
+
+Types of Internet Connections
+
+Dial-Up
+
+Dial-up access is cheap and slow and its modem connects once the computer dials up a number.
+
+This analog signal is born-again to be digital via the modem and sent over a land-line repaired by
+a public phone network.
+
+Telephone lines are variable in quality and therefore the affiliation is poor at times. The lines
+frequently experience interference and this affects the speed, anywhere from 28K to 56K.
+
+Since a laptop or different device shares a similar line as the telephone, they can’t be active at the
+same time.
+
+Dial-up is by far the slowest internet connection. It is found in rural communities and remote
+areas where it only requires the existing telephone lines but many ISP’s and other telephone
+companies have discontinued this service because of evolution in technology.
+
+DSL Connection
+
+DSL stands for Digital Subscriber Line which is usually available at places where other
+connections like cable or fiber cannot be found. DSL aims at running the internet connection
+through the phone lines.
+
+This connection is always on and uses 2 lines on the phone when the computer is connected.
+With the use of a router, it can change its data transportation and rage of connection depending
+on the service offered ranging between 128K to 8 Mbps.
+
+On one hand where dial-up connection can be interrupted because of a call, you do not have to
+worry about getting a call with the DSL connection.
+
+It is mostly used in rural communities because of its reliability and affordability.
+
+ 4
+
+ 
+
+--- Page 6 ---
+
+The speed as compared to other connections with an average download from 3 to 50 Mbps, lags
+behind but is also a cheaper alternative to satellite internet.
+
+Cable Internet
+
+Cable connection provides the internet through a modem which operates over cable TV lines.
+With a range of speeds depending on the uploading and downloading data transmissions, it
+provides a greater bandwidth over dial-up or DSL and faster access as well.
+
+The speed of cable connection ranges from 512K to 20 Mbps.
+
+Full of home phone services and TV packages, it uses the same coaxial as the TV cable. It also
+has a convenient process of wiring job where a technician will visit your residence if it’s not
+working.
+
+As compared to other internet connections, it is a faster and a more stable connection but its
+uncommon to use by businesses because they lack coaxial connections at their workplace.
+
+Wireless Networks
+
+Wireless or Wi-Fi connection works without the use of telephone lines or cables to connect to the
+internet. Instead, it makes use of radio frequency and can be accessed from anywhere.
+
+It is really a common network around the United States and can be found growing in coverage
+areas every minute. The speed ranges from 5 Mbps to 20 Mbps.
+
+They work without wires and offer high-speed internet, for example, mobile broadband or data
+connections such as 3G, 4G etc. which are commonly offered by mobile companies.
+
+The connection speeds are as high as 1 Gbit and if you are in a remote location, this might the
+best option available to you.
+
+It is important to ensure that you get the strongest signal with proper antenna placement with a
+clear view of the sky.
+
+ 5
+
+ 
+
+--- Page 7 ---
+
+If there are obstacles such as trees, buildings or hills in between, it can distort your connection.
+
+Satellite Connection
+
+As one of the most widely accepted internet connections, it does not rely on ground-laid
+infrastructure like cables, cellular towers or line-of-sight antenna connections.
+
+It works through the connection with satellites orbiting overhead.
+
+If you have a clear view of the sky, the connection will be better so it is better to get the
+connection on the terrace or ground facing upwards.
+
+It is also best suited for rural areas with bad weather conditions and obstructions which are not in
+your control.
+
+The speed ranges from 12 to 100 Mbps, which makes it perfect for smaller households where
+people wish to stream, play games or upload files online.
+
+This service is a bit on the expensive side, because it reaches areas where is does not have to
+compete with other technologies.
+
+Because of the enormous distance between the signals from earth to satellite, it provides a
+delayed connection compared to cable and DSL.
+
+Fiber Optics
+
+As the name suggests, fiber connection reaches your home through fiber optic cable using the
+pulses of light along with the thin strands called fibers of glass or plastic which transmit data.
+
+It is the fastest traditional internet connection with download speed of 2 Gigabits which is almost
+enough to download a two-hour movie in HD in less than a minute.
+
+It is much faster as compared to cable connection because of the fiber-optics.
+
+With the internet traffic travelling along copper cables resulting in distortion and slower speeds,
+fiber optic cables help in reducing distortion, making it much faster.
+
+The disadvantage of this network is that is it quite expensive and it is not available everywhere.
+
+Conclusion
+
+With a high-speed internet connection, one can stimulate economic growth and attract new
+employers and jobs and residents in the area.
+
+With all the options available to you, it is important to understand the difference between all
+these cellular technologies before you sign up for one.
+
+ 6
+
+ 
+
+--- Page 8 ---
+
+What are 10 Advantages of internet?
+What are the advantages of the Internet?
+
+  Information, knowledge, and learning.
+  Connectivity, communication, and sharing.
+  Address, mapping, and contact information.
+  Banking, bills, and shopping.
+  Selling and making money.
+  Collaboration, work from home, and access to a global workforce.
+  Donations and funding.
+  Entertainment.
+
+What are the advantages of the Internet?
+
+The Internet is one of the greatest creations and provides people with instant access to an endless
+supply of knowledge and entertainment. Below is a complete list of all of the advantages of the
+Internet.
+
+Information, knowledge, and learning
+
+As mentioned earlier, the Internet contains an endless supply of knowledge and information that
+lets you learn about almost any topic or question you may have. Using a search engine like
+Google, you can ask virtually any question and find a web page with an answer to and
+information about that question. There are also millions of videos on sites like YouTube
+explaining various topics, and even online courses to help teach you about many different
+subjects.
+
+Connectivity, communication, and sharing
+
+In the past, it would take days and sometimes even months to receive a letter from someone else.
+Today, with the Internet, you can send an e-mail to anyone in the world and often have it
+delivered in less than a minute. Other forms of communication, such as chat and VOIP, also
+allow you to have instant communication with anyone in the world.
+
+ 7
+
+ 
+
+--- Page 9 ---
+
+Online forums are also places where people who share common interests can connect and talk
+about what they enjoy, or ask questions of other experts in the field.
+
+Address, mapping, and contact information
+
+With the help of GPS technology, the Internet helps map and direct you to almost every place in
+the world. You can quickly route to your location or find businesses in your area that may sell or
+provide you with a service you need. Today's search engines are also smart enough to know your
+location and help give you the most relevant searches for your area. For example, if you need a
+plumber and search for "plumber," you'll get a list of local plumbers in your area.
+
+Banking, bills, and shopping
+
+The Internet provides access to your bank account to view the balance, make transactions, and
+send money. Also, many services enable you to view and pay bills electronically.
+
+Online shopping is another huge advantage of the Internet, giving people the ability to find
+products of interest and buy them without having to visit a store. The Internet provides easy
+access to compare prices between companies, and even see what others think about a product
+through online reviews to help make better purchasing decisions.
+
+Selling and making money
+
+If you are a business or want to sell products and services, the Internet is a perfect place to sell
+most goods.
+
+Because anyone in the world with Internet access can find your website, you have access to more
+potential customers than you ever could with a local retail store.
+
+ 8
+
+ 
+
+--- Page 10 ---
+
+The Internet is always on and always available, which means you have the potential of selling
+goods every day at all times.
+
+The Internet also gives businesses the ability to advertise their product or service to everyone in
+the world or specify an exact demographic they want to reach.
+
+There are other ways someone can make money online by performing other online services.
+
+Collaboration, work from home, and access to a global workforce
+
+The Internet is the perfect place to work with other people from around the world. Several online
+services help you work with people around the world, and with an almost instant communication,
+it can even make producing new products and services faster.
+
+An Internet connection provides many people with the ability to work from home or have a
+virtual office.
+
+Today, many businesses allow their employees to work from home using their computers and
+Internet connection.
+
+Working from home can save people money by not having to pay for child care, and save them
+money and time by eliminating the daily commute to and from work every day.
+
+If you are a business that needs employees, many services online can give you access to people
+looking for a job all around the world.
+
+Being able to hire someone from another part of the country or world gives you access to a wider
+talent pool and may also be cheaper.
+
+Donations and funding
+
+With access to a much wider audience, anyone with an Internet connection can quickly donate to
+their favorite charity or help fund projects and ideas that interest them.
+
+Also, those looking for charity can find many online services that help make it easier to help
+donate or support their causes.
+
+Entertainment
+
+The Internet gives everyone access to an endless supply of entertainment, with access to watch
+videos, watch movies, listen to music, and even play games
+
+ 9
+
+ 
+
+--- Page 11 ---
+
+Internet of Things
+
+The Internet helps make devices in your home connected and smarter by giving them access to
+the Internet.
+
+For example, the Nest thermostat can connects to the Internet to help control the heating and
+cooling in your home.
+
+Also, once these devices are connected, they can be controlled remotely using your computer or
+smartphone. By connecting IoT (Internet of Things) devices to your home, it can become smarter
+and more efficient and help save energy, money, and time.
+
+Cloud computing and cloud storage
+
+The Internet connects your computers and Internet-enabled devices to cloud services, like cloud
+computing and cloud storage.
+
+With cloud computing, a device can have access to more powerful computers and even
+supercomputers to perform complex tasks while you or your business work on other tasks.
+
+Cloud storage synchronizes data across any of your Internet-connected devices, so you have
+access to your files from anywhere.
+
+It makes backing up information easier, and safer — your data is securely stored in a
+professionally-maintained server.
+
+So, if you are using a cloud storage backup service and your home or office burned down, you
+would not lose all your valuable data.
+
+ 10
+
+ 
+
+--- Page 12 ---
+
+What are the disadvantages of the Internet?
+
+Although the Internet is one of man's greatest creations, it has many disadvantages, several of
+which are listed in the following sections.
+
+Trolls, bullying, and stalkers
+
+Trolls
+
+Anyone who has spent time on the Internet has encountered trolls or abusive people.
+
+With the anonymous nature of the Internet, it's easier for people to be mean because they feel
+they won't face the repercussions.
+
+Cyberbullying
+
+Another growing issue, especially with kids in school, is cyberbullying. Because it's easier to be
+anonymous on the Internet, a person may bully others who are also online.
+
+Stalking
+
+With people sharing more information about themselves and their families on the Internet, it can
+be easier for stalkers to find personal information.
+
+ 11
+
+ 
+
+--- Page 13 ---
+
+Pornographic and violent images
+
+In our digital age, there's a nearly an infinite amount of content on the Internet. While there are
+amazing resources, such as Wikipedia, less desirable content also exists.
+
+Consequently, users can accidentally come across violent or pornographic images that they may
+not want to view.
+
+Addiction, time-waster, and causes distractions
+
+Surfing and playing games on the Internet can quickly become very addictive.
+
+Doing so can lead to spending a lot of frivolous time on the Internet instead of doing something
+productive. On this same note, the Internet can hamper workplace productivity as well.
+
+Tip
+
+See our computer addiction page for further information about and help with computer addiction.
+
+Never being able to disconnect from work
+
+The Internet is great for giving its users the ability to work from anywhere. However, you may
+be expected to be available to work at any time of the day, even if you had not previously agreed
+to be available.
+
+For example, you may be at home and get a notification of an important work-related e-mail and
+end up working without getting paid.
+
+ 12
+
+ 
+
+--- Page 14 ---
+
+Crime, identity theft, hacking, viruses, and cheating
+
+With access to billions of computers, computer hackers and malicious users can hack accounts
+and steal personal information that could be used for identity theft.
+
+The Internet also connects all computers, so hackers can scan millions of computers and quickly
+identify what computers are vulnerable to attack.
+
+Hidden places also exist on the Internet and the deep web for criminals to conduct business
+without as much fear of being caught.
+
+A global audience also gives criminals more ways to solicit their goods.
+
+The Internet also enables students to cheat on their studies or find others on the Internet to do
+their homework.
+
+Spam and advertising
+
+It's great that the Internet allows access to a much wider audience than traditional advertising
+methods (e.g., newspaper, TV, and radio).
+
+ 13
+
+ 
+
+--- Page 15 ---
+
+However, because digital advertising can be sent on a massive scale, you might see more spam in
+your inbox than junk mail in real life.
+
+Affects focus and patience
+
+The sites we use on the Internet every day have an "instant gratification" effect.
+
+They also present an endless menu of things to think about and experience at any moment, on-
+demand.
+
+Getting information this way rewards fast-paced thinking that shifts focus quickly, which affects
+your interactions in general, making you more impatient and less focused on your activities.
+
+Try to balance this natural effect with time away from social media and focused on more
+productive real-life activities like exercise or cleaning.
+
+Depression, loneliness, and social isolation
+
+Social networking sites can also lead to depression as many people tend to compare their lives
+with others.
+
+For example, if your social network friends have vacation pictures, you may get the false
+impression that everyone but you is going on vacation.
+
+The Internet and online games can be very addictive and time-consuming, and spending too
+much time with your virtual friends may take away from your real-life friends.
+
+Health issues and obesity
+
+ 14
+
+ 
+
+--- Page 16 ---
+
+As with watching TV, spending too much time on the computer, surfing the Internet, or playing
+games can also lead to obesity and an unhealthy lifestyle.
+
+A computer also requires a lot of repetitive movement can lead to carpal tunnel syndrome.
+
+For example, moving your hand from your keyboard to a mouse and typing are all repetitive
+actions, which can cause injuries.
+
+Taking breaks, keeping the proper posture, and understanding computer ergonomics can all help
+delay or prevent these injuries.
+
+Echo chambers, filter bubbles, and personalized content
+
+The Internet has new information added every second, and it would be impossible for anyone to
+keep up-to-date with the latest news and information.
+
+So, companies have developed algorithms that help sort and give you information they feel you'd
+find most helpful or interesting.
+
+Unfortunately, because these algorithms show you personalized information, they create an
+artificial bubble that can be hard to escape.
+
+These bubbles can also be amplified when participating in social networks.
+
+If your social circles of family and friends all share similar content from their bubbles, your
+social circle can become an echo chamber of everyone sharing the same thoughts.
+
+While it's easier to find interesting information and news by existing in an online bubble, you're
+also not introduced to opposing views and new concepts.
+
+It's also believed by many experts that these bubbles make people more polarized because they
+only see news tailored to them that's often more sensationalized to help get more visitors.
+
+Fake news
+
+In the past, a person would need to create a website to post information online.
+
+Because of the difficulty and cost involved, not many people posted information online.
+
+Today, with blogs and social network sites, it's possible for anyone with an Internet connection to
+post their thoughts online with little or no cost.
+
+Some people and even some governments take advantage of how easy it is to create sites that
+spread lies or other fake news.
+
+ 15
+
+ 
+
+--- Page 17 ---
+
+Buying things you don't need
+
+The Internet reduces the barriers for consumers to make purchases, so users may find themselves
+purchasing products without putting much thought into whether they should.
+
+Also, for some people, buying items on the Internet can become so addictive that it causes
+serious debt.
+
+Web - How it Works
+
+On the simplest level, the Web physically consists of the following components −
+
+  Your personal computer − This is the PC at which you sit to see the web.
+  A Web browser − A software installed on your PC which helps you to browse the Web.
+  An internet connection − This is provided by an ISP and connects you to the internet to
+ reach to any Website.
+  A Web server − This is the computer on which a website is hosted.
+  Routers & Switches − They are the combination of software and hardware who take
+ your request and pass to appropriate Web server.
+
+The Web is known as a client-server system. Your computer is the client and the remote
+computers that store electronic files are the servers.
+
+How the Web Works
+
+When you enter something like Google.com the request goes to one of many special computers
+on the Internet known as Domain Name Servers (DNS). All these requests are routed through
+various routers and switches.
+
+The domain name servers keep tables of machine names and their IP addresses, so when you
+type in Google.com it gets translated into a number, which identifies the computers that serve the
+Google Website to you.
+
+When you want to view any page on the Web, you must initiate the activity by requesting a page
+using your browser.
+
+The browser asks a domain name server to translate the domain name you requested into an IP
+address. The browser then sends a request to that server for the page you want, using a standard
+called Hypertext Transfer Protocol or HTTP.
+
+The server should constantly be connected to the Internet, ready to serve pages to visitors.
+
+When it receives a request, it looks for the requested document and returns it to the Web browser.
+
+When a request is made, the server usually logs the client's IP address, the document requested,
+and the date and time it was requested. This information varies server to server.
+
+ 16
+
+ 
+
+--- Page 18 ---
+
+An average Web page actually requires the Web browser to request more than one file from the
+Web server and not just the HTML / XHTML page, but also any images, style sheets, and other
+resources used in the web page.
+
+Each of these files including the main page needs a URL to identify each item.
+
+Then each item is sent by the Web server to the Web browser and Web browser collects all this
+information and displays them in the form of Web page.
+
+In Short
+
+We have seen how a Web client - server interaction happens. We can summarize these steps as
+follows −
+
+A user enters a URL into a browser (for example, Google.com. This request is passed to a
+domain name server.
+
+The domain name server returns an IP address for the server that hosts the Website (for example,
+68.178.157.132).
+
+The browser requests the page from the Web server using the IP address specified by the domain
+name server.
+
+The Web server returns the page to the IP address specified by the browser requesting the page.
+
+The page may also contain links to other files on the same server, such as images, which the
+browser will also request.
+
+The browser collects all the information and displays to your computer in the form of Web page.
+
+Web - Browser Types
+
+Web Browsers are software installed on your PC. To access the Web, you need a web browser,
+such as Netscape Navigator, Microsoft Internet Explorer or Mozilla Firefox.
+
+Currently you must be using any sort of Web browser while you are navigating through our site
+tutorialspoint.com. On the Web, when you navigate through pages of information, this is
+commonly known as web browsing or web surfing.
+
+There are four leading web browsers − Explorer, Firefox, Netscape, and Safari, but there are
+many others browsers available. You might be interested in knowing Complete Browser
+Statistics. Now we will see these browsers in bit more detail.
+
+ 17
+
+ 
+
+--- Page 19 ---
+
+While developing a site, we should try to make it compatible to as many browsers as possible.
+Especially sites should be compatible to major browsers like Explorer, Firefox, Chrome,
+Netscape, Opera, and Safari.
+
+ Internet Explorer
+
+Internet Explorer (IE) is a product from software giant Microsoft. This is the most commonly
+used browser in the universe. This was introduced in 1995 along with Windows 95 launch and it
+has passed Netscape popularity in 1998.
+
+You can download a latest version of this browser by clicking here → Download Internet
+Explorer
+
+ Google Chrome
+
+This web browser is developed by Google and its beta version was first released on September 2,
+2008 for Microsoft Windows. Today, chrome is known to be one of the most popular web
+browser with its global share of more than 50%.
+
+You can download a latest version of this browser by clicking here → Download Google Chrome
+
+ Mozilla Firefox
+
+Firefox is a new browser derived from Mozilla. It was released in 2004 and has grown to be the
+second most popular browser on the Internet.
+
+You can download a latest version of this browser by clicking here → Download Firefox
+
+ Safari
+
+Safari is a web browser developed by Apple Inc. and included in Mac OS X. It was first released
+as a public beta in January 2003. Safari has very good support for latest technologies like
+XHTML, CSS2 etc.
+
+You can download a latest version of this browser by clicking here → Download Safari
+
+ Opera
+
+ 18
+
+ 
+
+--- Page 20 ---
+
+Opera is smaller and faster than most other browsers, yet it is full- featured. Fast, user-friendly,
+with keyboard interface, multiple windows, zoom functions, and more. Java and non-Java-
+enabled versions available. Ideal for newcomers to the Internet, school children, handicap and as
+a front-end for CD-ROM and kiosks.
+
+You can download a latest version of this browser by clicking here → Download Opera
+
+ Konqueror
+
+Konqueror is an Open Source web browser with HTML 4.01 compliance, supporting Java
+applets, JavaScript, CSS 1, CSS 2.1, as well as Netscape plugins. This works as a file manager as
+well as it supports basic file management on local UNIX filesystems, from simple cut/copy and
+paste operations to advanced remote and local network file browsing.
+
+You can download a latest version of this browser by clicking here → Download Konqueror
+
+ Lynx
+
+Lynx is a fully-featured World Wide Web browser for users on UNIX, VMS, and other platforms
+running cursor-addressable, character-cell terminals or emulators.
+
+You can download a latest version of this browser by clicking here → Download Lynx
+
+Web - Server Types
+
+Every Website sits on a computer known as a Web server.
+
+This server is always connected to the internet.
+
+Every Web server that is connected to the Internet is given a unique address made up of a series
+of four numbers between 0 and 255 separated by periods. For example, 68.178.157.132 or
+68.122.35.127.
+
+When you register a web address, also known as a domain name, such as tutorialspoint.com you
+have to specify the IP address of the Web server that will host the site.
+
+You can load up with Dedicated Servers that can support your web-based operations.
+
+There are four leading web servers − Apache, IIS, lighttpd and Jagsaw. Now we will see these
+servers in bit more detail.
+
+Apart from these Web Servers, there are other Web Servers also available in the market but they
+are very expensive. Major ones are Netscape's iPlanet, Bea's Web Logic and IBM's WebSphere.
+
+ 19
+
+ 
+
+--- Page 21 ---
+
+ Apache HTTP Server
+
+This is the most popular web server in the world developed by the Apache Software Foundation.
+Apache web server is an open source software and can be installed on almost all operating
+systems including Linux, UNIX, Windows, FreeBSD, Mac OS X and more. About 60% of the
+web server machines run the Apache Web Server.
+
+You can have Apache with tomcat module to have JSP and J2EE related support.
+
+You can have detailed information about this server at Apache HTTP Server
+
+ Internet Information Services
+
+The Internet Information Server (IIS) is a high performance Web Server from Microsoft. This
+web server runs on Windows NT/2000 and 2003 platforms (and may be on upcoming new
+Windows version also). IIS comes bundled with Windows NT/2000 and 2003; Because IIS is
+tightly integrated with the operating system so it is relatively easy to administer it.
+
+You can have detailed information about this server at Miscrosoft IIS
+
+ lighttpd
+
+The lighttpd, pronounced lighty is also a free web server that is distributed with the FreeBSD
+operating system. This open source web server is fast, secure and consumes much less CPU
+power. Lighttpd can also run on Windows, Mac OS X, Linux and Solaris operating systems.
+
+You can have detailed information about this server at lighttpd
+
+ Sun Java System Web Server
+
+This web server from Sun Microsystems is suited for medium and large websites. Though the
+server is free it is not open source. It however, runs on Windows, Linux and UNIX platforms.
+The Sun Java System web server supports various languages, scripts and technologies required
+for Web 2.0 such as JSP, Java Servlets, PHP, Perl, Python, Ruby on Rails, ASP and Coldfusion
+etc.
+
+You can have detailed information about this server at Sun Java System Web Server
+
+ 20
+
+ 
+
+--- Page 22 ---
+
+ Jigsaw Server
+
+Jigsaw (W3C's Server) comes from the World Wide Web Consortium. It is open source and free
+and can run on various platforms like Linux, UNIX, Windows, Mac OS X Free BSD etc. Jigsaw
+has been written in Java and can run CGI scripts and PHP programs.
+
+Web - Site Advantages
+
+If you are constructing a Website, then we hope you are aware of its advantages as well. Here, in
+this chapter, we have listed out a few major advantages of keeping a website.
+
+Business is Open 24x7
+
+This means that once you put your business onsite, then your business is open 7 days a week and
+365 days a year.
+
+Even if you are in different locations of the world then you will be able to serve your customers
+on 24x7 hours basis.
+
+Increased Customer Base
+
+Because anyone in the world can see your website so you will gain customers from other states
+and countries while you are putting in the same amount of effort and money.
+
+Tremendous Cost Saving
+
+This is one of the biggest advantages of having a business online.
+
+You do not need to keep a big man power and lot of resources to maintain a business on site.
+There are many other cost saving opportunities while keeping business online.
+
+Think of how many cards you mail out to let customers know about your sale.
+
+All of that can be eliminated by putting the sale information on your website and inviting your
+customers to visit it.
+
+Advertising Opportunities
+
+Apart from saving your advertising cost, you have additional opportunities to run advertisements
+from other companies and start making money.
+
+If you ever advertised in a local newspaper, you know the costs.
+
+ 21
+
+ 
+
+--- Page 23 ---
+
+You are being charged per line, per inch, and per color.
+
+On the Web, there is no limit to how much you can put. So whenever there is a new product or
+service, then you can advertise it in a better way.
+
+Creates a Brand Image
+
+Internet is a great medium through which you can create any image of yourself which you want.
+It is all in your hands.
+
+For example, you can design a professional website, add helpful content, and your company will
+immediately take a step up in the image it represents.
+
+No matter how small your business is, with the right tools and a great desire you can make it
+look like a corporation on the Web.
+
+Customer Satisfaction
+
+If you have a really good site online, then you can give your customers a lot of satisfaction in
+terms of customer care.
+
+You can keep online help, FAQ, and other important information which is useful for your
+customers.
+
+You can create online forums for open discussion and you can conduct customer survey to take
+customer feedback etc.
+
+Showcase Your Work
+
+Whether you are a real estate agent, construction business owner or a beauty salon specialist −
+you can put your work on display when you have a website.
+
+Anytime a potential client wants to see your past work and projects, simply refer him or her to
+your site.
+
+No need to scan and mail pictures, or bring your client to a finished building project.
+
+Web - Skills Required
+
+If you are planning to maintain a Website, then you would require a specific set of skills.
+
+This skillset can be endless because today, there are numerous technologies available and many
+are coming every day.
+
+ 22
+
+ 
+
+--- Page 24 ---
+
+So you have to plan and affirm on any one of the available technologies and go ahead for your
+project.
+
+This is not required that you should have knowledge of all the listed skills.
+
+If you want to develop a simple Website, then you would needs just first four skills listed here.
+Rest of the skills are required if you want to go for a bigger and more interactive Website.
+
+  Computer Operations − All you need to know is how to operate a computer − Windows,
+ Linux or Macintosh.
+
+ This depends on which Web Server you want to host your website. So you should have
+ basic knowledge of that system only.
+
+ You should be well acquainted of basic operations like creating file, deleting file,
+ updating file, directory creation, file permission etc.
+
+  Remote Access − Most of the times your Web Server will be accessed from remote site
+ only.
+
+ You should be well aware how to connect a computer from remote site.
+
+ So at least you should have basic knowledge of telnet utility to connect to a remote
+ machine.
+
+ There are many service providers who will provide you control panel to manage your
+ Website.
+
+  File Uploading & Downloading − As I told you most of the times your Web Server will
+ be on remote site.
+
+ So you would need to upload and download all the files related to your Website. So at
+ least you should have basic knowledge of FTP utility to connect to a remote machine and
+ download or upload your files.
+
+ Almost service providers give you facility to upload your files on your Web server.
+
+  HTML / XHTML Knowledge − These are the markup languages which you will use to
+ build your website. So you should have good understanding on these languages. You can
+ refer our tutorial to learn HTML / XHTML
+  CSS Knowledge − Cascading Style Sheet knowledge is required to achieve many results
+ which are not possible through HTML or XHTML.
+  PHP Script − Now-a-days many sites are being developed using PHP language. This
+ script helps you to create an interactive Website. You can refer our tutorial to learn PHP
+ Script
+
+ 23
+
+ 
+
+--- Page 25 ---
+
+  PERL Script − PERL is another language which is being highly used to develop
+ interactive Web Applications. So if you are planning to use PERL to develop your
+ Website, then you can refer our tutorial to learn PERL Script
+  Java or VB Scripts − These scripts are required to perform user level validations and to
+ add more interactivity in your Website. So a web developer is desired to have knowledge
+ of any of the client side scripts.
+  AJAX Technology − This is the latest technology in the web. Google and Yahoo are
+ using this technology to give a better browsing experience to their site visitors. You can
+ refer our tutorial to learn AJAX Technology
+  ASP or JSP − These are another technologies to be used to develop interactive Websites.
+  Flash Knowledge − You can plan to use Macromedia Flash to build your Website. This is
+ a bit time consuming to learn this technology but once you learnt then you can develop
+ very beautiful and attractive websites using Flash.
+  HTTP Protocol − As you grow you are desired to have more knowledge about Web. So I
+ would suggest you to go through the web backbone i.e. HTTP protocol as well. You can
+ refer our tutorial to learn HTTP Protocol
+
+Web - Tools Required
+
+As a basic necessity, you need a good internet connection from a reliable service provider which
+provides decent connectivity and speed.
+
+Evaluate vendors based on their services and support before selecting. Here due diligence plays a
+major part.
+
+The following tools and infrastructure will help you in developing a Website −
+
+  Computer Machine − If you do not have computer available and you received this
+ tutorial printed on a paper then I would say that first of all you would need a computer
+ machine running either Windows or Linux or UNIX or Macintosh system or any other
+ operating system.
+  Internet Connection − If you are not connected to the internet and you received this
+ tutorial printed on a paper then I would say that this is second and another most important
+ tool would need to connect to the Internet and to you Web Server where you will host
+ your website.
+
+ For this purpose you can buy either a dial up connection or broadband connection of high
+ speed connectivity based on your requirement and budget.
+
+  A Web Server − Apart from basic Internet connectivity you will need one Web Server to
+ keep all the files related to your Website. So you would need to buy space on a Web
+ Server. There are millions of ISPs who are in business of selling web space at competitive
+ prices. We will give more detail on this in Web Hosting Concepts chapter.
+
+ 24
+
+ 
+
+--- Page 26 ---
+
+  A Text Editor − This is another most important tool which you will need to develop your
+ Website.
+
+ If you are using Windows then you can use notepad as a text editor, or if you are using
+ Linux/Unix then vi editor is one of my favorite editors.
+
+ You will need this editor to write your HTML, PHP or ASP pages or for any other editing
+ purpose. For practice purpose, you can use our Online HTML Editor
+
+  A Web Browser − You will need this tool to see the result of your HTML file. So you
+ should have either Internet Explorer or Firefox etc. installed on your computer.
+  Web Authoring Tools − If you don't want to use a simple Text Editor to edit your HTML
+ files then there are many commercial Web Authoring Tools available.
+
+ These tools are also called HTML editors. Microsoft's FrontPage and Macromedia
+ Dreamweaver are both a visual HTML (WYSIWYG) and HTML source code editor.
+ These editors’ helps you to develop your HTML pages vary rapidly.
+
+  Secure telnet client − If you are connecting to your Web server directly then you can use
+ a tool called PuTTY. This is what I'm using while connecting to my web server.
+  Secure FTP client − If you are connecting to your Web server directly using FTP client
+ to upload or download your web files then you can use a tool called PSFTP.
+
+ FTP stands for File Transfer Protocol. Simply put, after you design your website, you
+ need to send it to the Web and your FTP program will do just that for you. This is what
+ I'm using while connecting to my web server.
+
+Web - Domain Names
+
+A domain name is the part of your Internet address that comes after "www". For example, in
+Tutorialspoint.com the domain name is tutorialspoint.com.
+
+A domain name becomes your Business Address so care should be taken to select a domain
+name. Your domain name should be easy to remember and easy to type.
+
+How to Get a Domain Name?
+
+When you plan to put a site online, this is one of the important steps to buy a domain name. This
+is always not necessary that whatever domain name you are looking that is available so in that
+case you will have to opt for any other good domain name.
+
+When you buy a domain name it is registered and when domain names are registered they are
+added to a large domain name register, and information about your site − including your Internet
+
+ 25
+
+ 
+
+--- Page 27 ---
+
+IP address is stored on a DNS server and your contact information etc. is registered with your
+registrar.
+
+You can buy domain name from any domain registrar like GoDaddy
+
+Domain Extension Types
+
+There are many types of domain extensions you can choose for your domain name. This depends
+on your business nature.
+
+For example, if you are going to register a domain name for education purpose then you can
+choose.edu extension.
+
+Below is a reference of the correct usage of certain extensions. But there is no hard and fast rule
+to go for any extension. Most commonly used is.com
+
+ .com − Stands for company/commercial, but it can be used for any website.
+ .net − Stands for network and is usually used for a network of sites.
+ .org − Stands for organization and is supposed to be for non-profit bodies.
+ .us,.in − They are based on your country names so that you can go for country specific
+ domain extensions
+ .biz − A newer extension on the Internet and can be used to indicate that this site is purely
+ related to business.
+ .info − Stands for information. This domain name extension can be very useful, and as a
+ new comer it's doing well.
+ .tv − Stands for Television and are more appropriate for TV channel sites.
+
+Newer domain extensions such as.biz.info and.us etc. have more name choices available as
+many of the popular domains have yet to be taken and most of the them are available at very
+nominal prices.
+
+Choosing a Domain Name
+
+The domain name will be your business address. Hence, it is imperative that you choose the
+domain name with utmost care.
+
+Many people think it is important to have keywords in a domain. Keywords in the domain name
+are usually important, but it usually can be done while keeping the domain name short,
+memorable, and free of hyphens.
+
+Using keywords in your domain name gives you a strong competitive advantage over your
+competitors. Having your keywords in your domain name can increase click through rates on
+search engine listings and paid ads as well as make it easier to using your keywords in get
+keyword rich descriptive inbound links.
+
+ 26
+
+ 
+
+--- Page 28 ---
+
+Avoid buying long and confusing domain names. May people separate the words in their domain
+names using dashes or hyphen. In the past the domain name itself was a significant ranking
+factor but now with advanced search engines, it is not a significant factor anymore.
+
+Keep two to three words in your domain name − it will be more memorable.
+
+Some of the most memorable websites do a great job of branding by creating their own words.
+Examples include eBay, Yahoo!, Expedia, Slashdot, Fark, Wikipedia, Google. You should be able to say it over the telephone once and the other person should know how to
+spell it and they should know what you sell.
+
+If you can do that AND work keywords in there, good for you. If you can't, skip the keywords.
+
+What are Sub-Domains
+
+You can divide your domain into many sub domains based on your requirement. If you are doing
+multiple business using the same domain, then it would be useful to have sub-domains for every
+business. Following are examples of some sub-domains −
+
+You must have seen google.com as a main domain but google has created many subdomains
+based on their business. Some of them are as follows −
+
+  adwords.google.com − This sub domain is being used for Google Adwords.
+  groups.google.com − This sub domain is being used for Google Groups.
+  images.google.com − This sub domain is being used for Google Images.
+
+This way, you can present your different business sections in a very good segregated way. It is
+not a big thing to create a sub-domains.
+
+If you already have registered a domain, then your registrar will provide you a way to create sub-
+domains. You may need to talk to your registrar for more detail.
+
+Web - Site Construction
+
+Now you are ready for a website construction. Before proceeding further, you have to take many
+factors into consideration.
+
+I cannot list out each and everything but I have described the major factors in this tutorial which
+will help you to have a better website −
+
+What to Put on Your Website?
+
+ 27
+
+ 
+
+--- Page 29 ---
+
+What you would have on your website totally depends on your business and the nature of your
+website. Here is a list of pages that you might want to create for your website.
+
+  Attractive Home Page: Always required for every website.
+  List of Product and Services along with complete detail.
+  Complete Pricing Information.
+  About your company and nature of business including your achievements.
+  About your staff and if possible their experience.
+  Your complete contact information.
+  Frequently Asked Questions.
+  Success Stories and Feedback from Customers.
+
+Finally, make your site useful and interesting for your customers. Your site visitors are your
+customers and they should find each and everything they are looking for. Customer satisfaction
+should be your prime concern.
+
+How to Design Your Website?
+
+You should not simply start developing your website, otherwise you will end up with a bogus
+website. First, you should put a complete plan and your design on a paper or in an electronic
+document.
+
+In this section, we have listed out a few points which can help you to design a better website −
+
+  Consider what technology you are going to use to develop your website. Adopt one
+ which gives you better flexibility and rapid development opportunities and then design it
+ accordingly.
+  Design a generic framework so that in future you can enhance and modify your website
+ by putting minimal effort.
+  Design a site to keep required performance in mind. If you are designing database driven
+ website then lot of effort has to put to design good database schemas.
+  Keep your design as simple as possible so that any new developer should become
+ familiar with your design as soon as possible.
+  Identify repeatable components of your website and then keep them separate and try to
+ use them wherever possible.
+  Identify the nature and qualification of your site visitors and give importance to look and
+ feel accordingly.
+  Think from the perspective of a site visitor. If you were a visitor, then how would you
+ like to see this website? If the same site belongs to somebody else, then would you like to
+ spend some time on such site?
+  You should create a search engine friendly website.
+
+Once again. your presentation should be unique and attractive, otherwise there are a lot of
+websites available on the Internet and it will be difficult for you to retain a site visitor for more
+than a minute.
+
+ 28
+
+ 
+
+--- Page 30 ---
+
+How to Make a Website Interactive?
+
+Many statistics show that if you are able to retain your site visitors for a long time, then they do
+bigger shopping and visit the site again and again.
+
+So make sure you have done something for your site visitors to do on your website. Offering a
+lot of quality information can serve as a great magnet for visitors.
+
+Here is a list of some interactive tools that you can add to your website without any
+programming skills or incurring any costs −
+
+  Poll
+  Forum
+  Guest book
+  Chat room
+  Greeting cards
+  Tell-a-friend about this site
+  Feedback form
+  Live customer service
+  Daily joke or daily cartoon
+  Daily news headlines
+  Site Search Engine
+  Mailing List
+  Automated Frequently Asked Questions
+  The list can go on and on, depending on what will attract your type of visitors.
+
+How to Code Your Website?
+
+Finally, when you start coding for your website, you should be well aware of the following tips
+for a better website −
+
+  Your site should meet all the quality requirements defined by W3C. Today we are using
+ XHTML to develop any website. XHTML is just a cleaner version of HTML.
+  You should keep validating your source code using W3C Validator.
+  Do use appropriate comments but avoid using to many comments inside HTML files.
+  Keep your style sheets and JAVA or VB scripts into separate files and then include them
+ where ever is required.
+  Do not use too much graphics in your web pages.
+  Try to keep your web pages static instead of generating them dynamically.
+  Make sure there is no broken link on any web page.
+  Test your developed web page in major browsers like Internet Explorer, Firefox, Mozilla,
+ Netscape, etc.
+  Test your all the scripts for all the possible scenarios. Do not host any page without
+ complete testing.
+
+How to Create a Search Engine Friendly Website?
+
+ 29
+
+ 
+
+--- Page 31 ---
+
+It is very important to make your website search friendly, otherwise you will be away from a
+large chunk of your customer base which comes from search engines like google and yahoo.
+
+This subject is so important that we have put a complete tutorial on Search Engine Optimization
+and I will strongly recommend you to go through this tutorial before you start developing your
+website.
+
+Securing Your Source Code Frequently
+
+While developing your website, it is very important to keep a backup of your complete source
+code. Many times, you might accidentally delete a file.
+
+If you have a backup, then you can restore previous files and start doing your work.
+
+It is a good practice to take backup on an hourly basis or at least on a daily basis. Keep this
+backup on a different machine or media.
+
+Web - Hosting Concepts
+
+Web hosting deals with putting the contents of your website on a Web server. Hosting your
+website on your own server could be an option.
+
+But this will become very much expensive unless you are hosting a site like yahoo.com or
+google.com. So this tutorials does not cover how to set up your own hosting server.
+
+Buying a server space or renting a complete server from an Internet Service Provider (ISP) is the
+most widely used option.
+
+This section guides you to choose a hosting type and makes you aware of other related concepts.
+
+Hosting Platforms
+
+You can go for any of the following two most widely used hosting platforms −
+
+  Windows Hosting Servers − If you are a Windows lover then you will find many
+ hosting servers running different flavors of Windows and you can buy space from these
+ servers. Normally Windows hosting servers are more expensive because of lot of
+ software licensing costs are involved with these servers.
+  Linux Hosting Servers − If you want to go for Linux then opportunities are unlimited
+ and they will have to pay less then what you will pay for Windows Hosting Server. There
+ are many ISP who provides Hosting Servers with different flavors of UNIX.
+
+Hosting Types
+
+ 30
+
+ 
+
+--- Page 32 ---
+
+There are many options available and you can select any hosting type based on your requirement
+and budget. Following are most widely used hosting types −
+
+Free Hosting
+
+Yes, this is true there are many service providers who will give you free space on their web
+server with a condition that you will allow them to run their advertisement at your web pages.
+
+So if you are OK with this option, then you have nothing to pay for a space. There are some
+websites like geocities.com, lycos.com, myspace.com, etc. that give you space to build your web
+pages.
+
+Shared Hosting
+
+With shared hosting, your website is hosted on a powerful server along with other websites.
+
+On a shared host, you will have your own user ID and password to login to the shared host and
+you will be allowed to work in your work area.
+
+You would not be able to touch any file or directory belonging to other host partner. Even you
+would not know how many sites are hosted on your shared host.
+
+This type of hosting is very cost effective and good for small websites where your space and
+speed are not very important.
+
+Here traffic on one site will affect the speed of all other hosted sites.
+
+Virtual Dedicated Hosting
+
+This type of hosting is better for medium size business.
+
+With virtual dedicated hosting, you will have a dedicated bandwidth and dedicated RAM for
+your site. You will be given a root ID and password to maintain your Web server.
+
+You will be the complete owner of your virtual dedicated server and will be able to install or de-
+install any software.
+
+This type of hosting is created on a single server, but it is managed in such a way that every user
+will have dedicated speed and bandwidth.
+
+This is bit more expensive but really good one for medium size business.
+
+Dedicated Hosting
+
+ 31
+
+ 
+
+--- Page 33 ---
+
+This type of hosting is very similar to virtual dedicated hosting, but here, a complete machine
+will be allotted for you.
+
+They are more expensive than virtual dedicated hosting and should be considered when you have
+a very high traffic requirement.
+
+Collocated Hosting
+
+It is very difficult to set dedicated resources such as high-security against fire and vandalism,
+regulated backup power, dedicated Internet connections and more.
+
+Collocation is the option which allows you to put your machine in a service provider's premises
+to avail all the available facilities.
+
+This is also a very expensive option and should be opted when you have very high traffic
+requirement.
+
+Hosting Components
+
+When you buy a Web server space, then you should be clear about the follows. You should do a
+price comparison between different service providers based on the following components −
+
+Disc Space
+
+A small or medium website will require between 10 and 100MB of disk space.
+
+If you plan to keep a lot of audio and video on your website, then you need plan to buy more
+space.
+
+Before buying server space, you should check the options available to expand your disc space if
+you need it in future.
+
+Monthly Traffic
+
+A small or medium website will need between 1GB and 10GB of data transfer on a monthly
+basis.
+
+If you plan to keep a lot of audio and video on your website, then you need a plan with more data
+transfer capacity.
+
+Check different options based on your requirements. What are the other options available in case
+you cross the given data transfer limit.
+
+Your site should not be stopped in case you exceed given limit.
+
+Processing Speed
+
+ 32
+
+ 
+
+--- Page 34 ---
+
+If you are buying space on a shared machine, then you cannot guess how much speed will be
+given to you.
+
+In that case, only way is to see other hosted sites with the same service provider to know about
+their hosting quality.
+
+But if you are buying virtual dedicated server or dedicated server, then you should consider how
+much RAM is being allocated to you. Your pricing will depend on the given processing power to
+you.
+
+Connection Speed
+
+Nowadays, most service providers allow very fast connection speed. So choose a service
+provider who is giving better connection speed in terms of bits per second. You can have a
+connection speed ranging from 64Kb per second to 2.488Gb per second.
+
+Email Accounts
+
+Make sure you are going to get sufficient number of e-mail accounts.
+
+There are many other options available which come along with your e-mail account. Like, will
+you get IMAP, POP and E-mail Forwarding options available along with your e-mail facilities.
+
+Emailing Support
+
+Apart from having email accounts, it is also very important that your web server should have a
+facility to send emails from back-end.
+
+In case your site visitors want to contact to you using a form, then you will be able to use that
+emailing facility to send emails to your designated account.
+
+In simple terms, you should make sure that the SMTP Server is setup and working on your Web
+server.
+
+Latest Technologies
+
+You should make sure that your web server is equipped with all the latest technologies. It should
+have the latest version support for PHP, PERL, ASP and JAVA, etc.
+
+Databases
+
+There are many databases available MySQL, Oracle, SQL Server, etc. You should choose your
+server based on your database requirement.
+
+If you are buying space on a shared server, then you need to verify how much space will be
+allocated for your database.
+
+ 33
+
+ 
+
+--- Page 35 ---
+
+Many ISPs do not give more than a limited space for databases. If your site needs a lot of
+database size, then you should go for a virtual dedicated server.
+
+Server Uptime
+
+It is important that you buy a web server from a reliable and reputed ISP.
+
+You should make sure your ISP is giving you 99.99% server uptime.
+
+If the is server down, then there are many service providers who gives you compensation in case
+your sites goes down more than a limited number of time.
+
+Backup & FTP
+
+Make sure your Service Provider is giving you more ways of taking regular backup of your
+website.
+
+If your site is changing every day, then it becomes very important that you should take regular
+backup of your website. Many service providers do it on your behalf by charging a small cost for
+this service.
+
+Control Panel
+
+Just make sure what type of facilities you will get to maintain your hosting account.
+
+Check if your service provider is providing you an easy-to-use Control Panel or some other
+similar tool.
+
+Using a Control Panel, you should be able to maintain basic operations related to your website
+such as logging your service request, your reboot request, or any other problem.
+
+Customer Support
+
+Before finalizing a deal with your service provider, you should make sure they provide you the
+required support.
+
+You can get this information using Internet forums or from your friends. There are many service
+providers who give you 24x7 support for any technical or non-technical problem.
+
+Web - Ecommerce Hosting
+
+Ecommerce is a way of doing business through Internet.
+
+ 34
+
+ 
+
+--- Page 36 ---
+
+You are doing ecommerce, especially when you are selling your products or services through
+Internet.
+
+If you planning to put a website which will have transactions such as buying or selling items or
+services, then it means you are going to setup an ecommerce website.
+
+If this is the case, then I don't think this guide will help you up to a level where should be able to
+setup an ecommerce site because there are many more things which should be considered while
+setting up an ecommerce website.
+
+Still you can start from here − E-commerce hosting is a bit expensive, but they are not as
+expensive that you cannot start an ecommerce website.
+
+Nowadays, it is very easy to set up an ecommerce site.
+
+All that one needs to do is to get in touch with any good service provider and start gathering
+basic information.
+
+There are many service providers who help you set up your virtual store and charge you
+unexpectedly very low. Google has also started google account service in which you can sell
+your products.
+
+While finalizing your ecommerce hosting setup, you should be very clear on how to handle the
+following −
+
+  Customer Registrations
+  Customer Transactions
+  Product Catalogs
+  Customer Orders
+  Order Security
+  Server Security
+  Server Maintenance
+  Server Backup
+  Server downtime
+  Inventory Control
+  Shipment Methods
+  Payment Methods
+  Foreign currency
+  Credit Cards
+  Taxes issues
+
+You should take this list and discuss it with your service provider as well to understand how they
+will support you to handle all these items.
+
+Web - Site Backup
+
+ 35
+
+ 
+
+--- Page 37 ---
+
+Your server's hard drive crashed. Your site is hacked and the hacker deleted all your files. Your
+web host disappeared with your money and your data.
+
+Even worse, there was and earth quack and your ISP building is gone down and everything is
+lost.
+
+Touch Wood!!! Nobody should face such a situation. But if you are not prepared for these
+situations, your hard work might be lost forever.
+
+That is why it is of the utmost importance that you keep regular backups of your data.
+
+Now there are many questions −
+
+  How frequently backup should be taken?
+  Where this backup should be preserved?
+  What type of backup should be taken?
+  Who should take these backup?
+  Now let us answer these questions one by one −
+
+How Frequently Backup should be taken?
+
+If your site is not changing over a period of time, then it is advisable to take backups only once
+and keep it on your hard disc or data disc or DVD wherever you like. In case you need to restore
+it, just do it and see if your website is up and running.
+
+But if you are in the habit of making frequent modifications on your site, then it is necessary that
+you take regular backup. Websites like amazon.com have very tight backup schedules and very
+expensive backup infrastructure.
+
+It depends on your business and you have to see how much data loss you can bear. If you think it
+is not affordable to lose even a single day’s data, then I would recommend to schedule daily
+backup and similarly, you can decide if weekly or monthly backup are OK for you or not.
+
+Where the Backup should be preserved?
+
+Most of the times, backups are taken from one machine and saved on another machine or media.
+If possible, you should arrange a different backup server where you can FTP your complete data
+to be backup up. If this is not too much then you can keep it in data CD or DVD etc.
+
+If possible, keep multiple copies of backup but with a managed way to avoid any confusion. You
+should have a proper version control over different backups. There are many service providers
+who provide you different backup servers with a very nominal cost and it is recommended that
+you spend that amount on backup services.
+
+What Type of Backup Should be taken?
+
+ 36
+
+ 
+
+--- Page 38 ---
+
+There are two types of backup − incremental and full. It depends on what type of backup tools
+you are using. There are many backup tools − for example, Oracle provides its own utilities to
+take different types of backup.
+
+  Incremental Backup − The backup’s controller compares the existing backup with the
+ data that you wish to backup. If there is an exact match between the two, then no
+ additional files will be backed up. However, if you have added or edited any file, these
+ files will be updated in the backup, thus the name incremental.
+  Full Backup − Here all files are written to the backup, even if they already exist in the
+ most current backup.
+
+Who Should Take These Backup?
+
+The simplest case is that you can login to your web server on a monthly or weekly basis and
+copy all the website related files on different computer or media. It works only in case you have
+limited amount of data on your site.
+
+If you have a huge database and numerous files, then it is difficult to manage such backups on an
+everyday and weekly basis. In such cases, you may need to have automated scripts to take
+backup and keep them at another machine or media.
+
+You can write your shell script or perl script and browse through different directories and collect
+all the files and zip them automatically, assign them a unique backup number and then ftp those
+files on a designated backup server or media like tap drive.
+
+Conclusion
+
+It is up to you to decide how you want to take your backup. If you are a website owner, then you
+must take regular backup without failure. Else, it might lead to serious consequences.
+
+ 37

@@ -1,0 +1,2301 @@
+--- Page 1 ---
+
+ WebWeb QuickQuick GuideGuide ConceptsConcepts
+
+StatisticsStatistics && ProgrammingProgramming (Kenyatta(a higher education institution)University)
+
+ ScanScan toto openopen onon StudocuStudocu
+
+ StudocuStudocu isis notnot sponsoredsponsored oror endorsedendorsed byby anyany collegecollege oror universityuniversity
+ 
+
+--- Page 2 ---
+
+Web Quick Guide
+
+Web - Basic Concepts
+
+What is Internet?
+
+The Internet is essentially a global network of computing resources.
+
+You can think of the Internet as a physical collection of routers and circuits as a set of shared
+resources.
+
+Some common definitions given in the past include −
+
+  A network of networks based on the TCP/IP communications protocol.
+  A community of people who use and develop those networks.
+
+Note:
+
+TCP/IP: PHP (recursive acronym for PHP: Hypertext Preprocessor) is a widely-used open source
+general-purpose scrip琀椀ng language that is especially suited for web
+
+The PHP Programming Language Meaning Explained. PHP is an open-source server-side scrip琀椀ng
+language that many devs use for web development. It is also a general-purpose language that you
+can use to make lots of projects, including Graphical User Interfaces (GUIs).
+
+Internet-Based Services
+
+Some of the basic services available to Internet users are −
+
+  Email − A fast, easy, and inexpensive way to communicate with other Internet users
+ around the world.
+  Telnet − Allows a user to log into a remote computer as though it were a local system.
+  FTP − Allows a user to transfer virtually every kind of file that can be stored on a
+ computer from one Internet-connected computer to another.
+  UseNet news − A distributed bulletin board that offers a combination news and
+ discussion service on thousands of topics.
+  World Wide Web (WWW) − A hypertext interface to Internet information resources.
+
+Note:
+
+Messages distributed by electronic means from one computer user to one or more recipients
+via a network.
+"Reading email has become the first task of the morning"
+
+ 1
+
+ 
+
+--- Page 3 ---
+
+Telnet:
+
+Telnet is a network protocol used to virtually access a computer and to provide a two-way,
+collabora琀椀ve and text-based communica琀椀on channel between two machines. It follows a user
+command Transmission Control Protocol/Internet Protocol (TCP/IP) networking protocol for crea琀椀ng
+remote sessions.
+
+WWW:
+
+An informa琀椀on system on the internet which allows documents to be connected to other documents
+by hypertext links, enabling the user to search for informa琀椀on by moving from one document to
+another.
+
+What is WWW?
+
+WWW stands for World Wide Web. A technical definition of the World Wide Web is − All the
+resources and users on the Internet that are using the Hypertext Transfer Protocol (HTTP).
+
+A broader definition comes from the organization that Web inventor Tim Berners-Lee helped
+found, the World Wide Web Consortium (W3C): The World Wide Web is the universe of
+network-accessible information, an embodiment of human knowledge.
+
+In simple terms, The World Wide Web is a way of exchanging information between computers
+on the Internet, tying them together into a vast collection of interactive multimedia resources.
+
+What is HTTP?
+
+HTTP stands for Hypertext Transfer Protocol. This is the protocol being used to transfer
+hypertext documents that makes the World Wide Web possible.
+
+A standard web address such as Yahoo.com is called a URL and here the prefix http indicates its
+protocol
+
+What is URL?
+
+URL stands for Uniform Resource Locator, and is used to specify addresses on the World Wide
+Web. A URL is the fundamental network identification for any resource connected to the web
+(e.g., hypertext pages, images, and sound files).
+
+A URL will have the following format −
+
+protocol: //hostname/other information
+
+The protocol specifies how information is transferred from a link.
+
+The protocol used for web resources is Hypertext Transfer Protocol (HTTP).
+
+ 2
+
+ 
+
+--- Page 4 ---
+
+Other protocols compatible with most web browsers include FTP, telnet, newsgroups, and
+Gopher.
+
+The protocol is followed by a colon, two slashes, and then the domain name. The domain name
+is the computer on which the resource is located.
+
+Links to particular files or subdirectories may be further specified after the domain name. The
+directory names are separated by single forward slashes.
+
+Note:
+
+Newsgroups:
+
+A Usenet newsgroup is a repository usually within the Usenet system, for messages posted from users
+in di昀昀erent loca琀椀ons using the Internet. They are discussion groups and are not devoted to publishing
+news.
+
+Newsgroups are found on USENET, a network of discussion groups where millions of users read
+pos琀椀ngs, or ar琀椀cles, using so昀琀ware called a newsreader. Users can then make comments and ask
+ques琀椀ons in response to the pos琀椀ngs. Thousands of newsgroups exist, covering a wide range of topics.
+
+Gopher:
+
+Gopher is an applica琀椀on-layer protocol that provides the ability to extract and view Web documents
+stored on remote Web servers.
+
+Gopher is an Internet applica琀椀on that allows you to browse many di昀昀erent kinds of resources by
+looking at menus or lis琀椀ngs of informa琀椀on available. Its func琀椀on is easy to remember because of its
+name: you use Gopher to "go for" informa琀椀on that is on other computers all over the world.
+
+What is Website?
+
+Currently you are on our website Tutorialspoint.com which is a collection of various pages
+written in HTML markup language. This is a location on the web where people can find tutorials
+on latest technologies.
+
+Similarly, there are millions of websites available on the web.
+
+Each page available on the website is called a web page and first page of any website is called
+home page for that site.
+
+What is Web Server?
+
+Every Website sits on a computer known as a Web server.
+
+This server is always connected to the internet.
+
+ 3
+
+ 
+
+--- Page 5 ---
+
+Every Web server that is connected to the Internet is given a unique address made up of a series
+of four numbers between 0 and 256 separated by periods.
+
+For example, 68.178.157.132 or 68.122.35.127.
+
+When you register a Web address, also known as a domain name, such as tutorialspoint.com you
+have to specify the IP address of the Web server that will host the site.
+
+We will see different type of Web servers in a separate chapter.
+
+What is Web Browser?
+
+Web Browsers are software installed on your PC. To access the Web you need a web browsers,
+such as Netscape Navigator, Microsoft Internet Explorer or Mozilla Firefox.
+
+Currently you must be using any sort of Web browser while you are navigating through my site
+tutorialspoint.com.
+
+On the Web, when you navigate through pages of information this is commonly known as
+browsing or surfing.
+
+We will see different type of Web browsers in a separate chapter.
+
+What is SMTP Server?
+
+SMTP stands for Simple Mail Transfer Protocol Server.
+
+This server takes care of delivering emails from one server to another server. When you send an
+email to an email address, it is delivered to its recipient by a SMTP Server.
+
+What is ISP?
+
+ISP stands for Internet Service Provider. They are the companies who provide you service in
+terms of internet connection to connect to the internet.
+
+You will buy space on a Web Server from any Internet Service Provider. This space will be used
+to host your Website.
+
+What is HTML?
+
+HTML stands for Hyper Text Markup Language. This is the language in which we write web
+pages for any Website. Even the page you are reading right now is written in HTML.
+
+ 4
+
+ 
+
+--- Page 6 ---
+
+This is a subset of Standard Generalized Mark-Up Language (SGML) for electronic publishing,
+the specific standard used for the World Wide Web.
+
+What is Hyperlink?
+
+A hyperlink or simply a link is a selectable element in an electronic document that serves as an
+access point to other electronic resources.
+
+Typically, you click the hyperlink to access the linked resource. Familiar hyperlinks include
+buttons, icons, image maps, and clickable text links.
+
+What is DNS?
+
+DNS stands for Domain Name System. When someone types in your domain name,
+www.example.com, your browser will ask the Domain Name System to find the IP that hosts
+your site.
+
+When you register your domain name, your IP address should be put in a DNS along with your
+domain name. Without doing it your domain name will not be functioning properly.
+
+Note:
+
+DNS: The Domain Name System (DNS) is the phonebook of the Internet. Humans access informa琀椀on
+online through domain names, like ny琀椀mes.com or espn.com.
+
+The Domain Name System (DNS) turns domain names into IP addresses, which browsers use to load
+internet pages. Every device connected to the internet has its own IP address, which is used by other
+devices to locate the device.
+
+The domain name system (DNS) is a naming database in which internet domain names are located
+and translated into Internet Protocol (IP) addresses. The domain name system maps the name people
+use to locate a website to the IP address that a computer uses to locate that website.
+
+The DNS operates as a distributed database, where di昀昀erent types of DNS servers are responsible for
+di昀昀erent parts of the DNS name space. The three DNS server types server are the following: DNS stub
+resolver server. DNS recursive resolver server.
+
+NOTED:
+
+The 3 types of DNS servers and how they work
+
+DNS is a core internet technology, instrumental in mapping human-readable domains into corresponding IP
+addresses. Learn about the three DNS server types and their roles in the internet
+
+ 5
+
+ 
+
+--- Page 7 ---
+
+Not all DNS servers are created equal, and understanding how the three different types of DNS
+servers work together to resolve domain names can be helpful for any information security or IT
+professional.
+
+DNS is a core internet technology that translates human-friendly domain names into machine-
+usable IP addresses, such as www.example.com into 192.0.2.1. The DNS operates as a
+distributed database, where different types of DNS servers are responsible for different parts of
+the DNS name space.
+
+The three DNS server types server are the following:
+
+ 1. DNS stub resolver server
+ 2. DNS recursive resolver server
+ 3. DNS authoritative server
+
+Figure 1 below illustrates the three different types of DNS server.
+
+A stub resolver is a software component normally found in endpoint hosts that generates DNS
+queries when application programs running on desktop computers or mobile devices need to
+resolve DNS domain names.
+
+DNS queries issued by stub resolvers are typically sent to a DNS recursive resolver; the resolver
+will perform as many queries as necessary to obtain the response to the original query and then
+send the response back to the stub resolver.
+
+Note:
+
+What is DNS? The domain name system (DNS) is a naming database in which internet domain names
+are located
+
+Example domains
+
+As described in RFC 2606 and RFC 6761, a number of domains such as example.com and
+example.org are maintained for documentation purposes. These domains may be used as
+illustrative examples in documents without prior coordination with us. They are not available
+for registration or transfer.
+
+Recursive DNS server
+
+A recursive DNS server is a domain name system server that takes website name or URL (uniform
+resource locator)
+
+Cloudflare 1.1.1.1 DNS promises more private web browsing
+
+Cloudflare promises its new 1.1.1.1 DNS service is faster and enables better privacy for web browsing than
+competing offerings, but it's unclear how different its service will be.
+
+ 6
+
+ 
+
+--- Page 8 ---
+
+Infoblox's Cricket Liu explains DNS over HTTPS security issues
+
+Cricket Liu, chief DNS architect at Infoblox, explains how DNS over HTTPS and DNS over TLS
+improve security, as well as challenges the new protocols may soon raise for enterprises.
+
+The domain name system is one of the fundamental technologies that has enabled the rapid
+growth and current stability.
+
+Figure 1. The three different types of DNS server interoperate to deliver correct and current
+mappings of IP addresses with domain names.
+
+The recursive resolver may reside in a home router, be hosted by an internet service provider or
+be provided by a third party, such as Google's Public DNS recursive resolver at 8.8.8.8 or the
+Cloudflare DNS service at 1.1.1.1.
+
+Since the DNS operates as a distributed database, different servers are responsible --
+authoritative in DNS-speak -- for different parts of the DNS name space.
+
+Figure 2 illustrates a hypothetical DNS resolution scenario in which an application uses all three
+types of DNS servers to resolve the domain name www.example.com into an IPv4 address -- in
+other words, a DNS address resource record.
+
+ 7
+
+ 
+
+--- Page 9 ---
+
+Figure 2. DNS servers cooperate to accurately resolve an IP address from a domain name.
+
+In step 1, the stub resolver at the host sends a DNS query to the recursive resolver.
+
+In step 2, the recursive resolver resends the query to one of the DNS authoritative name servers
+for the root zone.
+
+This authoritative name server does not have the response to the query but is able to provide a
+reference to the authoritative name server for the.com zone.
+
+As a result, the recursive resolver resends the query to the authoritative name server for the.com
+zone.
+
+This process continues until the query is finally resent to an authoritative name server for the
+www.example.com zone that can provide the answer to the original query -- i.e., what are the IP
+addresses for www.example.com?
+
+Finally, in step 8, this response is sent back to the stub resolver.
+
+One thing worth noting is that all these DNS messages are transmitted in the clear, and there is
+the potential for malicious actors to monitor users' internet activities.
+
+ 8
+
+ 
+
+--- Page 10 ---
+
+Anyone administering DNS servers should be aware of DNS privacy issues and the ways in
+which those threats can be mitigated.
+
+What is W3C?
+
+W3C stands for World Wide Web Consortium which is an international consortium of
+companies involved with the Internet and the Web.
+
+The W3C was founded in 1994 by Tim Berners-Lee, the original architect of the World Wide
+Web.
+
+The organization's purpose is to develop open standards so that the Web evolves in a single
+direction rather than being splintered among competing factions.
+
+The W3C is the chief standards body for HTTP and HTML.
+
+Web - How it Works?
+
+On the simplest level, the Web physically consists of the following components −
+
+  Your personal computer − This is the PC at which you sit to see the web.
+  A Web browser − A software installed on your PC which helps you to browse the Web.
+  An internet connection − This is provided by an ISP and connects you to the internet to
+ reach to any Website.
+  A Web server − This is the computer on which a website is hosted.
+  Routers & Switches − They are the combination of software and hardware who take
+ your request and pass to appropriate Web server.
+
+The Web is known as a client-server system. Your computer is the client and the remote
+computers that store electronic files are the servers.
+
+How the Web Works
+
+When you enter something like Google.com the request goes to one of many special computers
+on the Internet known as Domain Name Servers (DNS).
+
+All these requests are routed through various routers and switches.
+
+The domain name servers keep tables of machine names and their IP addresses, so when you
+type in Google.com it gets translated into a number, which identifies the computers that serve the
+Google Website to you.
+
+When you want to view any page on the Web, you must initiate the activity by requesting a page
+using your browser.
+
+ 9
+
+ 
+
+--- Page 11 ---
+
+The browser asks a domain name server to translate the domain name you requested into an IP
+address.
+
+The browser then sends a request to that server for the page you want, using a standard called
+Hypertext Transfer Protocol or HTTP.
+
+The server should constantly be connected to the Internet, ready to serve pages to visitors.
+
+When it receives a request, it looks for the requested document and returns it to the Web
+browser.
+
+When a request is made, the server usually logs the client's IP address, the document requested,
+and the date and time it was requested.
+
+This information varies server to server.
+
+An average Web page actually requires the Web browser to request more than one file from the
+Web server and not just the HTML / XHTML page, but also any images, style sheets, and other
+resources used in the web page.
+
+Each of these files including the main page needs a URL to identify each item.
+
+Then each item is sent by the Web server to the Web browser and Web browser collects all this
+information and displays them in the form of Web page.
+
+In Short
+
+We have seen how a Web client - server interaction happens. We can summarize these steps as
+follows −
+
+A user enters a URL into a browser (for example, Google.com. This request is passed to a
+domain name server.
+
+The domain name server returns an IP address for the server that hosts the Website (for example,
+68.178.157.132).
+
+The browser requests the page from the Web server using the IP address specified by the domain
+name server.
+
+The Web server returns the page to the IP address specified by the browser requesting the page.
+
+The page may also contain links to other files on the same server, such as images, which the
+browser will also request.
+
+The browser collects all the information and displays to your computer in the form of Web page.
+
+ 10
+
+ 
+
+--- Page 12 ---
+
+Web - Browser Types
+
+Web Browsers are software installed on your PC. To access the Web, you need a web browser,
+such as Netscape Navigator, Microsoft Internet Explorer or Mozilla Firefox.
+
+Currently you must be using any sort of Web browser while you are navigating through our site
+tutorialspoint.com. On the Web, when you navigate through pages of information, this is
+commonly known as web browsing or web surfing.
+
+There are four leading web browsers − Explorer, Firefox, Netscape, and Safari, but there are
+many others browsers available.
+
+You might be interested in knowing Complete Browser Statistics. Now we will see these
+browsers in bit more detail.
+
+While developing a site, we should try to make it compatible to as many browsers as possible.
+
+Especially sites should be compatible to major browsers like Explorer, Firefox, Chrome,
+Netscape, Opera, and Safari.
+
+ Internet Explorer
+
+Internet Explorer (IE) is a product from software giant Microsoft. This is the most commonly
+used browser in the universe.
+
+This was introduced in 1995 along with Windows 95 launch and it has passed Netscape
+popularity in 1998.
+
+You can download latest version of this browser from Microsoft site Download Internet Explorer
+
+ Netscape
+
+Netscape is one of the original Web browsers. This is what Microsoft designed Internet Explorer
+to compete against. Netscape and IE comprise the major portion of the browser market. Netscape
+was introduced in 1994.
+
+You can download latest copy of this browser from Download Netscape
+
+ Mozilla
+
+ 11
+
+ 
+
+--- Page 13 ---
+
+Mozilla is an open-source Web browser, designed for standards compliance, performance and
+portability. The development and testing of the browser is coordinated by providing discussion
+forums, software engineering tools, releases and bug tracking. Browsers based on Mozilla code
+is the second largest browser family on the Internet today, representing about 30% of the Internet
+community.
+
+You can download latest copy of this browser from Download Mozilla
+
+ Konqueror
+
+Konqueror is an Open Source web browser with HTML 4.01 compliance, supporting Java
+applets, JavaScript, CSS 1, CSS 2.1, as well as Netscape plugins. This works as a file manager as
+well as it supports basic file management on local UNIX filesystems, from simple cut/copy and
+paste operations to advanced remote and local network file browsing.
+
+You can download latest copy of this browser from Download Konqueror
+
+ Firefox
+
+Firefox is a new browser derived from Mozilla. It was released in 2004 and has grown to be the
+second most popular browser on the Internet.
+
+You can download a latest version of this browser from Download Firefox
+
+ Safari
+
+Safari is a web browser developed by Apple Inc. and included in Mac OS X. It was first released
+as a public beta in January 2003. Safari has very good support for latest technologies like
+XHTML, CSS2 etc.
+
+You can download a latest version of this browser from Download Safari
+
+ Opera
+
+Opera is smaller and faster than most other browsers, yet it is full- featured. Fast, user-friendly,
+with keyboard interface, multiple windows, zoom functions, and more. Java and non-Java-
+enabled versions available. Ideal for newcomers to the Internet, school children, handicap and as
+a front-end for CD-Rom and kiosks.
+
+ 12
+
+ 
+
+--- Page 14 ---
+
+You can download a latest version of this browser Download Opera
+
+ Lynx
+
+Lynx is a fully-featured World Wide Web browser for users on Unix, VMS, and other platforms
+running cursor-addressable, character-cell terminals or emulators.
+
+You can download a latest version of this browser from Download Lynx
+
+Web - Server Types
+
+Every Website sits on a computer known as a Web server. This server is always connected to the
+internet.
+
+Every Web server that is connected to the Internet is given a unique address made up of a series
+of four numbers between 0 and 255 separated by periods.
+
+For example, 68.178.157.132 or 68.122.35.127.
+
+When you register a web address, also known as a domain name, such as tutorialspoint.com you
+have to specify the IP address of the Web server that will host the site.
+
+You can load up with Dedicated Servers that can support your web-based operations.
+
+There are four leading web servers − Apache, IIS, lighttpd and Jagsaw. Now we will see these
+servers in bit more detail.
+
+Apart from these Web Servers, there are other Web Servers also available in the market but they
+are very expensive. Major ones are Netscape's iPlanet, Bea's Web Logic and IBM's WebSphere.
+
+ Apache HTTP Server
+
+This is the most popular web server in the world developed by the Apache Software Foundation.
+
+Apache web server is an open source software and can be installed on almost all operating
+systems including Linux, UNIX, Windows, FreeBSD, Mac OS X and more.
+
+About 60% of the web server machines run the Apache Web Server.
+
+You can have Apache with tomcat module to have JSP and J2EE related support.
+
+You can have detailed information about this server at Apache HTTP Server
+
+ 13
+
+ 
+
+--- Page 15 ---
+
+ Internet Information Services
+
+The Internet Information Server (IIS) is a high performance Web Server from Microsoft. This
+web server runs on Windows NT/2000 and 2003 platforms (and may be on upcoming new
+Windows version also). IIS comes bundled with Windows NT/2000 and 2003; Because IIS is
+tightly integrated with the operating system so it is relatively easy to administer it.
+
+You can have detailed information about this server at Miscrosoft IIS
+
+ lighttpd
+
+The lighttpd, pronounced lighty is also a free web server that is distributed with the FreeBSD
+operating system. This open source web server is fast, secure and consumes much less CPU
+power. Lighttpd can also run on Windows, Mac OS X, Linux and Solaris operating systems.
+
+You can have detailed information about this server at lighttpd
+
+ Sun Java System Web Server
+
+This web server from Sun Microsystems is suited for medium and large websites. Though the
+server is free it is not open source. It however, runs on Windows, Linux and Unix platforms. The
+Sun Java System web server supports various languages, scripts and technologies required for
+Web 2.0 such as JSP, Java Servlets, PHP, Perl, Python, Ruby on Rails, ASP and Coldfusion etc.
+
+You can have detailed information about this server at Sun Java System Web Server
+
+ Jigsaw Server
+
+Jigsaw (W3C's Server) comes from the World Wide Web Consortium. It is open source and free
+and can run on various platforms like Linux, UNIX, Windows, Mac OS X Free BSD etc. Jigsaw
+has been written in Java and can run CGI scripts and PHP programs.
+
+You can have detailed information about this server at Jigsaw Server
+
+Web - Site Advantages
+
+If you are constructing a Website, then we hope you are aware of its advantages as well. Here, in
+this chapter, we have listed out a few major advantages of keeping a website.
+
+Business is Open 24x7
+
+ 14
+
+ 
+
+--- Page 16 ---
+
+This means that once you put your business onsite, then your business is open 7 days a week and
+365 days a year.
+
+Even if you are in different locations of the world then you will be able to serve your customers
+on 24x7 hours basis.
+
+Increased Customer Base
+
+Because anyone in the world can see your website so you will gain customers from other states
+and countries while you are putting in the same amount of effort and money.
+
+Tremendous Cost Saving
+
+This is one of the biggest advantages of having a business online. You do not need to keep a big
+man power and lot of resources to maintain a business on site.
+
+There are many other cost saving opportunities while keeping business online.
+
+Think of how many cards you mail out to let customers know about your sale.
+
+All of that can be eliminated by putting the sale information on your website and inviting your
+customers to visit it.
+
+Advertising Opportunities
+
+Apart from saving your advertising cost, you have additional opportunities to run advertisements
+from other companies and start making money. If you ever advertised in a local newspaper, you
+know the costs.
+
+You are being charged per line, per inch, and per color.
+
+On the Web, there is no limit to how much you can put. So whenever there is a new product or
+service, then you can advertise it in a better way.
+
+Creates a Brand Image
+
+Internet is a great medium through which you can create any image of yourself which you want.
+It is all in your hands.
+
+For example, you can design a professional website, add helpful content, and your company will
+immediately take a step up in the image it represents.
+
+No matter how small your business is, with the right tools and a great desire you can make it
+look like a corporation on the Web.
+
+ 15
+
+ 
+
+--- Page 17 ---
+
+Customer Satisfaction
+
+If you have a really good site online, then you can give your customers a lot of satisfaction in
+terms of customer care.
+
+You can keep online help, FAQ, and other important information which is useful for your
+customers.
+
+You can create online forums for open discussion and you can conduct customer survey to take
+customer feedback etc.
+
+Showcase Your Work
+
+Whether you are a real estate agent, construction business owner or a beauty salon specialist −
+you can put your work on display when you have a website.
+
+Anytime a potential client wants to see your past work and projects, simply refer him or her to
+your site.
+
+No need to scan and mail pictures, or bring your client to a finished building project.
+
+Web - Skills Required
+
+If you are planning to maintain a Website, then you would require a specific set of skills.
+
+This skillset can be endless because today, there are numerous technologies available and many
+are coming every day.
+
+So you have to plan and affirm on any one of the available technologies and go ahead for your
+project.
+
+This is not required that you should have knowledge of all the listed skills.
+
+If you want to develop a simple Website, then you would needs just first four skills listed here.
+Rest of the skills are required if you want to go for a bigger and more interactive Website.
+
+  Computer Operations − All you need to know is how to operate a computer −
+ Windows, Linux or Macintosh. This depends on which Web Server you want to host your
+ website. So you should have basic knowledge of that system only. You should be well
+ acquainted of basic operations like creating file, deleting file, updating file, directory
+ creation, file permission etc.
+  Remote Access − Most of the times your Web Server will be accessed from remote site
+ only. You should be well aware how to connect a computer from remote site. So at least
+ you should have basic knowledge of telnet utility to connect to a remote machine. There
+ are many service providers who will provide you control panel to manage your Website.
+
+ 16
+
+ 
+
+--- Page 18 ---
+
+  File Uploading & Downloading − As I told you most of the times your Web Server will
+ be on remote site. So you would need to upload and download all the files related to your
+ Website. So at least you should have basic knowledge of FTP utility to connect to a
+ remote machine and download or upload your files. Almost service providers give you
+ facility to upload your files on your Web server.
+  HTML / XHTML Knowledge − These are the markup languages which you will use to
+ build your website. So you should have good understanding on these languages. You can
+ refer our tutorial to learn HTML / XHTML
+  CSS Knowledge − Cascading Style Sheet knowledge is required to achieve many results
+ which are not possible through HTML or XHTML.
+  PHP Script − Now-a-days many sites are being developed using PHP language. This
+ script helps you to create an interactive Website. You can refer our tutorial to learn PHP
+ Script
+  PERL Script − PERL is another language which is being highly used to develop
+ interactive Web Applications. So if you are planning to use PERL to develop your
+ Website, then you can refer our tutorial to learn PERL Script
+  Java or VB Scripts − These scripts are required to perform user level validations and to
+ add more interactivity in your Website. So a web developer is desired to have knowledge
+ of any of the client side scripts.
+  AJAX Technology − This is the latest technology in the web. Google and Yahoo are
+ using this technology to give a better browsing experience to their site visitors. You can
+ refer our tutorial to learn AJAX Technology
+  ASP or JSP − These are another technologies to be used to develop interactive Websites.
+  Flash Knowledge − You can plan to use Macromedia Flash to build your Website. This
+ is a bit time consuming to learn this technology but once you learnt then you can develop
+ very beautiful and attractive websites using Flash.
+  HTTP Protocol − As you grow you are desired to have more knowledge about Web. So
+ I would suggest you to go through the web backbone i.e. HTTP protocol as well. You can
+ refer our tutorial to learn HTTP Protocol
+
+Web - Tools Required
+
+As a basic necessity, you need a good internet connection from a reliable service provider which
+provides decent connectivity and speed. Evaluate vendors based on their services and support
+before selecting. Here due diligence plays a major part.
+
+The following tools and infrastructure will help you in developing a Website −
+
+  Computer Machine − If you do not have computer available and you received this
+ tutorial printed on a paper then I would say that first of all you would need a computer
+ machine running either Windows or Linux or UNIX or Macintosh system or any other
+ operating system.
+  Internet Connection − If you are not connected to the internet and you received this
+ tutorial printed on a paper then I would say that this is second and another most important
+ tool would need to connect to the Internet and to you Web Server where you will host
+
+ 17
+
+ 
+
+--- Page 19 ---
+
+ your website. For this purpose you can buy either a dial up connection or broadband
+ connection of high speed connectivity based on your requirement and budget.
+  A Web Server − Apart from basic Internet connectivity you will need one Web Server to
+ keep all the files related to your Website. So you would need to buy space on a Web
+ Server. There are millions of ISPs who are in business of selling web space at
+ competitive prices. We will give more detail on this in Web Hosting Concepts chapter.
+  A Text Editor − This is another most important tool which you will need to develop
+ your Website. If you are using Windows then you can use notepad as a text editor, or if
+ you are using Linux/Unix then vi editor is one of my favorite editors. You will need this
+ editor to write your HTML, PHP or ASP pages or for any other editing purpose. For
+ practice purpose, you can use our Online HTML Editor
+  A Web Browser − You will need this tool to see the result of your HTML file. So you
+ should have either Internet Explorer or Firefox etc. installed on your computer.
+  Web Authoring Tools − If you don't want to use a simple Text Editor to edit your
+ HTML files then there are many commercial Web Authoring Tools available. These tools
+ are also called HTML editors. Microsoft's FrontPage and Macromedia Dreamweaver are
+ both a visual HTML (WYSIWYG) and HTML source code editor. These editors helps
+ you to develop your HTML pages vary rapidly.
+  Secure telnet client − If you are connecting to your Web server directly then you can use
+ a tool called PuTTY. This is what I'm using while connecting to my web server.
+  Secure FTP client − If you are connecting to your Web server directly using FTP client
+ to upload or download your web files then you can use a tool called PSFTP. FTP stands
+ for File Transfer Protocol. Simply put, after you design your website, you need to send it
+ to the Web and your FTP program will do just that for you. This is what I'm using while
+ connecting to my web server.
+
+Web - Domain Names
+
+A domain name is the part of your Internet address that comes after "www". For example, in
+Tutorialspoint.com the domain name is tutorialspoint.com.
+
+A domain name becomes your Business Address so care should be taken to select a domain
+name. Your domain name should be easy to remember and easy to type.
+
+How to Get a Domain Name?
+
+When you plan to put a site online, this is one of the important steps to buy a domain name.
+
+This is always not necessary that whatever domain name you are looking that is available so in
+that case you will have to opt for any other good domain name.
+
+When you buy a domain name it is registered and when domain names are registered they are
+added to a large domain name register, and information about your site − including your Internet
+IP address is stored on a DNS server and your contact information etc. is registered with your
+registrar.
+
+ 18
+
+ 
+
+--- Page 20 ---
+
+You can buy domain name from any domain registrar like GoDaddy
+
+Domain Extension Types
+
+There are many types of domain extensions you can choose for your domain name. This depends
+on your business nature.
+
+For example, if you are going to register a domain name for education purpose then you can
+choose.edu extension.
+
+Below is a reference of the correct usage of certain extensions. But there is no hard and fast rule
+to go for any extension. Most commonly used is.com
+
+ .com − Stands for company/commercial, but it can be used for any website.
+ .net − Stands for network and is usually used for a network of sites.
+ .org − Stands for organization and is supposed to be for non-profit bodies.
+ .us,.in − They are based on your country names so that you can go for country specific
+ domain extensions
+ .biz − A newer extension on the Internet and can be used to indicate that this site is
+ purely related to business.
+ .info − Stands for information. This domain name extension can be very useful, and as a
+ new comer it's doing well.
+ .tv − Stands for Television and are more appropriate for TV channel sites.
+
+Newer domain extensions such as.biz.info and.us etc. have more name choices available as
+many of the popular domains have yet to be taken and most of the them are available at very
+nominal prices.
+
+Choosing a Domain Name
+
+The domain name will be your business address. Hence, it is imperative that you choose the
+domain name with utmost care.
+
+Many people think it is important to have keywords in a domain.
+
+Keywords in the domain name are usually important, but it usually can be done while keeping
+the domain name short, memorable, and free of hyphens.
+
+Using keywords in your domain name gives you a strong competitive advantage over your
+competitors.
+
+Having your keywords in your domain name can increase click through rates on search engine
+listings and paid ads as well as make it easier to using your keywords in get keyword rich
+descriptive inbound links.
+
+ 19
+
+ 
+
+--- Page 21 ---
+
+Avoid buying long and confusing domain names. May people separate the words in their domain
+names using dashes or hyphen.
+
+In the past the domain name itself was a significant ranking factor but now with advanced search
+engines, it is not a significant factor anymore.
+
+Keep two to three words in your domain name − it will be more memorable.
+
+Some of the most memorable websites do a great job of branding by creating their own words.
+Examples include eBay, Yahoo!, Expedia, Slashdot, Fark, Wikipedia, Google. You should be able to say it over the telephone once and the other person should know how to
+spell it and they should know what you sell.
+
+If you can do that AND work keywords in there, good for you. If you can't, skip the keywords.
+
+What are Sub-Domains
+
+You can divide your domain into many sub domains based on your requirement.
+
+If you are doing multiple business using the same domain, then it would be useful to have sub-
+domains for every business.
+
+Following are examples of some sub-domains −
+
+You must have seen google.com as a main domain but google has created many subdomains
+based on their business. Some of them are as follows −
+
+  adwords.google.com − This sub domain is being used for Google Adwords.
+  groups.google.com − This sub domain is being used for Google Groups.
+  images.google.com − This sub domain is being used for Google Images.
+
+This way, you can present your different business sections in a very good segregated way. It is
+not a big thing to create a sub-domains.
+
+If you already have registered a domain, then your registrar will provide you a way to create sub-
+domains. You may need to talk to your registrar for more detail.
+
+Web - Site Construction
+
+Now you are ready for a website construction.
+
+Before proceeding further, you have to take many factors into consideration.
+
+I cannot list out each and everything but I have described the major factors in this tutorial which
+will help you to have a better website −
+
+ 20
+
+ 
+
+--- Page 22 ---
+
+What to Put on Your Website?
+
+What you would have on your website totally depends on your business and the nature of your
+website.
+
+Here is a list of pages that you might want to create for your website.
+
+  Attractive Home Page: Always required for every website.
+  List of Product and Services along with complete detail.
+  Complete Pricing Information.
+  About your company and nature of business including your achievements.
+  About your staff and if possible their experience.
+  Your complete contact information.
+  Frequently Asked Questions.
+  Success Stories and Feedback from Customers.
+
+Finally, make your site useful and interesting for your customers.
+
+Your site visitors are your customers and they should find each and everything they are looking
+for. Customer satisfaction should be your prime concern.
+
+How to Design Your Website?
+
+You should not simply start developing your website, otherwise you will end up with a bogus
+website.
+
+First, you should put a complete plan and your design on a paper or in an electronic document.
+
+In this section, we have listed out a few points which can help you to design a better website −
+
+  Consider what technology you are going to use to develop your website. Adopt one
+ which gives you better flexibility and rapid development opportunities and then design it
+ accordingly.
+  Design a generic framework so that in future you can enhance and modify your website
+ by putting minimal effort.
+  Design a site to keep required performance in mind. If you are designing database driven
+ website then lot of effort has to put to design good database schemas.
+  Keep your design as simple as possible so that any new developer should become
+ familiar with your design as soon as possible.
+  Identify repeatable components of your website and then keep them separate and try to
+ use them wherever possible.
+  Identify the nature and qualification of your site visitors and give importance to look and
+ feel accordingly.
+  Think from the perspective of a site visitor. If you were a visitor, then how would you
+ like to see this website? If the same site belongs to somebody else, then would you like to
+ spend some time on such site?
+
+ 21
+
+ 
+
+--- Page 23 ---
+
+  You should create a search engine friendly website.
+
+Once again. your presentation should be unique and attractive, otherwise there are a lot of
+websites available on the Internet and it will be difficult for you to retain a site visitor for more
+than a minute.
+
+How to Make a Website Interactive?
+
+Many statistics show that if you are able to retain your site visitors for a long time, then they do
+bigger shopping and visit the site again and again.
+
+So make sure you have done something for your site visitors to do on your website.
+
+Offering a lot of quality information can serve as a great magnet for visitors.
+
+Here is a list of some interactive tools that you can add to your website without any
+programming skills or incurring any costs −
+
+  Poll
+  Forum
+  Guest book
+  Chat room
+  Greeting cards
+  Tell-a-friend about this site
+  Feedback form
+  Live customer service
+  Daily joke or daily cartoon
+  Daily news headlines
+  Site Search Engine
+  Mailing List
+  Automated Frequently Asked Questions
+  The list can go on and on, depending on what will attract your type of visitors.
+
+How to Code Your Website?
+
+Finally, when you start coding for your website, you should be well aware of the following tips
+for a better website −
+
+  Your site should meet all the quality requirements defined by W3C. Today we are using
+ XHTML to develop any website. XHTML is just a cleaner version of HTML.
+  You should keep validating your source code using W3C Validator.
+  Do use appropriate comments but avoid using to many comments inside HTML files.
+  Keep your style sheets and JAVA or VB scripts into separate files and then include them
+ where ever is required.
+  Do not use too much graphics in your web pages.
+  Try to keep your web pages static instead of generating them dynamically.
+
+ 22
+
+ 
+
+--- Page 24 ---
+
+  Make sure there is no broken link on any web page.
+  Test your developed web page in major browsers like Internet Explorer, Firefox, Mozilla,
+ Netscape, etc.
+  Test your all the scripts for all the possible scenarios. Do not host any page without
+ complete testing.
+
+How to Create a Search Engine Friendly Website?
+
+It is very important to make your website search friendly, otherwise you will be away from a
+large chunk of your customer base which comes from search engines like google and yahoo.
+
+This subject is so important that we have put a complete tutorial on Search Engine Optimization
+and I will strongly recommend you to go through this tutorial before you start developing your
+website.
+
+Securing Your Source Code Frequently
+
+While developing your website, it is very important to keep a backup of your complete source
+code. Many times, you might accidentally delete a file. If you have a backup, then you can
+restore previous files and start doing your work.
+
+It is a good practice to take backup on an hourly basis or at least on a daily basis. Keep this
+backup on a different machine or media.
+
+Web - Hosting Concepts
+
+Web hosting deals with putting the contents of your website on a Web server.
+
+Hosting your website on your own server could be an option.
+
+But this will become very much expensive unless you are hosting a site like yahoo.com or
+google.com.
+
+So this tutorials does not cover how to set up your own hosting server.
+
+Buying a server space or renting a complete server from an Internet Service Provider (ISP) is the
+most widely used option. This section guides you to choose a hosting type and makes you aware
+of other related concepts.
+
+Hosting Platforms
+
+You can go for any of the following two most widely used hosting platforms −
+
+  Windows Hosting Servers − If you are a Windows lover then you will find many
+ hosting servers running different flavors of Windows and you can buy space from these
+
+ 23
+
+ 
+
+--- Page 25 ---
+
+ servers. Normally Windows hosting servers are more expensive because of lot of
+ software licensing costs are involved with these servers.
+  Linux Hosting Servers − If you want to go for Linux then opportunities are unlimited
+ and they will have to pay less then what you will pay for Windows Hosting Server. There
+ are many ISP who provides Hosting Servers with different flavors of Unix.
+
+Hosting Types
+
+There are many options available and you can select any hosting type based on your requirement
+and budget. Following are most widely used hosting types −
+
+Free Hosting
+
+Yes, this is true there are many service providers who will give you free space on their web
+server with a condition that you will allow them to run their advertisement at your web pages.
+
+So if you are OK with this option, then you have nothing to pay for a space.
+
+There are some websites like geocities.com, lycos.com, myspace.com, etc. that give you space to
+build your web pages.
+
+Shared Hosting
+
+With shared hosting, your website is hosted on a powerful server along with other websites.
+
+On a shared host, you will have your own user ID and password to login to the shared host and
+you will be allowed to work in your work area.
+
+You would not be able to touch any file or directory belonging to other host partner.
+
+Even you would not know how many sites are hosted on your shared host.
+
+This type of hosting is very cost effective and good for small websites where your space and
+speed are not very important.
+
+Here traffic on one site will affect the speed of all other hosted sites.
+
+Virtual Dedicated Hosting
+
+This type of hosting is better for medium size business.
+
+With virtual dedicated hosting, you will have a dedicated bandwidth and dedicated RAM for
+your site.
+
+You will be given a root ID and password to maintain your Web server.
+
+ 24
+
+ 
+
+--- Page 26 ---
+
+You will be the complete owner of your virtual dedicated server and will be able to install or de-
+install any software.
+
+This type of hosting is created on a single server, but it is managed in such a way that every user
+will have dedicated speed and bandwidth.
+
+This is bit more expensive but really good one for medium size business.
+
+Dedicated Hosting
+
+This type of hosting is very similar to virtual dedicated hosting, but here, a complete machine
+will be allotted for you.
+
+They are more expensive than virtual dedicated hosting and should be considered when you have
+a very high traffic requirement.
+
+Collocated Hosting
+
+It is very difficult to set dedicated resources such as high-security against fire and vandalism,
+regulated backup power, dedicated Internet connections and more.
+
+Collocation is the option which allows you to put your machine in a service provider's premises
+to avail all the available facilities.
+
+This is also a very expensive option and should be opted when you have very high traffic
+requirement.
+
+Hosting Components
+
+When you buy a Web server space, then you should be clear about the follows.
+
+You should do a price comparison between different service providers based on the following
+components −
+
+Disc Space
+
+A small or medium website will require between 10 and 100MB of disk space.
+
+ If you plan to keep a lot of audio and video on your website, then you need plan to buy more
+space.
+
+Before buying server space, you should check the options available to expand your disc space if
+you need it in future.
+
+ 25
+
+ 
+
+--- Page 27 ---
+
+Monthly Traffic
+
+A small or medium website will need between 1GB and 10GB of data transfer on a monthly
+basis.
+
+If you plan to keep a lot of audio and video on your website, then you need a plan with more data
+transfer capacity.
+
+Check different options based on your requirements.
+
+What are the other options available in case you cross the given data transfer limit.
+
+Your site should not be stopped in case you exceed given limit.
+
+Processing Speed
+
+If you are buying space on a shared machine, then you cannot guess how much speed will be
+given to you.
+
+In that case, only way is to see other hosted sites with the same service provider to know about
+their hosting quality.
+
+But if you are buying virtual dedicated server or dedicated server, then you should consider how
+much RAM is being allocated to you.
+
+Your pricing will depend on the given processing power to you.
+
+Connection Speed
+
+Nowadays, most service providers allow very fast connection speed.
+
+So choose a service provider who is giving better connection speed in terms of bits per second.
+
+You can have a connection speed ranging from 64Kb per second to 2.488 GB per second.
+
+Email Accounts
+
+Make sure you are going to get sufficient number of e-mail accounts.
+
+There are many other options available which come along with your e-mail account.
+
+Like, will you get IMAP, POP and E-mail Forwarding options available along with your e-mail
+facilities.
+
+ 26
+
+ 
+
+--- Page 28 ---
+
+Emailing Support
+
+Apart from having email accounts, it is also very important that your web server should have a
+facility to send emails from back-end.
+
+In case your site visitors want to contact to you using a form, then you will be able to use that
+emailing facility to send emails to your designated account.
+
+In simple terms, you should make sure that the SMTP Server is setup and working on your Web
+server.
+
+Latest Technologies
+
+You should make sure that your web server is equipped with all the latest technologies. It should
+have the latest version support for PHP, PERL, ASP and JAVA, etc.
+
+Databases
+
+There are many databases available MySQL, Oracle, SQL Server, etc.
+
+You should choose your server based on your database requirement.
+
+If you are buying space on a shared server, then you need to verify how much space will be
+allocated for your database.
+
+Many ISPs do not give more than a limited space for databases. If your site needs a lot of
+database size, then you should go for a virtual dedicated server.
+
+Server Uptime
+
+It is important that you buy a web server from a reliable and reputed ISP.
+
+You should make sure your ISP is giving you 99.99% server uptime.
+
+If the is server down, then there are many service providers who gives you compensation in case
+your sites goes down more than a limited number of time.
+
+Backup & FTP
+
+Make sure your Service Provider is giving you more ways of taking regular backup of your
+website.
+
+If your site is changing every day, then it becomes very important that you should take regular
+backup of your website. Many service providers do it on your behalf by charging a small cost for
+this service.
+
+ 27
+
+ 
+
+--- Page 29 ---
+
+Control Panel
+
+Just make sure what type of facilities you will get to maintain your hosting account. Check if
+your service provider is providing you an easy-to-use Control Panel or some other similar tool.
+
+Using a Control Panel, you should be able to maintain basic operations related to your website
+such as logging your service request, your reboot request, or any other problem.
+
+Customer Support
+
+Before finalizing a deal with your service provider, you should make sure they provide you the
+required support.
+
+You can get this information using Internet forums or from your friends.
+
+There are many service providers who give you 24x7 support for any technical or non-technical
+problem.
+
+Web - Ecommerce Hosting
+
+Ecommerce is a way of doing business through Internet.
+
+You are doing ecommerce, especially when you are selling your products or services through
+Internet.
+
+ If you planning to put a website which will have transactions such as buying or selling items or
+services, then it means you are going to setup an ecommerce website.
+
+If this is the case, then I don't think this guide will help you up to a level where should be able to
+setup an ecommerce site because there are many more things which should be considered while
+setting up an ecommerce website.
+
+Still you can start from here − E-commerce hosting is a bit expensive, but they are not as
+expensive that you cannot start an ecommerce website.
+
+Nowadays, it is very easy to set up an ecommerce site.
+
+All that one needs to do is to get in touch with any good service provider and start gathering
+basic information.
+
+There are many service providers who help you set up your virtual store and charge you
+unexpectedly very low.
+
+Google has also started google account service in which you can sell your products.
+
+ 28
+
+ 
+
+--- Page 30 ---
+
+While finalizing your ecommerce hosting setup, you should be very clear on how to handle the
+following −
+
+  Customer Registrations
+  Customer Transactions
+  Product Catalogs
+  Customer Orders
+  Order Security
+  Server Security
+  Server Maintenance
+  Server Backup
+  Server downtime
+  Inventory Control
+  Shipment Methods
+  Payment Methods
+  Foreign currency
+  Credit Cards
+  Taxes issues
+
+You should take this list and discuss it with your service provider as well to understand how they
+will support you to handle all these items.
+
+Web - Site Backup
+
+Your server's hard drive crashed. Your site is hacked and the hacker deleted all your files. Your
+web host disappeared with your money and your data.
+
+Even worse, there was and earth quack and your ISP building is gone down and everything is
+lost.
+
+Touch Wood!!! Nobody should face such a situation. But if you are not prepared for these
+situations, your hard work might be lost forever.
+
+That is why it is of the utmost importance that you keep regular backups of your data.
+
+Now there are many questions −
+
+  How frequently backup should be taken?
+  Where this backup should be preserved?
+  What type of backup should be taken?
+  Who should take these backup?
+  Now let us answer these questions one by one −
+
+ 29
+
+ 
+
+--- Page 31 ---
+
+How Frequently Backup should be taken?
+
+If your site is not changing over a period of time, then it is advisable to take backups only once
+and keep it on your hard disc or data disc or DVD wherever you like.
+
+In case you need to restore it, just do it and see if your website is up and running.
+
+But if you are in the habit of making frequent modifications on your site, then it is necessary that
+you take regular backup.
+
+Websites like amazon.com have very tight backup schedules and very expensive backup
+infrastructure.
+
+It depends on your business and you have to see how much data loss you can bear.
+
+If you think it is not affordable to lose even a single day’s data, then I would recommend to
+schedule daily backup and similarly, you can decide if weekly or monthly backup are OK for
+you or not.
+
+Where the Backup should be preserved?
+
+Most of the times, backups are taken from one machine and saved on another machine or media.
+
+If possible, you should arrange a different backup server where you can FTP your complete data
+to be backup up.
+
+If this is not too much then you can keep it in data CD or DVD etc.
+
+If possible, keep multiple copies of backup but with a managed way to avoid any confusion.
+
+You should have a proper version control over different backups.
+
+There are many service providers who provide you different backup servers with a very nominal
+cost and it is recommended that you spend that amount on backup services.
+
+What Type of Backup Should be Taken?
+
+There are two types of backup − incremental and full. It depends on what type of backup tools
+you are using. There are many backup tools − for example, Oracle provides its own utilities to
+take different types of backup.
+
+  Incremental Backup − The backup’s controller compares the existing backup with the
+ data that you wish to backup.
+
+ 30
+
+ 
+
+--- Page 32 ---
+
+ If there is an exact match between the two, then no additional files will be backed up.
+ However, if you have added or edited any file, these files will be updated in the backup,
+ thus the name incremental.
+
+  Full Backup − Here all files are written to the backup, even if they already exist in the
+ most current backup.
+
+Who Should Take These Backup?
+
+The simplest case is that you can login to your web server on a monthly or weekly basis and
+copy all the website related files on different computer or media.
+
+It works only in case you have limited amount of data on your site.
+
+If you have a huge database and numerous files, then it is difficult to manage such backups on an
+everyday and weekly basis.
+
+In such cases, you may need to have automated scripts to take backup and keep them at another
+machine or media.
+
+You can write your shell script or Perl script and browse through different directories and collect
+all the files and zip them automatically, assign them a unique backup number and then ftp those
+files on a designated backup server or media like tap drive.
+
+Conclusion
+
+It is up to you to decide how you want to take your backup. If you are a website owner, then you
+must take regular backup without failure. Else, it might lead to serious consequences.
+
+Web - Site Statistics
+
+Once your site is up and running, it is important that you track your visitors and analyze what
+they are using. You should have a detailed information on the following −
+
+  Who is your visitor? − You should have your site visitor IP address available with you
+ to know the geographical location and identity of that visitor.
+  Visitors’ Timestamp − You should be aware of the time when your site gets the most
+ number of visitors so that you can plan a server down easily. Secondly, timestamp and IP
+ address will help you identify your site visitors in case an investigation is required against
+ a site visitor.
+  What the visitors prefer? − What pages did the site visitor view on your website will
+ give you an idea about the importance of various sections of your website.
+  How visitors came? − This is another important information you should be aware of.
+ How are you getting your site visitors? Are they coming directly or coming through some
+ other website or advertising program.
+
+ 31
+
+ 
+
+--- Page 33 ---
+
+  How long do they stay? − How much time a visitor spends on your site? If visitors are
+ leaving your site just after browsing 1 or 2 pages, then you should come up with some
+ innovative ways to retain them for a longer duration.
+  Visitors’ Browser − This information is important to improve your website for that type
+ of web browsers.
+
+Statistics Programs
+
+There are many websites that help you to find out all the information discussed in the previous
+section.
+
+You just need to keep a small piece of code in the <head<. </head> section of your web pages
+and you will have not only all the above mentioned information but also a complete analysis of
+your site.
+
+  You can try Googles Analytics Program to capture your website statistics.
+  Another good program is Webalizer. This will give you all the basic site statistics you
+ need.
+  There is a site from sourceforge which gives you opportunity to collect your website
+ statistics. So you can try it as well AWStats.
+
+Site Statistics Terminology
+
+Go through the following terms so that become more comfortable with your site statistics report
+and analysis.
+
+  Unique Visits − The number of unique visitors you had in a given time period. Example
+ − if there was only a single person who visited your website, and visited 1,000 separate
+ times in a day, the unique visits would just be one. The uniqueness is counted based on
+ the IP address of the visitor.
+  Total Visits − The total number of visits including duplicate visits that a website receives
+ in a given time period. Each time a site visitor reaches your site, it is counted as one visit.
+  Page Views or Page Impressions − Each time a web page is loaded, it is referred to as a
+ page view. If you are counting a website link available on this page, then it will be
+ counted as a page impression.
+  Hits − Hits are very similar to page views and will be counted every time a visitor clicks
+ any link related to your website.
+  Direct Access − It refers to the people who accessed your website through their
+ bookmarks or typed in your URL manually in the URL box of the browser.
+  Referrer & Referral URL − The web address where the visitor followed a link to reach
+ your website. For example, if someone finds your website in google search and clicks
+ over the link to reach your site, then google will be the referrer.
+
+ 32
+
+ 
+
+--- Page 34 ---
+
+Web - Site Popularity
+
+You designed a website and developed it and finally hosted it. Now just think how many site
+visitors know about this site address and related service.
+
+If you want to make your site a success, then the actual work starts after hosting your website
+successfully. It includes the following actions, but gaining popularity is certainly not limited to
+these actions.
+
+  Search Engine Inclusion − First step, you should go and include your website in various
+ search engines like google, yahoo, and msn. Never trust automated software to include
+ your site in search engines. There are many fraud companies in this business, so stay
+ away from them and don't waste your money.
+  Open directory inclusion − This is another way to make your site popular. There are
+ many open directory projects like dmoz.com and yahoo.com where you can include your
+ website to get attention from net surfers.
+  Google AdWords − This is a paid program from google where you can register and you
+ can pay based on the number of clicks on your website link or based on the number of
+ page impressions.
+  Advertising Programs − If you have a big budget, then you can go for higher resources
+ like TV ads or Newspaper or magazine advertising programs. They are most effective
+ and expensive as well.
+  Whitepapers and Article − If you write whitepapers or articles, then you can include
+ your website link in those whitepapers or articles to get more traffic on your site.
+  Site Link Exchange − There are many sites including tutorialspoint.com that do site link
+ exchange. What it means is − You will keep the link of another website on your site and
+ the other site will keep yours. This is for the mutual benefit of the site link exchangers.
+
+Web - Free Graphics
+
+Graphic elements play a crucial role on any website. If you have time and talent to design your
+web graphics, then it is great. It does not only require time and talent to have web graphics, but
+you need to spend a good deal of money as well to buy good graphics software like Paint Shop
+Pro or Adobe Photoshop.
+
+However, if you are not blessed with an artist's hand and you don't have money as well to spend
+on buying graphics software, then Internet is the heaven and you should appreciate thousands of
+graphics designers who have created free web graphics for you.
+
+We also have listed tons of Free Graphics for you which you can use on your website. You will
+find it here Free Web Graphics. A sample page is also given here.
+
+Beautiful Flowers Clipart
+
+  Click on any image, it will display a bigger image.
+
+ 33
+
+ 
+
+--- Page 35 ---
+
+  Right-click on the image and select "Save Image As" to save the image on your PC.
+
+Web - Summary
+
+We do hope that you found this tutorial useful and informative. Here we have covered all the
+basics of Web and Web Hosting.
+
+Now it is time to move forward and we will encourage you to start developing your website
+using our HTML Tutorial.
+
+If you are planning to develop an interactive website, then we recommend you go through our
+PERL Tutorial or PHP Tutorial.
+
+We have complete reference manuals for these server-side scripting languages.
+
+Search Engine Optimization techniques are very important and you should be well-versed with
+them before designing and developing your website.
+
+You can go through our SEO Tutorial to gain a complete understanding of SEO techniques.
+
+Comments and suggestions for the improvement of this tutorial are welcome.
+
+Please send us your feedback at webmaster@tutorialspoint.com.
+
+Thank you very much for visiting tutorialspoint.com
+
+ 34
+
+ 
+
+--- Page 36 ---
+
+NOTE:
+
+What Is DNS? Everything You Need to Know About the Web's Phone Book
+
+Conducting a web search? The Domain Name System converts website names into IP addresses
+so your computer can understand the query. Here's what that means.
+
+If you’ve ever had to fiddle with your Wi-Fi settings, say at the local coffee shop when the
+connection isn’t working, chances are you have come across the term DNS server somewhere.
+But what does DNS mean, and how does it work?
+
+What Is DNS, Anyway?
+
+Simply put, Domain Name System (DNS) is the phone book of the internet.
+
+It’s the system that converts website domain names (hostnames) into numerical values (IP
+address) so they can be found and loaded into your web browser.
+
+This happens because machines don't understand site names like we do.
+
+A website written as pcmag.com is a way for us, as humans, to remember web pages while the
+servers they’re stored on refer to them as numbers.
+
+DNS works in the background, and it's not something the average internet user will need to
+worry about much.
+
+But without it, your browser wouldn’t know where to point your web page request, and finding
+the information you need would be a much more arduous process.
+
+How DNS Works
+
+ 35
+
+ 
+
+--- Page 37 ---
+
+When you type a web address into your search engine, such as youtube.com, your computer
+conducts a search for the website's corresponding IP address to find the right page.
+
+Popular websites like Google have multiple IP addresses that can be used simultaneously to
+prevent a backlog of web traffic.
+
+According to networking software company Cloudflare, four main servers(Opens in a new
+window) play a part in the hostname-to-IP address conversion, also called DNS resolution.
+
+Cloudflare likens this process to a librarian being asked to find a book and progressively
+narrowing their search:
+
+  The recursive DNS server: Usually the first stop your request makes. It gets the initial
+ query, checks the recently cached addresses, and sends a request to servers further down
+ the line if it can’t find the right IP for your website. This would be the rack of recently
+ returned books that have yet to be re-shelved.
+  The root name server: Helps translate site names into IPs by pointing your request
+ toward more specific areas. This is equivalent to a specific section of the library.
+  The top level domain (TLD) nameserver: Narrows the search even further by hosting
+ specific top level domains, which are the last portion of a website’s hostname
+ like.com,.org, or.edu. A search for pcmag.com, for example, would be pointed to
+ the.com TLD nameserver. There are banks of TLD name servers located all around the
+ world to improve the speed of handling requests. This would be a specific rack of books
+ within that section.
+  The authoritative nameserver: The last stop your request makes, this server hosts
+ specific IPs for domain names. Once it receives the request, it will return the
+ corresponding DNS record so the web page can load. If the server doesn’t have the
+ record, it returns an error message. This is the book with the information the librarian
+ first set out to find.
+
+Once the proper IP address is found, the information is sent back to your browser and the web
+page loads.
+
+The recursive DNS server also stores that IP in its cache memory for a few seconds to a week
+(Opens in a new window). This is done so that the server can quickly return the address without
+having to query the other servers.
+
+Think of this as similar to the RAM in your computer, which stores information about recently
+opened applications so it can access them more quickly the next time they’re used.
+
+If a query gets all the way to the authoritative name server level and the IP address still can’t be
+found, an error message is returned to your browser.
+
+This might seem like a lengthy process, but it happens in less time that it takes you to blink—
+usually a few milliseconds.
+
+ 36
+
+ 
+
+--- Page 38 ---
+
+What to Do When Something Goes Wrong
+
+The DNS usually works without a hitch, but glitches happen. If the website you're trying to reach
+changes servers that cached address may not load.
+
+Maybe the servers doing the checking are slower than they should be. In either case, there are
+fixes available.
+
+If there's a caching issue, you can flush your DNS cache to start from scratch, so your computer
+looks up web addresses on the DNS server again. Do this by opening the Command Prompt in
+Windows or Terminal in macOS and running a simple command, which will tell your computer
+to delete its reserve of cached websites in order to find the correct servers.
+
+Recommended by Our Editors
+
+How to Flush Your DNS Cache
+
+If you're having problems when trying to visit certain websites, flushing your DNS cache might
+help.
+
+Here's what that means, and how to do it in Windows and on a Mac.
+
+ 37
+
+ 
+
+--- Page 39 ---
+
+When you type a website into your address bar—like PCMag.com—your computer doesn't
+actually know where to go on its own.
+
+Instead, it looks that address up on a Domain Name System (DNS) server, which matches it with
+an IP address for your computer to visit.
+
+It's like your friend saying "meet me at Tom's Bistro"—if you don't know where Tom's Bistro is,
+you can look up the address in the phone book and drive there.
+
+However, it can take a long time to scan the phone book before you find the right address.
+
+In order to speed this process up, your computer saves some of these entries for easy access later
+on.
+
+To continue with the previous metaphor, it's like writing down "Tom's Bistro - 123 Main Street"
+on a sticky note.
+
+This allows your computer to navigate to sites you've already visited, without asking the DNS
+server every time. Unfortunately, on rare occasions, this cache can cause problems.
+
+Maybe the site you're visiting changed servers, and is no longer located at the cached address, or
+you have some malware that's trying to redirect common pages to malicious sites. (If you suspect
+the problem might be malware, you might want to run a 
+the case, you can "flush" your DNS cache to start from scratch, so your computer looks up web
+addresses on the DNS server again.
+
+This process is, of course, different from clearing your web cache from a web browser. If
+clearing your browser's cache has not solved the problem, clearing your DNS cache may be the
+next step.
+
+Here's how to do it on Windows and macOS using the command line. (If you're using Linux,
+you'll need to look up instructions for your particular distribution.)
+
+Flush the DNS Cache on Windows
+
+ 38
+
+ 
+
+--- Page 40 ---
+
+If you're on a Windows machine—any Windows machine, even going back to XP and older—
+flushing the DNS merely takes a simple command.
+
+Click the Start menu and type "cmd." Right-click on the Command Prompt option and choose
+"Run as Administrator."
+
+In the Command Prompt window that appears, type the following command:
+
+ipconfig /flushdns
+
+If successful, the Command Prompt will report back with "Successfully flushed the DNS
+Resolver Cache.
+
+“Try visiting the website in question again, and see if that solved the problem.
+
+If not, the site may be down, you could be having Wi-Fi problems, or you may have a more
+elusive network problem on your end that needs to be tracked down.
+
+If this is someone else's computer, you can always try troubleshooting remotely.
+
+Flush the DNS Cache on a Mac
+
+ 39
+
+ 
+
+--- Page 41 ---
+
+Mac users need to run a quick Terminal command to flush the DNS cache, but the command
+differs depending on your version of macOS.
+
+First, press Command+Space to open Spotlight and search for "Terminal." Press Enter to open it.
+
+Most modern versions of macOS—from OS X Lion through macOS Big Sur—use the following
+command. Type it into the Terminal and press Enter:
+
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+
+If you're on OS X 10.10.1, 10.10.2, or 10.10.3, you'll need to run this command instead:
+
+sudo discoveryutil udnsflushcaches; sudo discoveryutil mdnsflushcaches
+
+You won't see a success message for either command, but you can check the problematic website
+and see if it fixed the problem.
+
+If not, you'll have to try other troubleshooting steps.
+
+How (and Why) to Change Your DNS Server
+
+ 40
+
+ 
+
+--- Page 42 ---
+
+How (and Why) to Change Your DNS Server
+
+The Domain Name System is an essential part of your internet communications.
+
+Upgrading to a better DNS server can make your surfing both faster and more secure, and we
+show you how.
+
+(Illustration: René Ramos)
+
+You open your browser, type pcmag.com in the Address Bar, and get pages and pages of useful
+reviews and information.
+
+That’s how it works, right? Oh, you may understand that you get that information because your
+browser requests it from a web host server.
+
+But there’s another player involved in the flow of traffic between your browser and that server,
+and that’s the Domain Name System, or DNS. Understanding DNS can help you protect your
+online security and privacy, and even speed your web surfing.
+
+The servers that route your internet requests don't understand domain names like pcmag.com.
+
+They only understand numeric IP addresses like 104.17.101.99, or the longer numeric addresses
+from the modern IPv6 system. (By longer, I mean a lot longer.
+
+Here's a sample IPv6 address: 2606:4700:0000:0000:0000:0000:6811:8e63. To be fair, that
+would typically be shortened to 2606:4700: 6811:8e63, but still…)
+
+What Do DNS Servers Do?
+
+So, the machines only speak numbers, but the people want to use memorable domain names like
+girlgeniusonline.com or zombo.com.
+
+ 41
+
+ 
+
+--- Page 43 ---
+
+To resolve this impasse, the Domain Name System handles translating friendly domain names to
+numeric IP addresses.
+
+Your home network typically relies on a DNS Server supplied by your ISP.
+
+After your browser sends the server a domain name, the server goes through a moderately
+complex interaction with other servers to return the corresponding IP address, thoroughly vetted
+and verified.
+
+If it's a much-used domain, the DNS Server may have that information cached, for speedier
+access. Now that the interaction is down to numbers, the machines can handle getting the pages
+you want to see.
+
+DNS Difficulties
+
+As you can see, the Domain Name System is essential to all your internet activities.
+
+Any problems with the system can have cascading effects on your experience.
+
+For starters, if the ISP-supplied DNS servers are slow, or not properly configured for caching,
+they can effectively slow your connection.
+
+This is especially true when you load a page that draws content from many different domains,
+such as advertisers and affiliates.
+
+Switching to DNS servers optimized for efficiency can speed up your surfing, whether in a home
+or business setting.
+
+Speaking of a business setting, some companies offer DNS services with business-friendly add-
+ons.
+
+For example, they can filter out malicious websites at the DNS level, so the pages never reach an
+employee's browser.
+
+They may also filter out porn and other work-inappropriate sites. In a similar fashion, DNS-
+based parental control systems help parents control children's access to age-inappropriate
+content, on every device, though they admittedly lack the fine control of locally-installed
+parental control software.
+
+I mentioned that your DNS server caches popular requests, so it can respond quickly, without
+having to query other components of the Domain Name System.
+
+Your PC or Mac also has a local DNS cache, and if the cache gets screwed up, you can have
+trouble visiting certain sites.
+
+ 42
+
+ 
+
+--- Page 44 ---
+
+This is a simple problem, one that doesn't require switching DNS servers. All you need to do is
+flush your local DNS cache.
+
+It's Surprisingly Easy to Be More Secure Online
+
+Unless you're using a VPN (Virtual Private Network), your ISP's DNS servers see every domain
+you request.
+
+You really can't get away from that—if you want something from the internet, you can't avoid
+telling someone just what you want.
+
+Your ISP knows where you go on the web, and probably doesn't care.
+
+However, some ISPs have found a way to monetize their DNS service.
+
+When you hit an erroneous domain, one that has no actual IP address, they divert your browser
+to a search and advertising page preloaded with a search phrase derived from the domain name.
+
+For example, the image below shows the results of trying to visit the non-existent
+funnycatpiktures.com.
+
+ 43
+
+ 
+
+--- Page 45 ---
+
+This may seem like a nonissue. What does it matter if the ISP displays ads? But privacy-wise it's
+significant. You started off with a private back-and-forth between your browser and the DNS
+server.
+
+The ISP broke that bubble of privacy by sending a version of your request to a search engine,
+where it winds up in your search history.
+
+Some people worry about the privacy of search, which is why no-history search sites like
+DuckDuckGo and StartPage exist.
+
+DNS under Attack
+
+You're probably familiar with the concept of phishing. Nefarious webmasters set up a fraudulent
+website that looks exactly like PayPal, or your bank, or even a gaming or dating site.
+
+They disseminate links to the fake site using spam, malicious adverts, or other techniques.
+
+Any hapless netizen who logs in without noticing the fakery has given valuable login credentials
+to the bad guys.
+
+And the fraudsters typically use those credentials to log you in to the real site, so you don't
+realize anything has happened.
+
+The one thing that gives these frauds away is the address bar.
+
+Keeping a sharp eye on the address bar is one way to avoid phishing scams.
+
+Some are egregious, like a page that purports to be, say, LinkedIn, but has a totally unrelated
+domain such as bestastroukusa.com.
+
+Others work harder to fool you, with slightly-off names like microsfot.com, or extremely lengthy
+URLs that conceal the actual domain. But no matter how they try, they can't fool an eagle-eyed
+web surfer.
+
+ 44
+
+ 
+
+--- Page 46 ---
+
+That's where cache poisoning comes in. In this kind of attack, malefactors infiltrate incorrect
+information into the Domain Name System, typically by manipulating the cache.
+
+The user types a valid domain name, the poisoned DNS system returns the IP address for a
+fraudulent site, and the Address Bar shows the valid name. Unless the miscreants did a poor job
+imitating the target site, there's no visible clue to their chicanery.
+
+A similar attack called DNS hijacking happens on your local computer.
+
+Malware running on the system reaches into the TCP/IP settings and simply switches you over to
+a DNS server controlled by hackers.
+
+Of course, this only works if the malware in question can get past your antivirus, but there are
+still a few folks who haven't got the message about using antivirus on every computer.
+
+What's the Best DNS Server?
+
+DNS attacks and problems occur when DNS isn't a priority for your ISP.
+
+Getting away from these problems can be as simple as switching to a service that makes DNS
+security and privacy a priority.
+
+Google Public DNS (Opens in a new window) has been available since 2009, with the easy-to-
+remember IP addresses of 8.8.8.8 and 8.8.4.4.
+
+Google promises a secure DNS connection, hardened against attacks, as well as speed benefits.
+
+Founded in 2005, OpenDNS has been offering secure DNS even longer.
+
+It doesn't have memorable IP addresses like Google's, but does offer a variety of services.
+
+ 45
+
+ 
+
+--- Page 47 ---
+
+In addition to DNS servers focusing on privacy and security, it offers what it calls FamilyShield
+servers, which filter out inappropriate content.
+
+The company also offers a premium parental control system that gives parents more granular
+control over filtering.
+
+Its parent company Cisco supplies enterprises with Cisco Umbrella, which includes a security
+and DNS services for businesses.
+
+Cloudflare may be the biggest internet company you've never heard of.
+
+With a sprawling, worldwide collection of servers, it offers websites internet security and
+protection against Distributed Denial of Service attacks, among other services.
+
+Starting in 2018 Cloudflare made secure DNS available, at the very memorable IP addresses of
+1.1.1.1 and 1.0.0.1.
+
+The company also offers a free desktop and mobile app, cleverly named 1.1.1.1, which
+automates using secure DNS and provides related privacy protection features.
+
+There are other free, public, security-centric DNS services, but you won't go wrong with these
+three big ones.
+
+How Do I Change My Router's DNS Server?
+
+As far as switching your router to a fast, secure DNS server, I have good news and bad news.
+The good news is that if you make the change in your router settings, it affects every connected
+device.
+
+Not just computers and smartphones, mind you, but video doorbells, smart baby monitors, even
+internet-aware lightbulbs.
+
+The bad news is that the precise technique for changing your router's DNS settings is different
+for every router.
+
+Recommended by Our Editors
+
+How to Find Your IP Address
+
+ 46
+
+ 
+
+--- Page 48 ---
+
+Want to Speed Up Your Users' Internet? Look at Your DNS Server
+
+How to Register a Domain Name for Your Website
+
+To get started, search the web by appending "change DNS" to the make and model of your
+router. If you're lucky, you'll find a clear set of instructions.
+
+Navigate to the desired setting and enter the primary and alternate DNS addresses for the service
+you chose.
+
+You may need to restart the router for the change to take effect.
+
+If your router is an all-in-one handling internet and TV signals, and possibly phone as well, you
+may not be able to make this change.
+
+These high-end multi-function devices don’t make it easy to directly access settings, and even
+when they do, they may not allow you to switch to another DNS server.
+
+A true network expert could install a standard router upstream from the all-in-one and thereby
+take greater control over the network, but most of us aren’t true network experts.
+
+How Do I Change My Device's DNS Server?
+
+Now all the devices on your home network are using fast, secure DNS, but you've probably got
+some devices that don't stay on the home network.
+
+When your laptop or smartphone connects to the free Wi-Fi at that sleazy internet café, you're
+also using whatever DNS server the owner chose as the default.
+
+Who needs cache poisoning when you have total DNS control?
+
+ 47
+
+ 
+
+--- Page 49 ---
+
+That's why you should change the local DNS settings on your laptops and mobile devices. Just
+how you do that varies by platform. On Windows 10:
+
+ 1. Press Windows+I to open Settings,
+ 2. Click Network & Internet,
+ 3. Click Change adapter options,
+ 4. Right-click your internet connection and choose Properties,
+ 5. Select Internet Protocol Version 4 and click the Properties button,
+ 6. Click the item labeled Use the following DNS server addresses,
+ 7. Enter the two addresses,
+ 8. Click OK, and
+ 9. Repeat the process for Internet Protocol Version 6.
+
+Yes, that's quite a few steps, but you can do it!
+
+ 48
+
+ 
+
+--- Page 50 ---
+
+If you're using a macOS laptop:
+
+ 1. Select System Preferences from the Apple menu,
+ 2. Select Network,
+ 3. Highlight the Wi-Fi connection and click the Advanced button,
+ 4. Click the DNS tab,
+ 5. Use the plus-sign button to add both IPv4 and IPv6 DNS addresses, and
+ 6. Use the minus-sign button to remove any existing addresses.
+
+ 49
+
+ 
+
+--- Page 51 ---
+
+Where old versions of Android made setting your own choice of DNS servers quite difficult, it’s
+easy in modern versions. Well, almost.
+
+ 1. Tap Settings,
+ 2. Choose Network & Internet,
+ 3. Tap Advanced,
+ 4. Tap Private DNS,
+ 5. Tap Private DNS provider hostname, and
+ 6. Tap Save.
+
+That next-to-last step is the reason I said it’s almost easy. Android doesn’t let you enter an easy
+IP address like 1.1.1.1 or 8.8.8.8. Instead, you must enter the corresponding hostname.
+
+For Google Public DNS, that’s not too bad—it’s dns.google. But for CloudFlare, you’ll have to
+type 1dot1dot1dot1.cloudflare-dns.com.
+
+ 50
+
+ 
+
+--- Page 52 ---
+
+Apple’s iOS protects you from all kinds of security problems by locking down settings that other
+operating systems leave open.
+
+This added security can get in the way, though. You can change DNS settings on an iOS device,
+but you must do it again every time you connect to a new Wi-Fi network. As for your cellular
+connection, there’s no way to change its DNS settings.
+
+Those using iOS need a third-party app to get global DNS control. A VPN would do the job, as
+would Cloudflare's 1.1.1.1 app.
+
+Upgrade the DNS Server, Save the World
+
+You never see them in action, but without DNS servers the internet just wouldn’t work.
+
+They translate human-friendly domain names into machine-friendly IP addresses.
+
+Right now, chances are good you’re using a DNS server supplied by your ISP, a server whose
+quality is unknown, owned by an entity that likely doesn’t value your privacy.
+
+Switching to a third-party DNS service can both speed your internet activity and protect against
+tricky DNS-based attacks. Give it a try!
+
+Like what you’re Reading?
+
+Sign up for Security Watch newsletter for our top privacy and security stories delivered right to
+your inbox.
+
+This newsletter may contain advertising, deals, or affiliate links. Subscribing to a newsletter
+indicates your consent to our Terms of Use and Privacy Policy. You may unsubscribe from the
+newsletters at any time.
+
+When the IBM PC was new, I served as the president of the San Francisco PC User Group for
+three years. That’s how I met PCMag’s editorial team, who brought me on board in 1986. In the
+years since that fateful meeting, I’ve become PCMag’s expert on security, privacy, and identity
+protection, putting antivirus tools, security suites, and all kinds of security software through their
+paces.
+
+Before my current security gig, I supplied PCMag readers with tips and solutions on using
+popular applications, operating systems, and programming languages in my "User to User" and
+"Ask Neil" columns, which began in 1990 and ran for almost 20 years.
+
+Along the way I wrote more than 40 utility articles, as well as Delphi Programming for Dummies
+and six other books covering DOS, Windows, and programming.
+
+I also reviewed thousands of products of all kinds, ranging from early Sierra Online adventure
+games to AOL’s precursor Q-Link.
+
+ 51
+
+ 
+
+--- Page 53 ---
+
+In the early 2000s I turned my focus to security and the growing antivirus industry.
+
+After years working with antivirus, I’m known throughout the security industry as an expert on
+evaluating antivirus tools.
+
+I serve as an advisory board member for the Anti-Malware Testing Standards Organization
+(AMTSO), an international nonprofit group dedicated to coordinating and improving testing of
+anti-malware solutions.
+
+If the problem is with the servers themselves—maybe your ISP-supplied DNS servers aren't
+properly configured—you can switch servers in order to optimize your web searches and speed
+up the process.
+
+Enter your device's network settings and manually add the IP address—such as 1.1.1.1 for
+Cloudflare or 8.8.8.8 for Google—to connect to the desired DNS server.
+
+You can also do this at the router level, but the exact process differs based on the router you
+have.
+
+A Cybersecurity Warning
+
+How DNS cache poisoning happens (Credit: Cloudflare)
+
+Hackers have sometimes taken advantage of lax oversight and used DNS maliciously.
+
+One example of that is DNS cache poisoning (Opens in a new window), in which false data is
+fed into the DNS cache that directs people to malicious websites hosting data-swiping malware.
+
+ 52

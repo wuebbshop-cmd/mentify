@@ -1,0 +1,343 @@
+LESSON 8
+Second Order Equations with Variable Coefficients
+
+8.1 Introduction
+in the previous lessons you have  learnt various methods of solving second order
+differential equations with constant coefficients.  In this lesson you will learn different
+methods of solving the second order equations with variable coefficients.
+
+8.2 Objectives of this lesson
+By the end of this lesson you should be able to
+  i).  Define the general form of a second order equation with variable coefficients.
+ ii).  Solve the second order equation with variable coefficients:
+        a) By changing the independent variable
+       b) By removal of the first derivative or by reduction of the equal to normal form.
+
+8.3 Definition of second order Linear equations with variable coefficients.
+An equation of the form
+   d 2 y    dy
+a 0     2 + a1   + a 2 y =  f ( x ), a0 ≠ 0   dx     dx
+   d 2 y    dy
+or     2 + P   + Qy = R   dx     dx
+
+       a1     a 2               f ( x )(where   = P ,   = Q , and     = R are functions of x only) is called a second order
+       a0     a 0         a0
+linear differential equation with variable coefficients.
+
+8.4 Solving the differential equation (Method I)
+Transformation of equations by changing the independent variable
+
+Theorem
+    d 2 y    dy
+Let     2 + P   + Qy = R                                    (1)    dx     dx
+Where P, Q, R are functions of x be in standard form (coefficients of y ′′ is unity).
+                dz  2Choosing Q =                                             (2)
+                dx 
+The equation is transformed into linear equation with constant coefficients of the form
+d 2 y    dy
+     2 + P1   + R1 dx     dx
+
+--- Page 76 ---
+d 2 z    dz
+                    2 + P          dx     dx     Q          Rwhere P1 =            2     , Q1 =        2 and R1 =        2       (3)
+                dz             dz               dz 
+                               dx                         dx                           dx 
+
+Proof
+    d 2 y    dy
+Let     2 + P   + Qy = R                                    (1)    dx     dx
+
+Where P, Q, R are functions of x. Let the independent variable x be changed from x to z
+where z = f(x).
+     dy   dy dz
+Then   =      .                                              (4)
+     dx   dz dx
+d 2 y   d  dy 
+     2 =        
+ dx    dx  dx 
+       d  dy dz     =             .
+       dx  dz dx 
+       d  dy  dz  dy d 2 z
+    =              .  +      .    2       dx  dz  dx  dz dx
+       d  dy  dz dz  dy d 2 z
+    =        .     .  +      .    2
+       dz  dx  dx dx  dz dx
+       d 2 y  dz  2  dy d 2 z
+    =     2     +      .    2                  (5)
+        dz   dx    dz dx
+
+Substituting (4) and (5) in (1) we have
+ d 2 y  dz  2      2     dz  dy
+     2      +  d z + P       + Qy = R                   (6) dz   dx           dx  dx
+                  dz  2
+Dividing (6) by     we have
+                  dx 
+d 2 y    dy
+    2 + P1   + Q1 y = R1 dz      dz
+          d 2 z    dz
+                    2 + P          dx     dx     Q          Rwhere P1 =            2     , Q1 =        2 and R1 =        2       (7)
+                dz             dz               dz 
+                               dx                         dx                           dx 
+Here P1, Q1 and R1 are function of x but they can be converted to functions of z. Suppose
+                        dz  2      dzwe take Q = k  f ( x ) =      then   =  k  f ( x )
+                        dx       dx
+
+--- Page 77 ---
+or z =  ( k  f ( x ) )dx is the Transformation.       ∫
+
+The method of solving a second order equation with variable coefficients is illustrated in
+the following examples.
+
+Example 1
+                 d 2 y  dy       3       5
+Solve the equation x     2 −   + 4 x y = x                  dx   dx
+
+Solution
+Let xy ′′ − y ′ + 4 x 3 y = x 5 .
+                       d 2 y  1 dy       2       4
+The standard form of (1) is     2 −    + 4 x y = x                        dx    x dx
+         1Here P = -    , Q = 4x2 and R = x4.
+          x
+
+     dz  2        dz          2Let      = Q or   =  4x
+     dx         dx
+Then dz = 2x dx and the transformation is z = x2 (we need a relation between s and x and
+we don’t need constant).
+                                            d 2 y    dy
+Now using this transformation the equation becomes,     2 + P1   + Q1 y = R1                                                 dz      dz
+          d 2 z    dz        1                        −   2. x                     2 + P     2 +           dx     dx                x Where P1 =            2   =           2    = 0
+                 dz          4 x
+                                dx 
+
+        Q    4 x 2
+    Q1 =        2 =     2 = 1
+              dz    4 x
+                            dx 
+          R     x 4    x 2   z
+     R1 =        2 =     2 =    or
+              dz    4 x    4   4
+                            dx 
+                     d 2 y    dy                          d 2 y           z
+Then  the  equation  to                       + P1   + Q1 y = R   is  connected  to       2 + 0 + y =    or                                        2                        dz      dz                              dz         4
+(D 2 + 1) y = z .
+          4
+
+The complementary function
+
+--- Page 78 ---
+The characteristic equation is m2 + 1 = 0 whose roots are m1 =  I, m2 = -  i.  The
+complementary function is y = A cos z + B sin z
+The particular integral is
+         z
+ y =       2    4(D + )1
+      1    z 
+ y =    2         D + 1  4 
+    1         2 −1  =   (1 + D  )  z
+    4
+    1  =   (1 − .......)z ]
+    4
+     z
+  =
+    4
+Hence the general solution is
+                        z
+ y = c1 cos z + c 2 sin z +
+                  4
+using z = x2 we have,
+                           2x
+y = c1 cos x2 + c2 sin x2 +     is general solution.
+                      4
+
+8.5 Solving the Differentiation equation (Method II)
+
+Theorem
+Let the second order equation be
+
+d 2 y    dy
+     2 + P   + Qy = R                                        (1) dx     dx
+can be reduced to the form
+d 2 v
+    2 + sv = T                                                 (2) dx
+            1   2  1 dpwhere S = Q −  P −                                       (3)
+            4     2 dx
+      R
+and T =      .
+       u
+
+Proof
+Let the complete solution of (1) be y = uv where u  and v are functions of  x.
+Differentiating y = uv twice we have
+dy    dv   du
+   = u   + v                                                (6)
+ dx    dx    dx
+d 2 y  d 2 u     du dv   d 2 v
+     2 =     2 v + 2     + u    2                               (7) dx    dx      dx dx    dx
+
+--- Page 79 ---
+d 2 y     du
+Substituting     2 and     in (1) we have           dx      dx
+  d 2 v         du  dv     d 2 u    du      
+u    2 +  Pu + 2       + v     2 + P   + Qu  = R  dx          dx  dx     dx     dx      
+   d 2 v       2 du  dv  1  d 2 u    du          R
+or     2 +  P +         +          2 + P   + Qu  v =   dx        u dx  dx  u  dx      dx          u
+                      dv
+to remove first derivative    from (8) we take,
+                      dx
+    2 du
+P +    = 0
+    u dx
+   du    1
+or   = −  Pdx                                             (9)
+   u    2
+         1
+           Pdxor ln u = −  ∫         2
+             1
+           −   ∫ Pdx
+or u = e  2
+
+Hence the required substitution is y = u v
+                    1
+                 −   ∫ Pdx
+Where u = e  2
+More over the coefficient of v in (8) is
+1  d 2 u    du           1   2  1  dp 
+         2 + P   + Qu  = Q −  P −                       (10)u  dx     dx           4     2  dx 
+      du    1             d 2 u    1  du  1 dp
+(Since   = −  Pu from 9 and     2 = −  P   −     u )       dx    2              dx     2  dx  2 dx
+Thus the equation (1) is transformed into
+d 2 v
+    2 + Sv = T dx
+            1   2  1 dp       Rwhere S = Q −  P −     and T =     .
+            4     2 dx        u
+
+Example 2
+      d 2 y  2 dy      2 Solve     2 −    + + 4     2  y = 0
+      dx    x dx       x  
+          2         2
+Here P = −    , Q = 4 +   2  , R = 0           x         x
+                      1       1   2
+                                     dxThe substitution is now − ∫                       Pdx = −  ∫ −                      2       2    x
+                              1
+                                 dx                         = ∫                                  x
+                         = ln x
+
+--- Page 80 ---
+1
+       − ∫ 2 Pdx       ln xu = e    = e  = x
+
+
+       p 2  1 dp
+S = Q −   −
+       4   2 dx
+       2   1  4   1 d − 2 
+  = 4 +   2 −     2  −          
+        x   4  x    2 dx  x 
+       2   1   1
+  = 4 +   2 −   2 −   2        x   x    x
+  = 4
+
+   R
+T =  = 0
+    u
+
+d 2 v              d 2 v
+    2 + SV = T gives     2 + 4v = 0 dx                dx
+
+The auxiliary equation is m2 + 4 = 0, m = ± 2i
+v = A cos 2 x + B sin 2 x
+The solution is
+y = uv
+y = x (A cos 2x + B sin 2x)
+
+Example
+      d 2 y     dy        2
+Solve     2 − 4 x   + ( 4 x − 3) y = xe 2      dx      dx
+Here P = -4x, Q = 4x2 – 3, R = xe 2
+        1     − 1            x 2      2                   4 x dx = 2   = xThen − ∫        Pdx =    ∫ −        2      2            2
+                    1
+                    Pdx                − ∫
+                    2      u = e    = e x 2
+           P 2  1 dP
+      S = Q −   −
+             4   2 dx
+                    2     16 x 2  1 d       = 4 x − 3 −    −       (− 4 x )
+                  4   2 dx
+       = −1
+
+   R   e x 2
+R =  =     2 = 1
+    u   e x
+d 2 v
+    2 + Tv = S becomes dx
+
+--- Page 81 ---
+d 2 v
+    2 −v = 1 dx
+The auxiliary equation is
+m2 – 1 = 0, m = 1, -1
+The complementary function is
+v = c1e x + c 2 e − x
+         1     1e 0 x     1
+P.I: y =    2   =    2   =    = − 1     D − 1  D − 1  0 − 1
+v = CF + PI = c1e x + c 2 e −x − 1
+The complete solution is y = uv
+ y = e x 2 (c1e                 x + c 2 e −x − )1
+
+Exercise
+            d 2 y  2 dy        2 
+    1) Solve     2 −    +  25 +   2  y = 0
+            dx    x dx        x  
+            d 2 y  2 dy
+                       2 +    − 16 y = 0
+    2) Solve dx    x dx
+             y ′′ + 4 xy ′ + 4 x 2 y = 0    3) Solve
+                                                       1  2                                                 −  x
+    4) Solve  ′′y + 2 xy ′ + ( x 2 + 5) y = xe  2
+
+    5) Reduce the differential equation
+    y ′′ − 4 xy ′ + ( 4 x 2 − )1 y = − 3 xe x 2 sin 2 x to normal form and hence find its solution.
+
+    6) Reduce the equation
+
+                                                        2   d 2 y     dy       2          x
+          2 − 4 x   + 4 x y = xe   to normal form and hence solve the equation.    dx      dx
+             y ′′ − 2 tan xy ′ + 5 y = 0    7) Solve
+            d 2 y     dy         2    8) Solve    − 4 x   + ( 4 x − )3 y = xe 2
+            dx 2     dx
+                 2               y ′′ −  y ′ + 9 y = 0
+    9) Solve       x
+
+               2   10) Solve y ′′ −  y ′ − 25 y = 0
+                 x
+
+Summary
+You have learnt the following from this lesson
+
+--- Page 82 ---
+1. The general form of the second order linear equation with variable coefficients is
+           d 2 y    dy
+   given by     2 + P   + Qy = R            dx     dx
+   Where P, Q, R are functions of x.
+2. The equation  y ′′ + Py ′ + Qy = R can be transformed into an equation of constant
+                                    dz  2    coefficients by choosing Q =      and solved.
+                                    dx 
+                                                            d 2 v
+3. The equation y ′′ + Py ′ + Qy = R can be transformed into an equation     2 + Sv = I in                                                               dx
+   which the first derivative is not present, using the transformation: y = uv where
+              1
+            −   ∫ Pdx
+   u = e  2
+
+Further Reading
+1.  Differential Equations
+   By Frank Ayres
+   Schaum’s outline series
+   McGraw – Hill Book Company
+  New York, Toronto, Sydney.
+
+2.  Elementary Differential Equations
+   By Dr. D. Sengottaiyan
+   Oxford Publications
+   Harrow. London. Nairobi.
+
+--- Page 83 ---

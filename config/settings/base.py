@@ -297,6 +297,18 @@ REDIRECT_DOMAINS = set(
 )
 BASE_URL = os.environ.get("BASE_URL", "http://127.0.0.1:8000")
 
+# Exact institutional student-mail domains may be added here as a comma-separated
+# environment variable. Student-labelled Kenyan academic domains are also
+# recognised in services.credit_service without accepting every .co.ke address.
+STUDENT_EMAIL_DOMAINS = tuple(
+    domain.strip().lower().lstrip("@")
+    for domain in os.environ.get(
+        "STUDENT_EMAIL_DOMAINS",
+        "students.ku.ac.ke,students.uonbi.ac.ke,students.jkuat.ac.ke,students.must.ac.ke",
+    ).split(",")
+    if domain.strip()
+)
+
 
 # ─── Email (Resend.com) ───────────────────────────────────────────────────────
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")

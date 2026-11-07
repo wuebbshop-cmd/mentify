@@ -13,10 +13,16 @@ from django.utils import timezone
 
 # ─── Plan Constants ────────────────────────────────────────────────────────────
 
-TRIAL_CREDITS = 100
+STUDENT_TRIAL_CREDITS = 100
+NON_STUDENT_TRIAL_CREDITS = 10
+# Backwards-compatible name for the standard student allowance.
+TRIAL_CREDITS = STUDENT_TRIAL_CREDITS
 TRIAL_DURATION = timedelta(days=7)
 
-FREEMIUM_CREDITS = 20
+STUDENT_FREEMIUM_CREDITS = 20
+NON_STUDENT_FREEMIUM_CREDITS = 10
+# Backwards-compatible name for the standard student allowance.
+FREEMIUM_CREDITS = STUDENT_FREEMIUM_CREDITS
 FREEMIUM_CYCLE_DAYS = 30
 
 PURCHASED_CREDIT_DURATION = timedelta(days=30)
@@ -50,6 +56,81 @@ NOTE_LEVEL_CREDIT_COSTS = {
     "level_2": 0,
     "level_3": 4,
 }
+
+
+def is_student_email(email: str | None) -> bool:
+    """Return whether an address qualifies for the student free-credit allowance.
+
+    This is deliberately stricter than accepting every ``.co.ke`` address, since
+    those domains are also used by businesses and staff. Kenyan institutions
+    commonly issue student mail below ``students.<institution>.ac.ke``. Exact
+    additional domains can be supplied through ``STUDENT_EMAIL_DOMAINS``.
+    """
+    domain = str(email or "").strip().lower().rpartition("@")[2]
+    if not domain or "." not in domain:
+        return False
+
+    configured_domains = {
+        str(value).strip().lower().lstrip("@")
+        for value in getattr(settings, "STUDENT_EMAIL_DOMAINS", ())
+        if str(value).strip()
+    }
+    if domain in configured_domains:
+        return True
+
+    # Student-labelled domains are the reliable convention used by Kenyan
+    # institutions such as KU, UoN, JKUAT, and Meru University.
+    if re.fullmatch(r"(?:students?|studentmail|student-mail|learners?)\.(?:[a-z0-9-]+\.)*ac\.ke", domain):
+        return True
+
+    # .edu domains are restricted academic domains. This supports recognised
+    # international academic accounts without treating ordinary .co.ke mail as
+    # student mail.
+    return bool(re.fullmatch(r"(?:[a-z0-9-]+\.)*edu(?:\.[a-z]{2})?", domain))
+
+
+def get_free_credit_entitlement(user_or_email) -> dict[str, int | bool | str]:
+    """Return the free allowance associated with an account's email address."""
+    email = getattr(user_or_email, "email", user_or_email)
+    student = is_student_email(email)
+    return {
+        "is_student": student,
+        "trial_credits": STUDENT_TRIAL_CREDITS if student else NON_STUDENT_TRIAL_CREDITS,
+        "freemium_credits": STUDENT_FREEMIUM_CREDITS if student else NON_STUDENT_FREEMIUM_CREDITS,
+        "account_type": "Student account" if student else "Standard account",
+    }
+
+
+def notify_standard_account_credit_limit(user) -> bool:
+    """Create one clear allowance notice for a signed-in standard-email account."""
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return False
+
+    entitlement = get_free_credit_entitlement(user)
+    if entitlement["is_student"]:
+        return False
+
+    from prep.models import PrepNotification
+
+    title = "Use your student email for the full free allowance"
+    notification, created = PrepNotification.objects.get_or_create(
+        user=user,
+        title=title,
+        defaults={
+            "message": (
+                "This account uses a standard email address, so it receives "
+                f"{entitlement['trial_credits']} trial credits and "
+                f"{entitlement['freemium_credits']} free credits every 30 days. "
+                "Sign in or register with your institution-issued student email "
+                "to receive the full 100-credit trial and 20-credit monthly allowance."
+            ),
+            "category": "general",
+            "url": "/prep/billing/",
+        },
+    )
+    return created
 
 
 # ─── Exceptions ────────────────────────────────────────────────────────────────
@@ -242,7 +323,8 @@ def enforce_upload_limit(wallet, required_credits: int = 2):
 
 def grant_freemium_monthly(wallet):
     """
-    Transition the wallet to Freemium and grant 20 credits for the next 30 days.
+    Transition the wallet to Freemium and grant its account-specific allowance
+    for the next 30 days.
     Safe to call when trial credits are exhausted OR when the 7-day timer fires.
     Also called by the management command to refresh an already-freemium wallet each cycle.
     """
@@ -264,12 +346,14 @@ def grant_freemium_monthly(wallet):
             "updated_at",
         ])
 
+    entitlement = get_free_credit_entitlement(wallet.user)
+    credits = int(entitlement["freemium_credits"])
     grant = grant_credits(
         wallet,
-        amount=FREEMIUM_CREDITS,
+        amount=credits,
         source="subscription",
         action_type="monthly_grant",
-        description="Freemium Monthly Grant (20 Credits — valid 30 days)",
+        description=f"Freemium Monthly Grant ({credits} Credits, valid 30 days)",
         expires_at=next_reset,
     )
 
@@ -280,7 +364,7 @@ def grant_freemium_monthly(wallet):
                 title="You're now on the Free Plan",
                 message=(
                     "Your trial has ended. You've been moved to the permanent Free Plan "
-                    "and received 20 credits for this month. Upgrade any time for full access."
+                    f"and received {credits} credits for this month. Upgrade any time for full access."
                 ),
                 category="general",
                 url="/prep/billing/",
@@ -322,28 +406,30 @@ def ensure_wallet_credit_state(wallet, initialize_trial: bool = False):
         now = timezone.now()
         _ensure_grant_locked(locked, now)
         if initialize_trial and not locked.credit_grants.exists() and locked.current_plan == "trial":
+            entitlement = get_free_credit_entitlement(locked.user)
+            credits = int(entitlement["trial_credits"])
             expires_at = locked.plan_expires_at or (now + TRIAL_DURATION)
             grant = PrepCreditGrant.objects.create(
                 wallet=locked,
                 source="trial",
-                granted_credits=TRIAL_CREDITS,
-                remaining_credits=TRIAL_CREDITS,
+                granted_credits=credits,
+                remaining_credits=credits,
                 granted_at=now,
                 expires_at=expires_at,
             )
             PrepTransaction.objects.create(
                 wallet=locked,
                 credit_grant=grant,
-                amount=TRIAL_CREDITS,
+                amount=credits,
                 action_type="trial_grant",
-                description=f"Welcome Grant: 7-Day Free Trial ({TRIAL_CREDITS} Credits)",
+                description=f"Welcome Grant: 7-Day Free Trial ({credits} Credits)",
             )
             try:
                 PrepNotification.objects.create(
                     user=locked.user,
                     title="Your 7-day free trial has started",
                     message=(
-                        f"You received {TRIAL_CREDITS} free credits. They expire exactly 7 days after "
+                        f"You received {credits} free credits. They expire exactly 7 days after "
                         "account creation. Subscribe before the expiry time to continue using Mentify Prep."
                     ),
                     category="general",
