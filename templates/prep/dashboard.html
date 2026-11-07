@@ -624,8 +624,8 @@
     <div style="padding: 36px 20px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 10px;">
       {% if request.user.is_authenticated %}
       <p style="margin: 0 0 6px; font-weight: 600; color: var(--text);">No courses enrolled yet</p>
-      <p style="font-size: 0.85rem; margin: 0 0 14px;">Upload your lecture notes, CATs, or past examination papers to build your course workspace.</p>
-      <a href="{% url 'prep:upload' %}" class="ws-upload-btn">Upload Material</a>
+      <p style="font-size: 0.85rem; margin: 0 0 14px;">Search the shared course catalogue, then add the course to your workspace.</p>
+      <a href="{% url 'prep:courses' %}#course-search" class="ws-upload-btn">Search Courses</a>
       {% else %}
       <p style="margin: 0 0 6px; font-weight: 600; color: var(--text);">Sign in to see your courses</p>
       <p style="font-size: 0.85rem; margin: 0 0 14px;">Your enrolled courses, syllabus topics and past papers appear here once you sign in.</p>
