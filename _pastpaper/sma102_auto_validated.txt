@@ -1,0 +1,88 @@
+STATUS auto_validated: 29
+
+ID 476 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-86b469b6 | number 1 | marks 5 | issues=[]
+The quadratic equation 𝑥ଶ= (𝑘−1)𝑥+ 𝑘 has negative roots which differ by 3. Find the value of: a) each root. [4 marks] b) The constant 𝑘. [1 mark]
+
+ID 479 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-86b469b6 | number 4 | marks 4 | issues=[]
+If the roots of the equation 𝑥ଶ−5𝑥−7 = 0 are 𝛼 and 𝛽, find the equation whose roots are ఈ and ఉ ఉ ఈ
+
+ID 485 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-86b469b6 | number 10 | marks 6 | issues=[]
+𝛼 and 𝛽 are the roots of the quadratic equation 𝑥ଶ−(𝑘+ 2)𝑥+ 𝑘= 0. a) Find 𝛼+ 𝛽 and 𝛼𝛽 in terms of 𝑘. [2 marks] b) If (𝛼+ 1)(𝛽+ 2) = 4, show that 𝛼= −2𝑘. [2 marks] c) Hence find the two values of 𝑘. [2 marks]
+
+ID 489 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-86b469b6 | number 14 | marks 4 | issues=[]
+The quadratic equation 4𝑥ଶ+ 7𝑥−5 = 0 has roots 𝛼 and 𝛽. Find the quadratic equation whose roots are 𝛼ଶ and 𝛽ଶ and leave your answer in the form 𝑎𝑥ଶ+ 𝑏𝑥+ 𝑐= 0 where 𝑎, 𝑏 and 𝑐∈ℕ.
+
+ID 494 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-52fd756a | number 2 | marks 0 | issues=[]
+The roots of the quadratic equation $x^2 + 3x - 2 = 0$ are $\alpha$ and $\beta$. Determine a quadratic equation with integer coefficients which has roots $\left(\alpha - \frac{3}{\beta^2}\right)$ and $\left(\beta - \frac{3}{\alpha^2}\right)$.
+
+ID 496 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-52fd756a | number 4 | marks 0 | issues=[]
+Solve the inequality $x^2 - 7x + 10 > 0$.
+
+ID 477 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-86b469b6 | number 2 | marks 5 | issues=[]
+Solve 2𝑥ଷ+ 5𝑥ଶ−𝑥−6 = 0
+
+ID 480 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-86b469b6 | number 5 | marks 4 | issues=[]
+Factorize the polynomial 𝑓(𝑥) = 𝑥ଷ−7𝑥−6 completely.
+
+ID 481 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-86b469b6 | number 6 | marks 2 | issues=[]
+Find the remainder when 𝑓(𝑥) = 3𝑥ଷ−7𝑥ଶ+ 2𝑥−3 is divided by (1 −2𝑥).
+
+ID 488 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-86b469b6 | number 13 | marks 4 | issues=[]
+Factorize completely 𝑓(𝑥) = 2𝑥ଷ+ 𝑥ଶ−8𝑥−4. Hence solve the equation 𝑓(𝑥) = 0
+
+ID 490 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-86b469b6 | number 15 | marks 5 | issues=[]
+𝑓(𝑥) = 2𝑥ଷ+ 𝑎𝑥ଶ+ 𝑏𝑥−6, where 𝑎 and 𝑏 are constants. When 𝑓(𝑥) is divided by 2𝑥−1 the remainder is -5. When f(x) is divided by x+2 there is no remainder. Find the value of 𝑎 and 𝑏 and hence factorize f(x) completely.
+
+ID 493 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-52fd756a | number 1 | marks 0 | issues=[]
+Let $f(x)$ be a polynomial such that when $f(x)$ is divided by $x - 19$, the remainder is $99$, and when $f(x)$ is divided by $x - 99$, the remainder is $19$. What is the remainder when $f(x)$ is divided by $(x - 19)(x - 99)$?
+
+ID 497 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-52fd756a | number 5 | marks 0 | issues=[]
+Solve the equation $x^3 + 2x^2 - x - 2 = 0$.
+
+ID 500 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-f81f74bb | number 2 | marks 41 | issues=[]
+(20 marks) a) Rationalize the denominator and simplify [4marks] √ b) Find the value of a and b if the expression 2x3– 15 + ax + b is divided both by (x – 4) and (2x -1). [5marks] c) Factorise x4 + x3 – 3x2 – 4x – 4 as far as possible. [4marks] d) Solve 22x-1 - 9(2)x-2 + 1 = 0 [5marks] e) Express √ in terms of the simplest surd. [3marks]
+
+ID 505 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-226a4224 | number 3 | marks 55 | issues=[]
+(15 MARKS) a) i) Let n E N. Give a counter cxa1nple of the statemen!Vn (2"n). (2 marks] i) Prove by induction that 1+3+5+ --- +(2n - 1) = n n EN [3 marks] b) Solve for x and ygiven that 3+4i-2+i =X+ iy. 13 marks| c) Find (1 + i)20 d) Find the fourth roots of 1 13marks] |4 narks] QUESTION FOUR(I5MARKS) a) The roots of thecquation 3x - 17x + 2 =0 are a andB. Determinea quadralic cqualion whose ruois arc a + 1and B +1 (5 marks] b) A polynonialf(x) = 6x + kr' +x-2 wherc k is a constant has 3x-1 as a factor. Dcterrnincthe value ofk |4 marks] c) Determineand simplify, the middle tern in the cxpansion of6x |3 narks| d) Al a dinner party, 6 inen and6 wonien sit at a round tablc. In bow many ways can they sit if men and womcn alternate?
+
+ID 512 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-226a4224 | number 2 | marks 20 | issues=[]
+u) The =s liunction f(r) -412 4+ +b is such thuat it is divisible by t-3 snd when divice by z-L, is a there of 4, remaincler Fiul of tlhe values uand b. ( cle) b) The roots of the quaratic ettation 2:1 + 7 3= 0are o and B. Find the qusrlratc equation-whoseroots arc a +4arid B (5narlks) c) In a class of. 100 stndents, 35 like gcography,45 likc History and 10 likc both. How mairy like either.of thein and how many like neither? (3 marks) ) Finl tlhe set of ll vlues of 1SILcl1 tlhat 12:1:<T+6. (4 marks) c) Simplify (A*n B) U(1nB) U(An B) (I mark:)
+
+ID 522 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-1f736f42 | number 2 | marks 41 | issues=[]
+(20 marks) a) Rationalize the denominator and simplify [4marks] √ b) Find the value of a and b if the expression 2x3– 15 + ax + b is divided both by (x – 4) and (2x -1). [5marks] c) Factorise x4 + x3 – 3x2 – 4x – 4 as far as possible. [4marks] d) Solve 22x-1 - 9(2)x-2 + 1 = 0 [5marks] e) Express √ in terms of the simplest surd. [3marks]
+
+ID 527 | topic 111 Remainder and Factor Theorem and their Applications | paper sma102-doc-ec1b158d | number 2 | marks 20 | issues=[]
+- } (a) Find the value of $k$ so that the equation $4x^2 - 8kx + 9 = 0$ has roots which differ by 4 and hence find the quadratic equations arising. (5 Marks) (b) Solve the inequality $3x^2 - 8x + 7 > 2x^2 - 3x + 1$. (5 Marks) (c) When $f(x)$ is divided by $(x + 1)$, the remainder is $-9$ and when it is divided by $(2x - 1)$ the remainder is $3$. Find the remainder wen $f(x)$ is divided by $(x + 1)(2x - 1)$. (5 Marks) (d) Solve the equation $3x^3 + 7x^2 - 22x - 8 = 0$. (5 Marks)
+
+ID 478 | topic 112 Permutations and Combinations | paper sma102-doc-86b469b6 | number 3 | marks 2 | issues=[]
+How many arrangements of the letters of the word BENGALI can be made if the vowels are never together?
+
+ID 483 | topic 112 Permutations and Combinations | paper sma102-doc-86b469b6 | number 8 | marks 2 | issues=[]
+How many arrangements can be made of three letters chosen from PEAT if the first letter is a vowel and each arrangement contains three different letters? Answer 12
+
+ID 491 | topic 112 Permutations and Combinations | paper sma102-doc-86b469b6 | number 16 | marks 3 | issues=[]
+How many integers, greater than 999 but less than 4 000, can be formed with the digits 0,1,2,3 and 4, if repetition of digits is allowed.
+
+ID 495 | topic 112 Permutations and Combinations | paper sma102-doc-52fd756a | number 3 | marks 0 | issues=[]
+A committee of 5 people is formed from a group of 4 men and 7 women. How many possible committees can be formed if at least 3 women are in the committee?
+
+ID 529 | topic 114 Set Theory | paper sma102-doc-ec1b158d | number 4 | marks 20 | issues=[]
+- } (a) A survey showed that in a polling station $XYZ$ with 1000 voters: 310 voted for president, 650 voted for governor and 440 voted for senator. 170 voted for president and governor, 180 voted for governor and senator, 150 voted for president and senator. If all the voters participated in voting, determine the number of people who voted for all the three candidates, indicating the number of voters in each region of the Venn diagram. (7 Marks) (b) Use laws of algebra of sets to simplify $(A^c \cup B^c) \cap (A \cap B^c)^c$. (4 Marks) (c) Show that $(p \Rightarrow q) \land (q \Rightarrow r) \Rightarrow (p \Rightarrow r)$ is a tautology. (5 Marks) (d) Simplify $(p \land q) \lor (p \land \sim q) \lor (p \Rightarrow q)$. (4 Marks)
+
+ID 518 | topic 116 Method of Proof | paper sma102-doc-7c3c9eea | number 3 | marks 7 | issues=[]
+A survey of 500 university students showed that 125 did Mathematics only, 110 did Physics only and 90 did Chemistry only. The number that did Mathematics and Physics was 60, the number that did Chemistry and Physics was 50, the number that did Mathematics and Chemistry is 80 and the number that did Physics was 180. Find the number that did i) all the three subjects. (5 Marks) ii) at least one of the three subjects. (1 Mark) iii) none of the three subjects. (1 Mark)
+
+ID 528 | topic 116 Method of Proof | paper sma102-doc-ec1b158d | number 3 | marks 20 | issues=[]
+- } (a) Determine the number of permutations of letters of the word MASIMARA. (2 Marks) (b) A committee of five is to be formed from nine women and three men. In how many ways can the members be chosen so as to include at most two men? (5 Marks) (c) Find the $9^{\text{th}}$ term of the expansion $\left(x - \frac{1}{\sqrt{x}}\right)^{12}$. (3 Marks) (d) Prove by Mathematical Induction that $1 + 5 + 5^2 + \cdots + 5^{n-1} = \frac{1}{4}(5^n - 1)$, for all $n \geq 1$. (5 Marks) (e) Evaluate $\sqrt{24}$ correct to five places of decimals by using Binomial Expansion Formula. (5 Marks)
+
+ID 482 | topic 117 Complex Numbers | paper sma102-doc-86b469b6 | number 7 | marks 4 | issues=[]
+How many even numbers, greater than 2000, can be formed with the digits 1,2,4,8 a) if each digit can be used only once in each number? b) if repetition is allowed. Answers a) 12 b) 144
+
+ID 484 | topic 117 Complex Numbers | paper sma102-doc-86b469b6 | number 9 | marks 5 | issues=[]
+How many odd numbers greater than 500,000 can be made from the digits 2,3,4,5,6,7 a) without repetitions. b) with repetitions allowed.
+
+ID 486 | topic 117 Complex Numbers | paper sma102-doc-86b469b6 | number 11 | marks 2 | issues=[]
+How many three digit numbers can be made from the integers 2, 3, 4,5,6,7 if each integer is used only once?
+
+ID 502 | topic 117 Complex Numbers | paper sma102-doc-f81f74bb | number 4 | marks 20 | issues=[]
+. a) State Moivre’s Theorem. [2marks] b) Find (1+j√ [5marks] c) Simplify [4marks] d) Given that z1 =3-2j, z2 = -3-4j, z3= j – 2. i) Obtain 3z1 – 2z2 + z3, [4marks] z 1 ii) in terms of r1 , r2 , ñ1 and ñ2 [5marks] z 2

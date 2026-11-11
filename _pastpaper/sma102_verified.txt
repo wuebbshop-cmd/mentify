@@ -1,0 +1,10 @@
+STATUS verified: 3
+
+ID 531 | topic 114 Set Theory | paper None | number 1 | marks 7 | issues=[]
+In a survey of 800 students at a college, it was found that: - 400 students study Mathematics, - 350 students study Physics, - 300 students study Chemistry, - 150 students study both Mathematics and Physics, - 120 students study both Physics and Chemistry, - 100 students study both Mathematics and Chemistry, - 50 students study all three subjects. (i) Draw a Venn diagram and determine the number of students in each region. (ii) How many students study none of the three subjects? (iii) How many students study exactly one of the three subjects?
+
+ID 532 | topic 114 Set Theory | paper None | number 2 | marks 4 | issues=[]
+Use the laws of algebra of sets to simplify the following expression: $$ (A \cup B)^c \cap (A^c \cap B)^c $$ State the law used at each step.
+
+ID 533 | topic 114 Set Theory | paper None | number 3 | marks 5 | issues=[]
+Let $U = \{1, 2, 3, 4, 5, 6, 7, 8\}$, $A = \{1, 2, 3, 4\}$, and $B = \{3, 4, 5, 6\}$. (i) List all the elements of $A \triangle B$ (the symmetric difference of $A$ and $B$). (ii) Determine $|\mathcal{P}(A \cap B)|$, where $\mathcal{P}(X)$ denotes the power set of $X$. (iii) Find $(A \setminus B) \cup (B \setminus A)$ and verify that it equals $A \triangle B$.

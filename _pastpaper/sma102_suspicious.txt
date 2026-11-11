@@ -1,0 +1,135 @@
+TOP NONASCII
+44 '𝑥' MATHEMATICAL ITALIC SMALL X Ll
+23 '−' MINUS SIGN Sm
+22 '–' EN DASH Pd
+20 '⁄' FRACTION SLASH Sm
+15 'ଶ' ORIYA LETTER SHA Lo
+8 '√' SQUARE ROOT Sm
+8 '𝑘' MATHEMATICAL ITALIC SMALL K Ll
+8 '𝛼' MATHEMATICAL ITALIC SMALL ALPHA Ll
+8 '𝑓' MATHEMATICAL ITALIC SMALL F Ll
+7 '\uf02b' UNKNOWN Co
+7 '\uf028' UNKNOWN Co
+7 '\uf029' UNKNOWN Co
+7 '𝛽' MATHEMATICAL ITALIC SMALL BETA Ll
+5 '’' RIGHT SINGLE QUOTATION MARK Pf
+5 '\uf0d9' UNKNOWN Co
+5 'ଷ' ORIYA LETTER SSA Lo
+5 '𝑎' MATHEMATICAL ITALIC SMALL A Ll
+5 '𝑏' MATHEMATICAL ITALIC SMALL B Ll
+4 '\uf0da' UNKNOWN Co
+4 'ß' LATIN SMALL LETTER SHARP S Ll
+3 '\uf03d' UNKNOWN Co
+2 '\uf061' UNKNOWN Co
+2 '\uf071' UNKNOWN Co
+2 '½' VULGAR FRACTION ONE HALF No
+2 '\uf02d' UNKNOWN Co
+2 '²' SUPERSCRIPT TWO No
+2 'ñ' LATIN SMALL LETTER N WITH TILDE Ll
+2 'ఈ' TELUGU LETTER II Lo
+2 'ఉ' TELUGU LETTER U Lo
+2 '𝑐' MATHEMATICAL ITALIC SMALL C Ll
+1 '\uf070' UNKNOWN Co
+1 '\uf0e7' UNKNOWN Co
+1 '\uf0f7' UNKNOWN Co
+1 '\uf0e8' UNKNOWN Co
+1 '\uf0f8' UNKNOWN Co
+1 '\uf0e9' UNKNOWN Co
+1 '\uf0eb' UNKNOWN Co
+1 '\uf0db' UNKNOWN Co
+1 '\uf0f9' UNKNOWN Co
+1 '\uf0fb' UNKNOWN Co
+1 '\uf0ae' UNKNOWN Co
+1 '\uf0ce' UNKNOWN Co
+1 '÷' DIVISION SIGN Sm
+1 '¢' CENT SIGN Sc
+1 'ú' LATIN SMALL LETTER U WITH ACUTE Ll
+1 'é' LATIN SMALL LETTER E WITH ACUTE Ll
+1 'í' LATIN SMALL LETTER I WITH ACUTE Ll
+1 '¿' INVERTED QUESTION MARK Po
+1 '«' LEFT-POINTING DOUBLE ANGLE QUOTATION MARK Pi
+1 'ü' LATIN SMALL LETTER U WITH DIAERESIS Ll
+1 'ð' LATIN SMALL LETTER ETH Ll
+1 '∈' ELEMENT OF Sm
+1 'ℕ' DOUBLE-STRUCK CAPITAL N Lu
+1 '≥' GREATER-THAN OR EQUAL TO Sm
+
+VISIBLE SUSPECT TEXT
+ID=531 status=verified topic=114 num=1
+In a survey of 800 students at a college, it was found that: - 400 students study Mathematics, - 350 students study Physics, - 300 students study Chemistry, - 150 students study both Mathematics and Physics, - 120 students study both Physics and Chemistry, - 100 students study both Mathematics and Chemistry, - 50 students study all three subjects. (i) Draw a Venn diagram and determine the number of students in each region. (ii) How many students study none of the three subjects? (iii) How many students study exactly one of the three subjects?
+ID=526 status=flagged topic=110 num=1
+- Compulsory- }} 1. The roots of the quadratic equation \(x^2 + 3x - 2 = 0\) are \(\alpha\) and \(\beta\). Without first evaluating the values of \(\alpha\) and \(\beta\) in the given equation, determine a quadratic equation with integer coefficients which has \(\left(\alpha - \frac{3}{\beta^2}\right)\) and \(\left(\beta - \frac{3}{\alpha^2}\right)\) as roots. (8 Marks) 2. 1. How many ways can you arrange the letters of the word KITCHEN if it must start with a consonant and end with a vowel? (3 Marks) 2. A mixed hockey team containing 5 men and 6 women is to be chosen from 7 men and 9 women. In how many ways can this be done? (3 Marks) 3. If \(n(U) = 23\), \(n(H^c) = 12\), \(n(K) = 15\), \(n(H^c \cap K^c) = 4\), find 1. \(n(H^c \cap K)\) (2 Marks) 2. \(n(H \cap K)\) (2 Marks) 3. \(n(H \cap K^c)\) (3 Marks) 4. 1. By using the truth table, show whether or not \((p \lor q) \land \sim p\) and \(q \land \sim p\) are logically equivalent. (3 Marks) 2. By using Boolean algebra, show that \(\sim (p \Rightarrow q) \lor p = p\) (3 Marks) *INVOLVEMENT IN EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION* ** **Page 1 of 3** (e) Express $z = 2 + 2\sqrt{3} i$ in polar form. (3 Marks)
+ID=528 status=auto_validated topic=116 num=3
+- } (a) Determine the number of permutations of letters of the word MASIMARA. (2 Marks) (b) A committee of five is to be formed from nine women and three men. In how many ways can the members be chosen so as to include at most two men? (5 Marks) (c) Find the $9^{\text{th}}$ term of the expansion $\left(x - \frac{1}{\sqrt{x}}\right)^{12}$. (3 Marks) (d) Prove by Mathematical Induction that $1 + 5 + 5^2 + \cdots + 5^{n-1} = \frac{1}{4}(5^n - 1)$, for all $n \geq 1$. (5 Marks) (e) Evaluate $\sqrt{24}$ correct to five places of decimals by using Binomial Expansion Formula. (5 Marks)
+ID=521 status=flagged topic=111 num=1
+(20 marks) 1. a) The roots of the equation 2x2 – 3x-5 = 0 are and . Find the value of i) [2marks] ii) ⁄ ⁄ [2marks] b) How many permutations are there of all the letters in the word MATHEMATICS? [3marks] ⁄ ⁄ ⁄ ⁄ c) Simplify ⁄ ⁄ [3marks] d) Evaluate without using tables ⁄ ⁄ e) Express -3 – 4j in the form [4marks] f) Prove that (1 – cos A) (1 + sec A) = Sin A tan A. [3marks] g) Find the remainder when x5 – 4x3 + 2x + 3 is divided by x+ 2. [4marks]
+ID=523 status=flagged topic=110 num=3
+a) If sin   2 3 and 2 7 find the possible values of cos ( ) [4marks] r b) Given that prove that 2 s [4marks] c) Find the angles of triangle whose sides are 2: 3: 4. [4marks] d) Calculate the radius of a circle given that a segment of it has an area of 10cm2 and subtends an angle of 4 at the centres. [4marks] e) Find the solution of the equation .
+ID=524 status=flagged topic=117 num=4
+. a) State Moivre’s Theorem. [2marks] b) Find (1+j√ [5marks] c) Simplify [4marks] d) Given that z1 =3-2j, z2 = -3-4j, z3= j – 2. i) Obtain 3z1 – 2z2 + z3, [4marks] z 1 ii) in terms of r1 , r2 , and1 2 [5marks] z 2
+ID=525 status=flagged topic=117 num=5
+a) Evaluate i) [2marks] 10P6 ii) [2marks] 19P4 b) How many 3-digit numbers can be made from the integers 2, 3, 4, 5, 6 if each digit is used only once. [2marks] c) A rugby team consists of 15 players . i) How many teams can be selected form a squad of 20? [3marks] ii) If 10 players are definitely in the team, how many teams are now possible? [3marks) 2 up to the 4th term. [4marks]d) i) Expand ( r  x 1) iii) By substituting 0.08 for x in (1 + x)½ and its expansion, find √ correct to 4 sig, fig. [4marks]
+ID=516 status=flagged topic=113 num=1
+Find the constant term in the expansion  2x  2  .  x 
+ID=517 status=flagged topic=113 num=2
+i) Expand 3 8  3x in ascending powers of x as far as the term in 3x . (3 Marks) ii) Use expansion to evaluate 3 7.7 correct to five significant figures. (3 Marks)
+ID=519 status=flagged topic=115 num=4
+Simplify by using Boolean algebra ~ ~ ~  p  q  p  q  p  q  p  ~ q  . (4 Marks) .5. Construct the truth table of the proposition   p   ~ q     r   p  r (5 Marks)
+ID=520 status=flagged topic=116 num=16
+Prove that 2 4 6  2n  n  n   for all n  .
+ID=504 status=flagged topic=116 num=1
+(30MARKS) a) Aquadratic / () has cquation tworoots a andß. Ia-4 +Sl, determine the root f and thus oblain an for Cxpression the quadratic cquation f(x). 14 smrks hus p(x) b) Apolynomial 3 when remander divided by x -1 and renainder S when dividcd by x-2. Find the is remainder when f() divided by x- 3x + 2. 14 marks c) Find all the solutions(conmplex or reul) of the cubiccquation z-3z' +z+5 0 (4 rmarka d) Solve the cquation for nin ()=11.). 15 marks) e) There are l00 cach tourists, of whom by onc travellcd or more of of ncans the following as in the shown iransportotion Venn diagraun bclow. 52 by bus and Iravelled 35 by train, of u. findthe valucs v and w and the of nunber who torists by at travelled least of Iwo means transportaion. 14 narksl Car Bus W 18 6 12 V|2 Train ). ) Use loyical luws to smpitytheexpresston(PA)VPA~ 3 narks| Page 1 of2 INVOLVEMENTIN ANY EXAMINATION IRREGULARITYSHALL LEAD TO DISCONTINUATION @jaykheed01 Nokia G21 Prove the conditionalproposition "Ifa and b are consecutiveintegers, then the suin atD 1s 0dd" by: |3 narks] i) Proof by contradicion 3 niarks] ii) Proof by the contrapositive QUESTION TIYO (15 MARKS) a) Given that U= (1,2,3,4,5,6,7,8)is the universals
+ID=507 status=flagged topic=115 num=1
+(30 marks| Lnewtie potgaa (a) For what range of valuesis r -9r+14<0? (3 marks] (b) Find the value ofk given that x+2 is a factor of 2r' - 5x + lx+ k [4marks] Polgn ml (c) Asquash team is to contain 3 men and 2 women, chosen from 15 men and 9 women. In Conebns how many ways can the team be chosen? (3 marks] 2 () Find the eighth tern in the expansionof 2x* [5 marks] Bmer l (e) Given the sets A= (1,2,4,5), B = (3, 4,5,6,7) and C= (2,4,6,8} from the universal set eti 1 U= (1,2, ...,9}, findthe values of the set A'n (BU C) [3marks] ( () Let A be the proposition Johh is tall" and B be John is handsome". Write the statement "Either John is tall or short and handsome" in symbols using A and B [2 marks) (1) Use truth tables to show that ~ (AVB) is equivalentto ~ A A~ B [3marks] Logi (g) Prove by Mathematicalinductionthat 1 + 2 +3* + + n =÷n'(n + 1)2 [4marks] -2+i in the form z =a t bi where a, b are real numbers and i=-l. tomplex (h) Express == 3+4i [3marks] DISCONTINUATION IRREGULARITYSHALL LEAD TO EXAMINATION INVOLVEMENTIN ANY Page 1 of3 @jaykheed01 Nokia G21 Question Tivo (20 marks] (a) If a and ß are the roots of theequation 5x' -X-2 #0,find withoutsolving the equation,the quadratic equ
+ID=511 status=flagged topic=110 num=1
+a) Draw a Venn liagran representing(AUB) - (An B) (2 inarks) b) Give tie truth talbleof the propositiongive by ~ (p A) (~p)V(r 4). (3 marks) c) State the converse, inverse und the contrapositiveof if a triangle is equiagular, then it is equilateral ' (3 marks) l) If a and are tle roots of tlhe quadratic equation 22:- 4T - 3 = 0, fnd the quadratic :qualion whose roots are and 2 (E warks) e) Deternnine tlhe line of syminetry and minimun or ximumpoint of the graph fe) = 2- 2: 2 without clrawing (he curve. '(I unarks) ) Vhen the polyuotoialf(c) = 1 +2- 5ut 7 is clivide:l by z+1, the rcmainder is IR, When tlhe polyuouial/(¢) =+ ac' 12 +6 is livilerl by -2. the reintainderis It2 If 2R, + Ry = 6, hndl the valie of a. (3 matks) g) Solv: y2 + | = (0 (l marks) I) Find Re(s) anl Jin(=) given that z = 2-ivA 3 narks) INVOLVEMENTIN EXAMINATIONIRREGULARITYSHALL LEAD TODISCONTINUATION Page 1 of 4 @jaykheed01 Nokia G21 i) Prove tlhat vG is iul irtatioal rober. (4 murles)
+ID=512 status=auto_validated topic=111 num=2
+u) The =s liunction f(r) -412 4+ +b is such thuat it is divisible by t-3 snd when divice by z-L, is a there of 4, remaincler Fiul of tlhe values uand b. ( cle) b) The roots of the quaratic ettation 2:1 + 7 3= 0are o and B. Find the qusrlratc equation-whoseroots arc a +4arid B (5narlks) c) In a class of. 100 stndents, 35 like gcography,45 likc History and 10 likc both. How mairy like either.of thein and how many like neither? (3 marks) ) Finl tlhe set of ll vlues of 1SILcl1 tlhat 12:1:<T+6. (4 marks) c) Simplify (A*n B) U(1nB) U(An B) (I mark:)
+ID=505 status=auto_validated topic=111 num=3
+(15 MARKS) a) i) Let n E N. Give a counter cxa1nple of the statemen!Vn (2"n). (2 marks] i) Prove by induction that 1+3+5+ --- +(2n - 1) = n n EN [3 marks] b) Solve for x and ygiven that 3+4i-2+i =X+ iy. 13 marks| c) Find (1 + i)20 d) Find the fourth roots of 1 13marks] |4 narks] QUESTION FOUR(I5MARKS) a) The roots of thecquation 3x - 17x + 2 =0 are a andB. Determinea quadralic cqualion whose ruois arc a + 1and B +1 (5 marks] b) A polynonialf(x) = 6x + kr' +x-2 wherc k is a constant has 3x-1 as a factor. Dcterrnincthe value ofk |4 marks] c) Determineand simplify, the middle tern in the cxpansion of6x |3 narks| d) Al a dinner party, 6 inen and6 wonien sit at a round tablc. In bow many ways can they sit if men and womcn alternate?
+ID=513 status=flagged topic=113 num=3
+a) Solve the equation :c 2u 4r +8=0. (I narks) b) Ihave uincpaintings and have room to dlisplay only four of then at a timc on my walL. Hoss aiy clifferent 1V:ys COuld [do this? (2 narks) c) Find the coefficient of r in the expansion of (1y - 3:c)l5 (3 narks) t) There are ud 12 16 boys girls in How a class. tnany ways can a conmittee of 4 people Ie forned be if therc nust at least 2 girls on the coumúttee? (! marks) ) (sc tlhe biuonial theorem to expand (8 -3r)= in asccnding powers of r up to the erm Use yopEDasion. with suitable vlt: of , to obtal an to 7.7 apprximation plas.@jaykheed01 Nokia G21 i77 IN INVOLVEMENT EXAMINATIONIRREGULARITYSHALL LEAD TO DISCON (5 tuarlas) PARRAMATTA. arrangenmentsof the letters of thé word the umiber of (2marks)
+ID=1204 status=pending topic=113 num=3
+(a) Write down the first four terms in ascending powers of $x$ in the expansion of $(1+x)^{1/2}$. By taking $x=0.02$, obtain $\sqrt{1.02}$ correct to 4 decimal places. [8 marks] (b) Use the first three terms of a binomial expansion to find an approximate value of $\sqrt{0.99}$ correct to 3 decimal places. [4 marks] (c) From a group of 6 men and 7 women, how many different committees consisting of 3 men and 5 women can be formed if Jane, Joyce and John must always be together? [5 marks] (d) Find the number of distinguishable arrangements of the letters of the word DISSAPPOINTMENTS. [3 marks]
+ID=1208 status=pending topic=113 num=3
+A student is revising the binomial theorem and its applications. (a) Solve the quadratic equation $x^2 - 4x + 8 = 0$. (b) A gallery owner has 9 distinct paintings and wall space to display only 4 of them at a time. In how many different ways can the owner choose and arrange 4 paintings on the wall? (c) Find the coefficient of $x^3$ in the expansion of $(1 - 3x)^{15}$. (d) A class contains 12 boys and 16 girls. In how many ways can a committee of 4 people be formed if there must be at least 2 girls on the committee? (e) Use the binomial theorem to expand $(8 - 3x)^{1/3}$ in ascending powers of $x$ up to and including the term in $x^2$. Hence, by taking a suitable value of $x$, obtain an approximation for $\sqrt[3]{7.7}$ correct to 4 decimal places.
+ID=509 status=flagged topic=114 num=4
+(a) If the universal set is given by U= {1,2,3,4,5,6}, A={,2}, B={2,4,5), show that i(4UB)=AOB [4 marks) (b) In e competition,a school awarded medals in the following categories: 36 medals in dance, 12 medals in drama and 18 medals in music. If these medals went toa total of 45 persons and only 4 persSons got medals in all the three categories, how manv received medals in exactly two of the categories. [6 marks) INVOLVEMENT IN ANY EXAMINATION IRREGULARITYSHALL LEAD TO DISCONTINUATION Page 2 of3@jaykheed01 Nokia G21 (C) For the given conditionalstatement,write the converse. inyerse and contrapositivestatements. Conditionalstatement: If I buy tickets fortethe game. thben my favourite football team will qualify for the superBowl [3marks] (7 marks] (d) Completea truth table for the statementpa(yv~r]’~paq))
+ID=506 status=flagged topic=111 num=5
+|3 marks] a) For what range of values is: x' 9x +14< 0 |3 marks] 6+x> 12r2 3 narks] b) In how many ways can agrOup of 5men and2 women be chosen iron 7 men and 3 woen? c) Apolynomialf(x)leaves remainder of 2when divideu by (3x + 1) and a 3 marks| renainder of -2 wien dividcd by (2x - 1). Determinethe Fmainder whenf(r) is divkled by 6r-r-[ I6 marks| Page 2 of2 EXAMINATIONIRREGULARITYSHALL LEAD TO DISCONTINUATION@jaykheedo7 Nokia G21 a higher education institution UNIVERSITY EXAMINATIONS2020/2021 RSTSEMESTER EDUCATION SMA 112: BASIC MATHEMATICS DATE: Wednesdav,17 March 2021 TIME: 11.00 a.m. - 1.00 p.m. INSTRCTIONS: Answer questionONE and any other TWOquestions
+ID=510 status=flagged topic=117 num=5
+(a) Prove that the sum of two odd numbers is even [5 marks] (b) Using MathematicalInduction, prove that n(n+ 1)(n+ 5)is a multiple of 3for all nEN [5 marks] 6+3i (c) Evaluate [5 marks] 10+8i (d) Find all the cube roots of V3 +i (5 marks] INVOLVEMENTIN ANY EXAMINATIONIRREGULARITYSHALL LEAD TODISCONTINUATION Page 3 of3@jaykheed01 Nokia G21 MATHEMATICS SMA 102: BASIC TIME: 2Hours 1 SEMESTER 2021/2022 INSTRUCTIONS:Attempt Question ONE and any other TWO
+ID=515 status=flagged topic=117 num=5
+(20 Marks) a) By giving a counter example,disapprove,the staternent VreR,(> 0). (2 marks) 1) Provc by iluctionthat 2+4+6 + +2rn = ru +1). (# marks) c) (a) Express the couplex uunler 2 in the foruta r bi. where a, bE R. @jaykheede1 (2 nat)VVoAELTNokiaINEXAMINATIONG21 RREGULARITYSHALL LEAD TO DISCONTINUATION Page 3 of4 (b) Express the cotiplex nunber z=-5 45i in polarfoun (3arlks) d) (a) By sing De Mooivre's tlheorem, expíess (1 4+ ¿)0 in the form a +- bi, where a, be R. (4 marks) (b) Find the sare yoots of i. (5 narks) @jaykheed01 Nokia G21 IATTAVAVAS a higher education institution UNIVERSITY EXAMINATIONS 2010/2011 DISTANCE ANDE-LEARNING BACHELOR OF EDUCATION AND SMA 102: BASICMATHEMATICS Monday 4h July 2011 TIME: 8.00a.m- 10.00a.m TIONS: stion ONE and any other TWO questions N ONE (20 marks) The roots of the equation 2x*-3x-5= 0 are o< andB. Find the value of i) <2-1 B+ 1 (2marks] ii) «/ß + B/a [2marks] How many permutationsare there of all the letters in the word MATHEMATICS? [3marks] -1/2 -(r?+1)/2=1/2('+1)-/2 Simplify x1/2 (x2+ )1/2 [3marks] Evaluate without using tables Cot n/6 cos sin5I cosec² n/4 cos2 5 6 Express -3 4j in the form r(cos0 +j sin 0) [4marks] Prove that (| - cos
+ID=499 status=flagged topic=111 num=1
+(20 marks) 1. a) The roots of the equation 2x2 – 3x-5 = 0 are and . Find the value of i) [2marks] ii) ⁄ ⁄ [2marks] b) How many permutations are there of all the letters in the word MATHEMATICS? [3marks] ⁄ ⁄ ⁄ ⁄ c) Simplify ⁄ ⁄ [3marks] d) Evaluate without using tables ⁄ ⁄ e) Express -3 – 4j in the form [4marks] f) Prove that (1 – cos A) (1 + sec A) = Sin A tan A. [3marks] g) Find the remainder when x5 – 4x3 + 2x + 3 is divided by x+ 2. [4marks]
+ID=501 status=flagged topic=110 num=3
+a) If sin   2 3 and 2 7 find the possible values of cos ( ) [4marks] r b) Given that prove that 2 s [4marks] c) Find the angles of triangle whose sides are 2: 3: 4. [4marks] d) Calculate the radius of a circle given that a segment of it has an area of 10cm2 and subtends an angle of ð4 at the centres. [4marks] e) Find the solution of the equation .
+ID=503 status=flagged topic=117 num=5
+a) Evaluate i) [2marks] 10P6 ii) [2marks] 19P4 b) How many 3-digit numbers can be made from the integers 2, 3, 4, 5, 6 if each digit is used only once. [2marks] c) A rugby team consists of 15 players . i) How many teams can be selected form a squad of 20? [3marks] ii) If 10 players are definitely in the team, how many teams are now possible? [3marks) d) i) Expand ( r  x 1) 2 up to the 4th term. [4marks] iii) By substituting 0.08 for x in (1 + x)½ and its expansion, find √ correct to 4 sig, fig. [4marks]
+ID=493 status=auto_validated topic=111 num=1
+Let $f(x)$ be a polynomial such that when $f(x)$ is divided by $x - 19$, the remainder is $99$, and when $f(x)$ is divided by $x - 99$, the remainder is $19$. What is the remainder when $f(x)$ is divided by $(x - 19)(x - 99)$?
+ID=495 status=auto_validated topic=112 num=3
+A committee of 5 people is formed from a group of 4 men and 7 women. How many possible committees can be formed if at least 3 women are in the committee?
+ID=478 status=auto_validated topic=112 num=3
+How many arrangements of the letters of the word BENGALI can be made if the vowels are never together?
+ID=482 status=auto_validated topic=117 num=7
+How many even numbers, greater than 2000, can be formed with the digits 1,2,4,8 a) if each digit can be used only once in each number? b) if repetition is allowed. Answers a) 12 b) 144
+ID=483 status=auto_validated topic=112 num=8
+How many arrangements can be made of three letters chosen from PEAT if the first letter is a vowel and each arrangement contains three different letters? Answer 12
+ID=485 status=auto_validated topic=110 num=10
+𝛼 and 𝛽 are the roots of the quadratic equation 𝑥ଶ−(𝑘+ 2)𝑥+ 𝑘= 0. a) Find 𝛼+ 𝛽 and 𝛼𝛽 in terms of 𝑘. [2 marks] b) If (𝛼+ 1)(𝛽+ 2) = 4, show that 𝛼= −2𝑘. [2 marks] c) Hence find the two values of 𝑘. [2 marks]
+ID=486 status=auto_validated topic=117 num=11
+How many three digit numbers can be made from the integers 2, 3, 4,5,6,7 if each integer is used only once?
+ID=490 status=auto_validated topic=111 num=15
+𝑓(𝑥) = 2𝑥ଷ+ 𝑎𝑥ଶ+ 𝑏𝑥−6, where 𝑎 and 𝑏 are constants. When 𝑓(𝑥) is divided by 2𝑥−1 the remainder is -5. When f(x) is divided by x+2 there is no remainder. Find the value of 𝑎 and 𝑏 and hence factorize f(x) completely.
+ID=471 status=flagged topic=113 num=1
+} 1. Find the set of values of \(x\) for which \(15 + x - 2x^2 > 0\) (3 marks) 2. Factorize completely \(f(x) = 2x^3 + x^2 - 8x - 4\). Hence solve the equation \(f(x) = 0\) (6 marks) 3. A team of ten is to be chosen from eight men and six women. In how many ways can this be done if at least three women are to be in the team. (3 marks) 4. Let \(n(U) = 20\), \(n(A) = 16\), \(n(B) = 12\) and \(n(A^c \cap B^c) = 2\). Find \(n(A \cap B)\) (3 marks) 5. 1. Simplify the proposition \(\sim (p \Rightarrow q) \lor p\) (3 marks) 2. determine whether the proposition \((p \lor q) \Rightarrow \sim p\) is a tautology, a contradiction or neither. (2 marks) 6. Find the middle term in the binomial expansion of \(\left(2 - \frac{x}{2}\right)^{12}\) (2 marks) 7. Prove by Mathematical Induction that \(8^n - 1\) for any natural number \(n\) is divisible by 7. (4 marks) 8. Express \(z = 8 + 8\sqrt{3}i\) in polar form (4 marks) **INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** **Page 1 of 4**
+ID=473 status=flagged topic=113 num=3
+** a) In how many ways can a committee of 9 seat around a rectangular table? (2 marks) b) Simplify $\frac{33!}{27!6!} + \frac{3 \times 33!}{29!4!}$ (2 marks) c) Determine the number of permutations of letters of the word PHYTOTHERAPY (2 marks) d) How many odd numbers, greater than 40,000, can be made using the digits 0, 1, 4, 5, 7 if each digit can be used only once in each number? (5 marks) e) How many ways can a customer of a hardware select 3 different bolts from 10 available types and 8 different screws from 12 available types. (3 marks) f) Use the binomial theorem to expand $(1 + 5x)^{\frac{1}{3}}$ in ascending powers of $x$ up to the term in $x^3$. Use your expansion, with substitution of $x = -\frac{1}{32}$, to obtain an approximation to $\sqrt[3]{27}$ correct to 3 decimal places. (4 marks) g) Find the coefficient of \(x^7\) in the expansion of \((4x - 37)^{10}\) (2 marks)
+ID=474 status=flagged topic=114 num=4
+} a) Given two sets \(A\) and \(B\) such that \(A = \{2, 4, 6, 8, , 10, 12\}\) and \(B = \{3, 6, 9, 12\}\). Show that $$ n(A \cup B) = n(A) + n(B) - n(A \cap B) $$ (3 marks) b) Represent \([A \cap (B \cap C)^c]^c\) in a Venn diagram (3 marks) c) Give the truth table of the proposition given by \(\sim (p \lor q) \Leftrightarrow (\sim p \land \sim q)\) and conclude if it is a Tautology, a Contradiction or neither. (5 marks) d) State the converse, inverse and the contrapositive of the statement; *'if a triangle is equiangular, then it is equilateral'* (3 marks) e) Out of a group of 85 people, 30 like beef, 45 like goat meat and 44 like pork. In addition, 23 like both goat meat and pork, 13 like goat meat and beef, and another 13 like beef and pork. 10 of the people like none of the meat. i) Use a Venn diagram to present the above information. (4 marks) ii) How many people like at most two meat type? (1 mark) iii) How many people like goat meat only? (1 mark)
+ID=1193 status=reconstructed topic=114 num=4
+(a) Given the sets \(A=\{1,3,5,7,9,11\}\) and \(B=\{2,3,6,9,12\}\), verify that $$ n(A\cup B)=n(A)+n(B)-n(A\cap B). $$ (b) Draw a Venn diagram to represent the set \(\bigl[A\cap(B\cap C)^c\bigr]^c\). (c) Construct the truth table for the proposition $$ \sim(p\lor q)\Leftrightarrow(\sim p\land\sim q) $$ and state whether it is a tautology, a contradiction, or neither. (d) For the statement ``If a quadrilateral is a square, then it is a rectangle'', write down its converse, inverse, and contrapositive. (e) In a survey of 100 students, 40 like tea, 50 like coffee, and 45 like juice. Also, 20 like both coffee and juice, 15 like both tea and coffee, and 10 like both tea and juice. 5 students like none of the three drinks. (i) Represent the information on a Venn diagram. (ii) How many students like at most two of the drinks? (iii) How many students like tea only?
+ID=475 status=flagged topic=116 num=5
+} a) Using counter example, ascertain the truth value of \((x + 1)^2 = x^2 + 1\) (2 marks) b) Prove by contradiction that, if \(a\) is a rational number and \(b\) is an irrational number, then the sum \(a + b\) is an irrational number. (3 marks) **INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** **Page 3 of 4** c) Using Mathematical Induction, show that the summation formula $$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $$ is valid for all integers $n$. (5 marks) d) Find all the values of $z$ for which $z^4 + 2 - i2\sqrt{3} = 0$ (5 marks) e) Use De Moivre's Theorem to show that $$ \sin 5\theta = 16\sin^5\theta - 20\sin^3\theta + 5\sin\theta $$ (5 marks) **INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION** **Page 4 of 4**

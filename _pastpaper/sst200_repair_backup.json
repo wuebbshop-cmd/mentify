@@ -1,0 +1,222 @@
+{
+ "2316": {
+  "question_latex": "(a) Suppose that, for a group of students, we have information on marks in two tests (A and B) stored as vectors in R named `MarksA` and `MarksB`. We also have a vector `CandNum` that contains the candidates numbers of the students. Give the R commands to do the following\n (i) Create a data frame `MarksDF` containing the marks for each course and set the row names of the data frame to be the candidates numbers. Remove the original vectors from the workspace **(2 marks)**\n (ii) Make the variables encapsulated in `MarksDF` visible from the commandline and calculate the mean and variance of each set of marks **(2 marks)**\n (iii) Generate a scatter plot of marks for test B against marks for test A and label outlying points with the appropriate candidate number **(2 marks)**\n (iv) Give the candidate number of the candidate with the highest aggregate mark **(2 marks)**\n (v) Output the candidate numbers of candidates with marks below 60 in at least one course but whose aggregate mark is greater than 110 **(2 marks)**\n (vi) Find the mean absolute difference in marks for cases where the marks in test A are higher than those in test B **(3 marks)**\n(b) R allows users define their own functions\n (i) Using well illustrated examples, give reasons why we might want to define our own functions **(2 marks)**\n (ii) You are given a rough description of a programming problem and asked to write a function to tackle it. Describe three aspects of good programming practice that make the process of writing a function simpler and/or more effective **(5 marks)**\n\n4. (a) Consider the following specification for an R function\n \n\n- takes 2 vectors (not necessarily of same length) as inputs\n- prints out the relationship (equal to, less than or greater than) between the ith element of the first vector and the ith element of the second vector\n\n The function `func1($\\cdots$)` below represents my first attempt. This function does not meet the specification\n\n```r\nfunc1=function(x1,x2)\n {# variables and constants of the program\n ing = min(length(x1),length(x2))\n for(i in 1:ing)\n {\n cat(i,\":\")\n if(x1[i]==x2[i]) cat(\"EQ. \")\n if(x1[i]< x2[i]) cat(\"LT. \")\n else cat(\"GT. \")\n }\n }\n```",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 3,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2317": {
+  "question_latex": "We would like to use the Cars93 data set from the MASS package. In particular, we are interested in the relationship between the type of vehicle and its price.\n\n(a) Describe briefly the purpose of the following commands **(6 marks)**\n\n```r\n> library(MASS)\n> attach(Cars93)\n```\n\n(b) Give a brief (description) and or interpretation of the following commands and output as used to investigate the relationship theat exist between the study variables\n\n```r\n> lmP = lm(Price ~ Type)\n> summary(lmP)\n```\n\n**(3 marks)**\n**(5 marks)**\n\nCoefficients:\n\n| | Estimate | Std error | t value | Pr( >|t|) |\n| --- | --- | --- | --- | --- |\n| (Intercept) | 18.2125 | 1.9258 | 9.457 | 5.2e-15 *** |\n| Type Large | 6.0875 | 3.0172 | 2.018 | 0.046713 * |\n| Type Midsize | 9.0057 | 2.5310 | 3.558 | 0.000608 *** |\n| Type Small | -8.0458 | 2.5563 | -3.148 | 0.002256 ** |\n| Type Sporty | 1.1804 | 2.8191 | 0.419 | 0.676467 |\n| Type Van | 0.884 | 3.2097 | 0.277 | 0.782815 |\n\n```r\n> anova(lmP)\n```\n\n**(6 marks)**\n\nAnalysis of Variance Table\n\nResponse: \\quad Price\n\n| | Df | Sum sq | Mean sq | F-value | Pr(>F) |\n| --- | --- | --- | --- | --- | --- |\n| Type | 5 | 3421.4 | 684.3 | 11.532 | 1.477e-08 |\n| Residuals | 87 | 5162.6 | 59.3 | | |\n\nGiven the assignments above, what is the output of the following commands?\n\n- [(i)] `alpha[1]+beta[3]` **(1 mark)**\n- [(ii)] `length(gamma)` **(1 mark)**\n- [(iii)] `gamma[rep((1:4), times=2)]` **(1 mark)**\n- [(iv)] `alpha+beta` **(1 mark)**\n- [(v)] `gamma[beta>19]` **(1 mark)**\n- [(vi)] `gamma==\"c\"` **(1 mark)**\n\n(d) Consider the following result\n\n```r\n> x <-c(7, NA, 12.5, NA, 18)\n> y <-c(NA, NA, 6.5, 8, 7)\n> cbind(x=x[!is.na(x)&!is.na(y)],y=y[!is.na(x)&!is.na(y)])\n```\n\nWrite the expected result and find the inverse of the matrix **(4 marks)**\n\n(e) Create a new list with factors as components named `tacs` with a numeric vector `c(3,2.1,3.3,4,1.5,4.9)` as components named `nums` and nested in a list comprising the first three members of the list and perform the following\n\n- [(i)] Extract the element of `tacs` that correspond to elements of `nums` that are greater than or equals to 3 **(3 marks)**\n- [(ii)] Add a new member to the list named `flags`. This member should be logical vector of length 6 obtained as two-fold repetition of the 3rd column of the logical matrix **(2 marks)**\n\n(f) Students of Statistics and programming course, a higher education institution scored marks in four units as given in the extract for four entries as shown below here\n\n| TOE | Multivariate | Bayesian | Algebra |\n| --- | --- | --- | --- |\n| 60 | 67 | 63 | 65 |\n| 58 | 59 | 58 | 49 |\n| 62 | 55 | 68 | 57 |\n| 59 | 60 | 66 | 54 |\n\n- [(i)] Write the R-code that creates a data frame called `CourseUNITS` **(3 marks)**\n- [(ii)] Give the R-code that you would use to extract columns 2 and 3 **(2 marks)**\n\nGiven the definition of `funct1($\\cdots$)` above, what is the output from the following commands\n\n- [(i)] `funct1(c(2.5,-1,0),3:1)` **(3 marks)**\n- [(ii)] `funct1(1:3,3:1)` **(4 marks)**\n\n(b) Briefly describe the circumstances under which `funct1($\\cdots$)` gives wrong output and explain why this happens **(2 marks)**\n\n(c) What change could be made to `funct1` in order to make it meet the specification given in (a) **(3 marks)**\n\n(d) Write a function that meets the specification given in part (a) without using a loop **(8 marks)**",
+  "solution_latex": "## 1. Problem Statement & Given Conditions\n\nThe",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 2,
+  "marks": 60,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2318": {
+  "question_latex": "(a) We have a response variable $y$ and three explanatory variables $x_1, x_2$ and $x_3$. These are stored as `Y`, `x1`, `x2` and `x3` in a data frame called `mock4a`. We give the following commands in R\n\n```r\n> (lmres <- lm(Y~x1+x2+x3, data=mock4a)) # (a)i.\n> plot(fitted(lmres),rstudent(lmres),col=2) # (a)ii.\n> plot(lm.influence(lmres)$hat,type=\"h\",col=2) # (a)ii.\n```\n\n- [(i)] For the command labeled (a)i., state the model that is being fitted by the command. What is the purpose of the brackets surrounding the command? **(3 marks)**\n- [(ii)] For each of the commands labeled (a)ii., state what is being plotted and briefly describe the purpose of each plot **(6 marks)**\n\n(b) Suppose that $X$ is a random variable with a known distribution parameterised by $\\alpha$ and $\\beta$. The statistic $g(X)$ is proposed as an estimator of $\\beta$.\n\n- [(i)] For given $\\alpha$ and $\\beta$, briefly describe an experiment to generate a simulated approximation to the bias of $g(X)$ as an estimator of $\\beta$ for a random sample of size $n$. **(5 marks)**\n- [(ii)] What might we vary in our simulation experiment in order to gain an insight into how $g(X)$ behaves as an estimator of $\\beta$ under different conditions? **(3 marks)**\n- [(iii)] What role does the number of simulated replication $r$ play in determining the accuracy of simulated approximations? What constraints are there on the value of $r$? **(3 marks)**\n\n{*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*}\n\ni) Used to declare that a method does not return any value. **(2 marks)**\nii) Used to finish the execution of a method. **(2 marks)**\niii) Used in a class declaration to specify super class **(2 marks)**\n\nc) i) Define the term recursive function. **(2 marks)**\nii) Write a java program that uses recursive function to display the factorial of 8. **(4 marks)**",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 5,
+  "marks": 32,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2319": {
+  "question_latex": "a) Describe four relational operators used in programming. **(4 marks)**\n\nb) Distinguish between *Is-a* and *has-a* relationship as used in OOP. **(4 marks)**\n\nc) i) Define the term constructor as used in OOP **(2 marks)**\nii) Write a java program that implements a class named wall, with length and height as its data members. The class has a constructor that initializes the length and height values as 20 and 40 respectively, a member function CalArea that computes and displays the area of the wall. **(6 marks)**\n\nd) Write a java program that allows a user to enter two integer values. The program should evaluate the evaluate the smaller and larger value and display appropriate information. **(4 marks)**",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": null,
+  "number": 5,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2320": {
+  "question_latex": "(a) (i) Distinguish between intrinsic and non-intrinsic attributes of an object as used in any programming language ****",
+  "solution_latex": "1. **Problem Statement & Given Conditions**\n\nWe are asked to distinguish between **intrinsic attributes** and **non-intrinsic attributes** of an object as used in a programming language. An object is a runtime entity that has a type/value and may also have attributes, where an attribute is a named property or item of metadata associated with the object. The distinction concerns whether an attribute is required for the object’s fundamental type, structure, or interpretation, or whether it is optional supplementary information.\n\n2. **Step-by-Step Rigorous Proof / Derivation**\n\n**Step 1: Define an attribute of an object.** \nAn attribute is a property attached to an object that describes something about the object beyond, or alongside, its stored value. Attributes may describe structure, type, labels, names, units, custom metadata, and so on.\n\n**Step 2: Define an intrinsic attribute.** \nAn intrinsic attribute is an attribute that is inherent in the object’s type or construction and is required for the object to be correctly interpreted as that kind of object. It is normally created and managed automatically by the programming language. Removing or changing an intrinsic attribute would alter the object’s fundamental type, structure, or validity. Examples include the type or mode of an object, the length of a vector, or the dimensions of a matrix or array. In some languages, the class of an object in a class-based object system may also be regarded as intrinsic because it determines the object’s behaviour and permissible operations.\n\n**Step 3: Define a non-intrinsic attribute.** \nA non-intrinsic attribute is an additional piece of metadata attached to an object by the programmer or a library. It is not necessary for the object to exist or to be interpreted as its basic type. Such an attribute can usually be added, modified, or removed without changing the object’s value or fundamental type. Examples include names, labels, comments, units, display hints, and other user-defined metadata.\n\n**Step 4: Compare by essential criteria.** \n- **Origin:** intrinsic attributes arise automatically from the object’s type or construction; non-intrinsic attributes are usually supplied by the user or software. \n- **Necessity:** intrinsic attributes are essential to the object’s identity or valid interpretation; non-intrinsic attributes are optional. \n- **Effect of removal:** removing an intrinsic attribute changes or invalidates the object’s type or structure; removing a non-intrinsic attribute leaves the object’s fundamental value and type unchanged. \n- **Scope:** intrinsic attributes concern the object’s core semantics; non-intrinsic attributes concern supplementary information.\n\n**Step 5: Illustrate in a programming language such as R.** \nFor a numeric vector, its type and length are intrinsic properties. A user-added attribute such as `units = \"kg\"` is non-intrinsic: it can be removed while the vector remains the same numeric vector. For a matrix, its dimensions are structural and intrinsic in the ordinary sense, whereas row or column names are supplementary, non-intrinsic metadata.\n\n3. **Final Result / Q.E.D.**\n\nIntrinsic attributes are the object’s inherent, automatically determined structural or type properties, without which the object would not be the same kind of object or would not be correctly interpreted. Non-intrinsic attributes are optional, user- or library-supplied metadata that can be added, modified, or removed without changing the object’s fundamental type or value. Therefore, the distinction is based on necessity, origin, and the effect of removal. **Q.E.D.**",
+  "verification_status": "auto_validated",
+  "topic_id": 236,
+  "number": 1,
+  "marks": 2,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2321": {
+  "question_latex": "(ii) What are some of the basis rules observed whilst coming up with identifiers of objects in R ****",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": null,
+  "number": 2,
+  "marks": 3,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2322": {
+  "question_latex": "(b) (i) Construct and store a \\(4 \\times 2\\) matrix filled row-wise with the values 4.3, 2, 4, 2.1, 3, 78, -9, and 2 in that order. Check the output of the matrix ****",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": null,
+  "number": 3,
+  "marks": 2,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2323": {
+  "question_latex": "(ii) Create a list that contains, in this order, a sequence of 20 evenly spaced numbers between -4 and 4, a \\(3 \\times 3\\) matrix of logical vector `c(F,T,T,T,F,T,T,F,F)` filled column-wise, a character vector with strings `don` and `quixote` and a factor vector containing the observations `c(LOW, MED, LOW, MED, MED, HIGH)`. Then do the following",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": null,
+  "number": 4,
+  "marks": 0,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2324": {
+  "question_latex": "(c) We type the following in R\n \n\n```r\n> alpha <- c(12,26)\n> beta <- 17:23\n> gamma <- c(\"a\",\"b\",\"c\",\"d\")\n```\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n\n **Page 1 of 5**\n\nGiven the assignments above, what is the output of the following commands?\n\n- [(i)] `alpha[1]+beta[3]` **(1 mark)**\n- [(ii)] `length(gamma)` **(1 mark)**\n- [(iii)] `gamma[rep((1:4), times=2)]` **(1 mark)**\n- [(iv)] `alpha+beta` **(1 mark)**\n- [(v)] `gamma[beta>19]` **(1 mark)**\n- [(vi)] `gamma==c\"` **(1 mark)**\n\n(d) Consider the following result\n\n```r\n> x <-c(7, NA, 12.5, NA, 18)\n> y <-c(NA, NA, 6.5, 8, 7)\n> cbind(x=x[!is.na(x)&!is.na(y)],y=y[!is.na(x)&!is.na(y)])\n```\n\nWrite the expected result and find the inverse of the matrix **(4 marks)**\n\n(e) Create a new list with factors as components named `tacs` with a numeric vector `c(3,2.1,3.3,4,1.5,4.9)` as components named `nums` and nested in a list comprising the first three members of the list and perform the following\n\n- [(i)] Extract the element of `tacs` that correspond to elements of `nums` that are greater than or equals to 3 **(3 marks)**\n- [(ii)] Add a new member to the list named `flags`. This member should be logical vector of length 6 obtained as two-fold repetition of the 3rd column of the logical matrix **(2 marks)**\n\n(f) Students of Statistics and programming course, a higher education institution scored marks in four units as given in the extract for four entries as shown below here\n\n| TOE | Multivariate | Bayesian | Algebra |\n| --- | --- | --- | --- |\n| 60 | 67 | 63 | 65 |\n| 58 | 59 | 58 | 49 |\n| 62 | 55 | 68 | 57 |\n| 59 | 60 | 66 | 54 |\n\n- [(i)] Write the R-code that creates a data frame called `CourseUNITS` **(3 marks)**\n- [(ii)] Give the R-code that you would use to extract columns 2 and 3 **(2 marks)**\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n **Page 2 of 5**",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 7,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2325": {
+  "question_latex": "We would like to use the Cars93 data set from the MASS package. In particular, we are interested in the relationship between the type of vehicle and its price.\n\n(a) Describe briefly the purpose of the following commands **(6 marks)**\n\n```r\n> library(MASS)\n> attach(Cars93)\n```\n\n(b) Give a brief (description) and or interpretation of the following commands and output as used to investigate the relationship theat exist between the study variables\n\n```r\n> lmP = lm(Price ~ Type)\n```\n\n**(3 marks)**\n\n```r\n> summary(lmP)\n```\n\n**(5 marks)**\n\nCoefficients:\n\n| | Estimate | Std error | t value | Pr( >|t|) | |\n| --- | --- | --- | --- | --- | --- |\n| (Intercept) | 18.2125 | 1.9258 | 9.457 | 5.2e-15 | *** |\n| Type Large | 6.0875 | 3.0172 | 2.018 | 0.046713 | * |\n| Type Midsize | 9.0057 | 2.5310 | 3.558 | 0.000608 | *** |\n| Type Small | -8.0458 | 2.5563 | -3.148 | 0.002256 | ** |\n| Type Sporty | 1.1804 | 2.8191 | 0.419 | 0.676467 | |\n| Type Van | 0.884 | 3.2097 | 0.277 | 0.782815 | |\n\n```r\n> anova(lmP)\n```\n\n**(6 marks)**\n\nAnalysis of Variance Table\n\nResponse: \\quad Price\n\n| | Df | Sum sq | Mean sq | F-value | Pr(>F) |\n| --- | --- | --- | --- | --- | --- |\n| Type | 5 | 3421.4 | 684.3 | 11.532 | 1.477e-08 |\n| Residuals | 87 | 5162.6 | 59.3 | | |\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n **Page 3 of 5**",
+  "solution_latex": "1. **Problem Statement & Given Conditions**\n\nThe Cars93 data set from the MASS package is to be used to study the relationship between the type of vehicle, Type, and its price, Price. Here Price is a quantitative response variable and Type is a categorical predictor with six levels: Compact, Large, Midsize, Small, Sporty, and Van. In the fitted model, Compact is the reference category because it is the first level alphabetically and is therefore omitted from the coefficient table. The fitted model is a one-way analysis of variance expressed as a linear regression with a categorical predictor.\n\n2. **Step-by-Step Solution**\n\n**(a) Purpose of the two commands**\n\n- The command **library(MASS)** loads and attaches the MASS package to the current R session. This makes the functions and data sets contained in MASS available, including the Cars93 data set. It does not itself load the Cars93 data set into the workspace; it only makes it accessible through the package.\n\n- The command **attach(Cars93)** places the columns of the Cars93 data frame on the search path so that variables such as Price and Type can be referred to directly by name, without writing Cars93 $Price or Cars93$ Type. This is convenient, but it can cause name masking or conflicts if objects with the same names already exist. For this reason, explicit use of the data argument in modelling functions is often preferred.\n\n**(b) Interpretation of the regression and analysis of variance output**\n\n1. **Interpretation of the model-fitting command**\n\nThe command **lmP = lm(Price ~ Type)** fits a linear model in which Price is regressed on Type. Since Type is a categorical factor, R creates indicator variables for the categories, with Compact as the reference level. The model estimates the mean price for the reference category through the intercept and the difference in mean price between each other vehicle type and Compact through the remaining coefficients. The fitted model object is stored as lmP for later use with summary and anova.\n\n2. **Interpretation of the coefficient summary**\n\nThe summary output gives the estimated coefficients, their standard errors, the t statistics, and the corresponding two-sided p-values.\n\n- The intercept estimate is 18.2125, with standard error 1.9258, t value 9.457, and p-value 5.2e-15. This is the estimated mean price for the reference group, Compact vehicles. The very small p-value indicates that the mean price for Compact vehicles is significantly different from zero.\n\n- The coefficient for Type Large is 6.0875, with standard error 3.0172, t value 2.018, and p-value 0.046713. This means that Large vehicles are estimated to cost 6.0875 price units more than Compact vehicles on average. The p-value is below 0.05, so this difference is statistically significant at the 5% level.\n\n- The coefficient for Type Midsize is 9.0057, with standard error 2.5310, t value 3.558, and p-value 0.000608. Midsize vehicles are estimated to cost 9.0057 price units more than Compact vehicles on average. This is highly significant.\n\n- The coefficient for Type Small is -8.0458, with standard error 2.5563, t value -3.148, and p-value 0.002256. Small vehicles are estimated to cost 8.0458 price units less than Compact vehicles on average. This difference is statistically significant.\n\n- The coefficient for Type Sporty is 1.1804, with standard error 2.8191, t value 0.419, and p-value 0.676467. This difference from Compact is not statistically significant.\n\n- The coefficient for Type Van is 0.884, with standard error 3.2097, t value 0.277, and p-value 0.782815. This difference from Compact is also not statistically significant.\n\nIn general, the t value is the estimate divided by its standard error, and the p-value tests the null hypothesis that the corresponding coefficient is zero. The significance stars indicate the strength of evidence against that null hypothesis. The individual p-values compare each listed category only with the reference category Compact, not with all other categories.\n\n3. **Interpretation of the analysis of variance table**\n\nThe ANOVA table partitions the total variation in Price into variation explained by Type and residual variation not explained by Type.\n\n- The Type source has 5 degrees of freedom because there are 6 vehicle-type categories, and 6 minus 1 equals 5.\n- The residual degrees of freedom are 87. Together with the 5 model degrees of freedom, this gives 92 total degrees of freedom, corresponding to 93 observations in the Cars93 data set.\n- The Type sum of squares is 3421.4, and the corresponding mean square is 3421.4 divided by 5, which is 684.3.\n- The residual sum of squares is 5162.6, and the residual mean square is 5162.6 divided by 87, approximately 59.3.\n- The F statistic is the ratio of the Type mean square to the residual mean square: 684.3 divided by 59.3, approximately 11.53.\n- The p-value is 1.477e-08, which is extremely small.\n\nThe null hypothesis for this overall ANOVA F test is that the population mean prices are equal for all vehicle types, equivalently that all Type coefficients are zero apart from the intercept. The alternative hypothesis is that at least one vehicle type has a different mean price. Since the p-value is far below 0.05, the null hypothesis is rejected. There is very strong statistical evidence that the mean price differs among at least some vehicle types.\n\nThe Type sum of squares is 3421.4 and the residual sum of squares is 5162.6. Hence the proportion of variation in Price explained by Type is approximately 3421.4 divided by 3421.4 plus 5162.6, which is about 0.3985. Thus Type explains roughly 39.9% of the total variation in Price. The residual standard error is approximately the",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 2,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2326": {
+  "question_latex": "(a) Suppose that, for a group of students, we have information on marks in two tests (A and B) stored as vectors in R named MarksA and MarksB. We also have a vector CandNum that contains the candidates numbers of the students. Give the R commands to do the following\n\n(i) Create a data frame MarksDF containing the marks for each course and set the row names of the data frame to be the candidates numbers. Remove the original vectors from the workspace **(2 marks)**\n(ii) Make the variables encapsulated in MarksDF visible from the commandline and calculate the mean and variance of each set of marks **(2 marks)**\n(iii) Generate a scatter plot of marks for test B against marks for test A and label outlying points with the appropriate candidate number **(2 marks)**\n(iv) Give the candidate number of the candidate with the highest aggregate mark **(2 marks)**\n(v) Output the candidate numbers of candidates with marks below 60 in at least one course but whose aggregate mark is greater than 110 **(2 marks)**\n(vi) Find the mean absolute difference in marks for cases where the marks in test A are higher than those in test B **(3 marks)**\n\n(b) R allows users define their own functions\n\n(i) Using well illustrated examples, give reasons why we might want to define our own functions **(2 marks)**\n(ii) You are given a rough description of a programming problem and asked to write a function to tackle it. Describe three aspects of good programming practice that make the process of writing a function simpler and/or more effective **(5 marks)**",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 3,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2327": {
+  "question_latex": "(a) Consider the following specification for an R function\n\n- takes 2 vectors (not necessarily of same length) as inputs\n- prints out the relationship (equal to, less than or greater than) between the ith element of the first vector and the ith element of the second vector\n\nThe function `func1(\\dots)` below represents my first attempt. This function does not meet the specification\n\n```r\nfunc1=function(x1,x2)\n {# variables and constants of the program\n ing = min(length(x1),length(x2))\n for(i in 1:ing)\n {\n cat(i,\":\")\n if(x1[i]==x2[i]) cat(\"EQ. \")\n if(x1[i]< x2[i]) cat(\"LT. \")\n else cat(\"GT. \")\n }\n }\n```\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n **Page 4 of 5**\n\nGiven the definition of `func1($\\cdots$)` above, what is the output from the following commands\n\n- [(i)] `func1(c(2.5,-1,0),3:1)` **(3 marks)**\n- [(ii)] `func1(1:3,3:1)` **(4 marks)**\n\n(b) Briefly describe the circumstances under which `func1($\\cdots$)` gives wrong output and explain why this happens **(2 marks)**\n\n(c) What change could be made to `func1` in order to make it meet the specification given in (a) **(3 marks)**\n\n(d) Write a function that meets the specification given in part (a) without using a loop **(8 marks)**",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 4,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2328": {
+  "question_latex": "(a) We have a response variable $y$ and three explanatory variables $x_1, x_2$ and $x_3$. These are stored as `Y,x1, x2` and `x3` in a data frame called `mock4a`. We give the following commands in R\n\n```r\n> (lmres <- lm(Y~x1+x2+x3, data=mock4a)) # (a)i.\n> plot(fitted(lmres),rstudent(lmres),col=2) # (a)ii.\n> plot(lm.influence(lmres)$hat,type=\"h\",col=2) # (a)ii.\n```\n\n- [(i)] For the command labeled (a)i., state the model that is being fitted by the command. What is the purpose of the brackets surrounding the command? **(3 marks)**\n- [(ii)] For each of the commands labeled (a)ii., state what is being plotted and briefly describe the purpose of each plot **(6 marks)**\n\n(b) Suppose that $X$ is a random variable with a known distribution parameterised by $\\alpha$ and $\\beta$. The statistic $g(X)$ is proposed as an estimator of $\\beta$.\n\n- [(i)] For given $\\alpha$ and $\\beta$, briefly describe an experiment to generate a simulated approximation to the bias of $g(X)$ as an estimator of $\\beta$ for a random sample of size $n$. **(5 marks)**\n- [(ii)] What might we vary in our simulation experiment in order to gain an insight into how $g(X)$ behaves as an estimator of $\\beta$ under different conditions? **(3 marks)**\n- [(iii)] What role does the number of simulated replication $r$ play in determining the accuracy of simulated approximations? What constraints are there on the value of $r$? **(3 marks)**\n\n*INVOLVEMENT IN ANY EXAMINATION IRREGULARITY SHALL LEAD TO DISCONTINUATION*\n **Page 5 of 5**",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 5,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2329": {
+  "question_latex": "a) Define the following concepts of modern of statistics. (4 marks)\n i) Estimation\n ii) Inferential statistics\n iii) Hypothesis testing\n\nb) Let iv) Descriptive10 and statistics2. Write an R program to evaluate 20 15 2 3 9 5 6 (4 marks)\nc) Write the R output of the following\n i) ourmatrix<-matrix(c(2,4,3,1,-1,6),nrow=2,ncol=3,byrow=TRUE) (2 marks)\n\n ii) our.matrix<-matrix(c(2,4,3,1,-1,6),nrow=2,ncol=3,byrow=FALSE) (2 marks)\n\n iii) seq(1,10) (1 mark)\n\n iv) s1<-seq(1,10,by=0.5) (2 marks)\n\n v) s2<-rep(c(1,4),c(10,15) (2 marks)\n\n vi) children=factor(c(1,0,1,0,0,0),leels=c(0,1),labels=c(“boy”,”girl”)) (2 marks)\n\n Examination Irregularity is punishable by expulsion Page 1 of 4\n\n \n\nd) Give four reasons for using R-program. (4 marks)\n\ne) The data y<-c(33,44,29,16,25,45,33,19,54,22,21,49,11,24,56) contain sales of milk in\n\n litres for 5 days in three different shops(the first 3 values are for shops 1,2 and 3 on\n\n Monday, e.t.c). Produce a statistical summary of the sales for each day of the week and\n\n also for each shop using R program. (5 marks)\n\nf) Generate Binomial random vector of x of n=1000, size=1, probability =0.5 and hence\n\n plot (2 marks)\n\nSECTION B: ANSWER ANY OTHER TWO QUESTIONS",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 1,
+  "marks": 30,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2330": {
+  "question_latex": "a) Define the term Data frame (2 marks)\nb) Given a data frame called our.data with the following entries.\n Year Mean_weight Gender Mean_height\n 1 1980 71.5 M 179.3\n 2 1988 72.1 M 179.9\n 3 1996 73.7 F 180.5\n 4 1998 74.3 F 180.1\n 5 2000 75.2 M 180.3\n 6 2002 74.7 M 180.4\n\n i) Read the dataset in R (3 marks)\n\n ii) Display the Mean weight values only from the data frame. (2 marks)\n\n iii) Select the data for Males only (2 marks)\n\n iv) Select the data that displays the Mean_height and Mean_weight only from the\n\n data set above (2 marks)\n\nc) Suppose Determine the 95% confidence interval for the true 30, 4, 100, mean. (4 marks)\nd) Given the following datasets\n 144,145,170,129,165,77,134,174,88,100,146,172,128,121,171,117,123,120. Write R\n program that reads and display the data hence display its summary statistics. (5 marks)",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 2,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2331": {
+  "question_latex": "a) Given the following two matrices\n\n and. Write the R program that does the following; 0 6 3 2 3 1 5 2 2 4 1 6\n Examination Irregularity is punishable by expulsion Page 2 of 4\n\n \n\n i) Reads and display the two matrices A and B (2 marks)\n ii) Adds the two matrices (1 mark)\n iii) Transpose of the expected output in ii. Above (2 marks)\n b) The table below shows the weights and heights of the seven students in a higher education institution Weight 40 60 72 57 90 95 72\n\n Height 1.55 1.75 1.80 1.65 1.90 1.74 1.91\n\n i) Read in the data in R hence find the standard deviation of weights (4 marks)\n\n ii) Calculate the corresponding BMI’s (3 marks)\n\n iii) Plot the weights versus heights, clearly labeling the x and y axes with the main\n\n tittle as ‘WEIGHT VS HEIGHT’ (4 marks)\n\n iv) Plot a boxplot of weight on height (1 mark)\n\n c) Consider the following system of linear equation, solve for x1 and x2 using R (3 marks)\n 3 1 4 2 4 1 2 2",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": null,
+  "number": 3,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2332": {
+  "question_latex": "a) The following dataset was saved in desktop as ourdata.csv\n\n 100,146,172,128,144,145,170,129,165,77,134,174,88,121,171,117,123,120,109,153,152,\n\n 96,87,98,111,145,87,114,124,74,105,157,128,115,46,53,128,65,126,132,187,59,104,158,\n\n 89,137,185,155,120,135,106,104,144.\n\n Write R program that;\n i) Reads file containing the dataset and hence display the data. (3 marks)\n\n ii) Calculates the confidence interval of the above data. (6 marks)",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 236,
+  "number": 4,
+  "marks": 9,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2333": {
+  "question_latex": "b) State two categories of statistics. (2 marks)\n\n\n\nc) Determine the output displayed in the following R program by systematically displaying\n\n the matrix at each stage. (4 marks)\n\n Matrix1<-matrix(c(5,6,2,-3), nrow=2,ncol=2,byrow=TRUE)\n\n Matrix1\n\n Matrix2<-matrix(c(2,6,2,3,-1,6), nrow=3,ncol=2,byrow=FALSE)\n\n Matrix2\n\n Summatrix<-Matrix1+Matrix2\n\n\n\nd) Write a program in R that takes in 4 variables, compute the average and returns the same\n (5 marks)\n\n Examination Irregularity is punishable by expulsion Page 3 of 4",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 4,
+  "marks": 11,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2334": {
+  "question_latex": "a) Consider a survey that has data on 200 females and 300 males. If the first 200 values are\n\n from females and the next 300 values are from males, write R program that represent this\n\n vector (5 marks)\n\nb) Five people are asked to rate the performance of a product on a scale of 1-5, with 1\n\n representing very poor performance and 5 representing very good performance. Given the\n\n following datasets 1,3,4,2,2,1. Represent the following in R programme and give the\n\n expected output. (5 marks)\n\nc) State and explain any two types of errors used in hypothesis testing. (4 marks)\nd) Given the following vector, 40. Write R program that find the mean and 100 90\n minimum of the vector A (4 marks)\n\ne) The following R program was run. The program could not run. Identify the mistake and\n\n explain why it couldn’t run (2 marks)\n\n Matrix1<-matrix(c(2,4,3,1,-1,6),nrow=2,ncol=3,byrow=FALSE))\n\n MATRIX1\n\n Examination Irregularity is punishable by expulsion Page 4 of 4",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": null,
+  "number": 5,
+  "marks": 20,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2335": {
+  "question_latex": "In R’s built-in datasets library is the data frame quakes. Make sure you can access this\n object and view the corresponding help file to get an idea of what this data represents.\n Then, do the following:\n (i) Select only those records that correspond to a magnitude (mag) of greater than or\n equal to 5 and write them to a table-format file called q5.txt in an existing folder\n on your machine. Use a delimiting character of! and do not include any row\n names.\n (ii) Read the file back into your R workspace, naming the object q5.dframe.",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 1,
+  "marks": 0,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2336": {
+  "question_latex": "In the contributed package car, there’s a data frame called Duncan, which provides\n historical data on perceived job prestige in 1950. Install the car package and access the\n Duncan data set and its help file. Then, do the following:\n (i) Write R code that will plot education on the x-axis and income on the y-axis, with\n both x- and y-axis limits fixed to be [0,100]. Provide appropriate axis labels. For\n jobs with a prestige value of less than or equal to 80, use a black o as the point\n character. For jobs with prestige greater than 80, use a blue •.\n (ii) Add a legend explaining the difference between the two types of points and then\n save a 500 × 500 pixel.png file of the image.",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 2,
+  "marks": 0,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ },
+ "2337": {
+  "question_latex": "Create a data frame called club. Points with the following data.\n\n (i) Calculate the average number of points received.\n (ii) Store the data for females only into a data frame called fpoints.\n (iii) The age for Jerry Burke was entered incorrectly. Change his age to 28.\n (iv) Determine the maximum age of the males.\n (v) Extract the data for people with more than 100 points and are over the age of 30",
+  "solution_latex": "",
+  "verification_status": "auto_validated",
+  "topic_id": 240,
+  "number": 3,
+  "marks": 0,
+  "reconstruction_metadata": {},
+  "reconstructed_from_id": null
+ }
+}

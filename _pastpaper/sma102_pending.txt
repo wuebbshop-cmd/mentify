@@ -1,0 +1,46 @@
+STATUS pending: 15
+
+ID 1199 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-f81f74bb | number 3 | marks 20 | issues=[]
+A quadratic equation is given by $$ x^2 - (k+2)x + (k+5) = 0, $$ where \(k\) is a real constant. (a) Find the discriminant of the equation in terms of \(k\). **[4 marks]** (b) Determine the values of \(k\) for which the equation has equal roots. **[4 marks]** (c) Find the range of values of \(k\) for which the equation has two distinct real roots. **[4 marks]** (d) Solve the inequality $$ x^2 - 5x + 6 < 0 $$ and illustrate the solution on a number line. **[4 marks]** (e) The sum of the roots of the equation is equal to twice their product. Find the possible values of \(k\). **[4 marks]**
+
+ID 1207 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-226a4224 | number 1 | marks 5 | issues=[]
+Let $\alpha$ and $\beta$ be the roots of the quadratic equation $2x^2 - 4x - 3 = 0$. Find the quadratic equation whose roots are $\alpha^2$ and $\beta^2$.
+
+ID 1216 | topic 110 Quadratic Equations and Inequalities | paper sma102-doc-1f736f42 | number 3 | marks 20 | issues=[]
+A quadratic equation is given by $$ (k-1)x^2 + 2(k+1)x + (2k-3) = 0, $$ where \(k\) is a real parameter. (a) Find the values of \(k\) for which the equation has equal roots. [4 marks] (b) Determine the range of values of \(k\) for which the equation has two distinct real roots. [4 marks] (c) Find the value(s) of \(k\) for which the equation has no real roots. [3 marks] (d) For \(k=2\), solve the resulting quadratic equation by completing the square. [4 marks] (e) A rectangular garden has length \(3\,\text{m}\) more than twice its width. The area of the garden is \(90\,\text{m}^2\). Form a quadratic equation in the width and solve it to find the dimensions of the garden. [5 marks]
+
+ID 1190 | topic 113 Binomial Theorem and its Applications | paper sma102-doc-7ea9093e | number 1 | marks 2 | issues=[]
+Find the middle term in the binomial expansion of \(\left(3 - \frac{x}{3}\right)^{10}\).
+
+ID 1192 | topic 113 Binomial Theorem and its Applications | paper sma102-doc-7ea9093e | number 3 | marks 4 | issues=[]
+Use the binomial theorem to expand $(1+4x)^{\frac{1}{2}}$ in ascending powers of $x$ up to and including the term in $x^3$. Hence, by substituting $x=\frac{1}{48}$, obtain an approximation to $\sqrt{3}$ correct to 3 decimal places.
+
+ID 1204 | topic 113 Binomial Theorem and its Applications | paper sma102-doc-226a4224 | number 3 | marks 20 | issues=[]
+(a) Write down the first four terms in ascending powers of $x$ in the expansion of $(1+x)^{1/2}$. By taking $x=0.02$, obtain $\sqrt{1.02}$ correct to 4 decimal places. [8 marks] (b) Use the first three terms of a binomial expansion to find an approximate value of $\sqrt{0.99}$ correct to 3 decimal places. [4 marks] (c) From a group of 6 men and 7 women, how many different committees consisting of 3 men and 5 women can be formed if Jane, Joyce and John must always be together? [5 marks] (d) Find the number of distinguishable arrangements of the letters of the word DISSAPPOINTMENTS. [3 marks]
+
+ID 1208 | topic 113 Binomial Theorem and its Applications | paper sma102-doc-226a4224 | number 3 | marks 20 | issues=[]
+A student is revising the binomial theorem and its applications. (a) Solve the quadratic equation $x^2 - 4x + 8 = 0$. (b) A gallery owner has 9 distinct paintings and wall space to display only 4 of them at a time. In how many different ways can the owner choose and arrange 4 paintings on the wall? (c) Find the coefficient of $x^3$ in the expansion of $(1 - 3x)^{15}$. (d) A class contains 12 boys and 16 girls. In how many ways can a committee of 4 people be formed if there must be at least 2 girls on the committee? (e) Use the binomial theorem to expand $(8 - 3x)^{1/3}$ in ascending powers of $x$ up to and including the term in $x^2$. Hence, by taking a suitable value of $x$, obtain an approximation for $\sqrt[3]{7.7}$ correct to 4 decimal places.
+
+ID 1211 | topic 113 Binomial Theorem and its Applications | paper sma102-doc-7c3c9eea | number 1 | marks 4 | issues=[]
+Find the constant term in the expansion of \(\left(2x - \dfrac{3}{x^2}\right)^{12}\).
+
+ID 1205 | topic 114 Set Theory | paper sma102-doc-226a4224 | number 4 | marks 20 | issues=[]
+(a) Let the universal set be $U=\{1,2,3,4,5,6\}$, with $A=\{1,2\}$ and $B=\{2,4,5\}$. Verify that $(A\cup B)^c = A^c \cap B^c$. (b) In a competition, an academic institution awarded medals in three categories: 36 medals in dance, 12 medals in drama, and 18 medals in music. These medals were awarded to a total of 45 persons, and exactly 4 persons received medals in all three categories. Determine how many persons received medals in exactly two of the categories. (c) For the conditional statement: ``If I buy tickets for the game, then my favourite football team will qualify for the Super Bowl'', write down its converse, inverse, and contrapositive. (d) Complete a truth table for the statement $[p\land(q\lor \neg r)]\lor(\neg p\land q)$.
+
+ID 1209 | topic 115 Logic | paper sma102-doc-226a4224 | number 4 | marks 14 | issues=[]
+1. Simplify the following propositional expressions using the laws of Boolean algebra: 1. $(p \land q) \lor (\neg p \land q) \lor (p \land \neg q)$ 2. $\neg(\neg p \lor q) \lor p$ 2. Determine whether the proposition $(p \to q) \land \neg q \to \neg p$ is a tautology, a contradiction, or neither. Justify your answer. 3. 1. Find the contrapositive of the converse of $p \to q$. 2. Write the negation of $\neg p \land \neg q$ in its simplest form. 4. Translate the following argument into symbolic form and, using a truth table, determine its validity: If the rains do not come, or no one works, then the crops will fail. The crops have failed. Therefore, the rains did not come.
+
+ID 1213 | topic 115 Logic | paper sma102-doc-7c3c9eea | number 4 | marks 9 | issues=[]
+(a) Simplify the following proposition using the laws of Boolean algebra, stating the law used at each step: $$ \sim\big(\sim(p \land q) \lor (p \land \sim q)\big) \lor (p \land q). $$ (b) Construct the truth table for the compound proposition $$ \big(p \leftrightarrow \sim q\big) \lor \big(r \to (p \land r)\big). $$ Hence determine whether the proposition is a tautology, a contradiction, or a contingency.
+
+ID 1201 | topic 116 Method of Proof | paper sma102-doc-226a4224 | number 1 | marks 6 | issues=[]
+Prove the conditional proposition: "If $a$ and $b$ are consecutive integers, then the sum $a+b$ is odd" by: (i) proof by contradiction; (ii) proof by the contrapositive.
+
+ID 1200 | topic 117 Complex Numbers | paper sma102-doc-f81f74bb | number 5 | marks 20 | issues=[]
+1. State De Moivre's Theorem. [2 marks] 2. Express $1+j\sqrt{3}$ in polar form, and hence evaluate $(1+j\sqrt{3})^{6}$. [5 marks] 3. Simplify $\dfrac{(1+j)^2}{(1-j)(2+j)}$ in the form $a+bj$, where $a,b\in\mathbb{R}$. [4 marks] 4. Given that $z_1=3-2j$, $z_2=-3-4j$ and $z_3=j-2$: 1. Obtain $3z_1-2z_2+z_3$. [4 marks] 2. If $z_1=r_1(\cos\theta_1+j\sin\theta_1)$ and $z_2=r_2(\cos\theta_2+j\sin\theta_2)$, express $\dfrac{z_1}{z_2}$ in terms of $r_1$, $r_2$, $\theta_1$ and $\theta_2$. [5 marks]
+
+ID 1210 | topic 117 Complex Numbers | paper sma102-doc-226a4224 | number 5 | marks 20 | issues=[]
+(a) Express the complex number $z=2-3i$ in the form $a+bi$, where $a,b\in\mathbb{R}$, and state its real and imaginary parts. **(2 marks)** (b) Express the complex number $z=-4+4i$ in polar form $r(\cos\theta+i\sin\theta)$, where $r>0$ and $-\pi<\theta\le\pi$. **(3 marks)** (c) Using De Moivre's theorem, express $(1+i)^{10}$ in the form $a+bi$, where $a,b\in\mathbb{R}$. **(4 marks)** (d) Find the square roots of $i$, giving your answers in the form $a+bi$. **(5 marks)**
+
+ID 1217 | topic 117 Complex Numbers | paper sma102-doc-1f736f42 | number 4 | marks 20 | issues=[]
+1. State De Moivre's Theorem. [2 marks] 2. Find \((1+j\sqrt{3})^{6}\) and express your answer in the form \(a+bj\). [5 marks] 3. Simplify \(\dfrac{(1+j)^2}{1-j}\). [4 marks] 4. Given that \(z_1 = 3-2j\), \(z_2 = -3-4j\), and \(z_3 = j-2\): 1. Obtain \(3z_1 - 2z_2 + z_3\). [4 marks] 2. If \(z_1 = r_1(\cos\theta_1 + j\sin\theta_1)\) and \(z_2 = r_2(\cos\theta_2 + j\sin\theta_2)\), express \(\dfrac{z_1}{z_2}\) in terms of \(r_1, r_2, \theta_1\) and \(\theta_2\). [5 marks]
