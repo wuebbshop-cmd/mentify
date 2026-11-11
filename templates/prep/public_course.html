@@ -113,6 +113,30 @@
     max-width: 780px;
   }
   /* Course PDF Pack Split Button */
+  @keyframes coursePdfPackAttention {
+    0%, 72%, 100% {
+      box-shadow: 0 0 0 0 rgba(15, 118, 110, 0);
+    }
+    82% {
+      box-shadow: 0 0 0 6px rgba(15, 118, 110, 0.20);
+    }
+  }
+
+  #course-pdf-pack-container {
+    border-radius: var(--radius-md);
+    animation: coursePdfPackAttention 4.5s ease-out infinite;
+  }
+
+  #course-pdf-pack-container:hover,
+  #course-pdf-pack-container:focus-within {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #course-pdf-pack-container {
+      animation: none;
+    }
+  }
   
   @keyframes packSpin {
     0% { transform: rotate(0deg); }
