@@ -4523,6 +4523,10 @@ def normalize_math_delimiters(text: str) -> str:
         text,
     )
 
+    # Normalize align/align* to aligned so KaTeX renders natively inside ...
+    text = re.sub(r'\\begin\{align\*?\}', r'\\begin{aligned}', text)
+    text = re.sub(r'\\end\{align\*?\}', r'\\end{aligned}', text)
+
     # Collapse adjacent display delimiters on the same line (e.g. \[ $$ -> $$) without merging consecutive $$ blocks across lines
     text = re.sub(r'\\\[[ \t]*\$\$|\$\$[ \t]*\\\[', '$$', text)
     text = re.sub(r'\$\$[ \t]*\\\]|\\\][ \t]*\$\$', '$$', text)

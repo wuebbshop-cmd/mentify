@@ -696,10 +696,15 @@
       return full;
     });
 
-    // In math blocks, replace literal '*' with '\ast' so Markdown's bold/italic parser
+    // Normalize align/align* to aligned so KaTeX renders natively inside ...
+    cleanText = cleanText.replace(/\\begin\{align\*?\}/g, '\\begin{aligned}');
+    cleanText = cleanText.replace(/\\end\{align\*?\}/g, '\\end{aligned}');
+
+    // In math blocks, replace literal '*' with '\\ast' so Markdown's bold/italic parser
     // never confuses math superscripts (e.g. p^* or Q_1^*) with Markdown asterisks.
+    // Guard against replacing '*' in environment names (e.g. \\begin{...*}).
     cleanText = cleanText.replace(/(\$\$[\s\S]*?\$\$|\$[^\$\n]+?\$)/g, function(m) {
-      return m.replace(/\*/g, '\\ast');
+      return m.replace(/(?<!\\begin\{[a-zA-Z]+|\\end\{[a-zA-Z]+)\*/g, '\\ast');
     });
 
     // Merge detached \[ lhs = \n\n$$\n\begin{cases}...\end{cases}\n$$
