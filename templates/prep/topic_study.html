@@ -28,6 +28,23 @@
     width: 0;
     height: 0;
   }
+  .topic-study-nav-shell {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .topic-study-nav-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+  }
+  .topic-study-nav-control,
+  .topic-study-nav-edge-fade {
+    display: none;
+  }
   .study-tab-btn.active {
     color: var(--green);
     border-bottom-color: var(--green);
@@ -35,6 +52,72 @@
   }
   .study-tab-btn:hover:not(.active) {
     color: var(--text);
+  }
+
+  @media (max-width: 768px) {
+    .topic-study-nav-shell {
+      padding: 0 38px;
+      overflow: hidden;
+    }
+    .topic-study-nav-tabs {
+      gap: 2px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+    .study-tab-btn {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .topic-study-nav-control {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+    .topic-study-nav-control:disabled {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .topic-study-nav-control--previous { left: 0; }
+    .topic-study-nav-control--next { right: 0; }
+    .topic-study-nav-edge-fade {
+      position: absolute;
+      top: 0;
+      bottom: 1px;
+      z-index: 1;
+      display: block;
+      width: 32px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .topic-study-nav-shell.has-tabs-before .topic-study-nav-edge-fade--previous,
+    .topic-study-nav-shell.has-tabs-after .topic-study-nav-edge-fade--next {
+      opacity: 1;
+    }
+    .topic-study-nav-edge-fade--previous {
+      left: 32px;
+      background: linear-gradient(90deg, var(--surface), transparent);
+    }
+    .topic-study-nav-edge-fade--next {
+      right: 32px;
+      background: linear-gradient(270deg, var(--surface), transparent);
+    }
   }
 
   /* Explore Further (Pillar 5) Minimal Design System */
@@ -2189,7 +2272,12 @@
 </div>
 
 <!-- ─── Topic study navigation ─────────────────────────────────────────────── -->
-<div class="topic-study-nav-tabs" style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;">
+<div class="topic-study-nav-shell" data-topic-study-nav>
+  <button type="button" class="topic-study-nav-control topic-study-nav-control--previous" aria-label="Show previous topic pages" title="Show previous topic pages" data-topic-tab-scroll="previous">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <span class="topic-study-nav-edge-fade topic-study-nav-edge-fade--previous" aria-hidden="true"></span>
+  <div class="topic-study-nav-tabs">
   <button type="button" data-study-tab="notes" class="study-tab-btn {% if active_subtab == 'notes' %}active{% endif %}" onclick="switchPillarTab('notes')">
     <svg width="16" height="16" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" style="color: var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
     Topic Notes &amp; Explanations
@@ -2213,6 +2301,11 @@
   <button type="button" data-study-tab="explore" class="study-tab-btn {% if active_subtab == 'explore' %}active{% endif %}" onclick="switchPillarTab('explore')">
     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2" stroke-linecap="round"/></svg>
     Explore Further
+  </button>
+  </div>
+  <span class="topic-study-nav-edge-fade topic-study-nav-edge-fade--next" aria-hidden="true"></span>
+  <button type="button" class="topic-study-nav-control topic-study-nav-control--next" aria-label="Show more topic pages" title="Show more topic pages" data-topic-tab-scroll="next">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 </div>
 
@@ -3685,6 +3778,31 @@
       .catch(() => {});
   }
 
+  function updateTopicStudyNavControls(shell) {
+    if (!shell) return;
+    const strip = shell.querySelector('.topic-study-nav-tabs');
+    const previous = shell.querySelector('[data-topic-tab-scroll="previous"]');
+    const next = shell.querySelector('[data-topic-tab-scroll="next"]');
+    if (!strip || !previous || !next) return;
+
+    const overflow = strip.scrollWidth > strip.clientWidth + 2;
+    const atStart = strip.scrollLeft <= 2;
+    const atEnd = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+    previous.disabled = !overflow || atStart;
+    next.disabled = !overflow || atEnd;
+    shell.classList.toggle('has-tabs-before', overflow && !atStart);
+    shell.classList.toggle('has-tabs-after', overflow && !atEnd);
+  }
+
+  function revealActiveTopicStudyTab() {
+    const shell = document.querySelector('[data-topic-study-nav]');
+    const activeButton = shell && shell.querySelector('.study-tab-btn.active');
+    if (activeButton && window.matchMedia('(max-width: 768px)').matches) {
+      activeButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+    window.setTimeout(() => updateTopicStudyNavControls(shell), 180);
+  }
+
   function switchPillarTab(tabName) {
     document.querySelectorAll('.study-tab-btn').forEach(btn => btn.classList.remove('active'));
     ['notes', 'quiz', 'assistant', 'past_questions', 'practice', 'explore'].forEach(name => {
@@ -3693,6 +3811,7 @@
     });
     const activeButton = document.querySelector(`[data-study-tab="${tabName}"]`);
     if (activeButton) activeButton.classList.add('active');
+    revealActiveTopicStudyTab();
     if (tabName === 'quiz') {
       loadTopicQuizLazy();
       if (window.innerWidth <= 800) {
@@ -4269,6 +4388,19 @@
 
   // ─── Initial Page Load Initialization ─────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
+    const topicNavShell = document.querySelector('[data-topic-study-nav]');
+    const topicNavStrip = topicNavShell && topicNavShell.querySelector('.topic-study-nav-tabs');
+    if (topicNavShell && topicNavStrip) {
+      topicNavShell.querySelectorAll('[data-topic-tab-scroll]').forEach(button => {
+        button.addEventListener('click', () => {
+          const direction = button.dataset.topicTabScroll === 'next' ? 1 : -1;
+          topicNavStrip.scrollBy({ left: direction * Math.max(180, topicNavStrip.clientWidth * 0.7), behavior: 'smooth' });
+        });
+      });
+      topicNavStrip.addEventListener('scroll', () => updateTopicStudyNavControls(topicNavShell), { passive: true });
+      updateTopicStudyNavControls(topicNavShell);
+      window.setTimeout(() => updateTopicStudyNavControls(topicNavShell), 100);
+    }
     const initialTutorHistory = document.getElementById('topic-tutor-conversations-data');
     if (initialTutorHistory && initialTutorHistory.textContent) {
       try {
@@ -4414,6 +4546,7 @@
       }
     });
     window.addEventListener('resize', () => {
+      updateTopicStudyNavControls(topicNavShell);
       if (window.innerWidth > 800) {
         if (topicTutorHistoryOpen) setTopicTutorHistoryOpen(false);
         else if (tutorHistoryPanel) tutorHistoryPanel.setAttribute('aria-hidden', 'false');
