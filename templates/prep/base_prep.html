@@ -73,6 +73,11 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
 
+  <!-- Academic Visual Libraries: Mermaid (Mindmaps/Flowcharts), Chart.js (Data/Math Graphs), SmilesDrawer (Chemistry) -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
+
   <script>
     if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark-theme');
@@ -100,6 +105,109 @@
       -webkit-user-select: none !important;
       -moz-user-select: none !important;
       -ms-user-select: none !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       ACADEMIC VISUAL RENDERING (Mermaid, Chart.js, SmilesDrawer)
+       ══════════════════════════════════════════════════════════════ */
+    .prep-visual-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      margin: 16px 0;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-sizing: border-box;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .prep-visual-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 1. Mermaid (Mindmaps, Flowcharts, Hierarchies) */
+    .prep-mermaid-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+      padding: 16px 10px;
+    }
+
+    .prep-mermaid-wrap .mermaid {
+      display: inline-block;
+      min-width: 200px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .prep-mermaid-wrap svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* 2. Chart.js (Data Graphs, Scientific Curves) */
+    .prep-chart-wrap {
+      padding: 16px 14px;
+    }
+
+    .prep-chart-canvas-box {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      max-height: 380px;
+    }
+
+    /* 3. Chemical Molecules (SmilesDrawer) */
+    .prep-chem-wrap {
+      text-align: center;
+      padding: 16px 14px;
+    }
+
+    .prep-chem-svg {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .prep-chem-formula {
+      margin-top: 10px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .prep-chem-formula code {
+      font-family: monospace;
+      background: var(--hover);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--text);
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      .prep-visual-wrap {
+        margin: 12px 0;
+        padding: 10px;
+        border-radius: 12px;
+      }
+      .prep-chart-canvas-box {
+        height: 230px;
+      }
+      .prep-mermaid-wrap {
+        padding: 12px 6px;
+      }
     }
     /* Hide scrollbar completely on notification dropdown */
     #prep-notif-list {

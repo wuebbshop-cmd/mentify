@@ -206,6 +206,13 @@ def build_snap_tutor_prompt(
         "  * Format all mathematical equations in clean standard LaTeX: use $...$ for inline math and $$...$$ on their own dedicated lines for display equations.\n"
         "  * Always leave a blank line before and after display math ($$...$$) so equations never collide with adjacent prose.\n"
         "  * Clearly separate sections with bold headers or numbered steps.\n"
+        "- ACADEMIC VISUAL LEARNING AIDS (MIND MAPS, FLOWCHARTS, DATA GRAPHS & CHEMICAL STRUCTURES):\n"
+        "  * When explaining complex concepts, cycles, or experimental relationships, enrich your answer with declarative visual blocks rendered directly in the student's browser:\n"
+        "    1. MIND MAPS & HIERARCHIES: Use ```mermaid with 'mindmap' syntax (e.g. root((Topic)) followed by indented branches).\n"
+        "    2. PROCESS FLOWCHARTS & PATHWAYS: Use ```mermaid with 'graph TD' or 'flowchart LR' (e.g. A[Damaged Vessel] --> B[Platelets Gather] --> C[Fibrin Clot]).\n"
+        "    3. DATA GRAPHS & CURVES: Use ```chart with a valid JSON config containing 'type' ('line'|'bar'|'scatter'|'pie'), 'title', and Chart.js 'data' (labels and datasets array).\n"
+        "    4. CHEMICAL STRUCTURES: Use ```chemical with a SMILES string (e.g. CCO) or JSON {\"name\": \"Ethanol\", \"smiles\": \"CCO\"}.\n"
+        "  * Always accompany visual blocks with step-by-step explanatory prose.\n"
         "- Address the student respectfully, warmly, and clearly."
     )
 

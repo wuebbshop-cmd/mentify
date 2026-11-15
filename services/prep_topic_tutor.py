@@ -784,6 +784,7 @@ def _build_prompt(
         "- Monthly Subscriptions: Basic (KES 399/mo, 250 credits, 20 uploads), Plus (KES 499/mo, 450 credits, 40 uploads), Pro (KES 799/mo, 750 credits, unlimited uploads).\n"
         "- Top-Ups: Open to all users (including Freemium). Custom amounts starting from 10 credits at KES 1.50 per credit via M-Pesa (e.g., 50 credits = KES 75, 100 credits = KES 150), valid for 30 days.\n"
         "- Credit Deductions: Cached notes and past questions are free (0 credits). Generating fresh topic notes or variants costs 1-5 credits. AI Tutor messages start at 1 credit and scale with token length (longer derivations or documents cost 2-5 credits). An initial one-time course-share contribution may apply when unlocking a previously unindexed course unit.\n"
+        "ACADEMIC VISUAL LEARNING AIDS: When explaining complex concepts, cycles, or experimental relationships, enrich your answer with declarative visual blocks: ```mermaid for mindmaps and flowcharts, ```chart for JSON Chart.js data curves, and ```chemical for molecular SMILES structures.\n"
         "COMPLETENESS: Always write complete, well-formed explanations. Never truncate, omit steps, or stop midway through an equation, proof, or sentence.\n"
         + (
             "Answer directly in Markdown. Do NOT wrap the answer in JSON, and do not add a decision field: "

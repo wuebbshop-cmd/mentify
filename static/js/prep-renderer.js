@@ -234,6 +234,242 @@
     }
   }
 
+  /**
+   * Academic Visuals Renderer:
+   * 1. Mermaid.js: Mind Maps, Flowcharts, State & Cycle Diagrams
+   * 2. Chart.js: Scientific Curves, Functions, Data & Statistical Graphs
+   * 3. SmilesDrawer: 2D Chemical Molecular Structures
+   */
+  function renderAcademicVisuals(containerElement) {
+    if (!containerElement) return;
+    var isDark = document.documentElement.classList.contains('dark-theme');
+
+    // ─── 1. Mermaid.js (Mind Maps, Flowcharts, Cycles) ───
+    if (window.mermaid) {
+      try {
+        if (!window.__prep_mermaid_initialized) {
+          window.mermaid.initialize({
+            startOnLoad: false,
+            theme: isDark ? 'dark' : 'default',
+            securityLevel: 'loose',
+            fontFamily: 'inherit',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            mindmap: { useMaxWidth: true }
+          });
+          window.__prep_mermaid_initialized = true;
+        }
+
+        var mermaidBlocks = containerElement.querySelectorAll('pre code.language-mermaid, pre code.mermaid');
+        var nodesToRun = [];
+        for (var mi = 0; mi < mermaidBlocks.length; mi++) {
+          var codeEl = mermaidBlocks[mi];
+          var preEl = codeEl.closest('pre');
+          if (!preEl || preEl.dataset.renderedVisual) continue;
+          preEl.dataset.renderedVisual = 'true';
+
+          var rawMermaid = codeEl.textContent.trim();
+          if (!rawMermaid) continue;
+
+          var uniqueId = 'mermaid-' + Math.random().toString(36).substring(2, 9);
+          var wrapper = document.createElement('div');
+          wrapper.className = 'prep-visual-wrap prep-mermaid-wrap';
+          wrapper.setAttribute('role', 'img');
+          wrapper.setAttribute('aria-label', 'Diagram or Mind Map');
+
+          var innerDiv = document.createElement('div');
+          innerDiv.className = 'mermaid';
+          innerDiv.id = uniqueId;
+          innerDiv.textContent = rawMermaid;
+
+          wrapper.appendChild(innerDiv);
+          preEl.parentNode.replaceChild(wrapper, preEl);
+          nodesToRun.push(innerDiv);
+        }
+
+        if (nodesToRun.length > 0) {
+          window.mermaid.run({ nodes: nodesToRun }).catch(function(err) {
+            console.warn('[Prep Renderer] Mermaid run notice:', err);
+          });
+        }
+      } catch (mErr) {
+        console.warn('[Prep Renderer] Mermaid processing error:', mErr);
+      }
+    }
+
+    // ─── 2. Chart.js (Data Graphs, Scientific & Economic Curves) ───
+    if (window.Chart) {
+      try {
+        var chartBlocks = containerElement.querySelectorAll('pre code.language-chart, pre code.language-graph');
+        for (var ci = 0; ci < chartBlocks.length; ci++) {
+          var cCodeEl = chartBlocks[ci];
+          var cPreEl = cCodeEl.closest('pre');
+          if (!cPreEl || cPreEl.dataset.renderedVisual) continue;
+          cPreEl.dataset.renderedVisual = 'true';
+
+          var rawChartJson = cCodeEl.textContent.trim();
+          if (!rawChartJson) continue;
+
+          var chartConfig = null;
+          try {
+            chartConfig = JSON.parse(rawChartJson);
+          } catch (jsonErr) {
+            var jsonMatch = rawChartJson.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              try { chartConfig = JSON.parse(jsonMatch[0]); } catch (e) {}
+            }
+          }
+
+          if (!chartConfig || typeof chartConfig !== 'object') continue;
+
+          var textColor = isDark ? '#f1f5f9' : '#1e293b';
+          var gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
+
+          var chartWrapper = document.createElement('div');
+          chartWrapper.className = 'prep-visual-wrap prep-chart-wrap';
+
+          if (chartConfig.title) {
+            var titleEl = document.createElement('div');
+            titleEl.className = 'prep-visual-title';
+            titleEl.textContent = chartConfig.title;
+            chartWrapper.appendChild(titleEl);
+          }
+
+          var canvasBox = document.createElement('div');
+          canvasBox.className = 'prep-chart-canvas-box';
+          var canvas = document.createElement('canvas');
+          canvasBox.appendChild(canvas);
+          chartWrapper.appendChild(canvasBox);
+
+          cPreEl.parentNode.replaceChild(chartWrapper, cPreEl);
+
+          var chartType = chartConfig.type || 'line';
+          var chartData = chartConfig.data || {};
+          var userOptions = chartConfig.options || {};
+
+          var defaultOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: textColor, font: { family: 'inherit', size: 12 } }
+              },
+              tooltip: {
+                enabled: true,
+                mode: 'index',
+                intersect: false
+              }
+            }
+          };
+
+          if (chartType !== 'pie' && chartType !== 'doughnut') {
+            defaultOptions.scales = {
+              x: {
+                ticks: { color: textColor },
+                grid: { color: gridColor },
+                title: { color: textColor }
+              },
+              y: {
+                ticks: { color: textColor },
+                grid: { color: gridColor },
+                title: { color: textColor }
+              }
+            };
+          }
+
+          var finalOptions = Object.assign(defaultOptions, userOptions);
+
+          try {
+            new window.Chart(canvas, {
+              type: chartType,
+              data: chartData,
+              options: finalOptions
+            });
+          } catch (chartErr) {
+            console.warn('[Prep Renderer] Chart creation error:', chartErr);
+          }
+        }
+      } catch (cErr) {
+        console.warn('[Prep Renderer] Chart processing error:', cErr);
+      }
+    }
+
+    // ─── 3. SmilesDrawer (Chemical Molecular Structures) ───
+    if (window.SmilesDrawer) {
+      try {
+        var chemBlocks = containerElement.querySelectorAll('pre code.language-chemical, pre code.language-molecule, pre code.language-smiles');
+        for (var chI = 0; chI < chemBlocks.length; chI++) {
+          var chemCodeEl = chemBlocks[chI];
+          var chemPreEl = chemCodeEl.closest('pre');
+          if (!chemPreEl || chemPreEl.dataset.renderedVisual) continue;
+          chemPreEl.dataset.renderedVisual = 'true';
+
+          var rawChem = chemCodeEl.textContent.trim();
+          if (!rawChem) continue;
+
+          var chemName = '';
+          var smilesStr = '';
+          if (rawChem.startsWith('{')) {
+            try {
+              var chemObj = JSON.parse(rawChem);
+              chemName = chemObj.name || chemObj.title || '';
+              smilesStr = chemObj.smiles || chemObj.structure || '';
+            } catch (e) {
+              smilesStr = rawChem;
+            }
+          } else {
+            smilesStr = rawChem;
+          }
+
+          if (!smilesStr) continue;
+
+          var chemWrapper = document.createElement('div');
+          chemWrapper.className = 'prep-visual-wrap prep-chem-wrap';
+
+          if (chemName) {
+            var cTitleEl = document.createElement('div');
+            cTitleEl.className = 'prep-visual-title';
+            cTitleEl.textContent = chemName;
+            chemWrapper.appendChild(cTitleEl);
+          }
+
+          var chemSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          chemSvg.setAttribute('width', '320');
+          chemSvg.setAttribute('height', '200');
+          chemSvg.className = 'prep-chem-svg';
+          chemWrapper.appendChild(chemSvg);
+
+          var smilesLabel = document.createElement('div');
+          smilesLabel.className = 'prep-chem-formula';
+          smilesLabel.innerHTML = 'SMILES: <code>' + escapeHtml(smilesStr) + '</code>';
+          chemWrapper.appendChild(smilesLabel);
+
+          chemPreEl.parentNode.replaceChild(chemWrapper, chemPreEl);
+
+          try {
+            var drawer = new window.SmilesDrawer.SvgDrawer({
+              width: 320,
+              height: 200,
+              bondThickness: 1.5,
+              padding: 12
+            });
+            (function(sStr, sSvg) {
+              window.SmilesDrawer.parse(sStr, function(tree) {
+                drawer.draw(tree, sSvg, isDark ? 'dark' : 'light', false);
+              }, function(parseErr) {
+                console.warn('[Prep Renderer] SmilesDrawer parse notice:', parseErr);
+                sSvg.style.display = 'none';
+              });
+            })(smilesStr, chemSvg);
+          } catch (drawErr) {
+            console.warn('[Prep Renderer] SmilesDrawer error:', drawErr);
+          }
+        }
+      } catch (chErr) {
+        console.warn('[Prep Renderer] SmilesDrawer processing error:', chErr);
+      }
+    }
+  }
+
   var reportedMathWarnings = {};
   function warnMathReviewIssue(code, message) {
     if (reportedMathWarnings[code] || !window.console || typeof window.console.warn !== 'function') return;
@@ -798,6 +1034,7 @@
     }
 
     highlightCode(containerElement);
+    renderAcademicVisuals(containerElement);
     return htmlOutput;
   }
 
@@ -806,6 +1043,7 @@
   window.cleanLatexDocumentMarkup = cleanLatexDocumentMarkup;
   window.tryRenderKaTeX = tryRenderKaTeX;
   window.createMathExtension = createMathExtension;
+  window.renderAcademicVisuals = renderAcademicVisuals;
   ensureMarkedConfigured();
 
 })(typeof window !== 'undefined' ? window : this);
