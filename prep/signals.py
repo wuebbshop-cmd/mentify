@@ -37,12 +37,23 @@ def detect_topic_source_change(sender, instance, **kwargs):
 
 @receiver(post_save, sender=PrepTopic)
 def invalidate_notes_after_topic_source_change(sender, instance, created, **kwargs):
-    """Discard published notes only when this topic's approved source changes."""
+    """Safely handle topic source changes without permanently deleting content cache.
+    
+    Instead of hard-deleting expensive generated notes, we:
+    1. Clear the generation guard so new/updated notes can be queued when requested.
+    2. Invalidate old cached PDF artifacts so stale downloads are rebuilt.
+    3. Clear in-memory/view-level Django caches for this topic.
+    Content records in PrepContentCache are preserved for fallback, revalidation, and recovery.
+    """
     if not created and getattr(instance, "_invalidate_topic_notes", False):
-        PrepContentCache.objects.filter(topic=instance, content_type="topic_notes").delete()
         PrepNoteGenerationGuard.objects.filter(topic=instance).delete()
+        
+        from django.core.cache import cache
+        cache.delete(f"prep_pub_topic_notes_{instance.pk}")
+        cache.delete(f"prep_pub_levels_{instance.pk}_True")
+        cache.delete(f"prep_pub_levels_{instance.pk}_False")
+        
         from services.prep_pdf_artifacts import invalidate_topic_note_pdfs
-
         invalidate_topic_note_pdfs(instance)
 
 

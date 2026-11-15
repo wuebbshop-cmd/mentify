@@ -1,6 +1,6 @@
 # Remaining Course Note Display Worklist
 
-**Audit time:** 2026-11-08 15:14 EAT  
+**Audit time:** 2026-11-11 23:38 EAT  
 **Scope:** Active courses and topics in the local database. Courses and topics with all three validated, current note levels are deliberately omitted.
 **Method:** Read-only cache audit. A level is counted as displayable only when it has the current validation marker, source signature, course profile version, topic rule version and non-empty content. No cache record, job or question was changed.
 
@@ -8,24 +8,12 @@
 
 - Active courses checked: **26**
 - Active topics checked: **220**
-- Topics complete at all three levels: **104**
-- Remaining topics: **116**
-- Displayable note levels: **316** of **660**
-- Remaining note levels: **344**
+- Topics complete at all three levels: **133**
+- Remaining topics: **87**
+- Displayable note levels: **399** of **660**
+- Remaining note levels: **261**
 
 ## Remaining Courses and Topics
-
-### ASC 100 - INTRODUCTION TO SOCIOLOGY
-
-| Topic | Note levels still required |
-|---|---|
-| Introduction to Sociology | Level 1, Level 2, Level 3 |
-
-### SMA 190 - INTRODUCTION TO COMPUTERS
-
-| Topic | Note levels still required |
-|---|---|
-| Database Management Systems | Level 1, Level 2, Level 3 |
 
 ### SMA 200 - CALCULUS 2
 
@@ -63,52 +51,11 @@
 | Statistical Graphics and Data Visualization | Level 1, Level 2, Level 3 |
 | Statistical Functions and Summary Metrics | Level 1, Level 2, Level 3 |
 
-### SST 202 - OBJECT ORIENTED PROGRAMMING
-
-| Topic | Note levels still required |
-|---|---|
-| Classes And Objects | Level 1, Level 2, Level 3 |
-| Methods | Level 1, Level 2, Level 3 |
-| Data Types | Level 1, Level 2, Level 3 |
-| Operators | Level 1, Level 2, Level 3 |
-| Control Statements | Level 1, Level 2, Level 3 |
-| Arrays | Level 1, Level 2, Level 3 |
-| Strings | Level 1, Level 2, Level 3 |
-
-### SST 204 - Probability and Statistics 1
-
-| Topic | Note levels still required |
-|---|---|
-| Random Variables | Level 1, Level 2, Level 3 |
-| Distribution Functions | Level 1, Level 2, Level 3 |
-| Mode And Median | Level 1, Level 2, Level 3 |
-| Expectation | Level 1, Level 2, Level 3 |
-| Moments And Variance Properties | Level 1, Level 2, Level 3 |
-| Moment Generating Function And Probability Generating Function | Level 1, Level 2, Level 3 |
-| Special Discrete Probability Distributions | Level 1, Level 2, Level 3 |
-| Poisson Distribution And Binomial Approximation | Level 1, Level 2, Level 3 |
-| Normal Distribution And Probability Computation | Level 1, Level 2, Level 3 |
-| Gamma, Exponential And Beta Distributions | Level 1, Level 2, Level 3 |
-| Change Of Variable | Level 1, Level 2, Level 3 |
-
-### SST 301 - Programming Language for Statistics 1
-
-| Topic | Note levels still required |
-|---|---|
-| Grouping, Loops & Control Structures | Level 1, Level 2, Level 3 |
-| Solutions of Systems of Linear Equations | Level 1, Level 3 |
-| Determining Roots of Equations & Optimization | Level 1, Level 2, Level 3 |
-| Pseudo-Random Number Generators & Simulation | Level 1, Level 2, Level 3 |
-| Hypothesis Testing | Level 1, Level 3 |
-
 ### SST 304 - MULTIVARIATE STATISTICAL METHODS 1
 
 | Topic | Note levels still required |
 |---|---|
 | Random And Mean Vectors | Level 1, Level 2, Level 3 |
-| Determination Of Parameters Of Mvn Distribution | Level 1, Level 2, Level 3 |
-| Multinomial Distribution | Level 1, Level 2, Level 3 |
-| The Weak Law Of Large Numbers | Level 1, Level 2, Level 3 |
 
 ### SST 401 - Decision Theory
 
@@ -209,9 +156,3 @@
 | The Indirect Least Squares Method | Level 1, Level 2, Level 3 |
 | The Two-Stage Least Squares Estimation Method (2SLS) | Level 1, Level 2, Level 3 |
 | The Instrumental Variables (IV) Method | Level 1, Level 2, Level 3 |
-
-### UCU 110 - COMMUNICATION SKILLS
-
-| Topic | Note levels still required |
-|---|---|
-| Reading Skills and Information Literacy | Level 3 |

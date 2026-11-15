@@ -1,9 +1,13 @@
 from django.urls import path
 from . import views
+from . import views_snap_tutor
 
 app_name = "prep"
 
 urlpatterns = [
+    # Universal Multi-Level Snap Tutor (Nursery to Tertiary)
+    path("tutor/", views_snap_tutor.prep_snap_tutor, name="snap_tutor"),
+    path("api/snap-tutor/", views_snap_tutor.prep_snap_tutor_api, name="api_snap_tutor"),
     # Public, crawlable Mentify Prep learning library. These read only approved
     # shared content and never invoke AI generation or student credit logic.
     path("library/", views.prep_public_library, name="public_library"),

@@ -1288,7 +1288,129 @@ class PrepStudentQuizSeen(models.Model):
         return f"{self.user} saw Quiz Q{self.quiz_question_id} ({self.topic.title})"
 
 
+class PrepSnapSession(models.Model):
+    """Universal multi-level study tutor session supporting K-12 to tertiary students."""
+    EDUCATION_LEVEL_CHOICES = [
+        ("nursery", "Nursery / Early Childhood"),
+        ("primary", "Primary / Elementary"),
+        ("secondary", "Secondary / High School"),
+        ("tertiary", "Tertiary / Higher Education"),
+    ]
+    SUBJECT_CHOICES = [
+        ("mathematics", "Mathematics"),
+        ("physics", "Physics"),
+        ("chemistry", "Chemistry"),
+        ("biology", "Biology"),
+        ("sciences", "General Sciences"),
+        ("humanities", "Humanities & Social Studies"),
+        ("business", "Business & Economics"),
+        ("languages", "Languages & Literature"),
+        ("general", "General / Other"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="prep_snap_sessions",
+        db_index=True,
+    )
+    title = models.CharField(max_length=255, default="New Study Session")
+    education_level = models.CharField(
+        max_length=30,
+        choices=EDUCATION_LEVEL_CHOICES,
+        default="secondary",
+        db_index=True,
+    )
+    subject = models.CharField(
+        max_length=40,
+        choices=SUBJECT_CHOICES,
+        default="general",
+        db_index=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+        verbose_name = "Snap Tutor Session"
+        verbose_name_plural = "Snap Tutor Sessions"
+
+    def __str__(self):
+        return f"{self.title} ({self.get_education_level_display()} - {self.get_subject_display()})"
 
 
+class PrepSnapMessage(models.Model):
+    """A message in a universal snap tutor conversation."""
+    ROLE_CHOICES = [
+        ("user", "User"),
+        ("assistant", "Tutor"),
+    ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(
+        PrepSnapSession,
+        on_delete=models.CASCADE,
+        related_name="messages",
+        db_index=True,
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, db_index=True)
+    content = models.TextField()
+    model_used = models.CharField(max_length=100, blank=True)
+    token_usage = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = "Snap Tutor Message"
+        verbose_name_plural = "Snap Tutor Messages"
+
+    def __str__(self):
+        return f"{self.role.capitalize()} at {self.created_at:%Y-%m-%d %H:%M} in {self.session_id}"
+
+
+class PrepSnapUpload(models.Model):
+    """Image or document uploaded by a student for homework/question solving."""
+    CONTENT_TYPE_CHOICES = [
+        ("text_notes", "Text-Based Worksheet / Question"),
+        ("mixed_visual", "Text with Visual Diagram"),
+        ("non_text_visual", "Diagram / Chart Only"),
+        ("unreadable", "Unreadable / Low Quality"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(
+        PrepSnapSession,
+        on_delete=models.CASCADE,
+        related_name="uploads",
+        db_index=True,
+    )
+    message = models.ForeignKey(
+        PrepSnapMessage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="uploads",
+        db_index=True,
+    )
+    original_name = models.CharField(max_length=255)
+    image_file = models.FileField(upload_to="prep/snap_uploads/%Y/%m/", blank=True)
+    content_type = models.CharField(
+        max_length=30,
+        choices=CONTENT_TYPE_CHOICES,
+        default="text_notes",
+    )
+    extracted_text = models.TextField(blank=True)
+    visual_description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = "Snap Tutor Upload"
+        verbose_name_plural = "Snap Tutor Uploads"
+
+    def __str__(self):
+        return f"{self.original_name} ({self.content_type})"
 

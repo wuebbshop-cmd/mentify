@@ -1,0 +1,1267 @@
+{% extends 'prep/base_prep.html' %}
+{% load static %}
+
+{% block title %}MenifyAI — Universal AI Study Assistant | Mentify Prep{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ══════════════════════════════════════════════════════════════
+     SNAP TUTOR CORE LAYOUT (Harmonized with Mentify Prep Topic Tutor)
+     ══════════════════════════════════════════════════════════════ */
+  .snap-page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 20px 24px;
+    box-sizing: border-box;
+  }
+
+  /* Control Header Bar */
+  .snap-control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  }
+
+  .snap-control-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .snap-control-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .snap-control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .snap-control-label {
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+  }
+
+  .snap-select {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  .snap-select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+  }
+
+  .snap-control-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Main Two-Column Grid */
+  .topic-tutor-shell {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .topic-tutor-history, .topic-tutor-main {
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .topic-tutor-history {
+    display: flex;
+    flex-direction: column;
+    height: min(84vh, 920px);
+    min-height: 640px;
+  }
+
+  .topic-tutor-history-head, .topic-tutor-head {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topic-tutor-history-head {
+    background: var(--surface);
+  }
+
+  .topic-tutor-history-list {
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #a3a3a3 transparent;
+  }
+
+  body.dark-theme .topic-tutor-history-list,
+  html.dark-theme body .topic-tutor-history-list {
+    background: #171717;
+    scrollbar-color: #555 transparent;
+  }
+
+  .topic-tutor-history-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: transparent;
+    color: var(--text);
+    padding: 11px 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    box-sizing: border-box;
+  }
+
+  .topic-tutor-history-item:hover, .topic-tutor-history-item.active {
+    background: var(--hover);
+    border-color: var(--border);
+  }
+
+  .topic-tutor-history-item.active {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.08);
+  }
+
+  .history-item-content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .history-item-title {
+    font-size: 0.84rem;
+    font-weight: 650;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .history-item-meta {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .history-item-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: var(--hover);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .history-delete-btn {
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s, color .15s;
+  }
+
+  .topic-tutor-history-item:hover .history-delete-btn {
+    opacity: 1;
+  }
+
+  .history-delete-btn:hover {
+    color: var(--danger);
+    background: rgba(220, 38, 38, 0.1);
+  }
+
+  /* Main Tutor View */
+  .topic-tutor-main {
+    position: relative;
+    height: min(84vh, 920px);
+    min-height: 640px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topic-tutor-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+  }
+
+  .topic-tutor-messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 24px clamp(16px, 3vw, 44px) 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #a3a3a3 transparent;
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(16, 185, 129, 0.06), transparent 45%),
+      var(--surface);
+  }
+
+  body.dark-theme .topic-tutor-messages,
+  html.dark-theme body .topic-tutor-messages {
+    scrollbar-color: #555 #171717;
+  }
+
+  .topic-tutor-message {
+    max-width: 88%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0 0 24px;
+    padding: 18px 22px;
+    border: 1px solid var(--border);
+    border-radius: 15px 15px 15px 4px;
+    background: var(--white, var(--surface));
+    color: var(--text);
+    overflow-wrap: anywhere;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, .03);
+    line-height: 1.6;
+  }
+
+  .topic-tutor-message.assistant {
+    overflow-x: visible;
+  }
+
+  .topic-tutor-message.assistant .markdown-rendered {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .topic-tutor-message.user {
+    margin-left: auto;
+    border-color: rgba(16, 185, 129, .25);
+    border-radius: 15px 15px 4px 15px;
+    background: rgba(16, 185, 129, .09);
+    white-space: pre-wrap;
+  }
+
+  .topic-tutor-message p:last-child { margin-bottom: 0; }
+
+  .topic-tutor-message-meta {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: .72rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .message-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--hover);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  /* Upload Previews in Message */
+  .message-upload-thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .message-upload-thumb {
+    max-width: 160px;
+    max-height: 120px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  /* Composer Area */
+  .topic-tutor-composer {
+    position: relative;
+    flex: 0 0 auto;
+    z-index: 2;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px clamp(12px, 3vw, 24px);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .topic-tutor-composer-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 8px 10px 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .06);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .topic-tutor-composer-bar:focus-within {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, .15), 0 4px 18px rgba(0, 0, 0, .09);
+  }
+
+  .topic-tutor-textarea {
+    resize: none;
+    box-sizing: border-box;
+    min-height: 38px;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    padding: 8px 2px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    line-height: 1.45;
+    outline: none;
+    overflow-y: hidden;
+  }
+
+  .topic-tutor-textarea:focus { box-shadow: none; }
+  .topic-tutor-textarea::placeholder { color: var(--text-muted); }
+
+  .topic-tutor-icon-button {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+
+  .topic-tutor-icon-button:hover:not(:disabled) {
+    background: var(--hover);
+    color: var(--green);
+  }
+
+  .topic-tutor-icon-button:disabled { cursor: not-allowed; opacity: .65; }
+
+  .topic-tutor-send {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background: var(--green);
+    color: #fff;
+    border-radius: 50%;
+  }
+
+  .topic-tutor-send:hover:not(:disabled) {
+    background: #059669;
+    color: #fff;
+  }
+
+  .topic-tutor-send svg { width: 18px; height: 18px; }
+
+  .topic-tutor-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, .4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: topic-tutor-spin .7s linear infinite;
+  }
+
+  @keyframes topic-tutor-spin { to { transform: rotate(360deg); } }
+
+  .topic-tutor-upload-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: .75rem;
+  }
+
+  .topic-tutor-upload-remove {
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .topic-tutor-upload-remove:hover {
+    color: var(--danger);
+    background: rgba(220, 38, 38, 0.1);
+  }
+
+  .topic-tutor-error {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 8px 18px 4px;
+    padding: 10px 14px;
+    border: 1px solid rgba(220, 38, 38, .3);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--danger);
+    font-size: .84rem;
+    line-height: 1.45;
+  }
+
+  .topic-tutor-error-dismiss {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  /* Fullscreen Expand Support */
+  .topic-tutor-shell.expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    border-radius: 0;
+    max-width: 100vw;
+    height: 100vh;
+    padding: 12px;
+    box-sizing: border-box;
+    background: var(--bg);
+  }
+
+  .topic-tutor-shell.expanded .topic-tutor-history,
+  .topic-tutor-shell.expanded .topic-tutor-main {
+    height: calc(100vh - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 860px) {
+    .topic-tutor-shell {
+      grid-template-columns: 1fr;
+    }
+    .topic-tutor-history {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 290px;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .topic-tutor-shell.drawer-open .topic-tutor-history {
+      display: flex;
+    }
+    .topic-tutor-history-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .topic-tutor-shell.drawer-open .topic-tutor-history-backdrop {
+      display: block;
+    }
+    .mobile-history-toggle {
+      display: inline-flex !important;
+    }
+  }
+
+  .mobile-history-toggle {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="snap-page-container">
+  <!-- Top Control Header Bar -->
+  <div class="snap-control-bar">
+    <div class="snap-control-left">
+      <div class="snap-control-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green);"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <span>MenifyAI</span>
+      </div>
+
+      <!-- Education Level Dropdown -->
+      <div class="snap-control-group">
+        <label for="snap-level-select" class="snap-control-label">Level:</label>
+        <select id="snap-level-select" class="snap-select">
+          {% for value, label in education_levels %}
+          <option value="{{ value }}" {% if value == default_level %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Subject Dropdown -->
+      <div class="snap-control-group">
+        <label for="snap-subject-select" class="snap-control-label">Subject:</label>
+        <select id="snap-subject-select" class="snap-select">
+          {% for value, label in subjects %}
+          <option value="{{ value }}" {% if value == default_subject %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="snap-control-right">
+      <button type="button" class="btn btn-primary btn-sm" id="snap-new-chat-top" style="display:inline-flex;align-items:center;gap:6px;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        <span>New Problem</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Tutor Shell -->
+  <div class="topic-tutor-shell" id="snap-tutor-shell">
+    <div class="topic-tutor-history-backdrop" id="snap-history-backdrop"></div>
+
+    <!-- Left Sidebar: Conversations & Balances -->
+    <aside class="topic-tutor-history" aria-label="Snap tutor conversation history">
+      <div class="topic-tutor-history-head">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <h3 style="font-size:.92rem;margin:0 0 2px;font-weight:700;">History</h3>
+            <p style="font-size:.74rem;color:var(--text-muted);margin:0;">Recent problem sessions</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button type="button" class="btn btn-outline btn-sm" id="snap-sidebar-new" style="padding:4px 8px;font-size:0.75rem;">New</button>
+            <button type="button" class="topic-tutor-icon-button mobile-history-toggle" id="snap-history-close" aria-label="Close menu" style="width:28px;height:28px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {% if request.user.is_authenticated %}
+      <!-- Credit Balance Card -->
+      <div style="margin: 10px 12px 6px; padding: 10px 12px; background: var(--hover); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Balance</div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--green); line-height: 1.2;">
+              <span id="snap-balance-val">{{ user_credits }}</span> <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted);">credits</span>
+            </div>
+          </div>
+        </div>
+        <a href="{% url 'prep:billing' %}" class="btn btn-outline btn-sm" style="font-size: 0.72rem; padding: 3px 8px; text-decoration: none;">Top Up</a>
+      </div>
+      {% endif %}
+
+      <div id="snap-history-list" class="topic-tutor-history-list" aria-live="polite">
+        <div style="padding:12px;color:var(--text-muted);font-size:.82rem;">Loading history…</div>
+      </div>
+    </aside>
+
+    <!-- Right Main Workspace -->
+    <section class="topic-tutor-main" aria-label="Snap tutor conversation">
+      <div class="topic-tutor-head">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <button type="button" id="snap-history-toggle" class="topic-tutor-icon-button mobile-history-toggle" aria-label="Open history menu" title="History">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <h2 id="snap-active-title" style="font-size:1.02rem;margin:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MenifyAI</h2>
+              <span id="snap-level-badge" class="badge badge-accent" style="font-size:.68rem;">Secondary</span>
+              <span id="snap-subject-badge" class="badge" style="font-size:.68rem;background:var(--hover);color:var(--text-muted);border:1px solid var(--border);">General</span>
+            </div>
+            <p id="snap-guidance-sub" style="margin:2px 0 0;color:var(--text-muted);font-size:.76rem;">Ask any question, solve problems step-by-step, or attach question photos calibrated to your grade level</p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <button type="button" id="snap-expand-toggle" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:5px;font-size:0.8rem;padding:5px 9px;" title="Toggle Fullscreen">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
+            <span id="snap-expand-text">Expand</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Stream -->
+      <div id="snap-messages" class="topic-tutor-messages" aria-live="polite">
+        <div class="topic-tutor-message assistant">
+          <strong>👋 Welcome to MenifyAI!</strong>
+          <p style="margin-top:6px;">Type any question or concept you need help with, or upload a photo of a homework problem, diagram, or worksheet.</p>
+          <p style="margin-top:4px;font-size:0.85rem;color:var(--text-secondary);">Your explanations are strictly calibrated to your selected <strong>Education Level</strong> and <strong>Subject</strong> — providing step-by-step guidance tailored to your curriculum.</p>
+        </div>
+      </div>
+
+      <!-- Error Banner -->
+      <div id="snap-error" class="topic-tutor-error" role="alert" style="display:none;">
+        <span id="snap-error-message"></span>
+        <button type="button" id="snap-error-dismiss" class="topic-tutor-error-dismiss" aria-label="Dismiss">&times;</button>
+      </div>
+
+      <!-- Composer Form -->
+      <form id="snap-form" class="topic-tutor-composer">
+        {% csrf_token %}
+        <!-- Upload Preview Chips -->
+        <div id="snap-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;"></div>
+
+        <!-- Quick Guidance Prompts -->
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Walk me through solving this question step by step.">
+            <span>📝 Step-by-step solution</span>
+          </button>
+          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Explain the key concept or formula used to solve this problem simply.">
+            <span>💡 Core formula/concept</span>
+          </button>
+          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Give me a hint on how to start this problem without giving away the full answer.">
+            <span>🔍 Give me a hint</span>
+          </button>
+          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Generate one similar practice problem for me to try on my own.">
+            <span>🎯 Practice problem</span>
+          </button>
+        </div>
+
+        <div class="topic-tutor-composer-bar">
+          <!-- Hidden File Inputs -->
+          <input type="file" id="snap-camera-input" accept="image/*" capture="environment" style="display:none">
+          <input type="file" id="snap-file-input" accept="image/png,image/jpeg,image/webp,image/gif" multiple style="display:none">
+
+          <!-- Camera Button (Direct snap on mobile) -->
+          <button type="button" id="snap-camera-btn" class="topic-tutor-icon-button" title="Take photo with camera" aria-label="Take photo with camera">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+
+          <!-- File Upload Button -->
+          <button type="button" id="snap-upload-btn" class="topic-tutor-icon-button" title="Upload question image" aria-label="Upload question image">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          </button>
+
+          <!-- Textarea -->
+          <textarea id="snap-input" class="topic-tutor-textarea" rows="1" maxlength="2000" placeholder="Ask a question, request a step-by-step explanation, or attach an image…" aria-label="Ask a question or describe your problem"></textarea>
+
+          <!-- Send Button -->
+          <button type="submit" id="snap-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Solve & Explain">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <div style="margin: 5px 8px 0; color: var(--text-muted); font-size: .68rem; text-align: center;">
+          Type any question or attach up to 3 images (max 4MB each). Answers are calibrated to your selected grade level.
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const SNAP_API_URL = "{% url 'prep:api_snap_tutor' %}";
+  const CSRF_TOKEN = "{{ csrf_token }}";
+
+  let currentSessionId = null;
+  let activeLevel = "{{ default_level }}";
+  let activeSubject = "{{ default_subject }}";
+  let attachedFiles = [];
+  let isSending = false;
+
+  // DOM Elements
+  const levelSelect = document.getElementById('snap-level-select');
+  const subjectSelect = document.getElementById('snap-subject-select');
+  const levelBadge = document.getElementById('snap-level-badge');
+  const subjectBadge = document.getElementById('snap-subject-badge');
+  const activeTitle = document.getElementById('snap-active-title');
+  const historyList = document.getElementById('snap-history-list');
+  const messagesContainer = document.getElementById('snap-messages');
+  const form = document.getElementById('snap-form');
+  const input = document.getElementById('snap-input');
+  const sendBtn = document.getElementById('snap-send');
+  const cameraBtn = document.getElementById('snap-camera-btn');
+  const uploadBtn = document.getElementById('snap-upload-btn');
+  const cameraInput = document.getElementById('snap-camera-input');
+  const fileInput = document.getElementById('snap-file-input');
+  const fileListContainer = document.getElementById('snap-file-list');
+  const errorBanner = document.getElementById('snap-error');
+  const errorMessage = document.getElementById('snap-error-message');
+  const errorDismiss = document.getElementById('snap-error-dismiss');
+  const newChatTopBtn = document.getElementById('snap-new-chat-top');
+  const sidebarNewBtn = document.getElementById('snap-sidebar-new');
+  const expandToggle = document.getElementById('snap-expand-toggle');
+  const expandText = document.getElementById('snap-expand-text');
+  const tutorShell = document.getElementById('snap-tutor-shell');
+  const historyToggle = document.getElementById('snap-history-toggle');
+  const historyClose = document.getElementById('snap-history-close');
+  const historyBackdrop = document.getElementById('snap-history-backdrop');
+
+  // Error handling
+  function showError(msg) {
+    if (!errorBanner) return;
+    errorMessage.textContent = msg;
+    errorBanner.style.display = 'flex';
+  }
+
+  function hideError() {
+    if (errorBanner) errorBanner.style.display = 'none';
+  }
+
+  if (errorDismiss) {
+    errorDismiss.addEventListener('click', hideError);
+  }
+
+  // Level & Subject Selectors
+  function updateBadges() {
+    if (levelSelect && levelBadge) {
+      activeLevel = levelSelect.value;
+      levelBadge.textContent = levelSelect.options[levelSelect.selectedIndex].text;
+    }
+    if (subjectSelect && subjectBadge) {
+      activeSubject = subjectSelect.value;
+      subjectBadge.textContent = subjectSelect.options[subjectSelect.selectedIndex].text;
+    }
+  }
+
+  if (levelSelect) {
+    levelSelect.addEventListener('change', function() {
+      updateBadges();
+      if (!currentSessionId) {
+        resetChatView();
+      }
+    });
+  }
+
+  if (subjectSelect) {
+    subjectSelect.addEventListener('change', function() {
+      updateBadges();
+      if (!currentSessionId) {
+        resetChatView();
+      }
+    });
+  }
+
+  // Auto-resize textarea
+  if (input) {
+    input.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 180) + 'px';
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  }
+
+  // Quick prompt buttons
+  document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const promptText = this.dataset.prompt;
+      if (promptText && input) {
+        input.value = promptText;
+        input.focus();
+        input.dispatchEvent(new Event('input'));
+      }
+    });
+  });
+
+  // Attachments Handling
+  if (cameraBtn && cameraInput) {
+    cameraBtn.addEventListener('click', () => cameraInput.click());
+    cameraInput.addEventListener('change', (e) => handleFiles(e.target.files));
+  }
+
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+  }
+
+  function handleFiles(files) {
+    if (!files || !files.length) return;
+    hideError();
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (attachedFiles.length >= 3) {
+        showError('You can attach a maximum of 3 images per question.');
+        break;
+      }
+      if (file.size > 4 * 1024 * 1024) {
+        showError(`Image "${file.name}" exceeds the 4MB limit.`);
+        continue;
+      }
+      attachedFiles.push(file);
+    }
+    renderFileList();
+  }
+
+  function renderFileList() {
+    if (!fileListContainer) return;
+    fileListContainer.innerHTML = '';
+    attachedFiles.forEach((file, idx) => {
+      const chip = document.createElement('div');
+      chip.className = 'topic-tutor-upload-chip';
+
+      const icon = document.createElement('span');
+      icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+
+      const label = document.createElement('span');
+      label.textContent = file.name;
+      label.style.maxWidth = '160px';
+      label.style.overflow = 'hidden';
+      label.style.textOverflow = 'ellipsis';
+      label.style.whiteSpace = 'nowrap';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'topic-tutor-upload-remove';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.title = 'Remove';
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        attachedFiles.splice(idx, 1);
+        renderFileList();
+      });
+
+      chip.appendChild(icon);
+      chip.appendChild(label);
+      chip.appendChild(removeBtn);
+      fileListContainer.appendChild(chip);
+    });
+  }
+
+  // Render a single message
+  function renderMessage(msg) {
+    if (!messagesContainer) return;
+    const isAssistant = msg.role === 'assistant';
+    const bubble = document.createElement('div');
+    bubble.className = `topic-tutor-message ${isAssistant ? 'assistant' : 'user'}`;
+
+    const body = document.createElement('div');
+    if (isAssistant) {
+      body.className = 'markdown-rendered';
+      if (typeof window.renderMarkdownWithKaTeX === 'function') {
+        window.renderMarkdownWithKaTeX(msg.content || '', body);
+      } else {
+        body.textContent = msg.content || '';
+      }
+    } else {
+      body.textContent = msg.content || '';
+    }
+    bubble.appendChild(body);
+
+    // Show upload attachments if any
+    if (Array.isArray(msg.uploads) && msg.uploads.length) {
+      const thumbs = document.createElement('div');
+      thumbs.className = 'message-upload-thumbnails';
+      msg.uploads.forEach(up => {
+        if (up.image_url) {
+          const img = document.createElement('img');
+          img.className = 'message-upload-thumb';
+          img.src = up.image_url;
+          img.alt = up.name || 'Uploaded worksheet';
+          img.title = up.name || 'Worksheet';
+          img.addEventListener('click', () => window.open(up.image_url, '_blank'));
+          thumbs.appendChild(img);
+        } else {
+          const chip = document.createElement('span');
+          chip.className = 'topic-tutor-upload-chip';
+          chip.textContent = up.name || 'Image';
+          thumbs.appendChild(chip);
+        }
+      });
+      bubble.appendChild(thumbs);
+    }
+
+    // Message meta tags
+    if (isAssistant && msg.model_used) {
+      const meta = document.createElement('div');
+      meta.className = 'topic-tutor-message-meta';
+      meta.innerHTML = `<span class="message-badge">⚡ ${msg.model_used}</span>`;
+      bubble.appendChild(meta);
+    }
+
+    messagesContainer.appendChild(bubble);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  // Reset chat view for a fresh start
+  function resetChatView() {
+    currentSessionId = null;
+    attachedFiles = [];
+    renderFileList();
+    hideError();
+
+    if (activeTitle) {
+      activeTitle.textContent = 'MenifyAI';
+    }
+
+    if (messagesContainer) {
+      const levelLabel = levelSelect ? levelSelect.options[levelSelect.selectedIndex].text : 'Secondary';
+      const subjectLabel = subjectSelect ? subjectSelect.options[subjectSelect.selectedIndex].text : 'General';
+      messagesContainer.innerHTML = `
+        <div class="topic-tutor-message assistant">
+          <strong>👋 Welcome to MenifyAI!</strong>
+          <p style="margin-top:6px;">Ready to help you with <strong>${subjectLabel}</strong> for <strong>${levelLabel}</strong>.</p>
+          <p style="margin-top:4px;font-size:0.85rem;color:var(--text-secondary);">Ask any question or attach a picture below. Explanations will strictly match your grade curriculum standards.</p>
+        </div>
+      `;
+    }
+
+    // Update active state in sidebar
+    document.querySelectorAll('.topic-tutor-history-item').forEach(el => el.classList.remove('active'));
+  }
+
+  // Load a session from the backend
+  function loadSession(sessionId) {
+    if (!sessionId) return;
+    hideError();
+
+    fetch(`${SNAP_API_URL}?session_id=${encodeURIComponent(sessionId)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          showError(data.error || 'Failed to load session.');
+          return;
+        }
+
+        currentSessionId = data.session.id;
+        if (activeTitle) {
+          activeTitle.textContent = data.session.title || 'Study Session';
+        }
+
+        // Synchronize dropdowns with loaded session
+        if (levelSelect && data.session.education_level) {
+          levelSelect.value = data.session.education_level;
+        }
+        if (subjectSelect && data.session.subject) {
+          subjectSelect.value = data.session.subject;
+        }
+        updateBadges();
+
+        // Render messages
+        if (messagesContainer) {
+          messagesContainer.innerHTML = '';
+          if (Array.isArray(data.messages) && data.messages.length) {
+            data.messages.forEach(renderMessage);
+          } else {
+            resetChatView();
+          }
+        }
+
+        // Highlight active session item
+        document.querySelectorAll('.topic-tutor-history-item').forEach(item => {
+          if (item.dataset.sessionId === currentSessionId) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+
+        // Close mobile drawer if open
+        closeMobileDrawer();
+      })
+      .catch(err => {
+        console.error(err);
+        showError('Network error while loading session.');
+      });
+  }
+
+  // Delete a session
+  function deleteSession(sessionId, event) {
+    if (event) event.stopPropagation();
+    if (!confirm('Are you sure you want to delete this session?')) return;
+
+    fetch(`${SNAP_API_URL}?session_id=${encodeURIComponent(sessionId)}`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRFToken': CSRF_TOKEN,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          if (currentSessionId === sessionId) {
+            resetChatView();
+          }
+          loadHistory();
+        } else {
+          showError(data.error || 'Failed to delete session.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showError('Network error while deleting session.');
+      });
+  }
+
+  // Load history session list
+  function loadHistory() {
+    if (!historyList) return;
+
+    fetch(`${SNAP_API_URL}?action=list_sessions`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success || !Array.isArray(data.sessions)) {
+          historyList.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:.82rem;">No sessions found.</div>';
+          return;
+        }
+
+        if (data.sessions.length === 0) {
+          historyList.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:.82rem;">Your questions will appear here.</div>';
+          return;
+        }
+
+        historyList.innerHTML = '';
+        data.sessions.forEach(sess => {
+          const item = document.createElement('div');
+          item.className = `topic-tutor-history-item ${sess.id === currentSessionId ? 'active' : ''}`;
+          item.dataset.sessionId = sess.id;
+
+          const content = document.createElement('div');
+          content.className = 'history-item-content';
+
+          const title = document.createElement('div');
+          title.className = 'history-item-title';
+          title.textContent = sess.title || 'Study Session';
+
+          const meta = document.createElement('div');
+          meta.className = 'history-item-meta';
+
+          const dateStr = sess.updated_at ? new Date(sess.updated_at).toLocaleDateString() : '';
+          meta.innerHTML = `
+            <span class="history-item-badge">${sess.education_level_display || sess.education_level}</span>
+            <span>${dateStr}</span>
+          `;
+
+          content.appendChild(title);
+          content.appendChild(meta);
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'history-delete-btn';
+          delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+          delBtn.title = 'Delete Session';
+          delBtn.addEventListener('click', (e) => deleteSession(sess.id, e));
+
+          item.appendChild(content);
+          item.appendChild(delBtn);
+
+          item.addEventListener('click', () => loadSession(sess.id));
+          historyList.appendChild(item);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        historyList.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:.82rem;">Unable to load history.</div>';
+      });
+  }
+
+  // Handle Form Submission
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (isSending) return;
+
+      const userText = input ? input.value.trim() : '';
+      if (!userText && !attachedFiles.length) {
+        showError('Please write a question or attach an image of your problem.');
+        return;
+      }
+
+      hideError();
+      isSending = true;
+      if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<div class="topic-tutor-spinner"></div>';
+      }
+
+      // Optimistically append user message bubble
+      const localUploadPreviews = attachedFiles.map(file => ({
+        name: file.name,
+        image_url: URL.createObjectURL(file)
+      }));
+
+      renderMessage({
+        role: 'user',
+        content: userText || '[Question Image]',
+        uploads: localUploadPreviews
+      });
+
+      // Show temporary thinking bubble
+      const thinkingBubble = document.createElement('div');
+      thinkingBubble.className = 'topic-tutor-message assistant';
+      thinkingBubble.id = 'snap-thinking-bubble';
+      thinkingBubble.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--text-muted);"><div class="topic-tutor-spinner" style="border-color:var(--green);border-top-color:transparent;"></div><span>Reasoning through your problem…</span></div>';
+      messagesContainer.appendChild(thinkingBubble);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      // Build FormData payload
+      const formData = new FormData();
+      formData.append('message', userText);
+      formData.append('education_level', levelSelect ? levelSelect.value : activeLevel);
+      formData.append('subject', subjectSelect ? subjectSelect.value : activeSubject);
+      if (currentSessionId) {
+        formData.append('session_id', currentSessionId);
+      }
+
+      attachedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      // Clear input fields immediately
+      if (input) {
+        input.value = '';
+        input.style.height = 'auto';
+      }
+      attachedFiles = [];
+      renderFileList();
+
+      fetch(SNAP_API_URL, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': CSRF_TOKEN,
+        },
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Remove thinking bubble
+          const tb = document.getElementById('snap-thinking-bubble');
+          if (tb) tb.remove();
+
+          if (!data.success) {
+            showError(data.error || 'An error occurred while generating the solution.');
+            return;
+          }
+
+          currentSessionId = data.session_id;
+          if (activeTitle && data.session_title) {
+            activeTitle.textContent = data.session_title;
+          }
+
+          // Render assistant solution
+          renderMessage({
+            role: 'assistant',
+            content: data.answer,
+            model_used: data.model_used,
+          });
+
+          // Refresh history sidebar list
+          loadHistory();
+        })
+        .catch(err => {
+          console.error(err);
+          const tb = document.getElementById('snap-thinking-bubble');
+          if (tb) tb.remove();
+          showError('Network error while communicating with the AI tutor.');
+        })
+        .finally(() => {
+          isSending = false;
+          if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>';
+          }
+        });
+    });
+  }
+
+  // Fullscreen Expand Toggle
+  if (expandToggle && tutorShell) {
+    expandToggle.addEventListener('click', function() {
+      tutorShell.classList.toggle('expanded');
+      const isExpanded = tutorShell.classList.contains('expanded');
+      if (expandText) {
+        expandText.textContent = isExpanded ? 'Collapse' : 'Expand';
+      }
+    });
+  }
+
+  // Mobile drawer handlers
+  function openMobileDrawer() {
+    if (tutorShell) tutorShell.classList.add('drawer-open');
+  }
+
+  function closeMobileDrawer() {
+    if (tutorShell) tutorShell.classList.remove('drawer-open');
+  }
+
+  if (historyToggle) historyToggle.addEventListener('click', openMobileDrawer);
+  if (historyClose) historyClose.addEventListener('click', closeMobileDrawer);
+  if (historyBackdrop) historyBackdrop.addEventListener('click', closeMobileDrawer);
+
+  // New Chat Buttons
+  if (newChatTopBtn) newChatTopBtn.addEventListener('click', resetChatView);
+  if (sidebarNewBtn) sidebarNewBtn.addEventListener('click', resetChatView);
+
+  // Initial load
+  updateBadges();
+  loadHistory();
+})();
+</script>
+{% endblock %}

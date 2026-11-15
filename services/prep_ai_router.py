@@ -203,7 +203,7 @@ def _deterministic_fallback_profile(course_obj) -> dict:
         return {
             "subject_family": "computing",
             "category": "Computing",
-            "capabilities": {"code": True, "math_notation": False, "chemical_equations": False},
+            "capabilities": {"code": True, "math_notation": True, "chemical_equations": False},
             "note_structure": [
                 "Concept and Use Case",
                 "Data, Syntax, and Core Concepts",
@@ -1765,7 +1765,7 @@ def _repair_dangling_visual_references(text: str) -> str:
 def _unavailable_visual_reference_issues(content: str) -> list[str]:
     """Reject figure callouts only when the referenced visual or table is actually absent from the note."""
     source = re.sub(r"```[\s\S]*?```", "", str(content or ""))
-    has_markdown_table = bool(re.search(r"(?m)^\s*\|[^|\n]+\|.*\n\s*\|[\s:\-|]+\|", source))
+    has_markdown_table = bool(re.search(r"(?m)^(?:>\s*)?\s*\|[^|\n]+\|.*\n(?:>\s*)?\s*\|[\s:\-|]+\|", source))
     has_embedded_image = bool(re.search(r"!\[[^\]]*\]\([^)]+\)", source))
     has_code_diagram = bool(
         re.search(
@@ -2467,7 +2467,7 @@ def _note_completion_issues(
         )
     )
     legacy_heading_compatibility = False
-    if level in _VALID_NOTE_LEVELS and not has_custom_structure:
+    if level in _VALID_NOTE_LEVELS:
         legacy_heading_compatibility = all(
             _section_heading_pattern(index, title, allow_legacy_default=True).search(content)
             for index, title in enumerate(_note_section_titles(topic_title, study_profile or {}, level), start=1)
@@ -2503,7 +2503,7 @@ def _note_completion_issues(
             pattern = _section_heading_pattern(
                 index,
                 title,
-                allow_legacy_default=not custom_structure,
+                allow_legacy_default=not custom_structure or allow_validated_legacy_headings,
             )
             if not pattern.search(content):
                 issues.append(f"missing section ## {index}. {title}")
@@ -2511,7 +2511,7 @@ def _note_completion_issues(
         for heading in _required_note_sections(topic_title, study_profile):
             if not re.search(rf"(?m)^\s*{re.escape(heading)}(?:\s|$)", content):
                 issues.append(f"missing section {heading}")
-    if allow_validated_legacy_headings and not has_custom_structure:
+    if allow_validated_legacy_headings:
         issues = [issue for issue in issues if not issue.startswith("missing section ##")]
 
     # A heading alone is not enough: a truncated response can contain the
@@ -2836,7 +2836,7 @@ def _revalidate_topic_note_cache_entry(
         content,
         topic_title,
         level=str(payload.get("level") or "level_2"),
-        allow_validated_legacy_headings=was_validated and not has_custom_structure,
+        allow_validated_legacy_headings=True,
         **validation_options,
     )
     if issues:
@@ -2999,7 +2999,6 @@ def get_published_topic_note_levels(topic_obj, *, validated_only: bool = False) 
                 level=level,
                 allow_validated_legacy_headings=(
                     payload.get("validation_state") == NOTE_VALIDATION_STATE
-                    and not has_custom_structure
                 ),
                 **validation_options,
             )

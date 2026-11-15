@@ -1012,6 +1012,10 @@ _ASSESSMENT_EXAM_FOOTER_RE = re.compile(
     r"SHALL LEAD TO DISCONTINUATION[ \t]*$\r?\n?"
 )
 _ASSESSMENT_SCANNER_FOOTER_RE = re.compile(r"(?im)^[ \t]*Scanned with CamScanner[ \t]*$\r?\n?")
+_ASSESSMENT_DOCUMENT_AVAILABILITY_FOOTER_RE = re.compile(
+    r"(?im)^[ \t]*This document is available on[ \t]*"
+    r"(?:\*\*[ \t]*|\r?\n[ \t]*\r?\n[ \t]*\*\*[ \t]*)\r?\n?"
+)
 _ASSESSMENT_ADVERTISEMENT_RE = re.compile(r"(?im)^[ \t]*VISIT US FOR\s*:")
 _ASSESSMENT_PAPER_HEADER_RE = re.compile(
     r"(?is)\\begin\{center\}\s*"
@@ -1026,12 +1030,19 @@ def _strip_assessment_document_footers(text: str) -> str:
     cleaned = _ASSESSMENT_PAGE_FOOTER_RE.sub("", str(text or ""))
     cleaned = _ASSESSMENT_EXAM_FOOTER_RE.sub("", cleaned)
     cleaned = _ASSESSMENT_SCANNER_FOOTER_RE.sub("", cleaned)
+    cleaned = _ASSESSMENT_DOCUMENT_AVAILABILITY_FOOTER_RE.sub("", cleaned)
     return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
 
 def _strip_safe_question_extraction_artifacts(text: str) -> str:
     """Remove only known extraction debris whose boundaries are unambiguous."""
     cleaned = str(text or "")
+    cleaned = re.sub(
+        r"^[ \t]*-{1,2}[ \t]*\*{2,}[ \t]*(?:\r?\n|$)",
+        "",
+        cleaned,
+        count=1,
+    ).lstrip()
     cleaned = re.sub(r"^\s*\*\*\s*(?=\r?\n|$)", "", cleaned, count=1).lstrip()
     cleaned = re.sub(r"^\s*\}+", "", cleaned, count=1).lstrip()
     header = _ASSESSMENT_PAPER_HEADER_RE.search(cleaned)
@@ -1043,7 +1054,8 @@ def _strip_safe_question_extraction_artifacts(text: str) -> str:
         cleaned[advertisement.end():],
     ):
         cleaned = cleaned[:advertisement.start()].rstrip()
-    return cleaned
+    cleaned = _ASSESSMENT_DOCUMENT_AVAILABILITY_FOOTER_RE.sub("", cleaned)
+    return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
 
 def _split_page_transcriptions(text: str) -> dict[int, str]:
@@ -2470,7 +2482,7 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
     issues = []
     if re.match(r"^\s*\}+", source):
         issues.append("question text begins with stray closing LaTeX braces")
-    if re.match(r"^\s*\*\*\s*(?:\r?\n|$)", source):
+    if re.match(r"^\s*(?:-{1,2}\s*)?\*{2,}\s*(?:\r?\n|$)", source):
         issues.append("question text begins with a stray Markdown bold marker")
     if _ASSESSMENT_PAPER_HEADER_RE.search(source):
         issues.append("question text contains the next examination paper header")
@@ -2532,6 +2544,8 @@ def assessment_question_rendering_issues(question_text: str) -> list[str]:
         issues.append("question text contains a following question heading")
     if re.search(r"(?i)\bdownloaded\s+by\b", source):
         issues.append("question text contains document download metadata")
+    if _ASSESSMENT_DOCUMENT_AVAILABILITY_FOOTER_RE.search(source):
+        issues.append("question text contains an incomplete document-availability footer")
     if (
         _ASSESSMENT_PAGE_FOOTER_RE.search(source)
         or _ASSESSMENT_EXAM_FOOTER_RE.search(source)

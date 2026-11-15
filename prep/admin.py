@@ -43,7 +43,10 @@ from .models import (
     PrepTopicAcademicPaper,
     PrepStudentSpacedCard,
     PrepTopicQuizQuestion,
-    PrepTopicQuizAttempt,
+        PrepTopicQuizAttempt,
+    PrepSnapSession,
+    PrepSnapMessage,
+    PrepSnapUpload,
 )
 from services.credit_service import grant_credits, grant_subscription
 
@@ -1696,3 +1699,27 @@ class PrepTopicQuizAttemptAdmin(admin.ModelAdmin):
 
 
 
+
+
+@admin.register(PrepSnapSession)
+class PrepSnapSessionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'education_level', 'subject', 'created_at', 'updated_at')
+    list_filter = ('education_level', 'subject', 'created_at')
+    search_fields = ('title', 'user__username', 'user__email')
+    readonly_fields = ('id', 'created_at', 'updated_at')
+
+
+@admin.register(PrepSnapMessage)
+class PrepSnapMessageAdmin(admin.ModelAdmin):
+    list_display = ('session', 'role', 'model_used', 'created_at')
+    list_filter = ('role', 'model_used', 'created_at')
+    search_fields = ('content', 'session__title', 'session__user__username')
+    readonly_fields = ('id', 'created_at')
+
+
+@admin.register(PrepSnapUpload)
+class PrepSnapUploadAdmin(admin.ModelAdmin):
+    list_display = ('original_name', 'session', 'content_type', 'created_at')
+    list_filter = ('content_type', 'created_at')
+    search_fields = ('original_name', 'extracted_text', 'session__title')
+    readonly_fields = ('id', 'created_at')

@@ -311,10 +311,55 @@ class GeneratedQuestionValidationTests(SimpleTestCase):
         )
         self.assertFalse(assessment_question_rendering_issues(cleaned))
 
+    def test_flags_and_strips_dashed_leading_bold_extraction_artifact(self):
+        examples = (
+            "-- **\n\nb) Find the distribution function and its mean. **(6 marks)**",
+            "-- ****\n\nb) Find the distribution function and its mean. **(6 marks)**",
+        )
+
+        for content in examples:
+            with self.subTest(content=content):
+                self.assertIn(
+                    "question text begins with a stray Markdown bold marker",
+                    assessment_question_rendering_issues(content),
+                )
+                cleaned = _strip_safe_question_extraction_artifacts(content)
+                self.assertEqual(
+                    cleaned,
+                    "b) Find the distribution function and its mean. **(6 marks)**",
+                )
+                self.assertFalse(assessment_question_rendering_issues(cleaned))
+
     def test_allows_asterisks_inside_question_content(self):
         content = "In Python, evaluate the expression 3 ** 2 and explain its value."
 
         self.assertFalse(assessment_question_rendering_issues(content))
+
+    def test_flags_and_strips_incomplete_document_availability_footer(self):
+        examples = (
+            (
+                "Obtain the p.d.f., c.d.f. and moment generating function. (8 marks)\n\n"
+                "This document is available on **",
+                "Obtain the p.d.f., c.d.f. and moment generating function. (8 marks)",
+            ),
+            (
+                "The density function is given by\n\n"
+                "This document is available on \n\n**\n\n"
+                "$$f(x)=\\lambda e^{-\\lambda x}$$\n\nFind the mean.",
+                "The density function is given by\n\n"
+                "$$f(x)=\\lambda e^{-\\lambda x}$$\n\nFind the mean.",
+            ),
+        )
+
+        for content, expected in examples:
+            with self.subTest(content=content):
+                self.assertIn(
+                    "question text contains an incomplete document-availability footer",
+                    assessment_question_rendering_issues(content),
+                )
+                cleaned = _strip_safe_question_extraction_artifacts(content)
+                self.assertEqual(cleaned, expected)
+                self.assertFalse(assessment_question_rendering_issues(cleaned))
 
     def test_flags_question_that_ends_before_its_referenced_table(self):
         content = (
