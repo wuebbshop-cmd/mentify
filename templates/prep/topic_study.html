@@ -3250,16 +3250,7 @@
     const isAssistant = message.role === 'assistant';
     bubble.className = `topic-tutor-message ${isAssistant ? 'assistant' : 'user'}`;
     const body = document.createElement('div');
-    if (isAssistant) {
-      body.className = 'markdown-rendered';
-      if (typeof window.renderMarkdownWithKaTeX === 'function') {
-        window.renderMarkdownWithKaTeX(message.content || '', body);
-      } else {
-        body.textContent = message.content || '';
-      }
-    } else {
-      body.textContent = message.content || '';
-    }
+    body.className = isAssistant ? 'markdown-rendered' : '';
     bubble.appendChild(body);
     if (Array.isArray(message.uploads) && message.uploads.length) {
       const files = document.createElement('div');
@@ -3280,6 +3271,16 @@
     }
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
+
+    if (isAssistant) {
+      if (typeof window.renderMarkdownWithKaTeX === 'function') {
+        window.renderMarkdownWithKaTeX(message.content || '', body);
+      } else {
+        body.textContent = message.content || '';
+      }
+    } else {
+      body.textContent = message.content || '';
+    }
   }
 
   function renderTopicTutorConversation(conversation) {

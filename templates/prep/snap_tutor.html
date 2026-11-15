@@ -1249,16 +1249,7 @@
     bubble.className = `topic-tutor-message ${isAssistant ? 'assistant' : 'user'}`;
 
     const body = document.createElement('div');
-    if (isAssistant) {
-      body.className = 'markdown-rendered';
-      if (typeof window.renderMarkdownWithKaTeX === 'function') {
-        window.renderMarkdownWithKaTeX(msg.content || '', body);
-      } else {
-        body.textContent = msg.content || '';
-      }
-    } else {
-      body.textContent = msg.content || '';
-    }
+    body.className = isAssistant ? 'markdown-rendered' : '';
     bubble.appendChild(body);
 
     // Show upload attachments if any
@@ -1284,8 +1275,19 @@
       bubble.appendChild(thumbs);
     }
 
+    // Append bubble to DOM FIRST so Mermaid and Chart.js have DOM dimensions
     messagesContainer.appendChild(bubble);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    if (isAssistant) {
+      if (typeof window.renderMarkdownWithKaTeX === 'function') {
+        window.renderMarkdownWithKaTeX(msg.content || '', body);
+      } else {
+        body.textContent = msg.content || '';
+      }
+    } else {
+      body.textContent = msg.content || '';
+    }
   }
 
   // Reset chat view for a fresh start
