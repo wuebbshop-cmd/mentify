@@ -4434,6 +4434,29 @@
           tutorForm.requestSubmit();
         }
       });
+      // Direct clipboard image paste into chat (ChatGPT style)
+      tutorInput.addEventListener('paste', event => {
+        const clipboardData = event.clipboardData || window.clipboardData;
+        if (!clipboardData || !clipboardData.items) return;
+        const items = clipboardData.items;
+        const pastedImages = [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) {
+              const ext = item.type.split('/')[1] || 'png';
+              const name = file.name && file.name !== 'image.png' ? file.name : ('screenshot_' + Date.now() + '.' + ext);
+              pastedImages.push(new File([file], name, { type: file.type }));
+            }
+          }
+        }
+        if (pastedImages.length > 0) {
+          event.preventDefault();
+          topicTutorSelectedFiles.push(...pastedImages);
+          renderTopicTutorSelectedFiles();
+        }
+      });
     }
     const tutorAttach = document.getElementById('topic-tutor-attach');
     const tutorUploadMenu = document.getElementById('topic-tutor-upload-menu');

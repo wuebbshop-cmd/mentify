@@ -11,7 +11,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from prep.models import PrepSnapSession, PrepWallet
-from services.credit_service import get_available_credits
+from services.credit_service import InsufficientCredits, get_available_credits
 from services.snap_tutor_service import (
     execute_snap_tutor_turn,
     get_or_create_snap_session,
@@ -107,6 +107,14 @@ def prep_snap_tutor_api(request: HttpRequest) -> JsonResponse:
                 uploaded_files=uploaded_files,
             )
             return JsonResponse(result)
+        except InsufficientCredits as exc:
+            wallet = PrepWallet.get_or_create_wallet(user) if user.is_authenticated else None
+            return JsonResponse({
+                "success": False,
+                "error": str(exc),
+                "credits_balance": get_available_credits(wallet) if wallet else 0,
+                "upgrade_required": True,
+            }, status=402)
         except Exception as exc:
             logger.exception("Error executing snap tutor turn: %s", exc)
             return JsonResponse({"success": False, "error": str(exc)}, status=500)

@@ -17,9 +17,31 @@ from typing import Any
 from django.conf import settings
 from django.db import transaction
 
-from prep.models import PrepSnapMessage, PrepSnapSession, PrepSnapUpload
+from prep.models import PrepSnapMessage, PrepSnapSession, PrepSnapUpload, PrepWallet
+from services.credit_service import (
+    InsufficientCredits,
+    get_available_credits,
+    get_remaining_scanned_allowance,
+    has_active_subscription,
+    record_upload,
+    release_credit_reservation,
+    reserve_credits,
+    settle_credit_reservation,
+)
 from services.prep_ai_router import route_math_request
-from services.prep_topic_tutor import _image_mime_type, _ocr_images, MAX_IMAGE_BYTES, MAX_IMAGE_COUNT
+from services.prep_topic_tutor import (
+    _image_mime_type,
+    _ocr_images,
+    MAX_IMAGE_BYTES,
+    MAX_IMAGE_COUNT,
+    MIN_OCR_CREDITS,
+)
+from services.prep_tutor_billing import (
+    calculate_provider_cost,
+    estimate_chat_reservation,
+    provider_cost_credits,
+    quote_summary,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -229,10 +251,13 @@ def build_snap_tutor_prompt(
 # Image Handling & Vision Extraction
 # ---------------------------------------------------------------------------
 
-def process_uploaded_images(uploaded_files: list[Any]) -> list[dict[str, Any]]:
-    """Inspect and extract text/visual descriptions from uploaded image files."""
+def process_uploaded_images(uploaded_files: list[Any]) -> tuple[list[dict[str, Any]], dict[str, Any], str]:
+    """Inspect and extract text/visual descriptions from uploaded image files.
+    
+    Returns (processed_results, ocr_usage, ocr_model).
+    """
     if not uploaded_files:
-        return []
+        return [], {}, ""
 
     images_to_ocr: list[dict[str, Any]] = []
     processed_results: list[dict[str, Any]] = []
@@ -262,19 +287,31 @@ def process_uploaded_images(uploaded_files: list[Any]) -> list[dict[str, Any]]:
         })
 
     if not images_to_ocr:
-        return []
+        return [], {}, ""
+
+    ocr_usage: dict[str, Any] = {}
+    ocr_model: str = getattr(settings, "TOGETHER_VISION_MODEL", "deepseek-ai/DeepSeek-V4.1-Flash")
 
     # Call Together / DeepSeek multimodal OCR
     try:
         ocr_payload = _ocr_images(
-            [{"name": item["name"], "mime_type": item["mime_type"], "base64": item["base64"]} for item in images_to_ocr],
+            [{"name": item["name"], "label": item["name"], "mime_type": item["mime_type"], "base64": item["base64"]} for item in images_to_ocr],
             figure_hint="For homework and exam questions, transcribe all problem numbers, formulas, and labels exactly.",
         )
-        items_by_label = {
-            item.get("label"): item
-            for item in ocr_payload.get("items", [])
-            if isinstance(item, dict) and item.get("label")
-        }
+        ocr_usage = ocr_payload.get("usage") or {}
+        ocr_model = ocr_payload.get("model") or ocr_model
+
+        raw_items = ocr_payload.get("items", {})
+        if isinstance(raw_items, dict):
+            items_by_label = raw_items
+        elif isinstance(raw_items, list):
+            items_by_label = {
+                item.get("label"): item
+                for item in raw_items
+                if isinstance(item, dict) and item.get("label")
+            }
+        else:
+            items_by_label = {}
     except Exception as exc:
         logger.error("Vision OCR call failed for snap tutor: %s", exc)
         items_by_label = {}
@@ -294,7 +331,7 @@ def process_uploaded_images(uploaded_files: list[Any]) -> list[dict[str, Any]]:
             "visual_description": desc,
         })
 
-    return processed_results
+    return processed_results, ocr_usage, ocr_model
 
 
 # ---------------------------------------------------------------------------
@@ -308,7 +345,7 @@ def execute_snap_tutor_turn(
     user_message: str,
     uploaded_files: list[Any],
 ) -> dict[str, Any]:
-    """Execute a complete learner interaction turn with vision OCR, reasoning, and DB save."""
+    """Execute a complete learner interaction turn with vision OCR, reasoning, credit deduction, and DB save."""
     # 1. Fetch previous session history for multi-turn conversational continuity
     recent_msg_records = list(session.messages.order_by("created_at")[:10])
     conversation_history = [
@@ -316,10 +353,105 @@ def execute_snap_tutor_turn(
         for m in recent_msg_records
     ]
 
-    # 2. Process and extract any uploaded question images
-    extracted_uploads = process_uploaded_images(uploaded_files)
+    # 2. Credit estimation and reservation
+    wallet = None
+    reservation = None
+    ocr_reserve = 0
+    chat_reserve = 0
+    ocr_credits = 0
+    chat_credits = 0
+    ocr_covered_by_plan = False
+    valid_files_count = min(len(uploaded_files or []), MAX_IMAGE_COUNT)
+    ocr_per_page = max(1, int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", MIN_OCR_CREDITS)))
 
-    # 3. Build the context-calibrated prompt with history
+    if user and user.is_authenticated:
+        wallet = PrepWallet.get_or_create_wallet(user)
+        has_sub = has_active_subscription(wallet)
+        scanned_allowance = get_remaining_scanned_allowance(wallet) if has_sub else 0
+        ocr_covered_by_plan = bool(has_sub and (scanned_allowance is None or scanned_allowance >= valid_files_count))
+        ocr_reserve = 0 if ocr_covered_by_plan else (ocr_per_page * valid_files_count)
+
+        CHAT_MAX_OUTPUT_TOKENS = 3000
+        chat_model = str(getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"))
+        # Quick provisional prompt for chat reservation
+        provisional_system, provisional_user = build_snap_tutor_prompt(
+            education_level=session.education_level,
+            subject=session.subject,
+            user_message=user_message,
+            extracted_materials=[],
+            conversation_history=conversation_history,
+        )
+        chat_reserve, chat_reserve_quote = estimate_chat_reservation(
+            provisional_system,
+            provisional_user,
+            chat_model,
+            output_token_cap=CHAT_MAX_OUTPUT_TOKENS,
+        )
+        total_reserve = ocr_reserve + chat_reserve
+        try:
+            reservation = reserve_credits(
+                wallet,
+                total_reserve,
+                purpose="snap_tutor",
+                metadata={
+                    "session_id": str(session.id),
+                    "education_level": session.education_level,
+                    "subject": session.subject,
+                    "ocr_image_count": valid_files_count,
+                    "ocr_reserved_credits": ocr_reserve,
+                    "chat_reserved_credits": chat_reserve,
+                    "chat_reservation_pricing": quote_summary(chat_reserve_quote, chat_reserve),
+                },
+            )
+        except InsufficientCredits:
+            available = get_available_credits(wallet)
+            raise InsufficientCredits(
+                f"MentifyAI requires {total_reserve} credits for this question (you currently have {available}). Please top up your balance."
+            )
+
+    # 3. Process and extract any uploaded question images
+    try:
+        extracted_uploads, ocr_usage, ocr_model = process_uploaded_images(uploaded_files)
+    except Exception as exc:
+        if reservation:
+            release_credit_reservation(reservation, reason=f"Image processing failed: {exc}")
+        raise
+
+    # Settle OCR reservation
+    if wallet and reservation and extracted_uploads:
+        if ocr_covered_by_plan:
+            record_upload(
+                wallet,
+                count=len(extracted_uploads),
+                upload_type="snap_image_ocr",
+                description=f"MentifyAI Image OCR ({len(extracted_uploads)} images - Plan Allowance)",
+            )
+            ocr_credits = 0
+            if ocr_reserve > 0:
+                # If anything was reserved for OCR, release that portion
+                release_credit_reservation(reservation, amount=ocr_reserve, reason="Covered by subscription allowance")
+        else:
+            ocr_quote = calculate_provider_cost("together", ocr_model, ocr_usage)
+            ocr_credits = settle_credit_reservation(
+                reservation,
+                ocr_per_page * len(extracted_uploads),
+                release_reserved=ocr_reserve,
+                action_type="snap_tutor_ocr",
+                description=f"MentifyAI Image OCR ({len(extracted_uploads)} images): {session.get_subject_display()}",
+                usage=ocr_usage,
+                model_name=ocr_model,
+                metadata={
+                    "provider": "together",
+                    "pricing": quote_summary(ocr_quote, ocr_per_page * len(extracted_uploads)),
+                    "image_count": len(extracted_uploads),
+                    "session_id": str(session.id),
+                },
+            )
+    elif reservation and ocr_reserve > 0 and not extracted_uploads:
+        # Released OCR reserve if no valid uploads found
+        release_credit_reservation(reservation, amount=ocr_reserve, reason="No valid images to OCR")
+
+    # 4. Build the context-calibrated prompt with history & extracted images
     system_prompt, user_prompt = build_snap_tutor_prompt(
         education_level=session.education_level,
         subject=session.subject,
@@ -328,15 +460,20 @@ def execute_snap_tutor_turn(
         conversation_history=conversation_history,
     )
 
-    # 3. Call DeepSeek / Together reasoning model via route_math_request
-    ai_result = route_math_request(
-        user_prompt,
-        course_code=f"SNAP-{session.education_level.upper()}",
-        topic_label=session.subject.capitalize(),
-        system_prompt=system_prompt,
-        is_complex_proof=(session.education_level == "tertiary"),
-        thinking_enabled=False,
-    )
+    # 5. Call DeepSeek / Together reasoning model via route_math_request
+    try:
+        ai_result = route_math_request(
+            user_prompt,
+            course_code=f"SNAP-{session.education_level.upper()}",
+            topic_label=session.subject.capitalize(),
+            system_prompt=system_prompt,
+            is_complex_proof=(session.education_level == "tertiary"),
+            thinking_enabled=False,
+        )
+    except Exception as exc:
+        if reservation:
+            release_credit_reservation(reservation, reason=f"AI model generation failed: {exc}")
+        raise
 
     answer_content = str(ai_result.get("content") or "").strip()
     if not answer_content:
@@ -346,22 +483,49 @@ def execute_snap_tutor_turn(
     model_used = ai_result.get("model_used") or "deepseek-v3"
     token_usage = ai_result.get("usage") or {}
 
-    # 4. Atomic database persistence
+    # 6. Settle Chat reservation
+    if wallet and reservation:
+        if token_usage and any(token_usage.values()):
+            chat_quote = calculate_provider_cost("deepseek", model_used, token_usage)
+            chat_credits = provider_cost_credits(chat_quote)
+            settle_credit_reservation(
+                reservation,
+                chat_credits,
+                action_type="snap_tutor",
+                description=f"MentifyAI reply: {session.get_education_level_display()} / {session.get_subject_display()}",
+                usage=token_usage,
+                model_name=model_used,
+                metadata={
+                    "provider": "deepseek",
+                    "pricing": quote_summary(chat_quote, chat_credits),
+                    "session_id": str(session.id),
+                },
+            )
+        else:
+            release_credit_reservation(reservation, reason="No billable chat token usage returned.")
+
+    total_credits_charged = ocr_credits + chat_credits
+    if wallet:
+        wallet.refresh_from_db(fields=["credits_balance"])
+
+    # 7. Atomic database persistence
     with transaction.atomic():
         # Save user message
         user_msg_record = PrepSnapMessage.objects.create(
             session=session,
             role="user",
             content=user_message.strip() or "[Image Upload Question]",
+            credits_charged=0,
         )
 
-        # Save assistant solution message
+        # Save assistant solution message with actual credits charged
         assistant_msg_record = PrepSnapMessage.objects.create(
             session=session,
             role="assistant",
             content=answer_content,
             model_used=model_used,
             token_usage=token_usage,
+            credits_charged=total_credits_charged,
         )
 
         # Save upload records
@@ -414,6 +578,8 @@ def execute_snap_tutor_turn(
         "model_used": model_used,
         "uploads": saved_uploads_metadata,
         "message_id": str(assistant_msg_record.id),
+        "credits_charged": total_credits_charged,
+        "credits_balance": get_available_credits(wallet) if wallet else None,
     }
 
 

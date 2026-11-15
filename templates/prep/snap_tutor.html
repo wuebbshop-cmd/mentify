@@ -500,6 +500,40 @@
     background: rgba(220, 38, 38, 0.1);
   }
 
+  /* Attach & Upload Menu (Exact match to Topic Tutor in topic_study.html) */
+  .topic-tutor-attach-wrap { position: relative; flex: 0 0 34px; }
+  .topic-tutor-upload-menu {
+    position: absolute;
+    z-index: 50;
+    left: 0;
+    bottom: calc(100% + 10px);
+    display: grid;
+    gap: 4px;
+    min-width: 172px;
+    padding: 7px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .18);
+  }
+  .topic-tutor-upload-menu[hidden] { display: none; }
+  .topic-tutor-upload-choice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .topic-tutor-upload-choice:hover { background: var(--hover); color: var(--danger); }
+  .topic-tutor-upload-choice svg { width: 19px; height: 19px; flex-shrink: 0; }
+
   .topic-tutor-error {
     flex: 0 0 auto;
     display: flex;
@@ -706,6 +740,10 @@
       font-size: 0.9rem;
     }
 
+    .topic-tutor-attach-wrap {
+      flex: 0 0 32px;
+    }
+
     .topic-tutor-icon-button {
       flex: 0 0 32px;
       width: 32px;
@@ -890,23 +928,33 @@
       <!-- Composer Form -->
       <form id="snap-form" class="topic-tutor-composer">
         {% csrf_token %}
+        <!-- Quoted Context Banner -->
+        <div id="snap-quote-container" style="display:none;margin:0 0 6px;"></div>
+
         <!-- Upload Preview Chips -->
         <div id="snap-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px;"></div>
 
         <div class="topic-tutor-composer-bar">
           <!-- Hidden File Inputs -->
-          <input type="file" id="snap-camera-input" accept="image/*" capture="environment" style="display:none">
-          <input type="file" id="snap-file-input" accept="image/png,image/jpeg,image/webp,image/gif" multiple style="display:none">
+          <input type="file" id="snap-file-input" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg" multiple hidden>
+          <input type="file" id="snap-camera-input" accept="image/*" capture="environment" hidden>
 
-          <!-- Camera Button (Direct snap on mobile) -->
-          <button type="button" id="snap-camera-btn" class="topic-tutor-icon-button" title="Take photo with camera" aria-label="Take photo with camera">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          </button>
-
-          <!-- File Upload Button -->
-          <button type="button" id="snap-upload-btn" class="topic-tutor-icon-button" title="Upload question image" aria-label="Upload question image">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-          </button>
+          <!-- Attach + Button with Menu (Exact match to Topic Tutor) -->
+          <div class="topic-tutor-attach-wrap">
+            <button type="button" id="snap-attach" class="topic-tutor-icon-button" aria-label="Choose files to attach" title="Attach files" aria-haspopup="true" aria-expanded="false">
+              <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>
+            </button>
+            <div id="snap-upload-menu" class="topic-tutor-upload-menu" role="menu" hidden>
+              <button type="button" class="topic-tutor-upload-choice" id="snap-choose-image" role="menuitem">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                <span>Upload image</span>
+              </button>
+              <button type="button" class="topic-tutor-upload-choice" id="snap-choose-camera" role="menuitem">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>Take photo</span>
+              </button>
+            </div>
+          </div>
 
           <!-- Textarea -->
           <textarea id="snap-input" class="topic-tutor-textarea" rows="1" maxlength="2000" placeholder="Ask a question or attach an image…" aria-label="Ask a question or describe your problem"></textarea>
@@ -951,8 +999,10 @@
   const form = document.getElementById('snap-form');
   const input = document.getElementById('snap-input');
   const sendBtn = document.getElementById('snap-send');
-  const cameraBtn = document.getElementById('snap-camera-btn');
-  const uploadBtn = document.getElementById('snap-upload-btn');
+  const attachBtn = document.getElementById('snap-attach');
+  const uploadMenu = document.getElementById('snap-upload-menu');
+  const chooseImageBtn = document.getElementById('snap-choose-image');
+  const chooseCameraBtn = document.getElementById('snap-choose-camera');
   const cameraInput = document.getElementById('snap-camera-input');
   const fileInput = document.getElementById('snap-file-input');
   const fileListContainer = document.getElementById('snap-file-list');
@@ -1007,7 +1057,7 @@
     });
   }
 
-  // Auto-resize textarea
+  // Auto-resize textarea & Clipboard Image Paste (ChatGPT style)
   if (input) {
     input.addEventListener('input', function() {
       this.style.height = 'auto';
@@ -1019,18 +1069,123 @@
         form.requestSubmit();
       }
     });
+
+    // Paste image directly from clipboard into chat (e.g. screenshots, copied photos)
+    input.addEventListener('paste', function(e) {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData || !clipboardData.items) return;
+      const items = clipboardData.items;
+      const pastedImages = [];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            const ext = item.type.split('/')[1] || 'png';
+            const name = file.name && file.name !== 'image.png' ? file.name : `screenshot_${Date.now()}.${ext}`;
+            pastedImages.push(new File([file], name, { type: file.type }));
+          }
+        }
+      }
+      if (pastedImages.length > 0) {
+        e.preventDefault();
+        handleFiles(pastedImages);
+      }
+    });
   }
 
-  // Attachments Handling
-  if (cameraBtn && cameraInput) {
-    cameraBtn.addEventListener('click', () => cameraInput.click());
-    cameraInput.addEventListener('change', (e) => handleFiles(e.target.files));
+  // Quoted Context Support (from global text selection or message references)
+  let snapQuotedContext = null;
+
+  window.clearSnapQuoteUI = function() {
+    snapQuotedContext = null;
+    const container = document.getElementById('snap-quote-container');
+    if (container) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+    }
+    if (input) {
+      input.placeholder = 'Ask a question or attach an image…';
+    }
+  };
+
+  window.askMentifyAIWithExcerpt = function(phrase) {
+    const cleanPhrase = (phrase || '').trim();
+    if (!cleanPhrase) return;
+
+    snapQuotedContext = cleanPhrase;
+
+    const container = document.getElementById('snap-quote-container');
+    if (container) {
+      container.style.display = 'block';
+      container.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--hover);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;padding:6px 10px;font-size:0.78rem;max-width:100%;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;">
+            <svg width="13" height="13" fill="none" stroke="var(--green)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m-8 6 2.2-2.2A8 8 0 1 1 20 15"/></svg>
+            <span style="font-weight:700;color:var(--green);white-space:nowrap;font-size:0.72rem;text-transform:uppercase;">Quote:</span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-style:italic;">"${cleanPhrase}"</span>
+          </div>
+          <button type="button" onclick="clearSnapQuoteUI()" style="border:0;background:transparent;cursor:pointer;color:var(--text-muted);font-size:1.2rem;line-height:1;padding:2px 6px;flex-shrink:0;" title="Remove quoted text">&times;</button>
+        </div>
+      `;
+    }
+
+    if (input) {
+      input.placeholder = `Ask about "${cleanPhrase.slice(0, 28)}${cleanPhrase.length > 28 ? '...' : ''}"…`;
+      input.focus();
+      setTimeout(() => {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
+  // Attachments Menu Handling (Exact match to Topic Tutor)
+  function setUploadMenuOpen(open) {
+    if (!uploadMenu || !attachBtn) return;
+    uploadMenu.hidden = !open;
+    attachBtn.setAttribute('aria-expanded', String(open));
   }
 
-  if (uploadBtn && fileInput) {
-    uploadBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+  if (attachBtn && uploadMenu) {
+    attachBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      setUploadMenuOpen(uploadMenu.hidden);
+    });
   }
+
+  if (chooseImageBtn && fileInput) {
+    chooseImageBtn.addEventListener('click', function() {
+      fileInput.click();
+      setUploadMenuOpen(false);
+    });
+    fileInput.addEventListener('change', function(e) {
+      handleFiles(e.target.files);
+      fileInput.value = '';
+    });
+  }
+
+  if (chooseCameraBtn && cameraInput) {
+    chooseCameraBtn.addEventListener('click', function() {
+      cameraInput.click();
+      setUploadMenuOpen(false);
+    });
+    cameraInput.addEventListener('change', function(e) {
+      handleFiles(e.target.files);
+      cameraInput.value = '';
+    });
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topic-tutor-attach-wrap')) {
+      setUploadMenuOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      setUploadMenuOpen(false);
+    }
+  });
 
   function handleFiles(files) {
     if (!files || !files.length) return;
@@ -1138,6 +1293,7 @@
     currentSessionId = null;
     attachedFiles = [];
     renderFileList();
+    clearSnapQuoteUI();
     hideError();
 
     if (activeTitle) {
@@ -1306,11 +1462,19 @@
       e.preventDefault();
       if (isSending) return;
 
-      const userText = input ? input.value.trim() : '';
+      let userText = input ? input.value.trim() : '';
+      const quotedText = snapQuotedContext || '';
       if (!userText && !attachedFiles.length) {
-        showError('Please write a question or attach an image of your problem.');
-        return;
+        if (quotedText) {
+          userText = 'Could you please explain this concept and give an example?';
+        } else {
+          showError('Please write a question or attach an image of your problem.');
+          return;
+        }
       }
+
+      const fullMessage = quotedText ? `> "${quotedText}"\n\n${userText}` : userText;
+      clearSnapQuoteUI();
 
       hideError();
       isSending = true;
@@ -1326,7 +1490,7 @@
 
       renderMessage({
         role: 'user',
-        content: userText || '[Problem Image]',
+        content: fullMessage || '[Problem Image]',
         uploads: localUploadPreviews
       });
 
@@ -1338,7 +1502,7 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
       const formData = new FormData();
-      formData.append('message', userText);
+      formData.append('message', fullMessage);
       formData.append('education_level', levelSelect ? levelSelect.value : activeLevel);
       formData.append('subject', subjectSelect ? subjectSelect.value : activeSubject);
       if (currentSessionId) {
@@ -1363,7 +1527,21 @@
         },
         body: formData,
       })
-        .then(res => res.json())
+        .then(async res => {
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            if (data && data.credits_balance !== undefined && data.credits_balance !== null) {
+              const balEl = document.getElementById('snap-balance-val');
+              if (balEl) balEl.textContent = data.credits_balance;
+              const navBalEl = document.querySelector('#prep-navbar-credit-count .credit-num');
+              if (navBalEl) navBalEl.textContent = data.credits_balance;
+            }
+            const err = new Error(data.error || `Request failed with status ${res.status}`);
+            err.data = data;
+            throw err;
+          }
+          return data;
+        })
         .then(data => {
           const tb = document.getElementById('snap-thinking-bubble');
           if (tb) tb.remove();
@@ -1371,6 +1549,13 @@
           if (!data.success) {
             showError(data.error || 'An error occurred while generating the solution.');
             return;
+          }
+
+          if (data.credits_balance !== null && data.credits_balance !== undefined) {
+            const balEl = document.getElementById('snap-balance-val');
+            if (balEl) balEl.textContent = data.credits_balance;
+            const navBalEl = document.querySelector('#prep-navbar-credit-count .credit-num');
+            if (navBalEl) navBalEl.textContent = data.credits_balance;
           }
 
           currentSessionId = data.session_id;
@@ -1389,7 +1574,7 @@
           console.error(err);
           const tb = document.getElementById('snap-thinking-bubble');
           if (tb) tb.remove();
-          showError('Network error while communicating with the AI tutor.');
+          showError(err.message || 'Network error while communicating with the AI tutor.');
         })
         .finally(() => {
           isSending = false;

@@ -1360,6 +1360,7 @@ class PrepSnapMessage(models.Model):
     content = models.TextField()
     model_used = models.CharField(max_length=100, blank=True)
     token_usage = models.JSONField(default=dict, blank=True)
+    credits_charged = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
