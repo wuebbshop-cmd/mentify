@@ -154,8 +154,9 @@ def build_snap_tutor_prompt(
     subject: str,
     user_message: str,
     extracted_materials: list[dict[str, str]],
+    conversation_history: list[dict[str, str]] | None = None,
 ) -> tuple[str, str]:
-    """Construct calibrated system and user prompts for the tutor model."""
+    """Construct calibrated system and user prompts for the tutor model with multi-turn memory."""
     level_key = education_level.lower().strip() if education_level else "secondary"
     level_config = LEVEL_PEDAGOGICAL_RULES.get(level_key, LEVEL_PEDAGOGICAL_RULES["secondary"])
 
@@ -167,17 +168,39 @@ def build_snap_tutor_prompt(
         f"PEDAGOGICAL GUIDELINES:\n{level_config['guidelines']}\n\n"
         f"{level_config['negative_constraints']}\n\n"
         f"{subject_guidance}\n\n"
-        "FORMATTING & ACCURACY RULES:\n"
-        "- You are MenifyAI, an intelligent multi-level AI study assistant designed to help students master concepts and solve problems across all subjects.\n"
-        "- You answer normal typed questions as well as questions from uploaded images or diagrams.\n"
-        "- Format all mathematical equations and formulas in clean LaTeX: use $...$ for inline math and $$...$$ for display blocks.\n"
-        "- Do not use unclosed code blocks or broken formatting.\n"
-        "- If images of questions or diagrams are attached, directly solve the problem depicted in the image.\n"
-        "- If no image is attached, answer the student's typed question directly, comprehensively, and step-by-step.\n"
-        "- Address the student respectfully and warmly."
+        "FORMATTING, CONCEPTUAL & MULTI-TURN ACCURACY RULES:\n"
+        "- You are MentifyAI, an intelligent, empathetic multi-level AI study assistant.\n"
+        "- MULTI-TURN CONTINUITY & PROACTIVE TUTORING:\n"
+        "  * You have full conversational memory of recent conversation turns provided below.\n"
+        "  * If you previously asked the student a question or offered to provide a past-paper calculation / example problem "
+        "(e.g., 'Would you like me to work through a past-paper style calculation?'), and the student confirms (e.g., 'yes', 'sure', 'do it', 'show me'):\n"
+        "    NEVER claim that the question or numbers didn't come through!\n"
+        "    YOU offered it, so YOU MUST directly formulate an authentic, grade-appropriate problem with realistic values and work through the full, step-by-step solution immediately!\n"
+        "- CONCEPTUAL & THEORETICAL QUESTIONS (NO WORKSHEET REQUIRED):\n"
+        "  * Students will frequently ask conceptual questions, definitions, explanations of theorems, or curiosity doubts (e.g., 'What is Newton's 2nd law?', 'Why does momentum conserve?').\n"
+        "  * Always answer concept questions directly, thoroughly, and intuitively with real-life analogies suited to the student's grade level.\n"
+        "  * Never claim that 'a question didn't come through' when the student is asking a concept question.\n"
+        "- MATHEMATICAL & EQUATION FORMATTING:\n"
+        "  * Format all mathematical equations in clean standard LaTeX: use $...$ for inline math and $$...$$ on their own dedicated lines for display equations.\n"
+        "  * Always leave a blank line before and after display math ($$...$$) so equations never collide with adjacent prose.\n"
+        "  * Clearly separate sections with bold headers or numbered steps.\n"
+        "- Address the student respectfully, warmly, and clearly."
     )
 
     user_parts: list[str] = []
+
+    # Include recent conversation turns for multi-turn conversational memory
+    if conversation_history:
+        history_lines = []
+        for turn in conversation_history[-8:]:
+            speaker = "Student" if turn.get("role") == "user" else "MentifyAI Tutor"
+            text_snip = str(turn.get("content") or "").strip()
+            if text_snip:
+                history_lines.append(f"[{speaker}]:\n{text_snip}")
+        if history_lines:
+            user_parts.append("### RECENT CONVERSATION HISTORY (Previous turns in this session):")
+            user_parts.append("\n\n".join(history_lines))
+            user_parts.append("--- End of recent conversation history ---\n")
 
     if extracted_materials:
         user_parts.append("### ATTACHED STUDY MATERIALS & QUESTION IMAGES:")
@@ -194,9 +217,9 @@ def build_snap_tutor_prompt(
                 user_parts.append(f"Visual Diagram / Chart Description:\n{desc}")
 
     if user_message.strip():
-        user_parts.append(f"\n### STUDENT'S QUESTION / INSTRUCTION:\n{user_message.strip()}")
+        user_parts.append(f"\n### STUDENT'S CURRENT MESSAGE / QUESTION:\n{user_message.strip()}")
     elif extracted_materials:
-        user_parts.append("\n### STUDENT'S QUESTION / INSTRUCTION:\nPlease solve and clearly explain the question shown in the attached image step-by-step.")
+        user_parts.append("\n### STUDENT'S CURRENT MESSAGE / QUESTION:\nPlease solve and clearly explain the problem shown in the attached image step-by-step.")
 
     user_prompt = "\n".join(user_parts)
     return system_prompt, user_prompt
@@ -286,15 +309,23 @@ def execute_snap_tutor_turn(
     uploaded_files: list[Any],
 ) -> dict[str, Any]:
     """Execute a complete learner interaction turn with vision OCR, reasoning, and DB save."""
-    # 1. Process and extract any uploaded question images
+    # 1. Fetch previous session history for multi-turn conversational continuity
+    recent_msg_records = list(session.messages.order_by("created_at")[:10])
+    conversation_history = [
+        {"role": m.role, "content": m.content}
+        for m in recent_msg_records
+    ]
+
+    # 2. Process and extract any uploaded question images
     extracted_uploads = process_uploaded_images(uploaded_files)
 
-    # 2. Build the context-calibrated prompt
+    # 3. Build the context-calibrated prompt with history
     system_prompt, user_prompt = build_snap_tutor_prompt(
         education_level=session.education_level,
         subject=session.subject,
         user_message=user_message,
         extracted_materials=extracted_uploads,
+        conversation_history=conversation_history,
     )
 
     # 3. Call DeepSeek / Together reasoning model via route_math_request

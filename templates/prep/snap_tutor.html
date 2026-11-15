@@ -1,94 +1,25 @@
 {% extends 'prep/base_prep.html' %}
 {% load static %}
 
-{% block title %}MenifyAI — Universal AI Study Assistant | Mentify Prep{% endblock %}
+{% block title %}MentifyAI — Universal AI Study Assistant | Mentify Prep{% endblock %}
 
 {% block extra_css %}
 <style>
   /* ══════════════════════════════════════════════════════════════
-     SNAP TUTOR CORE LAYOUT (Harmonized with Mentify Prep Topic Tutor)
+     MENTIFYAI CORE LAYOUT (Exact match to Topic Tutor in topic_study.html)
      ══════════════════════════════════════════════════════════════ */
   .snap-page-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 16px 20px 24px;
+    padding: 14px 18px 24px;
     box-sizing: border-box;
   }
 
-  /* Control Header Bar */
-  .snap-control-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 12px 18px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  }
-
-  .snap-control-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .snap-control-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .snap-control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .snap-control-label {
-    font-size: 0.76rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-  }
-
-  .snap-select {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    cursor: pointer;
-    transition: border-color .15s, box-shadow .15s;
-  }
-
-  .snap-select:focus {
-    border-color: var(--green);
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
-  }
-
-  .snap-control-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  /* Main Two-Column Grid */
+  /* Main Two-Column Grid Shell */
   .topic-tutor-shell {
     display: grid;
-    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    gap: 18px;
     align-items: stretch;
   }
 
@@ -100,19 +31,17 @@
     overflow: hidden;
   }
 
+  /* History Sidebar */
   .topic-tutor-history {
     display: flex;
     flex-direction: column;
-    height: min(84vh, 920px);
+    height: min(85vh, 920px);
     min-height: 640px;
   }
 
   .topic-tutor-history-head, .topic-tutor-head {
-    padding: 18px 22px;
+    padding: 14px 18px;
     border-bottom: 1px solid var(--border);
-  }
-
-  .topic-tutor-history-head {
     background: var(--surface);
   }
 
@@ -120,7 +49,7 @@
     min-height: 0;
     flex: 1;
     overflow-y: auto;
-    padding: 12px;
+    padding: 10px;
     scrollbar-width: thin;
     scrollbar-color: #a3a3a3 transparent;
   }
@@ -139,11 +68,11 @@
     width: 100%;
     text-align: left;
     border: 1px solid transparent;
-    border-radius: 11px;
+    border-radius: 10px;
     background: transparent;
     color: var(--text);
-    padding: 11px 12px;
-    margin-bottom: 6px;
+    padding: 10px 12px;
+    margin-bottom: 5px;
     cursor: pointer;
     transition: background .15s, border-color .15s;
     box-sizing: border-box;
@@ -165,7 +94,7 @@
   }
 
   .history-item-title {
-    font-size: 0.84rem;
+    font-size: 0.83rem;
     font-weight: 650;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -174,7 +103,7 @@
   }
 
   .history-item-meta {
-    font-size: 0.7rem;
+    font-size: 0.69rem;
     color: var(--text-muted);
     margin-top: 3px;
     display: flex;
@@ -184,9 +113,9 @@
 
   .history-item-badge {
     display: inline-block;
-    padding: 1px 6px;
+    padding: 1px 5px;
     border-radius: 4px;
-    font-size: 0.65rem;
+    font-size: 0.64rem;
     font-weight: 600;
     background: var(--hover);
     color: var(--text-muted);
@@ -216,7 +145,7 @@
   /* Main Tutor View */
   .topic-tutor-main {
     position: relative;
-    height: min(84vh, 920px);
+    height: min(85vh, 920px);
     min-height: 640px;
     display: flex;
     flex-direction: column;
@@ -225,20 +154,95 @@
   .topic-tutor-head {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
     background: var(--surface);
+    flex-shrink: 0;
   }
 
+  /* Level & Subject Selector Toolbar (cleanly attached under head) */
+  .snap-level-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 18px;
+    background: var(--hover);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  .snap-level-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .snap-level-label {
+    font-size: 0.73rem;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .snap-select {
+    padding: 4px 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  .snap-select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+  }
+
+  /* Expand Button */
+  .topic-tutor-expand-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: .78rem;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+
+  .topic-tutor-expand-button:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .topic-tutor-expand-button svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Messages Stream */
   .topic-tutor-messages {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-    padding: 24px clamp(16px, 3vw, 44px) 20px;
+    padding: 20px clamp(14px, 3vw, 36px) 16px;
     scrollbar-width: thin;
     scrollbar-color: #a3a3a3 transparent;
     background:
-      radial-gradient(ellipse at 15% 0%, rgba(16, 185, 129, 0.06), transparent 45%),
+      radial-gradient(ellipse at 15% 0%, rgba(16, 185, 129, 0.05), transparent 45%),
       var(--surface);
   }
 
@@ -257,20 +261,84 @@
     border-radius: 15px 15px 15px 4px;
     background: var(--white, var(--surface));
     color: var(--text);
-    overflow-wrap: anywhere;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, .03);
-    line-height: 1.6;
+    overflow-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .03);
+    line-height: 1.75;
   }
 
   .topic-tutor-message.assistant {
     overflow-x: visible;
   }
 
+  /* Robust KaTeX & Typography Layout (prevents equation / text overlap) */
   .topic-tutor-message.assistant .markdown-rendered {
     min-width: 0;
     max-width: 100%;
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.8;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .markdown-rendered p {
+    margin: 0 0 14px 0;
+    line-height: 1.8;
+  }
+
+  .markdown-rendered p:last-child {
+    margin-bottom: 0;
+  }
+
+  .markdown-rendered h1,
+  .markdown-rendered h2,
+  .markdown-rendered h3,
+  .markdown-rendered h4 {
+    margin: 20px 0 10px 0;
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .markdown-rendered ul,
+  .markdown-rendered ol {
+    margin: 8px 0 14px 22px;
+    padding-left: 2px;
+    line-height: 1.75;
+  }
+
+  .markdown-rendered li {
+    margin-bottom: 6px;
+  }
+
+  /* KaTeX Math Equations: Isolated with dedicated margin and padding so they never touch or collide with prose */
+  .markdown-rendered .katex-display {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 0;
+    margin: 16px 0;
+    max-width: 100%;
+    text-align: center;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(150, 150, 150, 0.25) transparent;
+  }
+
+  .markdown-rendered .katex {
+    font-size: 1.06em;
+    text-rendering: auto;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .markdown-rendered .katex-html {
+    overflow-x: visible;
+  }
+
+  .markdown-rendered .katex-mathml,
+  .katex-mathml {
+    display: none !important;
+    user-select: none !important;
   }
 
   .topic-tutor-message.user {
@@ -279,29 +347,10 @@
     border-radius: 15px 15px 4px 15px;
     background: rgba(16, 185, 129, .09);
     white-space: pre-wrap;
+    line-height: 1.6;
   }
 
   .topic-tutor-message p:last-child { margin-bottom: 0; }
-
-  .topic-tutor-message-meta {
-    margin-top: 8px;
-    color: var(--text-muted);
-    font-size: .72rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .message-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 7px;
-    border-radius: 999px;
-    background: var(--hover);
-    font-size: 0.68rem;
-    color: var(--text-muted);
-  }
 
   /* Upload Previews in Message */
   .message-upload-thumbnails {
@@ -327,7 +376,7 @@
     z-index: 2;
     width: 100%;
     box-sizing: border-box;
-    padding: 12px clamp(12px, 3vw, 24px);
+    padding: 10px clamp(10px, 2.5vw, 20px);
     border-top: 1px solid var(--border);
     background: var(--surface);
   }
@@ -335,30 +384,30 @@
   .topic-tutor-composer-bar {
     display: flex;
     align-items: flex-end;
-    gap: 8px;
+    gap: 6px;
     max-width: 860px;
     margin: 0 auto;
-    padding: 8px 10px 8px 12px;
+    padding: 6px 8px 6px 12px;
     border: 1px solid var(--border);
     border-radius: 22px;
     background: var(--white);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, .06);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
     transition: border-color .15s ease, box-shadow .15s ease;
   }
 
   .topic-tutor-composer-bar:focus-within {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, .15), 0 4px 18px rgba(0, 0, 0, .09);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, .15), 0 3px 14px rgba(0, 0, 0, .08);
   }
 
   .topic-tutor-textarea {
     resize: none;
     box-sizing: border-box;
-    min-height: 38px;
+    min-height: 36px;
     flex: 1;
     min-width: 0;
     width: 100%;
-    padding: 8px 2px;
+    padding: 7px 2px;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -375,9 +424,9 @@
   .topic-tutor-icon-button {
     display: inline-grid;
     place-items: center;
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
     border: 0;
     border-radius: 50%;
     background: transparent;
@@ -394,9 +443,9 @@
   .topic-tutor-icon-button:disabled { cursor: not-allowed; opacity: .65; }
 
   .topic-tutor-send {
-    flex-basis: 38px;
-    width: 38px;
-    height: 38px;
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
     background: var(--green);
     color: #fff;
     border-radius: 50%;
@@ -407,11 +456,11 @@
     color: #fff;
   }
 
-  .topic-tutor-send svg { width: 18px; height: 18px; }
+  .topic-tutor-send svg { width: 17px; height: 17px; }
 
   .topic-tutor-spinner {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 2px solid rgba(255, 255, 255, .4);
     border-top-color: #fff;
     border-radius: 50%;
@@ -425,19 +474,19 @@
     align-items: center;
     gap: 6px;
     max-width: 100%;
-    padding: 5px 10px;
+    padding: 4px 9px;
     border: 1px solid var(--border);
     border-radius: 999px;
     background: var(--surface);
     color: var(--text-secondary);
-    font-size: .75rem;
+    font-size: .74rem;
   }
 
   .topic-tutor-upload-remove {
     display: inline-grid;
     place-items: center;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     padding: 0;
     border: 0;
     border-radius: 50%;
@@ -457,135 +506,287 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    margin: 8px 18px 4px;
-    padding: 10px 14px;
+    margin: 6px 14px 4px;
+    padding: 8px 12px;
     border: 1px solid rgba(220, 38, 38, .3);
     border-radius: 10px;
     background: var(--surface);
     color: var(--danger);
-    font-size: .84rem;
-    line-height: 1.45;
+    font-size: .82rem;
+    line-height: 1.4;
   }
 
   .topic-tutor-error-dismiss {
     border: 0;
     background: transparent;
     color: inherit;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
     opacity: 0.75;
   }
 
-  /* Fullscreen Expand Support */
-  .topic-tutor-shell.expanded {
+  .topic-tutor-history-backdrop {
+    display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    border-radius: 0;
-    max-width: 100vw;
+    z-index: 1201;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, .48);
+  }
+
+  .topic-tutor-history-toggle,
+  .topic-tutor-history-close {
+    display: none;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     DESKTOP EXPANDED MODE (Full Viewport Overlay)
+     ══════════════════════════════════════════════════════════════ */
+  .topic-tutor-shell.topic-tutor-expanded {
+    position: fixed;
+    z-index: 1200;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
     height: 100vh;
-    padding: 12px;
+    height: 100dvh;
+    min-height: 0;
+    padding: 14px;
     box-sizing: border-box;
-    background: var(--bg);
+    overflow: hidden;
+    background: var(--surface);
   }
 
-  .topic-tutor-shell.expanded .topic-tutor-history,
-  .topic-tutor-shell.expanded .topic-tutor-main {
-    height: calc(100vh - 24px);
-    max-height: calc(100vh - 24px);
+  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-history,
+  .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
   }
 
-  /* Mobile Responsive */
-  @media (max-width: 860px) {
+  body.topic-tutor-expanded {
+    overflow: hidden;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     MOBILE RESPONSIVE RULES (Matching topic_study.html exactly)
+     ══════════════════════════════════════════════════════════════ */
+  @media (max-width: 800px) {
+    .snap-page-container {
+      padding: 4px 6px 12px;
+      width: 100%;
+    }
+
     .topic-tutor-shell {
-      grid-template-columns: 1fr;
+      position: relative;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      border: 0;
+      border-radius: 0;
     }
+
+    /* History drawer slide-out */
     .topic-tutor-history {
-      display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 290px;
-      z-index: 1000;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      z-index: 1202;
+      inset: 0 auto 0 0;
+      width: min(320px, 86vw);
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      max-height: none;
+      border-radius: 0 16px 16px 0;
+      box-shadow: 12px 0 36px rgba(0, 0, 0, .25);
+      transform: translateX(-105%);
+      transition: transform .22s ease, visibility .22s ease;
+      visibility: hidden;
     }
-    .topic-tutor-shell.drawer-open .topic-tutor-history {
-      display: flex;
+
+    .topic-tutor-shell.topic-tutor-history-open .topic-tutor-history {
+      transform: translateX(0);
+      visibility: visible;
     }
-    .topic-tutor-history-backdrop {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-    }
-    .topic-tutor-shell.drawer-open .topic-tutor-history-backdrop {
+
+    .topic-tutor-shell.topic-tutor-history-open .topic-tutor-history-backdrop {
       display: block;
     }
-    .mobile-history-toggle {
-      display: inline-flex !important;
+
+    .topic-tutor-history-toggle {
+      display: inline-grid !important;
+    }
+
+    .topic-tutor-history-close {
+      display: inline-grid !important;
+    }
+
+    /* Main Tutor Container */
+    .topic-tutor-main {
+      height: calc(100vh - 130px);
+      height: calc(100dvh - 130px);
+      min-height: 480px;
+      max-height: 90vh;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    /* Clean, non-cramped Header */
+    .topic-tutor-head {
+      padding: 8px 10px;
+      min-height: 44px;
+    }
+
+    .topic-tutor-head h2 {
+      font-size: 0.98rem !important;
+    }
+
+    .topic-tutor-badge-hide-mobile {
+      display: none !important;
+    }
+
+    /* Clean Level Toolbar on Mobile */
+    .snap-level-toolbar {
+      padding: 6px 10px;
+      gap: 8px;
+    }
+
+    .snap-level-toolbar .snap-level-group {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .snap-level-toolbar .snap-select {
+      width: 100%;
+      min-width: 0;
+      font-size: 0.76rem;
+      padding: 4px 6px;
+    }
+
+    .snap-level-toolbar .snap-level-label {
+      font-size: 0.68rem;
+    }
+
+    /* Messages & Bubbles on Mobile */
+    .topic-tutor-messages {
+      flex: 1 1 0%;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 12px 10px 10px;
+    }
+
+    .topic-tutor-message {
+      max-width: 100%;
+      padding: 12px 14px;
+      margin: 0 0 14px;
+      font-size: 0.92rem;
+    }
+
+    .topic-tutor-message.user {
+      max-width: 90%;
+      padding: 9px 12px;
+    }
+
+    /* Mobile Composer */
+    .topic-tutor-composer {
+      padding: 6px 8px calc(env(safe-area-inset-bottom, 0px) + 6px);
+    }
+
+    .topic-tutor-composer-bar {
+      padding: 4px 6px;
+      gap: 4px;
+    }
+
+    .topic-tutor-textarea {
+      min-height: 34px;
+      max-height: 100px;
+      padding: 6px 2px;
+      font-size: 0.9rem;
+    }
+
+    .topic-tutor-icon-button {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .topic-tutor-send {
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+    }
+
+    /* Mobile Fullscreen Expanded Mode */
+    .topic-tutor-shell.topic-tutor-expanded {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      z-index: 1200;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      padding: 0;
+      margin: 0;
+      gap: 0;
+      border: 0;
+      border-radius: 0;
+      background: var(--surface);
+    }
+
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-main {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      max-height: none;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      border: 0;
+      border-radius: 0;
+      background: var(--surface);
+    }
+
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-head {
+      padding: 8px 12px;
+    }
+
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-messages {
+      padding: 10px 10px 6px;
+    }
+
+    .topic-tutor-shell.topic-tutor-expanded .topic-tutor-composer {
+      padding: 6px 10px calc(env(safe-area-inset-bottom, 0px) + 6px);
     }
   }
 
-  .mobile-history-toggle {
-    display: none;
+  @media (max-width: 480px) {
+    .topic-tutor-head h2 {
+      max-width: 120px;
+    }
+    .topic-tutor-expand-button span {
+      display: none;
+    }
+    .topic-tutor-expand-button {
+      padding: 6px;
+      min-height: 30px;
+    }
   }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="snap-page-container">
-  <!-- Top Control Header Bar -->
-  <div class="snap-control-bar">
-    <div class="snap-control-left">
-      <div class="snap-control-title">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green);"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        <span>MenifyAI</span>
-      </div>
-
-      <!-- Education Level Dropdown -->
-      <div class="snap-control-group">
-        <label for="snap-level-select" class="snap-control-label">Level:</label>
-        <select id="snap-level-select" class="snap-select">
-          {% for value, label in education_levels %}
-          <option value="{{ value }}" {% if value == default_level %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <!-- Subject Dropdown -->
-      <div class="snap-control-group">
-        <label for="snap-subject-select" class="snap-control-label">Subject:</label>
-        <select id="snap-subject-select" class="snap-select">
-          {% for value, label in subjects %}
-          <option value="{{ value }}" {% if value == default_subject %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-
-    <div class="snap-control-right">
-      <button type="button" class="btn btn-primary btn-sm" id="snap-new-chat-top" style="display:inline-flex;align-items:center;gap:6px;">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-        <span>New Problem</span>
-      </button>
-    </div>
-  </div>
-
   <!-- Main Tutor Shell -->
   <div class="topic-tutor-shell" id="snap-tutor-shell">
-    <div class="topic-tutor-history-backdrop" id="snap-history-backdrop"></div>
+    <!-- Backdrop for slide-out mobile drawer -->
+    <button type="button" id="snap-history-backdrop" class="topic-tutor-history-backdrop" aria-label="Close conversation menu" tabindex="-1"></button>
 
     <!-- Left Sidebar: Conversations & Balances -->
-    <aside class="topic-tutor-history" aria-label="Snap tutor conversation history">
+    <aside class="topic-tutor-history" aria-label="MentifyAI conversation history">
       <div class="topic-tutor-history-head">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
@@ -594,7 +795,7 @@
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
             <button type="button" class="btn btn-outline btn-sm" id="snap-sidebar-new" style="padding:4px 8px;font-size:0.75rem;">New</button>
-            <button type="button" class="topic-tutor-icon-button mobile-history-toggle" id="snap-history-close" aria-label="Close menu" style="width:28px;height:28px;">
+            <button type="button" class="topic-tutor-icon-button topic-tutor-history-close" id="snap-history-close" aria-label="Close conversation menu" title="Close menu">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
             </button>
           </div>
@@ -602,8 +803,8 @@
       </div>
 
       {% if request.user.is_authenticated %}
-      <!-- Credit Balance Card -->
-      <div style="margin: 10px 12px 6px; padding: 10px 12px; background: var(--hover); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+      <!-- Credit Balance Card inside drawer -->
+      <div style="margin: 10px 10px 6px; padding: 10px 12px; background: var(--hover); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -625,36 +826,58 @@
     </aside>
 
     <!-- Right Main Workspace -->
-    <section class="topic-tutor-main" aria-label="Snap tutor conversation">
+    <section class="topic-tutor-main" aria-label="MentifyAI workspace">
+      <!-- Workspace Header -->
       <div class="topic-tutor-head">
-        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-          <button type="button" id="snap-history-toggle" class="topic-tutor-icon-button mobile-history-toggle" aria-label="Open history menu" title="History">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <button type="button" id="snap-history-toggle" class="topic-tutor-icon-button topic-tutor-history-toggle" aria-label="Open conversation menu" title="Conversations">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
-          <div style="min-width:0;">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <h2 id="snap-active-title" style="font-size:1.02rem;margin:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MenifyAI</h2>
-              <span id="snap-level-badge" class="badge badge-accent" style="font-size:.68rem;">Secondary</span>
-              <span id="snap-subject-badge" class="badge" style="font-size:.68rem;background:var(--hover);color:var(--text-muted);border:1px solid var(--border);">General</span>
-            </div>
-            <p id="snap-guidance-sub" style="margin:2px 0 0;color:var(--text-muted);font-size:.76rem;">Ask any question, solve problems step-by-step, or attach question photos calibrated to your grade level</p>
+          <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <h2 id="snap-active-title" style="font-size:1.02rem;margin:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MentifyAI</h2>
+            <span id="snap-level-badge" class="badge badge-accent topic-tutor-badge-hide-mobile" style="font-size:.68rem;">Secondary</span>
           </div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-          <button type="button" id="snap-expand-toggle" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:5px;font-size:0.8rem;padding:5px 9px;" title="Toggle Fullscreen">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button type="button" class="btn btn-primary btn-sm" id="snap-new-chat-top" style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;padding:4px 8px;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <span>New</span>
+          </button>
+          <button type="button" id="snap-expand-toggle" class="topic-tutor-expand-button" title="Toggle Fullscreen" aria-label="Expand tutor to full screen" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
             <span id="snap-expand-text">Expand</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Compact Grade & Subject Selector Toolbar -->
+      <div class="snap-level-toolbar">
+        <div class="snap-level-group">
+          <label for="snap-level-select" class="snap-level-label">Level:</label>
+          <select id="snap-level-select" class="snap-select">
+            {% for value, label in education_levels %}
+            <option value="{{ value }}" {% if value == default_level %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="snap-level-group">
+          <label for="snap-subject-select" class="snap-level-label">Subject:</label>
+          <select id="snap-subject-select" class="snap-select">
+            {% for value, label in subjects %}
+            <option value="{{ value }}" {% if value == default_subject %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
 
       <!-- Messages Stream -->
       <div id="snap-messages" class="topic-tutor-messages" aria-live="polite">
         <div class="topic-tutor-message assistant">
-          <strong>👋 Welcome to MenifyAI!</strong>
-          <p style="margin-top:6px;">Type any question or concept you need help with, or upload a photo of a homework problem, diagram, or worksheet.</p>
-          <p style="margin-top:4px;font-size:0.85rem;color:var(--text-secondary);">Your explanations are strictly calibrated to your selected <strong>Education Level</strong> and <strong>Subject</strong> — providing step-by-step guidance tailored to your curriculum.</p>
+          <strong>👋 Welcome to MentifyAI!</strong>
+          <p style="margin-top:6px;">Type any question or concept you need help with, or attach a photo of a homework problem or worksheet.</p>
+          <p style="margin-top:4px;font-size:0.84rem;color:var(--text-secondary);">Your explanations are strictly calibrated to your selected <strong>Education Level</strong> and <strong>Subject</strong> — providing step-by-step guidance tailored to your curriculum.</p>
         </div>
       </div>
 
@@ -668,23 +891,7 @@
       <form id="snap-form" class="topic-tutor-composer">
         {% csrf_token %}
         <!-- Upload Preview Chips -->
-        <div id="snap-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;"></div>
-
-        <!-- Quick Guidance Prompts -->
-        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
-          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Walk me through solving this question step by step.">
-            <span>📝 Step-by-step solution</span>
-          </button>
-          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Explain the key concept or formula used to solve this problem simply.">
-            <span>💡 Core formula/concept</span>
-          </button>
-          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Give me a hint on how to start this problem without giving away the full answer.">
-            <span>🔍 Give me a hint</span>
-          </button>
-          <button type="button" class="btn btn-outline btn-sm quick-prompt-btn" style="font-size:0.75rem;padding:3px 9px;border-radius:14px;white-space:nowrap;background:var(--surface);border-color:var(--border);color:var(--text);display:inline-flex;align-items:center;gap:5px;" data-prompt="Generate one similar practice problem for me to try on my own.">
-            <span>🎯 Practice problem</span>
-          </button>
-        </div>
+        <div id="snap-file-list" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px;"></div>
 
         <div class="topic-tutor-composer-bar">
           <!-- Hidden File Inputs -->
@@ -693,25 +900,25 @@
 
           <!-- Camera Button (Direct snap on mobile) -->
           <button type="button" id="snap-camera-btn" class="topic-tutor-icon-button" title="Take photo with camera" aria-label="Take photo with camera">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </button>
 
           <!-- File Upload Button -->
           <button type="button" id="snap-upload-btn" class="topic-tutor-icon-button" title="Upload question image" aria-label="Upload question image">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           </button>
 
           <!-- Textarea -->
-          <textarea id="snap-input" class="topic-tutor-textarea" rows="1" maxlength="2000" placeholder="Ask a question, request a step-by-step explanation, or attach an image…" aria-label="Ask a question or describe your problem"></textarea>
+          <textarea id="snap-input" class="topic-tutor-textarea" rows="1" maxlength="2000" placeholder="Ask a question or attach an image…" aria-label="Ask a question or describe your problem"></textarea>
 
           <!-- Send Button -->
-          <button type="submit" id="snap-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Solve & Explain">
+          <button type="submit" id="snap-send" class="topic-tutor-icon-button topic-tutor-send" aria-label="Send message" title="Send">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
           </button>
         </div>
 
-        <div style="margin: 5px 8px 0; color: var(--text-muted); font-size: .68rem; text-align: center;">
-          Type any question or attach up to 3 images (max 4MB each). Answers are calibrated to your selected grade level.
+        <div style="margin: 4px 6px 0; color: var(--text-muted); font-size: .67rem; text-align: center;">
+          Type any question or attach up to 3 images (max 4MB each). Answers calibrated to grade level.
         </div>
       </form>
     </section>
@@ -730,12 +937,14 @@
   let activeSubject = "{{ default_subject }}";
   let attachedFiles = [];
   let isSending = false;
+  let topicTutorHistoryOpen = false;
+  let topicTutorExpanded = false;
+  let topicTutorSavedScrollY = 0;
 
   // DOM Elements
   const levelSelect = document.getElementById('snap-level-select');
   const subjectSelect = document.getElementById('snap-subject-select');
   const levelBadge = document.getElementById('snap-level-badge');
-  const subjectBadge = document.getElementById('snap-subject-badge');
   const activeTitle = document.getElementById('snap-active-title');
   const historyList = document.getElementById('snap-history-list');
   const messagesContainer = document.getElementById('snap-messages');
@@ -753,7 +962,6 @@
   const newChatTopBtn = document.getElementById('snap-new-chat-top');
   const sidebarNewBtn = document.getElementById('snap-sidebar-new');
   const expandToggle = document.getElementById('snap-expand-toggle');
-  const expandText = document.getElementById('snap-expand-text');
   const tutorShell = document.getElementById('snap-tutor-shell');
   const historyToggle = document.getElementById('snap-history-toggle');
   const historyClose = document.getElementById('snap-history-close');
@@ -780,27 +988,22 @@
       activeLevel = levelSelect.value;
       levelBadge.textContent = levelSelect.options[levelSelect.selectedIndex].text;
     }
-    if (subjectSelect && subjectBadge) {
+    if (subjectSelect) {
       activeSubject = subjectSelect.value;
-      subjectBadge.textContent = subjectSelect.options[subjectSelect.selectedIndex].text;
     }
   }
 
   if (levelSelect) {
     levelSelect.addEventListener('change', function() {
       updateBadges();
-      if (!currentSessionId) {
-        resetChatView();
-      }
+      if (!currentSessionId) resetChatView();
     });
   }
 
   if (subjectSelect) {
     subjectSelect.addEventListener('change', function() {
       updateBadges();
-      if (!currentSessionId) {
-        resetChatView();
-      }
+      if (!currentSessionId) resetChatView();
     });
   }
 
@@ -817,18 +1020,6 @@
       }
     });
   }
-
-  // Quick prompt buttons
-  document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const promptText = this.dataset.prompt;
-      if (promptText && input) {
-        input.value = promptText;
-        input.focus();
-        input.dispatchEvent(new Event('input'));
-      }
-    });
-  });
 
   // Attachments Handling
   if (cameraBtn && cameraInput) {
@@ -868,11 +1059,11 @@
       chip.className = 'topic-tutor-upload-chip';
 
       const icon = document.createElement('span');
-      icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+      icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
 
       const label = document.createElement('span');
       label.textContent = file.name;
-      label.style.maxWidth = '160px';
+      label.style.maxWidth = '150px';
       label.style.overflow = 'hidden';
       label.style.textOverflow = 'ellipsis';
       label.style.whiteSpace = 'nowrap';
@@ -895,7 +1086,7 @@
     });
   }
 
-  // Render a single message
+  // Render a single message (WITHOUT model tag)
   function renderMessage(msg) {
     if (!messagesContainer) return;
     const isAssistant = msg.role === 'assistant';
@@ -924,8 +1115,8 @@
           const img = document.createElement('img');
           img.className = 'message-upload-thumb';
           img.src = up.image_url;
-          img.alt = up.name || 'Uploaded worksheet';
-          img.title = up.name || 'Worksheet';
+          img.alt = up.name || 'Uploaded problem';
+          img.title = up.name || 'Problem';
           img.addEventListener('click', () => window.open(up.image_url, '_blank'));
           thumbs.appendChild(img);
         } else {
@@ -936,14 +1127,6 @@
         }
       });
       bubble.appendChild(thumbs);
-    }
-
-    // Message meta tags
-    if (isAssistant && msg.model_used) {
-      const meta = document.createElement('div');
-      meta.className = 'topic-tutor-message-meta';
-      meta.innerHTML = `<span class="message-badge">⚡ ${msg.model_used}</span>`;
-      bubble.appendChild(meta);
     }
 
     messagesContainer.appendChild(bubble);
@@ -958,7 +1141,7 @@
     hideError();
 
     if (activeTitle) {
-      activeTitle.textContent = 'MenifyAI';
+      activeTitle.textContent = 'MentifyAI';
     }
 
     if (messagesContainer) {
@@ -966,14 +1149,13 @@
       const subjectLabel = subjectSelect ? subjectSelect.options[subjectSelect.selectedIndex].text : 'General';
       messagesContainer.innerHTML = `
         <div class="topic-tutor-message assistant">
-          <strong>👋 Welcome to MenifyAI!</strong>
+          <strong>👋 Welcome to MentifyAI!</strong>
           <p style="margin-top:6px;">Ready to help you with <strong>${subjectLabel}</strong> for <strong>${levelLabel}</strong>.</p>
-          <p style="margin-top:4px;font-size:0.85rem;color:var(--text-secondary);">Ask any question or attach a picture below. Explanations will strictly match your grade curriculum standards.</p>
+          <p style="margin-top:4px;font-size:0.84rem;color:var(--text-secondary);">Ask any question or attach a picture below. Explanations will strictly match your grade curriculum standards.</p>
         </div>
       `;
     }
 
-    // Update active state in sidebar
     document.querySelectorAll('.topic-tutor-history-item').forEach(el => el.classList.remove('active'));
   }
 
@@ -995,7 +1177,6 @@
           activeTitle.textContent = data.session.title || 'Study Session';
         }
 
-        // Synchronize dropdowns with loaded session
         if (levelSelect && data.session.education_level) {
           levelSelect.value = data.session.education_level;
         }
@@ -1004,7 +1185,6 @@
         }
         updateBadges();
 
-        // Render messages
         if (messagesContainer) {
           messagesContainer.innerHTML = '';
           if (Array.isArray(data.messages) && data.messages.length) {
@@ -1014,7 +1194,6 @@
           }
         }
 
-        // Highlight active session item
         document.querySelectorAll('.topic-tutor-history-item').forEach(item => {
           if (item.dataset.sessionId === currentSessionId) {
             item.classList.add('active');
@@ -1023,8 +1202,7 @@
           }
         });
 
-        // Close mobile drawer if open
-        closeMobileDrawer();
+        setTopicTutorHistoryOpen(false);
       })
       .catch(err => {
         console.error(err);
@@ -1141,7 +1319,6 @@
         sendBtn.innerHTML = '<div class="topic-tutor-spinner"></div>';
       }
 
-      // Optimistically append user message bubble
       const localUploadPreviews = attachedFiles.map(file => ({
         name: file.name,
         image_url: URL.createObjectURL(file)
@@ -1149,19 +1326,17 @@
 
       renderMessage({
         role: 'user',
-        content: userText || '[Question Image]',
+        content: userText || '[Problem Image]',
         uploads: localUploadPreviews
       });
 
-      // Show temporary thinking bubble
       const thinkingBubble = document.createElement('div');
       thinkingBubble.className = 'topic-tutor-message assistant';
       thinkingBubble.id = 'snap-thinking-bubble';
-      thinkingBubble.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--text-muted);"><div class="topic-tutor-spinner" style="border-color:var(--green);border-top-color:transparent;"></div><span>Reasoning through your problem…</span></div>';
+      thinkingBubble.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--text-muted);"><div class="topic-tutor-spinner" style="border-color:var(--green);border-top-color:transparent;"></div><span>Reasoning through your question…</span></div>';
       messagesContainer.appendChild(thinkingBubble);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-      // Build FormData payload
       const formData = new FormData();
       formData.append('message', userText);
       formData.append('education_level', levelSelect ? levelSelect.value : activeLevel);
@@ -1174,7 +1349,6 @@
         formData.append('files', file);
       });
 
-      // Clear input fields immediately
       if (input) {
         input.value = '';
         input.style.height = 'auto';
@@ -1191,7 +1365,6 @@
       })
         .then(res => res.json())
         .then(data => {
-          // Remove thinking bubble
           const tb = document.getElementById('snap-thinking-bubble');
           if (tb) tb.remove();
 
@@ -1205,14 +1378,11 @@
             activeTitle.textContent = data.session_title;
           }
 
-          // Render assistant solution
           renderMessage({
             role: 'assistant',
             content: data.answer,
-            model_used: data.model_used,
           });
 
-          // Refresh history sidebar list
           loadHistory();
         })
         .catch(err => {
@@ -1231,33 +1401,79 @@
     });
   }
 
-  // Fullscreen Expand Toggle
-  if (expandToggle && tutorShell) {
+  // Exact Topic Tutor History Drawer & Expand Functions
+  function setTopicTutorHistoryOpen(open) {
+    const shell = document.getElementById('snap-tutor-shell');
+    const toggle = document.getElementById('snap-history-toggle');
+    const history = document.querySelector('.topic-tutor-history');
+    if (!shell || !toggle || !history || topicTutorHistoryOpen === open) return;
+
+    topicTutorHistoryOpen = open;
+    shell.classList.toggle('topic-tutor-history-open', open);
+    document.body.classList.toggle('topic-tutor-history-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    history.setAttribute('aria-hidden', String(!open));
+    if (open) {
+      document.getElementById('snap-history-close')?.focus({ preventScroll: true });
+    } else {
+      toggle.focus({ preventScroll: true });
+    }
+  }
+
+  function setTopicTutorExpanded(expanded) {
+    const shell = document.getElementById('snap-tutor-shell');
+    const button = document.getElementById('snap-expand-toggle');
+    if (!shell || !button || topicTutorExpanded === expanded) return;
+
+    topicTutorExpanded = expanded;
+    shell.classList.toggle('topic-tutor-expanded', expanded);
+    document.body.classList.toggle('topic-tutor-expanded', expanded);
+    button.setAttribute('aria-pressed', String(expanded));
+    button.setAttribute(
+      'aria-label',
+      expanded ? 'Exit full-screen tutor' : 'Expand tutor to full screen'
+    );
+    button.title = expanded ? 'Exit full-screen tutor' : 'Expand tutor';
+    button.innerHTML = expanded
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m13-5v3a2 2 0 0 0 2 2h3M3 16h3a2 2 0 0 1 2 2v3m13-5h-3a2 2 0 0 0-2 2v3"/></svg><span>Collapse</span>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg><span>Expand</span>';
+
+    if (expanded) {
+      topicTutorSavedScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+      document.getElementById('snap-input')?.focus({ preventScroll: true });
+    } else {
+      window.scrollTo(0, topicTutorSavedScrollY);
+      button.focus({ preventScroll: true });
+    }
+  }
+
+  if (expandToggle) {
     expandToggle.addEventListener('click', function() {
-      tutorShell.classList.toggle('expanded');
-      const isExpanded = tutorShell.classList.contains('expanded');
-      if (expandText) {
-        expandText.textContent = isExpanded ? 'Collapse' : 'Expand';
-      }
+      setTopicTutorExpanded(!topicTutorExpanded);
     });
   }
 
-  // Mobile drawer handlers
-  function openMobileDrawer() {
-    if (tutorShell) tutorShell.classList.add('drawer-open');
+  if (historyToggle) {
+    historyToggle.addEventListener('click', () => setTopicTutorHistoryOpen(true));
   }
 
-  function closeMobileDrawer() {
-    if (tutorShell) tutorShell.classList.remove('drawer-open');
+  if (historyClose) {
+    historyClose.addEventListener('click', () => setTopicTutorHistoryOpen(false));
   }
 
-  if (historyToggle) historyToggle.addEventListener('click', openMobileDrawer);
-  if (historyClose) historyClose.addEventListener('click', closeMobileDrawer);
-  if (historyBackdrop) historyBackdrop.addEventListener('click', closeMobileDrawer);
+  if (historyBackdrop) {
+    historyBackdrop.addEventListener('click', () => setTopicTutorHistoryOpen(false));
+  }
 
   // New Chat Buttons
   if (newChatTopBtn) newChatTopBtn.addEventListener('click', resetChatView);
-  if (sidebarNewBtn) sidebarNewBtn.addEventListener('click', resetChatView);
+  if (sidebarNewBtn) {
+    sidebarNewBtn.addEventListener('click', () => {
+      resetChatView();
+      setTopicTutorHistoryOpen(false);
+    });
+  }
 
   // Initial load
   updateBadges();

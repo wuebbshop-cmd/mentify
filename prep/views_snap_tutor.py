@@ -33,7 +33,7 @@ def prep_snap_tutor(request: HttpRequest) -> HttpResponse:
     recent_sessions = list_snap_sessions(user) if user.is_authenticated else []
 
     context = {
-        "active_tab": "menify_ai",
+        "active_tab": "mentify_ai",
         "user_credits": user_credits,
         "recent_sessions": recent_sessions,
         "education_levels": PrepSnapSession.EDUCATION_LEVEL_CHOICES,
