@@ -305,7 +305,16 @@ def process_uploaded_images(uploaded_files: list[Any]) -> tuple[list[dict[str, A
     # Call Together / DeepSeek multimodal OCR
     try:
         ocr_payload = _ocr_images(
-            [{"name": item["name"], "label": item["name"], "mime_type": item["mime_type"], "base64": item["base64"]} for item in images_to_ocr],
+            [
+                {
+                    "name": item["name"],
+                    "label": item["name"],
+                    "mime_type": item["mime_type"],
+                    "bytes": item["content"],
+                    "base64": item["base64"],
+                }
+                for item in images_to_ocr
+            ],
             figure_hint="For homework and exam questions, transcribe all problem numbers, formulas, and labels exactly.",
         )
         ocr_usage = ocr_payload.get("usage") or {}

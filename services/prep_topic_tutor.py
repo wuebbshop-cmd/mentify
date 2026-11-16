@@ -262,7 +262,13 @@ def _ocr_images(images: list[dict], *, figure_hint: str = "") -> dict:
         ),
     }]
     for image in images:
-        encoded = base64.b64encode(image["bytes"]).decode("ascii")
+        encoded = image.get("base64")
+        if not encoded:
+            raw_bytes = image.get("bytes") or image.get("content") or b""
+            if isinstance(raw_bytes, str):
+                encoded = raw_bytes
+            else:
+                encoded = base64.b64encode(raw_bytes).decode("ascii") if raw_bytes else ""
         content.append({"type": "text", "text": f"Image label: {image['label']}"})
         content.append({
             "type": "image_url",
