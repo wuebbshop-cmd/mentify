@@ -51,6 +51,15 @@ class TutorPricingTests(SimpleTestCase):
         with self.assertRaises(TutorPricingError):
             calculate_provider_cost("together", "unpriced-model", {"total_tokens": 100})
 
+    def test_together_vision_model_version_tags_are_resolved(self):
+        cost = calculate_provider_cost(
+            "together",
+            "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+            {"prompt_tokens": 1000, "completion_tokens": 500},
+        )
+        self.assertEqual(cost["pricing_model"], "deepseek-ai/deepseek-v4.1-flash-1017")
+        self.assertEqual(cost["estimated_cost_usd"], "0.00090000")
+
     @override_settings(
         PREP_USD_TO_KES_RATE="130",
         PREP_NET_KES_PER_CREDIT="0.75",

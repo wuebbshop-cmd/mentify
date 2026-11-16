@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import math
+import re
 from datetime import datetime, timezone as datetime_timezone
 from decimal import Decimal, InvalidOperation, ROUND_CEILING
 
@@ -36,6 +37,11 @@ _TOGETHER_RATES_USD_PER_MILLION = {
         "output": "1.20",
     },
     "deepseek-ai/deepseek-v4.1-flash": {
+        "input": "0.30",
+        "cached_input": "0.006",
+        "output": "1.20",
+    },
+    "deepseek-ai/deepseek-v4.1-flash-1017": {
         "input": "0.30",
         "cached_input": "0.006",
         "output": "1.20",
@@ -121,6 +127,20 @@ def _usage_token_counts(usage: dict | None) -> dict:
     }
 
 
+def _together_rate_key(model_name: str) -> str | None:
+    model = str(model_name or "").strip().casefold()
+    if model in _TOGETHER_RATES_USD_PER_MILLION:
+        return model
+    cleaned = re.sub(r"-\d{4,}$", "", model)
+    if cleaned in _TOGETHER_RATES_USD_PER_MILLION:
+        return cleaned
+    if "deepseek-v4.1-flash" in model or "flash" in model:
+        return "deepseek-ai/deepseek-v4.1-flash"
+    if "deepseek-v3" in model:
+        return "deepseek-ai/deepseek-v3"
+    return None
+
+
 def calculate_provider_cost(
     provider: str,
     model_name: str,
@@ -139,14 +159,7 @@ def calculate_provider_cost(
         rate_period = "peak" if peak else "off_peak"
         rates = _DEEPSEEK_RATES_USD_PER_MILLION[rate_key][rate_period]
     elif provider_key == "together":
-        rate_key = next(
-            (
-                known
-                for known in _TOGETHER_RATES_USD_PER_MILLION
-                if known == model_key
-            ),
-            None,
-        )
+        rate_key = _together_rate_key(model_key)
         if rate_key is None:
             raise TutorPricingError(
                 f"No configured Together pricing for tutor model {model_name!r}."

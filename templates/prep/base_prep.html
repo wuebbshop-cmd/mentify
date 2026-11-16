@@ -66,7 +66,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 
   <!-- Unified Prep Markdown & KaTeX Engine -->
-  <script src="{% static 'js/prep-renderer.js' %}?v=20261116_v10_academic_visuals"></script>
+  <script src="{% static 'js/prep-renderer.js' %}?v=20261116_v12_mobile_visual_perfection"></script>
 
   <!-- Prism.js for R Code Syntax Highlighting -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
@@ -134,26 +134,60 @@
       gap: 6px;
     }
 
-    /* 1. Mermaid (Mindmaps, Flowcharts, Hierarchies) */
+    /* 1. Mermaid (Mindmaps, Flowcharts, Decision Trees, Hierarchies) */
     .prep-mermaid-wrap {
+      position: relative;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       text-align: center;
-      padding: 16px 10px;
+      padding: 20px 14px;
+      margin: 16px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .prep-mermaid-wrap::-webkit-scrollbar {
+      height: 6px;
+    }
+    .prep-mermaid-wrap::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .prep-mermaid-wrap::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
     }
 
     .prep-mermaid-wrap .mermaid {
       display: inline-block;
-      min-width: 200px;
-      max-width: 100%;
       margin: 0 auto;
+      min-width: 100%;
+      text-align: center;
     }
 
     .prep-mermaid-wrap svg {
-      max-width: 100%;
-      height: auto;
       display: block;
       margin: 0 auto;
+      height: auto;
+      font-size: 15px !important;
+    }
+
+    .prep-mermaid-wrap svg .node text,
+    .prep-mermaid-wrap svg .mindmap-node text,
+    .prep-mermaid-wrap svg .label text,
+    .prep-mermaid-wrap svg text {
+      font-family: inherit !important;
+      font-weight: 500 !important;
+    }
+
+    .prep-mermaid-scroll-hint {
+      display: none;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      opacity: 0.85;
     }
 
     /* 2. Chart.js (Data Graphs, Scientific Curves) */
@@ -164,8 +198,8 @@
     .prep-chart-canvas-box {
       position: relative;
       width: 100%;
-      height: 280px;
-      max-height: 380px;
+      height: 330px;
+      max-height: 440px;
     }
 
     /* 3. Chemical Molecules (SmilesDrawer) */
@@ -193,6 +227,74 @@
       padding: 2px 6px;
       border-radius: 6px;
       color: var(--text);
+    }
+
+    /* 4. Direct SVG Geometry / Loci Diagrams */
+    .prep-svg-wrap {
+      text-align: center;
+      padding: 16px 14px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .prep-svg-wrap svg {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Fallback Diagram Styling (Graceful fallback if diagram syntax fails) */
+    .prep-visual-fallback-box {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: left;
+    }
+    .prep-visual-fallback-header {
+      margin-bottom: 10px;
+    }
+    .prep-visual-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 6px;
+      padding: 2px 8px;
+    }
+    .prep-fallback-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      flex-wrap: wrap;
+    }
+    .prep-fallback-node {
+      background: var(--hover);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.86rem;
+      color: var(--text);
+    }
+    .prep-fallback-arrow {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .prep-fallback-item {
+      margin: 6px 0;
+      font-size: 0.86rem;
+      color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .prep-fallback-bullet {
+      color: var(--primary);
+      font-weight: bold;
     }
 
     /* Mobile Optimizations */

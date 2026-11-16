@@ -1187,18 +1187,73 @@
     }
   });
 
-  function handleFiles(files) {
+  // Fast, lossless client-side image compression for mobile camera shots
+  function compressImageIfNeeded(file) {
+    return new Promise(function(resolve) {
+      if (!file || !file.type || !file.type.startsWith('image/') || file.size < 1.5 * 1024 * 1024) {
+        resolve(file);
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var maxDim = 2048;
+          var w = img.width;
+          var h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          canvas.toBlob(function(blob) {
+            if (blob && blob.size < file.size) {
+              var optimized = new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              resolve(optimized);
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', 0.88);
+        };
+        img.onerror = function() { resolve(file); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function() { resolve(file); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleFiles(files) {
     if (!files || !files.length) return;
     hideError();
 
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+      let file = files[i];
       if (attachedFiles.length >= 3) {
         showError('You can attach a maximum of 3 images per question.');
         break;
       }
+      if (file.size > 1.5 * 1024 * 1024) {
+        try {
+          file = await compressImageIfNeeded(file);
+        } catch (compErr) {
+          console.warn('Image auto-compression notice:', compErr);
+        }
+      }
       if (file.size > 4 * 1024 * 1024) {
-        showError(`Image "${file.name}" exceeds the 4MB limit.`);
+        showError(`Image "${file.name}" is larger than 4MB. Please choose a slightly smaller picture.`);
         continue;
       }
       attachedFiles.push(file);
@@ -1576,7 +1631,12 @@
           console.error(err);
           const tb = document.getElementById('snap-thinking-bubble');
           if (tb) tb.remove();
-          showError(err.message || 'Network error while communicating with the AI tutor.');
+          const msg = (err && err.message) ? String(err.message) : '';
+          if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network error')) {
+            showError('Connection was briefly interrupted. Please check your signal and tap Send to try again.');
+          } else {
+            showError(msg || 'Unable to connect to MentifyAI tutor. Please retry.');
+          }
         })
         .finally(() => {
           isSending = false;
