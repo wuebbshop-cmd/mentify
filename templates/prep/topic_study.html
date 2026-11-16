@@ -4435,8 +4435,81 @@
           tutorForm.requestSubmit();
         }
       });
+      // Fast, lossless client-side image compression for mobile camera shots and paste
+      function compressTopicTutorImageIfNeeded(file) {
+        return new Promise(function(resolve) {
+          if (!file || !file.type || !file.type.startsWith('image/') || file.size < 1.5 * 1024 * 1024) {
+            resolve(file);
+            return;
+          }
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+              var maxDim = 2048;
+              var w = img.width;
+              var h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                  h = Math.round((h * maxDim) / w);
+                  w = maxDim;
+                } else {
+                  w = Math.round((w * maxDim) / h);
+                  h = maxDim;
+                }
+              }
+              var canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              canvas.toBlob(function(blob) {
+                if (blob && blob.size < file.size) {
+                  var optimized = new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolve(optimized);
+                } else {
+                  resolve(file);
+                }
+              }, 'image/jpeg', 0.88);
+            };
+            img.onerror = function() { resolve(file); };
+            img.src = e.target.result;
+          };
+          reader.onerror = function() { resolve(file); };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function addTopicTutorFiles(files) {
+        if (!files || !files.length) return;
+        clearTopicTutorError();
+        for (let i = 0; i < files.length; i++) {
+          let file = files[i];
+          if (topicTutorSelectedFiles.length >= 3) {
+            showTopicTutorError('You can attach a maximum of 3 files per question.');
+            break;
+          }
+          if (file.type && file.type.startsWith('image/') && file.size > 1.5 * 1024 * 1024) {
+            try {
+              file = await compressTopicTutorImageIfNeeded(file);
+            } catch (compErr) {
+              console.warn('Topic tutor image auto-compression notice:', compErr);
+            }
+          }
+          if (file.size > 4 * 1024 * 1024) {
+            showTopicTutorError(`"${file.name}" exceeds the 4MB limit.`);
+            continue;
+          }
+          topicTutorSelectedFiles.push(file);
+        }
+        renderTopicTutorSelectedFiles();
+      }
+
       // Direct clipboard image paste into chat (ChatGPT style)
-      tutorInput.addEventListener('paste', event => {
+      tutorInput.addEventListener('paste', async event => {
         const clipboardData = event.clipboardData || window.clipboardData;
         if (!clipboardData || !clipboardData.items) return;
         const items = clipboardData.items;
@@ -4454,8 +4527,7 @@
         }
         if (pastedImages.length > 0) {
           event.preventDefault();
-          topicTutorSelectedFiles.push(...pastedImages);
-          renderTopicTutorSelectedFiles();
+          await addTopicTutorFiles(pastedImages);
         }
       });
     }
@@ -4489,10 +4561,9 @@
         setUploadMenuOpen(false);
         pdfFiles.click();
       });
-      pdfFiles.addEventListener('change', () => {
-        topicTutorSelectedFiles.push(...Array.from(pdfFiles.files || []));
+      pdfFiles.addEventListener('change', async () => {
+        await addTopicTutorFiles(Array.from(pdfFiles.files || []));
         pdfFiles.value = '';
-        renderTopicTutorSelectedFiles();
       });
     }
     if (chooseImage && imageFiles) {
@@ -4500,10 +4571,9 @@
         setUploadMenuOpen(false);
         imageFiles.click();
       });
-      imageFiles.addEventListener('change', () => {
-        topicTutorSelectedFiles.push(...Array.from(imageFiles.files || []));
+      imageFiles.addEventListener('change', async () => {
+        await addTopicTutorFiles(Array.from(imageFiles.files || []));
         imageFiles.value = '';
-        renderTopicTutorSelectedFiles();
       });
     }
     const chooseCamera = document.getElementById('topic-tutor-choose-camera');
@@ -4522,10 +4592,9 @@
           cameraFiles.click();
         });
       }
-      cameraFiles.addEventListener('change', () => {
-        topicTutorSelectedFiles.push(...Array.from(cameraFiles.files || []));
+      cameraFiles.addEventListener('change', async () => {
+        await addTopicTutorFiles(Array.from(cameraFiles.files || []));
         cameraFiles.value = '';
-        renderTopicTutorSelectedFiles();
       });
     }
     const tutorNewChat = document.getElementById('topic-tutor-new-chat');

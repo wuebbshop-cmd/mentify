@@ -1405,7 +1405,7 @@
   <div id="toolbar-tutor-divider" style="display:none;width:1px;height:14px;background:var(--border);"></div>
   <button type="button" id="btn-sel-ask-tutor" onclick="handleToolbarTutorClick(event)" onmousedown="event.preventDefault()" style="display:none;align-items:center;gap:5px;border:0;background:transparent;color:var(--green);font-size:0.78rem;font-weight:600;padding:5px 9px;border-radius:16px;cursor:pointer;transition:background 0.15s ease;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">
     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m-8 6 2.2-2.2A8 8 0 1 1 20 15"/></svg>
-    <span id="btn-sel-ask-tutor-text">Ask Tutor</span>
+    <span id="btn-sel-ask-tutor-text">AI Tutor</span>
   </button>
 </div>
 
@@ -1478,7 +1478,7 @@
 
       if ((isTopicStudyPage || isMentifyAIPage) && tutorBtn && tutorDivider) {
         if (tutorBtnText) {
-          tutorBtnText.textContent = isMentifyAIPage ? 'MentifyAI' : 'Ask Tutor';
+          tutorBtnText.textContent = isMentifyAIPage ? 'MentifyAI' : 'AI Tutor';
         }
         tutorBtn.style.display = 'inline-flex';
         tutorDivider.style.display = 'block';
