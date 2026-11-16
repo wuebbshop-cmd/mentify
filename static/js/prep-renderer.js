@@ -28,6 +28,28 @@
       .replace(/'/g, '&#39;');
   }
 
+  var KATEX_COMMON_MACROS = {
+    "\\cdotp": "\\cdot",
+    "\\cdotv": "\\cdot",
+    "\\muT": "\\mu\\text{T}",
+    "\\muA": "\\mu\\text{A}",
+    "\\muV": "\\mu\\text{V}",
+    "\\muF": "\\mu\\text{F}",
+    "\\mum": "\\mu\\text{m}",
+    "\\mus": "\\mu\\text{s}",
+    "\\mug": "\\mu\\text{g}",
+    "\\muC": "\\mu\\text{C}",
+    "\\muW": "\\mu\\text{W}",
+    "\\muH": "\\mu\\text{H}",
+    "\\muJ": "\\mu\\text{J}",
+    "\\muN": "\\mu\\text{N}",
+    "\\muL": "\\mu\\text{L}",
+    "\\muK": "\\mu\\text{K}",
+    "\\muPa": "\\mu\\text{Pa}",
+    "\\muHz": "\\mu\\text{Hz}",
+    "\\muWb": "\\mu\\text{Wb}"
+  };
+
   /**
    * Robust KaTeX rendering with delimiter stripping and command normalization.
    */
@@ -38,6 +60,13 @@
     cleanLatex = cleanLatex.replace(/^(\$\$|\\\[|\$|\\\()/, '').replace(/(\$\$|\\\]|\$|\\\))$/, '').trim();
     // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     cleanLatex = cleanLatex.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+    // Normalize \cdotp and \cdotv (punctuation dots) to standard \cdot
+    cleanLatex = cleanLatex.replace(/\\cdot[pv]\b/g, '\\cdot');
+    // Normalize concatenated Greek prefixes with units (e.g. \muT -> \mu\text{T}, \muA -> \mu\text{A})
+    cleanLatex = cleanLatex.replace(/\\mu([A-Z][a-zA-Z]*|m|s|g|l|mol)\b/g, '\\mu\\text{$1}');
+    // Normalize unescaped percent signs inside math so KaTeX does not treat them as TeX comments
+    cleanLatex = cleanLatex.replace(/(?<!\\)%/g, '\\%');
+
     if (window.katex && typeof window.katex.renderToString === 'function') {
       try {
         return window.katex.renderToString(cleanLatex, {
@@ -45,7 +74,8 @@
           output: 'html',
           throwOnError: false,
           strict: false,
-          trust: true
+          trust: true,
+          macros: KATEX_COMMON_MACROS
         });
       } catch (e) {
         return '<span class="katex-fallback">' + escapeHtml(cleanLatex) + '</span>';
@@ -1278,13 +1308,6 @@
     // Normalize align/align* to aligned so KaTeX renders natively inside ...
     cleanText = cleanText.replace(/\\begin\{align\*?\}/g, '\\begin{aligned}');
     cleanText = cleanText.replace(/\\end\{align\*?\}/g, '\\end{aligned}');
-
-    // In math blocks, replace literal '*' with '\\ast' so Markdown's bold/italic parser
-    // never confuses math superscripts (e.g. p^* or Q_1^*) with Markdown asterisks.
-    // Guard against replacing '*' in environment names (e.g. \\begin{...*}).
-    cleanText = cleanText.replace(/(\$\$[\s\S]*?\$\$|\$[^\$\n]+?\$)/g, function(m) {
-      return m.replace(/(?<!\\begin\{[a-zA-Z]+|\\end\{[a-zA-Z]+)\*/g, '\\ast');
-    });
 
     // Merge detached \[ lhs = \n\n$$\n\begin{cases}...\end{cases}\n$$
     cleanText = cleanText.replace(
