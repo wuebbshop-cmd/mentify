@@ -260,26 +260,77 @@
     if (!rawText) return '';
     var text = rawText.trim();
 
-    // Remove <br/> inside ((...)) which breaks Mermaid mindmap lexer
-    text = text.replace(/\(\((.*?)(?:<br\s*\/?>)+(.*?)\)\)/gi, '(($1 $2))');
+    // Strip HTML <br> tags (breaks Mermaid mindmaps and node lexers)
+    text = text.replace(/<br\s*\/?>/gi, ' ');
 
-    // Auto-quote rectangle node labels containing math chars: A[(x-h)^2] -> A["(x-h)^2"]
-    text = text.replace(/(\b[a-zA-Z0-9_]+)\[(?!")(([^\]"]*?[+\-*\/^=<>(){}])+[^\]"]*?)\]/g,
-      function(m, id, label) { return id + '["' + label.replace(/"/g, "'") + '"]'; });
+    // Normalize mindmap root syntax: root((Label))
+    text = text.replace(/root\(\((.*?)\)\)/gi, function(m, p1) {
+      return 'root((' + p1.replace(/[()]/g, '').trim() + '))';
+    });
+
+    // Auto-quote rectangle node labels containing math chars, punctuation, or parens
+    text = text.replace(/(\b[a-zA-Z0-9_]+)\[(?!")([^\]\n]+?)\]/g, function(m, id, label) {
+      if (/[+\-*\/^=<>(){},:;?]/.test(label)) {
+        return id + '["' + label.replace(/"/g, "'").trim() + '"]';
+      }
+      return m;
+    });
 
     // Auto-quote diamond labels: A{Is x > 0?} -> A{"Is x > 0?"}
-    text = text.replace(/(\b[a-zA-Z0-9_]+)\{(?!")(([^}"]*?[+\-*\/^=<>()[\]])+[^}"]*?)\}/g,
-      function(m, id, label) { return id + '{"' + label.replace(/"/g, "'") + '"}'; });
+    text = text.replace(/(\b[a-zA-Z0-9_]+)\{(?!")([^}\n]+?)\}/g, function(m, id, label) {
+      if (/[+\-*\/^=<>()[\]:;?]/.test(label)) {
+        return id + '{"' + label.replace(/"/g, "'").trim() + '"}';
+      }
+      return m;
+    });
 
-    // Strip any remaining <br> tags (they break mermaid in all node types)
-    text = text.replace(/<br\s*\/?>/gi, ' ');
+    // Auto-quote rounded nodes: A(x^2 + y^2 = r^2) -> A("x^2 + y^2 = r^2")
+    // Skip if it is double parens ((...)) e.g. circle/mindmap node
+    text = text.replace(/(\b[a-zA-Z0-9_]+)\((?!\()((?!\")[^)\n]+?)\)/g, function(m, id, label) {
+      if (/[+\-*\/^=<>\[\]{}:;?]/.test(label)) {
+        return id + '("' + label.replace(/"/g, "'").trim() + '")';
+      }
+      return m;
+    });
 
     return text;
   }
 
   function renderFallbackFlowDiagram(targetDiv, rawCode) {
-    // Parse mermaid text into a readable step-by-step flow card
-    var lines = (rawCode || '').split('\n');
+    var raw = (rawCode || '').trim();
+    if (!raw) return;
+
+    // Handle mind maps fallback: render structured hierarchical outline tree
+    if (/^mindmap\b/i.test(raw)) {
+      var mlines = raw.split('\n');
+      var mHtml = '<div style="padding:14px 12px;text-align:left;background:var(--hover);border:1px solid var(--border);border-radius:10px;">';
+      mHtml += '<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3v6m0 6v6M3 12h6m6 0h6"/></svg> Mind Map Summary</div>';
+      mHtml += '<div style="display:flex;flex-direction:column;gap:6px;">';
+      for (var mi = 0; mi < mlines.length; mi++) {
+        var mline = mlines[mi];
+        if (!mline.trim() || /^mindmap\b/i.test(mline.trim())) continue;
+        var indentMatch = mline.match(/^(\s*)/);
+        var indent = indentMatch ? indentMatch[1].length : 0;
+        var cleanLabel = mline.trim().replace(/^root\(\((.*?)\)\)/i, '$1').replace(/^\(\((.*?)\)\)/, '$1').replace(/^["'\[\(\{]+|["'\]\)\}]+$/g, '').trim();
+        if (!cleanLabel) continue;
+        var isRoot = mi === 1 || /root\(/i.test(mline) || indent === 0;
+        var marginL = Math.max(0, (indent - 2) * 12);
+        if (isRoot) {
+          mHtml += '<div style="font-weight:700;font-size:0.95rem;color:var(--primary);padding:6px 12px;background:var(--surface);border:1px solid var(--primary);border-radius:8px;display:inline-block;margin-bottom:4px;">' + escapeHtml(cleanLabel) + '</div>';
+        } else {
+          mHtml += '<div style="margin-left:' + marginL + 'px;display:flex;align-items:center;gap:6px;font-size:0.86rem;color:var(--text);">';
+          mHtml += '<span style="color:var(--primary);font-size:0.65rem;">&#9679;</span>';
+          mHtml += '<span style="background:var(--surface);padding:3px 9px;border-radius:6px;border:1px solid var(--border);">' + escapeHtml(cleanLabel) + '</span>';
+          mHtml += '</div>';
+        }
+      }
+      mHtml += '</div></div>';
+      targetDiv.innerHTML = mHtml;
+      return;
+    }
+
+    // Parse mermaid flowchart text into a readable step-by-step flow card
+    var lines = raw.split('\n');
     var html = '<div style="padding:12px 4px;text-align:left;">';
     html += '<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:12px;">&#9654; Diagram</div>';
     var nodeMap = {};
@@ -341,16 +392,27 @@
       return;
     }
 
-    // Retry if CDN libraries not yet loaded (mobile/slow connections)
-    var missingLibs = !window.mermaid || !window.Chart || !window.SmilesDrawer;
+    // Check which libraries are actually needed by blocks in this container
+    var containerText = containerElement.textContent || '';
+    var needsMermaid = !!containerElement.querySelector('pre code.language-mermaid, pre code.mermaid, pre code.language-graph, pre code.language-flowchart') ||
+                       /^\s*(mindmap|graph\s+(TD|TB|BT|RL|LR)|flowchart\s+(TD|TB|BT|RL|LR)|sequenceDiagram|stateDiagram)\b/im.test(containerText);
+    var needsChart = !!containerElement.querySelector('pre code.language-chart') ||
+                     (containerText.includes('"datasets"') && (containerText.includes('"line"') || containerText.includes('"scatter"')));
+    var needsSmiles = !!containerElement.querySelector('pre code.language-chemical, pre code.language-smiles, pre code.language-molecule') ||
+                      (containerText.includes('"smiles"') && containerText.includes('{'));
+
+    var missingLibs = (needsMermaid && !window.mermaid) ||
+                      (needsChart && !window.Chart) ||
+                      (needsSmiles && !(window.SmilesDrawer || window.smilesDrawer));
+
     if (missingLibs) {
       var retryCount = (containerElement.__visualRetry | 0) + 1;
       containerElement.__visualRetry = retryCount;
-      if (retryCount <= 15) {
-        setTimeout(function() { renderAcademicVisuals(containerElement); }, 200 * Math.min(retryCount, 5));
+      if (retryCount <= 12) {
+        setTimeout(function() { renderAcademicVisuals(containerElement); }, 150 * Math.min(retryCount, 4));
         return;
       }
-      // After 3 seconds, proceed with whatever is available
+      // After retry limit, proceed with whatever is available
     }
     containerElement.__visualRetry = 0;
 
@@ -418,7 +480,7 @@
         }
 
         var mermaidBlocks = containerElement.querySelectorAll(
-          'pre code.language-mermaid, pre code.mermaid'
+          'pre code.language-mermaid, pre code.mermaid, pre code.language-graph, pre code.language-flowchart'
         );
         for (var mi = 0; mi < mermaidBlocks.length; mi++) {
           var codeEl = mermaidBlocks[mi];
@@ -445,6 +507,13 @@
           (function(uid, text, container, raw) {
             try {
               window.mermaid.render(uid, text).then(function(result) {
+                // If Mermaid returned an error SVG (e.g. bomb icon on syntax error), catch and fallback
+                if (result && result.svg && (result.svg.indexOf('error-icon') !== -1 || result.svg.indexOf('Syntax error') !== -1)) {
+                  var errEl = document.getElementById('d' + uid);
+                  if (errEl && errEl.parentNode) errEl.parentNode.removeChild(errEl);
+                  renderFallbackFlowDiagram(container, raw);
+                  return;
+                }
                 container.innerHTML = result.svg;
                 var svg = container.querySelector('svg');
                 if (svg) {
@@ -510,7 +579,7 @@
     if (window.Chart) {
       try {
         var chartBlocks = containerElement.querySelectorAll(
-          'pre code.language-chart, pre code.language-graph'
+          'pre code.language-chart'
         );
         for (var ci = 0; ci < chartBlocks.length; ci++) {
           var cCodeEl = chartBlocks[ci];
@@ -651,72 +720,65 @@
       window.console && console.warn('[Prep Renderer] SVG error:', svgE);
     }
 
-    // ─── 4. SmilesDrawer (Chemical Molecular Structures) ──────────────────────
-    var SD = window.SmilesDrawer || window.smilesDrawer;
-    if (SD) {
-      try {
-        var chemSelectors = [
-          'pre code.language-chemical',
-          'pre code.language-molecule',
-          'pre code.language-smiles',
-          'pre code.language-json'
-        ].join(', ');
-        var chemBlocks = containerElement.querySelectorAll(chemSelectors);
-        for (var chi = 0; chi < chemBlocks.length; chi++) {
-          var chEl = chemBlocks[chi];
-          var chPre = chEl.closest('pre');
-          if (!chPre || chPre.dataset.renderedVisual) continue;
+    // ─── 4. Chemical Molecular Structures (SmilesDrawer or Structured Card) ───
+    try {
+      var chemSelectors = [
+        'pre code.language-chemical',
+        'pre code.language-molecule',
+        'pre code.language-smiles',
+        'pre code.language-json'
+      ].join(', ');
+      var chemBlocks = containerElement.querySelectorAll(chemSelectors);
+      for (var chi = 0; chi < chemBlocks.length; chi++) {
+        var chEl = chemBlocks[chi];
+        var chPre = chEl.closest('pre');
+        if (!chPre || chPre.dataset.renderedVisual) continue;
 
-          var rawChem = chEl.textContent.trim();
-          if (!rawChem.includes('"smiles"') && !rawChem.includes('"structure"') &&
-              !chEl.classList.contains('language-chemical') && !chEl.classList.contains('language-molecule') &&
-              !chEl.classList.contains('language-smiles')) {
-            continue; // Skip JSON blocks without SMILES
+        var rawChem = chEl.textContent.trim();
+        if (!rawChem.includes('"smiles"') && !rawChem.includes('"structure"') &&
+            !chEl.classList.contains('language-chemical') && !chEl.classList.contains('language-molecule') &&
+            !chEl.classList.contains('language-smiles')) {
+          continue; // Skip JSON blocks without SMILES
+        }
+
+        var chemName = '';
+        var smilesStr = '';
+        if (rawChem.startsWith('{')) {
+          try {
+            var chemObj = JSON.parse(rawChem);
+            chemName = chemObj.name || chemObj.title || '';
+            smilesStr = chemObj.smiles || chemObj.structure || '';
+          } catch(e) {
+            var sm = rawChem.match(/"smiles"\s*:\s*"([^"]+)"/i);
+            if (sm) smilesStr = sm[1];
+            var nm2 = rawChem.match(/"name"\s*:\s*"([^"]+)"/i);
+            if (nm2) chemName = nm2[1];
           }
+        } else if (/^smiles:\s*/i.test(rawChem)) {
+          smilesStr = rawChem.replace(/^smiles:\s*/i, '').trim();
+        } else {
+          smilesStr = rawChem;
+        }
+        if (!smilesStr) continue;
 
-          var chemName = '';
-          var smilesStr = '';
-          if (rawChem.startsWith('{')) {
-            try {
-              var chemObj = JSON.parse(rawChem);
-              chemName = chemObj.name || chemObj.title || '';
-              smilesStr = chemObj.smiles || chemObj.structure || '';
-            } catch(e) {
-              var sm = rawChem.match(/"smiles"\s*:\s*"([^"]+)"/i);
-              if (sm) smilesStr = sm[1];
-              var nm2 = rawChem.match(/"name"\s*:\s*"([^"]+)"/i);
-              if (nm2) chemName = nm2[1];
-            }
-          } else if (/^smiles:\s*/i.test(rawChem)) {
-            smilesStr = rawChem.replace(/^smiles:\s*/i, '').trim();
-          } else {
-            smilesStr = rawChem;
-          }
-          if (!smilesStr) continue;
+        chPre.dataset.renderedVisual = 'true';
+        var chWrap = document.createElement('div');
+        chWrap.className = 'prep-visual-wrap prep-chem-wrap';
 
-          chPre.dataset.renderedVisual = 'true';
-          var chWrap = document.createElement('div');
-          chWrap.className = 'prep-visual-wrap prep-chem-wrap';
+        if (chemName) {
+          var chTitle = document.createElement('div');
+          chTitle.className = 'prep-visual-title';
+          chTitle.textContent = chemName;
+          chWrap.appendChild(chTitle);
+        }
 
-          if (chemName) {
-            var chTitle = document.createElement('div');
-            chTitle.className = 'prep-visual-title';
-            chTitle.textContent = chemName;
-            chWrap.appendChild(chTitle);
-          }
-
+        var SD = window.SmilesDrawer || window.smilesDrawer;
+        if (SD) {
           var chSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           chSvg.setAttribute('width', '340');
           chSvg.setAttribute('height', '220');
           chSvg.className = 'prep-chem-svg';
           chWrap.appendChild(chSvg);
-
-          var chLabel = document.createElement('div');
-          chLabel.className = 'prep-chem-formula';
-          chLabel.innerHTML = 'SMILES: <code>' + escapeHtml(smilesStr) + '</code>';
-          chWrap.appendChild(chLabel);
-
-          chPre.parentNode.replaceChild(chWrap, chPre);
 
           (function(ss, svg) {
             try {
@@ -729,9 +791,16 @@
             } catch(de) { svg.style.display = 'none'; }
           })(smilesStr, chSvg);
         }
-      } catch(chE) {
-        window.console && console.warn('[Prep Renderer] SmilesDrawer error:', chE);
+
+        var chLabel = document.createElement('div');
+        chLabel.className = 'prep-chem-formula';
+        chLabel.innerHTML = 'Molecular Structure (SMILES): <code>' + escapeHtml(smilesStr) + '</code>';
+        chWrap.appendChild(chLabel);
+
+        chPre.parentNode.replaceChild(chWrap, chPre);
       }
+    } catch(chE) {
+      window.console && console.warn('[Prep Renderer] Chemical structure error:', chE);
     }
   }
 
