@@ -65,18 +65,18 @@
   <!-- Markdown Renderer -->
   <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 
-  <!-- Unified Prep Markdown & KaTeX Engine -->
-  <script src="{% static 'js/prep-renderer.js' %}?v=20261116_v12_mobile_visual_perfection"></script>
-
   <!-- Prism.js for R Code Syntax Highlighting -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-r.min.js"></script>
 
-  <!-- Academic Visual Libraries: Mermaid (Mindmaps/Flowcharts), Chart.js (Data/Math Graphs), SmilesDrawer (Chemistry) -->
+  <!-- Academic Visual Libraries must load BEFORE prep-renderer.js -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
+
+  <!-- Unified Prep Markdown & KaTeX Engine (MUST come after Mermaid, Chart.js, SmilesDrawer) -->
+  <script src="{% static 'js/prep-renderer.js' %}?v=20261116_v13_fix_load_order"></script>
 
   <script>
     if (localStorage.getItem('theme') === 'dark') {
