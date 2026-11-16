@@ -493,6 +493,7 @@
 
           var cleanMermaid = sanitizeMermaidCode(rawMermaid);
           var uId = 'mm_' + Math.random().toString(36).slice(2, 9) + '_' + (Date.now() % 100000);
+          var renderId = 'mmsvg_' + uId;
 
           var wrap = document.createElement('div');
           wrap.className = 'prep-visual-wrap prep-mermaid-wrap';
@@ -500,7 +501,7 @@
           wrap.setAttribute('aria-label', 'Diagram');
 
           var inner = document.createElement('div');
-          inner.id = uId;
+          inner.className = 'prep-mermaid-inner';
           wrap.appendChild(inner);
           preEl.parentNode.replaceChild(wrap, preEl);
 
@@ -568,7 +569,7 @@
             } catch(e) {
               renderFallbackFlowDiagram(container, raw);
             }
-          })(uId, cleanMermaid, inner, rawMermaid);
+          })(renderId, cleanMermaid, inner, rawMermaid);
         }
       } catch(mErr) {
         window.console && console.warn('[Prep Renderer] Mermaid error:', mErr);
