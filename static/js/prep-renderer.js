@@ -538,8 +538,12 @@
           (function(uid, text, container, raw) {
             try {
               window.mermaid.render(uid, text).then(function(result) {
-                // If Mermaid returned an error SVG (e.g. bomb icon on syntax error), catch and fallback
-                if (result && result.svg && (result.svg.indexOf('error-icon') !== -1 || result.svg.indexOf('Syntax error') !== -1)) {
+                if (!result || !result.svg) {
+                  renderFallbackFlowDiagram(container, raw);
+                  return;
+                }
+                // Check if Mermaid generated an explicit error node (e.g. bomb icon element or error container)
+                if (result.svg.indexOf('class="error-icon"') !== -1 || result.svg.indexOf('aria-roledescription="error"') !== -1) {
                   var errEl = document.getElementById('d' + uid);
                   if (errEl && errEl.parentNode) errEl.parentNode.removeChild(errEl);
                   renderFallbackFlowDiagram(container, raw);
@@ -591,12 +595,14 @@
                   }
                 }
               }).catch(function(err) {
+                window.console && console.warn('[Prep Renderer] mermaid.render rejected:', err);
                 // Remove any error element mermaid may have injected
                 var errEl = document.getElementById('d' + uid);
                 if (errEl && errEl.parentNode) errEl.parentNode.removeChild(errEl);
                 renderFallbackFlowDiagram(container, raw);
               });
             } catch(e) {
+              window.console && console.warn('[Prep Renderer] mermaid.render threw synchronously:', e);
               renderFallbackFlowDiagram(container, raw);
             }
           })(renderId, cleanMermaid, inner, rawMermaid);
