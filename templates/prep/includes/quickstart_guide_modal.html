@@ -1,0 +1,356 @@
+{% load static %}
+<!-- Mentify Prep Quick Start Visual Tutorial Modal -->
+<style>
+  #prep-quickstart-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #prep-quickstart-overlay.open {
+    display: flex;
+  }
+  .prep-qs-dialog {
+    background: var(--surface, #ffffff);
+    color: var(--text, #0f172a);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 780px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+  .prep-qs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    background: var(--surface, #ffffff);
+  }
+  .prep-qs-title-wrap h3 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--text, #0f172a);
+  }
+  .prep-qs-title-wrap p {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted, #64748b);
+  }
+  .prep-qs-close {
+    background: var(--hover, #f1f5f9);
+    color: var(--text, #0f172a);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .prep-qs-close:hover {
+    opacity: 0.85;
+  }
+  .prep-qs-pills {
+    display: flex;
+    gap: 6px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    overflow-x: auto;
+    background: var(--bg, #f8fafc);
+    flex-shrink: 0;
+  }
+  .prep-qs-pill {
+    border: 1px solid var(--border, #e2e8f0);
+    background: var(--surface, #ffffff);
+    color: var(--text-muted, #64748b);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .prep-qs-pill:hover,
+  .prep-qs-pill.active {
+    background: var(--primary, #0f766e);
+    color: #ffffff;
+    border-color: var(--primary, #0f766e);
+  }
+  .prep-qs-body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 20px;
+    display: block;
+    scroll-behavior: smooth;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .prep-qs-card {
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 12px;
+    background: var(--bg, #f8fafc);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .prep-qs-card:last-child {
+    margin-bottom: 0;
+  }
+  .prep-qs-card-head {
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    background: var(--surface, #ffffff);
+  }
+  .prep-qs-step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--primary, #0f766e);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .prep-qs-card-head h4 {
+    margin: 0;
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--text, #0f172a);
+  }
+  .prep-qs-card-head p {
+    margin: 4px 0 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--text-muted, #475569);
+  }
+  .prep-qs-img-wrap {
+    padding: 10px;
+    background: var(--bg, #f8fafc);
+  }
+  .prep-qs-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e2e8f0);
+  }
+  .prep-qs-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+  .prep-qs-badge-red { background: #ef4444; }
+  .prep-qs-badge-green { background: #10b981; }
+  .prep-qs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border, #e2e8f0);
+    background: var(--surface, #ffffff);
+    flex-shrink: 0;
+  }
+  .prep-qs-footer-note {
+    font-size: 0.78rem;
+    color: var(--text-muted, #64748b);
+  }
+  .prep-qs-done-btn {
+    background: var(--primary, #0f766e);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .prep-qs-done-btn:hover {
+    opacity: 0.92;
+  }
+  @media (max-width: 640px) {
+    #prep-quickstart-overlay { padding: 8px; }
+    .prep-qs-header, .prep-qs-pills, .prep-qs-body, .prep-qs-footer { padding-left: 14px; padding-right: 14px; }
+  }
+</style>
+
+<div id="prep-quickstart-overlay" role="dialog" aria-modal="true" aria-labelledby="prep-qs-modal-title">
+  <div class="prep-qs-dialog">
+    <div class="prep-qs-header">
+      <div class="prep-qs-title-wrap">
+        <h3 id="prep-qs-modal-title">Welcome to Mentify Prep — Quick Start Guide</h3>
+        <p>Scroll through these 5 quick steps to find your notes, past papers, and AI tutors.</p>
+      </div>
+      <button type="button" class="prep-qs-close" onclick="closePrepQuickstart(true)" aria-label="Close guide">&times;</button>
+    </div>
+
+    <div class="prep-qs-pills" id="prep-qs-pills">
+      <button type="button" class="prep-qs-pill active" onclick="scrollPrepQsStep(1, this)">1. Open Course</button>
+      <button type="button" class="prep-qs-pill" onclick="scrollPrepQsStep(2, this)">2. Download Notes</button>
+      <button type="button" class="prep-qs-pill" onclick="scrollPrepQsStep(3, this)">3. Notes &amp; Past Papers</button>
+      <button type="button" class="prep-qs-pill" onclick="scrollPrepQsStep(4, this)">4. Topic AI Tutor</button>
+      <button type="button" class="prep-qs-pill" onclick="scrollPrepQsStep(5, this)">5. MentifyAI</button>
+    </div>
+
+    <div class="prep-qs-body" id="prep-qs-scroll-body">
+      <!-- Step 1 -->
+      <div class="prep-qs-card" id="prep-qs-step-1">
+        <div class="prep-qs-card-head">
+          <span class="prep-qs-step-num">1</span>
+          <div>
+            <h4>Open Your Course</h4>
+            <p>From your Dashboard, click any course card <span class="prep-qs-badge prep-qs-badge-red">1</span> under <strong>My Courses</strong> to open its syllabus, notes, and past papers.</p>
+          </div>
+        </div>
+        <div class="prep-qs-img-wrap">
+          <img src="{% static 'img/tutorials/step1_open_course.webp' %}" alt="Click a course card on the Dashboard to open it">
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="prep-qs-card" id="prep-qs-step-2">
+        <div class="prep-qs-card-head">
+          <span class="prep-qs-step-num">2</span>
+          <div>
+            <h4>Download Course Notes &amp; PDF Pack</h4>
+            <p>Click <strong>Download PDF Pack</strong> <span class="prep-qs-badge prep-qs-badge-red">1</span> to download all course PDFs as a ZIP, or select an individual lecture note / past paper <span class="prep-qs-badge prep-qs-badge-green">2</span> from the dropdown.</p>
+          </div>
+        </div>
+        <div class="prep-qs-img-wrap">
+          <img src="{% static 'img/tutorials/step2_download_notes.webp' %}" alt="Download PDF Pack or individual course PDFs" loading="lazy">
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="prep-qs-card" id="prep-qs-step-3">
+        <div class="prep-qs-card-head">
+          <span class="prep-qs-step-num">3</span>
+          <div>
+            <h4>Access Topic Notes &amp; Past Questions</h4>
+            <p>Inside any unit, click <strong>Topic Notes &amp; Explanations</strong> <span class="prep-qs-badge prep-qs-badge-red">1</span> to read structured notes, or switch to <strong>Authentic Past Questions</strong> <span class="prep-qs-badge prep-qs-badge-green">2</span> for real exam questions and worked solutions.</p>
+          </div>
+        </div>
+        <div class="prep-qs-img-wrap">
+          <img src="{% static 'img/tutorials/step3_notes_past_questions.webp' %}" alt="Switch between Topic Notes and Authentic Past Questions" loading="lazy">
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="prep-qs-card" id="prep-qs-step-4">
+        <div class="prep-qs-card-head">
+          <span class="prep-qs-step-num">4</span>
+          <div>
+            <h4>Ask the Topic AI Tutor</h4>
+            <p>Click <strong>Ask a Topic Tutor</strong> <span class="prep-qs-badge prep-qs-badge-red">1</span> whenever you get stuck on a concept in that unit. You can also highlight any sentence in the notes to ask the AI Tutor directly.</p>
+          </div>
+        </div>
+        <div class="prep-qs-img-wrap">
+          <img src="{% static 'img/tutorials/step4_ai_tutor.webp' %}" alt="Open Ask a Topic Tutor for topic-focused AI help" loading="lazy">
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="prep-qs-card" id="prep-qs-step-5">
+        <div class="prep-qs-card-head">
+          <span class="prep-qs-step-num">5</span>
+          <div>
+            <h4>Access MentifyAI (Snap &amp; Solve Any Question)</h4>
+            <p>Click <strong>MentifyAI</strong> <span class="prep-qs-badge prep-qs-badge-red">1</span> in the left menu anytime, then type a question or attach a photo of a homework problem <span class="prep-qs-badge prep-qs-badge-green">2</span> for step-by-step explanations.</p>
+          </div>
+        </div>
+        <div class="prep-qs-img-wrap">
+          <img src="{% static 'img/tutorials/step5_mentify_ai.webp' %}" alt="Open MentifyAI and type or attach an image question" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="prep-qs-footer">
+      <span class="prep-qs-footer-note">You can reopen this anytime via <strong>Quick Guide</strong> in the menu.</span>
+      <button type="button" class="prep-qs-done-btn" onclick="closePrepQuickstart(true)">Got it, let's study</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var QS_KEY = 'mentify_prep_quickstart_seen_v1';
+
+    window.openPrepQuickstart = function() {
+      var ov = document.getElementById('prep-quickstart-overlay');
+      if (!ov) return;
+      ov.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closePrepQuickstart = function(markSeen) {
+      var ov = document.getElementById('prep-quickstart-overlay');
+      if (ov) ov.classList.remove('open');
+      document.body.style.overflow = '';
+      if (markSeen) {
+        try { localStorage.setItem(QS_KEY, '1'); } catch (e) {}
+      }
+    };
+
+    window.scrollPrepQsStep = function(stepNum, btnEl) {
+      var target = document.getElementById('prep-qs-step-' + stepNum);
+      var container = document.getElementById('prep-qs-scroll-body');
+      if (target && container) {
+        container.scrollTo({
+          top: target.offsetTop - container.offsetTop - 8,
+          behavior: 'smooth'
+        });
+      }
+      var pills = document.querySelectorAll('#prep-qs-pills .prep-qs-pill');
+      for (var i = 0; i < pills.length; i++) pills[i].classList.remove('active');
+      if (btnEl) btnEl.classList.add('active');
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var ov = document.getElementById('prep-quickstart-overlay');
+      if (ov) {
+        ov.addEventListener('click', function(e) {
+          if (e.target === ov) window.closePrepQuickstart(true);
+        });
+      }
+      // Auto-open once for new users landing on the Mentify Prep dashboard
+      try {
+        var isDashboard = window.location.pathname === '/prep/' || window.location.pathname === '/prep';
+        if (isDashboard && !localStorage.getItem(QS_KEY)) {
+          setTimeout(window.openPrepQuickstart, 450);
+        }
+      } catch (e) {}
+    });
+  })();
+</script>
