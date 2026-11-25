@@ -1394,6 +1394,59 @@
    * Raw Markdown Source -> Marked AST -> KaTeX Tokens
    */
 
+  /**
+   * Ensure Markdown tables parse reliably in GFM (blank line before table,
+   * and unescaped pipes inside inline math replaced with \vert).
+   */
+  function normalizeMarkdownTables(markdown) {
+    if (!markdown) return '';
+    var lines = markdown.split('\n');
+    var sepRe = /^\s*\|?(?:\s*:?-{2,}:?\s*\|)+\s*:?-{2,}:?\s*\|?\s*$/;
+    var inFence = false;
+
+    function escapePipesInInlineMath(line) {
+      return line.replace(/(\$[^$\n]+?\$|\\\([^)\n]+?\\\))/g, function(m) {
+        return m.replace(/(?<!\\)\|/g, '\\vert ');
+      });
+    }
+
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      if (/^\s*```/.test(line)) {
+        inFence = !inFence;
+        out.push(line);
+        continue;
+      }
+      if (inFence) {
+        out.push(line);
+        continue;
+      }
+
+      // Check if this line is a table header followed by a GFM separator row
+      var nextLine = (i + 1 < lines.length) ? lines[i + 1] : '';
+      if (line.indexOf('|') !== -1 && sepRe.test(nextLine)) {
+        if (out.length > 0 && out[out.length - 1].trim() !== '' && !/^#{1,6}\s/.test(out[out.length - 1])) {
+          // Ensure blank line before table if preceded by prose or list item
+          out.push('');
+        }
+        out.push(escapePipesInInlineMath(line));
+        continue;
+      }
+
+      // If previous line was a separator or table body row and this line has pipes, escape math pipes
+      if (out.length > 0 && (sepRe.test(out[out.length - 1]) || (/^\s*\|/.test(out[out.length - 1]) && out[out.length - 1].indexOf('|') !== -1))) {
+        if (line.trim() !== '' && line.indexOf('|') !== -1) {
+          out.push(escapePipesInInlineMath(line));
+          continue;
+        }
+      }
+
+      out.push(line);
+    }
+    return out.join('\n');
+  }
+
   function renderMarkdownWithKaTeX(rawInput, containerElement) {
     if (!containerElement) return '';
     if (!rawInput) {
@@ -1518,6 +1571,7 @@
       }
     }
     cleanText = lines.join('\n');
+    cleanText = normalizeMarkdownTables(cleanText);
 
     var htmlOutput = '';
     if (window.marked && typeof window.marked.parse === 'function') {

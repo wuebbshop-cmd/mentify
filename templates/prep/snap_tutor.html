@@ -341,6 +341,52 @@
     user-select: none !important;
   }
 
+  .markdown-rendered .markdown-table-wrapper {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    margin: 14px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-sizing: border-box;
+  }
+
+  .markdown-rendered .markdown-table-wrapper table {
+    display: table !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+    font-size: 0.9rem;
+    border: none !important;
+  }
+
+  .markdown-rendered .markdown-table-wrapper th,
+  .markdown-rendered .markdown-table-wrapper td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: normal;
+    min-width: 90px;
+  }
+
+  .markdown-rendered .markdown-table-wrapper th {
+    background: rgba(15, 118, 110, 0.08);
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  body.dark-theme .markdown-rendered .markdown-table-wrapper th,
+  html.dark-theme body .markdown-rendered .markdown-table-wrapper th {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
   .topic-tutor-message.user {
     margin-left: auto;
     border-color: rgba(16, 185, 129, .25);
