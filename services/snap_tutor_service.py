@@ -192,8 +192,12 @@ def build_snap_tutor_prompt(
         f"{subject_guidance}\n\n"
         "FORMATTING, CONCEPTUAL & MULTI-TURN ACCURACY RULES:\n"
         "- You are MentifyAI, an intelligent, empathetic multi-level AI study assistant.\n"
-        "- MULTI-TURN CONTINUITY & PROACTIVE TUTORING:\n"
+        "- MULTI-TURN CONTINUITY & PERSISTENT WORKSHEET MEMORY:\n"
         "  * You have full conversational memory of recent conversation turns provided below.\n"
+        "  * Worksheets, exam problems, and images uploaded in earlier turns in this session remain available in `ATTACHED STUDY MATERIALS & QUESTION IMAGES`.\n"
+        "  * When a student refers back to an earlier uploaded question or worksheet (e.g., 'now solve question 2', 'what about part (b)?', 'find the value in the diagram', 'explain step 3'):\n"
+        "    NEVER claim the question or image didn't come through!\n"
+        "    Look at the visible text and diagram descriptions in `ATTACHED STUDY MATERIALS & QUESTION IMAGES`, locate the specific problem requested, and solve it directly and completely!\n"
         "  * If you previously asked the student a question or offered to provide a past-paper calculation / example problem "
         "(e.g., 'Would you like me to work through a past-paper style calculation?'), and the student confirms (e.g., 'yes', 'sure', 'do it', 'show me'):\n"
         "    NEVER claim that the question or numbers didn't come through!\n"
@@ -365,11 +369,23 @@ def execute_snap_tutor_turn(
     uploaded_files: list[Any],
 ) -> dict[str, Any]:
     """Execute a complete learner interaction turn with vision OCR, reasoning, credit deduction, and DB save."""
-    # 1. Fetch previous session history for multi-turn conversational continuity
-    recent_msg_records = list(session.messages.order_by("created_at")[:10])
+    # 1. Fetch previous session history for multi-turn conversational continuity (most recent messages in chronological order)
+    recent_msg_records = list(session.messages.order_by("-created_at")[:12])[::-1]
     conversation_history = [
         {"role": m.role, "content": m.content}
         for m in recent_msg_records
+    ]
+
+    # Preload existing session uploads in case the learner is asking a follow-up about a previously attached image
+    session_prev_uploads = list(session.uploads.order_by("-created_at")[:3]) if session else []
+    cached_session_materials = [
+        {
+            "name": pu.original_name,
+            "content_type": pu.content_type,
+            "text": pu.extracted_text,
+            "visual_description": pu.visual_description,
+        }
+        for pu in reversed(session_prev_uploads)
     ]
 
     # 2. Credit estimation and reservation
@@ -397,7 +413,7 @@ def execute_snap_tutor_turn(
             education_level=session.education_level,
             subject=session.subject,
             user_message=user_message,
-            extracted_materials=[],
+            extracted_materials=cached_session_materials,
             conversation_history=conversation_history,
         )
         chat_reserve, chat_reserve_quote = estimate_chat_reservation(
@@ -471,11 +487,14 @@ def execute_snap_tutor_turn(
         release_credit_reservation(reservation, amount=ocr_reserve, reason="No valid images to OCR")
 
     # 4. Build the context-calibrated prompt with history & extracted images
+    # If no new images were attached on this turn, persist previously uploaded images from this session
+    effective_materials = extracted_uploads if extracted_uploads else cached_session_materials
+
     system_prompt, user_prompt = build_snap_tutor_prompt(
         education_level=session.education_level,
         subject=session.subject,
         user_message=user_message,
-        extracted_materials=extracted_uploads,
+        extracted_materials=effective_materials,
         conversation_history=conversation_history,
     )
 

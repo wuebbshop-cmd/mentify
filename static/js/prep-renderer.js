@@ -769,7 +769,7 @@
       for (var chi = 0; chi < chemBlocks.length; chi++) {
         var chEl = chemBlocks[chi];
         var chPre = chEl.closest('pre');
-        if (!chPre || chPre.dataset.renderedVisual) continue;
+        if (!chPre || chPre.dataset.renderedVisual || !chPre.parentNode) continue;
 
         var rawChem = chEl.textContent.trim();
         if (!rawChem.includes('"smiles"') && !rawChem.includes('"structure"') &&
@@ -780,65 +780,101 @@
 
         var chemName = '';
         var smilesStr = '';
-        if (rawChem.startsWith('{')) {
-          try {
-            var chemObj = JSON.parse(rawChem);
-            chemName = chemObj.name || chemObj.title || '';
-            smilesStr = chemObj.smiles || chemObj.structure || '';
-          } catch(e) {
-            var sm = rawChem.match(/"smiles"\s*:\s*"([^"]+)"/i);
-            if (sm) smilesStr = sm[1];
-            var nm2 = rawChem.match(/"name"\s*:\s*"([^"]+)"/i);
-            if (nm2) chemName = nm2[1];
-          }
-        } else if (/^smiles:\s*/i.test(rawChem)) {
-          smilesStr = rawChem.replace(/^smiles:\s*/i, '').trim();
-        } else {
-          smilesStr = rawChem;
-        }
-        if (!smilesStr) continue;
-
-        chPre.dataset.renderedVisual = 'true';
-        var chWrap = document.createElement('div');
-        chWrap.className = 'prep-visual-wrap prep-chem-wrap';
-
-        if (chemName) {
-          var chTitle = document.createElement('div');
-          chTitle.className = 'prep-visual-title';
-          chTitle.textContent = chemName;
-          chWrap.appendChild(chTitle);
-        }
-
-        var SD = window.SmilesDrawer || window.smilesDrawer;
-        if (SD) {
-          var chSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-          chSvg.setAttribute('width', '340');
-          chSvg.setAttribute('height', '220');
-          chSvg.setAttribute('class', 'prep-chem-svg');
-          chWrap.appendChild(chSvg);
-
-          (function(ss, svg) {
+        try {
+          if (rawChem.startsWith('{')) {
             try {
-              var DrawerClass = SD.SvgDrawer || SD.Drawer;
-              var dr = new DrawerClass({ width: 340, height: 220, bondThickness: 1.6, padding: 14 });
-              SD.parse(ss,
-                function(tree) { dr.draw(tree, svg, isDark ? 'dark' : 'light'); },
-                function(err) { svg.style.display = 'none'; }
-              );
-            } catch(de) { svg.style.display = 'none'; }
-          })(smilesStr, chSvg);
+              var chemObj = JSON.parse(rawChem);
+              chemName = chemObj.name || chemObj.title || '';
+              smilesStr = chemObj.smiles || chemObj.structure || '';
+            } catch(e) {
+              var sm = rawChem.match(/"smiles"\s*:\s*"([^"]+)"/i);
+              if (sm) smilesStr = sm[1];
+              var nm2 = rawChem.match(/"name"\s*:\s*"([^"]+)"/i);
+              if (nm2) chemName = nm2[1];
+            }
+          } else if (/^smiles:\s*/i.test(rawChem)) {
+            smilesStr = rawChem.replace(/^smiles:\s*/i, '').trim();
+          } else {
+            smilesStr = rawChem;
+          }
+          if (!smilesStr) continue;
+
+          var chWrap = buildChemCard(chemName, smilesStr, isDark);
+          chPre.dataset.renderedVisual = 'true';
+          chPre.parentNode.replaceChild(chWrap, chPre);
+        } catch (blockErr) {
+          // A failure in one molecule must never leave the raw JSON block visible
+          // (or stop the remaining blocks from rendering).
+          window.console && console.warn('[Prep Renderer] Chemical block fallback:', blockErr);
+          try {
+            var fbWrap = document.createElement('div');
+            fbWrap.className = 'prep-visual-wrap prep-chem-wrap';
+            var fbTitle = document.createElement('div');
+            fbTitle.className = 'prep-visual-title';
+            fbTitle.textContent = chemName || 'Chemical structure';
+            fbWrap.appendChild(fbTitle);
+            if (smilesStr) {
+              var fbFormula = document.createElement('div');
+              fbFormula.className = 'prep-chem-formula';
+              fbFormula.innerHTML = 'SMILES: <code>' + escapeHtml(smilesStr) + '</code>';
+              fbWrap.appendChild(fbFormula);
+            }
+            chPre.dataset.renderedVisual = 'true';
+            chPre.parentNode.replaceChild(fbWrap, chPre);
+          } catch (fbErr) { /* leave the code block as-is rather than break the page */ }
         }
-
-        var chLabel = document.createElement('div');
-        chLabel.className = 'prep-chem-formula';
-        chLabel.innerHTML = 'Molecular Structure (SMILES): <code>' + escapeHtml(smilesStr) + '</code>';
-        chWrap.appendChild(chLabel);
-
-        chPre.parentNode.replaceChild(chWrap, chPre);
       }
     } catch(chE) {
       window.console && console.warn('[Prep Renderer] Chemical structure error:', chE);
     }
+  }
+
+  /**
+   * Build the molecule card (title + SmilesDrawer SVG + SMILES caption).
+   * Throws only if the card itself cannot be constructed; callers fall back to a text card.
+   */
+  function buildChemCard(chemName, smilesStr, isDark) {
+    var wrap = document.createElement('div');
+    wrap.className = 'prep-visual-wrap prep-chem-wrap';
+
+    if (chemName) {
+      var title = document.createElement('div');
+      title.className = 'prep-visual-title';
+      title.textContent = chemName;
+      wrap.appendChild(title);
+    }
+
+    var SD = window.SmilesDrawer || window.smilesDrawer;
+    if (SD && typeof SD.parse === 'function') {
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '340');
+      svg.setAttribute('height', '220');
+      svg.setAttribute('class', 'prep-chem-svg');
+      wrap.appendChild(svg);
+
+      (function(ss, svgEl) {
+        try {
+          var DrawerClass = SD.SvgDrawer || SD.Drawer;
+          if (typeof DrawerClass !== 'function') throw new Error('SmilesDrawer draw class unavailable');
+          var dr = new DrawerClass({ width: 340, height: 220, bondThickness: 1.6, padding: 14 });
+          SD.parse(ss,
+            function(tree) {
+              try { dr.draw(tree, svgEl, isDark ? 'dark' : 'light'); }
+              catch (drawErr) { if (svgEl.parentNode) svgEl.parentNode.removeChild(svgEl); }
+            },
+            function() { if (svgEl.parentNode) svgEl.parentNode.removeChild(svgEl); }
+          );
+        } catch (de) {
+          if (svgEl.parentNode) svgEl.parentNode.removeChild(svgEl);
+        }
+      })(smilesStr, svg);
+    }
+
+    var label = document.createElement('div');
+    label.className = 'prep-chem-formula';
+    label.innerHTML = 'Molecular Structure (SMILES): <code>' + escapeHtml(smilesStr) + '</code>';
+    wrap.appendChild(label);
+    return wrap;
   }
 
 
@@ -847,6 +883,48 @@
     if (reportedMathWarnings[code] || !window.console || typeof window.console.warn !== 'function') return;
     reportedMathWarnings[code] = true;
     window.console.warn('[Prep renderer][' + code + '] ' + message);
+  }
+
+  /**
+   * Repair model-mangled Markdown structure without touching code, math or normal prose.
+   * Typical failure: the model glues a heading onto a bold run and never closes the bold,
+   * e.g. "...compass width **fixed## 10. Completing the Golden Rules (continued)".
+   * Marked then prints the literal "**" and "##" instead of bolding text / starting a heading.
+   */
+  function normalizeMarkdownHeadingsAndFormatting(markdown) {
+    if (!markdown) return '';
+    var protectedBlocks = /(```[\s\S]*?```|`[^`\n]*`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^$\n]+?\$)/g;
+    var segments = markdown.split(protectedBlocks);
+
+    for (var i = 0; i < segments.length; i += 2) {
+      if (!segments[i]) continue;
+      var seg = segments[i];
+
+      // 1. A heading the model wrapped in bold: "**## 7. Title**" -> "## 7. Title".
+      seg = seg.replace(/\*\*[ \t]*(#{1,6}[ \t]+[^\n*]{1,160}?)[ \t]*\*\*/g, '$1');
+
+      // 2. Split a heading glued to the preceding prose or bold ("text## 10. Title",
+      //    "text ## 10. Title"). Close an unclosed bold run on that line before the break.
+      seg = seg.replace(/([^\s#])([ \t]*)(#{1,6}[ \t]+[^\n]+)/g, function (match, prevChar, gap, heading, offset, src) {
+        var lineStart = src.lastIndexOf('\n', offset) + 1;
+        var linePrefix = src.slice(lineStart, offset) + prevChar;
+        var openBold = ((linePrefix.match(/\*\*/g) || []).length % 2) === 1;
+        // Headings never need inline bold markers; drop any the model left inside one.
+        heading = heading.replace(/\*\*/g, '').replace(/[ \t]+$/, '');
+        return prevChar + (openBold ? '**' : '') + '\n\n' + heading;
+      });
+
+      // 3. A bold run left open on the line immediately above a heading line.
+      seg = seg.replace(/([^\n]*)\n(?=#{1,6}[ \t]+\S)/g, function (line) {
+        var openBold = ((line.match(/\*\*/g) || []).length % 2) === 1;
+        return (openBold ? line + '**' : line) + '\n';
+      });
+
+      // 4. Collapse the extra blank lines these repairs can introduce.
+      seg = seg.replace(/\n{3,}/g, '\n\n');
+      segments[i] = seg;
+    }
+    return segments.join('');
   }
 
   function normalizeInlineMathBoundaries(markdown) {
@@ -1283,6 +1361,7 @@
     cleanText = normalizeLegacyMathBlocks(cleanText);
     warnOnMathReviewTokens(cleanText);
     cleanText = normalizeInlineMathBoundaries(cleanText);
+    cleanText = normalizeMarkdownHeadingsAndFormatting(cleanText);
 
     // Normalize doubly-escaped LaTeX commands (e.g. \\mathbb -> \mathbb, \\frac -> \frac, \\setminus -> \setminus)
     cleanText = cleanText.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
