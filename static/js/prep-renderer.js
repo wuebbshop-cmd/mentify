@@ -814,7 +814,7 @@
           var chSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           chSvg.setAttribute('width', '340');
           chSvg.setAttribute('height', '220');
-          chSvg.className = 'prep-chem-svg';
+          chSvg.setAttribute('class', 'prep-chem-svg');
           chWrap.appendChild(chSvg);
 
           (function(ss, svg) {
@@ -822,7 +822,7 @@
               var DrawerClass = SD.SvgDrawer || SD.Drawer;
               var dr = new DrawerClass({ width: 340, height: 220, bondThickness: 1.6, padding: 14 });
               SD.parse(ss,
-                function(tree) { dr.draw(tree, svg, isDark ? 'dark' : 'light', false); },
+                function(tree) { dr.draw(tree, svg, isDark ? 'dark' : 'light'); },
                 function(err) { svg.style.display = 'none'; }
               );
             } catch(de) { svg.style.display = 'none'; }
