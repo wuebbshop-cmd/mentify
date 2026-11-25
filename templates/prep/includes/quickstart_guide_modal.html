@@ -157,6 +157,35 @@
     display: block;
     border-radius: 8px;
     border: 1px solid var(--border, #e2e8f0);
+    cursor: zoom-in;
+  }
+  .prep-qs-zoom-hint {
+    display: none;
+    text-align: right;
+    font-size: 0.72rem;
+    color: var(--text-muted, #64748b);
+    margin-top: 5px;
+  }
+  #prep-qs-zoom-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 12100;
+    background: rgba(2, 6, 23, 0.9);
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    cursor: zoom-out;
+  }
+  #prep-qs-zoom-overlay.open {
+    display: flex;
+  }
+  #prep-qs-zoom-overlay img {
+    max-width: 100%;
+    max-height: 92dvh;
+    border-radius: 10px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
   }
   .prep-qs-badge {
     display: inline-flex;
@@ -202,7 +231,48 @@
   }
   @media (max-width: 640px) {
     #prep-quickstart-overlay { padding: 8px; }
-    .prep-qs-header, .prep-qs-pills, .prep-qs-body, .prep-qs-footer { padding-left: 14px; padding-right: 14px; }
+    .prep-qs-dialog {
+      max-height: 92dvh;
+      border-radius: 14px;
+    }
+    .prep-qs-header {
+      padding: 12px 14px;
+    }
+    .prep-qs-title-wrap h3 { font-size: 0.98rem; }
+    .prep-qs-title-wrap p { font-size: 0.76rem; }
+    .prep-qs-pills {
+      padding: 8px 14px;
+      scrollbar-width: none;
+    }
+    .prep-qs-pills::-webkit-scrollbar { display: none; }
+    .prep-qs-pill {
+      padding: 7px 12px;
+      min-height: 34px;
+    }
+    .prep-qs-body {
+      padding: 12px 14px;
+    }
+    .prep-qs-card { margin-bottom: 14px; }
+    .prep-qs-card-head { padding: 10px 12px; }
+    .prep-qs-card-head h4 { font-size: 0.9rem; }
+    .prep-qs-card-head p { font-size: 0.8rem; }
+    .prep-qs-img-wrap { padding: 8px; }
+    .prep-qs-zoom-hint { display: block; }
+    .prep-qs-footer {
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .prep-qs-footer-note {
+      text-align: center;
+      font-size: 0.74rem;
+    }
+    .prep-qs-done-btn {
+      width: 100%;
+      min-height: 44px;
+      font-size: 0.9rem;
+    }
   }
 </style>
 
@@ -303,9 +373,14 @@
   </div>
 </div>
 
+<div id="prep-qs-zoom-overlay" onclick="this.classList.remove('open')" role="dialog" aria-modal="true" aria-label="Zoomed tutorial image">
+  <img id="prep-qs-zoom-img" src="" alt="Zoomed tutorial screenshot">
+</div>
+
 <script>
   (function() {
     var QS_KEY = 'mentify_prep_quickstart_seen_v1';
+    var IS_AUTH = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
 
     window.openPrepQuickstart = function() {
       var ov = document.getElementById('prep-quickstart-overlay');
@@ -317,6 +392,8 @@
     window.closePrepQuickstart = function(markSeen) {
       var ov = document.getElementById('prep-quickstart-overlay');
       if (ov) ov.classList.remove('open');
+      var zov = document.getElementById('prep-qs-zoom-overlay');
+      if (zov) zov.classList.remove('open');
       document.body.style.overflow = '';
       if (markSeen) {
         try { localStorage.setItem(QS_KEY, '1'); } catch (e) {}
@@ -344,10 +421,33 @@
           if (e.target === ov) window.closePrepQuickstart(true);
         });
       }
-      // Auto-open once for new users landing on the Mentify Prep dashboard
+
+      // Tap any tutorial screenshot to zoom in (especially helpful on mobile)
+      var imgs = document.querySelectorAll('#prep-qs-scroll-body .prep-qs-img-wrap img');
+      var zoomOv = document.getElementById('prep-qs-zoom-overlay');
+      var zoomImg = document.getElementById('prep-qs-zoom-img');
+      for (var j = 0; j < imgs.length; j++) {
+        (function(imgEl) {
+          var wrap = imgEl.parentElement;
+          if (wrap && !wrap.querySelector('.prep-qs-zoom-hint')) {
+            var hint = document.createElement('div');
+            hint.className = 'prep-qs-zoom-hint';
+            hint.textContent = 'Tap image to zoom';
+            wrap.appendChild(hint);
+          }
+          imgEl.addEventListener('click', function() {
+            if (zoomOv && zoomImg) {
+              zoomImg.src = imgEl.src;
+              zoomImg.alt = imgEl.alt || 'Tutorial screenshot';
+              zoomOv.classList.add('open');
+            }
+          });
+        })(imgs[j]);
+      }
+
+      // Auto-open once for ALL authenticated users (new & existing) on next visit to any Mentify Prep page
       try {
-        var isDashboard = window.location.pathname === '/prep/' || window.location.pathname === '/prep';
-        if (isDashboard && !localStorage.getItem(QS_KEY)) {
+        if (IS_AUTH && !localStorage.getItem(QS_KEY)) {
           setTimeout(window.openPrepQuickstart, 450);
         }
       } catch (e) {}
