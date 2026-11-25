@@ -856,11 +856,62 @@
         try {
           var DrawerClass = SD.SvgDrawer || SD.Drawer;
           if (typeof DrawerClass !== 'function') throw new Error('SmilesDrawer draw class unavailable');
-          var dr = new DrawerClass({ width: 340, height: 220, bondThickness: 1.6, padding: 14 });
+          var dr = new DrawerClass({
+            width: 340,
+            height: 220,
+            bondThickness: 1.8,
+            bondLength: 48,
+            padding: 16,
+            terminalCarbons: true
+          });
           SD.parse(ss,
             function(tree) {
-              try { dr.draw(tree, svgEl, isDark ? 'dark' : 'light'); }
-              catch (drawErr) { if (svgEl.parentNode) svgEl.parentNode.removeChild(svgEl); }
+              try {
+                dr.draw(tree, svgEl, isDark ? 'dark' : 'light');
+                // Chromium/Skia culls <g mask="..."> and <line stroke="url(#...)"> when a
+                // molecule is strictly horizontal/vertical (near-zero bbox height/width, e.g. Br-Br).
+                var lines = svgEl.querySelectorAll('line');
+                for (var li = 0; li < lines.length; li++) {
+                  var ln = lines[li];
+                  var x1 = parseFloat(ln.getAttribute('x1') || '0');
+                  var y1 = parseFloat(ln.getAttribute('y1') || '0');
+                  var x2 = parseFloat(ln.getAttribute('x2') || '0');
+                  var y2 = parseFloat(ln.getAttribute('y2') || '0');
+                  var dx = Math.abs(x2 - x1);
+                  var dy = Math.abs(y2 - y1);
+
+                  var st = ln.getAttribute('stroke') || '';
+                  var m = st.match(/url\(['"]?#([^'")]+)['"]?\)/);
+                  if (m) {
+                    var grad = svgEl.getElementById ? svgEl.getElementById(m[1]) : svgEl.querySelector('#' + m[1]);
+                    if (grad) {
+                      var stops = grad.querySelectorAll('stop');
+                      var c1 = stops[0] ? stops[0].getAttribute('stop-color') : '';
+                      var c2 = stops[1] ? stops[1].getAttribute('stop-color') : c1;
+                      if ((c1 && c1 === c2) || dx < 0.5 || dy < 0.5) {
+                        ln.setAttribute('stroke', c1 || (isDark ? '#e2e8f0' : '#1e293b'));
+                      }
+                    }
+                  }
+
+                  var parentG = ln.parentNode;
+                  if (parentG && parentG.tagName && parentG.tagName.toLowerCase() === 'g' &&
+                      parentG.hasAttribute('mask') && parentG.querySelectorAll('line').length === 1) {
+                    if (dx < 1 || dy < 1) {
+                      parentG.removeAttribute('mask');
+                      var len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+                      if (len > 28) {
+                        var ux = (x2 - x1) / len;
+                        var uy = (y2 - y1) / len;
+                        ln.setAttribute('x1', (x1 + ux * 13).toFixed(2));
+                        ln.setAttribute('y1', (y1 + uy * 13).toFixed(2));
+                        ln.setAttribute('x2', (x2 - ux * 13).toFixed(2));
+                        ln.setAttribute('y2', (y2 - uy * 13).toFixed(2));
+                      }
+                    }
+                  }
+                }
+              } catch (drawErr) { if (svgEl.parentNode) svgEl.parentNode.removeChild(svgEl); }
             },
             function() { if (svgEl.parentNode) svgEl.parentNode.removeChild(svgEl); }
           );
