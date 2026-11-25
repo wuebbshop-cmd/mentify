@@ -399,6 +399,8 @@ def execute_snap_tutor_turn(
     valid_files_count = min(len(uploaded_files or []), MAX_IMAGE_COUNT)
     ocr_per_page = max(1, int(getattr(settings, "PREP_OCR_CREDITS_PER_IMAGE_PAGE", MIN_OCR_CREDITS)))
 
+    CHAT_MAX_OUTPUT_TOKENS = 4500
+
     if user and user.is_authenticated:
         wallet = PrepWallet.get_or_create_wallet(user)
         has_sub = has_active_subscription(wallet)
@@ -406,7 +408,6 @@ def execute_snap_tutor_turn(
         ocr_covered_by_plan = bool(has_sub and (scanned_allowance is None or scanned_allowance >= valid_files_count))
         ocr_reserve = 0 if ocr_covered_by_plan else (ocr_per_page * valid_files_count)
 
-        CHAT_MAX_OUTPUT_TOKENS = 3000
         chat_model = str(getattr(settings, "DEEPSEEK_CHAT_MODEL", "deepseek-chat"))
         # Quick provisional prompt for chat reservation
         provisional_system, provisional_user = build_snap_tutor_prompt(
@@ -507,6 +508,8 @@ def execute_snap_tutor_turn(
             system_prompt=system_prompt,
             is_complex_proof=(session.education_level == "tertiary"),
             thinking_enabled=False,
+            auto_continue=True,
+            max_tokens_override=CHAT_MAX_OUTPUT_TOKENS,
         )
     except Exception as exc:
         if reservation:

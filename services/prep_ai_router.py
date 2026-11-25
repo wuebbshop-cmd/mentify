@@ -3818,48 +3818,53 @@ def call_deepseek(
             usage = data.get("usage", {})
 
             # Auto-continue if generation was truncated due to token length limit
-            if auto_continue and finish_reason == "length" and model != "deepseek-reasoner":
-                logger.info(f"[DeepSeek] Model output reached token limit ({max_tokens}). Automatically requesting continuation...")
-                if content:
-                    cont_messages = list(messages) + [
-                        {"role": "assistant", "content": content},
-                        {"role": "user", "content": "Continue directly from where you stopped. Do not repeat any preceding text, and complete all remaining sections thoroughly."},
-                    ]
-                else:
-                    # Model exhausted tokens entirely in reasoning_content before outputting assistant content
-                    logger.warning("[DeepSeek] Reasoning exhausted token budget before assistant content. Requesting immediate final answer...")
-                    cont_messages = list(messages) + [
-                        {"role": "user", "content": "Please immediately provide the final answer content now without further hidden thought tokens."},
-                    ]
+            cont_model = (
+                (_normalise_deepseek_model(getattr(settings, "DEEPSEEK_CHAT_MODEL", "")) or "deepseek-chat")
+                if model == "deepseek-reasoner"
+                else model
+            )
+            for _cont_attempt in range(2):
+                if not (auto_continue and finish_reason == "length" and content):
+                    break
+                logger.info(
+                    f"[DeepSeek] Model output reached token limit ({max_tokens}). "
+                    f"Automatically requesting continuation ({_cont_attempt + 1}/2) via {cont_model}..."
+                )
+                cont_messages = list(messages) + [
+                    {"role": "assistant", "content": content},
+                    {"role": "user", "content": "Continue directly from where you stopped. Do not repeat any preceding text, and complete all remaining sections thoroughly."},
+                ]
                 cont_payload = {
-                    "model": model,
+                    "model": cont_model,
                     "messages": cont_messages,
                     "max_tokens": max_tokens,
                     "temperature": temperature,
                 }
                 try:
                     cont_resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=cont_payload, timeout=90)
-                    if cont_resp.status_code == 200:
-                        cont_data = cont_resp.json()
-                        cont_choice = cont_data["choices"][0]
-                        cont_content = cont_choice["message"].get("content", "").strip()
-                        usage = _merge_usage(usage, cont_data.get("usage", {}))
-                        if not content:
-                            content = cont_content
-                        else:
-                            # Stitch continuation seamlessly:
-                            c_lines = content.split("\n")
-                            last_l = c_lines[-1].strip()
-                            first_cont_l = cont_content.split("\n")[0].strip() if cont_content else ""
-                            if len(last_l) >= 8 and first_cont_l.startswith(last_l[:min(len(last_l), 25)]):
-                                content = "\n".join(c_lines[:-1]).rstrip() + "\n\n" + cont_content
-                            elif not content.endswith(("\n", " ", ".", ":", "$", "`")):
-                                # Mid-token cutoff (e.g. 'a_{2' -> ',2}')
-                                content = content + cont_content
-                            else:
-                                content = content + "\n\n" + cont_content
+                    if cont_resp.status_code != 200:
+                        break
+                    cont_data = cont_resp.json()
+                    cont_choice = cont_data["choices"][0]
+                    finish_reason = cont_choice.get("finish_reason", "stop")
+                    cont_content = cont_choice["message"].get("content", "").strip()
+                    usage = _merge_usage(usage, cont_data.get("usage", {}))
+                    if not cont_content:
+                        break
+                    # Stitch continuation seamlessly:
+                    c_lines = content.split("\n")
+                    last_l = c_lines[-1].strip()
+                    first_cont_l = cont_content.split("\n")[0].strip()
+                    if len(last_l) >= 8 and first_cont_l.startswith(last_l[:min(len(last_l), 25)]):
+                        content = "\n".join(c_lines[:-1]).rstrip() + "\n\n" + cont_content
+                    elif not content.endswith(("\n", " ", ".", ":", "$", "`")):
+                        # Mid-token cutoff (e.g. 'a_{2' -> ',2}')
+                        content = content + cont_content
+                    else:
+                        content = content + "\n\n" + cont_content
                 except Exception as cont_err:
                     logger.warning(f"[DeepSeek] Auto-continuation failed: {cont_err}")
+                    break
 
             if not content and finish_reason == "length":
                 # A reasoning model can spend the entire budget on hidden thoughts and

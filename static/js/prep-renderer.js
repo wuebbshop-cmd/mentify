@@ -457,16 +457,28 @@
 
       if (/^\s*(mindmap|graph\s+(TD|TB|BT|RL|LR)|flowchart\s+(TD|TB|BT|RL|LR)|sequenceDiagram|classDiagram|stateDiagram|erDiagram)\b/i.test(txt)) {
         el.classList.add('language-mermaid');
-      } else if (!el.classList.contains('language-json') && txt.startsWith('{') && txt.includes('"smiles"')) {
+      } else if (txt.startsWith('{') && txt.includes('"smiles"')) {
+        // Catch smiles JSON whether tagged as json, chemical, or untagged
+        el.classList.remove('language-json');
         el.classList.add('language-chemical');
       } else if (/^\s*<svg[\s\S]*<\/svg>\s*$/i.test(txt)) {
         el.classList.add('language-svg');
       } else if (txt.startsWith('{') && (txt.includes('"datasets"') || txt.includes('"type"')) &&
                  (txt.includes('"line"') || txt.includes('"scatter"') || txt.includes('"bar"') || txt.includes('"pie"') || txt.includes('"datasets"'))) {
         el.classList.add('language-chart');
-      } else if (el.classList.contains('language-json') && txt.includes('"smiles"')) {
-        el.classList.remove('language-json');
-        el.classList.add('language-chemical');
+      }
+    }
+
+    // ─── Secondary pass: reclassify any language-json blocks with smiles that
+    //     highlight.js tagged AFTER the first pass set data-detected ───
+    var jsonSmiles = containerElement.querySelectorAll('pre code.language-json');
+    for (var jsi = 0; jsi < jsonSmiles.length; jsi++) {
+      var jel = jsonSmiles[jsi];
+      var jtxt = jel.textContent.trim();
+      if (jtxt.includes('"smiles"')) {
+        jel.classList.remove('language-json');
+        jel.classList.add('language-chemical');
+        jel.removeAttribute('data-detected'); // allow chem renderer to process it
       }
     }
 
